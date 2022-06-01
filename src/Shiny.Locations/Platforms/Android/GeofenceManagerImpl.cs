@@ -69,9 +69,16 @@ namespace Shiny.Locations
                     }
                 }
             };
-            var regions = await this.Repository.GetAll();
-            foreach (var region in regions)
-                await this.Create(region);
+            try
+            {
+                var regions = await this.Repository.GetAll();
+                foreach (var region in regions)
+                    await this.Create(region);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Failed to restart geofencing");
+            }
         }
 
 
@@ -166,7 +173,7 @@ namespace Shiny.Locations
         }
 
 
-        protected virtual PendingIntent GetPendingIntent() 
+        protected virtual PendingIntent GetPendingIntent()
             => this.geofencePendingIntent ??= this.context.GetBroadcastPendingIntent<GeofenceBroadcastReceiver>(IntentAction, PendingIntentFlags.UpdateCurrent);
     }
 }
