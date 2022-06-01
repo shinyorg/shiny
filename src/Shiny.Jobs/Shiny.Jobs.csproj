@@ -12,6 +12,6 @@
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <PackageReference Include="Xamarin.Build.Download" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />
-        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
+        <!--<PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />-->
     </ItemGroup>
 </Project>
