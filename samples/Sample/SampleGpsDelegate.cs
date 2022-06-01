@@ -1,9 +1,9 @@
-﻿using Shiny.Locations;
+﻿//using Shiny.Locations;
 
-namespace Sample;
+//namespace Sample;
 
 
-public class SampleGpsDelegate : IGpsDelegate
-{
-    public Task OnReading(GpsReading reading) => Task.CompletedTask;
-}
+//public class SampleGpsDelegate : IGpsDelegate
+//{
+//    public Task OnReading(GpsReading reading) => Task.CompletedTask;
+//}

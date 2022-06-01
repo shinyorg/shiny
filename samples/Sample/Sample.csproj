@@ -38,15 +38,17 @@
 
     <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
         <PackageReference Include="Xamarin.Build.Download" Version="0.11.2" PrivateAssets="All" />
-        <PackageReference Include="Xamarin.Google.Guava" Version="31.1.0.2" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="118.0.1" />
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.5" />
         <!--
+        <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.5" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.7.0.2" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Base" Version="118.0.1" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="118.0.1" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="118.0.1" />
+        <PackageReference Include="Xamarin.Google.Guava" Version="31.1.0.2" />
         <PackageReference Include="Xamarin.AndroidX.Arch.Core.Common" Version="2.1.0.14" />
         <PackageReference Include="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.1.0.14" />
         <PackageReference Include="Xamarin.Google.Guava.ListenableFuture" Version="1.0.0.8" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="118.0.1" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.4.1.1" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.4.1.1" />
         -->
@@ -56,23 +58,29 @@
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
+
         <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
-        <!--<ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'maccatalyst'" />-->
-        <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
-
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
+
+        <!--<ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />-->
+        <!--<ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'maccatalyst'" />-->
+        <!--
+        <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+        -->
+
+        <!--
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
+        -->
     </ItemGroup>
 
 </Project>

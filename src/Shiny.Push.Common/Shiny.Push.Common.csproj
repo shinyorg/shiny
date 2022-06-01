@@ -13,8 +13,8 @@
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <PackageReference Include="Xamarin.Build.Download" />
         <PackageReference Include="Xamarin.Firebase.Messaging" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
         <!--
+        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" />
         <PackageReference Include="Xamarin.Google.Dagger" />
