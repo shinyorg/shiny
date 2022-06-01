@@ -38,8 +38,9 @@
 
     <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
         <PackageReference Include="Xamarin.Build.Download" Version="0.11.2" PrivateAssets="All" />
-        <PackageReference Include="Xamarin.Google.Guava" Version="31.1.0.2" />
+        
         <!--
+        <PackageReference Include="Xamarin.Google.Guava" Version="31.1.0.2" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.5" />
         <PackageReference Include="Xamarin.AndroidX.Core" Version="1.7.0.2" />
         <PackageReference Include="Xamarin.GooglePlayServices.Base" Version="118.0.1" />
@@ -68,9 +69,9 @@
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
 
-        <!--<ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />-->
-        <!--<ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'maccatalyst'" />-->
         <!--
+        <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'maccatalyst'" />
         <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
