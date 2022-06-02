@@ -18,7 +18,7 @@ public static class MotionActivityServiceCollectionExtensions
 #endif
 
 #if ANDROID || IOS || MACCATALYST
-        services.AddShinyService<IMotionActivityManager, MotionActivityManagerImpl>();
+        services.AddShinyService<MotionActivityManagerImpl>();
         return true;
 #else
         return false;

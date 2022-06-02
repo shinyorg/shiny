@@ -12,9 +12,7 @@
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
-        <PackageReference Include="Xamarin.Build.Download" />
         <PackageReference Include="Xamarin.ShortcutBadger" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
-        <PackageReference Include="Xamarin.AndroidX.Core" />
     </ItemGroup>
 </Project>

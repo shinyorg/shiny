@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     public static bool AddNfc(this IServiceCollection services)
     {
 #if IOS || MACCATALYST || ANDROID
-        services.AddShinyServiceWithLifecycle<INfcManager, NfcManager>();
+        services.AddShinyService<NfcManager>();
         return true;
 #else
         return false;

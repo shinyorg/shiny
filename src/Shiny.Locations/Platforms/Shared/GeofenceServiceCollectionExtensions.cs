@@ -31,12 +31,12 @@ public static class GeofenceServiceCollectionExtensions
         if (resultCode == ConnectionResult.ServiceMissing)
             return services.AddGpsDirectGeofencing(delegateType);
 
-        services.AddShinyService(typeof(IGeofenceDelegate), delegateType);
-        services.AddShinyService<IGeofenceManager, GeofenceManagerImpl>();
+        services.AddShinyService(delegateType);
+        services.AddShinyService<GeofenceManagerImpl>();
         return true;
 #elif IOS || MACCATALYST
-        services.AddShinyService(typeof(IGeofenceDelegate), delegateType);
-        services.AddShinyService<IGeofenceManager, GeofenceManagerImpl>();
+        services.AddShinyService(delegateType);
+        services.AddShinyService<GeofenceManagerImpl>();
         return true;
 #else
         return false;
@@ -78,8 +78,8 @@ public static class GeofenceServiceCollectionExtensions
         if (!services.AddGps<GpsGeofenceDelegate>())
             return false;
 
-        services.AddShinyService(typeof(IGeofenceDelegate), delegateType);
-        services.AddShinyService<IGeofenceManager, GpsGeofenceManagerImpl>();
+        services.AddShinyService(delegateType);
+        services.AddShinyService<GpsGeofenceManagerImpl>();
         return true;
 #else
         return false;

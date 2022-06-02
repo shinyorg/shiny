@@ -16,10 +16,7 @@ public static class AppleExtensions
 {
     public static IServiceCollection AddIos(this IServiceCollection services)
     {
-        services.AddShinyServiceWithLifecycle<IPlatform, IosPlatform>();
-
-        // HACK: it seems MAUI's container is built differently!?
-        services.AddSingleton<IosPlatform>(x => (IosPlatform)x.GetRequiredService<IPlatform>());
+        services.AddShinyService<IosPlatform>();
 
         services.AddSingleton<IosLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
@@ -37,23 +34,6 @@ public static class AppleExtensions
 
 
     public static IosLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<IosLifecycleExecutor>();
-
-    public static IServiceCollection AddShinyServiceWithLifecycle<TService, TImpl>(this IServiceCollection services)
-        where TService : class
-        where TImpl : class, TService
-    {
-        services.AddShinyService<TService, TImpl>();
-
-        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IOnFinishedLaunching>();
-        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IRemoteNotifications>();
-        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IHandleEventsForBackgroundUrl>();
-        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IContinueActivity>();
-        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IApplicationLifecycle>();
-        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.INotificationHandler>();
-
-        return services;
-    }
-
 
 
     static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);

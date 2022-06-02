@@ -4,7 +4,7 @@
     {
         public static IConfigurationBuilder AddJsonPlatformBundle(this IConfigurationBuilder builder, string fileName = "appsettings.json", bool optional = true)
         {
-#if __IOS__ || XAMARIN_IOS || MACCATALYST || IOS
+#if XAMARIN_IOS || MACCATALYST || IOS
             builder.AddJsonIosBundle(fileName, optional);
 #elif MONOANDROID || ANDROID
             builder.AddJsonAndroidAsset(fileName, optional);
@@ -15,7 +15,7 @@
 
         public static IConfigurationBuilder AddPlatformPreferences(this IConfigurationBuilder builder)
         {
-#if __IOS__ || XAMARIN_IOS || MACCATALYST || IOS
+#if XAMARIN_IOS || MACCATALYST || IOS
             builder.AddIosUserDefaults();
 #elif MONOANDROID || ANDROID
             builder.AddAndroidPreferences();

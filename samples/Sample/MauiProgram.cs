@@ -1,4 +1,5 @@
-﻿using Shiny;
+﻿using Microsoft.Extensions.Configuration;
+using Shiny;
 
 namespace Sample;
 
@@ -14,6 +15,9 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseShiny();
 
+        builder.Configuration.AddJsonPlatformBundle();
+        builder.Configuration.AddPlatformPreferences();
+
         // shiny.sensors
         builder.Services.AddAllSensors();
 
@@ -22,12 +26,12 @@ public static class MauiProgram
 //        builder.Services.AddNfc();
 //#endif
         // shiny.locations
-        builder.Services.AddGps<SampleGpsDelegate>();
-        builder.Services.AddGeofencing<SampleGeofenceDelegate>();
-        builder.Services.AddMotionActivity();
+        //builder.Services.AddGps<SampleGpsDelegate>();
+        //builder.Services.AddGeofencing<SampleGeofenceDelegate>();
+        //builder.Services.AddMotionActivity();
 
         // shiny.notifications
-        builder.Services.AddNotifications<SampleNotificationDelegate>();
+        //builder.Services.AddNotifications<SampleNotificationDelegate>();
 
         // shiny.bluetoothle
         builder.Services.AddBluetoothLE<SampleBleDelegate>();
@@ -36,8 +40,8 @@ public static class MauiProgram
         builder.Services.AddBluetoothLeHosting();
 
         // shiny.beacons
-        builder.Services.AddBeaconRanging();
-        builder.Services.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
+        //builder.Services.AddBeaconRanging();
+        //builder.Services.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
 
         // shiny.net.http
         builder.Services.AddHttpTransfers<SampleHttpTransferDelegate>();
@@ -46,7 +50,7 @@ public static class MauiProgram
         builder.Services.AddSpeechRecognition();
 
         // shiny.push
-        builder.Services.AddPush<SamplePushDelegate>();
+        //builder.Services.AddPush<SamplePushDelegate>();
 
         // shiny.push.azurenotificationhubs
         //builder.Services.AddPushAzureNotificationHubs<SamplePushDelegate>(new AzureNotificationConfig(
@@ -55,8 +59,8 @@ public static class MauiProgram
         //));
 
         // shiny.jobs
-        builder.Services.AddJob(typeof(SampleJob));
-        builder.Services.AddJobs(); // not required if using above
+        //builder.Services.AddJob(typeof(SampleJob));
+        //builder.Services.AddJobs(); // not required if using above
 
         // shiny.core - startup task & persistent service registration
         builder.Services.AddShinyService<StartupTask>();
