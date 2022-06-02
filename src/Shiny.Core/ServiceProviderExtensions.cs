@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Stores;
@@ -26,79 +25,29 @@ public static class ServiceExtensions
 
 
     /// <summary>
-    /// This will attempt to resolve the service using standard TService, but if the TImpl implement a secondary service, it will add a registration in DI for that as well and resolve to the original main service
+    /// This will add the implementation for ALL of its interfaces and create a persistent storage binding if INotifyPropertyChanged is implemented
     /// </summary>
-    /// <typeparam name="TService"></typeparam>
-    /// <typeparam name="TImpl"></typeparam>
-    /// <typeparam name="TOther"></typeparam>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    public static IServiceCollection TryMultipleAddSingleton<TService, TImpl, TOther>(this IServiceCollection services)
-        where TService : class
-        where TImpl : class, TService
-        where TOther : class
-    {
-        services.TryAddSingleton<TService, TImpl>();
-
-        if (typeof(TImpl).IsAssignableTo(typeof(TOther)))
-            services.AddSingleton(sp => (TOther)sp.GetRequiredService(typeof(TService)));
-
-        return services;
-    }
-
-
-    /// <summary>
-    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
-    /// </summary>
-    /// <typeparam name="TService"></typeparam>
     /// <typeparam name="TImpl"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddShinyService<TService, TImpl>(this IServiceCollection services)
-        where TService : class
-        where TImpl : class, TService
-        => services.AddShinyService(typeof(TService), typeof(TImpl));
-
+    public static IServiceCollection AddShinyService<TImpl>(this IServiceCollection services) where TImpl : class
+        => services.AddShinyService(typeof(TImpl));
 
     /// <summary>
-    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
+    /// This will add the implementation for ALL of its interfaces and create a persistent storage binding if INotifyPropertyChanged is implemented
     /// </summary>
+    /// <typeparam name="TImpl"></typeparam>
     /// <param name="services"></param>
-    /// <param name="serviceType"></param>
-    /// <param name="implementationType"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddShinyService(this IServiceCollection services, Type serviceType, Type implementationType)
-    {
-        if (implementationType.IsAssignableTo(typeof(INotifyPropertyChanged)))
-        {
-            services.AddSingleton(serviceType, sp =>
-            {
-                var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, implementationType);
-                sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
-                return instance;
-            });
-        }
-        else
-        {
-            services.AddSingleton(serviceType, implementationType);
-        }
-        if (implementationType.IsAssignableTo(typeof(IShinyStartupTask)))
-            services.AddSingleton<IShinyStartupTask>(sp => (IShinyStartupTask)sp.GetRequiredService(serviceType));
-
-        return services;
-    }
-
-
-    /// <summary>
-    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="implementationType"></param>
     /// <returns></returns>
     public static IServiceCollection AddShinyService(this IServiceCollection services, Type implementationType)
     {
+        var interfaces = implementationType.GetInterfaces();
 
-        if (implementationType.IsAssignableTo(typeof(INotifyPropertyChanged)))
+        if (interfaces.Length == 0 || !interfaces.Any(x => x == typeof(INotifyPropertyChanged)))
+        {
+            services.AddSingleton(implementationType);
+        }
+        else
         {
             services.AddSingleton(implementationType, sp =>
             {
@@ -106,28 +55,14 @@ public static class ServiceExtensions
                 sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
                 return instance;
             });
+
+            interfaces = interfaces.Where(x => x != typeof(INotifyPropertyChanged)).ToArray();
         }
-        else
-        {
-            services.AddSingleton(implementationType);
-        }
-        if (implementationType.IsAssignableTo(typeof(IShinyStartupTask)))
-            services.AddSingleton<IShinyStartupTask>(sp => (IShinyStartupTask)sp.GetRequiredService(implementationType));
+        foreach (var iface in interfaces)
+            services.AddSingleton(iface, sp => sp.GetRequiredService(implementationType));
 
         return services;
     }
-
-
-    /// <summary>
-    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
-    /// </summary>
-    /// <typeparam name="TService"></typeparam>
-    /// <typeparam name="TImpl"></typeparam>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddShinyService<TImpl>(this IServiceCollection services) where TImpl : class
-        => services.AddShinyService(typeof(TImpl));
-
 
 
     public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)

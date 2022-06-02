@@ -34,10 +34,10 @@ public static class ServiceCollectionExtensions
 
 #if IOS || MACCATALYST || ANDROID
         services.AddChannelManager();
-        services.AddShinyService(typeof(IPushDelegate), delegateType);
+        services.AddShinyService(delegateType);
         services.TryAddSingleton(typeof(IPushManager), pushManagerType);
         services.AddShinyService<PushContainer>();
-        services.AddShinyServiceWithLifecycle<INativeAdapter, NativeAdapter>();
+        services.AddShinyService<NativeAdapter>();
         return true;
 #else
         return false;

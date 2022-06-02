@@ -21,10 +21,10 @@ public static class ServiceCollectionExtensions
 #if IOS || MACCATALYST || ANDROID
         services.AddRepository<NotificationStoreConverter, Notification>();
         services.AddChannelManager();
-        services.AddShinyServiceWithLifecycle<INotificationManager, NotificationManager>();
+        services.AddShinyService<NotificationManager>();
 
         if (delegateType != null)
-            services.AddShinyService(typeof(INotificationDelegate), delegateType);
+            services.AddShinyService(delegateType);
 
 #if ANDROID
         services.AddGeofencing<NotificationGeofenceDelegate>();

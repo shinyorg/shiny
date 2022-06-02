@@ -1,4 +1,5 @@
-﻿using Shiny;
+﻿using Microsoft.Extensions.Configuration;
+using Shiny;
 
 namespace Sample;
 
@@ -13,6 +14,9 @@ public static class MauiProgram
             // THIS IS REQUIRED TO BE DONE FOR SHINY TO RUN
             .UseMauiApp<App>()
             .UseShiny();
+
+        builder.Configuration.AddJsonPlatformBundle();
+        builder.Configuration.AddPlatformPreferences();
 
         // shiny.sensors
         builder.Services.AddAllSensors();
