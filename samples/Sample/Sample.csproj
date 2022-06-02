@@ -36,9 +36,9 @@
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
+    <!--
     <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
         <PackageReference Include="Xamarin.Build.Download" Version="0.11.2" PrivateAssets="All" />
-        <!--
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.5" />
         <PackageReference Include="Xamarin.AndroidX.Core" Version="1.7.0.2" />
         <PackageReference Include="Xamarin.GooglePlayServices.Base" Version="118.0.1" />
@@ -51,9 +51,9 @@
         <PackageReference Include="Xamarin.Google.Guava.ListenableFuture" Version="1.0.0.8" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.4.1.1" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.4.1.1" />
-        -->
     </ItemGroup>
-
+    -->
+    
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
