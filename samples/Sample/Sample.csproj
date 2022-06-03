@@ -82,5 +82,13 @@
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         -->
     </ItemGroup>
+    
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
+        <ProguardConfiguration Include="Platforms\Android\proguard.cfg" />
+		<PackageReference Include="Xamarin.AndroidX.Core" Version="1.7.0.2" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.4.1.1" />
+		<PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1" />
+		<PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.5" />
+	</ItemGroup>
 
 </Project>
