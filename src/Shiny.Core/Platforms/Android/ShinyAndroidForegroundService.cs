@@ -165,10 +165,7 @@ namespace Shiny
             if (id > 0)
                 return id;
 
-            if (id > 0)
-                return id;
-
-            throw new ArgumentException("Notification icon resource not found - ensure you have an appropriate resource called notification or one set appropriately as your application")
+            throw new InvalidOperationException("Unable to find notification icon for Shiny foreground service - ensure you have your application icon set or a drawable resource named notification");
         }
     }
 }
