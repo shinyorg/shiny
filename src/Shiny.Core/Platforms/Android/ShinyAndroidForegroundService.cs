@@ -161,7 +161,14 @@ namespace Shiny
             if (id > 0)
                 return id;
 
-            return this.Platform.AppContext.ApplicationInfo.Icon;
+            id = this.Platform.AppContext.ApplicationInfo?.Icon ?? 0;
+            if (id > 0)
+                return id;
+
+            if (id > 0)
+                return id;
+
+            throw new ArgumentException("Notification icon resource not found - ensure you have an appropriate resource called notification or one set appropriately as your application")
         }
     }
 }
