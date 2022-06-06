@@ -164,6 +164,10 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         if (id > 0)
             return id;
 
-        return this.Platform.AppContext.ApplicationInfo.Icon;
+        id = this.Platform.AppContext.ApplicationInfo?.Icon ?? 0;
+        if (id > 0)
+            return id;
+
+        throw new InvalidOperationException("Unable to find notification icon for Shiny foreground service - ensure you have your application icon set or a drawable resource named notification");
     }
 }

@@ -1,9 +1,9 @@
-﻿//using Shiny.Notifications;
+﻿using Shiny.Notifications;
 
-//namespace Sample;
+namespace Sample;
 
 
-//public class SampleNotificationDelegate : INotificationDelegate
-//{
-//    public Task OnEntry(NotificationResponse response) => Task.CompletedTask;
-//}
+public class SampleNotificationDelegate : INotificationDelegate
+{
+    public Task OnEntry(NotificationResponse response) => Task.CompletedTask;
+}
