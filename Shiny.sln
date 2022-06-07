@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1
 		src\global.json = src\global.json
 		src\nuget.png = src\nuget.png
 		src\nuget.txt = src\nuget.txt
+		TODO.txt = TODO.txt
 		version.json = version.json
 	EndProjectSection
 EndProject
@@ -73,9 +74,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Core", "src\Shiny.Core\Shiny.Core.csproj", "{5CBF580C-B30C-4279-8E77-80D23AB2EF93}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test samples", "test samples", "{658598AA-7091-4EAA-8E2B-79FE532D48B2}"
-	ProjectSection(SolutionItems) = preProject
-		TODO.txt = TODO.txt
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleBlazor", "samples\SampleBlazor\SampleBlazor.csproj", "{2BCD0A77-4FA1-4D29-AC53-4C2C28C0C84C}"
 EndProject
