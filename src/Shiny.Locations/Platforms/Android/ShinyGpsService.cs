@@ -21,11 +21,9 @@ namespace Shiny.Locations
         {
             this.Service!
                 .WhenReading()
-                .SubscribeAsync(
-                    reading => this.Delegates!.RunDelegates(
-                        x => x.OnReading(reading)
-                    )
-                )
+                .SubscribeAsync(reading => this.Delegates!.RunDelegates(
+                    x => x.OnReading(reading)
+                ))
                 .DisposedBy(this.DestroyWith!);
 
             IsStarted = true;

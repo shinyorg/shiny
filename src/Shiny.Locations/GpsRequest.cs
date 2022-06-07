@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace Shiny.Locations
+﻿namespace Shiny.Locations
 {
     public class GpsRequest
     {
@@ -9,7 +6,7 @@ namespace Shiny.Locations
         {
             //Priority = GpsPriority.Highest,
             //Interval = TimeSpan.FromSeconds(1),
-            Accuracy = GpsAccuracy.High,
+            Accuracy = GpsAccuracy.Highest,
             //Precise = true,
             BackgroundMode = background
                 ? GpsBackgroundMode.Realtime
@@ -55,6 +52,6 @@ namespace Shiny.Locations
         /// <summary>
         /// The minimum distance travelled before firing event
         /// </summary>
-        public Distance? MinimumDistance { get; set; }
+        //public Distance? MinimumDistance { get; set; }
     }
 }
