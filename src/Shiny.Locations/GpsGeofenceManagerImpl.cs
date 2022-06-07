@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Shiny.Locations.Infrastructure;
 
@@ -13,6 +14,7 @@ namespace Shiny.Locations
     public class GpsGeofenceManagerImpl : AbstractGeofenceManager, IShinyStartupTask
     {
         readonly IGpsManager gpsManager;
+        readonly ILogger logger;
 
 
         static readonly GpsRequest defaultRequest = new GpsRequest
@@ -22,15 +24,29 @@ namespace Shiny.Locations
         };
 
 
-        public GpsGeofenceManagerImpl(IRepository repository, IGpsManager gpsManager) : base(repository)
-            => this.gpsManager = gpsManager;
+        public GpsGeofenceManagerImpl(
+            ILogger<GpsGeofenceManagerImpl> logger,
+            IRepository repository, 
+            IGpsManager gpsManager
+        ) : base(repository)
+        { 
+            this.logger = logger;
+            this.gpsManager = gpsManager;
+        }
 
 
         public async void Start()
         {
-            var restore = await this.GetMonitorRegions();
-            if (restore.Any())
-                await this.TryStartGps();
+            try
+            { 
+                var restore = await this.GetMonitorRegions();
+                if (restore.Any())
+                    await this.TryStartGps();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Failed to start gps");
+            }
         }
 
 

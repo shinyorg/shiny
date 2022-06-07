@@ -37,17 +37,17 @@ namespace ShinyBuild.Tasks.Library
             var packages = context.GetFiles("src/**/*.nupkg");
             foreach (var package in packages)
             {
-                try
-                {
+                //try
+                //{
                     context.DotNetNuGetPush(package.FullPath, settings);
-                }
-                catch (Exception ex)
-                {
-                    if (context.AllowNugetUploadFailures)
-                        context.Error($"Error Upload: {package.FullPath} - Exception: {ex}");
-                    else
-                        throw; // break build
-                }
+                //}
+                //catch (Exception ex)
+                //{
+                //    if (context.AllowNugetUploadFailures)
+                //        context.Error($"Error Upload: {package.FullPath} - Exception: {ex}");
+                //    else
+                //        throw; // break build
+                //}
             }
         }
     }
