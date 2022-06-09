@@ -1,17 +1,15 @@
-﻿using System;
-using Shiny.Stores;
+﻿using Shiny.Stores;
+
+namespace Shiny.Tests.Core.Stores;
 
 
-namespace Shiny.Tests.Core.Stores
+[ObjectStoreBinder("file")]
+public class AttributeTestBind : NotifyPropertyChanged
 {
-    [ObjectStoreBinder("file")]
-    public class AttributeTestBind : NotifyPropertyChanged
+    string? testString;
+    public string? TestString
     {
-        string? testString;
-        public string? TestString
-        {
-            get => this.testString;
-            set => this.Set(ref this.testString, value);
-        }
+        get => this.testString;
+        set => this.Set(ref this.testString, value);
     }
 }

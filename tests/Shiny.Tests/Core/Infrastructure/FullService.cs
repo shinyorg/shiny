@@ -1,29 +1,27 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+
+namespace Shiny.Tests.Core.Infrastructure;
 
 
-namespace Shiny.Tests.Core.Infrastructure
+public interface IFullService : INotifyPropertyChanged, IShinyStartupTask
 {
-    public interface IFullService : INotifyPropertyChanged, IShinyStartupTask
+    int Count { get; }
+}
+
+
+public class FullService : NotifyPropertyChanged, IFullService
+{
+    int count;
+    public int Count
     {
-        int Count { get; }
+        get => this.count;
+        set => this.Set(ref this.count, value);
     }
 
 
-    public class FullService : NotifyPropertyChanged, IFullService
+    public void Start()
     {
-        int count;
-        public int Count
-        {
-            get => this.count;
-            set => this.Set(ref this.count, value);
-        }
-
-
-        public void Start()
-        {
-            this.Count++;
-            Console.WriteLine("Startup Count today is " + this.Count);
-        }
+        this.Count++;
+        Console.WriteLine("Startup Count today is " + this.Count);
     }
 }
