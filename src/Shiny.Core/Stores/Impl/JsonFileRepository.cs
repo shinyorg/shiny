@@ -80,7 +80,9 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
             var path = this.GetPath(key);
 
             if (!File.Exists(path))
+            { 
                 tcs.TrySetResult(false);
+            }
             else
             {
                 var entity = list[key];
@@ -121,8 +123,13 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         var path = this.GetPath(entity.Identifier);
         var update = File.Exists(path);
 
-        var serialize = this.converter.ToStore(entity);
-        // TODO: auto add Identifier if missing?
+        var serialize = this.converter.ToStore(entity).ToDictionary(
+            x => x.Property,
+            x => x.Value
+        );
+        if (!serialize.ContainsKey(nameof(IStoreEntity.Identifier)))
+            serialize.Add(nameof(IStoreEntity.Identifier), entity.Identifier);
+
         var value = this.serializer.Serialize(serialize);
         File.WriteAllText(path, value);
         return update;

@@ -12,7 +12,7 @@ public class HttpTransferStoreConverter : IStoreConverter<HttpTransfer>
     }
 
 
-    public IEnumerable<(string Property, object value)> ToStore(HttpTransfer entity)
+    public IEnumerable<(string Property, object Value)> ToStore(HttpTransfer entity)
     {
         return null;
     }

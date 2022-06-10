@@ -36,7 +36,7 @@ public class JobInfoStoreConverter : IStoreConverter<JobInfo>
     }
 
 
-    public IEnumerable<(string Property, object value)> ToStore(JobInfo entity)
+    public IEnumerable<(string Property, object Value)> ToStore(JobInfo entity)
     {
         yield return (nameof(JobInfo.TypeName), entity.TypeName);
         yield return (nameof(JobInfo.Identifier), entity.Identifier);

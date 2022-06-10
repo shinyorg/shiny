@@ -31,7 +31,7 @@ public class NotificationStoreConverter : IStoreConverter<Notification>
     }
 
 
-    public IEnumerable<(string Property, object value)> ToStore(Notification entity)
+    public IEnumerable<(string Property, object Value)> ToStore(Notification entity)
     {
         yield return (nameof(entity.Identifier), entity.Id.ToString());
         yield return (nameof(entity.Channel), entity.Channel!);

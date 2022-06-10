@@ -11,9 +11,9 @@ public static class MauiProgram
 
     public static MauiApp CreateMauiApp()
     {
-        Configuration = new ConfigurationBuilder()
-            .AddJsonPlatformBundle(optional: false)
-            .Build();
+        //Configuration = new ConfigurationBuilder()
+        //    .AddJsonPlatformBundle(optional: false)
+        //    .Build();
 
         return MauiApp
             .CreateBuilder()

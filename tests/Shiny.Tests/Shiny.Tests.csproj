@@ -34,6 +34,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <AndroidResource Remove="Samples\**" />
+      <Compile Remove="Samples\**" />
+      <EmbeddedResource Remove="Samples\**" />
+      <MauiCss Remove="Samples\**" />
+      <MauiXaml Remove="Samples\**" />
+      <None Remove="Samples\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.7.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0-alpha-0008" />

@@ -1,12 +1,8 @@
-﻿using System;
+﻿namespace Shiny.Tests.Core.Stores;
 
-
-namespace Shiny.Tests.Core.Stores
+public enum MyTestEnum
 {
-    public enum MyTestEnum
-    {
-        DontKnow,
-        Hi,
-        Bye
-    }
+    DontKnow,
+    Hi,
+    Bye
 }

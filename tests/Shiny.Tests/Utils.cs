@@ -3,6 +3,13 @@
 
 public static class Utils
 {
+#if ANDROID
+    public static AndroidPlatform GetPlatform() => new AndroidPlatform();
+#elif IOS || MACCATALYST
+    public static IosPlatform GetPlatform() => new IosPlatform();
+#endif
+
+
     /// <summary>
     /// Converts a HEX string to a byte array
     /// </summary>

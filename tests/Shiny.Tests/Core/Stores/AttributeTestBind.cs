@@ -3,7 +3,7 @@
 namespace Shiny.Tests.Core.Stores;
 
 
-[ObjectStoreBinder("file")]
+[ObjectStoreBinder("memory")]
 public class AttributeTestBind : NotifyPropertyChanged
 {
     string? testString;
