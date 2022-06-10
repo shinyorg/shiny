@@ -1,19 +1,30 @@
-﻿using Xunit.Runners.Maui;
+﻿using Microsoft.Extensions.Configuration;
+using Xunit.Runners.Maui;
 
 namespace Shiny.Tests;
 
 
 public static class MauiProgram
 {
-    public static MauiApp CreateMauiApp() => MauiApp
-        .CreateBuilder()
-        .ConfigureTests(new TestOptions
-        {
-            Assemblies =
+    public static IConfiguration Configuration { get; private set; }
+
+
+    public static MauiApp CreateMauiApp()
+    {
+        Configuration = new ConfigurationBuilder()
+            .AddJsonPlatformBundle(optional: false)
+            .Build();
+
+        return MauiApp
+            .CreateBuilder()
+            .ConfigureTests(new TestOptions
             {
-                typeof(MauiProgram).Assembly
-            }
-        })
-        .UseVisualRunner()
-        .Build();
+                Assemblies =
+                {
+                    typeof(MauiProgram).Assembly
+                }
+            })
+            .UseVisualRunner()
+            .Build();
+    }
 }

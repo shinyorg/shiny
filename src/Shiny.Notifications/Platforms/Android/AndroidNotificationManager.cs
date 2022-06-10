@@ -33,6 +33,7 @@ public class AndroidNotificationManager
     public virtual async Task Send(Notification notification)
     {
         var channel = await this.channelManager.Get(notification.Channel!);
+        //await this.Services.Platform.TrySetImage(notification.ImageUri, builder);
         var builder = this.CreateNativeBuilder(notification, channel!);
         this.SendNative(notification.Id, builder.Build());
     }
