@@ -41,7 +41,7 @@ namespace Shiny.Beacons
         public async void Start()
         {
             var regions = await this.GetMonitoredRegions().ConfigureAwait(false);
-            if (!regions.IsEmpty())
+            if (regions.IsEmpty())
                 this.StartService();
         }
 
