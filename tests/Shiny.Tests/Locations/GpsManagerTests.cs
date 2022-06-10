@@ -1,43 +1,28 @@
-﻿#if DEVICE_TESTS
-using System;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
+using Shiny.Hosting;
 using Shiny.Locations;
 using Xunit;
 using Xunit.Abstractions;
 
+namespace Shiny.Tests.Locations;
 
-namespace Shiny.Tests.Locations
+
+public class GpsManagerTests : AbstractShinyTests
 {
-    public class GpsManagerTests
+    public GpsManagerTests(ITestOutputHelper output) : base(output) { }
+    protected override void Configure(IHostBuilder hostBuilder) => hostBuilder.Services.AddGps();
+
+
+    [Fact(DisplayName = "GPS - Last Location")]
+    public async Task GetLastLocationTest()
     {
-        readonly IGpsManager gps;
+        var reading = await this.GetService<IGpsManager>()
+            .GetLastReading()
+            .Timeout(TimeSpan.FromSeconds(15))
+            .ToTask();
 
-
-        public GpsManagerTests(ITestOutputHelper output)
-        {
-            ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
-            {
-                BuildServices = x => x.UseGps(),
-                BuildLogging = x => x.AddXUnit(output)
-            });
-            this.gps = ShinyHost.Resolve<IGpsManager>();
-        }
-
-
-        [Fact(DisplayName = "GPS - Last Location")]
-        public async Task GetLastLocationTest()
-        {
-            var reading = await this.gps
-                .GetLastReading()
-                .Timeout(TimeSpan.FromSeconds(15))
-                .ToTask();
-
-            reading.Should().NotBeNull();
-        }
+        reading.Should().NotBeNull();
     }
 }
-#endif

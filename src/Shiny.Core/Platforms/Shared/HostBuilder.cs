@@ -40,15 +40,3 @@ public class HostBuilder : IHostBuilder
         return host;
     }
 }
-//services.AddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
-//            services.AddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
-//            services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-//            services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
-
-//            // do not register by default
-//            //services.AddSingleton<IKeyValueStore, MemoryKeyValueStore>();
-//            //services.AddSingleton<IKeyValueStore, FileKeyValueStore>();
-//            services.TryAddSingleton<IMessageBus, MessageBus>();
-//            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
-//            services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
-//            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();

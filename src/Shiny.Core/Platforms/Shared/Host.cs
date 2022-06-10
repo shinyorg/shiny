@@ -62,4 +62,10 @@ public class Host : IHost
         }
         Host.Current = this;
     }
+
+    public void Dispose()
+    {
+        (this.Services as IDisposable)?.Dispose();
+        this.Logging.Dispose();
+    }
 }
