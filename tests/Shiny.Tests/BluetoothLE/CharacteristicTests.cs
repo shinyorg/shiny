@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
 using Shiny.Hosting;
@@ -22,7 +19,7 @@ public class CharacteristicTests : AbstractShinyTests
 
 
     protected override void Configure(IHostBuilder hostBuilder) => hostBuilder.Services.AddBluetoothLE();
-    public override void Dispose() 
+    public override void Dispose()
     {
         this.peripheral?.CancelConnection();
         base.Dispose();
@@ -47,7 +44,7 @@ public class CharacteristicTests : AbstractShinyTests
             .Take(5)
             .Timeout(Constants.OperationTimeout)
             .ToTask();
-    }    
+    }
 
 
     [Fact]
