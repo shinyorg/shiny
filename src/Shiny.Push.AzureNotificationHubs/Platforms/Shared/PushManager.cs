@@ -185,8 +185,6 @@ public class PushManager : IPushManager,
             Platform = NotificationPlatform.Apns
 #elif __ANDROID__
             Platform = NotificationPlatform.Fcm
-#elif WINDOWS_UWP
-            Platform = NotificationPlatform.Wns
 #endif
         };
     }

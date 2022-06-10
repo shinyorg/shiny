@@ -9,11 +9,12 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp
-            .CreateBuilder()            
+            .CreateBuilder()
             .UseMauiApp<App>()
             // THIS IS REQUIRED TO BE DONE FOR SHINY TO RUN
             .UseShiny();
 
+        // microsoft.extensions.configuration providers
         builder.Configuration.AddJsonPlatformBundle();
         builder.Configuration.AddPlatformPreferences();
 
