@@ -15,7 +15,7 @@ public class TestModelStore : IStoreConverter<TestModel>
     public TestModel FromStore(IDictionary<string, object> values) => new TestModel
     {
         Identifier = (string)values[nameof(TestModel.Identifier)],
-        IntValue = (int)values[nameof(TestModel.IntValue)],
+        IntValue = Convert.ToInt32(values[nameof(TestModel.IntValue)]),
     };
 
 

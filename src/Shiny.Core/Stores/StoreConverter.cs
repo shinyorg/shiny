@@ -18,7 +18,7 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
         {
             var value = prop.GetValue(entity);
             if (value != null)
-            { 
+            {
                 var converted = this.ConvertToStoreValue(value);
                 yield return (prop.Name, converted);
             }
@@ -28,7 +28,7 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
 
     protected virtual object ConvertToStoreValue(object value)
     {
-        if (value is TimeSpan ts) 
+        if (value is TimeSpan ts)
             return ts.TotalMilliseconds;
 
         if (value is Distance dist)
@@ -42,12 +42,12 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
     }
 
 
-    
+
     protected virtual object ConvertFromStore(Type expectedType, object value)
     {
         // TODO: validate value can be converted to expectedType
         if (expectedType == typeof(TimeSpan))
-            return TimeSpan.FromMilliseconds((double)value); 
+            return TimeSpan.FromMilliseconds((double)value);
 
         if (expectedType == typeof(Distance))
             return Distance.FromKilometers((double)value);

@@ -5,7 +5,6 @@ using Shiny.Stores.Impl;
 namespace Shiny.Tests.Core.Stores;
 
 
-// TODO: test beacon regions, channels, notifications, geofence regions, jobs, http transfer stores
 public class JsonFileRepositoryTests : BaseRepositoryTests
 {
 
@@ -13,8 +12,11 @@ public class JsonFileRepositoryTests : BaseRepositoryTests
         => Utils.GetPlatform().AppData.GetFiles("*.shiny").ToList().ForEach(x => x.Delete());
 
 
-    protected override IRepository<TestModel> Create() => new JsonFileRepository<TestModelStore, TestModel>(
-        Utils.GetPlatform(),
-        new DefaultSerializer()
-    );
+    protected override IRepository<TModel> Create<TModel, TConverter>()
+    {
+        return new JsonFileRepository<TConverter, TModel>(
+            Utils.GetPlatform(),
+            new DefaultSerializer()
+        );
+    }
 }
