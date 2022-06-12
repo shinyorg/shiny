@@ -22,7 +22,7 @@ public abstract class BaseRepositoryTests
         where TConverter : class, IStoreConverter<TModel>, new();
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Persist")]
     public async Task PersistTests()
     {
         var repo1 = this.Create<TestModel, TestModelStore>();
@@ -43,7 +43,7 @@ public abstract class BaseRepositoryTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Update")]
     public async Task UpdateTest()
     {
         var repo = this.Create<TestModel, TestModelStore>();
@@ -63,7 +63,7 @@ public abstract class BaseRepositoryTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - GetList")]
     public async Task MultipleModels()
     {
         var repo = this.Create<TestModel, TestModelStore>();
@@ -78,7 +78,7 @@ public abstract class BaseRepositoryTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Remove")]
     public async Task RemoveTest()
     {
         var repo1 = this.Create<TestModel, TestModelStore>();
@@ -91,7 +91,7 @@ public abstract class BaseRepositoryTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Clear")]
     public async Task ClearTest()
     {
         await this.MultipleModels();
@@ -103,34 +103,63 @@ public abstract class BaseRepositoryTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Types - Notifications")]
     public async Task NotificationPersist()
     {
         var repo = this.Create<Notification, NotificationStoreConverter>();
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Types - Beacon Regions")]
     public async Task BeaconPersist()
     {
         var repo = this.Create<BeaconRegion, BeaconRegionStoreConverter>();
+        var uuid = Guid.NewGuid();
+
+        await repo.Set(new BeaconRegion(
+            "test",
+            uuid,
+            10,
+            11
+        ));
+
+        var region = await repo.Get("test");
+        region.Identifier.Should().Be("test");
+        region.Uuid.Should().Be(uuid);
+        region.Major.Should().Be(10);
+        region.Minor.Should().Be(11);
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Types - Geofence Regions")]
     public async Task GeofencePersist()
     {
         var repo = this.Create<GeofenceRegion, GeofenceRegionStoreConverter>();
+        await repo.Set(new GeofenceRegion(
+            "geotest",
+            new Position(1, 1),
+            Distance.FromMeters(300)
+        ));
+
+        var region = await repo.Get("geotest");
+        region.Should().NotBeNull();
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Types - Channels")]
     public async Task ChannelPersist()
     {
         var repo = this.Create<Channel, ChannelStoreConverter>();
         await repo.Set(new Channel
         {
-            Identifier = "test"
+            Identifier = "test",
+            Description = "channel description",
+            Importance = ChannelImportance.Low,
+            CustomSoundPath = "sound path",
+            Actions =
+            {
+                ChannelAction.Create("", "", ChannelActionType.OpenApp)
+            }
         });
 
         var channel = await repo.Get("test");
@@ -138,14 +167,24 @@ public abstract class BaseRepositoryTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Types - Jobs")]
     public async Task JobsPersist()
     {
         var repo = this.Create<JobInfo, JobInfoStoreConverter>();
+        await repo.Set(new JobInfo(
+            typeof(object),
+            "",
+            true
+        )
+        {
+            DeviceCharging = true,
+            RequiredInternetAccess = InternetAccess.Unmetered
+        });
+        var job = await repo.Get("");
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Repository - Types - HTTP Transfers")]
     public async Task HttpStorePersist()
     {
         var repo = this.Create<HttpTransfer, HttpTransferStoreConverter>();
