@@ -99,6 +99,7 @@ public abstract class BaseRepositoryTests
         var repo = this.Create<TestModel, TestModelStore>();
         await repo.Clear();
 
+        repo = this.Create<GeofenceRegion, GeofenceRegionStoreConverter>();
         var r = await repo.GetList();
         r.Count.Should().Be(0);
     }
@@ -152,6 +153,7 @@ public abstract class BaseRepositoryTests
             Distance.FromMeters(300)
         ));
 
+        repo = this.Create<GeofenceRegion, GeofenceRegionStoreConverter>();
         var region = await repo.Get("geotest");
         region.Should().NotBeNull();
         region.Identifier.Should().Be("geotest");
@@ -170,13 +172,15 @@ public abstract class BaseRepositoryTests
             Identifier = "test",
             Description = "channel description",
             Importance = ChannelImportance.Low,
-            CustomSoundPath = "sound path"
-            //Actions =
-            //{
-            //    ChannelAction.Create("", "", ChannelActionType.OpenApp)
-            //}
+            CustomSoundPath = "sound path",
+            Actions =
+            {
+                ChannelAction.Create("1", "2", ChannelActionType.OpenApp)
+            }
         });
 
+        // kill any internal caches
+        repo = this.Create<Channel, ChannelStoreConverter>();
         var channel = await repo.Get("test");
         channel.Should().NotBeNull("Channel should not be null");
     }
@@ -193,12 +197,26 @@ public abstract class BaseRepositoryTests
         )
         {
             DeviceCharging = true,
-            RequiredInternetAccess = InternetAccess.Unmetered
+            RequiredInternetAccess = InternetAccess.Unmetered,
+            PeriodicTime = TimeSpan.FromSeconds(3),
+            BatteryNotLow = true,
+            Parameters = new Dictionary<string, string>
+            {
+                { "Hello", "World" }
+            }
         });
+
+        repo = this.Create<JobInfo, JobInfoStoreConverter>();
         var job = await repo.Get("TestSampleJob");
         job.Should().NotBeNull();
         job.Identifier.Should().Be("TestSampleJob");
         job.TypeName.Should().Be(typeof(SampleJob).AssemblyQualifiedName);
+        job.PeriodicTime.Value.TotalSeconds.Should().Be(3);
+        job.RequiredInternetAccess.Should().Be(InternetAccess.Unmetered);
+        job.BatteryNotLow.Should().BeTrue();
+        job.DeviceCharging.Should().BeTrue();
+        job.Parameters.First().Key.Should().Be("Hello");
+        job.Parameters.First().Value.Should().Be("World");
     }
 
 

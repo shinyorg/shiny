@@ -43,8 +43,8 @@ public class JobInfo : IStoreEntity
     /// </summary>
     public bool IsSystemJob { get; set; }
     public InternetAccess RequiredInternetAccess { get; set; } = InternetAccess.None;
-    public DateTime? LastRunUtc { get; set; }
-    public Dictionary<string, object> Parameters { get; set; } = new();
+    public DateTimeOffset? LastRun { get; set; }
+    public Dictionary<string, string> Parameters { get; set; } = new();
 
 
     public bool IsValid() => this.TypeName.IsEmpty() || Type.GetType(this.TypeName) != null;

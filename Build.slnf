@@ -20,8 +20,7 @@
       "src\\Shiny.Push.Common\\Shiny.Push.Common.csproj",
       "src\\Shiny.Push\\Shiny.Push.csproj",
       "src\\Shiny.Sensors\\Shiny.Sensors.csproj",
-      "src\\Shiny.SpeechRecognition\\Shiny.SpeechRecognition.csproj",
-      "tests\\Shiny.Tests.Shared\\Shiny.Tests.Shared.shproj"
+      "src\\Shiny.SpeechRecognition\\Shiny.SpeechRecognition.csproj"
     ]
   }
 }

@@ -46,7 +46,7 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
 
 
     //protected void AddIf(IDictionary<string, object> values, Expression)
-    protected TValue? Get<TValue>(IDictionary<string, object> values, string key, TValue defaultValue = default)
+    protected TValue? ConvertFromStoreValue<TValue>(IDictionary<string, object> values, string key, TValue? defaultValue = default)
     {
         if (!values.ContainsKey(key))
             return defaultValue;
