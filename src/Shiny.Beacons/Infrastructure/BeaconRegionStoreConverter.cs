@@ -31,7 +31,7 @@ public class BeaconRegionStoreConverter : IStoreConverter<BeaconRegion>
     }
 
 
-    public IEnumerable<(string Property, object value)> ToStore(BeaconRegion entity)
+    public IEnumerable<(string Property, object Value)> ToStore(BeaconRegion entity)
     {
         entity.Validate();
 

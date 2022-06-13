@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Hosting;
 
 
-public interface IHost
+public interface IHost : IDisposable
 {
     IServiceProvider Services { get; }
     //IConfiguration Configuration { get; }

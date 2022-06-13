@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Shiny.Stores;
 
 namespace Shiny.Notifications;
@@ -48,13 +47,6 @@ public class Notification : IStoreEntity
     /// iOS: Thread, Android: Group
     /// </summary>
     public string? Thread { get; set; }
-
-    #if ANDROID
-    ///// <summary>
-    ///// Options specific to android
-    ///// </summary>
-    public AndroidOptions Android { get; set; } = new AndroidOptions();
-    #endif
 
     /// <summary>
     /// Scheduled date for notification (cannot be mixed with repeat interval or geofence)

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Android.Graphics;
 using AndroidX.Core.App;
-using AndroidX.Core.Content;
 using Java.Lang;
 using Shiny.Infrastructure;
 
@@ -37,6 +33,7 @@ public class AndroidNotificationManager
     public virtual async Task Send(Notification notification)
     {
         var channel = await this.channelManager.Get(notification.Channel!);
+        //await this.Services.Platform.TrySetImage(notification.ImageUri, builder);
         var builder = this.CreateNativeBuilder(notification, channel!);
         this.SendNative(notification.Id, builder.Build());
     }
@@ -49,41 +46,8 @@ public class AndroidNotificationManager
     public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification, Channel channel)
     {
         var builder = new NotificationCompat.Builder(this.platform.AppContext, channel.Identifier)
-            .SetContentTitle(notification.Title)
-            .SetSmallIcon(this.platform.GetSmallIconResource(notification.Android.SmallIconResourceName))
-            .SetAutoCancel(notification.Android.AutoCancel)
-            .SetOngoing(notification.Android.OnGoing);
+            .SetContentTitle(notification.Title);
 
-        //await this.Services.Platform.TrySetImage(notification.ImageUri, builder);
-
-        if (!notification.Thread.IsEmpty())
-            builder.SetGroup(notification.Thread);
-
-        this.ApplyLaunchIntent(builder, notification);
-        if (!notification.Android.ContentInfo.IsEmpty())
-            builder.SetContentInfo(notification.Android.ContentInfo);
-
-        if (!notification.Android.Ticker.IsEmpty())
-            builder.SetTicker(notification.Android.Ticker);
-
-        if (notification.Android.UseBigTextStyle)
-            builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
-        else
-            builder.SetContentText(notification.Message);
-
-        this.platform.TrySetLargeIconResource(notification.Android.LargeIconResourceName, builder);
-
-        if (!notification.Android.ColorResourceName.IsEmpty())
-        {
-            var color = this.platform.GetColorResourceId(notification.Android.ColorResourceName!);
-            builder.SetColor(color);
-        }
-
-        if (notification.Android.ShowWhen != null)
-            builder.SetShowWhen(notification.Android.ShowWhen.Value);
-
-        if (notification.Android.When != null)
-            builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
 
         this.ApplyChannel(builder, notification, channel);
         return builder;
@@ -163,44 +127,44 @@ public class AndroidNotificationManager
     {
         Intent launchIntent;
 
-        if (notification.Android.LaunchActivityType == null)
-        {
+        //if (notification.Android.LaunchActivityType == null)
+        //{
             launchIntent = this.platform!
                 .AppContext!
                 .PackageManager!
                 .GetLaunchIntentForPackage(this.platform!.Package!.PackageName!)!
-                .SetFlags(notification.Android.LaunchActivityFlags);
-        }
-        else
-        {
-            launchIntent = new Intent(
-                this.platform.AppContext,
-                notification.Android.LaunchActivityType
-            );
-        }
+                .SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
+        //}
+        //else
+        //{
+        //    launchIntent = new Intent(
+        //        this.platform.AppContext,
+        //        notification.Android.LaunchActivityType
+        //    );
+        //}
 
         this.PopulateIntent(launchIntent, notification);
 
         PendingIntent pendingIntent;
-        if ((notification.Android.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
-        {
-            pendingIntent = AndroidX.Core.App.TaskStackBuilder
-                .Create(this.platform.AppContext)
-                .AddNextIntent(launchIntent)
-                .GetPendingIntent(
-                    notification.Id,
-                    (int)this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
-                );
-        }
-        else
-        {
+        //if ((notification.Android.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
+        //{
+        //    pendingIntent = AndroidX.Core.App.TaskStackBuilder
+        //        .Create(this.platform.AppContext)
+        //        .AddNextIntent(launchIntent)
+        //        .GetPendingIntent(
+        //            notification.Id,
+        //            (int)this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
+        //        );
+        //}
+        //else
+        //{
             pendingIntent = PendingIntent.GetActivity(
                 this.platform.AppContext!,
                 notification.Id,
                 launchIntent!,
                 this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
             )!;
-        }
+        //}
         return pendingIntent;
     }
 

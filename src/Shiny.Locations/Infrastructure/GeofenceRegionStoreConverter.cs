@@ -25,7 +25,7 @@ public class GeofenceRegionStoreConverter : IStoreConverter<GeofenceRegion>
     };
 
 
-    public IEnumerable<(string Property, object value)> ToStore(GeofenceRegion entity)
+    public IEnumerable<(string Property, object Value)> ToStore(GeofenceRegion entity)
     {
         yield return (nameof(GeofenceRegion.Identifier), entity.Identifier);
         yield return (nameof(GeofenceRegion.Radius), entity.Radius.TotalKilometers);

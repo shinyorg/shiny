@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
@@ -80,7 +81,9 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
             var path = this.GetPath(key);
 
             if (!File.Exists(path))
+            {
                 tcs.TrySetResult(false);
+            }
             else
             {
                 var entity = list[key];
@@ -121,8 +124,13 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         var path = this.GetPath(entity.Identifier);
         var update = File.Exists(path);
 
-        var serialize = this.converter.ToStore(entity);
-        // TODO: auto add Identifier if missing?
+        var serialize = this.converter.ToStore(entity).ToDictionary(
+            x => x.Property,
+            x => x.Value
+        );
+        if (!serialize.ContainsKey(nameof(IStoreEntity.Identifier)))
+            serialize.Add(nameof(IStoreEntity.Identifier), entity.Identifier);
+
         var value = this.serializer.Serialize(serialize);
         File.WriteAllText(path, value);
         return update;
@@ -150,6 +158,35 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         {
             var text = File.ReadAllText(file.FullName);
             var dictionary = this.serializer.Deserialize<Dictionary<string, object>>(text);
+            foreach (var pair in dictionary)
+            {
+                var el = (JsonElement)pair.Value;
+                switch (el.ValueKind)
+                {
+                    case JsonValueKind.String:
+                        dictionary[pair.Key] = el.GetString();
+                        break;
+
+                    case JsonValueKind.Number:
+                        if (el.TryGetInt64(out var longValue))
+                        {
+                            dictionary[pair.Key] = longValue;
+                        }
+                        else
+                        {
+                            dictionary[pair.Key] = el.GetDouble();
+                        }
+                        break;
+
+                    case JsonValueKind.True:
+                    case JsonValueKind.False:
+                        dictionary[pair.Key] = el.GetBoolean();
+                        break;
+
+                    default:
+                        throw new ArgumentException("Invalid ValueKind - " + el.ValueKind);
+                }
+            }
 
             var entity = this.converter.FromStore(dictionary);
             dict.Add(entity.Identifier, entity);

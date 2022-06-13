@@ -176,14 +176,13 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IList<IGattDescriptor>> GetDescriptors() =>
+        public override IObservable<IList<IGattDescriptor>> GetDescriptors() => Observable.Return(
             this.native
                 .Descriptors
                 .Select(x => new GattDescriptor(this, this.context, x))
                 .Cast<IGattDescriptor>()
                 .ToList()
-                .Cast<IList<IGattDescriptor>>()
-                .ToObservable();
+        );
 
 
         public override bool Equals(object obj)

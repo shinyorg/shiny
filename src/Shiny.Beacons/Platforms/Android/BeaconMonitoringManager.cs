@@ -44,7 +44,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     public async void Start()
     {
         var regions = await this.GetMonitoredRegions().ConfigureAwait(false);
-        if (!regions.Any())
+        if (regions.Any())
             this.StartService();
     }
 

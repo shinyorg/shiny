@@ -7,10 +7,7 @@ namespace Shiny.Locations
     {
         public static GpsRequest Realtime(bool background) => new GpsRequest
         {
-            //Priority = GpsPriority.Highest,
-            //Interval = TimeSpan.FromSeconds(1),
-            Accuracy = GpsAccuracy.High,
-            //Precise = true,
+            Accuracy = GpsAccuracy.Highest,
             BackgroundMode = background
                 ? GpsBackgroundMode.Realtime
                 : GpsBackgroundMode.None
@@ -55,6 +52,6 @@ namespace Shiny.Locations
         /// <summary>
         /// The minimum distance travelled before firing event
         /// </summary>
-        public Distance? MinimumDistance { get; set; }
+        //public Distance? MinimumDistance { get; set; }
     }
 }
