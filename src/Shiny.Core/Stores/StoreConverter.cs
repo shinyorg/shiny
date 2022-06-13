@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace Shiny.Stores;
 
 
-//TODO: I want to also include logic for reading/writing to the props dictionary - could use expressions
 public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEntity
 {
     public abstract T FromStore(IDictionary<string, object> values);
@@ -37,12 +37,26 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
         if (value is DateTimeOffset ds)
             return ds.ToUnixTimeSeconds();
 
+        if (value is IDictionary<string, string> values)
+            return JsonSerializer.Serialize(values);
+
         // TODO: ensure simple type
         return value;
     }
 
 
+    //protected void AddIf(IDictionary<string, object> values, Expression)
+    protected TValue? Get<TValue>(IDictionary<string, object> values, string key, TValue defaultValue = default)
+    {
+        if (!values.ContainsKey(key))
+            return defaultValue;
 
+        return (TValue)this.ConvertFromStore(typeof(TValue), values[key]);
+    }
+
+
+    //public static bool IsSimple(this Type type) =>
+    //    TypeDescriptor.GetConverter(type).CanConvertFrom(typeof(string));
     protected virtual object ConvertFromStore(Type expectedType, object value)
     {
         // TODO: validate value can be converted to expectedType
@@ -54,6 +68,9 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
 
         if (expectedType == typeof(DateTimeOffset))
             return DateTimeOffset.FromUnixTimeSeconds((long)value);
+
+        if (expectedType == typeof(IDictionary<string, string>))
+            return JsonSerializer.Deserialize<Dictionary<string, string>>((string)value)!;
 
         return Convert.ChangeType(value, expectedType);
     }

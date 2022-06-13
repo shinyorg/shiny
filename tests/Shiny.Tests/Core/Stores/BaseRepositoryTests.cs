@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Sample;
 using Shiny.Beacons;
 using Shiny.Beacons.Infrastructure;
 using Shiny.Jobs;
@@ -107,6 +108,16 @@ public abstract class BaseRepositoryTests
     public async Task NotificationPersist()
     {
         var repo = this.Create<Notification, NotificationStoreConverter>();
+        var test = new Notification
+        {
+            Id = 10,
+            Title = "thisisatitle"
+        };
+        await repo.Set(test);
+
+        var notification = await repo.Get("10");
+        notification.Should().NotBeNull();
+        notification.Title.Should().Be(test.Title);
     }
 
 
@@ -137,12 +148,16 @@ public abstract class BaseRepositoryTests
         var repo = this.Create<GeofenceRegion, GeofenceRegionStoreConverter>();
         await repo.Set(new GeofenceRegion(
             "geotest",
-            new Position(1, 1),
+            new Position(1.1, 2.2),
             Distance.FromMeters(300)
         ));
 
         var region = await repo.Get("geotest");
         region.Should().NotBeNull();
+        region.Identifier.Should().Be("geotest");
+        region.Center.Latitude.Should().Be(1.1);
+        region.Center.Longitude.Should().Be(2.2);
+        region.Radius.TotalMeters.Should().Be(300);
     }
 
 
@@ -155,11 +170,11 @@ public abstract class BaseRepositoryTests
             Identifier = "test",
             Description = "channel description",
             Importance = ChannelImportance.Low,
-            CustomSoundPath = "sound path",
-            Actions =
-            {
-                ChannelAction.Create("", "", ChannelActionType.OpenApp)
-            }
+            CustomSoundPath = "sound path"
+            //Actions =
+            //{
+            //    ChannelAction.Create("", "", ChannelActionType.OpenApp)
+            //}
         });
 
         var channel = await repo.Get("test");
@@ -172,15 +187,18 @@ public abstract class BaseRepositoryTests
     {
         var repo = this.Create<JobInfo, JobInfoStoreConverter>();
         await repo.Set(new JobInfo(
-            typeof(object),
-            "",
+            typeof(SampleJob),
+            "TestSampleJob",
             true
         )
         {
             DeviceCharging = true,
             RequiredInternetAccess = InternetAccess.Unmetered
         });
-        var job = await repo.Get("");
+        var job = await repo.Get("TestSampleJob");
+        job.Should().NotBeNull();
+        job.Identifier.Should().Be("TestSampleJob");
+        job.TypeName.Should().Be(typeof(SampleJob).AssemblyQualifiedName);
     }
 
 

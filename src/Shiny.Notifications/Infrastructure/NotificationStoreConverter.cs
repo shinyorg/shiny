@@ -1,39 +1,38 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using Shiny.Stores;
 
 namespace Shiny.Notifications.Infrastructure;
 
 
-public class NotificationStoreConverter : IStoreConverter<Notification>
+public class NotificationStoreConverter : StoreConverter<Notification>
 {
-    public Notification FromStore(IDictionary<string, object> values)
+    public override Notification FromStore(IDictionary<string, object> values)
     {
         var result = new Notification
         {
-            Id = (int)values["Identifier"],
+            Id = Int32.Parse((string)values[nameof(Notification.Identifier)]),
             Message = (string)values[nameof(Notification.Message)],
             Channel = (string)values[nameof(Notification.Channel)],
-            BadgeCount = (int)values[nameof(Notification.BadgeCount)]
+            Title = this.Get<string>(values, nameof(Notification.Title)),
+            Thread = this.Get<string>(values, nameof(Notification.Thread)),
+            ImageUri = this.Get<string>(values, nameof(Notification.ImageUri)),
+            BadgeCount = this.Get<int>(values, nameof(Notification.BadgeCount), 0),
+            ScheduleDate = this.Get<DateTimeOffset>(values, nameof(Notification.ScheduleDate))
         };
-        
-        if (values.ContainsKey(nameof(Notification.Title)))
-            result.Title = (string)values[nameof(Notification.Title)];
+        if (values.ContainsKey(nameof(Notification.Geofence)))
+            result.Geofence = JsonSerializer.Deserialize<GeofenceTrigger>((string)values[nameof(Notification.Geofence)]);
 
-        if (values.ContainsKey(nameof(Notification.Thread)))
-            result.Thread = (string)values[nameof(Notification.Thread)];
+        if (values.ContainsKey(nameof(Notification.RepeatInterval)))
+            result.RepeatInterval = JsonSerializer.Deserialize<IntervalTrigger>((string)values[nameof(Notification.RepeatInterval)]);
 
-        if (values.ContainsKey(nameof(Notification.ImageUri)))
-            result.ImageUri = (string)values[nameof(Notification.ImageUri)];
-
-        //if (values.Contains(nameof(Notification.Geofence)))
-        //if (values.Contains(nameof(Notification.RepeatInterval)))
         return result;
     }
 
 
-    public IEnumerable<(string Property, object Value)> ToStore(Notification entity)
+    public override IEnumerable<(string Property, object Value)> ToStore(Notification entity)
     {
-        yield return (nameof(entity.Identifier), entity.Id.ToString());
         yield return (nameof(entity.Channel), entity.Channel!);
         yield return (nameof(entity.Message), entity.Message!);
 
@@ -46,10 +45,13 @@ public class NotificationStoreConverter : IStoreConverter<Notification>
         if (entity.ImageUri != null)
             yield return (nameof(entity.ImageUri), entity.ImageUri);
 
-        // I don't really want this here - maybe consider platform interceptors of some sort
-#if ANDROID
-        //result.Android
-#endif
+        if ((entity.Payload?.Count) > 0)
+            yield return (nameof(entity.Payload), this.ConvertToStoreValue(entity.Payload));
+        
+        if (entity.Geofence != null)
+            yield return (nameof(entity.Geofence), JsonSerializer.Serialize(entity.Geofence));
 
+        if (entity.RepeatInterval != null)
+            yield return (nameof(entity.RepeatInterval), JsonSerializer.Serialize(entity.RepeatInterval));
     }
 }

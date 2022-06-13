@@ -39,14 +39,12 @@ public class JobInfoStoreConverter : IStoreConverter<JobInfo>
     public IEnumerable<(string Property, object Value)> ToStore(JobInfo entity)
     {
         yield return (nameof(JobInfo.TypeName), entity.TypeName);
-        yield return (nameof(JobInfo.Identifier), entity.Identifier);
         yield return (nameof(JobInfo.IsSystemJob), entity.IsSystemJob);
         yield return (nameof(JobInfo.Repeat), entity.Repeat);
         yield return (nameof(JobInfo.RequiredInternetAccess), entity.RequiredInternetAccess);
         yield return (nameof(JobInfo.RunOnForeground), entity.RunOnForeground);
         yield return (nameof(JobInfo.DeviceCharging), entity.DeviceCharging);
         yield return (nameof(JobInfo.BatteryNotLow), entity.BatteryNotLow);
-        yield return (nameof(JobInfo.RequiredInternetAccess), entity.RequiredInternetAccess);
         yield return (nameof(JobInfo.Parameters), entity.Parameters);
 
         if (entity.LastRunUtc != null)

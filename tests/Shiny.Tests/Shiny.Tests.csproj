@@ -43,6 +43,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Include="Samples\SampleJob.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.7.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0-alpha-0008" />
