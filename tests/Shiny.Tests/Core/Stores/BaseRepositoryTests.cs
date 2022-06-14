@@ -99,7 +99,7 @@ public abstract class BaseRepositoryTests
         var repo = this.Create<TestModel, TestModelStore>();
         await repo.Clear();
 
-        repo = this.Create<GeofenceRegion, GeofenceRegionStoreConverter>();
+        repo = this.Create<TestModel, TestModelStore>();
         var r = await repo.GetList();
         r.Count.Should().Be(0);
     }
@@ -112,13 +112,48 @@ public abstract class BaseRepositoryTests
         var test = new Notification
         {
             Id = 10,
-            Title = "thisisatitle"
+            Title = "thisisatitle",
+            Message = "tester",
+            ImageUri = "http://somethingsomethingsomething",
+            Thread = "the thread",
+            BadgeCount = 8,
+            Channel = "chan",
+            Geofence = new GeofenceTrigger
+            {
+
+            },
+            RepeatInterval = new IntervalTrigger
+            {
+                Interval = TimeSpan.FromDays(1),
+                DayOfWeek = DayOfWeek.Wednesday,
+                TimeOfDay = TimeSpan.FromHours(3)
+            },
+            Payload = new Dictionary<string, string>
+            {
+                { "Payload", "Test" }
+            }
         };
         await repo.Set(test);
 
+        repo = this.Create<Notification, NotificationStoreConverter>();
         var notification = await repo.Get("10");
         notification.Should().NotBeNull();
+        notification.Identifier.Should().Be(test.Identifier);
         notification.Title.Should().Be(test.Title);
+        notification.Message.Should().Be(test.Message);
+        notification.Channel.Should().Be(test.Channel);
+        notification.ScheduleDate.Should().Be(test.ScheduleDate);
+        notification.Thread.Should().Be(test.Thread);
+        notification.ImageUri.Should().Be(test.ImageUri);
+        notification.BadgeCount.Should().Be(test.BadgeCount);
+        notification.Geofence.Radius.Should().Be(test.Geofence.Radius);
+        notification.Geofence.Center.Should().Be(test.Geofence.Center);
+        notification.Geofence.Repeat.Should().Be(test.Geofence.Repeat);
+        notification.RepeatInterval.DayOfWeek.Should().Be(test.RepeatInterval.DayOfWeek);
+        notification.RepeatInterval.Interval.Should().Be(test.RepeatInterval.Interval);
+        notification.RepeatInterval.TimeOfDay.Should().Be(test.RepeatInterval.TimeOfDay);
+        notification.Payload.First().Key.Should().Be(test.Payload.First().Key);
+        notification.Payload.First().Value.Should().Be(test.Payload.First().Value);
     }
 
 
@@ -135,6 +170,7 @@ public abstract class BaseRepositoryTests
             11
         ));
 
+        repo = this.Create<BeaconRegion, BeaconRegionStoreConverter>();
         var region = await repo.Get("test");
         region.Identifier.Should().Be("test");
         region.Uuid.Should().Be(uuid);
@@ -167,7 +203,7 @@ public abstract class BaseRepositoryTests
     public async Task ChannelPersist()
     {
         var repo = this.Create<Channel, ChannelStoreConverter>();
-        await repo.Set(new Channel
+        var test = new Channel
         {
             Identifier = "test",
             Description = "channel description",
@@ -177,12 +213,18 @@ public abstract class BaseRepositoryTests
             {
                 ChannelAction.Create("1", "2", ChannelActionType.OpenApp)
             }
-        });
+        };
+        await repo.Set(test);
 
         // kill any internal caches
         repo = this.Create<Channel, ChannelStoreConverter>();
         var channel = await repo.Get("test");
         channel.Should().NotBeNull("Channel should not be null");
+        channel.Identifier.Should().Be(test.Identifier);
+        channel.Description.Should().Be(test.Description);
+        channel.Importance.Should().Be(test.Importance);
+        channel.CustomSoundPath.Should().Be(test.CustomSoundPath);
+        channel.Actions.First().ActionType.Should().Be(test.Actions.First().ActionType);
     }
 
 
