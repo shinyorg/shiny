@@ -25,10 +25,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
         <MauiImage Include="Resources\Images\*" />
-        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
         <MauiFont Include="Resources\Fonts\*" />
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
@@ -40,6 +37,10 @@
       <MauiCss Remove="Samples\**" />
       <MauiXaml Remove="Samples\**" />
       <None Remove="Samples\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiImage Remove="Resources\Images\shiny.svg" />
     </ItemGroup>
 
     <ItemGroup>
@@ -81,5 +82,9 @@
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.1" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Resources\Raw\" />
     </ItemGroup>
 </Project>

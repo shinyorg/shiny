@@ -39,7 +39,6 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
 
         if (value is IDictionary<string, string> values)
             return JsonSerializer.Serialize(values);
-
         // TODO: ensure simple type
         return value;
     }
@@ -71,6 +70,9 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
 
         if (expectedType == typeof(IDictionary<string, string>))
             return JsonSerializer.Deserialize<Dictionary<string, string>>((string)value)!;
+
+        if (expectedType.IsEnum)
+            return Convert.ToInt32(value);
 
         return Convert.ChangeType(value, expectedType);
     }

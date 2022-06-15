@@ -11,10 +11,12 @@ public class ChannelStoreConverter : StoreConverter<Channel>
     {
         var channel = new Channel
         {
+            Identifier = (string)values[nameof(Channel.Identifier)],
             Description = this.ConvertFromStoreValue<string>(values, nameof(Channel.Description)),
             CustomSoundPath = this.ConvertFromStoreValue<string>(values, nameof(Channel.CustomSoundPath)),
-            Importance = (ChannelImportance)values[nameof(Channel.Importance)]
+            Importance = (ChannelImportance)(long)values[nameof(Channel.Importance)]
         };
+        
         if (values.ContainsKey(nameof(Channel.Actions)))
             channel.Actions = JsonSerializer.Deserialize<List<ChannelAction>>((string)values[nameof(channel.Actions)])!;
 

@@ -4,6 +4,9 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android;
 using Android.Content;
+
+using AndroidX.Core.App;
+
 using Shiny.Hosting;
 using Shiny.Locations;
 using Shiny.Stores;
@@ -13,8 +16,6 @@ namespace Shiny.Notifications;
 
 public partial class NotificationManager : INotificationManager, IAndroidLifecycle.IOnActivityNewIntent
 {
-    const string AndroidBadgeCountKey = "AndroidBadge";
-
     readonly Lazy<AndroidNotificationProcessor> processor;
     readonly AndroidPlatform platform;
     readonly IChannelManager channelManager;
@@ -143,8 +144,6 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         if (notification.ScheduleDate == null && notification.Geofence == null)
         {
             this.manager.SendNative(notification.Id, builder.Build());
-            if (notification.BadgeCount != null)
-                await this.SetBadge(notification.BadgeCount.Value).ConfigureAwait(false);
         }
         else
         {
@@ -155,24 +154,6 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
             if (notification.ScheduleDate != null)
                 this.manager.SetAlarm(notification);
         }
-    }
-
-
-    public Task<int> GetBadge()
-        => Task.FromResult(this.settings.Get(AndroidBadgeCountKey, 0));
-
-
-    public Task SetBadge(int? badge)
-    {
-        var value = badge ?? 0;
-        this.settings.Set(AndroidBadgeCountKey, value);
-
-        if (badge <= 0)
-            global::XamarinShortcutBadger.ShortcutBadger.RemoveCount(this.platform.AppContext);
-        else
-            global::XamarinShortcutBadger.ShortcutBadger.ApplyCount(this.platform.AppContext, value);
-
-        return Task.CompletedTask;
     }
 
 

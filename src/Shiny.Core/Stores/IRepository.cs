@@ -21,7 +21,7 @@ public interface IRepository<TEntity> where TEntity : IStoreEntity
     /// <typeparam name="T"></typeparam>
     /// <param name="key"></param>
     /// <returns></returns>
-    Task<TEntity> Get(string key);
+    Task<TEntity?> Get(string key);
 
     /// <summary>
     /// Gets all entities from storage of a given type

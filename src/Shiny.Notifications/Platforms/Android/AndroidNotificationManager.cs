@@ -4,7 +4,6 @@ using Android.App;
 using Android.Content;
 using AndroidX.Core.App;
 using Java.Lang;
-using Shiny.Infrastructure;
 
 namespace Shiny.Notifications;
 
@@ -13,18 +12,15 @@ public class AndroidNotificationManager
 {
     public NotificationManagerCompat NativeManager { get; }
     readonly AndroidPlatform platform;
-    readonly ISerializer serializer;
     readonly IChannelManager channelManager;
 
 
     public AndroidNotificationManager(
         AndroidPlatform platform,
-        ISerializer serializer,
         IChannelManager channelManager
     )
     {
         this.platform = platform;
-        this.serializer = serializer;
         this.NativeManager = NotificationManagerCompat.From(this.platform.AppContext);
         this.channelManager = channelManager;
     }
@@ -45,11 +41,8 @@ public class AndroidNotificationManager
 
     public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification, Channel channel)
     {
-        var builder = new NotificationCompat.Builder(this.platform.AppContext, channel.Identifier)
-            .SetContentTitle(notification.Title);
-
-
-        this.ApplyChannel(builder, notification, channel);
+        var builder = new NotificationCompat.Builder(this.platform.AppContext, channel.Identifier);
+        // TODO: apply customizers here including default
         return builder;
     }
 
@@ -80,145 +73,6 @@ public class AndroidNotificationManager
 
     AlarmManager? alarms;
     public AlarmManager Alarms => this.alarms ??= this.platform.GetSystemService<AlarmManager>(Context.AlarmService);
-
-
-    public virtual void ApplyLaunchIntent(NotificationCompat.Builder builder, Notification notification)
-    {
-        var pendingIntent = this.GetLaunchPendingIntent(notification);
-        builder.SetContentIntent(pendingIntent);
-    }
-
-
-    public virtual void ApplyChannel(NotificationCompat.Builder builder, Notification notification, Channel channel)
-    {
-        if (channel == null)
-            return;
-
-        builder.SetChannelId(channel.Identifier);
-        if (channel.Actions != null)
-        {
-            foreach (var action in channel.Actions)
-            {
-                switch (action.ActionType)
-                {
-                    case ChannelActionType.OpenApp:
-                        break;
-
-                    case ChannelActionType.TextReply:
-                        var textReplyAction = this.CreateTextReply(notification, action);
-                        builder.AddAction(textReplyAction);
-                        break;
-
-                    case ChannelActionType.None:
-                    case ChannelActionType.Destructive:
-                        var destAction = this.CreateAction(notification, action);
-                        builder.AddAction(destAction);
-                        break;
-
-                    default:
-                        throw new ArgumentException("Invalid action type");
-                }
-            }
-        }
-    }
-
-
-    public virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
-    {
-        Intent launchIntent;
-
-        //if (notification.Android.LaunchActivityType == null)
-        //{
-            launchIntent = this.platform!
-                .AppContext!
-                .PackageManager!
-                .GetLaunchIntentForPackage(this.platform!.Package!.PackageName!)!
-                .SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
-        //}
-        //else
-        //{
-        //    launchIntent = new Intent(
-        //        this.platform.AppContext,
-        //        notification.Android.LaunchActivityType
-        //    );
-        //}
-
-        this.PopulateIntent(launchIntent, notification);
-
-        PendingIntent pendingIntent;
-        //if ((notification.Android.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
-        //{
-        //    pendingIntent = AndroidX.Core.App.TaskStackBuilder
-        //        .Create(this.platform.AppContext)
-        //        .AddNextIntent(launchIntent)
-        //        .GetPendingIntent(
-        //            notification.Id,
-        //            (int)this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
-        //        );
-        //}
-        //else
-        //{
-            pendingIntent = PendingIntent.GetActivity(
-                this.platform.AppContext!,
-                notification.Id,
-                launchIntent!,
-                this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
-            )!;
-        //}
-        return pendingIntent;
-    }
-
-
-
-    static int counter = 100;
-    protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
-    {
-        counter++;
-        return this.platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
-            ShinyNotificationBroadcastReceiver.EntryIntentAction,
-            PendingIntentFlags.UpdateCurrent,
-            counter,
-            intent =>
-            {
-                this.PopulateIntent(intent, notification);
-                intent.PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
-            }
-        );
-    }
-
-
-    protected virtual void PopulateIntent(Intent intent, Notification notification)
-    {
-        var content = this.serializer.Serialize(notification);
-        intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, content);
-    }
-
-
-    protected virtual NotificationCompat.Action CreateAction(Notification notification, ChannelAction action)
-    {
-        var pendingIntent = this.CreateActionIntent(notification, action);
-        var iconId = this.platform.GetResourceIdByName(action.Identifier);
-        var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
-
-        return nativeAction;
-    }
-
-
-    protected virtual NotificationCompat.Action CreateTextReply(Notification notification, ChannelAction action)
-    {
-        var pendingIntent = this.CreateActionIntent(notification, action);
-        var input = new AndroidX.Core.App.RemoteInput.Builder(AndroidNotificationProcessor.RemoteInputResultKey)
-            .SetLabel(action.Title)
-            .Build();
-
-        var iconId = this.platform.GetResourceIdByName(action.Identifier);
-        var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
-            .SetAllowGeneratedReplies(true)
-            .AddRemoteInput(input)
-            .Build();
-
-        return nativeAction;
-    }
 
 
     public virtual void SendNative(int id, Android.App.Notification notification)
