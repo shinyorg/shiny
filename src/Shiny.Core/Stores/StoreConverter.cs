@@ -58,15 +58,18 @@ public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEnt
     //    TypeDescriptor.GetConverter(type).CanConvertFrom(typeof(string));
     protected virtual object ConvertFromStore(Type expectedType, object value)
     {
+        if (expectedType.IsValueType && Nullable.GetUnderlyingType(expectedType) != null)
+            expectedType = Nullable.GetUnderlyingType(expectedType)!;
+
         // TODO: validate value can be converted to expectedType
         if (expectedType == typeof(TimeSpan))
-            return TimeSpan.FromMilliseconds((double)value);
+            return TimeSpan.FromMilliseconds(Convert.ToDouble(value));
 
         if (expectedType == typeof(Distance))
-            return Distance.FromKilometers((double)value);
+            return Distance.FromKilometers(Convert.ToDouble(value));
 
         if (expectedType == typeof(DateTimeOffset))
-            return DateTimeOffset.FromUnixTimeSeconds((long)value);
+            return DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(value));
 
         if (expectedType == typeof(IDictionary<string, string>))
             return JsonSerializer.Deserialize<Dictionary<string, string>>((string)value)!;

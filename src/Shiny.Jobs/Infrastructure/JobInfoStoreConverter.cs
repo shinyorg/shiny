@@ -17,7 +17,7 @@ public class JobInfoStoreConverter : StoreConverter<JobInfo>
             Repeat = (bool)values[nameof(JobInfo.Repeat)],
             DeviceCharging = (bool)values[nameof(JobInfo.DeviceCharging)],
             BatteryNotLow = (bool)values[nameof(JobInfo.BatteryNotLow)],
-            RequiredInternetAccess = (InternetAccess)values[nameof(JobInfo.RequiredInternetAccess)],
+            RequiredInternetAccess = (InternetAccess)(long)values[nameof(JobInfo.RequiredInternetAccess)],
             PeriodicTime = this.ConvertFromStoreValue<TimeSpan?>(values, nameof(JobInfo.PeriodicTime)),
             LastRun = this.ConvertFromStoreValue<DateTimeOffset?>(values, nameof(JobInfo.LastRun))
         };
