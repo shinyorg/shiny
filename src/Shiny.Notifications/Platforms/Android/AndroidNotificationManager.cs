@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -13,36 +14,36 @@ public class AndroidNotificationManager
     public NotificationManagerCompat NativeManager { get; }
     readonly AndroidPlatform platform;
     readonly IChannelManager channelManager;
+    readonly IEnumerable<INotificationCustomizer> customizers;
 
 
     public AndroidNotificationManager(
         AndroidPlatform platform,
-        IChannelManager channelManager
+        IChannelManager channelManager,
+        IEnumerable<INotificationCustomizer> customizers
     )
     {
         this.platform = platform;
         this.NativeManager = NotificationManagerCompat.From(this.platform.AppContext);
         this.channelManager = channelManager;
+        this.customizers = customizers;
     }
 
 
     public virtual async Task Send(Notification notification)
     {
-        var channel = await this.channelManager.Get(notification.Channel!);
-        //await this.Services.Platform.TrySetImage(notification.ImageUri, builder);
-        var builder = this.CreateNativeBuilder(notification, channel!);
+        var channel = await this.channelManager.Get(notification.Channel!).ConfigureAwait(false);
+        var builder = await this.CreateNativeBuilder(notification, channel!).ConfigureAwait(false);
         this.SendNative(notification.Id, builder.Build());
     }
 
 
-    public Android.App.Notification CreateNativeNotification(Notification notification, Channel channel)
-        => this.CreateNativeBuilder(notification, channel).Build();
-
-
-    public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification, Channel channel)
+    public virtual async Task<NotificationCompat.Builder> CreateNativeBuilder(Notification notification, Channel channel)
     {
         var builder = new NotificationCompat.Builder(this.platform.AppContext, channel.Identifier);
-        // TODO: apply customizers here including default
+        foreach (var customizer in this.customizers)
+            await customizer.Customize(notification, channel, builder).ConfigureAwait(false);
+
         return builder;
     }
 

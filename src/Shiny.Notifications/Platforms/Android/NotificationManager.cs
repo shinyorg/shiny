@@ -29,6 +29,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         IServiceProvider services,
         AndroidPlatform platform,
         AndroidNotificationManager manager,
+        IRepository<Notification> repository,
         IChannelManager channelManager,
         IGeofenceManager geofenceManager,
         IKeyValueStoreFactory keystore
@@ -37,6 +38,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         this.processor = services.GetLazyService<AndroidNotificationProcessor>();
         this.platform = platform;
         this.manager = manager;
+        this.repository = repository;
         this.channelManager = channelManager;
         this.geofenceManager = geofenceManager;
         this.settings = keystore.DefaultStore;
@@ -125,7 +127,9 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         if (channel == null)
             throw new InvalidProgramException("There is no default channel!!");
 
-        var builder = this.manager.CreateNativeBuilder(notification, channel!);
+        var builder = await this.manager
+            .CreateNativeBuilder(notification, channel!)
+            .ConfigureAwait(false);
 
         if (notification.Geofence != null)
         {
@@ -171,8 +175,17 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
     }
 
 
-    public void Handle(Android.App.Activity activity, Intent intent)
+    public async void Handle(Android.App.Activity activity, Intent intent)
     {
-        this.processor.Value.TryProcessIntent(intent);
+        try
+        {
+            await this.processor.Value
+                .TryProcessIntent(intent)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 }

@@ -2,9 +2,11 @@
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using AndroidX.Core.App;
 using Shiny.Infrastructure;
 using Native = AndroidX.Core.App.NotificationCompat.Builder;
+using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
 
 namespace Shiny.Notifications;
 
@@ -13,21 +15,18 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
 {
     readonly AndroidPlatform platform;
     readonly ISerializer serializer;
-    readonly AndroidCustomizationOptions? options;
-    readonly Action<Notification, Channel, Native>? onCustomize;
+    readonly AndroidCustomizationOptions options;
 
 
     public DefaultAndroidNotificationCustomizer(
-        AndroidPlatform platform, 
+        AndroidPlatform platform,
         ISerializer serializer,
-        AndroidCustomizationOptions? options, 
-        Action<Notification, Channel, Native>? onCustomize
+        AndroidCustomizationOptions? options = null
     )
     {
         this.platform = platform;
         this.serializer = serializer;
         this.options = options ?? new AndroidCustomizationOptions();
-        this.onCustomize = onCustomize;
     }
 
 
@@ -42,10 +41,10 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
             .SetOngoing(this.options.OnGoing)
             .SetContentIntent(this.GetLaunchPendingIntent(notification));
 
-        
-        //if (!notification.Thread.IsEmpty())
-        //    builder.SetGroup(notification.Thread);
+        if (!notification.Thread.IsEmpty())
+            builder.SetGroup(notification.Thread);
 
+        //await this.Services.Platform.TrySetImage(notification.ImageUri, builder);
         //this.ApplyLaunchIntent(builder, notification);
         //if (!this.options.ContentInfo.IsEmpty())
         //    builder.SetContentInfo(this.options.ContentInfo);
@@ -66,17 +65,18 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
         else
             builder.SetContentText(notification.Message);
 
-        //this.platform.TrySetLargeIconResource(notification.Android.LargeIconResourceName, builder);
+        if (!this.options.LargeIconResourceName.IsEmpty())
+        {
+            var iconId = this.platform.GetResourceIdByName(this.options.LargeIconResourceName!);
+            if (iconId > 0)
+                builder.SetLargeIcon(BitmapFactory.DecodeResource(this.platform.AppContext.Resources, iconId));
+        }
 
         if (!this.options.ColorResourceName.IsEmpty())
         {
             var color = this.platform.GetColorResourceId(this.options.ColorResourceName!);
             builder.SetColor(color);
         }
-        
-
-        this.onCustomize?.Invoke(notification, channel, builder);
-
         return Task.CompletedTask;
     }
 
@@ -109,13 +109,13 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
         PendingIntent pendingIntent;
         if ((this.options.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
         {
-            pendingIntent = AndroidX.Core.App.TaskStackBuilder
+            pendingIntent = TaskStackBuilder
                 .Create(this.platform.AppContext)
                 .AddNextIntent(launchIntent)
                 .GetPendingIntent(
                     notification.Id,
                     (int)this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
-                );
+                )!;
         }
         else
         {
