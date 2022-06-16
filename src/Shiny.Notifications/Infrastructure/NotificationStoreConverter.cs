@@ -15,12 +15,15 @@ public class NotificationStoreConverter : StoreConverter<Notification>
             Id = Int32.Parse((string)values[nameof(Notification.Identifier)]),
             Message = (string)values[nameof(Notification.Message)],
             Channel = (string)values[nameof(Notification.Channel)],
-            Title = this.Get<string>(values, nameof(Notification.Title)),
-            Thread = this.Get<string>(values, nameof(Notification.Thread)),
-            ImageUri = this.Get<string>(values, nameof(Notification.ImageUri)),
-            BadgeCount = this.Get<int>(values, nameof(Notification.BadgeCount), 0),
-            ScheduleDate = this.Get<DateTimeOffset>(values, nameof(Notification.ScheduleDate))
+            Title = this.ConvertFromStoreValue<string>(values, nameof(Notification.Title)),
+            Thread = this.ConvertFromStoreValue<string>(values, nameof(Notification.Thread)),
+            ImageUri = this.ConvertFromStoreValue<string>(values, nameof(Notification.ImageUri)),
+            BadgeCount = this.ConvertFromStoreValue<int?>(values, nameof(Notification.BadgeCount)),
+            ScheduleDate = this.ConvertFromStoreValue<DateTimeOffset?>(values, nameof(Notification.ScheduleDate))
         };
+        if (values.ContainsKey(nameof(Notification.Payload)))
+            result.Payload = JsonSerializer.Deserialize<Dictionary<string, string>>((string)values[nameof(Notification.Payload)]);
+
         if (values.ContainsKey(nameof(Notification.Geofence)))
             result.Geofence = JsonSerializer.Deserialize<GeofenceTrigger>((string)values[nameof(Notification.Geofence)]);
 
@@ -36,6 +39,9 @@ public class NotificationStoreConverter : StoreConverter<Notification>
         yield return (nameof(entity.Channel), entity.Channel!);
         yield return (nameof(entity.Message), entity.Message!);
 
+        if (entity.BadgeCount != null)
+            yield return (nameof(entity.BadgeCount), entity.BadgeCount!);
+
         if (entity.Title != null)
             yield return (nameof(entity.Title), entity.Title);
 
@@ -47,7 +53,7 @@ public class NotificationStoreConverter : StoreConverter<Notification>
 
         if ((entity.Payload?.Count) > 0)
             yield return (nameof(entity.Payload), this.ConvertToStoreValue(entity.Payload));
-        
+
         if (entity.Geofence != null)
             yield return (nameof(entity.Geofence), JsonSerializer.Serialize(entity.Geofence));
 

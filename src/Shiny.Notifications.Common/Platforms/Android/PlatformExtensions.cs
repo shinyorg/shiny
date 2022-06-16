@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
@@ -13,28 +10,6 @@ namespace Shiny.Notifications;
 
 public static class PlatformExtensions
 {
-    // Construct a raw resource path of the form
-    // "android.resource://<PKG_NAME>/raw/<RES_NAME>", e.g.
-    // "android.resource://com.shiny.sample/raw/notification"
-    public static Android.Net.Uri GetSoundResourceUri(this AndroidPlatform platform, string soundResourceName)
-    {
-        // Strip file extension and leading slash from resource name to allow users
-        // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
-        if (File.Exists(soundResourceName))
-            return Android.Net.Uri.Parse("file://" + soundResourceName)!;
-
-        soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
-        var resourceId = platform.GetRawResourceIdByName(soundResourceName);
-        var resources = platform.AppContext.Resources!;
-        return new Android.Net.Uri.Builder()
-            .Scheme(ContentResolver.SchemeAndroidResource)!
-            .Authority(resources.GetResourcePackageName(resourceId))!
-            .AppendPath(resources.GetResourceTypeName(resourceId))!
-            .AppendPath(resources.GetResourceEntryName(resourceId))!
-            .Build()!;
-    }
-
-
     public static int GetColorResourceId(this AndroidPlatform platform, string colorResourceName)
     {
         var colorResourceId = platform.GetColorByName(colorResourceName);
@@ -53,7 +28,11 @@ public static class PlatformExtensions
             if (id > 0)
                 return id;
 
-            return platform.AppContext.ApplicationInfo!.Icon;
+            id = platform.AppContext.ApplicationInfo!.Icon;
+            if (id > 0)
+                return id;
+
+            throw new InvalidOperationException("Default notification icon not found - you need to create an android resource named notification or set the application icon");
         }
         var smallIconResourceId = platform.GetResourceIdByName(resourceName!);
         if (smallIconResourceId <= 0)

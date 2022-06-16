@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Acr.UserDialogs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Maui.LifecycleEvents;
 using Xunit.Runners.Maui;
 
 namespace Shiny.Tests;
@@ -25,6 +27,14 @@ public static class MauiProgram
                 }
             })
             .UseVisualRunner()
+            .ConfigureLifecycleEvents(lc =>
+            {
+#if ANDROID
+                lc.AddAndroid(x => x.OnApplicationCreating(app => UserDialogs.Init(app)));
+#elif IOS
+                UserDialogs.Init();
+#endif
+            })
             .Build();
     }
 }

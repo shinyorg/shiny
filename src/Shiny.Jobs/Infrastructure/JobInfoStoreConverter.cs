@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using Shiny.Stores;
 
 namespace Shiny.Jobs.Infrastructure;
 
 
-public class JobInfoStoreConverter : IStoreConverter<JobInfo>
+public class JobInfoStoreConverter : StoreConverter<JobInfo>
 {
-    public JobInfo FromStore(IDictionary<string, object> values)
+    public override JobInfo FromStore(IDictionary<string, object> values)
     {
         var info = new JobInfo((string)values[nameof(JobInfo.TypeName)], (string)values[nameof(JobInfo.Identifier)])
         {
@@ -16,27 +17,19 @@ public class JobInfoStoreConverter : IStoreConverter<JobInfo>
             Repeat = (bool)values[nameof(JobInfo.Repeat)],
             DeviceCharging = (bool)values[nameof(JobInfo.DeviceCharging)],
             BatteryNotLow = (bool)values[nameof(JobInfo.BatteryNotLow)],
-            RequiredInternetAccess = (InternetAccess)values[nameof(JobInfo.RequiredInternetAccess)],
-            Parameters = (Dictionary<string, object>)values[nameof(JobInfo.Parameters)]
+            RequiredInternetAccess = (InternetAccess)(long)values[nameof(JobInfo.RequiredInternetAccess)],
+            PeriodicTime = this.ConvertFromStoreValue<TimeSpan?>(values, nameof(JobInfo.PeriodicTime)),
+            LastRun = this.ConvertFromStoreValue<DateTimeOffset?>(values, nameof(JobInfo.LastRun))
         };
 
-        if (values.ContainsKey(nameof(JobInfo.LastRunUtc)))
-        {
-            var unixMillis = (long)values[nameof(JobInfo.LastRunUtc)];
-            info.LastRunUtc = DateTimeOffset.FromUnixTimeMilliseconds(unixMillis).UtcDateTime;
-        }
-
-        if (values.ContainsKey(nameof(JobInfo.PeriodicTime)))
-        {
-            var time = (double)values[nameof(JobInfo.PeriodicTime)];
-            info.PeriodicTime = TimeSpan.FromSeconds(time);
-        }
+        if (values.ContainsKey(nameof(JobInfo.Parameters)))
+            info.Parameters = JsonSerializer.Deserialize<Dictionary<string, string>>((string)values[nameof(JobInfo.Parameters)])!;
 
         return info;
     }
 
 
-    public IEnumerable<(string Property, object Value)> ToStore(JobInfo entity)
+    public override IEnumerable<(string Property, object Value)> ToStore(JobInfo entity)
     {
         yield return (nameof(JobInfo.TypeName), entity.TypeName);
         yield return (nameof(JobInfo.IsSystemJob), entity.IsSystemJob);
@@ -45,12 +38,14 @@ public class JobInfoStoreConverter : IStoreConverter<JobInfo>
         yield return (nameof(JobInfo.RunOnForeground), entity.RunOnForeground);
         yield return (nameof(JobInfo.DeviceCharging), entity.DeviceCharging);
         yield return (nameof(JobInfo.BatteryNotLow), entity.BatteryNotLow);
-        yield return (nameof(JobInfo.Parameters), entity.Parameters);
 
-        if (entity.LastRunUtc != null)
-            yield return (nameof(JobInfo.LastRunUtc), new DateTimeOffset(entity.LastRunUtc.Value).ToUnixTimeMilliseconds());
+        if ((entity.Parameters?.Count ?? 0) > 0)
+            yield return (nameof(JobInfo.Parameters), JsonSerializer.Serialize(entity.Parameters));
+
+        if (entity.LastRun != null)
+            yield return (nameof(JobInfo.LastRun), this.ConvertToStoreValue(entity.LastRun));
 
         if (entity.PeriodicTime != null)
-            yield return (nameof(JobInfo.PeriodicTime), entity.PeriodicTime.Value.TotalSeconds);
+            yield return (nameof(JobInfo.PeriodicTime), this.ConvertToStoreValue(entity.PeriodicTime));
     }
 }

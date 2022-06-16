@@ -80,18 +80,4 @@ public interface INotificationManager
     /// <param name="notification"></param>
     /// <returns>The messageID that you can use to cancel with</returns>
     Task Send(Notification notification);
-
-
-    /// <summary>
-    /// Get the app icon badge
-    /// </summary>
-    Task<int> GetBadge();
-
-
-    /// <summary>
-    /// Set the badge number
-    /// </summary>
-    /// <param name="badge">0 or null to clear</param>
-    /// <returns></returns>
-    Task SetBadge(int? badge);
 }

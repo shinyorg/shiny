@@ -189,6 +189,9 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
             }
 
             var entity = this.converter.FromStore(dictionary);
+            if (entity.Identifier.IsEmpty())
+                throw new InvalidOperationException("Identifier not set on store entity");
+
             dict.Add(entity.Identifier, entity);
         }
         return dict;

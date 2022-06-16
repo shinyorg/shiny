@@ -5,18 +5,12 @@ using Shiny.Stores;
 namespace Shiny.Beacons.Infrastructure;
 
 
-public class BeaconRegionStoreConverter : IStoreConverter<BeaconRegion>
+public class BeaconRegionStoreConverter : StoreConverter<BeaconRegion>
 {
-    public BeaconRegion FromStore(IDictionary<string, object> values)
+    public override BeaconRegion FromStore(IDictionary<string, object> values)
     {
-        ushort? major = null;
-        ushort? minor = null;
-
-        if (values.ContainsKey(nameof(BeaconRegion.Major)))
-            major = (ushort)values[nameof(BeaconRegion.Major)];
-
-        if (values.ContainsKey(nameof(BeaconRegion.Minor)))
-            major = (ushort)values[nameof(BeaconRegion.Minor)];
+        var major = this.ConvertFromStoreValue<ushort?>(values, nameof(BeaconRegion.Major));
+        var minor = this.ConvertFromStoreValue<ushort?>(values, nameof(BeaconRegion.Minor));
 
         return new BeaconRegion(
             (string)values[nameof(BeaconRegion.Identifier)],
@@ -31,11 +25,9 @@ public class BeaconRegionStoreConverter : IStoreConverter<BeaconRegion>
     }
 
 
-    public IEnumerable<(string Property, object Value)> ToStore(BeaconRegion entity)
+    public override IEnumerable<(string Property, object Value)> ToStore(BeaconRegion entity)
     {
-        entity.Validate();
-
-        yield return (nameof(BeaconRegion.Identifier), entity.Identifier);
+        //entity.Validate();
         yield return (nameof(BeaconRegion.Uuid), entity.Uuid);
         yield return (nameof(BeaconRegion.NotifyOnEntry), entity.NotifyOnEntry);
         yield return (nameof(BeaconRegion.NotifyOnExit), entity.NotifyOnExit);

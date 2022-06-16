@@ -127,20 +127,4 @@ public static class JobExtensions
             //Parameters = parameters?.ToDictionary() // TODO
         }, clearJobQueueFirst);
     }
-
-    public static void SetParameter<T>(this JobInfo job, string key, T value)
-        => job.Parameters[key] = value;
-
-
-    public static T? GetParameter<T>(this JobInfo job, string key, T? defaultValue = default)
-    {
-        if (!job.Parameters.ContainsKey(key))
-            return defaultValue;
-
-        var value = job.Parameters[key];
-        if (typeof(T).IsPrimitive)
-            return (T)Convert.ChangeType(value, typeof(T));
-
-        return (T)value;
-    }
 }

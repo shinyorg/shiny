@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -29,6 +31,7 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
         this.platform = platform;
         this.nativeManager = platform.GetSystemService<NotificationManager>(Context.NotificationService);
     }
+
 
     public void Start()
     {
@@ -68,7 +71,7 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
 
         Android.Net.Uri? uri = null;
         if (!channel.CustomSoundPath.IsEmpty())
-            uri = this.platform.GetSoundResourceUri(channel.CustomSoundPath!);
+            uri = this.GetSoundResourceUri(channel.CustomSoundPath!);
 
         switch (channel.Importance)
         {
@@ -123,5 +126,28 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
 
         this.nativeManager.DeleteNotificationChannel(channelId);
         return this.repository.Remove(channelId);
+    }
+
+
+    // Construct a raw resource path of the form
+    // "android.resource://<PKG_NAME>/raw/<RES_NAME>", e.g.
+    // "android.resource://com.shiny.sample/raw/notification"
+    protected Android.Net.Uri GetSoundResourceUri(string soundResourceName)
+    {
+        // Strip file extension and leading slash from resource name to allow users
+        // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
+        if (File.Exists(soundResourceName))
+            return Android.Net.Uri.Parse("file://" + soundResourceName)!;
+
+        soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
+        var resourceId = this.platform.GetRawResourceIdByName(soundResourceName);
+        var resources = this.platform.AppContext.Resources!;
+
+        return new Android.Net.Uri.Builder()
+            .Scheme(ContentResolver.SchemeAndroidResource)!
+            .Authority(resources.GetResourcePackageName(resourceId))!
+            .AppendPath(resources.GetResourceTypeName(resourceId))!
+            .AppendPath(resources.GetResourceEntryName(resourceId))!
+            .Build()!;
     }
 }

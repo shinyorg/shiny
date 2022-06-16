@@ -214,7 +214,7 @@ public abstract class AbstractJobManager : IJobManager
         {
             if (!cancel)
             {
-                job.LastRunUtc = DateTime.UtcNow;
+                job.LastRun = DateTimeOffset.UtcNow;
                 await this.repository.Set(job).ConfigureAwait(false);
             }
         }

@@ -21,6 +21,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     public static bool UseCriticalAlerts { get; set; }
 
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
+    readonly IEnumerable<INotificationCustomizer> customizers;
     readonly IPlatform platform;
     readonly IChannelManager channelManager;
     readonly IKeyValueStore settings;
@@ -30,13 +31,15 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         IServiceProvider services,
         IPlatform platform,
         IChannelManager channelManager,
-        IKeyValueStoreFactory keystore
+        IKeyValueStoreFactory keystore,
+        IEnumerable<INotificationCustomizer> customizers
     )
     {
         this.delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
         this.platform = platform;
         this.channelManager = channelManager;
         this.settings = keystore.DefaultStore;
+        this.customizers = customizers;
     }
 
 
@@ -122,12 +125,26 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         if (notification.Id == 0)
             notification.Id = this.settings.IncrementValue("NotificationId");
 
-        var content = await this.GetContent(notification);
+        var channel = Channel.Default;
+        if (!notification.Channel.IsEmpty())
+        {
+            channel = await this.channelManager.Get(notification.Channel!);
+            if (channel == null)
+                throw new InvalidOperationException($"{notification.Channel} does not exist");
+        }
+
+        var content = await this
+            .GetContent(notification, channel)
+            .ConfigureAwait(false);
+
         var request = UNNotificationRequest.FromIdentifier(
             notification.Id.ToString(),
             content,
             this.GetTrigger(notification)
         );
+        foreach (var customizer in this.customizers)
+            await customizer.Customize(notification, channel, request).ConfigureAwait(false);
+
         await UNUserNotificationCenter
             .Current
             .AddNotificationRequestAsync(request)
@@ -154,7 +171,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     });
 
 
-    protected virtual async Task<UNMutableNotificationContent> GetContent(Notification notification)
+    protected virtual async Task<UNMutableNotificationContent> GetContent(Notification notification, Channel channel)
     {
         var content = new UNMutableNotificationContent
         {
@@ -176,22 +193,13 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         if (notification.Payload?.Any() ?? false)
             content.UserInfo = notification.Payload!.ToNsDictionary();
 
-        await this.ApplyChannel(notification, content);
+        await this.ApplyChannel(notification, channel, content);
         return content;
     }
 
 
-    protected virtual async Task ApplyChannel(Notification notification, UNMutableNotificationContent native)
+    protected virtual async Task ApplyChannel(Notification notification, Channel channel, UNMutableNotificationContent native)
     {
-        var channel = Channel.Default;
-
-        if (!notification.Channel.IsEmpty())
-        {
-            channel = await this.channelManager.Get(notification.Channel!);
-            if (channel == null)
-                throw new InvalidOperationException($"{notification.Channel} does not exist");
-        }
-
         if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
         {
             native.InterruptionLevel = channel.Importance switch
@@ -325,7 +333,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             if (data != null)
             {
                 // TODO: need to parse this back into a notification
-                data.FromNsDictionary();
+                //data.FromNsDictionary();
             }
         }
     }

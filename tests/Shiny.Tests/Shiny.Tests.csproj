@@ -25,28 +25,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+
+        <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+
+        <!-- Images -->
+        <!--<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />-->
+
         <MauiImage Include="Resources\Images\*" />
-        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
         <MauiFont Include="Resources\Fonts\*" />
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
     <ItemGroup>
-      <AndroidResource Remove="Samples\**" />
-      <Compile Remove="Samples\**" />
-      <EmbeddedResource Remove="Samples\**" />
-      <MauiCss Remove="Samples\**" />
-      <MauiXaml Remove="Samples\**" />
-      <None Remove="Samples\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Include="Samples\SampleJob.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
+        <PackageReference Include="Acr.UserDialogs" Version="8.0.0-alpha-0006" />
         <PackageReference Include="FluentAssertions" Version="6.7.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0-alpha-0008" />

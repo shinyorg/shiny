@@ -13,8 +13,6 @@ namespace Shiny.Notifications;
 
 public partial class NotificationManager : INotificationManager, IAndroidLifecycle.IOnActivityNewIntent
 {
-    const string AndroidBadgeCountKey = "AndroidBadge";
-
     readonly Lazy<AndroidNotificationProcessor> processor;
     readonly AndroidPlatform platform;
     readonly IChannelManager channelManager;
@@ -28,6 +26,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         IServiceProvider services,
         AndroidPlatform platform,
         AndroidNotificationManager manager,
+        IRepository<Notification> repository,
         IChannelManager channelManager,
         IGeofenceManager geofenceManager,
         IKeyValueStoreFactory keystore
@@ -36,6 +35,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         this.processor = services.GetLazyService<AndroidNotificationProcessor>();
         this.platform = platform;
         this.manager = manager;
+        this.repository = repository;
         this.channelManager = channelManager;
         this.geofenceManager = geofenceManager;
         this.settings = keystore.DefaultStore;
@@ -124,7 +124,9 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         if (channel == null)
             throw new InvalidProgramException("There is no default channel!!");
 
-        var builder = this.manager.CreateNativeBuilder(notification, channel!);
+        var builder = await this.manager
+            .CreateNativeBuilder(notification, channel!)
+            .ConfigureAwait(false);
 
         if (notification.Geofence != null)
         {
@@ -143,8 +145,6 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         if (notification.ScheduleDate == null && notification.Geofence == null)
         {
             this.manager.SendNative(notification.Id, builder.Build());
-            if (notification.BadgeCount != null)
-                await this.SetBadge(notification.BadgeCount.Value).ConfigureAwait(false);
         }
         else
         {
@@ -155,24 +155,6 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
             if (notification.ScheduleDate != null)
                 this.manager.SetAlarm(notification);
         }
-    }
-
-
-    public Task<int> GetBadge()
-        => Task.FromResult(this.settings.Get(AndroidBadgeCountKey, 0));
-
-
-    public Task SetBadge(int? badge)
-    {
-        var value = badge ?? 0;
-        this.settings.Set(AndroidBadgeCountKey, value);
-
-        if (badge <= 0)
-            global::XamarinShortcutBadger.ShortcutBadger.RemoveCount(this.platform.AppContext);
-        else
-            global::XamarinShortcutBadger.ShortcutBadger.ApplyCount(this.platform.AppContext, value);
-
-        return Task.CompletedTask;
     }
 
 
@@ -190,8 +172,17 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
     }
 
 
-    public void Handle(Android.App.Activity activity, Intent intent)
+    public async void Handle(Android.App.Activity activity, Intent intent)
     {
-        this.processor.Value.TryProcessIntent(intent);
+        try
+        {
+            await this.processor.Value
+                .TryProcessIntent(intent)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 }

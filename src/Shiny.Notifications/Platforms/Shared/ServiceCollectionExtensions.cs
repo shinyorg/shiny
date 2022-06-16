@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
 
 #if ANDROID
         services.AddGeofencing<NotificationGeofenceDelegate>();
+        services.AddSingleton<INotificationCustomizer, DefaultAndroidNotificationCustomizer>();
         services.TryAddSingleton<AndroidNotificationProcessor>();
         services.TryAddSingleton<AndroidNotificationManager>();
 #endif
@@ -38,6 +39,19 @@ public static class ServiceCollectionExtensions
     }
 
 
-    public static bool AddNotifications<T>(this IServiceCollection services)
+#if ANDROID
+    public static bool AddNotifications(this IServiceCollection services, AndroidCustomizationOptions options, Type? delegateType)
+    {
+        services.AddSingleton(options);
+        return services.AddNotifications(delegateType);
+    }
+
+
+    public static bool AddNotifications<T>(this IServiceCollection services, AndroidCustomizationOptions options) where T : INotificationDelegate
+        => services.AddNotifications(options, typeof(T));
+
+#endif
+
+    public static bool AddNotifications<T>(this IServiceCollection services) where T : INotificationDelegate
         => services.AddNotifications(typeof(T));
 }

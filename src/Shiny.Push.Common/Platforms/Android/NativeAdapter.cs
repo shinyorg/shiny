@@ -168,7 +168,7 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
             if (!notification.Body.IsEmpty())
                 builder.SetContentText(notification.Body);
 
-            //this.platform.TrySetImage(notification.ImageUrl, builder);
+            ///this.platform.TrySetImage(notification.ImageUrl, builder);
 
             if (!notification.Color.IsEmpty())
             {
