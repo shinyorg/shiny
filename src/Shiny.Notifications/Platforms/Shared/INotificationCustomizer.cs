@@ -8,10 +8,10 @@ public interface INotificationCustomizer
 {
     Task Customize(Notification notification, Channel channel, AndroidX.Core.App.NotificationCompat.Builder builder);
 }
-#elif IOS
+#elif IOS || MACCATALYST
 public interface INotificationCustomizer
 {
-    Task Customize(Notification notification, Channel channel, UserNotifications.UNNotification nativeNotification);
+    Task Customize(Notification notification, Channel channel, UserNotifications.UNNotificationRequest notificationRequest);
 }
 
 #endif
