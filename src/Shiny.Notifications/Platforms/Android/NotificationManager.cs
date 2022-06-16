@@ -4,9 +4,6 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android;
 using Android.Content;
-
-using AndroidX.Core.App;
-
 using Shiny.Hosting;
 using Shiny.Locations;
 using Shiny.Stores;
