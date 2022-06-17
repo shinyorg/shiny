@@ -44,30 +44,7 @@
 //        }
 
 
-//        [Fact]
-//        public async Task EndToEnd()
-//        {
-//            var access = await this.push.RequestAccess();
-//            var task = this.push.WhenReceived().Take(1).Timeout(TimeSpan.FromSeconds(20)).ToTask();
 
-//            var response = await this.apnSender.SendAsync(
-//                new AppleNotification
-//                {
-//                    AlertBody = new AppleNotification.Alert
-//                    {
-//                        Title = "Test Title",
-//                        Body = "Test Body"
-//                    }
-//                },
-//                access.RegistrationToken
-//            );
-//            response.IsSuccess.Should().BeTrue();
-
-//            var result = await task.ConfigureAwait(false);
-//            result.Notification.Should().NotBeNull("Notification is null");
-//            result.Notification.Title.Should().Be("Test Title");
-//            result.Notification.Message.Should().Be("Test Body");
-//        }
 //    }
 
 
