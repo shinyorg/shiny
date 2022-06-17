@@ -73,7 +73,7 @@ namespace Shiny.Generators
             {
                 using (builder.BlockInvariant($"public partial class {activity.Name}"))
                 {
-                    //this.TryAppendOnCreate(activity, builder);
+                    this.TryAppendOnCreate(activity, builder);
                     //this.TryAppendOnResume(activity, builder);
                     this.TryAppendNewIntent(activity, builder);
                     this.TryAppendActivityResult(activity, builder);
@@ -87,52 +87,44 @@ namespace Shiny.Generators
         void TryAppendOnCreate(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
             if (activity.HasMethod("OnCreate"))
-            {
-                this.context.Log(
-                    "SHINY005",
-                    $"OnCreate already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnCreate hook for this"
-                );
-            }
-            else
-            {
-                builder.AppendLineInvariant("partial void OnBeforeCreate(Bundle savedInstanceState);");
-                builder.AppendLineInvariant("partial void OnAfterCreate(Bundle savedInstanceState);");
-                using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
-                {
-                    //builder.AppendLineInvariant("this.ShinyOnCreate();");
-                    builder.AppendLineInvariant("this.OnBeforeCreate(savedInstanceState);");
-                    this.TryAppendOnCreateThirdParty(activity, builder);
+                return;
 
-                    if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName))
+            builder.AppendLineInvariant("partial void OnBeforeCreate(Bundle savedInstanceState);");
+            builder.AppendLineInvariant("partial void OnAfterCreate(Bundle savedInstanceState);");
+            using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
+            {
+                builder.AppendLineInvariant("this.OnBeforeCreate(savedInstanceState);");
+                this.TryAppendOnCreateThirdParty(activity, builder);
+
+                if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName))
+                {
+                    builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                }
+                else
+                {
+                    var xfFormsActivityType = this.context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
+                    if (xfFormsActivityType != null && activity.Inherits(xfFormsActivityType))
                     {
+                        // do XF stuff
+                        builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
+                        builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
                         builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                        builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
+
+                        if (this.context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
+                            builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init(this, savedInstanceState);");
+
+                        if (this.context.Compilation.GetTypeByMetadataName("Xamarin.FormsMaps") != null)
+                            builder.AppendLineInvariant("global::Xamarin.FormsMaps.Init(this, savedInstanceState);");
+
+                        builder.AppendLineInvariant($"this.LoadApplication(new global::{this.values.XamarinFormsAppTypeName}());");
                     }
                     else
                     {
-                        var xfFormsActivityType = this.context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
-                        if (xfFormsActivityType != null && activity.Inherits(xfFormsActivityType))
-                        {
-                            // do XF stuff
-                            builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
-                            builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
-                            builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
-                            builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
-
-                            if (this.context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
-                                builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init(this, savedInstanceState);");
-
-                            if (this.context.Compilation.GetTypeByMetadataName("Xamarin.FormsMaps") != null)
-                                builder.AppendLineInvariant("global::Xamarin.FormsMaps.Init(this, savedInstanceState);");
-
-                            builder.AppendLineInvariant($"this.LoadApplication(new global::{this.values.XamarinFormsAppTypeName}());");
-                        }
-                        else
-                        {
-                            builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
-                        }
+                        builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
                     }
-                    builder.AppendLineInvariant("this.OnAfterCreate(savedInstanceState);");
                 }
+                builder.AppendLineInvariant("this.OnAfterCreate(savedInstanceState);");
             }
         }
 
