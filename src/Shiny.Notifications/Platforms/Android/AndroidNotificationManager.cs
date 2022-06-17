@@ -34,7 +34,7 @@ public class AndroidNotificationManager
     {
         var channel = await this.channelManager.Get(notification.Channel!).ConfigureAwait(false);
         var builder = await this.CreateNativeBuilder(notification, channel!).ConfigureAwait(false);
-        this.SendNative(notification.Id, builder.Build());
+        this.NativeManager.Notify(notification.Id, builder.Build());
     }
 
 
@@ -74,8 +74,4 @@ public class AndroidNotificationManager
 
     AlarmManager? alarms;
     public AlarmManager Alarms => this.alarms ??= this.platform.GetSystemService<AlarmManager>(Context.AlarmService);
-
-
-    public virtual void SendNative(int id, Android.App.Notification notification)
-        => this.NativeManager.Notify(id, notification);
 }

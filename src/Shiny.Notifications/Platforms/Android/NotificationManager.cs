@@ -144,7 +144,8 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
 
         if (notification.ScheduleDate == null && notification.Geofence == null)
         {
-            this.manager.SendNative(notification.Id, builder.Build());
+            var native = builder.Build();
+            this.manager.NativeManager.Notify(notification.Id, native);
         }
         else
         {

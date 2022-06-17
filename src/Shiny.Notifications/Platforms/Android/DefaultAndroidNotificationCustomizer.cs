@@ -30,25 +30,26 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
     }
 
 
-    public Task Customize(Notification notification, Channel channel, Native builder)
+    public async Task Customize(Notification notification, Channel channel, Native builder)
     {
         this.ApplyChannel(builder, notification, channel);
 
         builder
             .SetContentTitle(notification.Title)
+            .SetContentIntent(this.GetLaunchPendingIntent(notification))
             .SetSmallIcon(this.platform.GetSmallIconResource(this.options.SmallIconResourceName))
             .SetAutoCancel(this.options.AutoCancel)
-            .SetOngoing(this.options.OnGoing)
-            .SetContentIntent(this.GetLaunchPendingIntent(notification));
+            .SetOngoing(this.options.OnGoing);
 
         if (!notification.Thread.IsEmpty())
             builder.SetGroup(notification.Thread);
 
-        //await this.Services.Platform.TrySetImage(notification.ImageUri, builder);
-        //this.ApplyLaunchIntent(builder, notification);
-        //if (!this.options.ContentInfo.IsEmpty())
-        //    builder.SetContentInfo(this.options.ContentInfo);
-
+        if (!notification.ImageUri.IsEmpty())
+        {
+            await this.platform
+                .TrySetImage(notification.ImageUri, builder)
+                .ConfigureAwait(false);
+        }
         //if (notification.BadgeCount != null)
         //{
         //    // channel needs badge too
@@ -77,7 +78,6 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
             var color = this.platform.GetColorResourceId(this.options.ColorResourceName!);
             builder.SetColor(color);
         }
-        return Task.CompletedTask;
     }
 
 
@@ -101,10 +101,7 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
             );
         }
 
-        // TODO
-        //var content = this.serializer.Serialize(notification);
-        //intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, content);
-        //this.PopulateIntent(launchIntent, notification);
+        this.PopulateIntent(launchIntent, notification);
 
         PendingIntent pendingIntent;
         if ((this.options.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
