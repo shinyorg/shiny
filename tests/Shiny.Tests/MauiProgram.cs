@@ -26,6 +26,7 @@ public static class MauiProgram
                     typeof(MauiProgram).Assembly
                 }
             })
+            .UseShiny() // this is somewhat of a hack as it hooks the shiny events BUT to the current host provider
             .UseVisualRunner()
             .ConfigureLifecycleEvents(lc =>
             {

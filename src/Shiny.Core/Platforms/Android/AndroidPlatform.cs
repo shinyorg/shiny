@@ -39,10 +39,10 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     }
 
     // lifecycle hooks
-    public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults) 
+    public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
         => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResults));
 
-    public void Handle(Activity activity, int requestCode, Result resultCode, Intent data) 
+    public void Handle(Activity activity, int requestCode, Result resultCode, Intent data)
         => this.activityResultSubject.OnNext((requestCode, resultCode, data));
 
 
@@ -77,28 +77,28 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     //public string Manufacturer => B.Manufacturer;
     //public string Model => B.Model;
 
-    //public void OnActivityResult(int requestCode, Result resultCode, Intent data) 
+    //public void OnActivityResult(int requestCode, Result resultCode, Intent data)
 
 
 
-    public IObservable<(bool NewIntent, Intent Intent)> WhenIntentReceived() => Observable.Create<(bool NewIntent, Intent Intent)>(ob =>
-    {
-        var comp = new CompositeDisposable();
+    //public IObservable<(bool NewIntent, Intent Intent)> WhenIntentReceived() => Observable.Create<(bool NewIntent, Intent Intent)>(ob =>
+    //{
+    //    var comp = new CompositeDisposable();
 
-        //this.WhenActivityChanged()
-        //    .Where(x =>
-        //        x.State == ActivityState.Resumed &&
-        //        x.Activity.Intent != null
-        //    )
-        //    .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
-        //    .DisposedBy(comp);
+    //    //this.WhenActivityChanged()
+    //    //    .Where(x =>
+    //    //        x.State == ActivityState.Resumed &&
+    //    //        x.Activity.Intent != null
+    //    //    )
+    //    //    .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
+    //    //    .DisposedBy(comp);
 
-        //this.newIntentSubject
-        //    .Subscribe(intent => ob.OnNext((true, intent)))
-        //    .DisposedBy(comp);
+    //    //this.newIntentSubject
+    //    //    .Subscribe(intent => ob.OnNext((true, intent)))
+    //    //    .DisposedBy(comp);
 
-        return comp;
-    });
+    //    return comp;
+    //});
 
 
     public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
@@ -223,5 +223,5 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
         }
 
         return comp;
-    });    
+    });
 }

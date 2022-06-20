@@ -2,8 +2,8 @@
 using FluentAssertions;
 using Xunit;
 
-
 namespace Shiny.Tests.Beacons;
+
 
 public class BeaconParserTests
 {

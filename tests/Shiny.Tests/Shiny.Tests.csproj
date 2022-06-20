@@ -25,13 +25,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
 
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
-        <!-- Images -->
-        <!--<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />-->
         <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
 
         <MauiImage Include="Resources\Images\*" />
@@ -76,4 +73,8 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.1" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.6" />
     </ItemGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-ios'">
+        <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    </PropertyGroup>
 </Project>
