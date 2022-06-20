@@ -18,16 +18,16 @@ namespace Shiny.Push.FirebaseMessaging
         readonly PushContainer container;
         readonly ILogger logger;
         readonly AppleLifecycle lifecycle;
-        readonly FirebaseConfiguration? config;
+        readonly FirebaseConfiguration config;
 
 
         public PushManager(INativeAdapter adapter,
                            PushContainer container,
                            ILogger<PushManager> logger,
                            AppleLifecycle lifecycle,
-                           FirebaseConfiguration? config = null)
+                           FirebaseConfiguration config)
         {
-            config?.AssertValid();
+            config.AssertValid();
 
             this.adapter = adapter;
             this.container = container;
@@ -74,7 +74,7 @@ namespace Shiny.Push.FirebaseMessaging
             });
             if (App.DefaultInstance == null)
             {
-                if (this.config == null)
+                if (this.config.UseEmbeddedConfiguration)
                 {
                     App.Configure();
                     if (Messaging.SharedInstance == null)

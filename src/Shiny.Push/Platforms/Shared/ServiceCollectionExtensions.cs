@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Push;
 
 
@@ -16,6 +17,9 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
+#if MONOANDROID
+            services.TryAddSingleton(new FirebaseConfig { UseEmbeddedConfiguration = true });
+#endif
             services.RegisterModule(new PushModule(
                 typeof(PushManager),
                 delegateType
@@ -25,7 +29,7 @@ namespace Shiny
         }
 
 
-#if __ANDROID__
+#if MONOANDROID
         public static bool UsePush<TDelegate>(this IServiceCollection services, FirebaseConfig config) where TDelegate : class, IPushDelegate
             => services.UsePush(typeof(TDelegate), config);
 

@@ -22,17 +22,17 @@ namespace Shiny.Push
         readonly IPlatform platform;
         readonly ILogger logger;
         readonly IKeyValueStore settings;
-        readonly FirebaseConfig? config;
+        readonly FirebaseConfig config;
 
 
         public NativeAdapter(
             IPlatform platform,
             ILogger<NativeAdapter> logger,
             IKeyValueStore settings,
-            FirebaseConfig? config = null
+            FirebaseConfig config
         )
         {
-            config?.AssertValid();
+            config.AssertValid();
 
             this.platform = platform;
             this.logger = logger;
@@ -57,7 +57,7 @@ namespace Shiny.Push
                     {
                         var dict = new Dictionary<string, string>();
                         if (intent.Extras != null)
-                        { 
+                        {
                             foreach (var key in intent.Extras!.KeySet()!)
                             {
                                 var value = intent.Extras.Get(key)?.ToString();
@@ -160,7 +160,7 @@ namespace Shiny.Push
         {
             if (!this.initialized)
             {
-                if (this.config == null)
+                if (this.config.UseEmbeddedConfiguration)
                 {
                     FirebaseApp.InitializeApp(this.platform.AppContext);
                     if (FirebaseApp.Instance == null)

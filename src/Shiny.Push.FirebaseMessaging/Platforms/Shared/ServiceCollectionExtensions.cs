@@ -13,34 +13,33 @@ namespace Shiny
 
         public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType, FirebaseConfiguration? config = null)
         {
-#if __IOS__
-            config?.AssertValid();
-            if (config != null)
-                services.AddSingleton(config);
+#if XAMARINIOS
+            services.AddSingleton(config ?? new FirebaseConfiguration {  UseEmbeddedConfiguration = true });
 
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Push.FirebaseMessaging.PushManager),
                 delegateType
             ));
             return true;
-#elif __ANDROID__
+#elif MONOANDROID
 
-            if (config != null)
+            if (config == null)
+            {
+                services.UsePush(delegateType);
+            }
+            else
             {
                 services.UsePush(
                     delegateType,
                     new FirebaseConfig
-                    { 
+                    {
+                        UseEmbeddedConfiguration = config.UseEmbeddedConfiguration,
                         AppId = config.AppId,
                         SenderId = config.SenderId,
                         ProjectId = config.ProjectId,
                         ApiKey = config.ApiKey
                     }
                 );
-            }
-            else
-            {
-                services.UsePush(delegateType);
             }
             return true;
 #else

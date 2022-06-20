@@ -7,6 +7,9 @@ namespace Shiny.Push
     {
         public void AssertValid()
         {
+            if (this.UseEmbeddedConfiguration)
+                return;
+
             if (this.AppId == null)
                 throw new ArgumentNullException(nameof(this.AppId));
 
@@ -21,6 +24,10 @@ namespace Shiny.Push
         }
 
 
+        /// <summary>
+        /// If you have included a GoogleService-Info.plist (iOS) or google-services.json (Android), set this to true (default)
+        /// </summary>
+        public bool UseEmbeddedConfiguration { get; set; }
         public string? AppId { get; set; }
         public string? SenderId { get; set; }
         public string? ApiKey { get; set; }

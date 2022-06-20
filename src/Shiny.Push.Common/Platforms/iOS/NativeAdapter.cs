@@ -30,7 +30,7 @@ namespace Shiny.Push
             this.lifecycle = lifecycle;
         }
 
-        
+
         public Func<string, Task>? OnTokenRefreshed { get; set; }
 
 
@@ -75,7 +75,7 @@ namespace Shiny.Push
                 else
                 {
                     this.onEntrySub ??= new CompositeDisposable();
-                    
+
                     this.onEntrySub.Add(this.lifecycle.RegisterForOnFinishedLaunching(async options =>
                     {
                         if (options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
@@ -116,7 +116,7 @@ namespace Shiny.Push
                     }));
                 }
             }
-        }        
+        }
 
 
         public async Task<PushAccessState> RequestAccess()
@@ -203,7 +203,7 @@ namespace Shiny.Push
                             alertDict["title"]?.ToString(),
                             alertDict["body"]?.ToString()
                         );
-                    } 
+                    }
                 }
             }
             return null;
