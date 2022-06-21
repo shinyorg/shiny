@@ -77,4 +77,10 @@
     <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-ios'">
         <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     </PropertyGroup>
+
+    <!--<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
+        <GoogleServicesJson Include="../../google-services.json">
+            <Link>google-services.json</Link>
+        </GoogleServicesJson>
+    </ItemGroup>-->
 </Project>
