@@ -14,10 +14,14 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="fileName"></param>
         /// <param name="optional"></param>
         /// <returns></returns>
-        public static IConfigurationBuilder AddJsonIosBundle(this IConfigurationBuilder builder, string fileName = "appsettings.json", bool optional = true)
+        public static IConfigurationBuilder AddJsonIosBundle(this IConfigurationBuilder builder, string fileName = "appsettings.json", bool optional = true, bool reloadOnChange = true)
         {
+#if MACCATALYST
+            var path = Path.Combine(NSBundle.MainBundle.BundlePath, "Contents", "Resources", fileName);
+#else
             var path = Path.Combine(NSBundle.MainBundle.BundlePath, fileName);
-            return builder.AddJsonFile(path, optional, false);
+#endif
+            return builder.AddJsonFile(path, optional, reloadOnChange);
         }
 
 
