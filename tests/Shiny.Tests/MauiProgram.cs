@@ -1,5 +1,4 @@
-﻿using Acr.UserDialogs;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.LifecycleEvents;
 using Xunit.Runners.Maui;
 
@@ -31,9 +30,9 @@ public static class MauiProgram
             .ConfigureLifecycleEvents(lc =>
             {
 #if ANDROID
-                lc.AddAndroid(x => x.OnApplicationCreating(app => UserDialogs.Init(app)));
+                lc.AddAndroid(x => x.OnApplicationCreating(app => Acr.UserDialogs.UserDialogs.Init(app)));
 #elif IOS
-                UserDialogs.Init();
+                Acr.UserDialogs.UserDialogs.Init();
 #endif
             })
             .Build();
