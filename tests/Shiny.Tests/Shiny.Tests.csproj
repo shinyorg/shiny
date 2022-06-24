@@ -29,11 +29,10 @@
 
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
-        <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
-
         <MauiImage Include="Resources\Images\*" />
         <MauiFont Include="Resources\Fonts\*" />
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
     </ItemGroup>
 
     <ItemGroup>
