@@ -67,7 +67,7 @@ namespace Shiny.Notifications
         public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
 
 
-        public Task<int> GetBadge() => this.services.Platform.InvokeOnMainThreadAsync<int>(() =>
+        public Task<int> GetBadge() => this.services.Platform.InvokeOnMainThreadAsync(() =>
             (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
         );
 
@@ -124,7 +124,7 @@ namespace Shiny.Notifications
             => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-        public Task<IEnumerable<Notification>> GetPendingNotifications() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
+        public Task<IEnumerable<Notification>> GetPendingNotifications() => this.services.Platform.InvokeTaskOnMainThread(async () =>
         {
             var requests = await UNUserNotificationCenter
                 .Current
@@ -136,9 +136,10 @@ namespace Shiny.Notifications
         });
 
 
-        public Task Send(Notification notification) => this.services.Platform.InvokeOnMainThreadAsync(async () =>
+        public Task Send(Notification notification) => this.services.Platform.InvokeTaskOnMainThread(async () =>
         {
             notification.AssertValid();
+            (await this.RequestRequiredAccess(notification).ConfigureAwait(false)).Assert();
 
             if (notification.Id == 0)
                 notification.Id = this.services.Settings.IncrementValue("NotificationId");
@@ -182,11 +183,19 @@ namespace Shiny.Notifications
                 Title = notification.Title,
                 Body = notification.Message
             };
-            if (!notification.ImageUri.IsEmpty())
+            if (notification.Attachment != null)
             {
-                var imageUri = NSUrl.FromString(notification.ImageUri!);
-                var attachment = UNNotificationAttachment.FromIdentifier("image", imageUri, new UNNotificationAttachmentOptions(), out var _);
-                content.Attachments = new [] { attachment };
+                var uri = NSUrl.FromFilename(notification.Attachment.FullName);
+                var attachment = UNNotificationAttachment.FromIdentifier(
+                    Guid.NewGuid().ToString(),
+                    uri,
+                    new UNNotificationAttachmentOptions(),
+                    out var error
+                );
+                if (error != null)
+                    throw new InvalidOperationException("Error creating notification image attachment: " + error.Description);
+
+                content.Attachments = new[] { attachment };
             }
             if (!notification.Thread.IsEmpty())
                 content.ThreadIdentifier = notification.Thread!;
@@ -215,13 +224,19 @@ namespace Shiny.Notifications
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
             {
-                native.InterruptionLevel = channel.Importance switch
+                if (channel.Importance == ChannelImportance.High && notification.ScheduleDate != null)
                 {
-                    ChannelImportance.Low => UNNotificationInterruptionLevel.Passive,
-                    ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive,
-                    ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical,
-                    _ => UNNotificationInterruptionLevel.Active
-                };
+                    native.InterruptionLevel = UNNotificationInterruptionLevel.TimeSensitive;
+                }
+                else
+                {
+                    native.InterruptionLevel = channel.Importance switch
+                    {
+                        ChannelImportance.Low => UNNotificationInterruptionLevel.Passive,
+                        ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical,
+                        _ => UNNotificationInterruptionLevel.Active
+                    };
+                }
             }
 
             native.CategoryIdentifier = channel.Identifier;

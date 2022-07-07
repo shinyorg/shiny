@@ -74,6 +74,16 @@ namespace Shiny.Notifications
         }
 
 
+        public static void TrySetImage(this IPlatform platform, FileInfo attachment, NotificationCompat.Builder builder)
+        {
+            using (var stream = attachment.OpenRead())
+            {
+                var bitmap = BitmapFactory.DecodeStream(stream);
+                builder.SetStyle(new NotificationCompat.BigPictureStyle().BigPicture(bitmap));
+            }
+        }
+
+
         static readonly HttpClient httpClient = new HttpClient();
         public static async Task TrySetImage(this IPlatform platform, string? imageUri, NotificationCompat.Builder builder)
         {

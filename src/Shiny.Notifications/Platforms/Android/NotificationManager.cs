@@ -117,7 +117,6 @@ namespace Shiny.Notifications
         {
             notification.AssertValid();
 
-            // TODO: should I cancel an existing id if the user is setting it?
             if (notification.Id == 0)
                 notification.Id = this.core.Settings.IncrementValue("NotificationId");
 

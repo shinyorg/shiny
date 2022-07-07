@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.IO;
 
 namespace Shiny.Notifications
 {
@@ -69,8 +69,8 @@ namespace Shiny.Notifications
         public IntervalTrigger? RepeatInterval { get; set; }
 
         /// <summary>
-        /// Set an image uri for iOS attachment or Android bigpicture style
+        /// Set an image/video/audio for iOS attachment or Android bigpicture style - file must be on disk
         /// </summary>
-        public string? ImageUri { get; set; }
+        public FileInfo? Attachment { get; set; }
     }
 }
