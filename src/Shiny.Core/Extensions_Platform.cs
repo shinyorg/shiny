@@ -19,7 +19,7 @@ namespace Shiny
         public static bool IsNetstandard(this IPlatform platform) => platform.Is(KnownPlatforms.NetStandard);
 
 
-        public static async Task<T> InvokeOnMainThreadAsync<T>(this IPlatform platform, Func<Task<T>> func, CancellationToken cancelToken = default)
+        public static async Task<T> InvokeTaskOnMainThread<T>(this IPlatform platform, Func<Task<T>> func, CancellationToken cancelToken = default)
         {
             var tcs = new TaskCompletionSource<T>();
             using (cancelToken.Register(() => tcs.TrySetCanceled()))
@@ -38,6 +38,28 @@ namespace Shiny
                 });
             }
             return await tcs.Task.ConfigureAwait(false);
+        }
+
+
+        public static async Task InvokeTaskOnMainThread(this IPlatform platform, Func<Task> func, CancellationToken cancelToken = default)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            using (cancelToken.Register(() => tcs.TrySetCanceled()))
+            {
+                platform.InvokeOnMainThread(async () =>
+                {
+                    try
+                    {
+                        await func();
+                        tcs.TrySetResult(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.TrySetException(ex);
+                    }
+                });
+            }
+            await tcs.Task.ConfigureAwait(false);
         }
 
 
