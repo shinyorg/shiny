@@ -12,15 +12,14 @@ namespace Shiny.Notifications
         public static async Task<AccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
         {
             var request = AccessRequestFlags.Notification;
-            if (notification.RepeatInterval != null)
-                request |= AccessRequestFlags.TimeSensitivity;
 
-            if (!notification.Channel.IsEmpty())
+            if (notification.ScheduleDate != null)
             {
-                if (notification.ScheduleDate != null)
+                var channelId = notification.Channel ?? Channel.Default.Identifier;
+                var channel = await notificationManager.GetChannel(channelId)!;
+                if (channel.Importance == ChannelImportance.High)
                     request |= AccessRequestFlags.TimeSensitivity;
             }
-
             if (notification.Geofence != null)
                 request |= AccessRequestFlags.LocationAware;
 

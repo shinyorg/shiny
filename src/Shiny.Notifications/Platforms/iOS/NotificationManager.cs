@@ -61,6 +61,7 @@ namespace Shiny.Notifications
         }
 
 
+        public Task<Channel?> GetChannel(string channelId) => this.channelManager.Get(channelId);
         public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
         public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
         public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);

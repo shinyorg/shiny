@@ -37,6 +37,13 @@ namespace Shiny.Notifications
 
 
         /// <summary>
+        /// Get a specific channel by ID
+        /// </summary>
+        /// <param name="channelId"></param>
+        /// <returns></returns>
+        Task<Channel?> GetChannel(string channelId);
+
+        /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
         /// <param name="flags">You can request multiple types of permissions (TimeSensitive, LocationAware)</param>
