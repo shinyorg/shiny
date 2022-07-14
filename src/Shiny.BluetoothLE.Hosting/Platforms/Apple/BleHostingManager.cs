@@ -51,12 +51,9 @@ public class BleHostingManager : IBleHostingManager
         {
             ob.OnNext(new L2CapChannel(
                 args.Channel!.Psm,
-                null,
-                null
+                args.Channel!.InputStream.ToStream(),
+                args.Channel!.OutputStream.ToStream()
             ));
-            //args.Channel.Psm
-            //args.Channel.OutputStream
-            //args.Channel.InputStream
         });
         this.manager.DidOpenL2CapChannel += handler;
         var psm = await this.PublishL2Cap(secure);
@@ -68,27 +65,6 @@ public class BleHostingManager : IBleHostingManager
         };
     });
 
-
-    public void OpenL2Cap(bool secure)
-    {
-        this.manager.PublishL2CapChannel(secure);
-        this.manager.DidPublishL2CapChannel += this.Manager_DidPublishL2CapChannel;
-        this.manager.DidOpenL2CapChannel += this.Manager_DidOpenL2CapChannel;
-        this.manager.UnpublishL2CapChannel(0);
-    }
-
-    private void Manager_DidOpenL2CapChannel(object? sender, CBPeripheralManagerOpenL2CapChannelEventArgs e)
-    {
-        //e.Channel.Psm
-        //e.Channel.InputStream;
-        //e.Channel.OutputStream
-    }
-
-    private void Manager_DidPublishL2CapChannel(object? sender, CBPeripheralManagerL2CapChannelOperationEventArgs e)
-    {
-        //e.Error
-        //e.Psm
-    }
 
     public AccessState Status => this.manager.State switch
     {
