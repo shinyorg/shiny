@@ -15,12 +15,17 @@ namespace Shiny.BluetoothLE.Hosting
         public GattService(CBPeripheralManager manager, string uuid, bool primary)
         {
             this.manager = manager;
+
             this.Native = new CBMutableService(CBUUID.FromString(uuid), primary);
             this.characteristics = new List<GattCharacteristic>();
             this.Uuid = uuid;
             this.Primary = primary;
         }
 
+        //private void Manager_DidOpenL2CapChannel(object? sender, CBPeripheralManagerOpenL2CapChannelEventArgs e)
+        //{
+        //    e.Channel.InputStream
+        //}
 
         public CBMutableService Native { get; }
         public string Uuid { get; }

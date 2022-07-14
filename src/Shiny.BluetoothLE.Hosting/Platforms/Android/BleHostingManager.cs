@@ -14,8 +14,8 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public class BleHostingManager : IBleHostingManager
 {
+    readonly Dictionary<string, GattService> services = new();
     readonly GattServerContext context;
-    readonly Dictionary<string, GattService> services;
     readonly IMessageBus messageBus;
     AdvertisementCallbacks? adCallbacks;
 
@@ -23,7 +23,6 @@ public class BleHostingManager : IBleHostingManager
     public BleHostingManager(AndroidPlatform platform, IMessageBus messageBus)
     {
         this.context = new GattServerContext(platform);
-        this.services = new Dictionary<string, GattService>();
         this.messageBus = messageBus;
     }
 
@@ -41,7 +40,9 @@ public class BleHostingManager : IBleHostingManager
     {
         var service = new GattService(this.context, uuid, primary);
         serviceBuilder(service);
-        this.context.Server.AddService(service.Native);
+        if (!this.context.Server.AddService(service.Native))
+            throw new InvalidOperationException("Service operation did not complete - look at logs");
+
         return Task.FromResult<IGattService>(service);
     }
 

@@ -39,7 +39,7 @@ namespace Shiny.BluetoothLE.Hosting
         public async Task StartAdvertising(AdvertisementOptions? options = null)
         {
             if (this.manager.Advertising)
-                throw new ArgumentException("Advertising is already active");
+                throw new InvalidOperationException("Advertising is already active");
 
             options ??= new AdvertisementOptions();
             await this.manager
@@ -47,11 +47,11 @@ namespace Shiny.BluetoothLE.Hosting
                 .Timeout(TimeSpan.FromSeconds(10))
                 .ToTask();
 
-            var tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<bool>();
             var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
             {
                 if (args.Error == null)
-                    tcs.SetResult(null);
+                    tcs.SetResult(true);
                 else
                     tcs.SetException(new ArgumentException(args.Error.LocalizedDescription));
             });
@@ -98,25 +98,29 @@ namespace Shiny.BluetoothLE.Hosting
         public void RemoveService(string serviceUuid)
         {
             if (!this.services.ContainsKey(serviceUuid))
-                return;
-
-            var service = this.services[serviceUuid];
-            this.manager.RemoveService(service.Native);
-            service.Dispose();
-
-            this.services.Remove(serviceUuid);
+            {
+                var native = new CBMutableService(CBUUID.FromString(serviceUuid), false);
+                this.manager.RemoveService(native); // let's try to remove anyhow
+            }
+            else
+            {
+                var service = this.services[serviceUuid];
+                this.manager.RemoveService(service.Native);
+                service.Dispose();
+                this.services.Remove(serviceUuid);
+            }
         }
 
 
         public void ClearServices()
         {
-            //this.manager.RemoveAllServices();
             foreach (var service in this.services.Values)
             {
                 this.manager.RemoveService(service.Native);
                 service.Dispose();
             }
             this.services.Clear();
+            this.manager.RemoveAllServices();
         }
 
 
