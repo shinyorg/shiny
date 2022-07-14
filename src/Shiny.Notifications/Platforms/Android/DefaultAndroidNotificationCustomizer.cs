@@ -44,12 +44,9 @@ public class DefaultAndroidNotificationCustomizer : INotificationCustomizer
         if (!notification.Thread.IsEmpty())
             builder.SetGroup(notification.Thread);
 
-        if (!notification.ImageUri.IsEmpty())
-        {
-            await this.platform
-                .TrySetImage(notification.ImageUri, builder)
-                .ConfigureAwait(false);
-        }
+        if (!notification.LocalAttachmentPath.IsEmpty())
+            this.platform.TrySetImage(notification.LocalAttachmentPath, builder);
+
         //if (notification.BadgeCount != null)
         //{
         //    // channel needs badge too

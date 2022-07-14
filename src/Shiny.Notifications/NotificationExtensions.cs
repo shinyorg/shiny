@@ -17,9 +17,12 @@ public static class NotificationExtensions
         if (notification.RepeatInterval != null)
             request |= AccessRequestFlags.TimeSensitivity;
 
-        if (!notification.Channel.IsEmpty())
+        if (notification.ScheduleDate != null)
         {
-            if (notification.ScheduleDate != null)
+            var channelId = notification.Channel ?? Channel.Default.Identifier;
+            var channel = await notificationManager.GetChannel(channelId)!;
+
+            if (channel!.Importance == ChannelImportance.High)
                 request |= AccessRequestFlags.TimeSensitivity;
         }
 

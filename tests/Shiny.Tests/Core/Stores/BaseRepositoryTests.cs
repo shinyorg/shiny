@@ -114,7 +114,7 @@ public abstract class BaseRepositoryTests
             Id = 10,
             Title = "thisisatitle",
             Message = "tester",
-            ImageUri = "http://somethingsomethingsomething",
+            //ImageUri = "http://somethingsomethingsomething",
             Thread = "the thread",
             BadgeCount = 8,
             Channel = "chan",
@@ -144,7 +144,7 @@ public abstract class BaseRepositoryTests
         notification.Channel.Should().Be(test.Channel);
         notification.ScheduleDate.Should().Be(test.ScheduleDate);
         notification.Thread.Should().Be(test.Thread);
-        notification.ImageUri.Should().Be(test.ImageUri);
+        //notification.ImageUri.Should().Be(test.ImageUri);
         notification.BadgeCount.Should().Be(test.BadgeCount);
         notification.Geofence.Radius.Should().Be(test.Geofence.Radius);
         notification.Geofence.Center.Should().Be(test.Geofence.Center);

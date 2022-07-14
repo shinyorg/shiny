@@ -4,6 +4,7 @@ namespace Shiny.Push;
 
 
 public record FirebaseConfig(
+    bool UseEmbeddedConfiguration,
     string? AppId,
     string? SenderId,
     string? ApiKey,
@@ -12,6 +13,9 @@ public record FirebaseConfig(
 {
     public void AssertValid()
     {
+        if (this.UseEmbeddedConfiguration)
+            return;
+
         if (this.AppId == null)
             throw new ArgumentNullException(nameof(this.AppId));
 

@@ -46,6 +46,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
     public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
     public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);
+    public Task<Channel?> GetChannel(string channelId) => this.channelManager.Get(channelId);
     public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
 
 
@@ -106,7 +107,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-    public Task<IEnumerable<Notification>> GetPendingNotifications() => this.platform.InvokeOnMainThreadAsync(async () =>
+    public Task<IEnumerable<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
     {
         var requests = await UNUserNotificationCenter
             .Current
@@ -118,7 +119,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     });
 
 
-    public Task Send(Notification notification) => this.platform.InvokeOnMainThreadAsync(async () =>
+    public Task Send(Notification notification) => this.platform.InvokeTaskOnMainThread(async () =>
     {
         notification.AssertValid();
 
@@ -175,12 +176,12 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     {
         var content = new UNMutableNotificationContent
         {
-            Title = notification.Title,
-            Body = notification.Message
+            Title = notification.Title!,
+            Body = notification.Message!
         };
-        if (!notification.ImageUri.IsEmpty())
+        if (!notification.LocalAttachmentPath.IsEmpty())
         {
-            var imageUri = NSUrl.FromString(notification.ImageUri!);
+            var imageUri = NSUrl.FromString(notification.LocalAttachmentPath!);
             var attachment = UNNotificationAttachment.FromIdentifier("image", imageUri, new UNNotificationAttachmentOptions(), out var _);
             content.Attachments = new [] { attachment };
         }
