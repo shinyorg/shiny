@@ -8,6 +8,7 @@ using Android.Bluetooth.LE;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 using Shiny.Infrastructure;
+using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -35,6 +36,41 @@ public class BleHostingManager : IBleHostingManager
     public bool IsAdvertising => this.adCallbacks != null;
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
 
+
+    public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
+    {
+        var ad = BluetoothAdapter.DefaultAdapter;
+
+        var serverSocket = secure
+            ? ad.ListenUsingL2capChannel()
+            : ad.ListenUsingInsecureL2capChannel();
+
+        //socket.Psm
+        // start listen loop
+        //serverSocket.AcceptAsync();
+
+        return () =>
+        {
+
+        };
+    });
+
+
+    public void OpenL2Cap(bool secure)
+    {
+        var ad = BluetoothAdapter.DefaultAdapter;
+
+        var serverSocket = secure
+            ? ad.ListenUsingL2capChannel()
+            : ad.ListenUsingInsecureL2capChannel();
+
+        //socket.Psm
+        serverSocket.AcceptAsync();
+        var socket = serverSocket.Accept();
+        //socket.RemoteDevice
+        //socket.OutputStream
+        //socket.InputStream
+    }
 
     public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {

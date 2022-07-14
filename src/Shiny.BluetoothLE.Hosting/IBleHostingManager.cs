@@ -9,6 +9,7 @@ namespace Shiny.BluetoothLE.Hosting
     {
         AccessState Status { get; }
         IObservable<AccessState> WhenStatusChanged();
+        IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure);
 
         bool IsAdvertising { get; }
         Task StartAdvertising(AdvertisementOptions? options = null);
