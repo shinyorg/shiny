@@ -13,10 +13,10 @@ namespace Shiny.BluetoothLE.Hosting
         readonly CBPeripheralManager manager;
         readonly PeripheralCache cache;
 
-        CBMutableCharacteristic native;
-        Action<CharacteristicSubscription> onSubscribe;
-        Func<WriteRequest, GattState> onWrite;
-        Func<ReadRequest, ReadResult> onRead;
+        CBMutableCharacteristic native = null!;
+        Action<CharacteristicSubscription>? onSubscribe;
+        Func<WriteRequest, GattState>? onWrite;
+        Func<ReadRequest, ReadResult>? onRead;
 
         CBAttributePermissions permissions = 0;
         CBCharacteristicProperties properties = 0;
@@ -44,7 +44,7 @@ namespace Shiny.BluetoothLE.Hosting
             );
             if (!success)
             {
-                var tcs = new TaskCompletionSource<object>();
+                var tcs = new TaskCompletionSource<bool>();
                 var handler = new EventHandler((sender, args) =>
                 {
                     this.manager.UpdateValue(
@@ -52,7 +52,7 @@ namespace Shiny.BluetoothLE.Hosting
                         this.native,
                         null
                     );
-                    tcs.TrySetResult(null);
+                    tcs.TrySetResult(true);
                 });
 
                 try
@@ -68,7 +68,7 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public IGattCharacteristicBuilder SetNotification(Action<CharacteristicSubscription> onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
+        public IGattCharacteristicBuilder SetNotification(Action<CharacteristicSubscription>? onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
         {
             this.onSubscribe = onSubscribe;
             var enc = options.HasFlag(NotificationOptions.EncryptionRequired);
@@ -128,28 +128,28 @@ namespace Shiny.BluetoothLE.Hosting
                 null,
                 this.permissions
             );
-            service.Characteristics = service.Characteristics.Expand(this.native);
+            service.Characteristics = service.Characteristics!.Expand(this.native);
 
             if (this.onWrite != null)
-                this.manager.WriteRequestsReceived += this.OnWrite;
+                this.manager.WriteRequestsReceived += this.OnWrite!;
 
             if (this.onRead != null)
-                this.manager.ReadRequestReceived += this.OnRead;
+                this.manager.ReadRequestReceived += this.OnRead!;
 
             if (this.onSubscribe != null)
             {
-                this.manager.CharacteristicSubscribed += this.OnSubscribed;
-                this.manager.CharacteristicUnsubscribed += this.OnUnSubscribed;
+                this.manager.CharacteristicSubscribed += this.OnSubscribed!;
+                this.manager.CharacteristicUnsubscribed += this.OnUnSubscribed!;
             }
         }
 
 
         public void Dispose()
         {
-            this.manager.WriteRequestsReceived -= this.OnWrite;
-            this.manager.ReadRequestReceived -= this.OnRead;
-            this.manager.CharacteristicSubscribed -= this.OnSubscribed;
-            this.manager.CharacteristicUnsubscribed -= this.OnUnSubscribed;
+            this.manager.WriteRequestsReceived -= this.OnWrite!;
+            this.manager.ReadRequestReceived -= this.OnRead!;
+            this.manager.CharacteristicSubscribed -= this.OnSubscribed!;
+            this.manager.CharacteristicUnsubscribed -= this.OnUnSubscribed!;
         }
 
 
@@ -162,7 +162,7 @@ namespace Shiny.BluetoothLE.Hosting
 
             var peripheral = this.cache.SetSubscription(args.Central, subscribed);
             var sub = new CharacteristicSubscription(this, peripheral, subscribed);
-            this.onSubscribe(sub);
+            this.onSubscribe!(sub);
         }
 
 
