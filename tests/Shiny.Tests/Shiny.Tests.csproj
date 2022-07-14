@@ -25,18 +25,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
 
-        <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-
-        <!-- Images -->
-        <!--<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />-->
 
         <MauiImage Include="Resources\Images\*" />
         <MauiFont Include="Resources\Fonts\*" />
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -76,4 +72,24 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.1" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.6" />
     </ItemGroup>
+
+<!--
+<!DOCTYPE plist PUBLIC " -//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>aps-environment</key>
+        <string>development OR production</string>
+    </dict>
+</plist>
+
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-ios'">
+        <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    </PropertyGroup>-->
+
+    <!--<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
+        <GoogleServicesJson Include="../../google-services.json">
+            <Link>google-services.json</Link>
+        </GoogleServicesJson>
+    </ItemGroup>-->
 </Project>

@@ -12,8 +12,8 @@ namespace Shiny.BluetoothLE.Hosting
 {
     public class BleHostingManager : IBleHostingManager
     {
-        readonly CBPeripheralManager manager = new CBPeripheralManager();
-        readonly IDictionary<string, GattService> services = new Dictionary<string, GattService>();
+        readonly CBPeripheralManager manager = new();
+        readonly Dictionary<string, GattService> services = new();
 
 
         public AccessState Status => this.manager.State switch

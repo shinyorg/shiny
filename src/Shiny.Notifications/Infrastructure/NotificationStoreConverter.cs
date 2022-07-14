@@ -17,7 +17,7 @@ public class NotificationStoreConverter : StoreConverter<Notification>
             Channel = (string)values[nameof(Notification.Channel)],
             Title = this.ConvertFromStoreValue<string>(values, nameof(Notification.Title)),
             Thread = this.ConvertFromStoreValue<string>(values, nameof(Notification.Thread)),
-            ImageUri = this.ConvertFromStoreValue<string>(values, nameof(Notification.ImageUri)),
+            LocalAttachmentPath = this.ConvertFromStoreValue<string>(values, nameof(Notification.LocalAttachmentPath)),
             BadgeCount = this.ConvertFromStoreValue<int?>(values, nameof(Notification.BadgeCount)),
             ScheduleDate = this.ConvertFromStoreValue<DateTimeOffset?>(values, nameof(Notification.ScheduleDate))
         };
@@ -48,8 +48,8 @@ public class NotificationStoreConverter : StoreConverter<Notification>
         if (entity.Thread != null)
             yield return (nameof(entity.Thread), entity.Thread);
 
-        if (entity.ImageUri != null)
-            yield return (nameof(entity.ImageUri), entity.ImageUri);
+        if (entity.LocalAttachmentPath != null)
+            yield return (nameof(entity.LocalAttachmentPath), entity.LocalAttachmentPath);
 
         if ((entity.Payload?.Count) > 0)
             yield return (nameof(entity.Payload), this.ConvertToStoreValue(entity.Payload));

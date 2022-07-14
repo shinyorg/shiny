@@ -79,6 +79,8 @@ public class GeofenceManagerImpl : IGeofenceManager
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
     {
+        (await this.locationManager.RequestAccess(false)).Assert();
+
         var task = this.regionSubj
             .Where(x => region.Equals(x.Region))
             .Take(1)

@@ -24,18 +24,16 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
     readonly AndroidPlatform platform;
     readonly ILogger logger;
     readonly IKeyValueStore settings;
-    readonly FirebaseConfig? config;
+    readonly FirebaseConfig config;
 
 
     public NativeAdapter(
         AndroidPlatform platform,
         ILogger<NativeAdapter> logger,
         IKeyValueStore settings,
-        FirebaseConfig? config = null
+        FirebaseConfig config
     )
     {
-        config?.AssertValid();
-
         this.platform = platform;
         this.logger = logger;
         this.settings = settings;
@@ -108,7 +106,7 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
     {
         if (!this.initialized)
         {
-            if (this.config == null)
+            if (this.config.UseEmbeddedConfiguration)
             {
                 FirebaseApp.InitializeApp(this.platform.AppContext);
                 if (FirebaseApp.Instance == null)

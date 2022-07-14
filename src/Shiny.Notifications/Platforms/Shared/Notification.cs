@@ -64,9 +64,9 @@ public class Notification : IStoreEntity
     public IntervalTrigger? RepeatInterval { get; set; }
 
     /// <summary>
-    /// Set an image uri for iOS attachment or Android bigpicture style
+    /// Set an image/video/audio for iOS attachment or Android bigpicture style - file must be on disk
     /// </summary>
-    public string? ImageUri { get; set; }
+    public string? LocalAttachmentPath { get; set; }
 
     public string Identifier => this.Id.ToString();
 }

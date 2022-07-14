@@ -11,8 +11,6 @@ NFC
 
 Repository Conversion
 * HTTP Transfers
-* Notifications
-* Channels
 
 Tests
 * New Repository

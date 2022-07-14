@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Android.Graphics;
@@ -53,14 +54,11 @@ public static class PlatformExtensions
     }
 
 
-    static readonly HttpClient httpClient = new();
-    public static async Task TrySetImage(this AndroidPlatform platform, string? imageUri, NotificationCompat.Builder builder)
+    public static void TrySetImage(this IPlatform platform, string localAttachmentFilePath, NotificationCompat.Builder builder)
     {
-        if (imageUri.IsEmpty())
-            return;
-
-        var stream = await httpClient.GetStreamAsync(imageUri).ConfigureAwait(false);
-        var bitmap = await BitmapFactory.DecodeStreamAsync(stream).ConfigureAwait(false);
+        using var stream = File.OpenRead(localAttachmentFilePath);
+        
+        var bitmap = BitmapFactory.DecodeStream(stream);
         builder.SetStyle(new NotificationCompat.BigPictureStyle().BigPicture(bitmap));
     }
 }

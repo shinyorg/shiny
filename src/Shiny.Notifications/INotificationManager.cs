@@ -29,6 +29,14 @@ public interface INotificationManager
 
 
     /// <summary>
+    /// Get a specific channel by ID
+    /// </summary>
+    /// <param name="channelId"></param>
+    /// <returns></returns>
+    Task<Channel?> GetChannel(string channelId);
+
+
+    /// <summary>
     /// Gets list of channels
     /// </summary>
     /// <returns></returns>

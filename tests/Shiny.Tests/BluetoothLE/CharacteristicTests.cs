@@ -1,7 +1,6 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
-using Shiny.Hosting;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -9,40 +8,28 @@ namespace Shiny.Tests.BluetoothLE;
 
 
 [Trait("Category", "BluetoothLE")]
-public class CharacteristicTests : AbstractShinyTests
+public class CharacteristicTests : AbstractBleTests
 {
     IList<IGattCharacteristic> characteristics;
-    IPeripheral peripheral;
-
-
     public CharacteristicTests(ITestOutputHelper output) : base(output) {}
-
-
-    protected override void Configure(IHostBuilder hostBuilder) => hostBuilder.Services.AddBluetoothLE();
-    public override void Dispose()
-    {
-        this.peripheral?.CancelConnection();
-        base.Dispose();
-    }
 
 
     async Task Setup()
     {
-        var manager = this.GetService<IBleManager>();
-        this.peripheral = await manager
-            .ScanUntilPeripheralFound(Constants.PeripheralName)
-            .Timeout(Constants.DeviceScanTimeout)
+        this.Peripheral = await this.Manager
+            .ScanUntilPeripheralFound(this.Config.PeripheralName)
+            .Timeout(this.Config.DeviceScanTimeout)
             .ToTask();
 
-        await this.peripheral
+        await this.Peripheral
             .WithConnectIf()
-            .Timeout(Constants.ConnectTimeout) // android can take some time :P
+            .Timeout(this.Config.ConnectTimeout) // android can take some time :P
             .ToTask();
 
-        this.characteristics = await this.peripheral
-            .GetCharacteristicsByService(Constants.ScratchServiceUuid)
+        this.characteristics = await this.Peripheral
+            .GetCharacteristicsByService(this.Config.ServiceUuid)
             .Take(5)
-            .Timeout(Constants.OperationTimeout)
+            .Timeout(this.Config.OperationTimeout)
             .ToTask();
     }
 
@@ -55,7 +42,7 @@ public class CharacteristicTests : AbstractShinyTests
         var value = new byte[] { 0x01, 0x02 };
         foreach (var ch in this.characteristics)
         {
-            await ch.Write(value, false);
+            await ch.Write(value, false).Timeout(this.Config.OperationTimeout);
             //Assert.True(write.Success, "Write failed - " + write.ErrorMessage);
 
             // TODO: enable write back on host
@@ -101,7 +88,7 @@ public class CharacteristicTests : AbstractShinyTests
                 }
             });
 
-        await Task.Delay(Constants.OperationTimeout);
+        await Task.Delay(this.Config.OperationTimeout);
         sub.Dispose();
 
         Assert.True(list.Count >= 2, "There were not at least 2 characteristics in the replies");
@@ -118,7 +105,7 @@ public class CharacteristicTests : AbstractShinyTests
         var list = new List<Task<GattCharacteristicResult>>();
 
         foreach (var ch in this.characteristics)
-            list.Add(ch.Write(bytes).Timeout(Constants.OperationTimeout).ToTask());
+            list.Add(ch.Write(bytes).Timeout(this.Config.OperationTimeout).ToTask());
 
         await Task.WhenAll(list);
     }
@@ -130,63 +117,63 @@ public class CharacteristicTests : AbstractShinyTests
         await this.Setup();
         var list = new List<Task<GattCharacteristicResult>>();
         foreach (var ch in this.characteristics)
-            list.Add(ch.Read().Timeout(Constants.OperationTimeout).ToTask());
+            list.Add(ch.Read().Timeout(this.Config.OperationTimeout).ToTask());
 
         await Task.WhenAll(list);
     }
 
 
-    [Fact(Skip = "TODO")]
-    public async Task Reconnect_ReadAndWrite()
-    {
-        await this.Setup();
+    //[Fact(Skip = "TODO")]
+    //public async Task Reconnect_ReadAndWrite()
+    //{
+    //    await this.Setup();
 
-        var tcs = new TaskCompletionSource<object>();
-        IDisposable floodWriter = null;
-        Observable
-            .Timer(TimeSpan.FromSeconds(5))
-            .Subscribe(async _ =>
-            {
-                try
-                {
-                    floodWriter?.Dispose();
-                    this.peripheral.CancelConnection();
+    //    var tcs = new TaskCompletionSource<object>();
+    //    IDisposable floodWriter = null;
+    //    Observable
+    //        .Timer(TimeSpan.FromSeconds(5))
+    //        .Subscribe(async _ =>
+    //        {
+    //            try
+    //            {
+    //                floodWriter?.Dispose();
+    //                this.Peripheral.!CancelConnection();
 
-                    await Task.Delay(1000);
-                    await this.peripheral
-                        .WithConnectIf()
-                        .Timeout(Constants.ConnectTimeout);
+    //                await Task.Delay(1000);
+    //                await this.Peripheral
+    //                    .WithConnectIf()
+    //                    .Timeout(this.Config.ConnectTimeout);
 
-                    await this.peripheral
-                        .WriteCharacteristic(
-                            Constants.ScratchServiceUuid,
-                            Constants.ScratchCharacteristicUuid1,
-                            new byte[] {0x1}
-                        )
-                        .Timeout(Constants.OperationTimeout);
+    //                await this.Peripheral
+    //                    .WriteCharacteristic(
+    //                        this.Config.ServiceUuid,
+    //                        Constants.ScratchCharacteristicUuid1,
+    //                        new byte[] {0x1}
+    //                    )
+    //                    .Timeout(Constants.OperationTimeout);
 
-                    tcs.SetResult(null);
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
+    //                tcs.SetResult(null);
+    //            }
+    //            catch (Exception ex)
+    //            {
+    //                tcs.SetException(ex);
+    //            }
+    //        });
 
-        // this is used to flood queue
-        floodWriter = this.characteristics
-            .ToObservable()
-            .Select(x => x.Write(new byte[] { 0x1 }))
-            .Merge(4)
-            .Repeat()
-            //.Switch()
-            .Subscribe(
-                x => { },
-                ex => Console.WriteLine(ex)
-            );
+    //    // this is used to flood queue
+    //    floodWriter = this.characteristics
+    //        .ToObservable()
+    //        .Select(x => x.Write(new byte[] { 0x1 }))
+    //        .Merge(4)
+    //        .Repeat()
+    //        //.Switch()
+    //        .Subscribe(
+    //            x => { },
+    //            ex => Console.WriteLine(ex)
+    //        );
 
-        await tcs.Task;
-    }
+    //    await tcs.Task;
+    //}
 
 
     [Fact]
@@ -202,7 +189,7 @@ public class CharacteristicTests : AbstractShinyTests
             .Take(1)
             .Select(_ => tx.Write(new byte[] {0x0}))
             .Switch()
-            .Timeout(Constants.OperationTimeout)
+            .Timeout(this.Config.OperationTimeout)
             .FirstOrDefaultAsync();
 
         Assert.Equal(tx, r.Characteristic);
@@ -219,7 +206,7 @@ public class CharacteristicTests : AbstractShinyTests
     //        .RegisterAndNotify()
     //        .Subscribe();
 
-    //    this.peripheral.CancelConnection();
+    //    this.Peripheral.CancelConnection();
     //    sub.Dispose();
 
     //    await Task.Delay(1000);

@@ -1,5 +1,4 @@
-﻿using Acr.UserDialogs;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.LifecycleEvents;
 using Xunit.Runners.Maui;
 
@@ -13,9 +12,9 @@ public static class MauiProgram
 
     public static MauiApp CreateMauiApp()
     {
-        //Configuration = new ConfigurationBuilder()
-        //    .AddJsonPlatformBundle(optional: false)
-        //    .Build();
+        Configuration = new ConfigurationBuilder()
+            .AddJsonPlatformBundle(optional: false)
+            .Build();
 
         return MauiApp
             .CreateBuilder()
@@ -26,13 +25,14 @@ public static class MauiProgram
                     typeof(MauiProgram).Assembly
                 }
             })
+            .UseShiny() // this is somewhat of a hack as it hooks the shiny events BUT to the current host provider
             .UseVisualRunner()
             .ConfigureLifecycleEvents(lc =>
             {
 #if ANDROID
-                lc.AddAndroid(x => x.OnApplicationCreating(app => UserDialogs.Init(app)));
+                lc.AddAndroid(x => x.OnApplicationCreating(app => Acr.UserDialogs.UserDialogs.Init(app)));
 #elif IOS
-                UserDialogs.Init();
+                Acr.UserDialogs.UserDialogs.Init();
 #endif
             })
             .Build();
