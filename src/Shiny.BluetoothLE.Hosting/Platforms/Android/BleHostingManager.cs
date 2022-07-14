@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
@@ -39,38 +40,43 @@ public class BleHostingManager : IBleHostingManager
 
     public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
     {
+        var ct = new CancellationTokenSource();
         var ad = BluetoothAdapter.DefaultAdapter;
+        if (ad == null)
+            throw new InvalidOperationException("No Bluetooth Adaptor found");
 
         var serverSocket = secure
             ? ad.ListenUsingL2capChannel()
             : ad.ListenUsingInsecureL2capChannel();
 
-        //socket.Psm
-        // start listen loop
-        //serverSocket.AcceptAsync();
+
+        _ = Task.Run(() =>
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                try
+                {
+                    var socket = serverSocket.Accept();
+                    if (socket != null)
+                    {
+                        ob.OnNext(new L2CapChannel(
+                            (ushort)serverSocket.Psm,
+                            socket.InputStream!,
+                            socket.OutputStream!
+                        ));
+                    }
+                }
+                catch { }
+            }
+        });
 
         return () =>
         {
-
+            ct.Cancel();
+            serverSocket?.Dispose();
         };
     });
 
-
-    public void OpenL2Cap(bool secure)
-    {
-        var ad = BluetoothAdapter.DefaultAdapter;
-
-        var serverSocket = secure
-            ? ad.ListenUsingL2capChannel()
-            : ad.ListenUsingInsecureL2capChannel();
-
-        //socket.Psm
-        serverSocket.AcceptAsync();
-        var socket = serverSocket.Accept();
-        //socket.RemoteDevice
-        //socket.OutputStream
-        //socket.InputStream
-    }
 
     public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
