@@ -10,7 +10,7 @@ using Shiny.BluetoothLE.Internals;
 
 namespace Shiny.BluetoothLE
 {
-    public class Peripheral : AbstractPeripheral, IL2CapSupport
+    public class Peripheral : AbstractPeripheral, ICanL2Cap
     {
         readonly ManagerContext context;
         IDisposable? autoReconnectSub;
@@ -45,7 +45,7 @@ namespace Shiny.BluetoothLE
         };
 
 
-        public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm) => Observable.Create<L2CapChannel>(ob =>
+        public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
         {
             var handler = new EventHandler<CBPeripheralOpenL2CapChannelEventArgs>((sender, args) =>
             {

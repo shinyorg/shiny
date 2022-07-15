@@ -14,10 +14,11 @@ namespace Shiny.BluetoothLE
     public class Peripheral : AbstractPeripheral,
                               ICanDoTransactions,
                               ICanPairPeripherals,
-                              ICanRequestMtu
+                              ICanRequestMtu,
+                              ICanL2Cap
 
     {
-        readonly Subject<ConnectionState> connSubject;
+        readonly Subject<ConnectionState> connSubject = new();
         internal PeripheralContext Context { get; }
 
 
@@ -29,7 +30,6 @@ namespace Shiny.BluetoothLE
             ToDeviceId(native.Address).ToString()
         )
         {
-            this.connSubject = new Subject<ConnectionState>();
             this.Context = new PeripheralContext(centralContext, native);
         }
 
@@ -37,6 +37,22 @@ namespace Shiny.BluetoothLE
         public BluetoothDevice Native => this.Context.NativeDevice;
         public override ConnectionState Status => this.Context.Status;
 
+
+        public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
+        {
+            var socket = secure
+                ? this.Native.CreateL2capChannel(psm)
+                : this.Native.CreateInsecureL2capChannel(psm);
+
+            ob.Respond(new L2CapChannel(
+                psm,
+                socket.OutputStream!,
+                socket.InputStream!,
+                () => socket.Dispose()
+            ));
+
+            return Disposable.Empty;
+        });
 
         public override void Connect(ConnectionConfig? config)
         {
@@ -278,7 +294,7 @@ namespace Shiny.BluetoothLE
 
             macBytes.CopyTo(deviceGuid, 10);
             return new Guid(deviceGuid);
-        }
+        }        
 
         #endregion
     }
