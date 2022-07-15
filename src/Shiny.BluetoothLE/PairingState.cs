@@ -1,12 +1,11 @@
 ﻿using System;
 
 
-namespace Shiny.BluetoothLE
+namespace Shiny.BluetoothLE;
+
+public enum PairingState
 {
-    public enum PairingState
-    {
-        Unavailiable,
-        NotPaired,
-        Paired
-    }
+    Unavailiable,
+    NotPaired,
+    Paired
 }
