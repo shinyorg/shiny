@@ -34,10 +34,10 @@ public static class FeatureL2Cap
     public static bool IsL2CapAvailable(this IPeripheral peripheral) => peripheral is ICanL2Cap;
 
 
-    public static IObservable<L2CapChannel>? TryOpenL2CapChannel(this IPeripheral peripheral, ushort psm)
+    public static IObservable<L2CapChannel>? TryOpenL2CapChannel(this IPeripheral peripheral, ushort psm, bool secure)
     {
         if (peripheral is ICanL2Cap support)
-            return support.OpenL2CapChannel(psm);
+            return support.OpenL2CapChannel(psm, secure);
 
         return null;
     }

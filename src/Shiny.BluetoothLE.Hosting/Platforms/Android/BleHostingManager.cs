@@ -49,15 +49,14 @@ public class BleHostingManager : IBleHostingManager
             ? ad.ListenUsingL2capChannel()
             : ad.ListenUsingInsecureL2capChannel();
 
-
         _ = Task.Run(() =>
         {
             while (!ct.IsCancellationRequested)
             {
                 try
                 {
-                    var socket = serverSocket.Accept();
-                    if (socket != null)
+                    var socket = serverSocket.Accept(30000);
+                    if (socket != null && !ct.IsCancellationRequested)
                     {
                         ob.OnNext(new L2CapChannel(
                             (ushort)serverSocket.Psm,
