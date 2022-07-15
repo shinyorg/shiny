@@ -32,7 +32,7 @@ public class BleHostingManager : IBleHostingManager
             }
         });
         this.manager.DidPublishL2CapChannel += handler;
-        
+
         try
         {
             this.manager.PublishL2CapChannel(secure);
@@ -57,13 +57,17 @@ public class BleHostingManager : IBleHostingManager
         });
         this.manager.DidOpenL2CapChannel += handler;
         var psm = await this.PublishL2Cap(secure);
-        
+
         return () =>
         {
             this.manager.DidOpenL2CapChannel += handler;
             this.manager.UnpublishL2CapChannel(psm);
         };
     });
+
+
+    // TODO
+    public Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
 
 
     public AccessState Status => this.manager.State switch
@@ -77,19 +81,14 @@ public class BleHostingManager : IBleHostingManager
     };
 
 
-    public IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
-    {
-        var handler = new EventHandler((sender, args) => ob.Respond(this.Status));
-        this.manager.StateUpdated += handler;
-        return () => this.manager.StateUpdated -= handler;
-    });
-
-
     public bool IsAdvertising => this.manager.Advertising;
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
         if (this.manager.Advertising)
             throw new InvalidOperationException("Advertising is already active");
+
+        if (this.Status != AccessState.Unknown || this.Status != AccessState.Available)
+            throw new InvalidOperationException("Invalid Status: " + this.Status);
 
         options ??= new AdvertisementOptions();
         await this.manager

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
-using Shiny.Infrastructure;
+using static Android.Manifest;
 using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -18,28 +19,38 @@ public class BleHostingManager : IBleHostingManager
 {
     readonly Dictionary<string, GattService> services = new();
     readonly GattServerContext context;
-    readonly IMessageBus messageBus;
     AdvertisementCallbacks? adCallbacks;
 
+    public BleHostingManager(AndroidPlatform platform) => this.context = new GattServerContext(platform);
 
-    public BleHostingManager(AndroidPlatform platform, IMessageBus messageBus)
+
+    public async Task<AccessState> RequestAccess()
     {
-        this.context = new GattServerContext(platform);
-        this.messageBus = messageBus;
+        if (!this.context.Platform.IsMinApiLevel(23))
+            return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
+
+        var current = this.context.Manager.GetAccessState();
+        if (current != AccessState.Available)
+            return current;
+
+        if (this.context.Platform.IsMinApiLevel(31))
+        {
+            var result = await this.context.Platform.RequestPermissions(Permission.BluetoothConnect, Permission.BluetoothAdvertise);
+            if (!result.IsSuccess())
+                return AccessState.Denied;
+        }
+        return AccessState.Available;
     }
 
 
-    public AccessState Status => this.context.Manager.GetAccessState();
-    public IObservable<AccessState> WhenStatusChanged() => this.messageBus
-        .Listener<State>()
-        .Select(x => x.FromNative())
-        .StartWith(this.Status);
     public bool IsAdvertising => this.adCallbacks != null;
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
 
 
     public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
     {
+        (await this.RequestAccess()).Assert();
+
         var ct = new CancellationTokenSource();
         var ad = BluetoothAdapter.DefaultAdapter;
         if (ad == null)
@@ -77,14 +88,24 @@ public class BleHostingManager : IBleHostingManager
     });
 
 
-    public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+    public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
+        (await this.RequestAccess()).Assert();
+
+        var task = this.context
+            .WhenServiceAdded
+            .Take(1)
+            .Timeout(TimeSpan.FromSeconds(5))
+            .ToTask();
+
         var service = new GattService(this.context, uuid, primary);
         serviceBuilder(service);
         if (!this.context.Server.AddService(service.Native))
             throw new InvalidOperationException("Service operation did not complete - look at logs");
 
-        return Task.FromResult<IGattService>(service);
+        await task.ConfigureAwait(false);
+
+        return service;
     }
 
 
@@ -108,21 +129,12 @@ public class BleHostingManager : IBleHostingManager
 
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
-        var android = this.context.Platform;
-        if (!android.IsMinApiLevel(23))
-            throw new ApplicationException("BLE Advertiser needs API Level 23+");
-
-        if (android.IsMinApiLevel(31))
-        {
-            var access = await android.RequestAccess(Android.Manifest.Permission.BluetoothAdvertise);
-            if (access != AccessState.Available)
-                throw new ArgumentException("Insufficient permissions");
-        }
+        (await this.RequestAccess()).Assert();
 
         options ??= new AdvertisementOptions();
-        var tcs = new TaskCompletionSource<object>();
+        var tcs = new TaskCompletionSource<bool>();
         this.adCallbacks = new AdvertisementCallbacks(
-            () => tcs.SetResult(null),
+            () => tcs.SetResult(true),
             ex => tcs.SetException(ex)
         );
 
