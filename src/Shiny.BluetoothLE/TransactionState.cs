@@ -1,13 +1,9 @@
-﻿using System;
+﻿namespace Shiny.BluetoothLE;
 
-
-namespace Shiny.BluetoothLE
+public enum TransactionState
 {
-    public enum TransactionState
-    {
-        Active,
-        Committing,
-        Committed,
-        Aborted
-    }
+    Active,
+    Committing,
+    Committed,
+    Aborted
 }

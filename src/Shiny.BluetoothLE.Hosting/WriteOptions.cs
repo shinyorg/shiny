@@ -1,14 +1,13 @@
 ﻿using System;
 
+namespace Shiny.BluetoothLE.Hosting;
 
-namespace Shiny.BluetoothLE.Hosting
+
+[Flags]
+public enum WriteOptions
 {
-    [Flags]
-    public enum WriteOptions
-    {
-        Write,
-        WriteWithoutResponse,
-        AuthenticatedSignedWrites,
-        EncryptionRequired
-    }
+    Write,
+    WriteWithoutResponse,
+    AuthenticatedSignedWrites,
+    EncryptionRequired
 }

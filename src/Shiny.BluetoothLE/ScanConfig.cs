@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Shiny.BluetoothLE;
 
-
-namespace Shiny.BluetoothLE;
 
 public record ScanConfig(
     /// <summary>

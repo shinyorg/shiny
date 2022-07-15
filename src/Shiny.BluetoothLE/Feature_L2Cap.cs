@@ -1,60 +1,45 @@
-﻿//using System;
+﻿using System;
+using System.IO;
+using System.Reactive.Linq;
+
+namespace Shiny.BluetoothLE;
 
 
-//namespace Shiny.BluetoothLE
-//{
-//    public interface IL2CapSupport
-//    {
-//        /// <summary>
-//        /// Open an L2Cap socket
-//        /// </summary>
-//        /// <param name="psm">PSM Value</param>
-//        /// <returns></returns>
-//        IObservable<IChannel> OpenChannel(int psm);
-//    }
-
-//public interface IChannel : IDisposable
-//{
-//    Guid PeerUuid { get; }
-//    int Psm { get; } //=> 0x25;
-
-//    IStream InputStream { get; }
-//    IStream OutputStream { get; }
-//}
-//using System;
-//using System.Reactive;
+public record L2CapChannel(
+    ushort Psm,
+    Stream OutputStream,
+    Stream InputStream,
+    Action? OnDispose = null
+) : IDisposable
+{
+    public void Dispose()
+    {
+        this.OnDispose?.Invoke();
+    }
+}
 
 
-//namespace Shiny.BluetoothLE
-//{
-//    public interface IStream
-//    {
-//        bool IsDataAvailable { get; }
-//        void Open();
-//        void Close();
-//        bool CanRead { get; }
-//        bool CanWrite { get; }
+public interface ICanL2Cap : IPeripheral
+{
+    /// <summary>
+    /// Open an L2Cap socket
+    /// </summary>
+    /// <param name="psm">PSM Value</param>
+    /// <param name="secure">Only applies to Android</param>
+    /// <returns></returns>
+    IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure);
+}
 
-//        bool IsOpen { get; }
-//        //public int Read(byte[] buffer, int offset, int count) => 0;
-
-
-//        IObservable<Unit> Write(byte[] buffer);
-//        IObservable<Unit> Write(byte[] buffer, int offeset, int count);
-//    }
-//}
-
-//    public static class FeatureL2Cap
-//    {
-//        public static bool IsL2CapAvailable(this IPeripheral peripheral) => peripheral is IL2CapSupport;
+public static class FeatureL2Cap
+{
+    public static bool IsL2CapAvailable(this IPeripheral peripheral) => peripheral is ICanL2Cap;
 
 
-//        public static IObservable<IChannel>? OpenChannel(this IPeripheral peripheral, int psm)
-//        {
-//            if (peripheral is IL2CapSupport support)
-//                return support.OpenChannel(psm);
+    public static IObservable<L2CapChannel>? TryOpenL2CapChannel(this IPeripheral peripheral, ushort psm, bool secure)
+    {
+        if (peripheral is ICanL2Cap support)
+            return support.OpenL2CapChannel(psm, secure);
 
-//            return null;
-//        }
-//    }
-//}
+        return Observable.Empty<L2CapChannel>();
+    }
+}

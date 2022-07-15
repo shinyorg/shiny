@@ -1,12 +1,8 @@
-﻿using System;
+﻿namespace Shiny.BluetoothLE;
 
-
-namespace Shiny.BluetoothLE
+public enum BleScanType
 {
-    public enum BleScanType
-    {
-        LowPowered,
-        Balanced,
-        LowLatency
-    }
+    LowPowered,
+    Balanced,
+    LowLatency
 }

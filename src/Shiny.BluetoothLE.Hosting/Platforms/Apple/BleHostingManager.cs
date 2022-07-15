@@ -7,121 +7,173 @@ using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
 
+namespace Shiny.BluetoothLE.Hosting;
 
-namespace Shiny.BluetoothLE.Hosting
+
+public class BleHostingManager : IBleHostingManager
 {
-    public class BleHostingManager : IBleHostingManager
+    readonly CBPeripheralManager manager = new();
+    readonly Dictionary<string, GattService> services = new();
+
+
+    async Task<ushort> PublishL2Cap(bool secure)
     {
-        readonly CBPeripheralManager manager = new();
-        readonly Dictionary<string, GattService> services = new();
+        var tcs = new TaskCompletionSource<ushort>();
 
-
-        public AccessState Status => this.manager.State switch
+        var handler = new EventHandler<CBPeripheralManagerL2CapChannelOperationEventArgs>((sender, args) =>
         {
-            CBManagerState.PoweredOff => AccessState.Disabled,
-            CBManagerState.Unauthorized => AccessState.Denied,
-            CBManagerState.Unsupported => AccessState.NotSupported,
-            CBManagerState.PoweredOn => AccessState.Available,
-            //  CBPeripheralManagerState.Resetting, Unknown
-            _ => AccessState.Unknown
+            if (args.Error == null)
+            {
+                tcs.TrySetResult(args.Psm);
+            }
+            else
+            {
+                tcs.TrySetException(new InvalidOperationException(args.Error.Description));
+            }
+        });
+        this.manager.DidPublishL2CapChannel += handler;
+
+        try
+        {
+            this.manager.PublishL2CapChannel(secure);
+            return await tcs.Task.ConfigureAwait(false);
+        }
+        finally
+        {
+            this.manager.DidPublishL2CapChannel -= handler;
+        }
+    }
+
+
+    public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
+    {
+        var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
+        {
+            ob.OnNext(new L2CapChannel(
+                args.Channel!.Psm,
+                args.Channel!.InputStream.ToStream(),
+                args.Channel!.OutputStream.ToStream()
+            ));
+        });
+        this.manager.DidOpenL2CapChannel += handler;
+        var psm = await this.PublishL2Cap(secure);
+
+        return () =>
+        {
+            this.manager.DidOpenL2CapChannel += handler;
+            this.manager.UnpublishL2CapChannel(psm);
         };
+    });
 
 
-        public IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
+    // TODO
+    public Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
+
+
+    public AccessState Status => this.manager.State switch
+    {
+        CBManagerState.PoweredOff => AccessState.Disabled,
+        CBManagerState.Unauthorized => AccessState.Denied,
+        CBManagerState.Unsupported => AccessState.NotSupported,
+        CBManagerState.PoweredOn => AccessState.Available,
+        //  CBPeripheralManagerState.Resetting, Unknown
+        _ => AccessState.Unknown
+    };
+
+
+    public bool IsAdvertising => this.manager.Advertising;
+    public async Task StartAdvertising(AdvertisementOptions? options = null)
+    {
+        if (this.manager.Advertising)
+            throw new InvalidOperationException("Advertising is already active");
+
+        if (this.Status != AccessState.Unknown || this.Status != AccessState.Available)
+            throw new InvalidOperationException("Invalid Status: " + this.Status);
+
+        options ??= new AdvertisementOptions();
+        await this.manager
+            .WhenReady()
+            .Timeout(TimeSpan.FromSeconds(10))
+            .ToTask();
+
+        var tcs = new TaskCompletionSource<bool>();
+        var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
         {
-            var handler = new EventHandler((sender, args) => ob.Respond(this.Status));
-            this.manager.StateUpdated += handler;
-            return () => this.manager.StateUpdated -= handler;
+            if (args.Error == null)
+                tcs.SetResult(true);
+            else
+                tcs.SetException(new ArgumentException(args.Error.LocalizedDescription));
         });
 
-
-        public bool IsAdvertising => this.manager.Advertising;
-        public async Task StartAdvertising(AdvertisementOptions? options = null)
+        try
         {
-            if (this.manager.Advertising)
-                throw new ArgumentException("Advertising is already active");
+            this.manager.AdvertisingStarted += handler;
 
-            options ??= new AdvertisementOptions();
-            await this.manager
-                .WhenReady()
-                .Timeout(TimeSpan.FromSeconds(10))
-                .ToTask();
+            var opts = new StartAdvertisingOptions();
+            var serviceUuids = options.UseGattServiceUuids
+                ? this.services.Keys.ToList()
+                : options.ServiceUuids;
 
-            var tcs = new TaskCompletionSource<object>();
-            var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
+            if (serviceUuids.Count > 0)
             {
-                if (args.Error == null)
-                    tcs.SetResult(null);
-                else
-                    tcs.SetException(new ArgumentException(args.Error.LocalizedDescription));
-            });
-
-            try
-            {
-                this.manager.AdvertisingStarted += handler;
-
-                var opts = new StartAdvertisingOptions();
-                var serviceUuids = options.UseGattServiceUuids
-                    ? this.services.Keys.ToList()
-                    : options.ServiceUuids;
-
-                if (serviceUuids.Count > 0)
-                {
-                    opts.ServicesUUID = serviceUuids
-                        .Select(CBUUID.FromString)
-                        .ToArray();
-                }
-
-                this.manager.StartAdvertising(opts);
-                await tcs.Task.ConfigureAwait(false);
+                opts.ServicesUUID = serviceUuids
+                    .Select(CBUUID.FromString)
+                    .ToArray();
             }
-            finally
-            {
-                this.manager.AdvertisingStarted -= handler;
-            }
+
+            this.manager.StartAdvertising(opts);
+            await tcs.Task.ConfigureAwait(false);
         }
-
-
-        public void StopAdvertising() => this.manager.StopAdvertising();
-
-
-        public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+        finally
         {
-            var service = new GattService(this.manager, uuid, primary);
-            serviceBuilder(service);
-            this.services.Add(uuid, service);
-            this.manager.AddService(service.Native);
-            return Task.FromResult<IGattService>(service);
+            this.manager.AdvertisingStarted -= handler;
         }
+    }
 
 
-        public void RemoveService(string serviceUuid)
+    public void StopAdvertising() => this.manager.StopAdvertising();
+
+
+    public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+    {
+        var service = new GattService(this.manager, uuid, primary);
+        serviceBuilder(service);
+        this.services.Add(uuid, service);
+        this.manager.AddService(service.Native);
+        return Task.FromResult<IGattService>(service);
+    }
+
+
+    public void RemoveService(string serviceUuid)
+    {
+        if (!this.services.ContainsKey(serviceUuid))
         {
-            if (!this.services.ContainsKey(serviceUuid))
-                return;
-
+            var native = new CBMutableService(CBUUID.FromString(serviceUuid), false);
+            this.manager.RemoveService(native); // let's try to remove anyhow
+        }
+        else
+        {
             var service = this.services[serviceUuid];
             this.manager.RemoveService(service.Native);
             service.Dispose();
-
             this.services.Remove(serviceUuid);
         }
-
-
-        public void ClearServices()
-        {
-            //this.manager.RemoveAllServices();
-            foreach (var service in this.services.Values)
-            {
-                this.manager.RemoveService(service.Native);
-                service.Dispose();
-            }
-            this.services.Clear();
-        }
-
-
-        public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
     }
+
+
+    public void ClearServices()
+    {
+        foreach (var service in this.services.Values)
+        {
+            this.manager.RemoveService(service.Native);
+            service.Dispose();
+        }
+        this.services.Clear();
+        this.manager.RemoveAllServices();
+    }
+
+
+    public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
 }
 
 
