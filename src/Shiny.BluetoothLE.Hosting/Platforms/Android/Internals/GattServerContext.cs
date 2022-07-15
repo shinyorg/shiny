@@ -32,7 +32,7 @@ public class GattServerContext : BluetoothGattServerCallback
 
     public void CloseServer()
     {
-        this.server.Close();
+        this.server?.Close();
         this.server = null!;
     }
 
