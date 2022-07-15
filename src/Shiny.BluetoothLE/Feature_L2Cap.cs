@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE;
 
@@ -39,6 +40,6 @@ public static class FeatureL2Cap
         if (peripheral is ICanL2Cap support)
             return support.OpenL2CapChannel(psm, secure);
 
-        return null;
+        return Observable.Empty<L2CapChannel>();
     }
 }
