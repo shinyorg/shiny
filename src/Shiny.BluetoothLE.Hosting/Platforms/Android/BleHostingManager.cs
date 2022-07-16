@@ -92,19 +92,19 @@ public class BleHostingManager : IBleHostingManager
     {
         (await this.RequestAccess()).Assert();
 
-        var task = this.context
-            .WhenServiceAdded
-            .Take(1)
-            .Timeout(TimeSpan.FromSeconds(5))
-            .ToTask();
+        //var task = this.context
+        //    .WhenServiceAdded
+        //    .Take(1)
+        //    .Timeout(TimeSpan.FromSeconds(5))
+        //    .ToTask();
 
         var service = new GattService(this.context, uuid, primary);
         serviceBuilder(service);
         if (!this.context.Server.AddService(service.Native))
             throw new InvalidOperationException("Service operation did not complete - look at logs");
 
-        await task.ConfigureAwait(false);
-
+        //await task.ConfigureAwait(false);
+        this.services.Add(uuid, service);
         return service;
     }
 
@@ -186,6 +186,7 @@ public class BleHostingManager : IBleHostingManager
         foreach (var service in this.services)
             service.Value.Dispose();
 
+        this.services.Clear();
         this.context.CloseServer();
     }
 }
