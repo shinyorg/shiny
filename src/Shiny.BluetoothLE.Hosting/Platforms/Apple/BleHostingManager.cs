@@ -87,7 +87,7 @@ public class BleHostingManager : IBleHostingManager
         if (this.manager.Advertising)
             throw new InvalidOperationException("Advertising is already active");
 
-        if (this.Status != AccessState.Unknown || this.Status != AccessState.Available)
+        if (this.Status != AccessState.Unknown && this.Status != AccessState.Available)
             throw new InvalidOperationException("Invalid Status: " + this.Status);
 
         options ??= new AdvertisementOptions();
