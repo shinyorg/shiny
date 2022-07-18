@@ -30,7 +30,7 @@ public class BleHostingManager : IBleHostingManager
             return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
 
         var current = this.context.Manager.GetAccessState();
-        if (current != AccessState.Available)
+        if (current != AccessState.Available && current != AccessState.Unknown)
             return current;
 
         if (this.context.Platform.IsMinApiLevel(31))
@@ -92,18 +92,18 @@ public class BleHostingManager : IBleHostingManager
     {
         (await this.RequestAccess()).Assert();
 
-        //var task = this.context
-        //    .WhenServiceAdded
-        //    .Take(1)
-        //    .Timeout(TimeSpan.FromSeconds(5))
-        //    .ToTask();
+        var task = this.context
+            .WhenServiceAdded
+            .Take(1)
+            .Timeout(TimeSpan.FromSeconds(5))
+            .ToTask();
 
         var service = new GattService(this.context, uuid, primary);
         serviceBuilder(service);
         if (!this.context.Server.AddService(service.Native))
             throw new InvalidOperationException("Service operation did not complete - look at logs");
 
-        //await task.ConfigureAwait(false);
+        await task.ConfigureAwait(false);
         this.services.Add(uuid, service);
         return service;
     }
