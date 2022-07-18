@@ -133,14 +133,37 @@ public class BleHostingManager : IBleHostingManager
 
     public void StopAdvertising() => this.manager.StopAdvertising();
 
-
-    public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+    
+    public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
         var service = new GattService(this.manager, uuid, primary);
         serviceBuilder(service);
-        this.services.Add(uuid, service);
-        this.manager.AddService(service.Native);
-        return Task.FromResult<IGattService>(service);
+
+        var tcs = new TaskCompletionSource<bool>();
+        var handler = new EventHandler<CBPeripheralManagerServiceEventArgs>((sender, args) =>
+        {
+            if (args.Service.UUID != service.Native.UUID)
+                return;
+
+            if (args.Error == null)
+                tcs.TrySetResult(true);
+            else
+                throw new InvalidOperationException("Could not add BLE service - " + args.Error);
+        });
+
+        try
+        {
+            this.manager.ServiceAdded += handler;
+            this.manager.AddService(service.Native);
+            await tcs.Task.ConfigureAwait(false);
+
+            this.services.Add(uuid, service);
+        }
+        finally
+        {
+            this.manager.ServiceAdded -= handler;
+        }
+        return service;
     }
 
 
