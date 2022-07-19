@@ -93,7 +93,7 @@ public class ManagerContext : CBCentralManagerDelegate
     }
 
 
-    public Subject<CBPeripheral> PeripheralConnected { get; } = new Subject<CBPeripheral>();
+    public Subject<CBPeripheral> PeripheralConnected { get; } = new();
     public override async void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
     {
         var p = this.GetPeripheral(peripheral);
@@ -102,11 +102,11 @@ public class ManagerContext : CBCentralManagerDelegate
     }
 
 
-    public Subject<CBPeripheral> PeripheralDisconnected { get; } = new Subject<CBPeripheral>();
+    public Subject<CBPeripheral> PeripheralDisconnected { get; } = new();
     public override void DisconnectedPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError error) => this.PeripheralDisconnected.OnNext(peripheral);
 
 
-    public Subject<ScanResult> ScanResultReceived { get; } = new Subject<ScanResult>();
+    public Subject<ScanResult> ScanResultReceived { get; } = new();
     public override void DiscoveredPeripheral(CBCentralManager central, CBPeripheral peripheral, NSDictionary advertisementData, NSNumber rssi)
     {
         var result = new ScanResult(
@@ -118,12 +118,12 @@ public class ManagerContext : CBCentralManagerDelegate
     }
 
 
-    public Subject<PeripheralConnectionFailed> FailedConnection { get; } = new Subject<PeripheralConnectionFailed>();
+    public Subject<PeripheralConnectionFailed> FailedConnection { get; } = new();
     public override void FailedToConnectPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError error)
         => this.FailedConnection.OnNext(new PeripheralConnectionFailed(peripheral, error));
 
 
-    public Subject<AccessState> StateUpdated { get; } = new Subject<AccessState>();
+    public Subject<AccessState> StateUpdated { get; } = new();
     public override async void UpdatedState(CBCentralManager central)
     {
         var state = central.State.FromNative();

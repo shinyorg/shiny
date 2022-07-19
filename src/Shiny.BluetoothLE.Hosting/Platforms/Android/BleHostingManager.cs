@@ -119,8 +119,14 @@ public class BleHostingManager : IBleHostingManager
 
     public void RemoveService(string serviceUuid)
     {
-        var s = this.services[serviceUuid];
-        this.context.Server.RemoveService(s.Native);
+        var uuid = UUID.FromString(serviceUuid);
+        var s = this.services.ContainsKey(serviceUuid)
+            ? this.services[serviceUuid].Native
+            : this.context.Server.Services?.FirstOrDefault(x => x.Uuid?.Equals(uuid) ?? false);
+
+        if (s != null)
+            this.context.Server.RemoveService(s);
+
         this.services.Remove(serviceUuid);
         if (this.services.Count == 0)
             this.Cleanup();

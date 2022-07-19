@@ -136,6 +136,14 @@ public class BleHostingManager : IBleHostingManager
     
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
+        // TODO: not sure about this
+        //if (AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13) && !primary)
+        //    throw new InvalidOperationException("You must specify your service as primary when using bg BLE");
+        await this.manager
+            .WhenReady()
+            .Timeout(TimeSpan.FromSeconds(10))
+            .ToTask();
+
         var service = new GattService(this.manager, uuid, primary);
         serviceBuilder(service);
 
@@ -148,7 +156,7 @@ public class BleHostingManager : IBleHostingManager
             if (args.Error == null)
                 tcs.TrySetResult(true);
             else
-                throw new InvalidOperationException("Could not add BLE service - " + args.Error);
+                tcs.SetException(new InvalidOperationException("Could not add BLE service - " + args.Error));
         });
 
         try

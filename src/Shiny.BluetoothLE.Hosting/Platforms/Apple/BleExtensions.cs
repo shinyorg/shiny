@@ -15,7 +15,7 @@ public static class BleExtensions
             if (manager.State == CBManagerState.PoweredOn)
                 ob.Respond(Unit.Default);
             else
-                ob.OnError(new ArgumentException("Adapter state is invalid - " + manager.State));
+                ob.OnError(new InvalidOperationException("Adapter state is invalid - " + manager.State));
         });
         switch (manager.State)
         {
@@ -28,7 +28,7 @@ public static class BleExtensions
                 break;
 
             default:
-                ob.OnError(new ArgumentException("Adapter state is invalid - " + manager.State));
+                ob.OnError(new InvalidOperationException("Adapter state is invalid - " + manager.State));
                 break;
         }
         return () => manager.StateUpdated -= handler;

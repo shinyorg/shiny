@@ -122,14 +122,6 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
     public void Build(CBMutableService service)
     {
-        this.native = new CBMutableCharacteristic(
-            CBUUID.FromString(this.Uuid),
-            this.properties,
-            null,
-            this.permissions
-        );
-        service.Characteristics = service.Characteristics!.Expand(this.native);
-
         if (this.onWrite != null)
             this.manager.WriteRequestsReceived += this.OnWrite!;
 
@@ -141,6 +133,14 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             this.manager.CharacteristicSubscribed += this.OnSubscribed!;
             this.manager.CharacteristicUnsubscribed += this.OnUnSubscribed!;
         }
+
+        this.native = new CBMutableCharacteristic(
+            CBUUID.FromString(this.Uuid),
+            this.properties,
+            null,
+            this.permissions
+        );
+        service.Characteristics = service.Characteristics!.Expand(this.native);
     }
 
 

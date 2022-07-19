@@ -15,6 +15,6 @@ public class Peripheral : IPeripheral
 
     public string Uuid { get; }
     public CBCentral Central { get; }
-    public object Context { get; set; }
+    public object? Context { get; set; }
     public int Mtu => (int)this.Central.MaximumUpdateValueLength;
 }

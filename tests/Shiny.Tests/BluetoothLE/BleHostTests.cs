@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
 using Shiny.Hosting;
@@ -59,7 +58,9 @@ public class BleHostTests : AbstractBleTests
         var subj = new Subject<bool>();
         var bleHost = this.GetService<IBleHostingManager>();
 
-        await bleHost.AddService(SERVICE_UUID, false, sb =>
+        bleHost.ClearServices();
+
+        await bleHost.AddService(SERVICE_UUID, true, sb =>
         {
             var ch = sb.AddCharacteristic(
                 CHARACTERISTIC_UUID,
@@ -93,6 +94,17 @@ public class BleHostTests : AbstractBleTests
             );
         });
 
+        //var s1 = "8c927255-fdec-4605-957b-57b6450779c0";
+        //var c1 = "8c927255-fdec-4605-957b-57b6450779c1";
+        //await bleHost.AddService(
+        //    s1,
+        //    true,
+        //    sb => sb.AddCharacteristic(c1, cb =>
+        //        cb.SetWrite(x => GattState.Success)
+        //            .SetNotification()
+        //    )
+        //);
+
         await bleHost.StartAdvertising(new AdvertisementOptions
         {
             AndroidIncludeDeviceName = true,
@@ -104,7 +116,7 @@ public class BleHostTests : AbstractBleTests
 
         await subj
             .Take(3)
-            .Timeout(TimeSpan.FromSeconds(20))
+            //.Timeout(TimeSpan.FromSeconds(20))
             .ToTask();
     }
 }
