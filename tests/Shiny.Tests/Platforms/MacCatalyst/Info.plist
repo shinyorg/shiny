@@ -29,6 +29,10 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>HELLO</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>HELLO</string>	
+	<string>HELLO</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>BLE Peripheral Hello</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>BLE Background Hello</string>		
 </dict>
 </plist>

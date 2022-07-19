@@ -26,7 +26,9 @@ public class BleHostTests : AbstractBleTests
     {
         this.Peripheral = await this.Manager
             .Scan(new ScanConfig(
-                ServiceUuids: SERVICE_UUID
+                BleScanType.Balanced,
+                false,
+                SERVICE_UUID
             ))
             .Select(x => x.Peripheral)
             .Take(1)
