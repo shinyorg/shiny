@@ -1,5 +1,4 @@
-﻿#if !MACCATALYST
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Xunit;
 using Shiny.BluetoothLE;
@@ -261,4 +260,3 @@ public class PeripheralTests : AbstractBleTests
         Assert.Equal(count, origCount);
     }
 }
-#endif

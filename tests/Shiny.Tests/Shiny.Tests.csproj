@@ -9,7 +9,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
-        <ApplicationTitle>Shiny.Tests</ApplicationTitle>
+        <ApplicationTitle>Shiny Tests</ApplicationTitle>
         <ApplicationId>org.shiny.tests</ApplicationId>
         <ApplicationIdGuid>59CC0E85-36F6-4D0A-8EC1-573D0FEE56A6</ApplicationIdGuid>
 
@@ -36,7 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Acr.UserDialogs" Version="8.0.0-alpha-0006" />
+        <PackageReference Include="Acr.UserDialogs" Version="8.0.0-preview-0001" />
         <PackageReference Include="FluentAssertions" Version="6.7.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0-alpha-0008" />

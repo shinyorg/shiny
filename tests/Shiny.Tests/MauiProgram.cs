@@ -31,7 +31,7 @@ public static class MauiProgram
             {
 #if ANDROID
                 lc.AddAndroid(x => x.OnApplicationCreating(app => Acr.UserDialogs.UserDialogs.Init(app)));
-#elif IOS
+#else
                 Acr.UserDialogs.UserDialogs.Init();
 #endif
             })
