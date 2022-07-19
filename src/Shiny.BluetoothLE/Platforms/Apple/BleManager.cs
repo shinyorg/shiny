@@ -73,11 +73,14 @@ public class BleManager : AbstractBleManager
     }
 
 
+    static readonly PeripheralScanningOptions PeripheralScanningOptions = new PeripheralScanningOptions { AllowDuplicatesKey = true };
+
     public override IObservable<ScanResult> Scan(ScanConfig? config = null)
     {
         if (this.IsScanning)
             throw new ArgumentException("There is already an existing scan");
 
+        config ??= new ScanConfig();
         return this.RequestAccess()
             .Do(access =>
             {
@@ -85,16 +88,18 @@ public class BleManager : AbstractBleManager
                     throw new PermissionException(ErrorCategory, access);
             })
             .SelectMany(_ =>
-            {
-                config ??= new ScanConfig();
+            {   
                 if (config.ServiceUuids == null || config.ServiceUuids.Length == 0)
                 {
-                    this.context.Manager.ScanForPeripherals(null, new PeripheralScanningOptions { AllowDuplicatesKey = true });
+                    this.context.Manager.ScanForPeripherals(
+                        null!,
+                        PeripheralScanningOptions
+                    );
                 }
                 else
                 {
                     var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
-                    this.context.Manager.ScanForPeripherals(uuids, new PeripheralScanningOptions { AllowDuplicatesKey = true });
+                    this.context.Manager.ScanForPeripherals(uuids, PeripheralScanningOptions);
                 }
                 return this.context.ScanResultReceived;
             })

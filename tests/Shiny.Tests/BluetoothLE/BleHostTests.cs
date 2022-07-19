@@ -107,7 +107,7 @@ public class BleHostTests : AbstractBleTests
 
         await bleHost.StartAdvertising(new AdvertisementOptions
         {
-            AndroidIncludeDeviceName = true,
+            //AndroidIncludeDeviceName = true,
             ServiceUuids =
             {
                 SERVICE_UUID

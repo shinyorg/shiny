@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.OS;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 using static Android.Manifest;
@@ -92,18 +93,19 @@ public class BleHostingManager : IBleHostingManager
     {
         (await this.RequestAccess()).Assert();
 
-        var task = this.context
-            .WhenServiceAdded
-            .Take(1)
-            .Timeout(TimeSpan.FromSeconds(5))
-            .ToTask();
-
         var service = new GattService(this.context, uuid, primary);
         serviceBuilder(service);
+
+        //var task = this.context
+        //    .WhenServiceAdded
+        //    .Take(1)
+        //    .Timeout(TimeSpan.FromSeconds(5))
+        //    .ToTask();
+
         if (!this.context.Server.AddService(service.Native))
             throw new InvalidOperationException("Service operation did not complete - look at logs");
 
-        await task.ConfigureAwait(false);
+        //await task.ConfigureAwait(false);
         this.services.Add(uuid, service);
         return service;
     }
@@ -153,14 +155,18 @@ public class BleHostingManager : IBleHostingManager
             .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
 
         if (options.ManufacturerData != null)
-            data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
+            data = data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
 
         var serviceUuids = options.UseGattServiceUuids
             ? this.services.Keys.ToList()
             : options.ServiceUuids;
 
         foreach (var uuid in serviceUuids)
-            data.AddServiceUuid(new Android.OS.ParcelUuid(UUID.FromString(uuid)));
+        {
+            var nativeUuid = UUID.FromString(uuid);
+            var parcel = new ParcelUuid(nativeUuid);
+            data = data.AddServiceUuid(parcel);
+        }
 
         this.context
             .Manager
