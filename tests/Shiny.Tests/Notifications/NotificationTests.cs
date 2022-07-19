@@ -104,7 +104,7 @@ public class NotificationTests : AbstractShinyTests
 
 
     Task CreateNotification(int id, string channel)
-        => this.Notifications.Send(new Notification
+        => this.Notifications.Send(new Shiny.Notifications.Notification
         {
             Id = id,
             Title = id.ToString(),

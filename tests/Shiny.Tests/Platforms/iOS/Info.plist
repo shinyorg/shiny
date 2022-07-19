@@ -26,11 +26,20 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+	</array>	
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>HELLO</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>HELLO</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>BLE Peripheral Hello</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>BLE Background Hello</string>	
 </dict>
 </plist>

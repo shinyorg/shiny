@@ -1,5 +1,15 @@
-﻿namespace TestSamples;
+﻿using Shiny.BluetoothLE.Hosting;
 
-public class BleHostViewModel
+namespace TestSamples;
+
+
+public class BleHostViewModel : ReactiveObject
 {
+    public BleHostViewModel(IBleHostingManager bleHost)
+    {
+    }
+
+
+    public ICommand StartServer { get; }
+    public ICommand StopServer { get; }
 }

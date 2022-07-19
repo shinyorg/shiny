@@ -27,14 +27,16 @@
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
         <MauiImage Include="Resources\Images\*" />
-        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
-
         <MauiFont Include="Resources\Fonts\*" />
 
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="ReactiveUI.Fody" Version="18.2.9" />
+        <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.254-beta" />
+
+        <!--
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
@@ -51,7 +53,6 @@
 
         <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <!--
         <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
@@ -59,4 +60,12 @@
         -->
     </ItemGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.8.0.1" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.4.1.2" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.4.1.2" />
+        <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.1" />
+        <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.6" />
+    </ItemGroup>
 </Project>

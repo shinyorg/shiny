@@ -1,4 +1,5 @@
-﻿using Shiny;
+﻿using Prism.DryIoc;
+using Shiny;
 
 namespace TestSamples;
 
@@ -11,11 +12,17 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseShiny()
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            });
+            .UsePrismApp<App>(
+                new DryIocContainerExtension(),
+                prism => prism
+                    .RegisterTypes(registry =>
+                    {
+                        registry.RegisterForNavigation<BleHostPage, BleHostViewModel>();
+                    })
+                    .OnAppStart("NavigationPage/BleHostPage")
+            );
+
+        builder.Services.AddBluetoothLeHosting();
 
         return builder.Build();
     }

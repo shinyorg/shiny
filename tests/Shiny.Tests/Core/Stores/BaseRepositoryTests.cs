@@ -108,8 +108,8 @@ public abstract class BaseRepositoryTests
     [Fact(DisplayName = "Repository - Types - Notifications")]
     public async Task NotificationPersist()
     {
-        var repo = this.Create<Notification, NotificationStoreConverter>();
-        var test = new Notification
+        var repo = this.Create<Shiny.Notifications.Notification, NotificationStoreConverter>();
+        var test = new Shiny.Notifications.Notification
         {
             Id = 10,
             Title = "thisisatitle",
@@ -135,7 +135,7 @@ public abstract class BaseRepositoryTests
         };
         await repo.Set(test);
 
-        repo = this.Create<Notification, NotificationStoreConverter>();
+        repo = this.Create<Shiny.Notifications.Notification, NotificationStoreConverter>();
         var notification = await repo.Get("10");
         notification.Should().NotBeNull();
         notification.Identifier.Should().Be(test.Identifier);
