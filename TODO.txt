@@ -2,9 +2,6 @@ Shiny.Net.Http
 * Replace android http download/upload with httpclient and foreground service
 * Needs connectivity from jobs - may need a separate lib for this... could just fallback on Essentials at this point
 
-Shiny.Jobs
-* Needs foreground/background detection for foreground jobs
-
 NFC
 * Finish write
 * Add backgrounding
