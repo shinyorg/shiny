@@ -16,7 +16,7 @@ public static class AndroidExtensions
     public static IServiceCollection AddAndroid(this IServiceCollection services)
     {
         services.AddShinyService<AndroidPlatform>();
-        services.AddSingleton<AndroidLifecycleExecutor>();
+        services.AddShinyService<AndroidLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
         services.AddCommon();

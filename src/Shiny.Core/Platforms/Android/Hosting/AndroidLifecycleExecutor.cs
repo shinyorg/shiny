@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Hosting;
 
 
-public class AndroidLifecycleExecutor : Java.Lang.Object, ILifecycleObserver, IDisposable
+public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILifecycleObserver, IDisposable
 {
     readonly ILogger logger;
     readonly IEnumerable<IAndroidLifecycle.IApplicationLifecycle> appHandlers;
@@ -32,33 +32,30 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, ILifecycleObserver, ID
         this.permissionHandlers = permissionHandlers;
         this.newIntentHandlers = newIntentHandlers;
         this.activityResultHandlers = activityResultHandlers;
+    }
 
+
+    public void Start()
+    {
         ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
     }
 
 
     [Lifecycle.Event.OnResume]
     [Export]
-    public void OnResume()
-    {
-        this.Execute(this.appHandlers, x => x.OnForeground());
-        Console.WriteLine("LIFECYCLE: OnResume");
-    }
+    public void OnResume() => this.Execute(this.appHandlers, x => x.OnForeground());
+
 
     [Lifecycle.Event.OnPause]
     [Export]
-    public void OnPause()
-    {
-        this.Execute(this.appHandlers, x => x.OnBackground());
-        Console.WriteLine("LIFECYCLE: OnResume");
-    }
+    public void OnPause() => this.Execute(this.appHandlers, x => x.OnBackground());
 
-    [Lifecycle.Event.OnDestroy]
-    [Export]
-    public void OnDestroy()
-    {
-        Console.WriteLine("LIFECYCLE: OnDestory");
-    }
+    //[Lifecycle.Event.OnDestroy]
+    //[Export]
+    //public void OnDestroy()
+    //{
+    //    Console.WriteLine("LIFECYCLE: OnDestory");
+    //}
 
     public void OnRequestPermissionsResult(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
         => this.Execute(this.permissionHandlers, x => x.Handle(activity, requestCode, permissions, grantResults));
@@ -69,8 +66,11 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, ILifecycleObserver, ID
     public void OnActivityResult(Activity activity, int requestCode, Result result, Intent? intent)
         => this.Execute(this.activityResultHandlers, x => x.Handle(activity, requestCode, result, intent));
 
-    public void Dispose()
-        => ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this);
+    public new void Dispose()
+    {
+        ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this);
+        base.Dispose();
+    }
 
 
     void Execute<T>(IEnumerable<T> services, Action<T> action)

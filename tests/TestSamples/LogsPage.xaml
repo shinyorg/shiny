@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:TestSamples"
+             x:DataType="local:LogsViewModel"
+             x:Class="TestSamples.LogsPage"
+             Title="Logs">
+
+    <RefreshView Command="{Binding Load}"
+                 IsRefreshing="{Binding IsBusy}">
+
+        <CollectionView ItemsSource="{Binding Logs}">
+            <CollectionView.EmptyView>
+                <Label Text="No Events" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:Log">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding Detail}"
+                               FontSize="Large"
+                               FontAttributes="Bold" />
+
+                        <Label Text="{Binding Timestamp, StringFormat='{0:MM/dd/yyyy h:mm:ss tt}'}"
+                               FontSize="Medium"
+                               FontAttributes="Italic" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>

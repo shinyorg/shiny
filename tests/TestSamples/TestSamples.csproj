@@ -33,17 +33,17 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="18.2.9" />
         <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.254-beta" />
-
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
         <!--
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
@@ -68,4 +68,20 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.1" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.6" />
     </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+        <PackageReference Include="SQLitePCLRaw.core" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="2.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="LogsPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+    </ItemGroup>
+
+    <ProjectExtensions><VisualStudio><UserProperties XamarinHotReloadDebuggerTimeoutExceptionTestSamplesHideInfoBar="True" /></VisualStudio></ProjectExtensions>
 </Project>

@@ -1,5 +1,4 @@
 ﻿using Prism.DryIoc;
-using Shiny;
 
 namespace TestSamples;
 
@@ -17,12 +16,16 @@ public static class MauiProgram
                 prism => prism
                     .RegisterTypes(registry =>
                     {
-                        registry.RegisterForNavigation<BleHostPage, BleHostViewModel>();
+                        registry.RegisterForNavigation<LogsPage, LogsViewModel>();
+                        //registry.RegisterForNavigation<BleHostPage, BleHostViewModel>();
                     })
-                    .OnAppStart("NavigationPage/BleHostPage")
+                    .OnAppStart("NavigationPage/LogsPage")
             );
 
-        builder.Services.AddBluetoothLeHosting();
+        builder.Logging.AddDebug();
+        builder.Services.AddSingleton<SampleSqlConnection>();
+        builder.Services.AddShinyService<PlatformStateTests>();
+        //builder.Services.AddBluetoothLeHosting();
 
         return builder.Build();
     }
