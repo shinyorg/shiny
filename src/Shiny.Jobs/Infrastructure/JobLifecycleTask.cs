@@ -1,117 +1,116 @@
-﻿//using System;
-//using System.Linq;
-//using System.Timers;
-//using Shiny.Net;
-//using Shiny.Power;
+﻿#if ANDROID || IOS || MACCATALYST
+using System;
+using System.Linq;
+using System.Timers;
+using Shiny.Jobs.Net;
+using Shiny.Jobs.Power;
+
+namespace Shiny.Jobs.Infrastructure;
 
 
-//namespace Shiny.Jobs.Infrastructure
-//{
-//    public class JobLifecycleTask : ShinyLifecycleTask
-//    {
-//        static TimeSpan interval = TimeSpan.FromSeconds(30);
-//        public static TimeSpan Interval
-//        {
-//            get => interval;
-//            set
-//            {
-//                if (value.TotalSeconds < 15)
-//                    throw new ArgumentException("Job foreground timer intervals cannot be less than 15 seconds");
+public class JobLifecycleTask : ShinyLifecycleTask
+{
+    static TimeSpan interval = TimeSpan.FromSeconds(30);
+    public static TimeSpan Interval
+    {
+        get => interval;
+        set
+        {
+            if (value.TotalSeconds < 15)
+                throw new ArgumentException("Job foreground timer intervals cannot be less than 15 seconds");
 
-//                if (value.TotalMinutes > 5)
-//                    throw new ArgumentException("Job foreground timer intervals cannot be greater than 5 minutes");
+            if (value.TotalMinutes > 5)
+                throw new ArgumentException("Job foreground timer intervals cannot be greater than 5 minutes");
 
-//                interval = value;
-//            }
-//        }
+            interval = value;
+        }
+    }
 
 
-//        readonly IPowerManager powerManager;
-//        readonly IConnectivity connectivity;
-//        readonly Timer timer;
+    readonly IPowerManager powerManager;
+    readonly IConnectivity connectivity;
+    readonly Timer timer;
 
 
-//        public JobLifecycleTask(IJobManager jobManager,
-//                                IPowerManager powerManager,
-//                                IConnectivity connectivity)
-//        {
-//            this.powerManager = powerManager;
-//            this.connectivity = connectivity;
+    public JobLifecycleTask(IJobManager jobManager,
+                            IPowerManager powerManager,
+                            IConnectivity connectivity)
+    {
+        this.powerManager = powerManager;
+        this.connectivity = connectivity;
 
-//            this.timer = new Timer();
-//            this.timer.Elapsed += async (sender, args) =>
-//            {
-//                this.timer.Stop();
-//                var jobs = await jobManager.GetJobs().ConfigureAwait(false);
-//                var toRun = jobs.Where(this.CanRun).ToList();
+        this.timer = new Timer();
+        this.timer.Elapsed += async (sender, args) =>
+        {
+            this.timer.Stop();
+            var jobs = await jobManager.GetJobs().ConfigureAwait(false);
+            var toRun = jobs.Where(this.CanRun).ToList();
 
-//                foreach (var job in toRun)
-//                    await jobManager.RunJobAsTask(job.Identifier).ConfigureAwait(false);
+            foreach (var job in toRun)
+                await jobManager.RunJobAsTask(job.Identifier).ConfigureAwait(false);
 
-//                if (this.IsInForeground)
-//                    this.timer.Start();
-//            };
-//        }
-
-
-//        public override void Start()
-//        {
-
-//        }
+            if (this.IsInForeground)
+                this.timer.Start();
+        };
+    }
 
 
-//        public override void OnForeground()
-//        {
-//            this.timer.Interval = Interval.TotalMilliseconds;
-//            this.timer.Start();
-//        }
+    protected override void OnStateChanged(bool backgrounding)
+    {
+        if (backgrounding)
+        {
+            this.timer.Stop();
+        }
+        else
+        {
+            this.timer.Interval = Interval.TotalMilliseconds;
+            this.timer.Start();
+        }
+    }
 
 
-//        public override void OnBackground() => this.timer.Stop();
+    bool CanRun(JobInfo job)
+    {
+        if (!job.RunOnForeground)
+            return false;
+
+        if (!this.HasPowerLevel(job))
+            return false;
+
+        if (!this.HasReqInternet(job))
+            return false;
+
+        if (!this.HasChargeStatus(job))
+            return false;
+
+        return true;
+    }
 
 
-//        bool CanRun(JobInfo job)
-//        {
-//            if (!job.RunOnForeground)
-//                return false;
+    bool HasPowerLevel(JobInfo job)
+    {
+        if (!job.BatteryNotLow)
+            return true;
 
-//            if (!this.HasPowerLevel(job))
-//                return false;
-
-//            if (!this.HasReqInternet(job))
-//                return false;
-
-//            if (!this.HasChargeStatus(job))
-//                return false;
-
-//            return true;
-//        }
+        return this.powerManager.BatteryLevel > 20 || this.powerManager.IsPluggedIn();
+    }
 
 
-//        bool HasPowerLevel(JobInfo job)
-//        {
-//            if (!job.BatteryNotLow)
-//                return true;
-
-//            return this.powerManager.BatteryLevel > 20 || this.powerManager.IsPluggedIn();
-//        }
-
-
-//        bool HasReqInternet(JobInfo job) => job.RequiredInternetAccess switch
-//        {
-//            InternetAccess.Any => this.connectivity.IsInternetAvailable(),
-//            InternetAccess.Unmetered => !this.connectivity.Reach.HasFlag(NetworkReach.ConstrainedInternet),
-//            InternetAccess.None => true,
-//            _ => false
-//        };
+    bool HasReqInternet(JobInfo job) => job.RequiredInternetAccess switch
+    {
+        InternetAccess.Any => this.connectivity.IsInternetAvailable(),
+        InternetAccess.Unmetered => !this.connectivity.Reach.HasFlag(NetworkReach.ConstrainedInternet),
+        InternetAccess.None => true,
+        _ => false
+    };
 
 
-//        bool HasChargeStatus(JobInfo job)
-//        {
-//            if (!job.DeviceCharging)
-//                return true;
+    bool HasChargeStatus(JobInfo job)
+    {
+        if (!job.DeviceCharging)
+            return true;
 
-//            return this.powerManager.IsPluggedIn();
-//        }
-//    }
-//}
+        return this.powerManager.IsPluggedIn();
+    }
+}
+#endif

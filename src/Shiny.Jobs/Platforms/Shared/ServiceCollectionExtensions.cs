@@ -18,12 +18,12 @@ public static class ServiceCollectionExtensions
 
         services.AddRepository<JobInfoStoreConverter, JobInfo>();
         services.AddShinyService<JobsStartup>();
-        //services.AddShinyService<JobLifecycleTask>(); // TODO
         services.TryAddSingleton<IJobManager, JobManager>();
 
 #if IOS || ANDROID || MACCATALYST
         services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
         services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
+        services.AddShinyService<JobLifecycleTask>();
 #else
         services.TryAddSingleton<IConnectivity, SharedConnectivityImpl>();
 #endif
