@@ -102,6 +102,9 @@ namespace Shiny.Net.Http
 
         public static HttpTransfer FromNative(this NSUrlSessionTask task)
         {
+            const int statusCodeOkMin = 200;
+            const int statusCodeOkMax = 299;
+            const int cancelErrorCode = -999;
             var status = HttpTransferState.Unknown;
             var upload = task is NSUrlSessionUploadTask;
             Exception? exception = null;
@@ -113,9 +116,31 @@ namespace Shiny.Net.Http
                     break;
 
                 case NSUrlSessionTaskState.Completed:
-                    status = task.Error?.Code == -999
-                        ? HttpTransferState.Canceled
-                        : HttpTransferState.Completed;
+                    if (task.Error != null)
+                    {
+                        if (task.Error?.Code == cancelErrorCode)
+                        {
+                            status = HttpTransferState.Canceled;
+                        }
+                        else
+                        {
+                            status = HttpTransferState.Error;
+                            var e = task.Error;
+                            var msg = $"{e?.LocalizedDescription} - {e?.LocalizedFailureReason}";
+                            exception = new Exception(msg);
+                        }
+                    }
+                    else if ((task.Response as NSHttpUrlResponse)?.StatusCode < statusCodeOkMin ||
+                             (task.Response as NSHttpUrlResponse)?.StatusCode > statusCodeOkMax)
+                    {
+                        // Status code is not in between 200-299 (Http Ok States)
+                        status = HttpTransferState.Error;
+                        exception = new Exception("Transfer exception with error code: " + (task.Response as NSHttpUrlResponse)?.StatusCode);
+                    }
+                    else
+                    {
+                        status = HttpTransferState.Completed;
+                    }
                     break;
 
                 case NSUrlSessionTaskState.Suspended:
