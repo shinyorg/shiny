@@ -8,7 +8,7 @@ using UserNotifications;
 namespace Shiny.Hosting;
 
 
-public class IosLifecycleExecutor : IDisposable
+public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 {
     readonly ILogger logger;
     readonly IEnumerable<IIosLifecycle.IApplicationLifecycle> appHandlers;
@@ -36,7 +36,11 @@ public class IosLifecycleExecutor : IDisposable
         this.remoteHandlers = remoteHandlers;
         this.activityHandlers = activityHandlers;
         this.notificationHandlers = notificationHandlers;
+    }
 
+
+    public void Start()
+    {
         UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
             (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
             (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
