@@ -1,12 +1,8 @@
-﻿using System;
+﻿namespace Shiny.BluetoothLE;
 
-
-namespace Shiny.BluetoothLE
+public enum ConnectionPriority
 {
-    public enum ConnectionPriority
-    {
-        Low,
-        Normal,
-        High
-    }
+    Low,
+    Normal,
+    High
 }
