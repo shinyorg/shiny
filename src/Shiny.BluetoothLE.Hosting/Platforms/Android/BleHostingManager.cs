@@ -151,11 +151,15 @@ public class BleHostingManager : IBleHostingManager
             .SetConnectable(true);
 
         var data = new AdvertiseData.Builder()
+            // TODO: kill this in favour of local name below
             .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
             .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
 
         if (options.ManufacturerData != null)
             data = data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
+
+        if (options.LocalName != null)
+            BluetoothAdapter.DefaultAdapter.SetName(options.LocalName); // TODO: verify name length with exception
 
         var serviceUuids = options.UseGattServiceUuids
             ? this.services.Keys.ToList()

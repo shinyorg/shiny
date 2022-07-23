@@ -114,6 +114,7 @@ public class BleHostingManager : IBleHostingManager
                 ? this.services.Keys.ToList()
                 : options.ServiceUuids;
 
+            //opts.LocalName 
             if (serviceUuids.Count > 0)
             {
                 opts.ServicesUUID = serviceUuids
