@@ -13,25 +13,23 @@ namespace Shiny.BluetoothLE.Hosting;
 public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilder, IDisposable
 {
     readonly GattServerContext context;
-    readonly CompositeDisposable disposer;
-    readonly IDictionary<string, IPeripheral> subscribers;
-    Action<CharacteristicSubscription> onSubscribe;
-    Func<WriteRequest, GattState> onWrite;
-    Func<ReadRequest, ReadResult> onRead;
+    readonly CompositeDisposable disposer = new();
+    readonly Dictionary<string, IPeripheral> subscribers = new();
+    Action<CharacteristicSubscription>? onSubscribe;
+    Func<WriteRequest, GattState>? onWrite;
+    Func<ReadRequest, ReadResult>? onRead;
     GattProperty properties = 0;
     GattPermission permissions = 0;
 
 
     public GattCharacteristic(GattServerContext context, string uuid)
     {
-        this.subscribers = new Dictionary<string, IPeripheral>();
-        this.disposer = new CompositeDisposable();
         this.context = context;
         this.Uuid = uuid;
     }
 
 
-    public BluetoothGattCharacteristic Native { get; private set; }
+    public BluetoothGattCharacteristic Native { get; private set; } = null!;
     public string Uuid { get; }
     public CharacteristicProperties Properties { get; }
     public IReadOnlyList<IPeripheral> SubscribedCentrals
@@ -206,7 +204,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
                     ch.RequestId,
                     result.Status.ToNative(),
                     ch.Offset,
-                    result.Data
+                    result.Data!
                 );
             })
             .DisposedBy(this.disposer);
@@ -246,10 +244,10 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     {
         this.context
             .MtuChanged
-            .Where(x => this.subscribers.ContainsKey(x.Device.Address))
+            .Where(x => this.subscribers.ContainsKey(x.Device.Address!))
             .Subscribe(ch =>
             {
-                var peripheral = this.subscribers[ch.Device.Address] as Peripheral;
+                var peripheral = this.subscribers[ch.Device.Address!] as Peripheral;
                 if (peripheral != null)
                     peripheral.Mtu = ch.Mtu;
             })
@@ -261,24 +259,24 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     {
         lock (this.subscribers)
         {
-            if (this.subscribers.ContainsKey(native.Address))
-                return this.subscribers[native.Address];
+            if (this.subscribers.ContainsKey(native.Address!))
+                return this.subscribers[native.Address!];
 
             var device = new Peripheral(native);
-            this.subscribers.Add(native.Address, device);
+            this.subscribers.Add(native.Address!, device);
             return device;
         }
     }
 
 
-    IPeripheral Remove(BluetoothDevice native)
+    IPeripheral? Remove(BluetoothDevice native)
     {
         lock (this.subscribers)
         {
-            if (this.subscribers.ContainsKey(native.Address))
+            if (this.subscribers.ContainsKey(native.Address!))
             {
-                var device = this.subscribers[native.Address];
-                this.subscribers.Remove(native.Address);
+                var device = this.subscribers[native.Address!];
+                this.subscribers.Remove(native.Address!);
                 return device;
             }
             return null;
