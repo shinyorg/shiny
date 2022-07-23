@@ -27,15 +27,15 @@ public class BleGattService
 {
     public IGattCharacteristic Characteristic { get; internal set; } = null!;
 
-    protected virtual Task<GattState> OnWrite(WriteRequest request)
+    public virtual Task<GattState> OnWrite(WriteRequest request)
         => throw new InvalidOperationException("");
 
     // if overridden, add read property & hook to this
-    protected virtual Task<ReadResult> OnRead(ReadRequest request)
+    public virtual Task<ReadResult> OnRead(ReadRequest request)
         => throw new InvalidOperationException("");
 
     // if overridden, add notification property & hook to this
-    protected virtual Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
+    public virtual Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
         => throw new InvalidOperationException("");
 }
 
