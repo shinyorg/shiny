@@ -10,8 +10,8 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public class GattService : IGattService, IGattServiceBuilder, IDisposable
 {
+    readonly List<GattCharacteristic> characteristics = new();
     readonly GattServerContext context;
-    readonly List<GattCharacteristic> characteristics;
 
 
     public GattService(GattServerContext context, string uuid, bool primary)
@@ -20,7 +20,6 @@ public class GattService : IGattService, IGattServiceBuilder, IDisposable
         var type = primary ? GattServiceType.Primary : GattServiceType.Secondary;
 
         this.Native = new BluetoothGattService(Utils.ToUuidType(uuid), type);
-        this.characteristics = new List<GattCharacteristic>();
 
         this.Uuid = uuid;
         this.Primary = primary;

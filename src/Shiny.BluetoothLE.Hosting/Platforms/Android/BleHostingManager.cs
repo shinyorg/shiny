@@ -22,8 +22,6 @@ public partial class BleHostingManager : IBleHostingManager
     readonly GattServerContext context;
     AdvertisementCallbacks? adCallbacks;
 
-    public BleHostingManager(AndroidPlatform platform) => this.context = new GattServerContext(platform);
-
 
     public async Task<AccessState> RequestAccess()
     {

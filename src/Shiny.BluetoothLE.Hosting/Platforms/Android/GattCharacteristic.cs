@@ -15,9 +15,9 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     readonly GattServerContext context;
     readonly CompositeDisposable disposer = new();
     readonly Dictionary<string, IPeripheral> subscribers = new();
-    Action<CharacteristicSubscription>? onSubscribe;
-    Func<WriteRequest, GattState>? onWrite;
-    Func<ReadRequest, ReadResult>? onRead;
+    Func<CharacteristicSubscription, Task>? onSubscribe;
+    Func<WriteRequest, Task<GattState>>? onWrite;
+    Func<ReadRequest, Task<ReadResult>>? onRead;
     GattProperty properties = 0;
     GattPermission permissions = 0;
 
@@ -51,13 +51,14 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
         foreach (var send in sendTo)
         {
+            // TODO: exception on false?
             this.context.Server.NotifyCharacteristicChanged(send.Native, this.Native, false);
         }
         return Task.CompletedTask;
     }
 
 
-    public IGattCharacteristicBuilder SetNotification(Action<CharacteristicSubscription> onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
+    public IGattCharacteristicBuilder SetNotification(Func<CharacteristicSubscription, Task>? onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
     {
         this.onSubscribe = onSubscribe;
         if (options.HasFlag(NotificationOptions.Indicate))
@@ -70,7 +71,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, GattState> onWrite, WriteOptions options = WriteOptions.Write)
+    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, Task<GattState>> onWrite, WriteOptions options = WriteOptions.Write)
     {
         this.onWrite = onWrite;
         if (options.HasFlag(WriteOptions.EncryptionRequired))
@@ -94,7 +95,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, ReadResult> onRead, bool encrypted = false)
+    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, Task<ReadResult>> onRead, bool encrypted = false)
     {
         this.onRead = onRead;
         this.properties |= GattProperty.Read;
@@ -140,19 +141,19 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .DescriptorWrite
             .Where(x => x.Descriptor.Equals(ndesc))
-            .Subscribe(x =>
+            .Subscribe(async x =>
             {
                 var respond = true;
                 if (x.Value.SequenceEqual(Constants.IndicateEnableBytes) || x.Value.SequenceEqual(Constants.NotifyEnableBytes))
                 {
                     var peripheral = this.GetOrAdd(x.Device);
-                    this.onSubscribe(new CharacteristicSubscription(this, peripheral, true));
+                    await this.onSubscribe(new CharacteristicSubscription(this, peripheral, true)).ConfigureAwait(false);
                 }
                 else if (x.Value.SequenceEqual(Constants.NotifyDisableBytes))
                 {
                     var peripheral = this.Remove(x.Device);
                     if (peripheral != null)
-                        this.onSubscribe(new CharacteristicSubscription(this, peripheral, false));
+                        await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
                 }
                 else
                 { 
@@ -174,11 +175,11 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .ConnectionStateChanged
             .Where(x => x.NewState == ProfileState.Disconnected)
-            .Subscribe(x =>
+            .Subscribe(async x =>
             {
                 var peripheral = this.Remove(x.Device);
                 if (peripheral != null)
-                    this.onSubscribe(new CharacteristicSubscription(this, peripheral, false));
+                    await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
             })
             .DisposedBy(this.disposer);
     }
@@ -192,11 +193,11 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .CharacteristicRead
             .Where(x => x.Characteristic.Equals(this.Native))
-            .Subscribe(ch =>
+            .Subscribe(async ch =>
             {
                 var peripheral = new Peripheral(ch.Device);
                 var request = new ReadRequest(this, peripheral, ch.Offset);
-                var result = this.onRead(request);
+                var result = await this.onRead(request).ConfigureAwait(false);
 
                 this.context.Server.SendResponse
                 (
@@ -219,11 +220,11 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .CharacteristicWrite
             .Where(x => x.Characteristic.Equals(this.Native))
-            .Subscribe(ch =>
+            .Subscribe(async ch =>
             {
                 var peripheral = new Peripheral(ch.Device);
                 var request = new WriteRequest(this, peripheral, ch.Value, ch.Offset, ch.ResponseNeeded);
-                var state = this.onWrite(request);
+                var state = await this.onWrite(request).ConfigureAwait(false);
 
                 if (request.IsReplyNeeded)
                 {

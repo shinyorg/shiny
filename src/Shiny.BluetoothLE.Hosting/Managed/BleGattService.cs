@@ -17,12 +17,15 @@ public class BleGattServiceAttribute : Attribute
     public string ServiceUuid { get; }
     public string CharacteristicUuid { get; }
 
-    //public bool Primary { get; set; } // TODO: should this just be true for what we're doing here?
-    public bool Secure { get; set; } // makes all properties with characteristic secure
+    // TODO: should this just be true for what we're doing here?
+    //public bool Primary { get; set; } d
+    public bool IsReadSecure { get; set; }
+    public NotificationOptions Notifications { get; set; } = NotificationOptions.Notify;
+    public WriteOptions Write { get; set; } = WriteOptions.Write;
 }
 
 
-// TODO: what about secure or indicate?
+
 public class BleGattService
 {
     public IGattCharacteristic Characteristic { get; internal set; } = null!;

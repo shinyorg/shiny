@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Hosting.Managed;
+#if ANDROID
+using Shiny.BluetoothLE.Hosting.Internals;
+#endif
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -15,19 +20,31 @@ public partial class BleHostingManager
 
 
     public BleHostingManager(
+#if ANDROID
+        AndroidPlatform platform,
+#endif
         ILogger<IBleHostingManager> logger,
         IEnumerable<BleGattService> gattServices
     )
     {
+#if ANDROID
+        this.context = new GattServerContext(platform);
+#endif
         this.logger = logger;
         this.gattServices = gattServices;
     }
+
+
+    // TODO: save state
+    public bool IsRegisteredServicesAttached { get; private set; }
 
 
     public async Task AttachRegisteredServices()
     {
         (await this.RequestAccess()).Assert();
 
+        if (!this.services.Any())
+            throw new InvalidOperationException("There are no register BLE services");
 
         // TODO: group services by service UUID
         // TODO: ensure no overlapping characteristic UUID
@@ -46,49 +63,46 @@ public partial class BleHostingManager
                     var read = st.GetMethod(nameof(BleGattService.OnRead))!.DeclaringType != typeof(BleGattService);
                     if (read)
                     {
-                        // TODO: what about just returning the bytes?
-                        cb.SetRead(request =>
+                        // what about just returning the bytes?
+                        cb.SetRead(async request =>
                         {
                             try
                             {
-                                // TODO: this does not allow for async at the moment
-                                return ReadResult.Success(new byte[] { 0x0 });
+                                var result = await service
+                                    .OnRead(request)
+                                    .ConfigureAwait(false);
+
+                                return result;
                             }
                             catch (Exception ex)
                             {
                                 this.logger.LogError("Error executing BleGattService read request", ex);
                                 return ReadResult.Error(GattState.Failure);
                             }
-                        }, attribute.Secure);
+                        }, attribute.IsReadSecure);
                     }
 
                     var write = st.GetMethod(nameof(BleGattService.OnWrite))!.DeclaringType != typeof(BleGattService);
                     if (write)
                     {
-                        var options = WriteOptions.Write; // TODO: without response?
-                        if (attribute.Secure)
-                            options |= WriteOptions.EncryptionRequired;
-
-                        cb.SetWrite(request =>
+                        cb.SetWrite(async request =>
                         {
-                            // TODO: why bother returning state?  Maybe allow a custom control?
                             try
                             {
-                                // TODO: this does not allow for async at the moment
-                                return GattState.Success;
+                                var status = await service.OnWrite(request).ConfigureAwait(false);
+                                return status;
                             }
                             catch (Exception ex)
                             {
                                 this.logger.LogError("Error executing BleGattService write request", ex);
                                 return GattState.Failure;
                             }
-                        }, options);
+                        }, attribute.Write);
                     }
 
                     var notify = st.GetMethod(nameof(BleGattService.OnSubscriptionChanged))!.DeclaringType != typeof(BleGattService);
                     if (notify)
                     {
-                        // TODO: indicate
                         cb.SetNotification(async x =>
                         {
                             try
@@ -99,10 +113,9 @@ public partial class BleHostingManager
                             }
                             catch (Exception ex)
                             {
-                                // TODO: log for user
                                 this.logger.LogError("Error executing BleGattService notification subscription", ex);
                             }
-                        });
+                        }, attribute.Notifications);
                     }
                 });
 
@@ -113,7 +126,6 @@ public partial class BleHostingManager
 
     public void DetachRegisteredServices()
     {
-        // TODO: I should keep a registration cache instead of repeated reflection - this isn't going to be a huge perf boost since we aren't doing a lot here
         foreach (var service in this.gattServices)
         {
             var attribute = service

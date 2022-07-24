@@ -85,13 +85,13 @@ public class BleHostTests : AbstractBleTests
                     {
                         this.Log("Read Received");
                         subj.OnNext(true);
-                        return ReadResult.Success(new byte[] { 0x0 });
+                        return Task.FromResult(ReadResult.Success(new byte[] { 0x0 }));
                     })
                     .SetWrite(x =>
                     {
                         this.Log("Write Received");
                         subj.OnNext(true);
-                        return GattState.Success;
+                        return Task.FromResult(GattState.Success);
                     })
             );
         });
@@ -107,14 +107,10 @@ public class BleHostTests : AbstractBleTests
         //    )
         //);
 
-        await bleHost.StartAdvertising(new AdvertisementOptions
-        {
-            //AndroidIncludeDeviceName = true,
-            ServiceUuids =
-            {
-                SERVICE_UUID
-            }
-        });
+        await bleHost.StartAdvertising(new AdvertisementOptions(
+            "Tests",
+            SERVICE_UUID
+        ));
 
         await subj
             .Take(3)
