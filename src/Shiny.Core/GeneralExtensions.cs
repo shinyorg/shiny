@@ -75,6 +75,20 @@ public static class GeneralExtensions
     }
 
 
+    public static bool IsMethodOverridden(this Type type, string methodName)
+    {
+        var method = type.GetMethod(methodName);
+        if (method == null)
+            throw new InvalidOperationException($"No method named '{methodName}' was found on type '{type.FullName}'");
+
+        return method.IsOverridden();
+    }
+
+
+    public static bool IsOverridden(this MethodInfo methodInfo)
+        => methodInfo.GetBaseDefinition() != methodInfo;
+
+
     /// <summary>
     /// Extension method to String.IsNullOrWhiteSpace
     /// </summary>
