@@ -23,7 +23,7 @@
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0.6" />
 
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="119.0.1.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.4.1.2" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.0" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.4.1.2" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Common" Version="2.4.1.2" />
 
