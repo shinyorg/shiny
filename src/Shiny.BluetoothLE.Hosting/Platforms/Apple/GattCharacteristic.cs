@@ -10,10 +10,10 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilder, IDisposable
 {
-    readonly CBPeripheralManager manager;
-    readonly PeripheralCache cache;
+    readonly CBPeripheralManager manager = new();
+    readonly PeripheralCache cache = new();
 
-    CBMutableCharacteristic native = null!;
+    CBMutableCharacteristic? native;
     Func<CharacteristicSubscription, Task>? onSubscribe;
     Func<WriteRequest, Task<GattState>>? onWrite;
     Func<ReadRequest, Task<ReadResult>>? onRead;
@@ -24,19 +24,29 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
     public GattCharacteristic(CBPeripheralManager manager, string uuid)
     {
-        this.cache = new PeripheralCache();
         this.manager = manager;
         this.Uuid = uuid;
     }
 
 
     public string Uuid { get; }
-    public CharacteristicProperties Properties { get; }
+    public CharacteristicProperties Properties
+    {
+        get
+        {
+            var p = (CharacteristicProperties)(int)this.properties;
+            return p;
+        }
+    }
+    
     public IReadOnlyList<IPeripheral> SubscribedCentrals => this.cache.Subscribed;
 
 
     public async Task Notify(byte[] data, params IPeripheral[] centrals)
     {
+        if (this.native == null)
+            throw new InvalidOperationException("Characteristic has not been built");
+
         var success = this.manager.UpdateValue(
             NSData.FromArray(data),
             this.native,
@@ -74,15 +84,18 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         var enc = options.HasFlag(NotificationOptions.EncryptionRequired);
 
         if (options.HasFlag(NotificationOptions.Indicate))
+        {
             this.properties |= enc
                 ? CBCharacteristicProperties.IndicateEncryptionRequired
                 : CBCharacteristicProperties.Indicate;
+        }
 
         if (options.HasFlag(NotificationOptions.Notify))
+        {
             this.properties |= enc
                 ? CBCharacteristicProperties.NotifyEncryptionRequired
                 : CBCharacteristicProperties.Notify;
-
+        }
         return this;
     }
 
@@ -153,7 +166,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    bool IsThis(CBCharacteristic arg) => this.native.Equals(arg);
+    bool IsThis(CBCharacteristic arg) => this.native?.Equals(arg) ?? false;
 
     async void OnSubChanged(CBPeripheralManagerSubscriptionEventArgs args, bool subscribed)
     {

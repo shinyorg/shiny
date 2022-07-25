@@ -75,18 +75,17 @@ public static class GeneralExtensions
     }
 
 
-    public static bool IsMethodOverridden(this Type type, string methodName)
+    public static bool IsMethodOverridden(this Type type, string methodName, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public)
     {
-        var method = type.GetMethod(methodName);
+        var method = type.GetMethod(methodName, flags);
         if (method == null)
             throw new InvalidOperationException($"No method named '{methodName}' was found on type '{type.FullName}'");
 
-        return method.IsOverridden();
+        var baseType = method.GetBaseDefinition().DeclaringType;
+        var result = !method.DeclaringType!.FullName.Equals(method.GetBaseDefinition().DeclaringType?.FullName);
+
+        return result;
     }
-
-
-    public static bool IsOverridden(this MethodInfo methodInfo)
-        => methodInfo.GetBaseDefinition() != methodInfo;
 
 
     /// <summary>

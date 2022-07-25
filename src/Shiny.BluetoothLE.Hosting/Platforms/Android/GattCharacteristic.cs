@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Bluetooth;
+using Java.Lang.Annotation;
 using Shiny.BluetoothLE.Hosting.Internals;
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -31,7 +32,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
     public BluetoothGattCharacteristic Native { get; private set; } = null!;
     public string Uuid { get; }
-    public CharacteristicProperties Properties { get; }
+    public CharacteristicProperties Properties => (CharacteristicProperties)(int)this.properties;
     public IReadOnlyList<IPeripheral> SubscribedCentrals
     {
         get
