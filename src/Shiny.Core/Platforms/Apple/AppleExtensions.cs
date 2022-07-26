@@ -18,7 +18,7 @@ public static class AppleExtensions
     {
         services.AddShinyService<IosPlatform>();
 
-        services.AddSingleton<IosLifecycleExecutor>();
+        services.AddShinyService<IosLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
         services.AddCommon();

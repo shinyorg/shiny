@@ -1,7 +1,5 @@
-﻿using System;
+﻿namespace Shiny.BluetoothLE;
 
-
-namespace Shiny.BluetoothLE;
 
 public enum PairingState
 {

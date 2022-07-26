@@ -1,13 +1,12 @@
 ﻿using System;
 
+namespace Shiny.BluetoothLE.Hosting;
 
-namespace Shiny.BluetoothLE.Hosting
+
+[Flags]
+public enum NotificationOptions
 {
-    [Flags]
-    public enum NotificationOptions
-    {
-        Notify,
-        Indicate,
-        EncryptionRequired
-    }
+    Notify,
+    Indicate,
+    EncryptionRequired
 }

@@ -8,7 +8,10 @@ public class LogsViewModel : ReactiveObject, IPageLifecycleAware
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
             this.IsBusy = true;
-            this.Logs = await conn.Logs.OrderBy(x => x.Timestamp).ToListAsync();
+            this.Logs = await conn
+                .Logs
+                .OrderByDescending(x => x.Timestamp)
+                .ToListAsync();
             this.IsBusy = false;
         });
     }

@@ -1,7 +1,5 @@
-﻿using System;
+﻿namespace Shiny.BluetoothLE.Hosting;
 
-
-namespace Shiny.BluetoothLE.Hosting;
 
 public record ReadRequest(
     IGattCharacteristic Characteristic,

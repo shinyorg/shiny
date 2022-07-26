@@ -10,13 +10,13 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilder, IDisposable
 {
-    readonly CBPeripheralManager manager;
-    readonly PeripheralCache cache;
+    readonly CBPeripheralManager manager = new();
+    readonly PeripheralCache cache = new();
 
-    CBMutableCharacteristic native = null!;
-    Action<CharacteristicSubscription>? onSubscribe;
-    Func<WriteRequest, GattState>? onWrite;
-    Func<ReadRequest, ReadResult>? onRead;
+    CBMutableCharacteristic? native;
+    Func<CharacteristicSubscription, Task>? onSubscribe;
+    Func<WriteRequest, Task<GattState>>? onWrite;
+    Func<ReadRequest, Task<ReadResult>>? onRead;
 
     CBAttributePermissions permissions = 0;
     CBCharacteristicProperties properties = 0;
@@ -24,19 +24,29 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
     public GattCharacteristic(CBPeripheralManager manager, string uuid)
     {
-        this.cache = new PeripheralCache();
         this.manager = manager;
         this.Uuid = uuid;
     }
 
 
     public string Uuid { get; }
-    public CharacteristicProperties Properties { get; }
+    public CharacteristicProperties Properties
+    {
+        get
+        {
+            var p = (CharacteristicProperties)(int)this.properties;
+            return p;
+        }
+    }
+    
     public IReadOnlyList<IPeripheral> SubscribedCentrals => this.cache.Subscribed;
 
 
     public async Task Notify(byte[] data, params IPeripheral[] centrals)
     {
+        if (this.native == null)
+            throw new InvalidOperationException("Characteristic has not been built");
+
         var success = this.manager.UpdateValue(
             NSData.FromArray(data),
             this.native,
@@ -68,28 +78,31 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetNotification(Action<CharacteristicSubscription>? onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
+    public IGattCharacteristicBuilder SetNotification(Func<CharacteristicSubscription, Task>? onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
     {
         this.onSubscribe = onSubscribe;
         var enc = options.HasFlag(NotificationOptions.EncryptionRequired);
 
         if (options.HasFlag(NotificationOptions.Indicate))
+        {
             this.properties |= enc
                 ? CBCharacteristicProperties.IndicateEncryptionRequired
                 : CBCharacteristicProperties.Indicate;
+        }
 
         if (options.HasFlag(NotificationOptions.Notify))
+        {
             this.properties |= enc
                 ? CBCharacteristicProperties.NotifyEncryptionRequired
                 : CBCharacteristicProperties.Notify;
-
+        }
         return this;
     }
 
 
-    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, ReadResult> request, bool encrypted = false)
+    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, Task<ReadResult>> onRead, bool encrypted = false)
     {
-        this.onRead = request;
+        this.onRead = onRead;
         this.permissions |= encrypted
             ? CBAttributePermissions.ReadEncryptionRequired
             : CBAttributePermissions.Readable;
@@ -100,9 +113,9 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, GattState> request, WriteOptions options = WriteOptions.Write)
+    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, Task<GattState>> onWrite, WriteOptions options = WriteOptions.Write)
     {
-        this.onWrite = request;
+        this.onWrite = onWrite;
         this.permissions |= options.HasFlag(WriteOptions.EncryptionRequired)
             ? CBAttributePermissions.WriteEncryptionRequired
             : CBAttributePermissions.Writeable;
@@ -153,16 +166,16 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    bool IsThis(CBCharacteristic arg) => this.native.Equals(arg);
+    bool IsThis(CBCharacteristic arg) => this.native?.Equals(arg) ?? false;
 
-    void OnSubChanged(CBPeripheralManagerSubscriptionEventArgs args, bool subscribed)
+    async void OnSubChanged(CBPeripheralManagerSubscriptionEventArgs args, bool subscribed)
     {
         if (!this.IsThis(args.Characteristic))
             return;
 
         var peripheral = this.cache.SetSubscription(args.Central, subscribed);
         var sub = new CharacteristicSubscription(this, peripheral, subscribed);
-        this.onSubscribe!(sub);
+        await this.onSubscribe!.Invoke(sub);
     }
 
 
@@ -170,14 +183,14 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     void OnUnSubscribed(object sender, CBPeripheralManagerSubscriptionEventArgs args) => this.OnSubChanged(args, false);
 
 
-    void OnWrite(object sender, CBATTRequestsEventArgs args)
+    async void OnWrite(object sender, CBATTRequestsEventArgs args)
     {
         foreach (var req in args.Requests)
         {
             if (this.IsThis(req.Characteristic))
             {
                 var peripheral = this.cache.GetOrAdd(req.Central);
-                var result = this.onWrite.Invoke(new WriteRequest(
+                var result = await this.onWrite!.Invoke(new WriteRequest(
                     this,
                     peripheral,
                     req.Value?.ToArray(),
@@ -190,20 +203,20 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    void OnRead(object sender, CBATTRequestEventArgs args)
+    async void OnRead(object sender, CBATTRequestEventArgs args)
     {
         if (!args.Request.Characteristic.Equals(this.native))
             return;
 
         var peripheral = this.cache.GetOrAdd(args.Request.Central);
-        var result = this.onRead.Invoke(new ReadRequest(
+        var result = await this.onRead!.Invoke(new ReadRequest(
             this,
             peripheral,
             (int)args.Request.Offset)
         );
         if (result.Status == GattState.Success)
         {
-            args.Request.Value = NSData.FromArray(result.Data);
+            args.Request.Value = NSData.FromArray(result.Data!);
             this.manager.RespondToRequest(args.Request, CBATTError.Success);
         }
         else

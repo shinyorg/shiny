@@ -1,10 +1,9 @@
 ﻿using System;
 
+namespace Shiny.BluetoothLE.Hosting;
 
-namespace Shiny.BluetoothLE.Hosting
+
+public interface IGattServiceBuilder
 {
-    public interface IGattServiceBuilder
-    {
-        IGattCharacteristic AddCharacteristic(string uuid, Action<IGattCharacteristicBuilder> characteristicBuilder);
-    }
+    IGattCharacteristic AddCharacteristic(string uuid, Action<IGattCharacteristicBuilder> characteristicBuilder);
 }

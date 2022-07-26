@@ -1,10 +1,9 @@
 ﻿using System;
 
+namespace Shiny.BluetoothLE;
 
-namespace Shiny.BluetoothLE
+
+public class GattReliableWriteTransactionException : Exception
 {
-    public class GattReliableWriteTransactionException : Exception
-    {
-        public GattReliableWriteTransactionException(string msg) : base(msg) { }
-    }
+    public GattReliableWriteTransactionException(string msg) : base(msg) { }
 }

@@ -22,7 +22,7 @@ public abstract class AbstractShinyTests : IDisposable
 
 
     protected virtual void Log(string message) => this.output.WriteLine(message);
-    protected T GetService<T>() => this.Host.Services.GetRequiredService<T>();
+    protected T GetService<T>() => this.Host!.Services!.GetRequiredService<T>()!;
     protected IHost Host { get; }
     protected virtual void Configure(IHostBuilder hostBuilder) { }
 

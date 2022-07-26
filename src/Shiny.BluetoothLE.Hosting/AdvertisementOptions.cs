@@ -1,30 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Shiny.BluetoothLE.Hosting;
+﻿namespace Shiny.BluetoothLE.Hosting;
 
 
-public class AdvertisementOptions
-{
+public record AdvertisementOptions(
     /// <summary>
-    /// Used by UWP and iOS
+    /// Set the local name of the advertisement
     /// </summary>
-    public string? LocalName { get; set; }
+    string? LocalName = null,
 
     /// <summary>
-    /// WARNING: if your device name is too long, you will get an error
+    /// GATT services to advertise
     /// </summary>
-    public bool AndroidIncludeDeviceName { get; set; }
-    public bool AndroidIncludeTxPower { get; set; } = true;
-
-    /// <summary>
-    /// Used by UWP and Android
-    /// </summary>
-    public ManufacturerData? ManufacturerData { get; set; }
-
-    /// <summary>
-    /// You must already have added gatt resources
-    /// </summary>
-    public bool UseGattServiceUuids { get; set; } = true;
-    public List<string> ServiceUuids { get; set; } = new List<string>();
-}
+    params string[] ServiceUuids
+);

@@ -16,13 +16,11 @@ using Observable = System.Reactive.Linq.Observable;
 namespace Shiny.BluetoothLE.Hosting;
 
 
-public class BleHostingManager : IBleHostingManager
+public partial class BleHostingManager : IBleHostingManager
 {
     readonly Dictionary<string, GattService> services = new();
     readonly GattServerContext context;
     AdvertisementCallbacks? adCallbacks;
-
-    public BleHostingManager(AndroidPlatform platform) => this.context = new GattServerContext(platform);
 
 
     public async Task<AccessState> RequestAccess()
@@ -146,22 +144,22 @@ public class BleHostingManager : IBleHostingManager
             ex => tcs.SetException(ex)
         );
 
-        var settings = new AdvertiseSettings.Builder()
-            .SetAdvertiseMode(AdvertiseMode.Balanced)
+        var settings = new AdvertiseSettings.Builder()!
+            .SetAdvertiseMode(AdvertiseMode.Balanced)!
             .SetConnectable(true);
 
-        var data = new AdvertiseData.Builder()
-            .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
-            .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
+        var data = new AdvertiseData.Builder();
+        //var data = new AdvertiseData.Builder()
+        //    .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
+        //    .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
 
-        if (options.ManufacturerData != null)
-            data = data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
+        //if (options.ManufacturerData != null)
+        //    data = data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
 
-        var serviceUuids = options.UseGattServiceUuids
-            ? this.services.Keys.ToList()
-            : options.ServiceUuids;
+        if (options.LocalName != null)
+            BluetoothAdapter.DefaultAdapter.SetName(options.LocalName); // TODO: verify name length with exception
 
-        foreach (var uuid in serviceUuids)
+        foreach (var uuid in options.ServiceUuids)
         {
             var nativeUuid = UUID.FromString(uuid);
             var parcel = new ParcelUuid(nativeUuid);

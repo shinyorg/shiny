@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Bluetooth;
+using Java.Lang.Annotation;
 using Shiny.BluetoothLE.Hosting.Internals;
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -13,27 +14,25 @@ namespace Shiny.BluetoothLE.Hosting;
 public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilder, IDisposable
 {
     readonly GattServerContext context;
-    readonly CompositeDisposable disposer;
-    readonly IDictionary<string, IPeripheral> subscribers;
-    Action<CharacteristicSubscription> onSubscribe;
-    Func<WriteRequest, GattState> onWrite;
-    Func<ReadRequest, ReadResult> onRead;
+    readonly CompositeDisposable disposer = new();
+    readonly Dictionary<string, IPeripheral> subscribers = new();
+    Func<CharacteristicSubscription, Task>? onSubscribe;
+    Func<WriteRequest, Task<GattState>>? onWrite;
+    Func<ReadRequest, Task<ReadResult>>? onRead;
     GattProperty properties = 0;
     GattPermission permissions = 0;
 
 
     public GattCharacteristic(GattServerContext context, string uuid)
     {
-        this.subscribers = new Dictionary<string, IPeripheral>();
-        this.disposer = new CompositeDisposable();
         this.context = context;
         this.Uuid = uuid;
     }
 
 
-    public BluetoothGattCharacteristic Native { get; private set; }
+    public BluetoothGattCharacteristic Native { get; private set; } = null!;
     public string Uuid { get; }
-    public CharacteristicProperties Properties { get; }
+    public CharacteristicProperties Properties => (CharacteristicProperties)(int)this.properties;
     public IReadOnlyList<IPeripheral> SubscribedCentrals
     {
         get
@@ -53,13 +52,14 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
         foreach (var send in sendTo)
         {
+            // TODO: exception on false?
             this.context.Server.NotifyCharacteristicChanged(send.Native, this.Native, false);
         }
         return Task.CompletedTask;
     }
 
 
-    public IGattCharacteristicBuilder SetNotification(Action<CharacteristicSubscription> onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
+    public IGattCharacteristicBuilder SetNotification(Func<CharacteristicSubscription, Task>? onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
     {
         this.onSubscribe = onSubscribe;
         if (options.HasFlag(NotificationOptions.Indicate))
@@ -72,7 +72,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, GattState> onWrite, WriteOptions options = WriteOptions.Write)
+    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, Task<GattState>> onWrite, WriteOptions options = WriteOptions.Write)
     {
         this.onWrite = onWrite;
         if (options.HasFlag(WriteOptions.EncryptionRequired))
@@ -96,7 +96,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, ReadResult> onRead, bool encrypted = false)
+    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, Task<ReadResult>> onRead, bool encrypted = false)
     {
         this.onRead = onRead;
         this.properties |= GattProperty.Read;
@@ -142,19 +142,19 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .DescriptorWrite
             .Where(x => x.Descriptor.Equals(ndesc))
-            .Subscribe(x =>
+            .Subscribe(async x =>
             {
                 var respond = true;
                 if (x.Value.SequenceEqual(Constants.IndicateEnableBytes) || x.Value.SequenceEqual(Constants.NotifyEnableBytes))
                 {
                     var peripheral = this.GetOrAdd(x.Device);
-                    this.onSubscribe(new CharacteristicSubscription(this, peripheral, true));
+                    await this.onSubscribe(new CharacteristicSubscription(this, peripheral, true)).ConfigureAwait(false);
                 }
                 else if (x.Value.SequenceEqual(Constants.NotifyDisableBytes))
                 {
                     var peripheral = this.Remove(x.Device);
                     if (peripheral != null)
-                        this.onSubscribe(new CharacteristicSubscription(this, peripheral, false));
+                        await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
                 }
                 else
                 { 
@@ -176,11 +176,11 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .ConnectionStateChanged
             .Where(x => x.NewState == ProfileState.Disconnected)
-            .Subscribe(x =>
+            .Subscribe(async x =>
             {
                 var peripheral = this.Remove(x.Device);
                 if (peripheral != null)
-                    this.onSubscribe(new CharacteristicSubscription(this, peripheral, false));
+                    await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
             })
             .DisposedBy(this.disposer);
     }
@@ -194,11 +194,11 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .CharacteristicRead
             .Where(x => x.Characteristic.Equals(this.Native))
-            .Subscribe(ch =>
+            .Subscribe(async ch =>
             {
                 var peripheral = new Peripheral(ch.Device);
                 var request = new ReadRequest(this, peripheral, ch.Offset);
-                var result = this.onRead(request);
+                var result = await this.onRead(request).ConfigureAwait(false);
 
                 this.context.Server.SendResponse
                 (
@@ -206,7 +206,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
                     ch.RequestId,
                     result.Status.ToNative(),
                     ch.Offset,
-                    result.Data
+                    result.Data!
                 );
             })
             .DisposedBy(this.disposer);
@@ -221,11 +221,11 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.context
             .CharacteristicWrite
             .Where(x => x.Characteristic.Equals(this.Native))
-            .Subscribe(ch =>
+            .Subscribe(async ch =>
             {
                 var peripheral = new Peripheral(ch.Device);
                 var request = new WriteRequest(this, peripheral, ch.Value, ch.Offset, ch.ResponseNeeded);
-                var state = this.onWrite(request);
+                var state = await this.onWrite(request).ConfigureAwait(false);
 
                 if (request.IsReplyNeeded)
                 {
@@ -246,10 +246,10 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     {
         this.context
             .MtuChanged
-            .Where(x => this.subscribers.ContainsKey(x.Device.Address))
+            .Where(x => this.subscribers.ContainsKey(x.Device.Address!))
             .Subscribe(ch =>
             {
-                var peripheral = this.subscribers[ch.Device.Address] as Peripheral;
+                var peripheral = this.subscribers[ch.Device.Address!] as Peripheral;
                 if (peripheral != null)
                     peripheral.Mtu = ch.Mtu;
             })
@@ -261,24 +261,24 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     {
         lock (this.subscribers)
         {
-            if (this.subscribers.ContainsKey(native.Address))
-                return this.subscribers[native.Address];
+            if (this.subscribers.ContainsKey(native.Address!))
+                return this.subscribers[native.Address!];
 
             var device = new Peripheral(native);
-            this.subscribers.Add(native.Address, device);
+            this.subscribers.Add(native.Address!, device);
             return device;
         }
     }
 
 
-    IPeripheral Remove(BluetoothDevice native)
+    IPeripheral? Remove(BluetoothDevice native)
     {
         lock (this.subscribers)
         {
-            if (this.subscribers.ContainsKey(native.Address))
+            if (this.subscribers.ContainsKey(native.Address!))
             {
-                var device = this.subscribers[native.Address];
-                this.subscribers.Remove(native.Address);
+                var device = this.subscribers[native.Address!];
+                this.subscribers.Remove(native.Address!);
                 return device;
             }
             return null;

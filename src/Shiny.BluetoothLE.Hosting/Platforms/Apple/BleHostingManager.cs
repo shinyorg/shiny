@@ -10,7 +10,7 @@ using Foundation;
 namespace Shiny.BluetoothLE.Hosting;
 
 
-public class BleHostingManager : IBleHostingManager
+public partial class BleHostingManager : IBleHostingManager
 {
     readonly CBPeripheralManager manager = new();
     readonly Dictionary<string, GattService> services = new();
@@ -45,6 +45,7 @@ public class BleHostingManager : IBleHostingManager
     }
 
 
+    // TODO: I need to publish the PSM
     public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
     {
         var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
@@ -110,13 +111,13 @@ public class BleHostingManager : IBleHostingManager
             this.manager.AdvertisingStarted += handler;
 
             var opts = new StartAdvertisingOptions();
-            var serviceUuids = options.UseGattServiceUuids
-                ? this.services.Keys.ToList()
-                : options.ServiceUuids;
+            if (options.LocalName != null)
+                opts.LocalName = options.LocalName;
 
-            if (serviceUuids.Count > 0)
+            if (options.ServiceUuids.Length > 0)
             {
-                opts.ServicesUUID = serviceUuids
+                opts.ServicesUUID = options
+                    .ServiceUuids
                     .Select(CBUUID.FromString)
                     .ToArray();
             }
