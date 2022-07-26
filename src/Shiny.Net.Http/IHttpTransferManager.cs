@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Shiny.Net.Http;
 
 
-public interface IHttpTransferManager
+public interface IHttpTransferManager : IShinyForegroundManager
 {
     //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
     //native.SetNotificationVisibility(DownloadVisibility.Visible);

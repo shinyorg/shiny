@@ -23,13 +23,10 @@ namespace Shiny.Net
 
         public ProgressStreamContent(Stream content, int bufferSize, Action<int> packetSent)
         {
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
-
             if (bufferSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(bufferSize));
 
-            this.content = content;
+            this.content = content ?? throw new ArgumentNullException(nameof(content));
             this.bufferSize = bufferSize;
             this.packetSent = packetSent;
         }
