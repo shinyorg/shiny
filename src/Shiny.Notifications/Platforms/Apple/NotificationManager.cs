@@ -15,11 +15,6 @@ namespace Shiny.Notifications;
 
 public class NotificationManager : INotificationManager, IIosLifecycle.INotificationHandler, IIosLifecycle.IOnFinishedLaunching
 {
-    /// <summary>
-    /// This requires a special entitlement from Apple that is general disabled for anything but health & public safety alerts
-    /// </summary>
-    public static bool UseCriticalAlerts { get; set; }
-
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
     readonly IEnumerable<INotificationCustomizer> customizers;
     readonly IPlatform platform;
