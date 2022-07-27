@@ -1,10 +1,10 @@
-﻿using Shiny.Net.Http;
+﻿//using Shiny.Net.Http;
 
-namespace Sample;
+//namespace Sample;
 
 
-public class SampleHttpTransferDelegate : IHttpTransferDelegate
-{
-    public Task OnCompleted(HttpTransfer transfer) => Task.CompletedTask;
-    public Task OnError(HttpTransfer transfer, Exception ex) => Task.CompletedTask;
-}
+//public class SampleHttpTransferDelegate : IHttpTransferDelegate
+//{
+//    public Task OnCompleted(HttpTransfer transfer) => Task.CompletedTask;
+//    public Task OnError(HttpTransfer transfer, Exception ex) => Task.CompletedTask;
+//}

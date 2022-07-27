@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if ANDROID || IOS || MACCATALYST
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -195,3 +196,4 @@ public partial class BleHostingManager : IShinyStartupTask
         return services;
     }    
 }
+#endif

@@ -6,7 +6,7 @@ using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Locations;
 using Shiny.Locations.Infrastructure;
-using Shiny.Net.Http;
+//using Shiny.Net.Http;
 using Shiny.Notifications;
 using Shiny.Notifications.Infrastructure;
 using Shiny.Stores;
@@ -262,9 +262,9 @@ public abstract class BaseRepositoryTests
     }
 
 
-    [Fact(DisplayName = "Repository - Types - HTTP Transfers")]
-    public async Task HttpStorePersist()
-    {
-        var repo = this.Create<HttpTransfer, HttpTransferStoreConverter>();
-    }
+    //[Fact(DisplayName = "Repository - Types - HTTP Transfers")]
+    //public async Task HttpStorePersist()
+    //{
+    //    var repo = this.Create<HttpTransfer, HttpTransferStoreConverter>();
+    //}
 }

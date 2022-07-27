@@ -18,7 +18,7 @@ public static class HttpClientExtensions
     public static IObservable<HttpTransferMetric2> Download(this HttpClient httpClient, HttpRequestMessage request, string saveFullPath) => Observable.Create<HttpTransferMetric2>(async ob =>
     {
         var response = await httpClient.SendAsync(request);
-        response.
+
         return () =>
         {
 
