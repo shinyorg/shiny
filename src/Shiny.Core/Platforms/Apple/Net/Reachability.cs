@@ -3,9 +3,10 @@ using System.Net;
 using SystemConfiguration;
 using CoreFoundation;
 
-namespace Shiny;
+namespace Shiny.Net;
 
-public enum NetworkStatus
+
+internal enum NetworkStatus
 {
     NotReachable,
     ReachableViaCarrierDataNetwork,
@@ -13,7 +14,7 @@ public enum NetworkStatus
 }
 
 
-public static class Reachability
+internal static class Reachability
 {
     public static string HostName = "www.google.com";
 

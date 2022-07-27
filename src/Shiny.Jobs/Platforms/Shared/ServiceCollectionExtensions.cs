@@ -11,7 +11,7 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddJobs(this IServiceCollection services, bool? clearPrevJobs = null)
+    public static bool AddJobs(this IServiceCollection services, bool? clearPrevJobs = null)
     {
         if (clearPrevJobs != null)
             JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
@@ -21,12 +21,12 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IJobManager, JobManager>();
 
 #if IOS || ANDROID || MACCATALYST
-        services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-        services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
+        services.AddBattery();
+        services.AddConnectivity();
         services.AddShinyService<JobLifecycleTask>();
+        return true;
 #else
-        services.TryAddSingleton<IConnectivity, SharedConnectivityImpl>();
+        return false;
 #endif
-        return services;
     }
 }

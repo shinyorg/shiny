@@ -2,14 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+namespace Shiny.Logging;
 
-namespace Shiny.Logging
+
+public class ShinyLoggingBuilder : ILoggingBuilder
 {
-    public class ShinyLoggingBuilder : ILoggingBuilder
-    {
-        public ShinyLoggingBuilder(IServiceCollection services)
-            => this.Services = services;
+    public ShinyLoggingBuilder(IServiceCollection services)
+        => this.Services = services;
 
-        public IServiceCollection Services { get; }
-    }
+    public IServiceCollection Services { get; }
 }

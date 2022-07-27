@@ -2,8 +2,7 @@
 using System;
 using System.Linq;
 using System.Timers;
-using Shiny.Jobs.Net;
-using Shiny.Jobs.Power;
+using Shiny.Net;
 
 namespace Shiny.Jobs.Infrastructure;
 
@@ -27,7 +26,7 @@ public class JobLifecycleTask : ShinyLifecycleTask
     }
 
 
-    readonly IPowerManager powerManager;
+    readonly IBattery battery;
     readonly IConnectivity connectivity;
     readonly Timer timer;
 

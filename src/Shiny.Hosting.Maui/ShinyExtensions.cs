@@ -15,6 +15,7 @@ public static class ShinyExtensions
         builder.Services.AddIos();
 #endif
 
+        //Microsoft.Maui.Networking.Connectivity.Current.ConnectionProfiles.First() == ConnectionProfile.Bluetooth
         builder.ConfigureLifecycleEvents(events =>
         {
 #if ANDROID

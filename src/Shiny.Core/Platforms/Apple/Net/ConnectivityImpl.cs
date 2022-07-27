@@ -1,10 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using CoreTelephony;
 
-namespace Shiny.Jobs.Net;
+namespace Shiny.Net;
 
 
-public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
+public class ConnectivityImpl : IConnectivity
 {
     readonly CTTelephonyNetworkInfo cellular = new();
 
@@ -60,38 +61,39 @@ public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     }
 
 
-    public string? CellularCarrier => this.cellular.SubscriberCellularProvider?.CarrierName;
+    //public event PropertyChangedEventHandler? PropertyChanged;
+
+    ////{
+    ////    get
+    ////    {
+    ////        var tel = new CTTelephonyNetworkInfo();
+    ////        //tel.CellularProviderUpdatedEventHandler
+    ////        //tel.CurrentRadioAccessTechnology
+    ////        //tel.ServiceSubscriberCellularProvidersDidUpdateNotifier
+    ////        //tel.ServiceCurrentRadioAccessTechnology
+    ////        return tel.SubscriberCellularProvider.CarrierName;
+    ////    }
+    ////}
+
+    //protected override void OnNpcHookChanged(bool hasSubscribers)
     //{
-    //    get
+    //    if (hasSubscribers)
     //    {
-    //        var tel = new CTTelephonyNetworkInfo();
-    //        //tel.CellularProviderUpdatedEventHandler
-    //        //tel.CurrentRadioAccessTechnology
-    //        //tel.ServiceSubscriberCellularProvidersDidUpdateNotifier
-    //        //tel.ServiceCurrentRadioAccessTechnology
-    //        return tel.SubscriberCellularProvider.CarrierName;
+    //        Reachability.ReachabilityChanged += this.OnReachChanged;
+    //        this.cellular.CellularProviderUpdatedEventHandler = carrier =>
+    //            this.RaisePropertyChanged(nameof(this.CellularCarrier));
+    //    }
+    //    else
+    //    {
+    //        Reachability.ReachabilityChanged -= this.OnReachChanged;
+    //        this.cellular.CellularProviderUpdatedEventHandler = null;
     //    }
     //}
 
-    protected override void OnNpcHookChanged(bool hasSubscribers)
-    {
-        if (hasSubscribers)
-        {
-            Reachability.ReachabilityChanged += this.OnReachChanged;
-            this.cellular.CellularProviderUpdatedEventHandler = carrier =>
-                this.RaisePropertyChanged(nameof(this.CellularCarrier));
-        }
-        else
-        {
-            Reachability.ReachabilityChanged -= this.OnReachChanged;
-            this.cellular.CellularProviderUpdatedEventHandler = null;
-        }
-    }
 
-
-    void OnReachChanged(object sender, EventArgs args)
-    {
-        this.RaisePropertyChanged(nameof(this.Reach));
-        this.RaisePropertyChanged(nameof(this.Access));
-    }
+    //void OnReachChanged(object sender, EventArgs args)
+    //{
+    //    this.RaisePropertyChanged(nameof(this.Reach));
+    //    this.RaisePropertyChanged(nameof(this.Access));
+    //}
 }

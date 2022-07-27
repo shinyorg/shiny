@@ -3,6 +3,7 @@ using System.IO;
 
 namespace Shiny;
 
+
 public interface IPlatform
 {
     //string AppIdentifier { get; }

@@ -3,21 +3,6 @@
 //using Foundation;
 //using ObjCRuntime;
 
-//namespace Shiny
-//{
-//    //    services.AddSingleton<IInterface1>();
-//    //services.AddSingleton<IInterface2>(x => x.GetService<IInterface1>());
-//    //public static class ServiceCollectionExt
-//    //{
-//    //    public static void AddSingleton<I1, I2, T>(this IServiceCollection services)
-//    //        where T : class, I1, I2
-//    //        where I1 : class
-//    //        where I2 : class
-//    //    {
-//    //        services.AddSingleton<I1, T>();
-//    //        services.AddSingleton<I2, T>(x => (T)x.GetService<I1>());
-//    //    }
-//    //}
 
 
 //    //http://jonathanpeppers.com/Blog/xamarin-ios-under-the-hood-calling-objective-c-from-csharp

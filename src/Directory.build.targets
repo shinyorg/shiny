@@ -42,10 +42,12 @@
         <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
+    <!--
     <ItemGroup Condition="'$(IsStandardBuild)' == 'true'">
         <Compile Include="Platforms\netstandard\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
+    -->
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <Compile Include="Platforms\Android\**\*.cs" />

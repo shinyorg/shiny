@@ -11,7 +11,7 @@ using Shiny.Stores;
 namespace Shiny.Jobs;
 
 
-public class JobManager : AbstractJobManager
+public class JobManager : AbstractJobManager, IShinyStartupTask
 {
     const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
     bool registeredSuccessfully = false;
@@ -25,7 +25,10 @@ public class JobManager : AbstractJobManager
         container,
         repository,
         logger
-    )
+    ) {}
+
+
+    public void Start()
     {
         try
         {
@@ -40,7 +43,6 @@ public class JobManager : AbstractJobManager
             this.Log.LogCritical(new Exception(EX_MSG, ex), "Background tasks are not setup properly");
         }
     }
-
 
     protected void Assert()
     {
