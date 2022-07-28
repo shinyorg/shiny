@@ -14,7 +14,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddHttpTransfers(this IServiceCollection services, Type transferDelegateType)
     {
 #if IOS || MACCATALYST || ANDROID
-        services.AddShinyService<HttpTransferManager>();
+        services.AddConnectivity();
+        //services.AddShinyService<HttpTransferManager>();
         services.AddShinyService(transferDelegateType);
         services.AddRepository<HttpTransferStoreConverter, HttpTransfer>();
 #endif

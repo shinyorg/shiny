@@ -1,9 +1,4 @@
-﻿using System;
-using Android.Accounts;
-using System.Collections.Generic;
-using System.Reactive.Disposables;
-
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;

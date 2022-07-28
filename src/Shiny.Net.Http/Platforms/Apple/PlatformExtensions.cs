@@ -11,6 +11,11 @@ namespace Shiny.Net.Http;
 
 static class PlatformExtensions
 {
+    const int statusCodeOkMin = 200;
+    const int statusCodeOkMax = 299;
+    const int cancelErrorCode = -999;
+
+
     public static void WriteString(this Stream stream, string value, bool includeNewLine = true)
     {
         stream.Write(Encoding.Default.GetBytes(value));
@@ -114,9 +119,31 @@ static class PlatformExtensions
                 break;
 
             case NSUrlSessionTaskState.Completed:
-                status = task.Error?.Code == -999
-                    ? HttpTransferState.Canceled
-                    : HttpTransferState.Completed;
+                if (task.Error != null)
+                {
+                    if (task.Error?.Code == cancelErrorCode)
+                    {
+                        status = HttpTransferState.Canceled;
+                    }
+                    else
+                    {
+                        status = HttpTransferState.Error;
+                        var e = task.Error;
+                        var msg = $"{e?.LocalizedDescription} - {e?.LocalizedFailureReason}";
+                        exception = new Exception(msg);
+                    }
+                }
+                else if ((task.Response as NSHttpUrlResponse)?.StatusCode < statusCodeOkMin ||
+                         (task.Response as NSHttpUrlResponse)?.StatusCode > statusCodeOkMax)
+                {
+                    // Status code is not in between 200-299 (Http Ok States)
+                    status = HttpTransferState.Error;
+                    exception = new Exception("Transfer exception with error code: " + (task.Response as NSHttpUrlResponse)?.StatusCode);
+                }
+                else
+                {
+                    status = HttpTransferState.Completed;
+                }
                 break;
 
             case NSUrlSessionTaskState.Suspended:
