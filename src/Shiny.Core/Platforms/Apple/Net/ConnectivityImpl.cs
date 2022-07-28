@@ -1,28 +1,35 @@
 ﻿using System;
-using System.ComponentModel;
-using CoreTelephony;
+using System.Reactive.Linq;
+using Network;
 
 namespace Shiny.Net;
 
 
 public class ConnectivityImpl : IConnectivity
 {
-    readonly CTTelephonyNetworkInfo cellular = new();
+    readonly NWPathMonitor netmon = new();
 
 
-    public NetworkReach Reach
+    public ConnectionTypes ConnectionTypes
     {
         get
         {
-            var s = Reachability.InternetConnectionStatus();
-            if (s != NetworkStatus.NotReachable)
-                return NetworkReach.Internet;
+            if (this.netmon.CurrentPath == null)
+                return ConnectionTypes.None;
 
-            s = Reachability.LocalWifiConnectionStatus();
-            if (s != NetworkStatus.NotReachable)
-                return NetworkReach.Local;
-
-            return NetworkReach.None;
+            ConnectionTypes types = 0;
+            this.netmon.CurrentPath.EnumerateInterfaces(nw =>
+            {
+                var type = nw.InterfaceType switch
+                {
+                    NWInterfaceType.Wifi => ConnectionTypes.Wifi,
+                    NWInterfaceType.Wired => ConnectionTypes.Wired,
+                    NWInterfaceType.Cellular => ConnectionTypes.Cellular,
+                    _ => ConnectionTypes.Unknown // loopback & other
+                };
+                types |= type;
+            });
+            return types;
         }
     }
 
@@ -31,69 +38,37 @@ public class ConnectivityImpl : IConnectivity
     {
         get
         {
-            var s = Reachability.InternetConnectionStatus();
-            if (s != NetworkStatus.NotReachable)
-            {
-                switch (s)
-                {
-                    case NetworkStatus.ReachableViaCarrierDataNetwork:
-                        return NetworkAccess.Cellular;
+            var monitor = new NWPathMonitor();
+            if (monitor.CurrentPath == null)
+                return NetworkAccess.None;
 
-                    case NetworkStatus.ReachableViaWiFiNetwork:
-                        return NetworkAccess.WiFi;
-                }
+            var types = this.ConnectionTypes;
+            if (types.HasFlag(ConnectionTypes.Wifi) || types.HasFlag(ConnectionTypes.Wired))
+                return NetworkAccess.Internet;
+
+            var restricted = monitor.CurrentPath.Status != NWPathStatus.Satisfiable;
+            if (!restricted && types.HasFlag(ConnectionTypes.Cellular))
+            {
+                if (monitor.CurrentPath.IsConstrained)
+                    return NetworkAccess.ConstrainedInternet;
+
+                return NetworkAccess.Internet;
             }
 
-            s = Reachability.LocalWifiConnectionStatus();
-            if (s != NetworkStatus.NotReachable)
-            {
-                switch (s)
-                {
-                    case NetworkStatus.ReachableViaCarrierDataNetwork:
-                        return NetworkAccess.Cellular;
-
-                    case NetworkStatus.ReachableViaWiFiNetwork:
-                        return NetworkAccess.WiFi;
-                }
-            }
             return NetworkAccess.None;
         }
     }
 
 
-    //public event PropertyChangedEventHandler? PropertyChanged;
+    public IObservable<IConnectivity> WhenChanged() => Observable.Create<IConnectivity>(ob =>
+    {
+        this.netmon.SnapshotHandler = _ => ob.OnNext(this);
+        this.netmon.Start();
 
-    ////{
-    ////    get
-    ////    {
-    ////        var tel = new CTTelephonyNetworkInfo();
-    ////        //tel.CellularProviderUpdatedEventHandler
-    ////        //tel.CurrentRadioAccessTechnology
-    ////        //tel.ServiceSubscriberCellularProvidersDidUpdateNotifier
-    ////        //tel.ServiceCurrentRadioAccessTechnology
-    ////        return tel.SubscriberCellularProvider.CarrierName;
-    ////    }
-    ////}
-
-    //protected override void OnNpcHookChanged(bool hasSubscribers)
-    //{
-    //    if (hasSubscribers)
-    //    {
-    //        Reachability.ReachabilityChanged += this.OnReachChanged;
-    //        this.cellular.CellularProviderUpdatedEventHandler = carrier =>
-    //            this.RaisePropertyChanged(nameof(this.CellularCarrier));
-    //    }
-    //    else
-    //    {
-    //        Reachability.ReachabilityChanged -= this.OnReachChanged;
-    //        this.cellular.CellularProviderUpdatedEventHandler = null;
-    //    }
-    //}
-
-
-    //void OnReachChanged(object sender, EventArgs args)
-    //{
-    //    this.RaisePropertyChanged(nameof(this.Reach));
-    //    this.RaisePropertyChanged(nameof(this.Access));
-    //}
+        return () =>
+        {
+            this.netmon.Cancel();
+            this.netmon.SnapshotHandler = null;
+        };
+    });
 }

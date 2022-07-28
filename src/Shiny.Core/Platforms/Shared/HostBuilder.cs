@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Logging;
+using Shiny.Stores;
 
 namespace Shiny.Hosting;
 
@@ -26,12 +27,6 @@ public class HostBuilder : IHostBuilder
     {
         this.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
         this.Services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
-
-#if ANDROID
-        this.AddAndroid();
-#elif IOS || MACCATALYST
-        this.AddIos();
-#endif
 
         var serviceProvider = this.ConfigureContainer(this.Services);
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();

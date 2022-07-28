@@ -25,14 +25,14 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<AccessState> RequestAccess()
     {
-        if (!this.context.Platform.IsMinApiLevel(23))
+        if (!OperatingSystem.IsMacCatalystVersionAtLeast(23))
             return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
 
         var current = this.context.Manager.GetAccessState();
         if (current != AccessState.Available && current != AccessState.Unknown)
             return current;
 
-        if (this.context.Platform.IsMinApiLevel(31))
+        if (OperatingSystem.IsMacCatalystVersionAtLeast(31))
         {
             var result = await this.context.Platform.RequestPermissions(Permission.BluetoothConnect, Permission.BluetoothAdvertise);
             if (!result.IsSuccess())

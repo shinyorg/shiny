@@ -5,7 +5,7 @@ using UserNotifications;
 namespace Shiny.Notifications;
 
 
-public static class PlatformExtensions
+public static class ApplePlatformExtensions
 {
     public static Notification FromNative(this UNNotificationRequest native)
     {

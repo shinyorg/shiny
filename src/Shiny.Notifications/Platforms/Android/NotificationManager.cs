@@ -99,7 +99,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
             if (locPermission != AccessState.Available)
                 return AccessState.Restricted;
         }
-        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && this.platform.IsMinApiLevel(31))
+        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && OperatingSystem.IsAndroidVersionAtLeast(31))
         {
             var schedulePermission = await this.platform
                 .RequestPermissions(Manifest.Permission.ScheduleExactAlarm)

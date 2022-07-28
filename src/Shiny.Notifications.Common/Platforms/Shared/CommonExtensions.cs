@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Hosting;
 using Shiny.Notifications.Infrastructure;
 using Shiny.Stores;
 
@@ -9,6 +11,14 @@ namespace Shiny.Notifications;
 
 public static class CommonExtensions
 {
+    public static void SetSoundFromEmbeddedResource(this Channel channel, Assembly assembly, string resourceName)
+        => channel.CustomSoundPath = Host
+            .Current
+            .Services
+            .GetRequiredService<IPlatform>()
+            .ResourceToFilePath(assembly, resourceName);
+
+
     internal static void AssertChannelRemove(this IChannelManager channelManager, string channelIdentifier)
     {
         if (channelIdentifier == null)
@@ -21,10 +31,9 @@ public static class CommonExtensions
 
     public static IServiceCollection AddChannelManager(this IServiceCollection services)
     {
-#if IOS || MACCATALYST || ANDROID
         services.AddRepository<ChannelStoreConverter, Channel>();
         services.TryAddSingleton<IChannelManager, ChannelManager>();
-#endif
+
         return services;
     }
 }

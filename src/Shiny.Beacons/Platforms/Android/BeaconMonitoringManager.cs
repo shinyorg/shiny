@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
-using Shiny.Infrastructure;
 using Shiny.Stores;
 using System.Linq;
 #if ANDROID
@@ -17,7 +16,6 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 {
     readonly IRepository<BeaconRegion> repository;
     readonly IBleManager bleManager;
-    readonly IMessageBus messageBus;
 #if ANDROID
     readonly AndroidPlatform platform;
 #endif
@@ -25,15 +23,13 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public BeaconMonitoringManager(
         IBleManager bleManager,
-        IRepository<BeaconRegion> repository,
-        IMessageBus messageBus
+        IRepository<BeaconRegion> repository
 #if ANDROID
        , AndroidPlatform platform
 #endif
     )
     {
         this.bleManager = bleManager;
-        this.messageBus = messageBus;
         this.repository = repository;
 #if ANDROID
         this.platform = platform;
@@ -53,7 +49,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     {
         var stored = await this.repository.Set(region).ConfigureAwait(false);
         var eventType = stored ? BeaconRegisterEventType.Add : BeaconRegisterEventType.Update;
-        this.messageBus.Publish(new BeaconRegisterEvent(eventType, region));
+        //this.messageBus.Publish(new BeaconRegisterEvent(eventType, region));
         this.StartService();
     }
 
@@ -70,7 +66,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
                 .Remove(identifier)
                 .ConfigureAwait(false);
 
-            this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
+            //this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
 
             var regions = await this.repository
                 .GetList()
@@ -85,7 +81,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     public async Task StopAllMonitoring()
     {
         await this.repository.Clear().ConfigureAwait(false);
-        this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Clear, null));
+        //this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Clear, null));
         this.StopService();
     }
 
@@ -99,7 +95,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
 #if ANDROID
         await this.platform.RequestLocationAccess(LocationPermissionType.Fine);
-        if ((access == AccessState.Available && access == AccessState.Restricted) && this.platform.IsMinApiLevel(26))
+        if ((access == AccessState.Available && access == AccessState.Restricted) && OperatingSystem.IsAndroidVersionAtLeast(26))
         {
             access = await this.platform
                 .RequestAccess(Android.Manifest.Permission.ForegroundService)

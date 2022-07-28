@@ -6,32 +6,12 @@ using Android.Content;
 using Android.Content.PM;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
-using Shiny.Stores;
 
 namespace Shiny;
 
 
 public static class AndroidExtensions
 {
-    public static IServiceCollection AddAndroid(this IServiceCollection services)
-    {
-        services.AddShinyService<AndroidPlatform>();
-        services.AddShinyService<AndroidLifecycleExecutor>();
-        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
-        services.AddCommon();
-
-        return services;
-    }
-
-
-    public static IHostBuilder AddAndroid(this IHostBuilder hostBuilder)
-    {
-        hostBuilder.Services.AddAndroid();
-        return hostBuilder;
-    }
-
-
     public static AndroidLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<AndroidLifecycleExecutor>();
 
 
@@ -52,7 +32,7 @@ public static class AndroidExtensions
 
     public static PendingIntentFlags GetPendingIntentFlags(this AndroidPlatform platform, PendingIntentFlags flags)
     {
-        if (platform.IsMinApiLevel(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
             flags |= PendingIntentFlags.Mutable;
 
         return flags;
@@ -75,10 +55,8 @@ public static class AndroidExtensions
 
     public static TValue GetSystemServiceValue<TValue, TSysType>(this AndroidPlatform platform, string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
     {
-        using (var type = platform.GetSystemService<TSysType>(systemTypeName))
-        {
-            return func(type);
-        }
+        using var type = platform.GetSystemService<TSysType>(systemTypeName);
+        return func(type);
     }
 
 

@@ -9,13 +9,8 @@ public static class ShinyExtensions
     public static MauiAppBuilder UseShiny(this MauiAppBuilder builder)
     {
         builder.Services.AddSingleton<IMauiInitializeService, ShinyInitializationService>();
-#if ANDROID
-        builder.Services.AddAndroid();
-#elif IOS || MACCATALYST
-        builder.Services.AddIos();
-#endif
+        builder.Services.AddShinyCoreServices();
 
-        //Microsoft.Maui.Networking.Connectivity.Current.ConnectionProfiles.First() == ConnectionProfile.Bluetooth
         builder.ConfigureLifecycleEvents(events =>
         {
 #if ANDROID

@@ -3,10 +3,6 @@
 namespace Shiny.Power;
 
 
-/// <summary>
-/// This service uses INotifyPropertyChanged - when you subscribe to PropertyChanged, the underlying
-/// monitors are attached
-/// </summary>
 public interface IBattery
 {
     /// <summary>
@@ -21,12 +17,7 @@ public interface IBattery
     BatteryState Status { get; }
 
     /// <summary>
-    /// Gets the current battery level (scaled in %/percentage - 1-100)
+    /// Gets the current battery level (0.0-1.0)
     /// </summary>
-    int BatteryLevel { get; }
-
-    /// <summary>
-    /// Detects Android Doze or iOS Low Power mode
-    /// </summary>
-    State IsEnergySavingEnabled { get; }
+    double Level { get; }
 }

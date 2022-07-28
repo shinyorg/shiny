@@ -17,12 +17,14 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
     readonly IEnumerable<INotificationCustomizer> customizers;
+    readonly IosConfiguration configuration;
     readonly IPlatform platform;
     readonly IChannelManager channelManager;
     readonly IKeyValueStore settings;
 
 
     public NotificationManager(
+        IosConfiguration configuration,
         IServiceProvider services,
         IPlatform platform,
         IChannelManager channelManager,
@@ -30,6 +32,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         IEnumerable<INotificationCustomizer> customizers
     )
     {
+        this.configuration = configuration;
         this.delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
         this.platform = platform;
         this.channelManager = channelManager;
@@ -58,29 +61,9 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     public Task<AccessState> RequestAccess(AccessRequestFlags access)
     {
         var tcs = new TaskCompletionSource<AccessState>();
-        var request = UNAuthorizationOptions.Alert |
-                      UNAuthorizationOptions.Badge |
-                      UNAuthorizationOptions.Sound;
-
-        if (access.HasFlag(AccessRequestFlags.TimeSensitivity))
-            request |= UNAuthorizationOptions.TimeSensitive;
-
-        //UNAuthorizationOptions.Announcement | UNAuthorizationOptions.CarPlay
-        // https://medium.com/@shashidharyamsani/implementing-ios-critical-alerts-7d82b4bb5026
-//        {
-//“aps” : {
-//    “sound” : {
-//        “critical”: 1,
-//        “name”: “critical - alert - sound.wav”,
-//        “volume”: 1.0
-//    }
-//            }
-//        }
-        if (UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0))
-            request |= UNAuthorizationOptions.CriticalAlert;
 
         UNUserNotificationCenter.Current.RequestAuthorization(
-            request,
+            this.configuration.UNAuthorizationOptions,
             (approved, error) =>
             {
                 if (error != null)
@@ -225,7 +208,13 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             {
                 case ChannelImportance.Critical:
                 case ChannelImportance.High:
-                    native.Sound = UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0)
+#if IOS
+                    var is12 = OperatingSystem.IsIOSVersionAtLeast(12);
+#elif MACCATALYST
+                    var is12 = OperatingSystem.IsMacOSVersionAtLeast(12);
+#endif
+
+                    native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
                         ? UNNotificationSound.DefaultCriticalSound
                         : UNNotificationSound.Default;
                     break;

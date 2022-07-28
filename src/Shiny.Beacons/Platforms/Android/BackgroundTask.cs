@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Collections.Generic;
 using Shiny.BluetoothLE;
 using Microsoft.Extensions.Logging;
-using Shiny.Infrastructure;
 
 namespace Shiny.Beacons;
 
@@ -15,21 +14,18 @@ public class BackgroundTask
     readonly IBleManager bleManager;
     readonly IBeaconMonitoringManager beaconManager;
     readonly ILogger logger;
-    readonly IMessageBus messageBus;
     readonly IEnumerable<IBeaconMonitorDelegate> delegates;
     readonly IDictionary<string, BeaconRegionStatus> states;
     IDisposable? scanSub;
 
 
     public BackgroundTask(
-        IMessageBus messageBus,
         IBleManager centralManager,
         IBeaconMonitoringManager beaconManager,
         IEnumerable<IBeaconMonitorDelegate> delegates,
         ILogger<IBeaconMonitorDelegate> logger
     )
     {
-        this.messageBus = messageBus;
         this.bleManager = centralManager;
         this.beaconManager = beaconManager;
         this.logger = logger;
@@ -42,45 +38,46 @@ public class BackgroundTask
     {
         this.logger.LogInformation("Starting Beacon Monitoring");
 
+        // TODO
         // I record state of the beacon region so I can fire stuff without going into initial state from unknown
-        this.messageBus
-            .Listener<BeaconRegisterEvent>()
-            .Subscribe(ev =>
-            {
-                switch (ev.EventType)
-                {
-                    case BeaconRegisterEventType.Add:
-                        if (this.states.Count == 0)
-                        {
-                            this.StartScan();
-                        }
-                        else
-                        {
-                            lock (this.states)
-                            {
-                                this.states.Add(ev.Region!.Identifier, new BeaconRegionStatus(ev.Region));
-                            }
-                        }
-                        break;
+        //this.messageBus
+        //    .Listener<BeaconRegisterEvent>()
+        //    .Subscribe(ev =>
+        //    {
+        //        switch (ev.EventType)
+        //        {
+        //            case BeaconRegisterEventType.Add:
+        //                if (this.states.Count == 0)
+        //                {
+        //                    this.StartScan();
+        //                }
+        //                else
+        //                {
+        //                    lock (this.states)
+        //                    {
+        //                        this.states.Add(ev.Region!.Identifier, new BeaconRegionStatus(ev.Region));
+        //                    }
+        //                }
+        //                break;
 
-                    case BeaconRegisterEventType.Update:
-                        // this actually shouldn't be allowed
-                        break;
+        //            case BeaconRegisterEventType.Update:
+        //                // this actually shouldn't be allowed
+        //                break;
 
-                    case BeaconRegisterEventType.Remove:
-                        lock (this.states)
-                        {
-                            this.states.Remove(ev.Region!.Identifier);
-                            if (this.states.Count == 0)
-                                this.StopScan();
-                        }
-                        break;
+        //            case BeaconRegisterEventType.Remove:
+        //                lock (this.states)
+        //                {
+        //                    this.states.Remove(ev.Region!.Identifier);
+        //                    if (this.states.Count == 0)
+        //                        this.StopScan();
+        //                }
+        //                break;
 
-                    case BeaconRegisterEventType.Clear:
-                        this.StopScan();
-                        break;
-                }
-            });
+        //            case BeaconRegisterEventType.Clear:
+        //                this.StopScan();
+        //                break;
+        //        }
+        //    });
 
         this.StartScan();
         this.logger.LogInformation("Beacon Monitoring Started Successfully");

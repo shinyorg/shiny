@@ -17,8 +17,8 @@ public enum ConnectionTypes
     None = 0,
     Unknown = 1,
     Bluetooth = 2,
-    Ethernet = 4,
-    WiFi = 8,
+    Wired = 4,
+    Wifi = 8,
     Cellular = 16
 }
 

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using Shiny.Hosting;
 
 namespace Shiny.Notifications;
 
@@ -19,14 +16,6 @@ public static class ChannelExtensions
                 action.AssertValid();
         }
     }
-
-
-    public static void SetSoundFromEmbeddedResource(this Channel channel, Assembly assembly, string resourceName)
-        => channel.CustomSoundPath = Host
-            .Current
-            .Services
-            .GetRequiredService<IPlatform>()
-            .ResourceToFilePath(assembly, resourceName);
 
 
     public static void AssertValid(this ChannelAction action)

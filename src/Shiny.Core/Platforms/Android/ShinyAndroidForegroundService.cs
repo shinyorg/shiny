@@ -68,7 +68,7 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         this.Service = this.Resolve<TService>();
         this.Delegates = this.ResolveAll<TDelegate>().ToList();
 
-        if (this.Platform.IsMinApiLevel(26))
+        if (OperatingSystem.IsAndroidVersionAtLeast(26))
         {
             this.Service
                 .WhenAnyProperty()
@@ -91,7 +91,7 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
-        if (this.Platform!.IsMinApiLevel(26))
+        if (OperatingSystem.IsAndroidVersionAtLeast(26))
             this.StopForeground(true);
 
         this.StopSelf();

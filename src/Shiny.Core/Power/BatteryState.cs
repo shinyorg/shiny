@@ -19,7 +19,12 @@ public enum BatteryState
     /// <summary>
     /// Device is fully charged and plugged in
     /// </summary>
-    Charged,
+    Full,
+
+    /// <summary>
+    /// Device is possibly plugged in, but not receiving enough power from source
+    /// </summary>
+    NotCharging,
 
     /// <summary>
     /// Device is running on battery

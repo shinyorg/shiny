@@ -8,9 +8,6 @@ namespace Shiny.Notifications;
 
 public static class NotificationExtensions
 {
-    public static INotificationManager Notifications(this ShinyContainer container) => container.GetService<INotificationManager>();
-
-
     public static async Task<AccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
     {
         var request = AccessRequestFlags.Notification;

@@ -10,7 +10,6 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.Content;
-using B = global::Android.OS.Build;
 using AndroidX.Core.App;
 using Shiny.Hosting;
 
@@ -68,38 +67,6 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
 
     public string AppIdentifier => this.AppContext.PackageName;
 
-    //public string AppVersion => this.Package.VersionName;
-    //public string AppBuild => this.Package.VersionCode.ToString();
-
-    //public string MachineName => B.GetSerial();
-    //public string OperatingSystem => B.VERSION.Release;
-    //public string OperatingSystemVersion => B.VERSION.Sdk;
-    //public string Manufacturer => B.Manufacturer;
-    //public string Model => B.Model;
-
-    //public void OnActivityResult(int requestCode, Result resultCode, Intent data)
-
-
-
-    //public IObservable<(bool NewIntent, Intent Intent)> WhenIntentReceived() => Observable.Create<(bool NewIntent, Intent Intent)>(ob =>
-    //{
-    //    var comp = new CompositeDisposable();
-
-    //    //this.WhenActivityChanged()
-    //    //    .Where(x =>
-    //    //        x.State == ActivityState.Resumed &&
-    //    //        x.Activity.Intent != null
-    //    //    )
-    //    //    .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
-    //    //    .DisposedBy(comp);
-
-    //    //this.newIntentSubject
-    //    //    .Subscribe(intent => ob.OnNext((true, intent)))
-    //    //    .DisposedBy(comp);
-
-    //    return comp;
-    //});
-
 
     public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
     {
@@ -126,7 +93,7 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     {
         //ActionServiceStart
         var intent = new Intent(this.AppContext, serviceType);
-        if (this.IsMinApiLevel(26) && this.IsShinyForegroundService(serviceType))
+        if (OperatingSystem.IsAndroidVersionAtLeast(26) && this.IsShinyForegroundService(serviceType))
         {
             intent.SetAction(ActionServiceStart);
             this.AppContext.StartForegroundService(intent);
@@ -175,10 +142,6 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
 
         return sub;
     });
-
-
-    public bool IsMinApiLevel(int apiLevel)
-        => (int)B.VERSION.SdkInt >= apiLevel;
 
 
     public IObservable<AccessState> RequestAccess(string androidPermissions)

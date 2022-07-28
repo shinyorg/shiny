@@ -6,6 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Include="Notification.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
     </ItemGroup>

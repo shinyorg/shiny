@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Timers;
 using Shiny.Net;
+using Shiny.Power;
 
 namespace Shiny.Jobs.Infrastructure;
 
@@ -31,11 +32,13 @@ public class JobLifecycleTask : ShinyLifecycleTask
     readonly Timer timer;
 
 
-    public JobLifecycleTask(IJobManager jobManager,
-                            IPowerManager powerManager,
-                            IConnectivity connectivity)
+    public JobLifecycleTask(
+        IJobManager jobManager,
+        IBattery battery,
+        IConnectivity connectivity
+    )
     {
-        this.powerManager = powerManager;
+        this.battery = battery;
         this.connectivity = connectivity;
 
         this.timer = new Timer();
@@ -91,14 +94,14 @@ public class JobLifecycleTask : ShinyLifecycleTask
         if (!job.BatteryNotLow)
             return true;
 
-        return this.powerManager.BatteryLevel > 20 || this.powerManager.IsPluggedIn();
+        return this.battery.Level > 20 || this.battery.IsPluggedIn();
     }
 
 
     bool HasReqInternet(JobInfo job) => job.RequiredInternetAccess switch
     {
         InternetAccess.Any => this.connectivity.IsInternetAvailable(),
-        InternetAccess.Unmetered => !this.connectivity.Reach.HasFlag(NetworkReach.ConstrainedInternet),
+        InternetAccess.Unmetered => !this.connectivity.Access.HasFlag(NetworkReach.ConstrainedInternet),
         InternetAccess.None => true,
         _ => false
     };
@@ -109,7 +112,7 @@ public class JobLifecycleTask : ShinyLifecycleTask
         if (!job.DeviceCharging)
             return true;
 
-        return this.powerManager.IsPluggedIn();
+        return this.battery.IsPluggedIn();
     }
 }
 #endif

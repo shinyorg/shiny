@@ -7,32 +7,12 @@ using UIKit;
 using ObjCRuntime;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
-using Shiny.Stores;
 
 namespace Shiny;
 
 
 public static class AppleExtensions
 {
-    public static IServiceCollection AddIos(this IServiceCollection services)
-    {
-        services.AddShinyService<IosPlatform>();
-
-        services.AddShinyService<IosLifecycleExecutor>();
-        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
-        services.AddCommon();
-        return services;
-    }
-
-
-    public static IHostBuilder AddIos(this IHostBuilder hostBuilder)
-    {
-        hostBuilder.Services.AddIos();
-        return hostBuilder;
-    }
-
-
     public static IosLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<IosLifecycleExecutor>();
 
 
@@ -42,7 +22,7 @@ public static class AppleExtensions
     public static bool HasAppDelegateHook(string selector)
     {
         if (!selector.StartsWith("application:"))
-             selector = "application:" + selector;
+            selector = "application:" + selector;
 
         if (!selector.EndsWith(":"))
             selector += ":";
@@ -134,8 +114,11 @@ public static class AppleExtensions
     {
         if (ifVersion == null)
             return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
-#if __IOS__
-        if (UIKit.UIDevice.CurrentDevice.CheckSystemVersion(ifVersion.Value, 0))
+#if IOS
+        if (OperatingSystem.IsIOSVersionAtLeast(ifVersion.Value))
+            return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
+#elif MACCATALYST
+        if (OperatingSystem.IsMacCatalystVersionAtLeast(ifVersion.Value))
             return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
 #endif
         return false;
@@ -143,26 +126,4 @@ public static class AppleExtensions
 
     public static Guid ToGuid(this NSUuid uuid) => Guid.ParseExact(uuid.AsString(), "d");
     public static NSUuid ToNSUuid(this Guid guid) => new NSUuid(guid.ToString());
-
-
-    //public static void ShinyFinishedLaunching(this UIApplicationDelegate app, NSDictionary options)
-    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().OnFinishedLaunching(options);
-
-    //public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult>? completionHandler)
-    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().DidReceiveRemoteNotification(userInfo, completionHandler);
-
-    //public static void ShinyRegisteredForRemoteNotifications(this UIApplicationDelegate app, NSData deviceToken)
-    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().RegisteredForRemoteNotifications(deviceToken);
-
-    //public static void ShinyFailedToRegisterForRemoteNotifications(this UIApplicationDelegate app, NSError error)
-    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().FailedToRegisterForRemoteNotifications(error);
-
-    //public static void ShinyPerformFetch(this UIApplicationDelegate app, Action<UIBackgroundFetchResult> completionHandler)
-    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().OnPerformFetch(completionHandler);
-
-    //public static void ShinyHandleEventsForBackgroundUrl(this UIApplicationDelegate app, string sessionIdentifier, Action completionHandler)
-    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
-
-    //public static bool ShinyContinueUserActivity(this UIApplicationDelegate app, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
-    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().ContinueUserActivity(userActivity, completionHandler);
 }

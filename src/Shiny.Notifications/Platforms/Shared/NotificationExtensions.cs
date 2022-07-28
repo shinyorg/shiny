@@ -8,8 +8,11 @@ using Shiny.Stores;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class NotificationExtensions
 {
+    public static INotificationManager Notifications(this ShinyContainer container) => container.GetService<INotificationManager>();
+
+
     /// <summary>
     /// Registers notification manager with Shiny
     /// </summary>
