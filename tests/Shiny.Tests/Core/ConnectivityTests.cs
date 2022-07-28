@@ -21,13 +21,13 @@ public class ConnectivityTests : AbstractShinyTests
     }
 
 
-    [Theory(DisplayName = "Connectivity - Access (Simulator)")]
-    [InlineData(ConnectionTypes.Wifi, "")]
-    [InlineData(ConnectionTypes.Cellular, "")]
+    [Theory(DisplayName = "Connectivity - Connection Types (Simulator)")]
+    [InlineData(ConnectionTypes.Wifi, "Change the connection type to WIFI")]
+    [InlineData(ConnectionTypes.Cellular, "Change the connection type to a cellular type")]
     public async Task ConnectionTypeTests(ConnectionTypes type, string message)
     {
         var conn = this.GetService<IConnectivity>();
-        await UserDialogs.Instance.AlertAsync(message + " then press OK");
+        await UserDialogs.Instance.AlertAsync(message + " & then press OK");
         conn.ConnectionTypes.HasFlag(type).Should().BeTrue();
     }
 
