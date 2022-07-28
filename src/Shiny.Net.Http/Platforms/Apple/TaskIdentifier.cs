@@ -39,5 +39,5 @@ public struct TaskIdentifier
     public string? Value { get; }
     public FileInfo? File { get; }
     public bool IsValid { get; }
-    public override string ToString() => this.IsValid ? $"{this.Value}|{this.File.FullName}" : null;
+    public override string ToString() => this.IsValid ? $"{this.Value}|{this.File?.FullName}" : "";
 }
