@@ -16,13 +16,14 @@ public class BatteryImpl : IBattery
 
             try
             {
-                return UIDevice.CurrentDevice.BatteryState switch
+                var state = UIDevice.CurrentDevice.BatteryState switch
                 {
                     UIDeviceBatteryState.Charging => BatteryState.Charging,
                     UIDeviceBatteryState.Full => BatteryState.Full,
                     UIDeviceBatteryState.Unplugged => BatteryState.Discharging,
                     _ => UIDevice.CurrentDevice.BatteryLevel >= 1.0 ? BatteryState.Full : BatteryState.Unknown
                 };
+                return state;
             }
 		    finally
             {

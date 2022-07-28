@@ -77,11 +77,5 @@
         <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="2.1.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <MauiXaml Update="LogsPage.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </MauiXaml>
-    </ItemGroup>
-
     <ProjectExtensions><VisualStudio><UserProperties XamarinHotReloadDebuggerTimeoutExceptionTestSamplesHideInfoBar="True" /></VisualStudio></ProjectExtensions>
 </Project>

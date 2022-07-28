@@ -1,6 +1,13 @@
 ﻿global using Xunit;
 global using Xunit.Abstractions;
+global using FluentAssertions;
 global using Shiny;
+global using Microsoft.Extensions.DependencyInjection;
+global using System;
+global using System.Linq;
+global using System.Collections.Generic;
+global using System.Threading;
+global using System.Threading.Tasks;
 global using System.Windows.Input;
 global using System.Reactive;
 global using System.Reactive.Linq;

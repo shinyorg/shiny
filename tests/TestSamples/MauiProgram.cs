@@ -25,6 +25,8 @@ public static class MauiProgram
         builder.Logging.AddDebug();
         builder.Services.AddSingleton<SampleSqlConnection>();
         builder.Services.AddShinyService<PlatformStateTests>();
+        builder.Services.AddConnectivity();
+        builder.Services.AddBattery();
         //builder.Services.AddBluetoothLeHosting();
 
         return builder.Build();

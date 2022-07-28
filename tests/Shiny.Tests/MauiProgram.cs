@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
 using Xunit.Runners.Maui;
 
@@ -7,7 +8,7 @@ namespace Shiny.Tests;
 
 public static class MauiProgram
 {
-    public static IConfiguration Configuration { get; private set; }
+    public static IConfiguration Configuration { get; private set; } = null!;
 
 
     public static MauiApp CreateMauiApp()

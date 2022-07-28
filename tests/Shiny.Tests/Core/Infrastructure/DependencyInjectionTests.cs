@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-
 using Shiny.Hosting;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
