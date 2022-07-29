@@ -8,26 +8,35 @@ using System.Threading;
 namespace Shiny.Net.Http;
 
 
-public record HttpTransferMetric2(
-    double Progress, // 0.0 - 1.0
-    long? TotalBytes,
-    long? BytesRemaining,
-    long BytesPerSecond = 0,
-    TimeSpan? EstimatedTimeRemaining = null,
-    TimeSpan ElapsedTime
+public record HttpTransferProgress(
+    double Progress,
+    long BytesRemaining,
+    TimeSpan EstimatedTimeRemaing
 );
+
+
+public record HttpTransferMetrics(
+    long BytesTransferred,
+    long BytesPerSecond,
+    TimeSpan ElapsedTime,
+    HttpTransferProgress? Progress
+)
+{
+    public bool IsIndeterministic => this.Progress == null;
+}
 
 
 public static class HttpClientExtensions
 {
-    public static IObservable<HttpTransferMetric2> Download(this HttpClient httpClient, HttpRequestMessage request, string saveFullPath) => Observable.Create<HttpTransferMetric2>(async ob =>
+    public static IObservable<HttpTransferMetrics> Download(this HttpClient httpClient, HttpRequestMessage request, string saveFullPath) => Observable.Create<HttpTransferMetrics>(async ob =>
     {
+        var startTime = DateTimeOffset.UtcNow;
         var cts = new CancellationTokenSource();
         var sw = new Stopwatch();
-        var startTime = DateTimeOffset.UtcNow;
+
         var buffer = new byte[8192];
-        var total = 0;
-        var oldTotal = 0;
+        var bytesTransferred = 0;
+        var oldBytesTransferred = 0;
 
         try
         {
@@ -40,9 +49,7 @@ public static class HttpClientExtensions
             response.EnsureSuccessStatusCode();
             using var stream = response.Content.ReadAsStream(cts.Token);
 
-            var dlSize = response.Content.Headers.ContentLength ?? 0;
-            // TODO: if 0, progress is indeterministic
-
+            var contentLength = response.Content.Headers.ContentLength ?? 0;
             sw.Start();
             var read = stream.Read(buffer, 0, buffer.Length);
 
@@ -50,30 +57,23 @@ public static class HttpClientExtensions
             {
                 read = stream.Read(buffer, 0, buffer.Length);
                 localFile.Write(buffer, 0, buffer.Length);
-                total += read;
+                bytesTransferred += read;
 
                 var elapsed = sw.Elapsed;
                 if (elapsed.TotalMilliseconds >= 2000)
                 {
-                    sw.Reset();
-                    sw.Start();
-
-                    var bytesChanged = total - oldTotal;
-                    oldTotal = total;
-
+                    var bytesChanged = bytesTransferred - oldBytesTransferred;
+                    oldBytesTransferred = bytesTransferred;
                     var bps = Convert.ToInt64(bytesChanged / elapsed.TotalSeconds);
-                    var progress = total / dlSize;
-                    var remaining = dlSize - total;
-                    var estTimeRemaining = TimeSpan.FromSeconds(remaining / bps);
 
-                    ob.OnNext(new HttpTransferMetric2(
-                        progress,
-                        dlSize,
-                        remaining,
+                    ob.OnNext(new HttpTransferMetrics(
+                        bytesTransferred,
                         bps,
-                        estTimeRemaining,
-                        startTime.Subtract(DateTimeOffset.UtcNow)
+                        DateTimeOffset.UtcNow.Subtract(startTime),
+                        CalculateProgress(contentLength, bytesTransferred, bps)
                     ));
+
+                    sw.Restart();
                 }
             }
 
@@ -91,10 +91,14 @@ public static class HttpClientExtensions
 
 
 
-    public static IObservable<HttpTransferMetric2> Upload(this HttpClient httpClient, HttpRequestMessage request, string uploadFullPath) => Observable.Create<HttpTransferMetric2>(async ob =>
+    public static IObservable<HttpTransferMetrics> Upload(this HttpClient httpClient, HttpRequestMessage request, string uploadFullPath) => Observable.Create<HttpTransferMetrics>(async ob =>
     {
+        var startTime = DateTimeOffset.UtcNow;
         var cts = new CancellationTokenSource();
         var sw = new Stopwatch();
+
+        var bytesTransferred = 0;
+        var oldBytesTransferred = 0;
 
         try
         {
@@ -104,13 +108,22 @@ public static class HttpClientExtensions
 
             var progress = new Action<int>(sent =>
             {
-                total += sent;
-                var progress = total / file.Length;
+                bytesTransferred += sent;
 
-                // TODO: throttle otherwise there will be a lot of updates
-                // TODO: calculate time remaining
-                // TODO: calculate bytes per second
-                // TODO: calculate how much time is remaining based on bytes per second vs size remaining
+                if (sw.Elapsed.TotalMilliseconds > 2000)
+                {
+                    var bytesChanged = bytesTransferred - oldBytesTransferred;
+                    var bps = 0;
+                    var progress = total / file.Length;
+
+                    ob.OnNext(new HttpTransferMetrics(
+                        bytesTransferred,
+                        bps,
+                        DateTimeOffset.UtcNow.Subtract(startTime),
+                        CalculateProgress(file.Length, bytesTransferred, bps)
+                    ));
+                    sw.Restart();
+                }
             });
 
             request.Content = new ProgressStreamContent(file.OpenRead(), progress, 8192);
@@ -127,4 +140,21 @@ public static class HttpClientExtensions
             sw.Stop();
         };
     });
+
+
+    static HttpTransferProgress? CalculateProgress(long contentLength, long bytesTransferred, long bytesPerSecond)
+    {
+        if (contentLength == 0)
+            return null;
+
+        var value = (double)(bytesTransferred / contentLength);
+        var bytesRemaining = contentLength - bytesTransferred;
+        var estTimeRemaining = TimeSpan.FromSeconds(bytesRemaining / bytesPerSecond);
+
+        return new HttpTransferProgress(
+            value,
+            bytesRemaining,
+            estTimeRemaining
+        );
+    }
 }

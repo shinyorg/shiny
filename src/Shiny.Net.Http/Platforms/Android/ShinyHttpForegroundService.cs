@@ -21,6 +21,7 @@ public class ShinyHttpForegroundService : Service
         // TODO: on each new transfer I want to start a progress bar
         // TODO: each progress should have estimated time remaining, time taken, transfer speed
         // TODO: if service is starting for the first time, get all transfers - create their progress notifications, otherwise listen to
+        // TODO: transfers should be throttled in terms of how many can run at a time (1, 2, configurable)?
         var action = intent?.Action ?? AndroidPlatform.ActionServiceStart;
         switch (action)
         {
