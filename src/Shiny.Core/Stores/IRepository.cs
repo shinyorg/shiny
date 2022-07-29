@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 namespace Shiny.Stores;
 
 
+public enum RepositoryAction
+{
+    Remove,
+    Add,
+    Update,
+    Clear
+}
+
+
 public interface IRepository<TEntity> where TEntity : IStoreEntity
 {
     /// <summary>
@@ -52,4 +61,11 @@ public interface IRepository<TEntity> where TEntity : IStoreEntity
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     Task Clear();
+
+
+    /// <summary>
+    /// An observable for watching events within the repository
+    /// </summary>
+    /// <returns></returns>
+    IObservable<(RepositoryAction Action, TEntity? Entity)> WhenActionOccurs();
 }

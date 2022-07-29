@@ -47,9 +47,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public async Task StartMonitoring(BeaconRegion region)
     {
-        var stored = await this.repository.Set(region).ConfigureAwait(false);
-        var eventType = stored ? BeaconRegisterEventType.Add : BeaconRegisterEventType.Update;
-        //this.messageBus.Publish(new BeaconRegisterEvent(eventType, region));
+        await this.repository.Set(region).ConfigureAwait(false);
         this.StartService();
     }
 
@@ -66,8 +64,6 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
                 .Remove(identifier)
                 .ConfigureAwait(false);
 
-            //this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
-
             var regions = await this.repository
                 .GetList()
                 .ConfigureAwait(false);
@@ -81,7 +77,6 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     public async Task StopAllMonitoring()
     {
         await this.repository.Clear().ConfigureAwait(false);
-        //this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Clear, null));
         this.StopService();
     }
 

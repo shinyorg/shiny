@@ -5,32 +5,34 @@ using System.Reactive.Linq;
 using System.Collections.Generic;
 using Shiny.BluetoothLE;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 
 namespace Shiny.Beacons;
 
 
-public class BackgroundTask
+public class BackgroundTask : IDisposable
 {
+    readonly Dictionary<string, BeaconRegionStatus> states = new();
+    IDisposable? repoSub;
+    IDisposable? scanSub;
+
+    readonly IRepository<BeaconRegion> repository;
     readonly IBleManager bleManager;
-    readonly IBeaconMonitoringManager beaconManager;
     readonly ILogger logger;
     readonly IEnumerable<IBeaconMonitorDelegate> delegates;
-    readonly IDictionary<string, BeaconRegionStatus> states;
-    IDisposable? scanSub;
 
 
     public BackgroundTask(
+        IRepository<BeaconRegion> repository,
         IBleManager centralManager,
-        IBeaconMonitoringManager beaconManager,
         IEnumerable<IBeaconMonitorDelegate> delegates,
         ILogger<IBeaconMonitorDelegate> logger
     )
     {
+        this.repository = repository;
         this.bleManager = centralManager;
-        this.beaconManager = beaconManager;
         this.logger = logger;
         this.delegates = delegates;
-        this.states = new Dictionary<string, BeaconRegionStatus>();
     }
 
 
@@ -38,46 +40,44 @@ public class BackgroundTask
     {
         this.logger.LogInformation("Starting Beacon Monitoring");
 
-        // TODO
-        // I record state of the beacon region so I can fire stuff without going into initial state from unknown
-        //this.messageBus
-        //    .Listener<BeaconRegisterEvent>()
-        //    .Subscribe(ev =>
-        //    {
-        //        switch (ev.EventType)
-        //        {
-        //            case BeaconRegisterEventType.Add:
-        //                if (this.states.Count == 0)
-        //                {
-        //                    this.StartScan();
-        //                }
-        //                else
-        //                {
-        //                    lock (this.states)
-        //                    {
-        //                        this.states.Add(ev.Region!.Identifier, new BeaconRegionStatus(ev.Region));
-        //                    }
-        //                }
-        //                break;
+        this.repoSub = this.repository
+            .WhenActionOccurs()
+            .Subscribe(action =>
+            {
+                switch (action.Action)
+                {
+                    case RepositoryAction.Add:
+                        if (this.states.Count == 0)
+                        {
+                            this.StartScan();
+                        }
+                        else
+                        {
+                            lock (this.states)
+                            {
+                                this.states.Add(action.Entity!.Identifier, new BeaconRegionStatus(action.Entity));
+                            }
+                        }
+                        break;
 
-        //            case BeaconRegisterEventType.Update:
-        //                // this actually shouldn't be allowed
-        //                break;
+                    case RepositoryAction.Update:
+                        // this actually shouldn't be allowed
+                        break;
 
-        //            case BeaconRegisterEventType.Remove:
-        //                lock (this.states)
-        //                {
-        //                    this.states.Remove(ev.Region!.Identifier);
-        //                    if (this.states.Count == 0)
-        //                        this.StopScan();
-        //                }
-        //                break;
+                    case RepositoryAction.Remove:
+                        lock (this.states)
+                        {
+                            this.states.Remove(action.Entity!.Identifier);
+                            if (this.states.Count == 0)
+                                this.StopScan();
+                        }
+                        break;
 
-        //            case BeaconRegisterEventType.Clear:
-        //                this.StopScan();
-        //                break;
-        //        }
-        //    });
+                    case RepositoryAction.Clear:
+                        this.StopScan();
+                        break;
+                }
+            });
 
         this.StartScan();
         this.logger.LogInformation("Beacon Monitoring Started Successfully");
@@ -90,8 +90,8 @@ public class BackgroundTask
             return;
 
         this.logger.LogInformation("Beacon Monitoring Scan Starting");
-        var regions = await this.beaconManager
-            .GetMonitoredRegions()
+        var regions = await this.repository
+            .GetList()
             .ConfigureAwait(false);
 
         if (!regions.Any())
@@ -190,5 +190,11 @@ public class BackgroundTask
                 }
             }
         }
+    }
+
+    public void Dispose()
+    {
+        this.repoSub?.Dispose();
+        this.StopScan();
     }
 }

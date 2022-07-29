@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive.Subjects;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -14,7 +15,9 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
     where TStoreConverter : class, IStoreConverter<TEntity>, new()
     where TEntity : IStoreEntity
 {
+    readonly Subject<(RepositoryAction Action, TEntity? Entity)> repoSubj = new();
     readonly TStoreConverter converter = new();
+
     readonly IPlatform platform;
     readonly ISerializer serializer;
 
@@ -34,9 +37,9 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
     }
 
 
-    public async Task<TEntity> Get(string key)
+    public async Task<TEntity?> Get(string key)
     {
-        TEntity result = default;
+        TEntity? result = default;
         await this.InTransaction(list =>
         {
             if (list.ContainsKey(key))
@@ -68,6 +71,9 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         {
             update = this.Write(entity);
             list[entity.Identifier] = entity;
+
+            var action = update ? RepositoryAction.Update : RepositoryAction.Add;
+            this.repoSubj.OnNext((action, entity));
         });
         return update;
     }
@@ -90,6 +96,8 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
                 list.Remove(key);
                 File.Delete(path);
                 tcs.TrySetResult(true);
+
+                this.repoSubj.OnNext((RepositoryAction.Remove, entity));
             }
         });
         return tcs.Task;
@@ -105,7 +113,12 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         var files = this.GetFiles();
         foreach (var file in files)
             file.Delete();
+
+        this.repoSubj.OnNext((RepositoryAction.Clear, default));
     });
+
+
+    public IObservable<(RepositoryAction Action, TEntity? Entity)> WhenActionOccurs() => this.repoSubj;
 
 
     FileInfo[] GetFiles() => this.platform.AppData.GetFiles($"{typeof(TEntity).Name}_*.shiny");
