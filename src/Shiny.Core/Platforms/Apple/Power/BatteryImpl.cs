@@ -32,6 +32,7 @@ public class BatteryImpl : IBattery
         }
     }
 
+
     public double Level
     {
         get

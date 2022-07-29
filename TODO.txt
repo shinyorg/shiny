@@ -7,9 +7,3 @@ NFC
 
 Repository Conversion
 * HTTP Transfers
-
-Tests
-* New Repository
-* New Binding
-* Connectivity - iOS & Android
-* Power - iOS & Android

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Sample;
+﻿using Sample;
 using Shiny.Beacons;
 using Shiny.Beacons.Infrastructure;
 using Shiny.Jobs;
@@ -10,7 +9,6 @@ using Shiny.Locations.Infrastructure;
 using Shiny.Notifications;
 using Shiny.Notifications.Infrastructure;
 using Shiny.Stores;
-using Xunit;
 
 namespace Shiny.Tests.Core.Stores;
 
@@ -39,7 +37,7 @@ public abstract class BaseRepositoryTests
         var obj = await repo2.Get("value1");
 
         obj.Should().NotBeNull();
-        obj.Identifier.Should().Be("value1");
+        obj!.Identifier.Should().Be("value1");
         obj.IntValue.Should().Be(num);
     }
 
