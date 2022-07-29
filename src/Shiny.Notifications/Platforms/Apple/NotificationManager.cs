@@ -313,6 +313,11 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 
     public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
     {
+        var t = notification?.Request?.Trigger;
+        if (t == null || t is not UNPushNotificationTrigger)
+        {
+            completionHandler.Invoke(UNNotificationPresentationOptions.Banner);
+        }
     }
 
 
