@@ -15,7 +15,8 @@ public class ConnectivityImpl : IConnectivity
     {
         get
         {
-            if (!this.started) this.netmon.Start();
+            if (!this.started)
+                this.netmon.Start();
 
             if (this.netmon.CurrentPath == null)
                 return ConnectionTypes.None;
@@ -45,20 +46,20 @@ public class ConnectivityImpl : IConnectivity
     {
         get
         {
-            if (!this.started) this.netmon.Start();
-
-            var monitor = new NWPathMonitor();
-            if (monitor.CurrentPath == null)
+            if (!this.started)
+                this.netmon.Start();
+            
+            if (this.netmon.CurrentPath == null)
                 return NetworkAccess.None;
 
             var types = this.ConnectionTypes;
             if (types.HasFlag(ConnectionTypes.Wifi) || types.HasFlag(ConnectionTypes.Wired))
                 return NetworkAccess.Internet; // should be satisfied as well
 
-            var restricted = monitor.CurrentPath.Status != NWPathStatus.Satisfiable;
+            var restricted = this.netmon.CurrentPath.Status != NWPathStatus.Satisfiable;
             if (!restricted && types.HasFlag(ConnectionTypes.Cellular))
             {
-                if (monitor.CurrentPath.IsConstrained)
+                if (this.netmon.CurrentPath.IsConstrained)
                     return NetworkAccess.ConstrainedInternet;
 
                 return NetworkAccess.Internet;
@@ -71,16 +72,16 @@ public class ConnectivityImpl : IConnectivity
     }
 
 
+
     IObservable<IConnectivity>? connObs;
     public IObservable<IConnectivity> WhenChanged()
     {
         this.connObs ??= Observable
             .Create<IConnectivity>(ob =>
             {
-                var s = this.started;
                 this.netmon.SnapshotHandler = _ => ob.OnNext(this);
-                if (!s)
-                    this.netmon.Start();
+                this.netmon.Start();
+                this.started = true;
 
                 return () =>
                 {

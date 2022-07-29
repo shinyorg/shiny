@@ -10,14 +10,10 @@ public class ConnectivityTests : AbstractShinyTests
     public ConnectivityTests(ITestOutputHelper output) : base(output) {}
     protected override void Configure(IHostBuilder hostBuilder) => hostBuilder.Services.AddConnectivity();
 
-    [Theory(DisplayName = "Connectivity - Access (Simulator)")]
-#if ANDROID
-    [InlineData(NetworkAccess.Internet, "Set Cellular => Network Type => Full & Meter status to 'Temporarily not metered'")]
-    [InlineData(NetworkAccess.ConstrainedInternet, "Set Cellular => Network Type => Full & Meter status to 'Metered'")]
-#elif IOS || MACCATALYST
-    [InlineData(NetworkAccess.Internet, "Change ")]
-    [InlineData(NetworkAccess.ConstrainedInternet, "")]
-#endif
+
+    [Theory(DisplayName = "Connectivity - Access")]
+    [InlineData(NetworkAccess.Internet, "Ensure you have internet connectivity")]
+    [InlineData(NetworkAccess.None, "Disconnect from WIFI, disable cellular data, ")]
     public async Task StateTests(NetworkAccess expectedAccess, string message)
     {
         var conn = this.GetService<IConnectivity>();
@@ -26,9 +22,10 @@ public class ConnectivityTests : AbstractShinyTests
     }
 
 
-    [Theory(DisplayName = "Connectivity - Connection Types (Simulator)")]
-    [InlineData(ConnectionTypes.Wifi, "Change the connection type to WIFI")]
-    [InlineData(ConnectionTypes.Cellular, "Change the connection type to a cellular type")]
+    [Theory(DisplayName = "Connectivity - Connection Types")]
+    [InlineData(ConnectionTypes.Wifi, "Connect to WIFI")]
+    [InlineData(ConnectionTypes.Cellular, "Disconnect from WIFI and ensure cellular data")]
+    [InlineData(ConnectionTypes.None, "Disconnect from WIFI and disable cellular data")]
     public async Task ConnectionTypeTests(ConnectionTypes type, string message)
     {
         var conn = this.GetService<IConnectivity>();
@@ -37,7 +34,7 @@ public class ConnectivityTests : AbstractShinyTests
     }
 
 
-    [Fact(DisplayName = "Connectivity - Change Monitoring (Simulator)")]
+    [Fact(DisplayName = "Connectivity - Change Monitoring")]
     public async Task ChangeMonitorTest()
     {
         var conn = this.GetService<IConnectivity>();

@@ -150,7 +150,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     });
 
 
-    protected virtual async Task<UNMutableNotificationContent> GetContent(Notification notification, Channel channel)
+    protected virtual UNMutableNotificationContent GetContent(Notification notification, Channel channel)
     {
         var content = new UNMutableNotificationContent
         {
@@ -172,12 +172,12 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         if (notification.Payload?.Any() ?? false)
             content.UserInfo = notification.Payload!.ToNsDictionary();
 
-        await this.ApplyChannel(notification, channel, content);
+        this.ApplyChannel(notification, channel, content);
         return content;
     }
 
 
-    protected virtual async Task ApplyChannel(Notification notification, Channel channel, UNMutableNotificationContent native)
+    protected virtual void ApplyChannel(Notification notification, Channel channel, UNMutableNotificationContent native)
     {
         if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
         {
@@ -305,11 +305,17 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 .Value
                 .RunDelegates(x => x.OnEntry(shiny))
                 .ConfigureAwait(false);
+
+            completionHandler.Invoke();
         }
     }
 
 
-    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) { }
+    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+    {
+    }
+
+
     public void Handle(NSDictionary options)
     {
         if (options.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
