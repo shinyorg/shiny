@@ -17,11 +17,11 @@ public class BatteryTests : AbstractShinyTests
     public async Task LevelTest()
     {
         var intLevel = new Random().Next(1, 100);
-        var level = (double)(intLevel / 100);
+        var level = (double)intLevel / 100;
         var battery = this.GetService<IBattery>();
-        
+
         await UserDialogs.Instance.AlertAsync($"Change the battery to {intLevel} in Simulator & Press OK to continue test");
-        battery.Level.Should().Be(intLevel);
+        battery.Level.Should().Be(level);
     }
 
 
@@ -36,7 +36,7 @@ public class BatteryTests : AbstractShinyTests
         if (expectedState == BatteryState.NotCharging && battery.Level == 100)
             battery.Status.Should().Be(BatteryState.Full);
         else
-            battery.Status.Should().Be(BatteryState.NotCharging);
+            battery.Status.Should().Be(expectedState);
     }
 
 

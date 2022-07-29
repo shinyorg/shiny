@@ -14,6 +14,7 @@ public abstract class AbstractShinyTests : IDisposable
     {
         this.output = output;
         var builder = new HostBuilder();
+
         builder.Logging.AddXUnit(output);
         this.Configure(builder);
         this.Host = builder.Build();

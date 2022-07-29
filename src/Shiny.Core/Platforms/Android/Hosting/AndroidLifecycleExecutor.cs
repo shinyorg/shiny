@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Runtime;
+
 using AndroidX.Lifecycle;
 using Java.Interop;
 using Microsoft.Extensions.Logging;
@@ -13,14 +15,17 @@ namespace Shiny.Hosting;
 public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILifecycleObserver, IDisposable
 {
     readonly ILogger logger;
+    readonly AndroidPlatform platform;
     readonly IEnumerable<IAndroidLifecycle.IApplicationLifecycle> appHandlers;
     readonly IEnumerable<IAndroidLifecycle.IOnActivityRequestPermissionsResult> permissionHandlers;
     readonly IEnumerable<IAndroidLifecycle.IOnActivityNewIntent> newIntentHandlers;
     readonly IEnumerable<IAndroidLifecycle.IOnActivityResult> activityResultHandlers;
 
 
-    public AndroidLifecycleExecutor(
+    public AndroidLifecycleExecutor(IntPtr handle, JniHandleOwnership ownership) : base(handle, ownership) { }
+        public AndroidLifecycleExecutor(
         ILogger<AndroidLifecycleExecutor> logger,
+        AndroidPlatform platform,
         IEnumerable<IAndroidLifecycle.IApplicationLifecycle> appHandlers,
         IEnumerable<IAndroidLifecycle.IOnActivityRequestPermissionsResult> permissionHandlers,
         IEnumerable<IAndroidLifecycle.IOnActivityNewIntent> newIntentHandlers,
@@ -28,6 +33,7 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
     )
     {
         this.logger = logger;
+        this.platform = platform;
         this.appHandlers = appHandlers;
         this.permissionHandlers = permissionHandlers;
         this.newIntentHandlers = newIntentHandlers;
@@ -37,7 +43,10 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
 
     public void Start()
     {
-        ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
+        // this is really only need for unit tests - it will passthrough under normal circumstances
+        this.platform.InvokeOnMainThread(() =>
+            ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this)
+        );
     }
 
 
@@ -68,7 +77,11 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
 
     public new void Dispose()
     {
-        ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this);
+        // dispose is (should) only used by unit tests
+        // this is really only need for unit tests - it will passthrough under normal circumstances
+        this.platform.InvokeOnMainThread(() =>
+            ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this)
+        );
         base.Dispose();
     }
 

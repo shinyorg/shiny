@@ -11,12 +11,17 @@ public class ConnectivityTests : AbstractShinyTests
     protected override void Configure(IHostBuilder hostBuilder) => hostBuilder.Services.AddConnectivity();
 
     [Theory(DisplayName = "Connectivity - Access (Simulator)")]
-    [InlineData(NetworkAccess.Internet, "")]
+#if ANDROID
+    [InlineData(NetworkAccess.Internet, "Set Cellular => Network Type => Full & Meter status to 'Temporarily not metered'")]
+    [InlineData(NetworkAccess.ConstrainedInternet, "Set Cellular => Network Type => Full & Meter status to 'Metered'")]
+#elif IOS || MACCATALYST
+    [InlineData(NetworkAccess.Internet, "Change ")]
     [InlineData(NetworkAccess.ConstrainedInternet, "")]
+#endif
     public async Task StateTests(NetworkAccess expectedAccess, string message)
     {
         var conn = this.GetService<IConnectivity>();
-        await UserDialogs.Instance.AlertAsync(message + " then press OK");
+        await UserDialogs.Instance.AlertAsync(message + " & then press OK");
         conn.Access.Should().Be(expectedAccess);
     }
 

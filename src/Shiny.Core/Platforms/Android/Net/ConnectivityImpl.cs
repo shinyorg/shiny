@@ -85,6 +85,7 @@ public class ConnectivityImpl : IConnectivity, IShinyStartupTask
                         {
                             if (info.IsConnected)
                             {
+                                // TODO: roaming if on cell?
                                 currentAccess = IsBetterAccess(currentAccess, NetworkAccess.Internet);
                             }
                             else if (info.IsConnectedOrConnecting)
