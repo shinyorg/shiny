@@ -1,10 +1,8 @@
-﻿namespace ShinyBuild.Tasks.Library;
-
-using System.IO;
-using System.Threading.Tasks;
-using Cake.Frosting;
+﻿using Cake.Frosting;
 using Cake.GitVersioning;
 using Octokit;
+
+namespace ShinyBuild.Tasks.Library;
 
 
 [IsDependentOn(typeof(NugetDeployTask))]

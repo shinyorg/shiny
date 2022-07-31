@@ -12,7 +12,6 @@
       "src\\Shiny.Jobs\\Shiny.Jobs.csproj",
       "src\\Shiny.Locations.Common\\Shiny.Locations.Common.csproj",
       "src\\Shiny.Locations\\Shiny.Locations.csproj",
-      "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
       "src\\Shiny.Nfc\\Shiny.Nfc.csproj",
       "src\\Shiny.Notifications.Common\\Shiny.Notifications.Common.csproj",
       "src\\Shiny.Notifications\\Shiny.Notifications.csproj",
