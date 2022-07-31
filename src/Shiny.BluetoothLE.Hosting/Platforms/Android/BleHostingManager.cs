@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth;
@@ -23,18 +22,28 @@ public partial class BleHostingManager : IBleHostingManager
     AdvertisementCallbacks? adCallbacks;
 
 
-    public async Task<AccessState> RequestAccess()
+    public async Task<AccessState> RequestAccess(bool advertise = true, bool gattConnect = true)
     {
-        if (!OperatingSystem.IsMacCatalystVersionAtLeast(23))
+        if (!advertise && !gattConnect)
+            throw new ArgumentException("You must request at least 1 permission");
+
+        if (!OperatingSystem.IsAndroidVersionAtLeast(23))
             return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
 
         var current = this.context.Manager.GetAccessState();
         if (current != AccessState.Available && current != AccessState.Unknown)
             return current;
 
-        if (OperatingSystem.IsMacCatalystVersionAtLeast(31))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
-            var result = await this.context.Platform.RequestPermissions(Permission.BluetoothConnect, Permission.BluetoothAdvertise);
+            var perms = new List<string>();
+            if (advertise)
+                perms.Add(Permission.BluetoothAdvertise);
+
+            if (gattConnect)
+                perms.Add(Permission.BluetoothConnect);
+
+            var result = await this.context.Platform.RequestPermissions(perms.ToArray());
             if (!result.IsSuccess())
                 return AccessState.Denied;
         }
@@ -89,7 +98,7 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
-        (await this.RequestAccess()).Assert();
+        (await this.RequestAccess(false, true)).Assert();
 
         var service = new GattService(this.context, uuid, primary);
         serviceBuilder(service);
@@ -135,7 +144,7 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
-        (await this.RequestAccess()).Assert();
+        (await this.RequestAccess(true, false)).Assert();
 
         options ??= new AdvertisementOptions();
         var tcs = new TaskCompletionSource<bool>();

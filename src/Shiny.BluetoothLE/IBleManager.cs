@@ -7,10 +7,11 @@ namespace Shiny.BluetoothLE;
 public interface IBleManager
 {
     /// <summary>
-    /// Requests/ensures appropriate platform permissions where necessary
+    /// Requests/ensures appropriate platform permissions where necessary - this parameter only currently applies to Android
     /// </summary>
+    /// <param name="connect">We always request a SCAN permission, but you may choose NOT to request connection permissions</param>
     /// <returns></returns>
-    IObservable<AccessState> RequestAccess();
+    IObservable<AccessState> RequestAccess(bool connect = true);
 
     /// <summary>
     /// Get a known peripheral

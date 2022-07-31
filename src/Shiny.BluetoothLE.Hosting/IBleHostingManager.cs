@@ -7,8 +7,7 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public interface IBleHostingManager
 {
-    // WHENREADY on iOS needed, BLUETOOTH_CONNECT permission on Android 12+
-    Task<AccessState> RequestAccess();
+    Task<AccessState> RequestAccess(bool advertise = true, bool gattConnect = true);
     IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure); // TODO: how to tell if open?
 
     bool IsAdvertising { get; }

@@ -68,7 +68,7 @@ public partial class BleHostingManager : IBleHostingManager
 
 
     // TODO
-    public Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
+    public Task<AccessState> RequestAccess(bool advertise = true, bool gattConnect = true) => Task.FromResult(AccessState.Available);
 
 
     public AccessState Status => this.manager.State switch
@@ -134,7 +134,7 @@ public partial class BleHostingManager : IBleHostingManager
 
     public void StopAdvertising() => this.manager.StopAdvertising();
 
-    
+
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
         // TODO: not sure about this

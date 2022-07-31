@@ -52,22 +52,32 @@ public class BleManager : AbstractBleManager,
         );
 
 
-    static readonly AndroidPermission[] permissions = new []
+    public override IObservable<AccessState> RequestAccess(bool connect = true) => Observable.FromAsync(async ct =>
     {
-        new AndroidPermission(Manifest.Permission.Bluetooth, null, null),
-        new AndroidPermission(Manifest.Permission.BluetoothAdmin, null, null),
-        new AndroidPermission(Manifest.Permission.BluetoothScan, 31, null),
-        new AndroidPermission(Manifest.Permission.BluetoothConnect, 31, null),
-        new AndroidPermission(Manifest.Permission.AccessFineLocation, null, 31)
-    };
-    public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
-    {
-        if (!this.context.Android.EnsureAllManifestEntries(permissions))
+        var list = new List<string>(new[]
+        {
+            Manifest.Permission.Bluetooth,
+            Manifest.Permission.BluetoothAdmin
+        });
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        {
+            list.Add(Manifest.Permission.BluetoothScan);
+
+            if (connect)
+                list.Add(Manifest.Permission.BluetoothConnect);
+        }
+        else
+        {
+            list.Add(Manifest.Permission.AccessFineLocation);
+        }
+
+        if (!list.All(x => this.context.Android.IsInManifest(x)))
             return AccessState.NotSetup;
 
         var results = await this.context
             .Android
-            .RequestFilteredPermissions(permissions)
+            .RequestPermissions(list.ToArray())
             .ToTask(ct)
             .ConfigureAwait(false);
 
@@ -80,10 +90,10 @@ public class BleManager : AbstractBleManager,
     public override IObservable<ScanResult> Scan(ScanConfig? config = null)
     {
         if (this.IsScanning)
-            throw new ArgumentException("There is already an active scan");
+            throw new InvalidOperationException("There is already an active scan");
 
         return this
-            .RequestAccess()
+            .RequestAccess(false)
             .Do(access =>
             {
                 if (access != AccessState.Available)
