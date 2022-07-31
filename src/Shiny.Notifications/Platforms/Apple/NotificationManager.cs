@@ -112,9 +112,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 throw new InvalidOperationException($"{notification.Channel} does not exist");
         }
 
-        var content = await this
-            .GetContent(notification, channel)
-            .ConfigureAwait(false);
+        var content = this.GetContent(notification, channel);
 
         var request = UNNotificationRequest.FromIdentifier(
             notification.Id.ToString(),
