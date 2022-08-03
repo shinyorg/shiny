@@ -64,7 +64,7 @@ namespace Shiny
                     this.logger.LogError(ex, "WillPresentNotification");
                 }
             }
-            completionHandler.Invoke(UNNotificationPresentationOptions.Alert);
+            completionHandler.Invoke(UNNotificationPresentationOptions.Banner);
         }
     }
 }
