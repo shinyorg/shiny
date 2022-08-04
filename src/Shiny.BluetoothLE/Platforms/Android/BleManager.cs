@@ -52,22 +52,32 @@ namespace Shiny.BluetoothLE
             );
 
 
-        static readonly AndroidPermission[] permissions = new []
+        public override IObservable<AccessState> RequestAccess(bool connectPermission = true) => Observable.FromAsync(async ct =>
         {
-            new AndroidPermission(Manifest.Permission.Bluetooth, null, null),
-            new AndroidPermission(Manifest.Permission.BluetoothAdmin, null, null),
-            new AndroidPermission(Manifest.Permission.BluetoothScan, 31, null),
-            new AndroidPermission(Manifest.Permission.BluetoothConnect, 31, null),
-            new AndroidPermission(Manifest.Permission.AccessFineLocation, null, 31)
-        };
-        public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
-        {
-            if (!this.context.Android.EnsureAllManifestEntries(permissions))
+            var list = new List<string>(new[]
+            {
+                Manifest.Permission.Bluetooth,
+                Manifest.Permission.BluetoothAdmin
+            });
+
+            if (this.context.Android.IsMinApiLevel(31))
+            {
+                list.Add(Manifest.Permission.BluetoothScan);
+
+                if (connectPermission)
+                    list.Add(Manifest.Permission.BluetoothConnect);
+            }
+            else
+            {
+                list.Add(Manifest.Permission.AccessFineLocation);
+            }
+
+            if (!list.All(x => this.context.Android.IsInManifest(x)))
                 return AccessState.NotSetup;
 
             var results = await this.context
                 .Android
-                .RequestFilteredPermissions(permissions)
+                .RequestPermissions(list.ToArray())
                 .ToTask(ct)
                 .ConfigureAwait(false);
 

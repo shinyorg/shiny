@@ -10,7 +10,7 @@ namespace Shiny.BluetoothLE
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
         /// <returns></returns>
-        IObservable<AccessState> RequestAccess();
+        IObservable<AccessState> RequestAccess(bool requestConnectPermission = true);
 
         /// <summary>
         /// Get a known peripheral
