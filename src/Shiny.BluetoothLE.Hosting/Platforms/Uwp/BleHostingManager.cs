@@ -50,6 +50,8 @@ namespace Shiny.BluetoothLE.Hosting
             }
         }
 
+        
+
 
         public bool IsAdvertising => this.publisher.Status == BluetoothLEAdvertisementPublisherStatus.Started;
 

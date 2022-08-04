@@ -5,8 +5,10 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.OS;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
+using static Android.Manifest;
 
 
 namespace Shiny.BluetoothLE.Hosting
@@ -14,34 +16,71 @@ namespace Shiny.BluetoothLE.Hosting
     public class BleHostingManager : IBleHostingManager
     {
         readonly GattServerContext context;
+        readonly IPlatform platform;
         readonly Dictionary<string, GattService> services;
-        readonly IMessageBus messageBus;
         AdvertisementCallbacks? adCallbacks;
 
 
-        public BleHostingManager(IPlatform context, IMessageBus messageBus)
+        public BleHostingManager(IPlatform platform)
         {
-            this.context = new GattServerContext(context);
+            this.context = new GattServerContext(platform);
             this.services = new Dictionary<string, GattService>();
-            this.messageBus = messageBus;
+            this.platform = platform;
         }
 
 
-        public AccessState Status => this.context.Manager.GetAccessState();
-        public IObservable<AccessState> WhenStatusChanged() => this.messageBus
-            .Listener<State>()
-            .Select(x => x.FromNative())
-            .StartWith(this.Status);
+        public async Task<AccessState> RequestAccess(bool advertise = true, bool connect = true)
+        {
+            if (!advertise && !connect)
+                throw new ArgumentException("You must request at least 1 permission");
+
+            if (!this.platform.IsMinApiLevel(23))
+                return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
+
+            var current = this.context.Manager.GetAccessState();
+            if (current != AccessState.Available && current != AccessState.Unknown)
+                return current;
+
+            if (this.platform.IsMinApiLevel(31))
+            {
+                var perms = new List<string>();
+                if (advertise)
+                    perms.Add(Permission.BluetoothAdvertise);
+
+                if (connect)
+                    perms.Add(Permission.BluetoothConnect);
+
+                var result = await this.platform.RequestPermissions(perms.ToArray());
+                if (!result.IsSuccess())
+                    return AccessState.Denied;
+            }
+            return AccessState.Available;
+        }
+
+
         public bool IsAdvertising => this.adCallbacks != null;
         public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
 
 
-        public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+        public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
         {
+            (await this.RequestAccess(false, true)).Assert();
+
             var service = new GattService(this.context, uuid, primary);
             serviceBuilder(service);
-            this.context.Server.AddService(service.Native);
-            return Task.FromResult<IGattService>(service);
+
+            //var task = this.context
+            //    .WhenServiceAdded
+            //    .Take(1)
+            //    .Timeout(TimeSpan.FromSeconds(5))
+            //    .ToTask();
+
+            if (!this.context.Server.AddService(service.Native))
+                throw new InvalidOperationException("Service operation did not complete - look at logs");
+
+            //await task.ConfigureAwait(false);
+            this.services.Add(uuid, service);
+            return service;
         }
 
 
@@ -55,8 +94,14 @@ namespace Shiny.BluetoothLE.Hosting
 
         public void RemoveService(string serviceUuid)
         {
-            var s = this.services[serviceUuid];
-            this.context.Server.RemoveService(s.Native);
+            var uuid = UUID.FromString(serviceUuid);
+            var s = this.services.ContainsKey(serviceUuid)
+                ? this.services[serviceUuid].Native
+                : this.context.Server.Services?.FirstOrDefault(x => x.Uuid?.Equals(uuid) ?? false);
+
+            if (s != null)
+                this.context.Server.RemoveService(s);
+
             this.services.Remove(serviceUuid);
             if (this.services.Count == 0)
                 this.Cleanup();
@@ -65,41 +110,36 @@ namespace Shiny.BluetoothLE.Hosting
 
         public async Task StartAdvertising(AdvertisementOptions? options = null)
         {
-            var android = this.context.Context;
-            if (!android.IsMinApiLevel(23))
-                throw new ApplicationException("BLE Advertiser needs API Level 23+");
-
-            if (android.IsMinApiLevel(31))
-            {
-                var access = await android.RequestAccess(Android.Manifest.Permission.BluetoothAdvertise);
-                if (access != AccessState.Available)
-                    throw new ArgumentException("Insufficient permissions");
-            }
+            (await this.RequestAccess(true, false)).Assert();
 
             options ??= new AdvertisementOptions();
-            var tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<bool>();
             this.adCallbacks = new AdvertisementCallbacks(
-                () => tcs.SetResult(null),
+                () => tcs.SetResult(true),
                 ex => tcs.SetException(ex)
             );
 
-            var settings = new AdvertiseSettings.Builder()
-                .SetAdvertiseMode(AdvertiseMode.Balanced)
+            var settings = new AdvertiseSettings.Builder()!
+                .SetAdvertiseMode(AdvertiseMode.Balanced)!
                 .SetConnectable(true);
 
-            var data = new AdvertiseData.Builder()
-                .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
-                .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
+            var data = new AdvertiseData.Builder();
+            //var data = new AdvertiseData.Builder()
+            //    .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
+            //    .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
 
-            if (options.ManufacturerData != null)
-                data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
+            //if (options.ManufacturerData != null)
+            //    data = data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
 
-            var serviceUuids = options.UseGattServiceUuids
-                ? this.services.Keys.ToList()
-                : options.ServiceUuids;
+            if (options.LocalName != null)
+                BluetoothAdapter.DefaultAdapter.SetName(options.LocalName); // TODO: verify name length with exception
 
-            foreach (var uuid in serviceUuids)
-                data.AddServiceUuid(new Android.OS.ParcelUuid(UUID.FromString(uuid)));
+            foreach (var uuid in options.ServiceUuids)
+            {
+                var nativeUuid = UUID.FromString(uuid);
+                var parcel = new ParcelUuid(nativeUuid);
+                data = data.AddServiceUuid(parcel);
+            }
 
             this.context
                 .Manager
@@ -131,6 +171,7 @@ namespace Shiny.BluetoothLE.Hosting
             foreach (var service in this.services)
                 service.Value.Dispose();
 
+            this.services.Clear();
             this.context.CloseServer();
         }
     }
