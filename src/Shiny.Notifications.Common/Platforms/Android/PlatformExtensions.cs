@@ -84,14 +84,11 @@ namespace Shiny.Notifications
         }
 
 
-        static readonly HttpClient httpClient = new HttpClient();
-        public static async Task TrySetImage(this IPlatform platform, string? imageUri, NotificationCompat.Builder builder)
+        public static void TrySetImage(this IPlatform platform, string localAttachmentFilePath, NotificationCompat.Builder builder)
         {
-            if (imageUri.IsEmpty())
-                return;
+            using var stream = File.OpenRead(localAttachmentFilePath);
 
-            var stream = await httpClient.GetStreamAsync(imageUri).ConfigureAwait(false);
-            var bitmap = await BitmapFactory.DecodeStreamAsync(stream).ConfigureAwait(false);
+            var bitmap = BitmapFactory.DecodeStream(stream);
             builder.SetStyle(new NotificationCompat.BigPictureStyle().BigPicture(bitmap));
         }
     }

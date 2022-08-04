@@ -19,6 +19,11 @@ namespace Shiny.Notifications
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
 
+        /// <summary>
+        /// This requires an entitlement on the Apple portal
+        /// </summary>
+        public static bool UseTimeSensitiveAlerts { get; set; }
+
         readonly ShinyCoreServices services;
         readonly IChannelManager channelManager;
 
@@ -85,7 +90,7 @@ namespace Shiny.Notifications
                           UNAuthorizationOptions.Badge |
                           UNAuthorizationOptions.Sound;
 
-            if (access.HasFlag(AccessRequestFlags.TimeSensitivity))
+            if (UseTimeSensitiveAlerts && access.HasFlag(AccessRequestFlags.TimeSensitivity))
                 request |= UNAuthorizationOptions.TimeSensitive;
 
             //UNAuthorizationOptions.Announcement | UNAuthorizationOptions.CarPlay
@@ -184,18 +189,10 @@ namespace Shiny.Notifications
                 Title = notification.Title,
                 Body = notification.Message
             };
-            if (notification.Attachment != null)
+            if (!notification.LocalAttachmentPath.IsEmpty())
             {
-                var uri = NSUrl.FromFilename(notification.Attachment.FullName);
-                var attachment = UNNotificationAttachment.FromIdentifier(
-                    Guid.NewGuid().ToString(),
-                    uri,
-                    new UNNotificationAttachmentOptions(),
-                    out var error
-                );
-                if (error != null)
-                    throw new InvalidOperationException("Error creating notification image attachment: " + error.Description);
-
+                var imageUri = NSUrl.FromString(notification.LocalAttachmentPath!);
+                var attachment = UNNotificationAttachment.FromIdentifier("image", imageUri, new UNNotificationAttachmentOptions(), out var _);
                 content.Attachments = new[] { attachment };
             }
             if (!notification.Thread.IsEmpty())
@@ -225,7 +222,7 @@ namespace Shiny.Notifications
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
             {
-                if (channel.Importance == ChannelImportance.High && notification.ScheduleDate != null)
+                if (channel.Importance == ChannelImportance.High && UseTimeSensitiveAlerts && notification.ScheduleDate != null)
                 {
                     native.InterruptionLevel = UNNotificationInterruptionLevel.TimeSensitive;
                 }

@@ -48,8 +48,8 @@ namespace Shiny.Notifications
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
-            if (notification.Attachment != null)
-                this.Services.Platform.TrySetImage(notification.Attachment, builder);
+            if (!notification.LocalAttachmentPath.IsEmpty())
+                this.Services.Platform.TrySetImage(notification.LocalAttachmentPath!, builder);
 
             if (!notification.Thread.IsEmpty())
                 builder.SetGroup(notification.Thread);

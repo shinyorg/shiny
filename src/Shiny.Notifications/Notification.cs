@@ -33,7 +33,7 @@ namespace Shiny.Notifications
         /// <summary>
         /// Additional data you can add to your notification
         /// </summary>
-        public IDictionary<string, string>? Payload { get; set; } = new Dictionary<string, string>(0);
+        public Dictionary<string, string>? Payload { get; set; } = new Dictionary<string, string>(0);
 
         /// <summary>
         /// The value to display on the homescreen badge - set to 0z to remove it
@@ -71,6 +71,6 @@ namespace Shiny.Notifications
         /// <summary>
         /// Set an image/video/audio for iOS attachment or Android bigpicture style - file must be on disk
         /// </summary>
-        public FileInfo? Attachment { get; set; }
+        public string? LocalAttachmentPath { get; set; }
     }
 }
