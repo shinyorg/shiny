@@ -22,39 +22,6 @@ public partial class BleHostingManager : IBleHostingManager
     AdvertisementCallbacks? adCallbacks;
 
 
-    public async Task<AccessState> RequestAccess(bool advertise = true, bool gattConnect = true)
-    {
-        if (!advertise && !gattConnect)
-            throw new ArgumentException("You must request at least 1 permission");
-
-        if (!OperatingSystem.IsAndroidVersionAtLeast(23))
-            return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
-
-        var current = this.context.Manager.GetAccessState();
-        if (current != AccessState.Available && current != AccessState.Unknown)
-            return current;
-
-        if (OperatingSystem.IsAndroidVersionAtLeast(31))
-        {
-            var perms = new List<string>();
-            if (advertise)
-                perms.Add(Permission.BluetoothAdvertise);
-
-            if (gattConnect)
-                perms.Add(Permission.BluetoothConnect);
-
-            var result = await this.context.Platform.RequestPermissions(perms.ToArray());
-            if (!result.IsSuccess())
-                return AccessState.Denied;
-        }
-        return AccessState.Available;
-    }
-
-
-    public bool IsAdvertising => this.adCallbacks != null;
-    public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
-
-
     public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
     {
         (await this.RequestAccess()).Assert();
@@ -94,6 +61,39 @@ public partial class BleHostingManager : IBleHostingManager
             serverSocket?.Dispose();
         };
     });
+
+
+    public async Task<AccessState> RequestAccess(bool advertise = true, bool connect = true)
+    {
+        if (!advertise && !connect)
+            throw new ArgumentException("You must request at least 1 permission");
+
+        if (!OperatingSystem.IsAndroidVersionAtLeast(23))
+            return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
+
+        var current = this.context.Manager.GetAccessState();
+        if (current != AccessState.Available && current != AccessState.Unknown)
+            return current;
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        {
+            var perms = new List<string>();
+            if (advertise)
+                perms.Add(Permission.BluetoothAdvertise);
+
+            if (connect)
+                perms.Add(Permission.BluetoothConnect);
+
+            var result = await this.context.Platform.RequestPermissions(perms.ToArray());
+            if (!result.IsSuccess())
+                return AccessState.Denied;
+        }
+        return AccessState.Available;
+    }
+
+
+    public bool IsAdvertising => this.adCallbacks != null;
+    public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
 
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
