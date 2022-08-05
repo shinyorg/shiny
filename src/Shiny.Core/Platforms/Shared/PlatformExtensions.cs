@@ -104,7 +104,7 @@ public static class PlatformExtensions
         {
             using var stream = assembly.GetManifestResourceStream(resourceName);
             using var fs = File.Create(path);
-                
+
             stream!.CopyTo(fs);
         }
         return path;
