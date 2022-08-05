@@ -2,20 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <RootNamespace>Shiny.BluetoothLE</RootNamespace>
+        <RootNamespace>Shiny.Locations</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <SupportedPlatform Include="browser" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj" />
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
     </ItemGroup>
-
 </Project>

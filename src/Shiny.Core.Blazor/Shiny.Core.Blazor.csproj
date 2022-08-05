@@ -2,20 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <SupportedPlatform Include="browser" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.6" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 </Project>

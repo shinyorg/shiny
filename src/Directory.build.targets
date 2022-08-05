@@ -15,6 +15,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Update="Microsoft.AspNetCore.Components.Web" Version="6.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
     </ItemGroup>
 
