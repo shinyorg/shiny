@@ -33,27 +33,35 @@
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
     </PropertyGroup>
 
+    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
+        <IsStandardBuild>true</IsStandardBuild>
+    </PropertyGroup>
+
     <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>31.0</TargetPlatformMinVersion>
-        <!--<DefineConstants>$(DefineConstants);__ANDROID__;MONOANDROID</DefineConstants>-->
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
         <IsAndroidBuild>true</IsAndroidBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
-        <IsStandardBuild>true</IsStandardBuild>
+        <IsPlatform>true</IsPlatform>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <IsIosBuild>true</IsIosBuild>
+        <IsPlatform>true</IsPlatform>
+        <DefineConstants>$(DefineConstants);APPLE</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
+        <IsPlatform>true</IsPlatform>
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
         <IsIosBuild>true</IsIosBuild>
+        <DefineConstants>$(DefineConstants);APPLE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(IsPlatform)' == 'true'">
+        <DefineConstants>$(DefineConstants);PLATFORM</DefineConstants>
     </PropertyGroup>
 </Project>
