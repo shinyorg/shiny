@@ -36,23 +36,14 @@ jobs:
       with:
           fetch-depth: 0
 
-    - name: Setup .NET Core
+    - name: Setup .NET 6.0
       uses: actions/setup-dotnet@v1
       with:
           dotnet-version: '6.0.x'
 
-    - name: Add .NET 6 Android Workload
-      run: dotnet workload install android
+    - name: Add .NET 6 Workloads
+      run: dotnet workload install maui ios android maccatalyst
 
-    - name: Add .NET 6 iOS Workload
-      run: dotnet workload install ios
-
-    - name: Add .NET 6 MacCatalyst Workload
-      run: dotnet workload install maccatalyst
-
-    - name: Add MAUI Workload
-      run: dotnet workload install maui
- 
     - name: Build
       run: dotnet run --project build/ShinyBuild.csproj
 
