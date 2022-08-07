@@ -20,7 +20,9 @@ public partial class BleHostingManager : IShinyStartupTask
 {
     readonly ILogger logger;
     readonly IKeyValueStoreFactory keyStore;
-    readonly Dictionary<string, List<(BleGattCharacteristic Characteristic, BleGattCharacteristicAttribute Attribute)>> gattServices;
+    readonly IEnumerable<BleGattCharacteristic> gattChars;
+
+    Dictionary<string, List<(BleGattCharacteristic Characteristic, BleGattCharacteristicAttribute Attribute)>>? gattServices;
 
 
     public BleHostingManager(
@@ -37,7 +39,7 @@ public partial class BleHostingManager : IShinyStartupTask
 #endif
         this.keyStore = keyStore;
         this.logger = logger;
-        this.gattServices = CollectServices(gattChars);
+        this.gattChars = gattChars; // TODO: because I'm using a class - this is coming in with 1 instance from DryIoc
     }
 
 
@@ -69,6 +71,7 @@ public partial class BleHostingManager : IShinyStartupTask
     {
         (await this.RequestAccess()).Assert();
 
+        this.gattServices ??= CollectServices(this.gattChars);
         if (!this.gattServices.Any())
             throw new InvalidOperationException("There are no register BLE services");
 

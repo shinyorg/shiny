@@ -12,7 +12,17 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public partial class BleHostingManager : IBleHostingManager
 {
-    readonly CBPeripheralManager manager = new();
+    CBPeripheralManager _manager;
+    protected CBPeripheralManager Manager
+    {
+        get
+        {
+            this._manager ??= new();
+            return this._manager;
+        }
+    }
+
+
     readonly Dictionary<string, GattService> services = new();
 
 
@@ -31,16 +41,16 @@ public partial class BleHostingManager : IBleHostingManager
                 tcs.TrySetException(new InvalidOperationException(args.Error.Description));
             }
         });
-        this.manager.DidPublishL2CapChannel += handler;
+        this.Manager.DidPublishL2CapChannel += handler;
 
         try
         {
-            this.manager.PublishL2CapChannel(secure);
+            this.Manager.PublishL2CapChannel(secure);
             return await tcs.Task.ConfigureAwait(false);
         }
         finally
         {
-            this.manager.DidPublishL2CapChannel -= handler;
+            this.Manager.DidPublishL2CapChannel -= handler;
         }
     }
 
@@ -56,13 +66,13 @@ public partial class BleHostingManager : IBleHostingManager
                 args.Channel!.OutputStream.ToStream()
             ));
         });
-        this.manager.DidOpenL2CapChannel += handler;
+        this.Manager.DidOpenL2CapChannel += handler;
         var psm = await this.PublishL2Cap(secure);
 
         return () =>
         {
-            this.manager.DidOpenL2CapChannel += handler;
-            this.manager.UnpublishL2CapChannel(psm);
+            this.Manager.DidOpenL2CapChannel += handler;
+            this.Manager.UnpublishL2CapChannel(psm);
         };
     });
 
@@ -72,17 +82,17 @@ public partial class BleHostingManager : IBleHostingManager
     
 
 
-    public bool IsAdvertising => this.manager.Advertising;
+    public bool IsAdvertising => this.Manager.Advertising;
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
-        if (this.manager.Advertising)
+        if (this.Manager.Advertising)
             throw new InvalidOperationException("Advertising is already active");
 
         if (this.Status != AccessState.Unknown && this.Status != AccessState.Available)
             throw new InvalidOperationException("Invalid Status: " + this.Status);
 
         options ??= new AdvertisementOptions();
-        await this.manager
+        await this.Manager
             .WhenReady()
             .Timeout(TimeSpan.FromSeconds(10))
             .ToTask();
@@ -98,7 +108,7 @@ public partial class BleHostingManager : IBleHostingManager
 
         try
         {
-            this.manager.AdvertisingStarted += handler;
+            this.Manager.AdvertisingStarted += handler;
 
             var opts = new StartAdvertisingOptions();
             if (options.LocalName != null)
@@ -112,17 +122,17 @@ public partial class BleHostingManager : IBleHostingManager
                     .ToArray();
             }
 
-            this.manager.StartAdvertising(opts);
+            this.Manager.StartAdvertising(opts);
             await tcs.Task.ConfigureAwait(false);
         }
         finally
         {
-            this.manager.AdvertisingStarted -= handler;
+            this.Manager.AdvertisingStarted -= handler;
         }
     }
 
 
-    public void StopAdvertising() => this.manager.StopAdvertising();
+    public void StopAdvertising() => this.Manager.StopAdvertising();
 
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
@@ -130,12 +140,12 @@ public partial class BleHostingManager : IBleHostingManager
         // TODO: not sure about this
         //if (AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13) && !primary)
         //    throw new InvalidOperationException("You must specify your service as primary when using bg BLE");
-        await this.manager
+        await this.Manager
             .WhenReady()
             .Timeout(TimeSpan.FromSeconds(10))
             .ToTask();
 
-        var service = new GattService(this.manager, uuid, primary);
+        var service = new GattService(this.Manager, uuid, primary);
         serviceBuilder(service);
 
         var tcs = new TaskCompletionSource<bool>();
@@ -152,15 +162,15 @@ public partial class BleHostingManager : IBleHostingManager
 
         try
         {
-            this.manager.ServiceAdded += handler;
-            this.manager.AddService(service.Native);
+            this.Manager.ServiceAdded += handler;
+            this.Manager.AddService(service.Native);
             await tcs.Task.ConfigureAwait(false);
 
             this.services.Add(uuid, service);
         }
         finally
         {
-            this.manager.ServiceAdded -= handler;
+            this.Manager.ServiceAdded -= handler;
         }
         return service;
     }
@@ -171,12 +181,12 @@ public partial class BleHostingManager : IBleHostingManager
         if (!this.services.ContainsKey(serviceUuid))
         {
             var native = new CBMutableService(CBUUID.FromString(serviceUuid), false);
-            this.manager.RemoveService(native); // let's try to remove anyhow
+            this.Manager.RemoveService(native); // let's try to remove anyhow
         }
         else
         {
             var service = this.services[serviceUuid];
-            this.manager.RemoveService(service.Native);
+            this.Manager.RemoveService(service.Native);
             service.Dispose();
             this.services.Remove(serviceUuid);
         }
@@ -187,18 +197,18 @@ public partial class BleHostingManager : IBleHostingManager
     {
         foreach (var service in this.services.Values)
         {
-            this.manager.RemoveService(service.Native);
+            this.Manager.RemoveService(service.Native);
             service.Dispose();
         }
         this.services.Clear();
-        this.manager.RemoveAllServices();
+        this.Manager.RemoveAllServices();
     }
 
 
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
 
 
-    AccessState Status => this.manager.State switch
+    AccessState Status => this.Manager.State switch
     {
         CBManagerState.PoweredOff => AccessState.Disabled,
         CBManagerState.Unauthorized => AccessState.Denied,
