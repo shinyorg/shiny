@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Shiny.BluetoothLE.Hosting.Managed;
 
 
-public class BleGattCharacteristic
+public abstract class BleGattCharacteristic
 {
     public IGattCharacteristic Characteristic { get; internal set; } = null!;
 
