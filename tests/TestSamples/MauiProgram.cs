@@ -27,7 +27,7 @@ public static class MauiProgram
         builder.Services.AddShinyService<PlatformStateTests>();
         builder.Services.AddConnectivity();
         builder.Services.AddBattery();
-        //builder.Services.AddBluetoothLeHosting();
+        builder.Services.AddBluetoothLeHosting();
 
         return builder.Build();
     }

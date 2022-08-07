@@ -58,12 +58,13 @@
         <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         -->
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
         <PackageReference Include="Xamarin.AndroidX.Core" Version="1.8.0.1" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.0" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.0" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.1" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.1" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.6" />
