@@ -14,6 +14,14 @@ public class BleManagerTests : AbstractBleTests
     public BleManagerTests(ITestOutputHelper output) : base(output) { }
 
 
+    [Fact(DisplayName = "BLE Permissions")]
+    public async Task Permissions()
+    {
+        var status = await this.GetService<IBleManager>().RequestAccess();
+        status.Should().Be(AccessState.Available);
+    }
+
+
     [Fact]
     public async Task Scan_Filter()
     {
