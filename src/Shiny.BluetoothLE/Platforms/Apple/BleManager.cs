@@ -21,7 +21,7 @@ public class BleManager : AbstractBleManager
     public override bool IsScanning => this.context.Manager.IsScanning;
 
 
-    public override IObservable<AccessState> RequestAccess(bool connect = true) => Observable.Create<AccessState>(ob =>
+    public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
     {
         IDisposable? disp = null;
         if (this.context.Manager.State == CBManagerState.Unknown)
