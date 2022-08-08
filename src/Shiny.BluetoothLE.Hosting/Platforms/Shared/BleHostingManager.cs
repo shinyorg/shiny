@@ -39,7 +39,7 @@ public partial class BleHostingManager : IShinyStartupTask
 #endif
         this.keyStore = keyStore;
         this.logger = logger;
-        this.gattChars = gattChars; // TODO: because I'm using a class - this is coming in with 1 instance from DryIoc
+        this.gattChars = gattChars;
     }
 
 
