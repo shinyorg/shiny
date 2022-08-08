@@ -10,9 +10,7 @@ using Android.Bluetooth;
 namespace Shiny.BluetoothLE;
 
 
-public class BleManager : AbstractBleManager,
-                          ICanControlAdapterState,
-                          ICanViewPairedPeripherals
+public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
 {
     public const string BroadcastReceiverName = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
     readonly ManagerContext context;
@@ -52,24 +50,24 @@ public class BleManager : AbstractBleManager,
         );
 
 
-    public override IObservable<AccessState> RequestAccess(bool connect = true) => Observable.FromAsync(async ct =>
+    public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
     {
-        var list = new List<string>(new[]
-        {
-            Manifest.Permission.Bluetooth,
-            Manifest.Permission.BluetoothAdmin
-        });
+        var list = new List<string>();
 
         if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
-            list.Add(Manifest.Permission.BluetoothScan);
-
-            if (connect)
-                list.Add(Manifest.Permission.BluetoothConnect);
+            list.AddRange(new[] {
+                Manifest.Permission.BluetoothScan,
+                Manifest.Permission.BluetoothConnect
+            });
         }
         else
         {
-            list.Add(Manifest.Permission.AccessFineLocation);
+            list.AddRange(new[] {
+                Manifest.Permission.Bluetooth,
+                Manifest.Permission.BluetoothPrivileged,
+                Manifest.Permission.AccessFineLocation
+            });
         }
 
         if (!list.All(x => this.context.Android.IsInManifest(x)))
