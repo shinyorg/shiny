@@ -91,7 +91,7 @@ public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
             throw new InvalidOperationException("There is already an active scan");
 
         return this
-            .RequestAccess(false)
+            .RequestAccess()
             .Do(access =>
             {
                 if (access != AccessState.Available)
