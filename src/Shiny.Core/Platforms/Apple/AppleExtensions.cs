@@ -50,7 +50,7 @@ namespace Shiny
         }
 
 
-        public static IDictionary<string, string> FromNsDictionary(this NSDictionary ns)
+        public static Dictionary<string, string> FromNsDictionary(this NSDictionary ns)
         {
             var dict = new Dictionary<string, string>();
             if (ns != null)
