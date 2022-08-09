@@ -37,7 +37,7 @@ namespace Shiny.BluetoothLE
         //}
 
 
-        public override IObservable<AccessState> RequestAccess(bool connectPermission = true) => this.GetRadio()
+        public override IObservable<AccessState> RequestAccess() => this.GetRadio()
             .Catch((ArgumentException ex) => Observable.Return<Radio>(null))
             .Select(x => x == null ? AccessState.NotSupported : this.Status);
 

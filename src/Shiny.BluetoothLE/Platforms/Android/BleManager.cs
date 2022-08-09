@@ -52,24 +52,25 @@ namespace Shiny.BluetoothLE
             );
 
 
-        public override IObservable<AccessState> RequestAccess(bool connectPermission = true) => Observable.FromAsync(async ct =>
+        public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
         {
-            var list = new List<string>(new[]
-            {
-                Manifest.Permission.Bluetooth,
-                Manifest.Permission.BluetoothAdmin
-            });
+            var list = new List<string>();
 
             if (this.context.Android.IsMinApiLevel(31))
             {
-                list.Add(Manifest.Permission.BluetoothScan);
-
-                if (connectPermission)
-                    list.Add(Manifest.Permission.BluetoothConnect);
+                list.AddRange(new [] {
+                    Manifest.Permission.BluetoothScan,
+                    Manifest.Permission.BluetoothConnect,
+                    Manifest.Permission.BluetoothAdmin
+                });
             }
             else
             {
-                list.Add(Manifest.Permission.AccessFineLocation);
+                list.AddRange(new [] {
+                    Manifest.Permission.Bluetooth,
+                    Manifest.Permission.BluetoothAdmin,
+                    Manifest.Permission.AccessFineLocation
+                });
             }
 
             if (!list.All(x => this.context.Android.IsInManifest(x)))

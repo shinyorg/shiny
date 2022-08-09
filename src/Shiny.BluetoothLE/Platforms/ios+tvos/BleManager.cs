@@ -21,7 +21,7 @@ namespace Shiny.BluetoothLE
         public override bool IsScanning => this.context.Manager.IsScanning;
 
 
-        public override IObservable<AccessState> RequestAccess(bool connectPermission = true) => Observable.Create<AccessState>(ob =>
+        public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
         {
             IDisposable? disp = null;
             if (this.context.Manager.State == CBCentralManagerState.Unknown)
@@ -78,7 +78,7 @@ namespace Shiny.BluetoothLE
             if (this.IsScanning)
                 throw new ArgumentException("There is already an existing scan");
 
-            return this.RequestAccess(false)
+            return this.RequestAccess()
                 .Do(access =>
                 {
                     if (access != AccessState.Available)
