@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using Shiny.Stores;
 
 namespace Shiny.Notifications;
@@ -15,11 +14,13 @@ public class Channel : IStoreEntity
     };
 
 
-    public string Identifier { get; set; }
+    public string Identifier { get; set; } = null!;
     public string? Description { get; set; }
     public List<ChannelAction> Actions { get; set; } = new();
 
     public ChannelImportance Importance { get; set; } = ChannelImportance.Normal;
+
+    public ChannelSound Sound { get; set; } = ChannelSound.Default;
     public string? CustomSoundPath { get; set; }
 
 

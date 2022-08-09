@@ -189,6 +189,34 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         }
 
         native.CategoryIdentifier = channel.Identifier;
+        var useCriticalSound =
+            this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
+            channel.Importance == ChannelImportance.Critical &&
+            UIDevice.CurrentDevice.CheckSystemVersion(12, 0);
+
+        switch (channel.Sound)
+        {
+            case ChannelSound.High:
+                native.Sound = useCriticalSound
+                    ? UNNotificationSound.DefaultCriticalSound
+                    : UNNotificationSound.Default;
+                break;
+
+            case ChannelSound.Default:
+                native.Sound = UNNotificationSound.Default;
+                break;
+
+            case ChannelSound.Custom:
+                native.Sound = useCriticalSound
+                    ? UNNotificationSound.GetCriticalSound(channel.CustomSoundPath!)
+                    : UNNotificationSound.GetSound(channel.CustomSoundPath!);
+                break;
+
+            case ChannelSound.None:
+                break;
+        }
+
+
         if (!channel.CustomSoundPath.IsEmpty())
         {
             if (channel.Importance == ChannelImportance.Critical)

@@ -10,6 +10,12 @@ public static class ChannelExtensions
         if (channel.Identifier.IsEmpty())
             throw new ArgumentException("Channel identifier is required", nameof(channel.Identifier));
 
+        if (channel.Sound == ChannelSound.Custom && channel.CustomSoundPath.IsEmpty())
+            throw new ArgumentException("Sound is set to custom, but CustomSoundPath is not set");
+
+        if (channel.Sound != ChannelSound.Custom && !channel.CustomSoundPath.IsEmpty())
+            throw new ArgumentException("Sound is NOT set to custom, but CustomSoundPath is set");
+
         if (channel.Actions != null)
         {
             foreach (var action in channel.Actions)

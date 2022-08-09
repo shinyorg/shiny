@@ -14,9 +14,10 @@ public class ChannelStoreConverter : StoreConverter<Channel>
             Identifier = (string)values[nameof(Channel.Identifier)],
             Description = this.ConvertFromStoreValue<string>(values, nameof(Channel.Description)),
             CustomSoundPath = this.ConvertFromStoreValue<string>(values, nameof(Channel.CustomSoundPath)),
+            Sound = this.ConvertFromStoreValue<ChannelSound>(values, nameof(Channel.Sound)),
             Importance = (ChannelImportance)(long)values[nameof(Channel.Importance)]
         };
-        
+
         if (values.ContainsKey(nameof(Channel.Actions)))
             channel.Actions = JsonSerializer.Deserialize<List<ChannelAction>>((string)values[nameof(channel.Actions)])!;
 
@@ -26,6 +27,7 @@ public class ChannelStoreConverter : StoreConverter<Channel>
     public override IEnumerable<(string Property, object Value)> ToStore(Channel entity)
     {
         yield return (nameof(entity.Importance), entity.Importance);
+        yield return (nameof(entity.Sound), entity.Sound);
 
         if (entity.CustomSoundPath != null)
             yield return (nameof(entity.CustomSoundPath), entity.CustomSoundPath);
