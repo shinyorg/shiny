@@ -19,6 +19,8 @@ namespace Shiny.Notifications
         public List<ChannelAction> Actions { get; set; } = new List<ChannelAction>();
 
         public ChannelImportance Importance { get; set; } = ChannelImportance.Normal;
+
+        public ChannelSound Sound { get; set; } = ChannelSound.Default;
         public string? CustomSoundPath { get; set; }
 
 

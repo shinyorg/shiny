@@ -238,35 +238,31 @@ namespace Shiny.Notifications
             }
 
             native.CategoryIdentifier = channel.Identifier;
-            if (!channel.CustomSoundPath.IsEmpty())
-            {
-                if (channel.Importance == ChannelImportance.Critical)
-                {
-                    native.Sound = UNNotificationSound.GetCriticalSound(channel.CustomSoundPath!);
-                }
-                else
-                {
-                    native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath!);
-                }
-            }
-            else
-            {
-                switch (channel.Importance)
-                {
-                    case ChannelImportance.Critical:
-                    case ChannelImportance.High:
-                        native.Sound = UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0)
-                            ? UNNotificationSound.DefaultCriticalSound
-                            : UNNotificationSound.Default;
-                        break;
+            var useCriticalSound =
+                UseCriticalAlerts &&
+                channel.Importance == ChannelImportance.Critical &&
+                UIDevice.CurrentDevice.CheckSystemVersion(12, 0);
 
-                    case ChannelImportance.Normal:
-                        native.Sound = UNNotificationSound.Default;
-                        break;
+            switch (channel.Sound)
+            {
+                case ChannelSound.High:
+                    native.Sound = useCriticalSound
+                        ? UNNotificationSound.DefaultCriticalSound
+                        : UNNotificationSound.Default;
+                    break;
 
-                    case ChannelImportance.Low:
-                        break;
-                }
+                case ChannelSound.Default:
+                    native.Sound = UNNotificationSound.Default;
+                    break;
+
+                case ChannelSound.Custom:
+                    native.Sound = useCriticalSound
+                        ? UNNotificationSound.GetCriticalSound(channel.CustomSoundPath!)
+                        : UNNotificationSound.GetSound(channel.CustomSoundPath!);
+                    break;
+
+                case ChannelSound.None:
+                    break;
             }
         }
 
