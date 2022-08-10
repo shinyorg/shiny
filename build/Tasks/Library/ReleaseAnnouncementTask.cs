@@ -13,22 +13,32 @@ namespace ShinyBuild.Tasks.Library;
 [IsDependentOn(typeof(NugetDeployTask))]
 public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 {
-    const string DocLink = "https://shinylib.net/release-notes/mobile/v";
+    const string DocLink = "https://shinylib.net/release-notes/mobile/";
 
     public override bool ShouldRun(BuildContext context)
         => context.IsRunningInCI && context.IsNugetDeployBranch;
 
 
     public override Task RunAsync(BuildContext context)
-    {        
-        var link = context.IsReleaseBranch ? $"{DocLink}{context.ReleaseVersion}" : $"{DocLink}next";
-        var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - {link}";
-        //var releaseType = context.IsMainBranch ? "" : " **PREVIEW**";
-        //var message = $"New Shiny Release{releaseType} - Check out the latest release notes here - https://shinylib.net/release-notes/";
+    {
+        var message = GetMessage(context);
         return Task.WhenAll(
             this.Twitter(context, message),
             this.Discord(context, message)
         );
+    }
+
+
+    static string GetMessage(BuildContext context)
+    {
+        if (!context.IsReleaseBranch)
+            return $"{DocLink}vnext.html";
+
+        var ver = context.ReleaseVersion.Replace(".", String.Empty);
+        if (!ver.StartsWith("v"))
+            ver = "v" + ver;
+
+        return $"{DocLink}{ver}.html";
     }
 
 
