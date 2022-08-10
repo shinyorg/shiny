@@ -19,12 +19,3 @@ public abstract class BleGattCharacteristic
     public virtual Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
         => throw new InvalidOperationException("This method must overridden to use subscription");
 }
-
-
-////// TODO: you can only have 1
-//public interface IL2CapEndpointDelegate
-//{
-//    // TODO: secure?
-//    // TODO: when this is done, do we close the channel?  users will likely loop on the thread or a timer/infinite thread of some sort
-//    Task OnOpened(L2CapChannel channel);
-//}

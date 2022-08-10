@@ -64,7 +64,7 @@ public static class NotificationExtensions
     {
         services.AddSingleton(options ?? new());
         services.AddGeofencing<NotificationGeofenceDelegate>();
-        services.AddSingleton<INotificationCustomizer, DefaultAndroidNotificationCustomizer>();
+        //services.AddSingleton<INotificationCustomizer, DefaultAndroidNotificationCustomizer>();
         services.TryAddSingleton<AndroidNotificationProcessor>();
         services.TryAddSingleton<AndroidNotificationManager>();
 
