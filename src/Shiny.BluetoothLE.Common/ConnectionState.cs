@@ -1,13 +1,9 @@
-﻿using System;
+﻿namespace Shiny.BluetoothLE;
 
-
-namespace Shiny.BluetoothLE
+public enum ConnectionState
 {
-    public enum ConnectionState
-    {
-        Disconnected,
-        Disconnecting,
-        Connected,
-        Connecting
-    }
+    Disconnected,
+    Disconnecting,
+    Connected,
+    Connecting
 }
