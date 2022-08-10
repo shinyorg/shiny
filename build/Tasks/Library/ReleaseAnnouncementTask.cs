@@ -13,13 +13,16 @@ namespace ShinyBuild.Tasks.Library;
 [IsDependentOn(typeof(NugetDeployTask))]
 public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 {
+    const string DocLink = "https://shinylib.net/release-notes/mobile/v";
+
     public override bool ShouldRun(BuildContext context)
-        => context.IsRunningInCI;
+        => context.IsRunningInCI && context.IsNugetDeployBranch;
 
 
     public override Task RunAsync(BuildContext context)
-    {
-        var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - https://shinylib.net/release-notes/";
+    {        
+        var link = context.IsReleaseBranch ? $"{DocLink}{context.ReleaseVersion}" : $"{DocLink}next";
+        var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - {link}";
         //var releaseType = context.IsMainBranch ? "" : " **PREVIEW**";
         //var message = $"New Shiny Release{releaseType} - Check out the latest release notes here - https://shinylib.net/release-notes/";
         return Task.WhenAll(
@@ -31,9 +34,6 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
     async Task Twitter(BuildContext context, string message)
     {
-        if (!context.IsReleaseBranch)
-            return;
-
         try
         {
             context.Log.Information("Attempting to publish to Twitter");
@@ -63,9 +63,6 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
     async Task Discord(BuildContext context, string message)
     {
-        if (!context.IsNugetDeployBranch)
-            return;
-
         try
         {
             context.Log.Information("Attempting to publish Discord message");
