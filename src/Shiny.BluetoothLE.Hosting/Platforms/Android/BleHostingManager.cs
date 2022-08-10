@@ -152,6 +152,8 @@ public partial class BleHostingManager : IBleHostingManager
     {
         (await this.RequestAccess(true, false)).Assert();
 
+        var adapter = this.context.Platform.GetBluetoothAdapter()!;
+
         options ??= new AdvertisementOptions();
         var tcs = new TaskCompletionSource<bool>();
         this.adCallbacks = new AdvertisementCallbacks(
@@ -171,8 +173,9 @@ public partial class BleHostingManager : IBleHostingManager
         //if (options.ManufacturerData != null)
         //    data = data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
 
+
         if (options.LocalName != null)
-            BluetoothAdapter.DefaultAdapter.SetName(options.LocalName); // TODO: verify name length with exception
+            adapter.SetName(options.LocalName); // TODO: verify name length with exception
 
         foreach (var uuid in options.ServiceUuids)
         {
