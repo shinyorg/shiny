@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
 
@@ -15,55 +14,70 @@ public class L2CapTests : AbstractBleTests
     [Fact(DisplayName = "BLE - L2Cap Host")]
     public async Task HostTest()
     {
-        var tcs = new TaskCompletionSource<bool>();
-        var service = this.GetService<IBleHostingManager>();
-        var instance = service.OpenL2Cap(false, channel =>
+        L2CapInstance? instance = null;
+        try
         {
-            try
+            var tcs = new TaskCompletionSource<bool>();
+            var service = this.GetService<IBleHostingManager>();
+            instance = await service.OpenL2Cap(false, channel =>
             {
-                var buffer = new byte[8192];
-                var read = channel.InputStream.Read(buffer);
-                if (read == -1)
-                    throw new Exception("No data read");
+                try
+                {
+                    var buffer = new byte[8192];
+                    var read = channel.InputStream.Read(buffer);
+                    if (read == -1)
+                        throw new Exception("No data read");
 
-                channel.OutputStream.Write(Encoding.UTF8.GetBytes("Hello!"));
-                tcs.SetResult(true);
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
-            }
-        });
-        await this.AlertWait("Waiting for a WRITE and then a READ", () => tcs.Task);
+                    channel.OutputStream.Write(Encoding.UTF8.GetBytes("Hello!"));
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+            await this.AlertWait("Waiting for a WRITE and then a READ", () => tcs.Task);
+        }
+        finally
+        {
+            instance?.Dispose();
+        }
     }
 
 
     [Fact(DisplayName = "BLE - L2Cap Client")]
     public async Task ClientTest()
     {
-        var service = this.GetService<IBleManager>();
-        var peripheral = await service.Scan().Take(1).Select(x => x.Peripheral).ToTask();
-        var tcs = new TaskCompletionSource<bool>();
-
-        var sub = peripheral.TryOpenL2CapChannel(0, false)!.Subscribe(channel =>
+        IDisposable? sub = null;
+        try
         {
-            try
+            var service = this.GetService<IBleManager>();
+            var peripheral = await service.Scan().Take(1).Select(x => x.Peripheral).ToTask();
+            var tcs = new TaskCompletionSource<bool>();
+            sub = peripheral.TryOpenL2CapChannel(0, false)!.Subscribe(channel =>
             {
-                channel.OutputStream.Write(Encoding.UTF8.GetBytes("Hello!"));
+                try
+                {
+                    channel.OutputStream.Write(Encoding.UTF8.GetBytes("Hello!"));
 
-                var buffer = new byte[8192];
-                var read = channel.InputStream.Read(buffer, 0, buffer.Length);
-                if (read == -1)
-                    throw new Exception("Failed to read");
+                    var buffer = new byte[8192];
+                    var read = channel.InputStream.Read(buffer, 0, buffer.Length);
+                    if (read == -1)
+                        throw new Exception("Failed to read");
 
-                tcs.SetResult(true);
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
-            }
-        });
-        await tcs.Task;
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+            await tcs.Task;
+        }
+        finally
+        {
+            sub?.Dispose();
+        }
     }
 }
 
