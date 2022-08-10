@@ -46,8 +46,8 @@ namespace Shiny.BluetoothLE
 
             ob.Respond(new L2CapChannel(
                 psm,
-                socket.OutputStream!,
                 socket.InputStream!,
+                socket.OutputStream!,
                 () => socket.Dispose()
             ));
 
@@ -111,7 +111,6 @@ namespace Shiny.BluetoothLE
 
             return comp;
         });
-
 
 
         public override IObservable<IList<IGattService>> GetServices()

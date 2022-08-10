@@ -39,6 +39,7 @@ public abstract class AbstractBleTests : AbstractShinyTests
 
     protected virtual async Task FindFirstPeripheral(string serviceUuid, bool connect)
     {
+        this.Log("Scanning for peripheral");
         this.Peripheral = await this.Manager
             .Scan(new ScanConfig(
                 BleScanType.Balanced,
@@ -50,7 +51,13 @@ public abstract class AbstractBleTests : AbstractShinyTests
             .Timeout(TimeSpan.FromSeconds(30))
             .ToTask();
 
+        this.Log("Peripheral Found");
+
         if (connect)
+        {
+            this.Log("Connecting to peripheral");
             await this.Peripheral.ConnectAsync(timeout: TimeSpan.FromSeconds(5));
+            this.Log("Connected to peripheral");
+        }
     }
 }

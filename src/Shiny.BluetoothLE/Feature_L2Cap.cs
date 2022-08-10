@@ -7,8 +7,8 @@ namespace Shiny.BluetoothLE;
 
 public record L2CapChannel(
     ushort Psm,
-    Stream OutputStream,
     Stream InputStream,
+    Stream OutputStream,    
     Action? OnDispose = null
 ) : IDisposable
 {

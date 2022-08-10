@@ -37,12 +37,12 @@ public class L2CapTests : AbstractBleTests
                     tcs.SetException(ex);
                 }
             });
-            await this.AlertWait($"PSM: {instance!.Value.Psm} - Waiting for a WRITE and then a READ", () => tcs.Task);
-
             await this.HostingManager.StartAdvertising(new AdvertisementOptions(
                 "Tests",
                 AD_SERVICE_UUID
             ));
+
+            await this.AlertWait($"PSM: {instance!.Value.Psm} - Waiting for a WRITE and then a READ", () => tcs.Task);
         }
         finally
         {

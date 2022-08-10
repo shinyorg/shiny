@@ -28,11 +28,11 @@ public abstract class AbstractShinyTests : IDisposable
     protected virtual void Configure(IHostBuilder hostBuilder) { }
     protected virtual Task Alert(string message) => UserDialogs.Instance.AlertAsync(message);
 
-    protected virtual async Task<int> IntInput(string message, int maxLength = 2)
+    protected virtual async Task<int> IntInput(string message, int? maxLength = null)
     {
         var result = await UserDialogs.Instance.PromptAsync(new PromptConfig
         {
-            Text = message,
+            Message = message,
             MaxLength = maxLength,
             InputType = InputType.Number
         });

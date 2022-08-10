@@ -39,7 +39,7 @@ jobs:
     - name: Setup .NET 6.0
       uses: actions/setup-dotnet@v1
       with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '6.0.400'
 
     - name: Add .NET 6 Workloads
       run: dotnet workload install maui ios android maccatalyst
