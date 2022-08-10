@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#if PLATFORM
+using Microsoft.Extensions.DependencyInjection;
 using Shiny.Nfc;
 
 namespace Shiny;
@@ -6,6 +7,7 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
+
     public static INfcManager Nfc(this ShinyContainer container) => container.GetService<INfcManager>();
 
 
@@ -14,13 +16,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static bool AddNfc(this IServiceCollection services)
-    {
-#if IOS || MACCATALYST || ANDROID
-        services.AddShinyService<NfcManager>();
-        return true;
-#else
-        return false;
-#endif
-    }
+    public static IServiceCollection AddNfc(this IServiceCollection services)
+        => services.AddShinyService<NfcManager>();
 }
+#endif

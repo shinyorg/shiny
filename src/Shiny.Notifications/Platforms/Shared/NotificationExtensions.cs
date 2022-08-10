@@ -19,7 +19,7 @@ public static class NotificationExtensions
     /// <param name="services"></param>
     /// <param name="configuration"></param>
     /// <returns></returns>
-    public static void AddNotifications<TDelegate>(this IServiceCollection services, IosConfiguration? configuration) where TDelegate : INotificationDelegate
+    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, IosConfiguration? configuration) where TDelegate : INotificationDelegate
         => services.AddNotifications(typeof(TDelegate), configuration);
 
 
@@ -30,7 +30,7 @@ public static class NotificationExtensions
     /// <param name="delegateType"></param>
     /// <param name="configuration"></param>
     /// <returns></returns>
-    public static void AddNotifications(this IServiceCollection services, Type? delegateType = null, IosConfiguration? configuration = null)
+    public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, IosConfiguration? configuration = null)
     {
         services.AddSingleton(configuration ?? new());
         services.AddRepository<NotificationStoreConverter, Notification>();
@@ -39,6 +39,8 @@ public static class NotificationExtensions
 
         if (delegateType != null)
             services.AddShinyService(delegateType);
+
+        return services;
     }
 
 #elif ANDROID
@@ -49,7 +51,7 @@ public static class NotificationExtensions
     /// <param name="services"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static void AddNotifications<TDelegate>(this IServiceCollection services, AndroidCustomizationOptions? options = null) where TDelegate : INotificationDelegate
+    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, AndroidCustomizationOptions? options = null) where TDelegate : INotificationDelegate
         => services.AddNotifications(typeof(TDelegate), options);
 
 
@@ -60,7 +62,7 @@ public static class NotificationExtensions
     /// <param name="delegateType"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static void AddNotifications(this IServiceCollection services, Type? delegateType = null, AndroidCustomizationOptions? options = null)
+    public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, AndroidCustomizationOptions? options = null)
     {
         services.AddSingleton(options ?? new());
         services.AddGeofencing<NotificationGeofenceDelegate>();
@@ -74,6 +76,8 @@ public static class NotificationExtensions
 
         if (delegateType != null)
             services.AddShinyService(delegateType);
+
+        return services;
     }
 
 #endif

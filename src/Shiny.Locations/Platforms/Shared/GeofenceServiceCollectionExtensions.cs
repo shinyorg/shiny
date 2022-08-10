@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if PLATFORM
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
@@ -20,7 +21,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="delegateType"></param>
     /// <returns></returns>
-    public static bool AddGeofencing(this IServiceCollection services, Type delegateType)
+    public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
     {
         services.AddRepository<GeofenceRegionStoreConverter, GeofenceRegion>();
 #if ANDROID
@@ -33,14 +34,11 @@ public static class GeofenceServiceCollectionExtensions
 
         services.AddShinyService(delegateType);
         services.AddShinyService<GeofenceManagerImpl>();
-        return true;
-#elif IOS || MACCATALYST
+#elif APPLE
         services.AddShinyService(delegateType);
         services.AddShinyService<GeofenceManagerImpl>();
-        return true;
-#else
-        return false;
 #endif
+        return services;
     }
 
 
@@ -50,7 +48,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static bool AddGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+    public static IServiceCollection AddGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
         => services.AddGeofencing(typeof(T));
 
 
@@ -61,7 +59,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static bool AddGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+    public static IServiceCollection AddGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
         => services.AddGpsDirectGeofencing(typeof(T));
 
 
@@ -72,17 +70,11 @@ public static class GeofenceServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="delegateType"></param>
     /// <returns></returns>
-    public static bool AddGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
+    public static IServiceCollection AddGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
     {
-#if IOS || MACCATALYST || ANDROID
-        if (!services.AddGps<GpsGeofenceDelegate>())
-            return false;
-
         services.AddShinyService(delegateType);
         services.AddShinyService<GpsGeofenceManagerImpl>();
-        return true;
-#else
-        return false;
-#endif
+        return services;
     }
 }
+#endif

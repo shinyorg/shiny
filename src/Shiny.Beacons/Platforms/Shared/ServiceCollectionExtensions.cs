@@ -1,9 +1,9 @@
-﻿using System;
+﻿#if PLATFORM
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Beacons;
 using Shiny.Beacons.Infrastructure;
-using Shiny.Stores;
 
 namespace Shiny;
 
@@ -18,17 +18,13 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static bool AddBeaconRanging(this IServiceCollection services)
+    public static IServiceCollection AddBeaconRanging(this IServiceCollection services)
     {
-#if !IOS && !MACCATALYST && !ANDROID
-        return false;
-#else
 #if ANDROID
         services.AddBluetoothLE();
 #endif
         services.TryAddSingleton<IBeaconRangingManager, BeaconRangingManager>();
-        return true;
-#endif
+        return services;
     }
 
 
@@ -38,11 +34,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="delegateType"></param>
     /// <returns></returns>
-    public static bool AddBeaconMonitoring(this IServiceCollection services, Type delegateType)
+    public static IServiceCollection AddBeaconMonitoring(this IServiceCollection services, Type delegateType)
     {
-#if !IOS && !MACCATALYST && !ANDROID
-        return false;
-#else
         ArgumentNullException.ThrowIfNull(delegateType, "You can't register monitoring regions without a delegate type");
 
 #if ANDROID
@@ -52,8 +45,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
         services.AddRepository<BeaconRegionStoreConverter, BeaconRegion>();
         services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
-        return true;
-#endif
+
+        return services;
     }
 
 
@@ -63,6 +56,7 @@ public static class ServiceCollectionExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static bool AddBeaconMonitoring<T>(this IServiceCollection services) where T : class, IBeaconMonitorDelegate
+    public static IServiceCollection AddBeaconMonitoring<T>(this IServiceCollection services) where T : class, IBeaconMonitorDelegate
         => services.AddBeaconMonitoring(typeof(T));
 }
+#endif

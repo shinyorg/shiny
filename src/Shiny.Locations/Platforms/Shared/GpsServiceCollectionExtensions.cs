@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if PLATFORM
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations;
 #if ANDROID
@@ -18,7 +19,7 @@ public static class GpsServiceCollectionExtensions
     /// <param name="services">The servicecollection to configure</param>
     /// <returns></returns>
 
-    public static bool AddGps(this IServiceCollection services, Type? delegateType = null)
+    public static IServiceCollection AddGps(this IServiceCollection services, Type? delegateType = null)
     {
         if (delegateType != null)
             services.AddShinyService(delegateType);
@@ -33,14 +34,10 @@ public static class GpsServiceCollectionExtensions
         else
             services.AddShinyService<GooglePlayServiceGpsManagerImpl>();
 
-        return true;
-#elif IOS || MACCATALYST
+#elif APPLE
         services.AddShinyService<GpsManager>();
-        return true;
-#else
-        return false;
-
 #endif
+        return services;
     }
 
 
@@ -50,6 +47,7 @@ public static class GpsServiceCollectionExtensions
     /// <typeparam name="T">The IGpsDelegate to call</typeparam>
     /// <param name="services">The servicecollection to configure</param>
     /// <returns></returns>
-    public static bool AddGps<T>(this IServiceCollection services) where T : class, IGpsDelegate
+    public static IServiceCollection AddGps<T>(this IServiceCollection services) where T : class, IGpsDelegate
         => services.AddGps(typeof(T));
 }
+#endif

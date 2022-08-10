@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#if PLATFORM
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Hosting;
 using Shiny.Infrastructure;
@@ -13,7 +14,7 @@ namespace Shiny;
 
 public static class ShinyCoreExtensions
 {
-    public static void AddShinyCoreServices(this IServiceCollection services)
+    public static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
     {
 #if ANDROID
         services.AddShinyService<AndroidPlatform>();
@@ -21,21 +22,23 @@ public static class ShinyCoreExtensions
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
         services.AddCommon();
-#elif IOS || MACCATALYST
+#elif APPLE
         services.AddShinyService<IosPlatform>();
         services.AddShinyService<IosLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
         services.AddCommon();
 #endif
+        return services;
     }
 
 
-    public static void AddCommon(this IServiceCollection services)
+    public static IServiceCollection AddCommon(this IServiceCollection services)
     {
         services.TryAddSingleton<ISerializer, DefaultSerializer>();
         services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
         services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+        return services;
     }
 
 
@@ -48,24 +51,17 @@ public static class ShinyCoreExtensions
     }
 
 
-    public static bool AddBattery(this IServiceCollection services)
+    public static IServiceCollection AddBattery(this IServiceCollection services)
     {
-#if IOS || MACCATALYST || ANDROID
         services.TryAddSingleton<IBattery, BatteryImpl>();
-        return true;
-#else
-        return false;
-#endif
+        return services;
     }
 
 
-    public static bool AddConnectivity(this IServiceCollection services)
+    public static IServiceCollection AddConnectivity(this IServiceCollection services)
     {
-#if IOS || MACCATALYST || ANDROID
         services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-        return true;
-#else
-        return false;
-#endif
+        return services;
     }
 }
+#endif
