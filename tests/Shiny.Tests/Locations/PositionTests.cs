@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using Shiny.Locations;
-using Xunit;
+﻿using Shiny.Locations;
 
 namespace Shiny.Tests.Locations;
 

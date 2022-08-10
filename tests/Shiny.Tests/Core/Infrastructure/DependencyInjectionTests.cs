@@ -1,9 +1,5 @@
-﻿using FluentAssertions;
-using Shiny.Hosting;
-using Shiny.Stores;
+﻿using Shiny.Stores;
 using Shiny.Stores.Impl;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Shiny.Tests.Core.Infrastructure;
 

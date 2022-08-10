@@ -1,8 +1,5 @@
-﻿using FluentAssertions;
-using Shiny.Hosting;
+﻿using Shiny.Hosting;
 using Shiny.Notifications;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Shiny.Tests.Notifications;
 

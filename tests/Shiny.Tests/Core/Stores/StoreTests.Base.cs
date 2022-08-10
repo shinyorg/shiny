@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using Xunit;
-using Shiny.Stores;
+﻿using Shiny.Stores;
 
 namespace Shiny.Tests.Core.Stores;
 

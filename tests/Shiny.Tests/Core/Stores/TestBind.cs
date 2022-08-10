@@ -34,7 +34,7 @@ public class TestBind : NotifyPropertyChanged
         set => this.Set(ref this.protectedGetterProperty, value);
     }
 
-    
+
     string? protectedSetterProperty;
     public string? ProtectedSetterProperty
     {

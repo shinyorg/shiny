@@ -1,8 +1,4 @@
-﻿using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using Shiny.BluetoothLE;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Shiny.BluetoothLE;
 
 namespace Shiny.Tests.BluetoothLE;
 

@@ -1,7 +1,6 @@
 using Shiny.Infrastructure.Impl;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
-using Xunit.Abstractions;
 
 namespace Shiny.Tests.Core.Stores;
 

@@ -1,10 +1,5 @@
-﻿using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using FluentAssertions;
-using Shiny.Hosting;
+﻿using Shiny.Hosting;
 using Shiny.Locations;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Shiny.Tests.Locations;
 

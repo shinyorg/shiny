@@ -1,5 +1,4 @@
-﻿using Acr.UserDialogs;
-using Shiny.Power;
+﻿using Shiny.Power;
 using Shiny.Hosting;
 
 namespace Shiny.Tests.Core;
@@ -20,7 +19,7 @@ public class BatteryTests : AbstractShinyTests
         var level = (double)intLevel / 100;
         var battery = this.GetService<IBattery>();
 
-        await UserDialogs.Instance.AlertAsync($"Change the battery to {intLevel} in Simulator & Press OK to continue test");
+        await this.Alert($"Change the battery to {intLevel} in Simulator & Press OK to continue test");
         battery.Level.Should().Be(level);
     }
 
@@ -31,7 +30,7 @@ public class BatteryTests : AbstractShinyTests
     [InlineData(BatteryState.NotCharging)]
     public async Task StateTest(BatteryState expectedState)
     {
-        await UserDialogs.Instance.AlertAsync($"Change the battery state to {expectedState} in the Simulator & Press OK to continue test");
+        await this.Alert($"Change the battery state to {expectedState} in the Simulator & Press OK to continue test");
         var battery = this.GetService<IBattery>();
         if (expectedState == BatteryState.NotCharging && battery.Level == 100)
             battery.Status.Should().Be(BatteryState.Full);
@@ -43,7 +42,7 @@ public class BatteryTests : AbstractShinyTests
     [Fact(DisplayName = "Battery - Change Monitoring (Simulator)")]
     public async Task MonitorTest()
     {
-        await UserDialogs.Instance.AlertAsync($"Change the battery state or level in the Simulator AFTER pressing OK to pass test");
+        await this.Alert($"Change the battery state or level in the Simulator AFTER pressing OK to pass test");
 
         var battery = this.GetService<IBattery>();
         await battery

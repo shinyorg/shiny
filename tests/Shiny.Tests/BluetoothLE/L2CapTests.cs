@@ -15,12 +15,11 @@ public class L2CapTests : AbstractBleTests
     public async Task HostTest()
     {
         var service = this.GetService<IBleHostingManager>();
-        var sub = service
-            .WhenL2CapChannelOpened(false)
-            .Subscribe(channel =>
-            {
-                //channel.Psm
-            });
+        var instance = service.OpenL2Cap(false, channel =>
+        {
+
+        });
+
     }
 
 

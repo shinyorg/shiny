@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
-using FluentAssertions;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
-using Xunit;
 
 namespace Shiny.Tests.Core.Stores;
 

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Acr.UserDialogs;
+using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
-using Xunit.Abstractions;
 
 namespace Shiny.Tests;
 
@@ -26,6 +26,7 @@ public abstract class AbstractShinyTests : IDisposable
     protected T GetService<T>() => this.Host!.Services!.GetRequiredService<T>()!;
     protected IHost Host { get; }
     protected virtual void Configure(IHostBuilder hostBuilder) { }
+    protected virtual Task Alert(string message) => UserDialogs.Instance.AlertAsync(message);
 
     public virtual void Dispose() => this.Host?.Dispose();
 }

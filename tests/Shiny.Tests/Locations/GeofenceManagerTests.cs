@@ -1,9 +1,6 @@
-﻿using FluentAssertions;
-using Sample;
+﻿using Sample;
 using Shiny.Hosting;
 using Shiny.Locations;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Shiny.Tests.Locations;
 

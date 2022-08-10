@@ -1,7 +1,4 @@
-﻿using FluentAssertions;
-using Xunit;
-
-namespace Shiny.Tests.Locations;
+﻿namespace Shiny.Tests.Locations;
 
 
 public class DistanceTests

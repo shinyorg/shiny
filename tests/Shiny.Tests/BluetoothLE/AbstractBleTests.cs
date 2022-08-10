@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Shiny.BluetoothLE;
 using Shiny.Hosting;
-using Xunit.Abstractions;
 
 namespace Shiny.Tests.BluetoothLE;
 

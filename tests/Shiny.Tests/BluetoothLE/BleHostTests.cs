@@ -1,5 +1,4 @@
 ﻿using System.Reactive.Subjects;
-using FluentAssertions;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
 using Shiny.BluetoothLE.Hosting.Managed;
@@ -159,7 +158,7 @@ public class BleHostTests : AbstractBleTests
         finally
         {
             bleHost.DetachRegisteredServices();
-        }        
+        }
     }
 
 

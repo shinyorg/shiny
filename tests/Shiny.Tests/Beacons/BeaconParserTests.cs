@@ -1,6 +1,4 @@
 ﻿using Shiny.Beacons;
-using FluentAssertions;
-using Xunit;
 
 namespace Shiny.Tests.Beacons;
 
