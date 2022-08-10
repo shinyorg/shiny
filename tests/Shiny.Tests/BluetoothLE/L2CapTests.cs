@@ -8,6 +8,8 @@ namespace Shiny.Tests.BluetoothLE;
 [Trait("Category", "BluetoothLE")]
 public class L2CapTests : AbstractBleTests
 {
+    const string AD_SERVICE_UUID = "ee768769-1494-4690-860a-265de1d51bd5";
+
     public L2CapTests(ITestOutputHelper output) : base(output) { }
 
 
@@ -18,8 +20,7 @@ public class L2CapTests : AbstractBleTests
         try
         {
             var tcs = new TaskCompletionSource<bool>();
-            var service = this.GetService<IBleHostingManager>();
-            instance = await service.OpenL2Cap(false, channel =>
+            instance = await this.HostingManager.OpenL2Cap(false, channel =>
             {
                 try
                 {
@@ -37,6 +38,11 @@ public class L2CapTests : AbstractBleTests
                 }
             });
             await this.AlertWait($"PSM: {instance!.Value.Psm} - Waiting for a WRITE and then a READ", () => tcs.Task);
+
+            await this.HostingManager.StartAdvertising(new AdvertisementOptions(
+                "Tests",
+                AD_SERVICE_UUID
+            ));
         }
         finally
         {
@@ -48,15 +54,15 @@ public class L2CapTests : AbstractBleTests
     [Fact(DisplayName = "BLE - L2Cap Client")]
     public async Task ClientTest()
     {
+        await this.FindFirstPeripheral(AD_SERVICE_UUID, true);
         IDisposable? sub = null;
+
         try
         {
-            var service = this.GetService<IBleManager>();
-            var peripheral = await service.Scan().Take(1).Select(x => x.Peripheral).ToTask();
             var tcs = new TaskCompletionSource<bool>();
 
             var psmValue = await this.IntInput("PSM Value");
-            sub = peripheral.TryOpenL2CapChannel((ushort)psmValue, false)!.Subscribe(channel =>
+            sub = this.Peripheral!.TryOpenL2CapChannel((ushort)psmValue, false)!.Subscribe(channel =>
             {
                 try
                 {

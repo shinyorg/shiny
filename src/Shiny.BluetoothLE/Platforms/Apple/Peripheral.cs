@@ -45,7 +45,7 @@ public class Peripheral : AbstractPeripheral, ICanL2Cap
     };
 
 
-    public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
+    public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(async ob =>
     {
         var handler = new EventHandler<CBPeripheralOpenL2CapChannelEventArgs>((sender, args) =>
         {

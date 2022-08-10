@@ -57,7 +57,7 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
-        (await this.RequestAccess()).Assert();
+        await this.AssertReady();
 
         var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
         {
@@ -85,21 +85,16 @@ public partial class BleHostingManager : IBleHostingManager
 
 
 
+
     public bool IsAdvertising => this.Manager.Advertising;
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
         if (this.Manager.Advertising)
             throw new InvalidOperationException("Advertising is already active");
 
-        if (this.Status != AccessState.Unknown && this.Status != AccessState.Available)
-            throw new InvalidOperationException("Invalid Status: " + this.Status);
+        await this.AssertReady();
 
         options ??= new AdvertisementOptions();
-        await this.Manager
-            .WhenReady()
-            .Timeout(TimeSpan.FromSeconds(10))
-            .ToTask();
-
         var tcs = new TaskCompletionSource<bool>();
         var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
         {
@@ -143,10 +138,7 @@ public partial class BleHostingManager : IBleHostingManager
         // TODO: not sure about this
         //if (AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13) && !primary)
         //    throw new InvalidOperationException("You must specify your service as primary when using bg BLE");
-        await this.Manager
-            .WhenReady()
-            .Timeout(TimeSpan.FromSeconds(10))
-            .ToTask();
+        await this.AssertReady();
 
         var service = new GattService(this.Manager, uuid, primary);
         serviceBuilder(service);
@@ -209,6 +201,18 @@ public partial class BleHostingManager : IBleHostingManager
 
 
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
+
+
+    async Task AssertReady()
+    {
+        if (this.Status != AccessState.Unknown && this.Status != AccessState.Available)
+            throw new InvalidOperationException("Invalid Status: " + this.Status);
+
+        await this.Manager
+            .WhenReady()
+            .Timeout(TimeSpan.FromSeconds(10))
+            .ToTask();
+    }
 
 
     AccessState Status => this.Manager.State switch

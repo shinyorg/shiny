@@ -37,18 +37,9 @@ public class BleHostTests : AbstractBleTests
     [Fact(DisplayName = "BLE Host - Client Tester")]
     public async Task BleHostClientTester()
     {
-        this.Peripheral = await this.Manager
-            .Scan(new ScanConfig(
-                BleScanType.Balanced,
-                false,
-                SERVICE_UUID
-            ))
-            .Select(x => x.Peripheral)
-            .Take(1)
-            .Timeout(TimeSpan.FromSeconds(30))
-            .ToTask();
+        await this.FindFirstPeripheral(SERVICE_UUID, false);
 
-        await this.Peripheral.WriteCharacteristicAsync(
+        await this.Peripheral!.WriteCharacteristicAsync(
             SERVICE_UUID,
             CHARACTERISTIC_UUID,
             new byte[] { 0x01 }
@@ -71,9 +62,7 @@ public class BleHostTests : AbstractBleTests
     public async Task BleHostEndToEnd()
     {
         var subj = new Subject<bool>();
-        var bleHost = this.GetService<IBleHostingManager>();
-
-        bleHost.ClearServices();
+        var bleHost = this.HostingManager;
 
         await bleHost.AddService(SERVICE_UUID, true, sb =>
         {
@@ -125,7 +114,7 @@ public class BleHostTests : AbstractBleTests
     public async Task ManagedEndToEnd()
     {
         var subj = new Subject<bool>();
-        var bleHost = this.GetService<IBleHostingManager>();
+        var bleHost = this.HostingManager;
 
         ManagedTestCharacteristicReadOnly.Callback = async () =>
         {
