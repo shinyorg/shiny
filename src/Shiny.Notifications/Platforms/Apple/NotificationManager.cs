@@ -16,7 +16,6 @@ namespace Shiny.Notifications;
 public class NotificationManager : INotificationManager, IIosLifecycle.INotificationHandler, IIosLifecycle.IOnFinishedLaunching
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
-    readonly IEnumerable<INotificationCustomizer> customizers;
     readonly IosConfiguration configuration;
     readonly IPlatform platform;
     readonly IChannelManager channelManager;
@@ -28,8 +27,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         IServiceProvider services,
         IPlatform platform,
         IChannelManager channelManager,
-        IKeyValueStoreFactory keystore,
-        IEnumerable<INotificationCustomizer> customizers
+        IKeyValueStoreFactory keystore
     )
     {
         this.configuration = configuration;
@@ -37,7 +35,6 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         this.platform = platform;
         this.channelManager = channelManager;
         this.settings = keystore.DefaultStore;
-        this.customizers = customizers;
     }
 
 
@@ -119,8 +116,9 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             content,
             this.GetTrigger(notification)
         );
-        foreach (var customizer in this.customizers)
-            await customizer.Customize(notification, channel, request).ConfigureAwait(false);
+        var customize = (notification as AppleNotification)?.Customize;
+        if (customize != null)
+            await customize.Invoke(channel, request).ConfigureAwait(false);
 
         await UNUserNotificationCenter
             .Current
