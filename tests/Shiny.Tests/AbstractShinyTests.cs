@@ -28,5 +28,11 @@ public abstract class AbstractShinyTests : IDisposable
     protected virtual void Configure(IHostBuilder hostBuilder) { }
     protected virtual Task Alert(string message) => UserDialogs.Instance.AlertAsync(message);
 
+    protected virtual async Task AlertWait(string message, Func<Task> wait)
+    {
+        using (UserDialogs.Instance.Alert(message))
+            await wait.Invoke();
+    }
+
     public virtual void Dispose() => this.Host?.Dispose();
 }
