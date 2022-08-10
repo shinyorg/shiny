@@ -10,7 +10,6 @@ using Android.OS;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 using static Android.Manifest;
-using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -22,12 +21,13 @@ public partial class BleHostingManager : IBleHostingManager
     AdvertisementCallbacks? adCallbacks;
 
 
-    public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
+    public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
         (await this.RequestAccess()).Assert();
 
         var ct = new CancellationTokenSource();
-        var ad = BluetoothAdapter.DefaultAdapter;
+        var ad = this.context.Platform.GetBluetoothAdapter();
+
         if (ad == null)
             throw new InvalidOperationException("No Bluetooth Adaptor found");
 
@@ -35,6 +35,9 @@ public partial class BleHostingManager : IBleHostingManager
             ? ad.ListenUsingL2capChannel()
             : ad.ListenUsingInsecureL2capChannel();
 
+        var psm = Convert.ToUInt16(serverSocket!.Psm);
+
+        // TODO: error trap
         _ = Task.Run(() =>
         {
             while (!ct.IsCancellationRequested)
@@ -44,8 +47,8 @@ public partial class BleHostingManager : IBleHostingManager
                     var socket = serverSocket.Accept(30000);
                     if (socket != null && !ct.IsCancellationRequested)
                     {
-                        ob.OnNext(new L2CapChannel(
-                            (ushort)serverSocket.Psm,
+                        onOpen(new L2CapChannel(
+                            psm,
                             socket.InputStream!,
                             socket.OutputStream!
                         ));
@@ -55,12 +58,15 @@ public partial class BleHostingManager : IBleHostingManager
             }
         });
 
-        return () =>
-        {
-            ct.Cancel();
-            serverSocket?.Dispose();
-        };
-    });
+        return new L2CapInstance(
+            psm,
+            () =>
+            {
+                ct.Cancel();
+                serverSocket?.Dispose();
+            }
+        );
+    }
 
 
     public async Task<AccessState> RequestAccess(bool advertise = true, bool connect = true)
