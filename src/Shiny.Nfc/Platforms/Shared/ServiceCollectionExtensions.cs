@@ -1,4 +1,4 @@
-﻿#if PLATFORM
+﻿#if IOS || ANDROID
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Nfc;
 
