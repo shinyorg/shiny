@@ -8,7 +8,7 @@ namespace Shiny.BluetoothLE.Hosting;
 public interface IBleHostingManager
 {
     Task<AccessState> RequestAccess(bool advertise = true, bool connect = true);
-    IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure); // TODO: how to tell if open?
+    Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen);
 
     bool IsAdvertising { get; }
     Task StartAdvertising(AdvertisementOptions? options = null);

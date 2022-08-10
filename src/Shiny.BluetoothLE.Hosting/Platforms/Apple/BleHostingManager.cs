@@ -55,12 +55,13 @@ public partial class BleHostingManager : IBleHostingManager
     }
 
 
-    // TODO: I need to publish the PSM
-    public IObservable<L2CapChannel> WhenL2CapChannelOpened(bool secure) => Observable.Create<L2CapChannel>(async ob =>
+    public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
+        (await this.RequestAccess()).Assert();
+
         var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
         {
-            ob.OnNext(new L2CapChannel(
+            onOpen(new L2CapChannel(
                 args.Channel!.Psm,
                 args.Channel!.InputStream.ToStream(),
                 args.Channel!.OutputStream.ToStream()
@@ -68,18 +69,20 @@ public partial class BleHostingManager : IBleHostingManager
         });
         this.Manager.DidOpenL2CapChannel += handler;
         var psm = await this.PublishL2Cap(secure);
-
-        return () =>
-        {
-            this.Manager.DidOpenL2CapChannel += handler;
-            this.Manager.UnpublishL2CapChannel(psm);
-        };
-    });
+        return new L2CapInstance(
+            psm,
+            () =>
+            {
+                this.Manager.UnpublishL2CapChannel(psm);
+                this.Manager.DidOpenL2CapChannel -= handler;
+            }
+        );
+    }
 
 
     public Task<AccessState> RequestAccess(bool advertise = true, bool connect = true)
         => Task.FromResult(this.Status);
-    
+
 
 
     public bool IsAdvertising => this.Manager.Advertising;

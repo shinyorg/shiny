@@ -1,10 +1,15 @@
 ﻿using Android.Bluetooth;
+using Android.Content;
 
 namespace Shiny.BluetoothLE;
 
 
 public static class Extensions
 {
+    public static BluetoothAdapter? GetBluetoothAdapter(this AndroidPlatform platform)
+        => platform.GetSystemService<BluetoothManager>(Context.BluetoothService).Adapter;
+
+
     public static AccessState GetAccessState(this BluetoothManager bluetoothManager)
     {
         var ad = bluetoothManager?.Adapter;
