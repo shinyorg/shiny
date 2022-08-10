@@ -36,7 +36,7 @@ public class L2CapTests : AbstractBleTests
                     tcs.SetException(ex);
                 }
             });
-            await this.AlertWait("Waiting for a WRITE and then a READ", () => tcs.Task);
+            await this.AlertWait($"PSM: {instance!.Value.Psm} - Waiting for a WRITE and then a READ", () => tcs.Task);
         }
         finally
         {
@@ -54,7 +54,9 @@ public class L2CapTests : AbstractBleTests
             var service = this.GetService<IBleManager>();
             var peripheral = await service.Scan().Take(1).Select(x => x.Peripheral).ToTask();
             var tcs = new TaskCompletionSource<bool>();
-            sub = peripheral.TryOpenL2CapChannel(0, false)!.Subscribe(channel =>
+
+            var psmValue = await this.IntInput("PSM Value");
+            sub = peripheral.TryOpenL2CapChannel((ushort)psmValue, false)!.Subscribe(channel =>
             {
                 try
                 {

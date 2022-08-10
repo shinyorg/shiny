@@ -183,16 +183,18 @@ public class PeripheralTests : AbstractBleTests
             .Subscribe(x => count++);
 
         await this.Peripheral!.WhenConnected().Take(1).ToTask();
-        var disp = UserDialogs.Instance.Alert("Now turn off peripheral and wait");
-        await this.Peripheral!.WhenDisconnected().Take(1).ToTask();
-        count = 0;
-        disp.Dispose();
+        await this.AlertWait(
+            "Now turn off peripheral and wait",
+            () => this.Peripheral!.WhenDisconnected().Take(1).ToTask()
+        );
+        count = 0;        
 
         await Task.Delay(1000);
-        disp = UserDialogs.Instance.Alert("Now turn peripheral on and wait");
-        await this.Peripheral!.WhenConnected().Take(1).ToTask();
-        disp.Dispose();
-
+        await this.AlertWait(
+            "Now turn peripheral on and wait",
+            () => this.Peripheral!.WhenConnected().Take(1).ToTask()
+        );
+        
         await Task.Delay(3000);
         sub.Dispose();
         Assert.True(count > 0, "No pings");
@@ -223,7 +225,7 @@ public class PeripheralTests : AbstractBleTests
             });
 
         await this.Peripheral!.WithConnectIf();
-        await UserDialogs.Instance.AlertAsync("No turn peripheral off - wait a 3 seconds then turn it back on - press OK if light goes green or you believe connection has failed");
+        await this.Alert("No turn peripheral off - wait a 3 seconds then turn it back on - press OK if light goes green or you believe connection has failed");
         Assert.Equal(2, connected);
         Assert.Equal(2, disconnected);
     }
@@ -246,11 +248,11 @@ public class PeripheralTests : AbstractBleTests
         this.Peripheral!.GetServices().Subscribe(_ => count++);
 
         await this.Peripheral!.WithConnectIf().ToTask();
-        await UserDialogs.Instance.AlertAsync("Now turn peripheral off & press OK");
+        await this.Alert("Now turn peripheral off & press OK");
         var origCount = count;
         count = 0;
 
-        await UserDialogs.Instance.AlertAsync("Now turn peripheral back on & press OK when light turns green");
+        await this.Alert("Now turn peripheral back on & press OK when light turns green");
         await Task.Delay(5000);
         Assert.Equal(count, origCount);
     }

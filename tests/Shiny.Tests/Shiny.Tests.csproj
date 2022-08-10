@@ -57,11 +57,11 @@
         <!--<ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" />-->
         <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
+        <!--<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />-->
+        <!--<ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />-->
+        <!--<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />-->
+        <!--<ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />-->
+        <!--<ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
@@ -70,7 +70,7 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.2" />
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.7" />
+        <!--<PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.7" />-->
     </ItemGroup>
 
     <!--
@@ -93,4 +93,11 @@
         </GoogleServicesJson>
     </ItemGroup>
     -->
+    <ItemGroup>
+        <Compile Remove="Push\AbstractPushTests.cs" />
+        <Compile Remove="Push\TestGoogleCredential.cs" />
+        <Compile Remove="Push\FirebaseTests.cs" />
+        <Compile Remove="Push\AppleNativeTests.cs" />
+        <Compile Remove="Push\AzureNotificationHubTests.cs" />
+    </ItemGroup>
 </Project>
