@@ -57,7 +57,7 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
-        await this.AssertReady();
+        (await this.RequestAccess(false, true)).Assert();
 
         var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
         {
@@ -80,19 +80,13 @@ public partial class BleHostingManager : IBleHostingManager
     }
 
 
-    public Task<AccessState> RequestAccess(bool advertise = true, bool connect = true)
-        => Task.FromResult(this.Status);
-
-
-
-
     public bool IsAdvertising => this.Manager.Advertising;
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
+        (await this.RequestAccess(true, false)).Assert();
+
         if (this.Manager.Advertising)
             throw new InvalidOperationException("Advertising is already active");
-
-        await this.AssertReady();
 
         options ??= new AdvertisementOptions();
         var tcs = new TaskCompletionSource<bool>();
@@ -138,7 +132,7 @@ public partial class BleHostingManager : IBleHostingManager
         // TODO: not sure about this
         //if (AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13) && !primary)
         //    throw new InvalidOperationException("You must specify your service as primary when using bg BLE");
-        await this.AssertReady();
+        (await this.RequestAccess(false, true)).Assert();
 
         var service = new GattService(this.Manager, uuid, primary);
         serviceBuilder(service);
@@ -203,19 +197,30 @@ public partial class BleHostingManager : IBleHostingManager
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
 
 
-    async Task AssertReady()
+    public async Task<AccessState> RequestAccess(bool advertise = true, bool connect = true)
     {
-        if (this.Status != AccessState.Unknown && this.Status != AccessState.Available)
-            throw new InvalidOperationException("Invalid Status: " + this.Status);
-
-        await this.Manager
-            .WhenReady()
-            .Timeout(TimeSpan.FromSeconds(10))
-            .ToTask();
+        var status = ToStatus(this.Manager.State);
+        if (status == AccessState.Unknown)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var handler = new EventHandler((sender, args) =>
+            {
+                if (this.Manager.State != CBManagerState.Unknown)
+                {
+                    status = ToStatus(this.Manager.State);
+                    tcs.SetResult(true);
+                }
+            });
+            // this should not hang...
+            this.Manager.StateUpdated += handler;
+            await tcs.Task.ConfigureAwait(false);
+            this.Manager.StateUpdated -= handler;
+        }
+        return status;
     }
 
 
-    AccessState Status => this.Manager.State switch
+    static AccessState ToStatus(CBManagerState state) => state switch
     {
         CBManagerState.PoweredOff => AccessState.Disabled,
         CBManagerState.Unauthorized => AccessState.Denied,
