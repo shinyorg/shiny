@@ -20,11 +20,7 @@ public class Host : IHost
 
             return currentHost;
         }
-        private set
-        {
-            ArgumentNullException.ThrowIfNull(value);
-            currentHost = value;
-        }
+        private set => currentHost = value ?? throw new ArgumentException(nameof(value));
     }
 
     public static bool IsInitialized => currentHost != null;

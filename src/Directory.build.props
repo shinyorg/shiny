@@ -17,7 +17,7 @@
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
-        <AndroidTargetFramework>monoandroid12.0</AndroidTargetFramework>
+        <ClassicAndroidTargetFramework>monoandroid12.0</ClassicAndroidTargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
@@ -33,35 +33,43 @@
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
-        <IsStandardBuild>true</IsStandardBuild>
+    <PropertyGroup Condition="$(TargetFramework.Contains('netstandard'))">
+        <IsClassicTarget>true</IsClassicTarget>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
+    <PropertyGroup Condition="$(TargetFramework.Contains('xamarin.ios'))">
+        <IsAppleBuild>true</IsAppleBuild>
+        <IsClassicTarget>true</IsClassicTarget>
+        <DefineConstants>$(DefineConstants);APPLE;PLATFORM;XAMARIN</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('monoandroid'))">
+        <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
+        <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
+        <IsAndroidBuild>true</IsAndroidBuild>
+        <IsClassicTarget>true</IsClassicTarget>
+        <DefineConstants>$(DefineConstants);ANDROID;PLATFORM;XAMARIN</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>31.0</TargetPlatformMinVersion>
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
         <IsAndroidBuild>true</IsAndroidBuild>
-        <IsPlatform>true</IsPlatform>
+        <DefineConstants>$(DefineConstants);ANDROID;PLATFORM</DefineConstants>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-        <IsIosBuild>true</IsIosBuild>
-        <IsPlatform>true</IsPlatform>
-        <DefineConstants>$(DefineConstants);APPLE</DefineConstants>
+        <IsAppleBuild>true</IsAppleBuild>
+        <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
-        <IsPlatform>true</IsPlatform>
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
-        <IsIosBuild>true</IsIosBuild>
-        <DefineConstants>$(DefineConstants);APPLE</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(IsPlatform)' == 'true'">
-        <DefineConstants>$(DefineConstants);PLATFORM</DefineConstants>
+        <IsAppleBuild>true</IsAppleBuild>
+        <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 </Project>
