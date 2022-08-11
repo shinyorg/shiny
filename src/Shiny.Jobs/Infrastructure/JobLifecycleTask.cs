@@ -1,4 +1,4 @@
-﻿#if ANDROID || IOS || MACCATALYST
+﻿#if PLATFORM
 using System;
 using System.Linq;
 using System.Timers;

@@ -6,12 +6,12 @@ namespace Shiny;
 #if ANDROID
 public partial class ShinyLifecycleTask : IAndroidLifecycle.IApplicationLifecycle, IShinyStartupTask { }
 
-#elif IOS || MACCATALYST
+#elif APPLE
 public partial class ShinyLifecycleTask : IIosLifecycle.IApplicationLifecycle, IShinyStartupTask { }
 
 #endif
 
-#if IOS || MACCATALYST || ANDROID
+#if PLATFORM
 public partial class ShinyLifecycleTask
 {
     public virtual void Start() { }
