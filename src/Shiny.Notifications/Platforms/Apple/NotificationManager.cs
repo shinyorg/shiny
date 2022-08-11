@@ -235,7 +235,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 #if IOS
                     var is12 = OperatingSystem.IsIOSVersionAtLeast(12);
 #elif MACCATALYST
-                    var is12 = OperatingSystem.IsMacOSVersionAtLeast(12);
+                    var is12 = OperatingSystem.IsMacCatalystVersionAtLeast(12);
 #endif
 
                     native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
