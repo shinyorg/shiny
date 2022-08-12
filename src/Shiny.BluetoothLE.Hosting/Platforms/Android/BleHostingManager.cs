@@ -74,14 +74,14 @@ public partial class BleHostingManager : IBleHostingManager
         if (!advertise && !connect)
             throw new ArgumentException("You must request at least 1 permission");
 
-        if (!OperatingSystem.IsAndroidVersionAtLeast(23))
+        if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
             return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
 
         var current = this.context.Manager.GetAccessState();
         if (current != AccessState.Available && current != AccessState.Unknown)
             return current;
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             var perms = new List<string>();
             if (advertise)

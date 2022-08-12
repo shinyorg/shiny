@@ -36,7 +36,8 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddBeaconMonitoring(this IServiceCollection services, Type delegateType)
     {
-        ArgumentNullException.ThrowIfNull(delegateType, "You can't register monitoring regions without a delegate type");
+        if (delegateType == null)
+            throw new ArgumentNullException(nameof(delegateType), "You can't register monitoring regions without a delegate type");
 
 #if ANDROID
         services.TryAddSingleton<BackgroundTask>();

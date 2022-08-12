@@ -93,7 +93,7 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     {
         //ActionServiceStart
         var intent = new Intent(this.AppContext, serviceType);
-        if (OperatingSystem.IsAndroidVersionAtLeast(26) && this.IsShinyForegroundService(serviceType))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(26) && this.IsShinyForegroundService(serviceType))
         {
             intent.SetAction(ActionServiceStart);
             this.AppContext.StartForegroundService(intent);

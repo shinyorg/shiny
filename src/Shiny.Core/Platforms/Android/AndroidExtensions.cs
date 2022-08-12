@@ -32,7 +32,7 @@ public static class AndroidExtensions
 
     public static PendingIntentFlags GetPendingIntentFlags(this AndroidPlatform platform, PendingIntentFlags flags)
     {
-        if (OperatingSystem.IsAndroidVersionAtLeast(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
             flags |= PendingIntentFlags.Mutable;
 
         return flags;

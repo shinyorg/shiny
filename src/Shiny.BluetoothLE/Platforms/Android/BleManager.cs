@@ -54,7 +54,7 @@ public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
     {
         var list = new List<string>();
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             list.AddRange(new[] {
                 Manifest.Permission.BluetoothScan,

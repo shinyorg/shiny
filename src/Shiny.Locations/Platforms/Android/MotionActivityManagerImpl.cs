@@ -117,7 +117,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
     {
         var result = AccessState.Available;
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(29))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
         {
             result = await this.platform
                 .RequestAccess(Permission.ActivityRecognition)

@@ -90,7 +90,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
 #if ANDROID
         await this.platform.RequestLocationAccess(LocationPermissionType.Fine);
-        if ((access == AccessState.Available && access == AccessState.Restricted) && OperatingSystem.IsAndroidVersionAtLeast(26))
+        if ((access == AccessState.Available && access == AccessState.Restricted) && OperatingSystemShim.IsAndroidVersionAtLeast(26))
         {
             access = await this.platform
                 .RequestAccess(Android.Manifest.Permission.ForegroundService)

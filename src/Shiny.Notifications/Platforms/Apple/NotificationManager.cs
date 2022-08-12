@@ -233,9 +233,9 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 case ChannelImportance.Critical:
                 case ChannelImportance.High:
 #if IOS
-                    var is12 = OperatingSystem.IsIOSVersionAtLeast(12);
+                    var is12 = OperatingSystemShim.IsIOSVersionAtLeast(12);
 #elif MACCATALYST
-                    var is12 = OperatingSystem.IsMacCatalystVersionAtLeast(12);
+                    var is12 = OperatingSystemShim.IsMacCatalystVersionAtLeast(12);
 #endif
 
                     native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12

@@ -30,7 +30,8 @@ public record BeaconRegion(
 
         if (this.Minor != null)
         {
-            ArgumentNullException.ThrowIfNull(this.Major, "You must provide a major value if you are setting minor");
+            if (this.Major == null)
+                throw new InvalidOperationException("You must provide a major value if you are setting minor");
 
             if (this.Minor < 1)
                 throw new InvalidOperationException("Invalid Minor Value");

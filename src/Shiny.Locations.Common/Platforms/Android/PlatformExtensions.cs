@@ -23,7 +23,7 @@ public static class PlatformExtensions
     {
         var lm = platform.GetSystemService<LocationManager>(Context.LocationService);
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(28) && !lm.IsLocationEnabled)
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(28) && !lm.IsLocationEnabled)
             return false;
 
         if (networkRequired && !lm.IsProviderEnabled(LocationManager.NetworkProvider))
@@ -59,7 +59,7 @@ public static class PlatformExtensions
         platform.AssertBackgroundInManifest();
 
         AccessState status;
-        if (OperatingSystem.IsMacCatalystVersionAtLeast(30))
+        if (OperatingSystemShim.IsMacCatalystVersionAtLeast(30))
         {
             // Android 11+ need to request background separately
             // Android 12+ user can decline fine, but allow coarse
@@ -70,7 +70,7 @@ public static class PlatformExtensions
                 status = bg == AccessState.Available ? status : AccessState.Restricted;
             }
         }
-        else if (OperatingSystem.IsMacCatalystVersionAtLeast(29))
+        else if (OperatingSystemShim.IsMacCatalystVersionAtLeast(29))
         {
             // Android 10: Request BG permission with other permissions
             var perms = new List<string> { P.AccessBackgroundLocation, P.AccessCoarseLocation };
@@ -95,7 +95,7 @@ public static class PlatformExtensions
 
     static void AssertBackgroundInManifest(this AndroidPlatform platform)
     {
-        if (OperatingSystem.IsAndroidVersionAtLeast(29) && !platform.IsInManifest(P.AccessBackgroundLocation))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(29) && !platform.IsInManifest(P.AccessBackgroundLocation))
             throw new ArgumentException($"{P.AccessBackgroundLocation} is not in your manifest but is required");
     }
 
