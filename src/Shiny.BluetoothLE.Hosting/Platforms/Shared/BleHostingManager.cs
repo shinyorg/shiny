@@ -1,10 +1,8 @@
-﻿#if ANDROID || IOS || MACCATALYST
+﻿#if PLATFORM
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
@@ -84,8 +82,11 @@ public partial class BleHostingManager : IShinyStartupTask
 
     public void DetachRegisteredServices()
     {
+        if (!this.IsRegisteredServicesAttached)
+            return;
+
         this.IsRegisteredServicesAttached = false;
-        foreach (var serviceUuid in this.gattServices.Keys)
+        foreach (var serviceUuid in this.gattServices!.Keys)
         {
             this.RemoveService(serviceUuid);
         }
@@ -197,6 +198,6 @@ public partial class BleHostingManager : IShinyStartupTask
             services[attr.ServiceUuid].Add((ch, attr));
         }
         return services;
-    }    
+    }
 }
 #endif

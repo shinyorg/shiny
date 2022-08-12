@@ -10,9 +10,6 @@
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
         <PackageReference Include="System.Text.Json" />
     </ItemGroup>
 

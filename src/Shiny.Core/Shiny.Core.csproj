@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android;xamarin.ios10;$(ClassicAndroidTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>

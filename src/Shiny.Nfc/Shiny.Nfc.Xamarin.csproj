@@ -1,0 +1,11 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</TargetFrameworks>
+        <Description>Shiny Near Field Communication (NFC)</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.Xamarin.csproj" />
+    </ItemGroup>
+</Project>

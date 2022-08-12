@@ -47,6 +47,7 @@
 
     <ItemGroup Condition="'$(IsClassicTarget)' == 'True'">
         <Compile Include="Platforms\Classic\**\*.cs" />
+        <Compile Include="$(MSBuildThisFileDirectory)IsExternalInit.cs" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">

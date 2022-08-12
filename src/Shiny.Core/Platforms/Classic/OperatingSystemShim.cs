@@ -1,10 +1,13 @@
 ﻿namespace System;
 
-public static class OperatingSystem
+public static class OperatingSystemShim
 {
     public static bool IsAndroidVersionAtLeast(int apiLevel)
     {
-#if MONOANDROID
+#if NET6
+        //return OperatingSystem.
+        return false;
+#elif MONOANDROID
         return (int)Android.OS.Build.VERSION.SdkInt >= apiLevel;
 #else
         return false;

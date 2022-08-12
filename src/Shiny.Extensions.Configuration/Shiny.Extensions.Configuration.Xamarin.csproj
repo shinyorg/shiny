@@ -1,0 +1,18 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</TargetFrameworks>
+        <Description>Xamarin Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
+	</PropertyGroup>
+
+    <ItemGroup>
+        <None Include="Platforms\**\*.cs" />
+		<Compile Remove="Platforms\**\*.cs" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
+		<PackageReference Include="Xamarin.AndroidX.Preference" />
+    </ItemGroup>
+</Project>

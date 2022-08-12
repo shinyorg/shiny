@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</TargetFrameworks>
         <Description>Shiny background jobs module</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.Xamarin.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">

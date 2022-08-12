@@ -40,7 +40,7 @@
     <PropertyGroup Condition="$(TargetFramework.Contains('xamarin.ios'))">
         <IsAppleBuild>true</IsAppleBuild>
         <IsClassicTarget>true</IsClassicTarget>
-        <DefineConstants>$(DefineConstants);APPLE;PLATFORM;XAMARIN</DefineConstants>
+        <DefineConstants>$(DefineConstants);IOS;APPLE;PLATFORM;XAMARIN</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('monoandroid'))">
@@ -62,14 +62,14 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-        <IsAppleBuild>true</IsAppleBuild>
+        <IsIosBuild>true</IsIosBuild>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
-        <IsAppleBuild>true</IsAppleBuild>
+        <IsIosBuild>true</IsIosBuild>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 </Project>
