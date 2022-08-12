@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="3.0.44" Condition="'$(CompileClassic)' == 'true'" />
+    <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 
     <PropertyGroup>
         <TargetFrameworks>net6.0;net6.0-ios;net6.0-android</TargetFrameworks>
-        <TargetFrameworks Condition="'$(CompileClassic)' == 'true'">$(TargetFrameworks);netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</TargetFrameworks>
+        <TargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(TargetFrameworks);$(ClassicTargets)</TargetFrameworks>
         <Description>Shiny Near Field Communication (NFC)</Description>
     </PropertyGroup>
 
@@ -11,5 +11,5 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-    <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="3.0.44" Condition="'$(CompileClassic)' == 'true'" />
+    <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

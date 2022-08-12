@@ -17,8 +17,33 @@
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
-        <CompileClassic Condition="$([MSBuild]::IsOSPlatform('windows'))">true</CompileClassic>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!--
+        To compile classic targets on Mac:
+            1. UseMSBuild = true
+            2. Comment out net6 related from DefaultTargetFrameworks
+            3. You may need to enable msbuild
+
+        To compile modern targets on Mac:
+            1. UseMSBuild = false
+            2. Leave only net6.0 related targets
+            3. You may need to disable msbuild
+
+        To compile everything on Windows
+            1. UseMSBuild = true
+            2. Set all DefaultTargetFrameworks
+        -->
+
+        <!--what about nfc & configuration-->
+        <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">false</UseMSBuild>
         <ClassicAndroidTargetFramework>monoandroid12.0</ClassicAndroidTargetFramework>
+        <ClassicTargets>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</ClassicTargets>
+        <DefaultTargetFrameworks>$(DefaultTargetFrameworks);net6.0;net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</DefaultTargetFrameworks>
+        <DefaultTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(DefaultTargetFrameworks);$(ClassicTargets)</DefaultTargetFrameworks>
+
+        <MSBuildSdkExtrasVersion>3.0.44</MSBuildSdkExtrasVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
