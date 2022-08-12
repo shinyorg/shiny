@@ -1,7 +1,0 @@
-<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</TargetFrameworks>
-        <RootNamespace>Shiny</RootNamespace>
-    </PropertyGroup>
-
-</Project>
