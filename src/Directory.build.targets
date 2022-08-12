@@ -45,7 +45,7 @@
         <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsClassicTarget)' == 'True'">
+    <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
         <Compile Include="Platforms\Classic\**\*.cs" />
         <Compile Include="$(MSBuildThisFileDirectory)IsExternalInit.cs" />
     </ItemGroup>

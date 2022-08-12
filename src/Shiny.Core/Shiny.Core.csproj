@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="3.0.44" Condition="'$(CompileClassic)' == 'true'" />
 
     <PropertyGroup>
         <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
@@ -23,9 +24,5 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="MSBuild.Sdk.Extras" Version="3.0.44" />
-    </ItemGroup>
-
-    <Import Project="$(MSBuildSdkExtrasTargets)" Condition="$([MSBuild]::IsOSPlatform('windows')) AND Exists('$(MSBuildSdkExtraTargets)')" />
+    <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="3.0.44" Condition="'$(CompileClassic)' == 'true'" />
 </Project>
