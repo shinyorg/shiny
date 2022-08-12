@@ -58,7 +58,7 @@
         <PackageReference Include="Xamarin.Build.Download" Version="0.11.3" PrivateAssets="All" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsAppleBuild)' == 'true'">
+    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
         <Compile Include="Platforms\Apple\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />
