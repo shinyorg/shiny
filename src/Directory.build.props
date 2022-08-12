@@ -17,6 +17,7 @@
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+        <CompileClassic Condition="$([MSBuild]::IsOSPlatform('windows'))">true</CompileClassic>
         <ClassicAndroidTargetFramework>monoandroid12.0</ClassicAndroidTargetFramework>
     </PropertyGroup>
 
