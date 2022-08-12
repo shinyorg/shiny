@@ -40,7 +40,7 @@
         <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">false</UseMSBuild>
         <ClassicAndroidTargetFramework>monoandroid12.0</ClassicAndroidTargetFramework>
         <ClassicTargets>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</ClassicTargets>
-        <DefaultTargetFrameworks>$(DefaultTargetFrameworks);net6.0;net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</DefaultTargetFrameworks>
+        <DefaultTargetFrameworks>$(DefaultTargetFrameworks);net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</DefaultTargetFrameworks>
         <DefaultTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(DefaultTargetFrameworks);$(ClassicTargets)</DefaultTargetFrameworks>
 
         <MSBuildSdkExtrasVersion>3.0.44</MSBuildSdkExtrasVersion>
@@ -63,27 +63,28 @@
         <IsClassicTarget>true</IsClassicTarget>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('xamarin.ios'))">
-        <IsIosBuild>true</IsIosBuild>
-        <IsClassicTarget>true</IsClassicTarget>
-        <DefineConstants>$(DefineConstants);IOS;APPLE;PLATFORM;XAMARIN</DefineConstants>
-    </PropertyGroup>
-
     <PropertyGroup Condition="$(TargetFramework.Contains('monoandroid'))">
-        <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
-        <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
         <IsAndroidBuild>true</IsAndroidBuild>
         <IsClassicTarget>true</IsClassicTarget>
-        <DefineConstants>$(DefineConstants);ANDROID;PLATFORM;XAMARIN</DefineConstants>
+        <DefineConstants>$(DefineConstants);XAMARIN</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>31.0</TargetPlatformMinVersion>
+        <IsAndroidBuild>true</IsAndroidBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
-        <IsAndroidBuild>true</IsAndroidBuild>
         <DefineConstants>$(DefineConstants);ANDROID;PLATFORM</DefineConstants>
+    </PropertyGroup>
+
+   <PropertyGroup Condition="$(TargetFramework.Contains('xamarin.ios'))">
+        <IsIosBuild>true</IsIosBuild>
+        <IsClassicTarget>true</IsClassicTarget>
+        <DefineConstants>$(DefineConstants);IOS;APPLE;PLATFORM;XAMARIN</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">

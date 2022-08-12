@@ -46,7 +46,6 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
-        <Compile Include="Platforms\Classic\**\*.cs" />
         <Compile Include="$(MSBuildThisFileDirectory)IsExternalInit.cs" />
     </ItemGroup>
 
