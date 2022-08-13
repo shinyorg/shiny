@@ -5,7 +5,9 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <DisableExtraReferences>False</DisableExtraReferences>
-        <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
+        <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+        <!--<NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>-->
+        <NoWarn>MSB4011</NoWarn>
         <Description>Shiny</Description>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -16,7 +18,6 @@
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -37,7 +38,7 @@
         -->
 
         <!--what about nfc & configuration-->
-        <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">false</UseMSBuild>
+        <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>
         <ClassicAndroidTargetFramework>monoandroid12.0</ClassicAndroidTargetFramework>
         <ClassicTargets>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</ClassicTargets>
         <DefaultTargetFrameworks>$(DefaultTargetFrameworks);net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</DefaultTargetFrameworks>
