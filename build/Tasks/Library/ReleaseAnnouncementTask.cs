@@ -21,7 +21,9 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
     public override Task RunAsync(BuildContext context)
     {
-        var message = GetMessage(context);
+        var link = GetLink(context);
+        var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - {link}";
+
         return Task.WhenAll(
             this.Twitter(context, message),
             this.Discord(context, message)
@@ -29,7 +31,7 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
     }
 
 
-    static string GetMessage(BuildContext context)
+    static string GetLink(BuildContext context)
     {
         if (!context.IsReleaseBranch)
             return $"{DocLink}vnext.html";
