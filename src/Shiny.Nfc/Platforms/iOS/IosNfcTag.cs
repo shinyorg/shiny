@@ -27,11 +27,19 @@ public class IosNfcTag : INfcTag
         {
             this.identifier ??= this.nativeTag.Type switch
             {
+#if XAMARIN
+                NFCTagType.FeliCa => this.nativeTag.GetNFCFeliCaTag()!.CurrentIdm.ToArray(),
+                NFCTagType.Iso15693 => this.nativeTag.GetNFCIso15693Tag()!.Identifier.ToArray(),
+                NFCTagType.Iso7816Compatible => this.nativeTag.GetNFCIso7816Tag()!.Identifier.ToArray(),
+                NFCTagType.MiFare => this.nativeTag.GetNFCMiFareTag()!.Identifier.ToArray(),
+                _ => throw new InvalidProgramException("Invalid tag type")
+#else
                 NFCTagType.FeliCa => this.nativeTag.AsNFCFeliCaTag!.CurrentIdm.ToArray(),
                 NFCTagType.Iso15693 => this.nativeTag.AsNFCIso15693Tag!.Identifier.ToArray(),
                 NFCTagType.Iso7816Compatible => this.nativeTag.AsNFCIso7816Tag!.Identifier.ToArray(),
                 NFCTagType.MiFare => this.nativeTag.AsNFCMiFareTag!.Identifier.ToArray(),
                 _ => throw new InvalidProgramException("Invalid tag type")
+#endif
             };
             return this.identifier!;
         }
