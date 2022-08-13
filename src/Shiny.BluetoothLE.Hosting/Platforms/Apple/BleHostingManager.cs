@@ -205,11 +205,9 @@ public partial class BleHostingManager : IBleHostingManager
             var tcs = new TaskCompletionSource<bool>();
             var handler = new EventHandler((sender, args) =>
             {
-                if (this.Manager.State != CBManagerState.Unknown)
-                {
-                    status = ToStatus(this.Manager.State);
-                    tcs.SetResult(true);
-                }
+                status = ToStatus(this.Manager.State);
+                if (status != AccessState.Unknown)
+                    tcs.TrySetResult(true);
             });
             // this should not hang...
             this.Manager.StateUpdated += handler;
@@ -219,7 +217,18 @@ public partial class BleHostingManager : IBleHostingManager
         return status;
     }
 
+#if XAMARIN
+    static AccessState ToStatus(CBPeripheralManagerState state) => state switch
+    {
+        CBPeripheralManagerState.PoweredOff => AccessState.Disabled,
+        CBPeripheralManagerState.Unauthorized => AccessState.Denied,
+        CBPeripheralManagerState.Unsupported => AccessState.NotSupported,
+        CBPeripheralManagerState.PoweredOn => AccessState.Available,
+        //  CBPeripheralManagerState.Resetting, Unknown
+        _ => AccessState.Unknown
+    };
 
+#else
     static AccessState ToStatus(CBManagerState state) => state switch
     {
         CBManagerState.PoweredOff => AccessState.Disabled,
@@ -229,4 +238,5 @@ public partial class BleHostingManager : IBleHostingManager
         //  CBPeripheralManagerState.Resetting, Unknown
         _ => AccessState.Unknown
     };
+#endif
 }
