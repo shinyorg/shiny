@@ -24,7 +24,7 @@ public class BleManager : AbstractBleManager
     public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
     {
         IDisposable? disp = null;
-        if (this.context.Manager.State == CBManagerState.Unknown)
+        if (this.context.Manager.State.IsUnknown())
         {
             disp = this.context
                 .StateUpdated
