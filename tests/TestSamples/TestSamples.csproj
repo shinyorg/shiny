@@ -35,7 +35,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
-        <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.254-beta" />
+        <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
@@ -66,7 +66,7 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.1" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4" />
-        <!--<PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1.2" />-->
+        <!--<PackageReference Include="Xamarin.GooglePlayServices.Location" Version="120.0.0" />-->
         <!--<PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.7" />-->
     </ItemGroup>
 

@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="119.0.1.2" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="120.0.0" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.1" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.5.1" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1" />

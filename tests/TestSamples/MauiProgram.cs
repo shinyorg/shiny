@@ -11,7 +11,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseShiny()
-            .UsePrismApp<App>(
+            .UsePrism(
                 new DryIocContainerExtension(),
                 prism => prism
                     .RegisterTypes(registry =>
