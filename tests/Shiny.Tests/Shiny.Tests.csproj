@@ -67,7 +67,7 @@
         <!--<ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />-->
         <!--<ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />-->
     </ItemGroup>
-
+    
     <ItemGroup>
         <Compile Remove="Push\AbstractPushTests.cs" />
         <Compile Remove="Push\TestGoogleCredential.cs" />
