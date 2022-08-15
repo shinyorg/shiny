@@ -60,8 +60,7 @@ namespace Shiny.BluetoothLE
             {
                 list.AddRange(new [] {
                     Manifest.Permission.BluetoothScan,
-                    Manifest.Permission.BluetoothConnect,
-                    Manifest.Permission.BluetoothAdmin
+                    Manifest.Permission.BluetoothConnect
                 });
             }
             else
