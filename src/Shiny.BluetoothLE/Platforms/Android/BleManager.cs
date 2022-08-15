@@ -66,6 +66,7 @@ public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
             list.AddRange(new[] {
                 Manifest.Permission.Bluetooth,
                 Manifest.Permission.BluetoothPrivileged,
+                Manifest.Permission.BluetoothAdmin,
                 Manifest.Permission.AccessFineLocation
             });
         }
