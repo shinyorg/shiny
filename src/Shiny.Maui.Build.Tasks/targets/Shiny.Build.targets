@@ -1,0 +1,75 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+	<PropertyGroup>
+		<_ShinyTaskAssemblyName>$(MSBuildThisFileDirectory)Shiny.Build.dll</_ShinyTaskAssemblyName>
+		<_ShinyPlatformIdentifier>$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))</_ShinyPlatformIdentifier>
+		<_ShinyIsIos Condition="'$(_ShinyPlatformIdentifier)' == 'ios'">True</_ShinyIsIos>
+		<_ShinyIsMac Condition="'$(_ShinyPlatformIdentifier)' == 'maccatalyst'">True</_ShinyIsMac>
+		<_ShinyIsAndroid Condition="'$(_ShinyPlatformIdentifier)' == 'android'">True</_ShinyIsAndroid>
+	</PropertyGroup>
+
+	<UsingTask
+        AssemblyFile="$(_ShinyTaskAssemblyName)"
+        TaskName="Shiny.Build.ValidatePermissionsTask" />
+
+	<UsingTask
+        AssemblyFile="$(_ShinyTaskAssemblyName)"
+        TaskName="Shiny.Build.ApplePermissionsTask" />
+
+	<UsingTask
+        AssemblyFile="$(_ShinyTaskAssemblyName)"
+        TaskName="Shiny.Build.AndroidPermissionsTask" />
+
+	<Target Name="_ValidateShinyPermissions">
+		<ValidatePermissionsTask Permissions="@(ShinyPermissions)" />
+	</Target>
+
+	<Target Name="_ProcessShinyPermissionsIos"
+			DependsOnTargets="_ValidateShinyPermissions"
+			BeforeTargets="_DetectAppManifest"
+			Condition="'$(_ShinyIsIos)' == 'true' OR '$(_ShinyIsMac)' == 'true'">
+
+		<PropertyGroup>
+			<_ShinyIntermediateOutputPath>$(IntermediateOutputPath)shiny\</_ShinyIntermediateOutputPath>
+		</PropertyGroup>
+
+		<ApplePermissionsTask
+            IntermediateOutputPath="$(_ShinyIntermediateOutputPath)"
+            InfoPlistOutputFile="ShinyInfo.plist"
+			Permissions="@(ShinyPermission)"
+		/>
+
+		<ItemGroup>
+			<PartialAppManifest Include="$(_ShinyIntermediateOutputPath)ShinyInfo.plist" />
+			<!--<ShinyPermission Remove="@(ShinyPermission)" Exclude="@(ShinyPermission)" />-->
+		</ItemGroup>
+    </Target>
+
+	<Target Name="_ProcessShinyPermissionsAndroid"
+			DependsOnTargets="_ValidateShinyPermissions"
+			BeforeTargets="_ComputeAndroidResourcePaths"
+			Condition="'$(_ShinyIsAndroid)' == 'true'">
+
+		<PropertyGroup>
+			<_ShinyIntermediateOutputPath>$(IntermediateOutputPath)shiny\</_ShinyIntermediateOutputPath>
+		</PropertyGroup>
+
+		<AndroidPermissionsTask
+			ManifestOutputFile="AndroidManifest.cs"
+			Permissions="@(ShinyPermission)"
+			IntermediateOutputPath="$(_ShinyIntermediateOutputPath)"
+		/>
+		<ItemGroup>
+			<Compile Include="$(_ShinyIntermediateOutputPath)AndroidManifest.cs" />
+			<!--<ShinyPermission Remove="@(ShinyPermission)" Exclude="@(ShinyPermission)" />-->
+		</ItemGroup>
+	</Target>
+
+<!--	<Target Name="_RemoveShinyPermissions" AfterTargets="AfterBuild">
+		<ItemGroup>
+			<ShinyPermission Remove="@(ShinyPermission)" />
+			<None Remove="@(ShinyPermission)" />
+        </ItemGroup>
+    </Target>-->
+</Project>

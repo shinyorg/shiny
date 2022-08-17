@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>10.0</LangVersion>
+		<IsPackable>false</IsPackable>
+		<!--<PackageId>Microsoft.Maui.Resizetizer.Sdk</PackageId>-->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Build.Framework" Version="17.2.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.2.0" PrivateAssets="all" />
+		<PackageReference Include="System.Text.Json" Version="6.0.5" />
+	</ItemGroup>
+
+	<Target Name="_CopyToSampeDir" AfterTargets="Build">
+		<ItemGroup>
+			<_CopyItems Include="$(TargetDir)**\*.dll" Exclude="$(TargetDir)System.*.dll" />
+			<!--
+			<_CopyItems Include="$(TargetDir)**\*.so" />
+			<_CopyItems Include="$(TargetDir)**\*.dylib" />
+			-->
+		</ItemGroup>
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ProjectDir)targets" ContinueOnError="true" Retries="0" />
+	</Target>
+	<!--
+	<ItemGroup>
+		<None Include="@(_ResizetizerFiles)" Visible="false" Pack="true" PackagePath="build/%(Arch)" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="$(OutputPath)$(AssemblyName).dll" Visible="false" Pack="true" PackagePath="build" />
+		<None Include="$(OutputPath)$(AssemblyName).pdb" Visible="false" Pack="true" PackagePath="build" />
+		<None Include="$(MauiNuSpecDirectory)Microsoft.Maui.Resizetizer.targets" Visible="false" Pack="true" PackagePath="build/$(PackageId).targets" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	-->
+	<ItemGroup>
+		<EmbeddedResource Include="Permissions.json" />
+	</ItemGroup>
+</Project>

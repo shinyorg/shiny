@@ -1,0 +1,165 @@
+﻿{
+  "Battery": {
+    "AndroidManifest": [
+      "BATTERY_STATS"
+    ]
+  },
+  "CalendarWrite": {
+    "AndroidManifest": [
+      "WRITE_CALENDAR"
+    ]
+  },
+  "CalendarRead": {
+    "AndroidManifest": [
+      "READ_CALENDAR"
+    ]
+  },
+  "Camera": {
+    "AndroidManifest": [
+      "CAMERA"
+    ]
+  },
+  "ContactsRead": {
+    "AndroidManifest": [
+      "READ_CONTACTS"
+    ]
+  },
+  "ContactWrite": {
+    "AndroidManifest": [
+      "WRITE_CONTACTS"
+    ]
+  },
+  "Flashlight": {
+    "AndroidManifest": [
+      "CAMERA",
+      "FLASHLIGHT"
+    ]
+  },
+  "Microphone": {
+    "AndroidManifest": [
+      "RECORD_AUDIO"
+    ]
+  },
+  "Push": {
+    "Ios": {
+      "Entitlements": [
+        "aps-environment"
+      ],
+      "BackgroundModes": [
+        "remote-notification"
+      ]
+    }
+  },
+  "Jobs": {
+    "iOS": {
+      "BackgroundModes": [
+        "fetch",
+        "processing"
+      ]
+    }
+  },
+  "BleHosting": {
+    "AndroidManifest": [
+      "BLUETOOTH_ADVERTISE"
+    ]
+  },
+  "BluetoothLE": {
+    "AndroidManifest": [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "BLUETOOTH",
+      "BLUETOOTH_ADMIN",
+      "BLUETOOTH_PRIVILEGED",
+      "BLUETOOTH_SCAN",
+      "BLUETOOTH_CONNECT"
+    ],
+    "iOS": {
+      "Info": [
+        "NSBluetoothPeripheralUsageDescription",
+        "NSBluetoothAlwaysUsageDescription"
+      ]
+    }
+  },
+  "BeaconMonitoring": {
+    "AndroidManifest": [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "BLUETOOTH",
+      "BLUETOOTH_ADMIN",
+      "BLUETOOTH_PRIVILEGED",
+      "BLUETOOTH_SCAN",
+      "BLUETOOTH_CONNECT",
+      "FOREGROUND_SERVICE"
+    ],
+    "iOS": {
+      "Info": [
+        "NSLocationAlwaysAndWhenInUseUsageDescription",
+        "NSLocationWhenInUseUsageDescription"
+      ],
+      "BackgroundModes": [
+        "location"
+      ]
+    }
+  },
+  "BeaconRanging": {
+    "AndroidManifest": [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "BLUETOOTH",
+      "BLUETOOTH_ADMIN",
+      "BLUETOOTH_PRIVILEGED",
+      "BLUETOOTH_SCAN",
+      "BLUETOOTH_CONNECT"
+    ],
+    "iOS": {
+      "Info": [
+        "NSLocationAlwaysAndWhenInUseUsageDescription",
+        "NSLocationWhenInUseUsageDescription"
+      ]
+    }
+  },
+  "LocationInUse": {
+    "AndroidManifest": [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION"
+    ],
+    "Ios": {
+      "Info": [
+        "NSLocationAlwaysAndWhenInUseUsageDescription",
+        "NSLocationWhenInUseUsageDescription"
+      ]
+    }
+  },
+  "LocationAlways": {
+    "AndroidManifest": [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "ACCESS_BACKGROUND_LOCATION",
+      "FOREGROUND_SERVICE"
+    ],
+    "iOS": {
+      "Info": [
+        "NSLocationAlwaysAndWhenInUseUsageDescription",
+        "NSLocationWhenInUseUsageDescription"
+      ],
+      "BackgroundModes": [
+        "location"
+      ]
+    }
+  },
+  "MotionActivity": {
+    "AndroidManifest": [
+      "ACTIVITY_RECOGNITION"
+    ],
+    "iOS": {
+      "Info": [
+        "NSMotionUsageDescription"
+      ]
+    }
+  },
+  "Notifications": {
+    "AndroidManifest": [
+      "SCHEDULE_EXACT_ALARM"
+    ]
+  }
+}

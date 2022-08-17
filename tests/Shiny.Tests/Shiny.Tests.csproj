@@ -75,4 +75,10 @@
         <Compile Remove="Push\AppleNativeTests.cs" />
         <Compile Remove="Push\AzureNotificationHubTests.cs" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="BuildTasks\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="BuildTasks\" />
+    </ItemGroup>
 </Project>
