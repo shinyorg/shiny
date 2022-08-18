@@ -6,8 +6,23 @@
         <SingleProject>true</SingleProject>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
+<!--
+    <ItemGroup>
+        <None Include="targets\shiny.targets" PackagePath="buildTransitive\netstandard2.0" Pack="true" />
+        <None Include="targets\shiny.props" PackagePath="buildTransitive\netstandard2.0" Pack="true" />
+        <None Include="targets\shiny.targets" PackagePath="build\netstandard2.0" Pack="true" />
+    </ItemGroup>
+-->
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
+
+<!--
+    <Target Name="BundleBuildTasks" BeforeTargets="Pack;_LoadPackInputItems">
+        <ItemGroup>
+            <None Include="..\Shiny.Maui.Build.Tasks\bin\$(Configuration)\**\Shiny.Maui.Build.Tasks.dll" Pack="true" PackagePath="analyzers\dotnet\cs\Shiny.Maui.Build.Tasks.dll" Visible="false" />
+        </ItemGroup>
+    </Target>
+-->
 </Project>
