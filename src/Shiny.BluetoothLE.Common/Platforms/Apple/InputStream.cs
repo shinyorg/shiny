@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Foundation;
 
 namespace Shiny.BluetoothLE;
@@ -14,15 +16,32 @@ public class InputStream : System.IO.Stream
 
     public override void Flush()
         => throw new NotSupportedException();
-    
 
-    public override int Read(byte[] buffer, int offset, int count)
+
+    public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        if (offset != 0)
-            throw new NotSupportedException();
-
-        return (int)this.stream!.Read(buffer, (nuint)count);
+        await this.WaitForBytesAvailable(cancellationToken).ConfigureAwait(false);
+        var read = (int)this.stream.Read(buffer, offset, (nuint)count);
+        return read;
     }
+
+
+    public async Task WaitForBytesAvailable(CancellationToken cancellationToken)
+    {
+        if (this.stream.HasBytesAvailable())
+            return;
+
+        await this.stream
+            .WaitForEvent(
+                NSStreamEvent.HasBytesAvailable,
+                cancellationToken
+            )
+            .ConfigureAwait(false);
+    }
+
+    
+    public override int Read(byte[] buffer, int offset, int count)
+        => (int)this.stream!.Read(buffer, offset, (nuint)count);
 
     public override long Seek(long offset, System.IO.SeekOrigin origin)
         => throw new NotSupportedException();

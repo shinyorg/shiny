@@ -3,6 +3,8 @@ using CoreVideo;
 using Foundation;
 using ObjCRuntime;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Shiny.BluetoothLE;
 
@@ -31,11 +33,56 @@ public class OutputStream : System.IO.Stream
     public override void SetLength(long value)
         => throw new NotSupportedException();
 
+
+    public async Task WaitForSpaceAvailable(CancellationToken cancellationToken)
+    {
+        if (this.stream.HasSpaceAvailable())
+            return;
+
+        await this.stream
+            .WaitForEvent(
+                NSStreamEvent.HasSpaceAvailable,
+                cancellationToken
+            )
+            .ConfigureAwait(false);
+    }
+
+
+    public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+    {
+        await this.WaitForSpaceAvailable(cancellationToken).ConfigureAwait(false);
+        var stillToSend = new byte[buffer.Length - offset];
+        this.buffer.CopyTo(stillToSend, offset);
+
+        while (count > 0 && !cancellationToken.IsCancellationRequested)
+        {
+            await this.WaitForSpaceAvailable(cancellationToken).ConfigureAwait(false);
+            var bytesWritten = this.stream.Write(buffer, offset, (uint)count);
+
+            if (bytesWritten == -1)
+            {
+                throw new InvalidOperationException("Write error: -1 returned");
+            }
+            else if (bytesWritten > 0)
+            {
+                Console.WriteLine("Bytes written: " + bytesWritten.ToString());
+                count -= (int)bytesWritten;
+                if (0 == count)
+                    break;
+
+                var temp = new List<byte>();
+                for (var i = bytesWritten; i < stillToSend.Length; i++)
+                {
+                    temp.Add(stillToSend[i]);
+                }
+                stillToSend = temp.ToArray();
+            }
+        }
+    }
+
+
     public override void Write(byte[] buffer, int offset, int count)
     {
-        if (offset != 0)
-            throw new NotSupportedException();
-
         var stillToSend = new byte[buffer.Length - offset];
         this.buffer.CopyTo(stillToSend, offset);
 
@@ -43,7 +90,7 @@ public class OutputStream : System.IO.Stream
         {
             if (this.stream.HasSpaceAvailable())
             {
-                var bytesWritten = this.stream.Write(buffer, (uint)count);
+                var bytesWritten = this.stream.Write(buffer, offset, (uint)count);
                 if (bytesWritten == -1)
                 {
                     throw new InvalidOperationException("Write error: -1 returned");

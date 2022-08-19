@@ -20,16 +20,16 @@ public class L2CapTests : AbstractBleTests
         try
         {
             var tcs = new TaskCompletionSource<bool>();
-            instance = await this.HostingManager.OpenL2Cap(false, channel =>
+            instance = await this.HostingManager.OpenL2Cap(false, async channel =>
             {
                 try
                 {
                     var buffer = new byte[8192];
-                    var read = channel.InputStream.Read(buffer);
+                    var read = await channel.InputStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
                     if (read == -1)
                         throw new Exception("No data read");
 
-                    channel.OutputStream.Write(Encoding.UTF8.GetBytes("Hello!"));
+                    await channel.OutputStream.WriteAsync(Encoding.UTF8.GetBytes("Hello!"));
                     tcs.SetResult(true);
                 }
                 catch (Exception ex)
@@ -37,7 +37,7 @@ public class L2CapTests : AbstractBleTests
                     tcs.SetException(ex);
                 }
             });
-            await this.HostingManager.StartAdvertising(new AdvertisementOptions(
+            await this.HostingManager.StartAdvertising(new(
                 "Tests",
                 AD_SERVICE_UUID
             ));
@@ -62,14 +62,16 @@ public class L2CapTests : AbstractBleTests
             var tcs = new TaskCompletionSource<bool>();
 
             var psmValue = await this.IntInput("PSM Value");
-            sub = this.Peripheral!.TryOpenL2CapChannel((ushort)psmValue, false)!.Subscribe(channel =>
+            sub = this.Peripheral!.TryOpenL2CapChannel((ushort)psmValue, false)!.Subscribe(async channel =>
             {
                 try
                 {
-                    channel.OutputStream.Write(Encoding.UTF8.GetBytes("Hello!"));
+                    var bytes = Encoding.UTF8.GetBytes("Hello!");
+                    channel.OutputStream.Write(bytes);
+                    //await channel.OutputStream.WriteAsync(bytes).ConfigureAwait(false);
 
                     var buffer = new byte[8192];
-                    var read = channel.InputStream.Read(buffer, 0, buffer.Length);
+                    var read = await channel.InputStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
                     if (read == -1)
                         throw new Exception("Failed to read");
 
