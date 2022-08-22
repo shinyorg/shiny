@@ -34,6 +34,18 @@ public class BleHostTests : AbstractBleTests
     }
 
 
+    [Fact(DisplayName = "Beacon Advertising")]
+    public async Task BeaconAdvertising()
+    {
+        await this.GetService<IBleHostingManager>().AdvertiseBeacon(
+            Guid.NewGuid(),
+            11,
+            222,
+            -1
+        );
+    }
+
+
     [Fact(DisplayName = "BLE Host - Client Tester")]
     public async Task BleHostClientTester()
     {

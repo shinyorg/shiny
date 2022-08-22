@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.OS;
 using Java.Util;
@@ -150,62 +149,67 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
-        (await this.RequestAccess(true, false)).Assert();
-
-        var adapter = this.context.Platform.GetBluetoothAdapter()!;
-
         options ??= new AdvertisementOptions();
-        var tcs = new TaskCompletionSource<bool>();
-        this.adCallbacks = new AdvertisementCallbacks(
-            () => tcs.SetResult(true),
-            ex => tcs.SetException(ex)
-        );
 
         var settings = new AdvertiseSettings.Builder()!
             .SetAdvertiseMode(AdvertiseMode.Balanced)!
-            .SetConnectable(true);
+            .SetConnectable(true)!;
 
-        var data = new AdvertiseData.Builder();
-        //var data = new AdvertiseData.Builder()
-        //    .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
-        //    .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
-
-        //if (options.ManufacturerData != null)
-        //    data = data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
-
-
-        if (options.LocalName != null)
-            adapter.SetName(options.LocalName); // TODO: verify name length with exception
-
+        var data = new AdvertiseData.Builder()!;
         foreach (var uuid in options.ServiceUuids)
         {
             var nativeUuid = UUID.FromString(uuid);
             var parcel = new ParcelUuid(nativeUuid);
-            data = data.AddServiceUuid(parcel);
+            data = data!.AddServiceUuid(parcel);
         }
 
-        this.context
-            .Manager
-            .Adapter
-            .BluetoothLeAdvertiser
-            .StartAdvertising(
-                settings.Build(),
-                data.Build(),
-                this.adCallbacks
-            );
+        await this.DoAdvertise(settings, data);
 
-        await tcs.Task;
+        if (options.LocalName != null)
+        {
+            var adapter = this.context.Platform.GetBluetoothAdapter()!;
+            adapter.SetName(options.LocalName); // TODO: verify name length with exception
+        }
     }
 
 
     public void StopAdvertising()
     {
-        this.context
-            .Manager
-            .Adapter
-            .BluetoothLeAdvertiser
-            .StopAdvertising(this.adCallbacks);
+        var adapter = this.context.Platform.GetBluetoothAdapter()!;
+        adapter.BluetoothLeAdvertiser!.StopAdvertising(this.adCallbacks);
         this.adCallbacks = null;
+    }
+
+
+    public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
+    {
+        //https://www.pubnub.com/blog/build-android-ibeacon-beacon-emitter/
+        var settings = new AdvertiseSettings.Builder()!
+            .SetAdvertiseMode(AdvertiseMode.LowPower)!
+            .SetTimeout(0)!
+            .SetTxPowerLevel(AdvertiseTx.PowerMedium)!
+            .SetConnectable(false)!;
+
+        var data = new AdvertiseData.Builder()!;
+        //.SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
+
+        var bytes = new List<byte>();
+
+        // beacon identifier
+        bytes.Add(0xBE);
+        bytes.Add(0xAC);
+
+        // beacon data
+        bytes.AddRange(uuid.ToByteArray());
+        bytes.AddRange(BitConverter.GetBytes(major));
+        bytes.AddRange(BitConverter.GetBytes(minor));
+        bytes.Add((byte)(txpower ?? -75));
+
+        // 224 - Google's Manufacturer ID
+        // 79 - Apple's manufacturer ID
+        data.AddManufacturerData(79, bytes.ToArray());
+
+        return this.DoAdvertise(settings, data);
     }
 
 
@@ -216,5 +220,25 @@ public partial class BleHostingManager : IBleHostingManager
 
         this.services.Clear();
         this.context.CloseServer();
+    }
+
+
+    async Task DoAdvertise(AdvertiseSettings.Builder settings, AdvertiseData.Builder data)
+    {
+        (await this.RequestAccess(true, false)).Assert();
+
+        var tcs = new TaskCompletionSource<bool>();
+        this.adCallbacks = new AdvertisementCallbacks(
+            () => tcs.SetResult(true),
+            ex => tcs.SetException(ex)
+        );
+        var adapter = this.context.Platform.GetBluetoothAdapter()!;
+        adapter.BluetoothLeAdvertiser!.StartAdvertising(
+            settings.Build(),
+            data.Build(),
+            this.adCallbacks
+        );
+
+        await tcs.Task.ConfigureAwait(false);
     }
 }

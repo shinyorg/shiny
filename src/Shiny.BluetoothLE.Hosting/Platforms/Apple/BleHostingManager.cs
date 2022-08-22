@@ -6,6 +6,8 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
+using CoreLocation;
+using Microsoft.Extensions.Options;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -81,50 +83,50 @@ public partial class BleHostingManager : IBleHostingManager
 
 
     public bool IsAdvertising => this.Manager.Advertising;
-    public async Task StartAdvertising(AdvertisementOptions? options = null)
+    public Task StartAdvertising(AdvertisementOptions? options = null)
     {
-        (await this.RequestAccess(true, false)).Assert();
-
-        if (this.Manager.Advertising)
-            throw new InvalidOperationException("Advertising is already active");
-
         options ??= new AdvertisementOptions();
-        var tcs = new TaskCompletionSource<bool>();
-        var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
+        var opts = new StartAdvertisingOptions();
+        if (options.LocalName != null)
+            opts.LocalName = options.LocalName;
+
+        if (options.ServiceUuids.Length > 0)
         {
-            if (args.Error == null)
-                tcs.SetResult(true);
-            else
-                tcs.SetException(new ArgumentException(args.Error.LocalizedDescription));
-        });
-
-        try
-        {
-            this.Manager.AdvertisingStarted += handler;
-
-            var opts = new StartAdvertisingOptions();
-            if (options.LocalName != null)
-                opts.LocalName = options.LocalName;
-
-            if (options.ServiceUuids.Length > 0)
-            {
-                opts.ServicesUUID = options
-                    .ServiceUuids
-                    .Select(CBUUID.FromString)
-                    .ToArray();
-            }
-
-            this.Manager.StartAdvertising(opts);
-            await tcs.Task.ConfigureAwait(false);
+            opts.ServicesUUID = options
+                .ServiceUuids
+                .Select(CBUUID.FromString)
+                .ToArray();
         }
-        finally
-        {
-            this.Manager.AdvertisingStarted -= handler;
-        }
+        return this.DoAdvertise(opts.Dictionary);
     }
 
 
     public void StopAdvertising() => this.Manager.StopAdvertising();
+
+    public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
+    {
+        NSMutableDictionary data = null!;
+#if MACCATALYST
+        // throw new NotSupportedException("Not supported on MacCatalyst");
+        var bytes = new List<byte>();
+        bytes.AddRange(uuid.ToByteArray());
+        bytes.AddRange(BitConverter.GetBytes(major));
+        bytes.AddRange(BitConverter.GetBytes(minor));
+        bytes.Add((byte)(txpower ?? -75));
+
+        data = new NSMutableDictionary();
+        data.SetValueForKey(NSData.FromArray(bytes.ToArray()), new NSString("kCBAdvDataAppleBeaconKey"));
+#else
+        var id = new CLBeaconIdentityConstraint(uuid.ToNSUuid(), major, minor);
+        var beacon = new CLBeaconRegion(id, "ShinyBle");
+        NSNumber? number = null;
+        if (txpower != null)
+            number = new NSNumber(txpower.Value);
+        //	data	{{     kCBAdvDataAppleBeaconKey = {length = 21, bytes = 0x14fdbc1ba0d1441abd822bd8b49c0ba5000b00deff}; }}	Foundation.NSMutableDictionary
+        data = beacon.GetPeripheralData(number); // this returns null on catalyst
+#endif
+        return this.DoAdvertise(data);
+    }
 
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
@@ -215,6 +217,35 @@ public partial class BleHostingManager : IBleHostingManager
             this.Manager.StateUpdated -= handler;
         }
         return status;
+    }
+
+
+    async Task DoAdvertise(NSDictionary parameters)
+    {
+        (await this.RequestAccess(true, false)).Assert();
+
+        if (this.Manager.Advertising)
+            throw new InvalidOperationException("Advertising is already active");
+        
+        var tcs = new TaskCompletionSource<bool>();
+        var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
+        {
+            if (args.Error == null)
+                tcs.SetResult(true);
+            else
+                tcs.SetException(new ArgumentException(args.Error.LocalizedDescription));
+        });
+
+        try
+        {
+            this.Manager.AdvertisingStarted += handler;
+            this.Manager.StartAdvertising(parameters);
+            await tcs.Task.ConfigureAwait(false);
+        }
+        finally
+        {
+            this.Manager.AdvertisingStarted -= handler;
+        }
     }
 
 #if XAMARIN

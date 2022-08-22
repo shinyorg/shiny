@@ -14,6 +14,8 @@ public interface IBleHostingManager
     Task StartAdvertising(AdvertisementOptions? options = null);
     void StopAdvertising();
 
+    Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null);
+
     Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder);
     void RemoveService(string serviceUuid);
     void ClearServices();
