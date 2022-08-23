@@ -58,12 +58,17 @@ namespace Shiny.Nfc
         {
             var ndef = Ndef.Get(this.nativeTag);
             if (ndef == null)
-                return null;
+                return Task.FromResult<NDefRecord[]>(null);
 
             //ndef.ConnectAsync();
-            var result = ndef
+            var records = ndef.
                 .NdefMessage?
-                .GetRecords()
+                .GetRecords();
+
+            if (records == null)
+                return Task.FromResult<NDefRecord[]>(null);
+
+            var result = records
                 .Select(record => new NDefRecord
                 {
                     Identifier = record.GetId(),
@@ -85,7 +90,7 @@ namespace Shiny.Nfc
                 })
                 .ToArray();
 
-            return Task.FromResult(result);
+            return Task.FromResult<NDefRecord[]?>(result);
         }
 
 

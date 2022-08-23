@@ -54,11 +54,9 @@ namespace Shiny.Nfc
         public async Task<NDefRecord[]?> Read()
         {
             await this.session.ConnectToAsync(this.nativeTag);
-            if (this.nativeTag is not INFCNdefTag readTag)
-                throw new InvalidOperationException("Tag is not readable");
-
             var tcs = new TaskCompletionSource<NDefRecord[]>();
-            readTag.ReadNdef((msg, e) =>
+
+            this.OpTag.ReadNdef((msg, e) =>
             {
                 if (e != null)
                 {
@@ -96,15 +94,8 @@ namespace Shiny.Nfc
         public async Task Write(NDefRecord[] records, bool makeReadOnly)
         {
             await this.session.ConnectToAsync(this.nativeTag);
-            if (this.nativeTag is not INFCNdefTag writeTag)
-                throw new InvalidOperationException("Invalid Tag");
-
-            //writeTag.QueryNdefStatus((status, code, error) =>
-            //{
-            //    //status == NFCNdefStatus.ReadWrite
-            //});
-
             var tcs = new TaskCompletionSource<bool>();
+
             var nativeRecords = records
                 .Select(record => new NFCNdefPayload(
                     record.PayloadType switch
@@ -119,7 +110,7 @@ namespace Shiny.Nfc
                 .ToArray();
 
             var message = new NFCNdefMessage(nativeRecords);
-            writeTag.WriteNdef(message, e =>
+            this.OpTag.WriteNdef(message, e =>
             {
                 if (e == null)
                     tcs.SetResult(true);
@@ -130,7 +121,7 @@ namespace Shiny.Nfc
             if (makeReadOnly)
             {
                 tcs = new TaskCompletionSource<bool>();
-                writeTag.WriteLock(e =>
+                this.OpTag.WriteLock(e =>
                 {
                     if (e == null)
                         tcs.SetResult(true);
@@ -138,6 +129,24 @@ namespace Shiny.Nfc
                         tcs.SetException(new Exception(e.LocalizedDescription));
                 });
                 await tcs.Task;
+            }
+        }
+
+
+        INFCNdefTag? opTag;
+        INFCNdefTag OpTag
+        {
+            get
+            {
+                this.opTag ??= this.nativeTag.Type switch
+                {
+                    NFCTagType.FeliCa => this.nativeTag.AsNFCFeliCaTag!,
+                    NFCTagType.Iso15693 => this.nativeTag.AsNFCIso15693Tag!,
+                    NFCTagType.Iso7816Compatible => this.nativeTag.AsNFCIso7816Tag!,
+                    NFCTagType.MiFare => this.nativeTag.AsNFCMiFareTag!,
+                    _ => throw new InvalidProgramException("Invalid tag type")
+                };
+                return this.opTag;
             }
         }
     }
