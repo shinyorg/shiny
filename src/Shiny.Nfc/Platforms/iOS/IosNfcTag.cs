@@ -62,11 +62,9 @@ public class IosNfcTag : INfcTag
     public async Task<NDefRecord[]?> Read()
     {
         await this.session.ConnectToAsync(this.nativeTag);
-        if (this.nativeTag is not INFCNdefTag readTag)
-            throw new InvalidOperationException("Tag is not readable");
 
         var tcs = new TaskCompletionSource<NDefRecord[]>();
-        readTag.ReadNdef((msg, e) =>
+        this.OpTag.ReadNdef((msg, e) =>
         {
             if (e != null)
             {
@@ -104,9 +102,6 @@ public class IosNfcTag : INfcTag
     public async Task Write(NDefRecord[] records, bool makeReadOnly)
     {
         await this.session.ConnectToAsync(this.nativeTag);
-        if (this.nativeTag is not INFCNdefTag writeTag)
-            throw new InvalidOperationException("Invalid Tag");
-
         //writeTag.QueryNdefStatus((status, code, error) =>
         //{
         //    //status == NFCNdefStatus.ReadWrite
@@ -127,7 +122,7 @@ public class IosNfcTag : INfcTag
             .ToArray();
 
         var message = new NFCNdefMessage(nativeRecords);
-        writeTag.WriteNdef(message, e =>
+        this.OpTag.WriteNdef(message, e =>
         {
             if (e == null)
                 tcs.SetResult(true);
@@ -138,7 +133,7 @@ public class IosNfcTag : INfcTag
         if (makeReadOnly)
         {
             tcs = new TaskCompletionSource<bool>();
-            writeTag.WriteLock(e =>
+            this.OpTag.WriteLock(e =>
             {
                 if (e == null)
                     tcs.SetResult(true);
@@ -146,6 +141,32 @@ public class IosNfcTag : INfcTag
                     tcs.SetException(new Exception(e.LocalizedDescription));
             });
             await tcs.Task;
+        }
+    }
+
+
+    INFCNdefTag? opTag;
+    INFCNdefTag OpTag
+    {
+        get
+        {
+            this.opTag ??= this.nativeTag.Type switch
+            {
+#if XAMARIN
+                NFCTagType.FeliCa => this.nativeTag.GetNFCFeliCaTag()!,
+                NFCTagType.Iso15693 => this.nativeTag.GetNFCIso15693Tag()!,
+                NFCTagType.Iso7816Compatible => this.nativeTag.GetNFCIso7816Tag()!,
+                NFCTagType.MiFare => this.nativeTag.GetNFCMiFareTag()!,
+                _ => throw new InvalidProgramException("Invalid tag type")
+#else
+                NFCTagType.FeliCa => this.nativeTag.AsNFCFeliCaTag!,
+                NFCTagType.Iso15693 => this.nativeTag.AsNFCIso15693Tag!,
+                NFCTagType.Iso7816Compatible => this.nativeTag.AsNFCIso7816Tag!,
+                NFCTagType.MiFare => this.nativeTag.AsNFCMiFareTag!,
+                _ => throw new InvalidProgramException("Invalid tag type")
+#endif
+            };
+            return this.opTag;
         }
     }
 }
