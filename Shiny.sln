@@ -96,9 +96,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7ABDA2A1-3B8C-456D-8347-9C03C1DACC73}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
-		.github\workflows\lock.yml = .github\workflows\lock.yml
-		.github\workflows\sponsors.yml = .github\workflows\sponsors.yml
-		.github\workflows\stale.yml = .github\workflows\stale.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.AppCenter", "src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj", "{9B392162-FC9B-4DBA-8391-6795F0B0A7F4}"
@@ -1580,5 +1577,21 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {135D86AF-4EC4-4AA0-BD06-75C410F3EA08}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.scope = text/x-csharp
+		$0.TextStylePolicy = $4
+		$4.inheritsSet = null
+		$4.scope = application/x-msbuild
+		$0.XmlFormattingPolicy = $5
+		$5.inheritsSet = null
+		$5.scope = application/x-msbuild
 	EndGlobalSection
 EndGlobal
