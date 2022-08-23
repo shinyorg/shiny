@@ -49,12 +49,17 @@ public class DroidNfcTag : INfcTag
     {
         var ndef = Ndef.Get(this.nativeTag);
         if (ndef == null)
-            return null;
+            return Task.FromResult<NDefRecord[]?>(null);
+
+        var records = ndef
+            .NdefMessage?
+            .GetRecords();
+
+        if (records == null)
+            return Task.FromResult<NDefRecord[]?>(null);
 
         //ndef.ConnectAsync();
-        var result = ndef
-            .NdefMessage?
-            .GetRecords()
+        var result = records
             .Select(record => new NDefRecord
             {
                 Identifier = record.GetId(),
@@ -76,7 +81,7 @@ public class DroidNfcTag : INfcTag
             })
             .ToArray();
 
-        return Task.FromResult(result);
+        return Task.FromResult<NDefRecord[]?>(result);
     }
 
 
