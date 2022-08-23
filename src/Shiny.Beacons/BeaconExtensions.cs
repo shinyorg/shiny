@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Android.Locations;
 using Shiny.Beacons.Managed;
 
 namespace Shiny.Beacons;
@@ -38,20 +39,20 @@ public static class BeaconExtensions
     /// <param name="rssi">Rssi.</param>
     public static Beacon Parse(this byte[] data, int rssi)
     {
-        if (BitConverter.IsLittleEndian)
-        {
+        //if (BitConverter.IsLittleEndian)
+        //{
             var uuidString = BitConverter.ToString(data, 2, 16).Replace("-", String.Empty);
             var uuid = new Guid(uuidString);
             var major = BitConverter.ToUInt16(data.Skip(18).Take(2).Reverse().ToArray(), 0);
             var minor = BitConverter.ToUInt16(data.Skip(20).Take(2).Reverse().ToArray(), 0);
-            var txpower = data[22];
+            var txpower = (sbyte)data[22];
             var accuracy = CalculateAccuracy(txpower, rssi);
             //var proximity = CalculateProximity(accuracy);
             var proximity = CalculateProximity(txpower, rssi);
 
             return new Beacon(uuid, major, minor, proximity, rssi, accuracy);
-        }
-        throw new ArgumentException("Invalid beacon packet");
+        //}
+        //throw new InvalidOperationException("Invalid beacon packet");
     }
 
 
@@ -59,9 +60,9 @@ public static class BeaconExtensions
     // 2 meters+ = near
     // 0.5 meters += immediate
 
-    public static Proximity CalculateProximity(int txpower, double rssi)
+    public static Proximity CalculateProximity(sbyte txpower, double rssi)
     {
-        var distance = Math.Pow(10d, (txpower * -1 - rssi) / 20);
+        var distance = Math.Pow(10d, (txpower - rssi) / 20);
         if (distance >= 6E-6d)
             return Proximity.Far;
 
@@ -72,21 +73,16 @@ public static class BeaconExtensions
     }
 
 
-    public static double CalculateAccuracy(int txPower, double rssi)
+    public static double CalculateAccuracy(sbyte txPower, double rssi)
     {
-        var accuracy = -1.0;
-        if (rssi > 0)
-        {
-            var ratio = rssi * 1.0 / txPower;
-            if (ratio < 1.0)
-            {
-                accuracy = Math.Pow(ratio, 10);
-            }
-            else
-            {
-                accuracy = 0.89976 * Math.Pow(ratio, 7.7095) + 0.111;
-            }
-        }
+        if (rssi == 0.0)
+            return -1;
+
+        var ratio = rssi * 1.0 / txPower;
+        if (ratio < 1.0)        
+            return Math.Pow(ratio, 10);
+
+        var accuracy = 0.89976 * Math.Pow(ratio, 7.7095) + 0.111;
         return accuracy;
     }
 

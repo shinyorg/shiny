@@ -22,7 +22,7 @@ public static class BleManagerExtensions
         return manager
             .Scan(cfg)
             .Where(x => x.IsBeacon())
-            .Select(x => x.AdvertisementData.ManufacturerData.Data.Parse(x.Rssi));
+            .Select(x => x.AdvertisementData.ManufacturerData!.Data.Parse(x.Rssi));
     }
 
 
