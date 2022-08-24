@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using Android.Locations;
 using Shiny.Beacons.Managed;
 
 namespace Shiny.Beacons;

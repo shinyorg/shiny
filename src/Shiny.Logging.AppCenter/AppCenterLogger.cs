@@ -33,13 +33,13 @@ namespace Shiny.Logging.AppCenter
             {
                 exception ??= new Exception(message);
 
-                Crashes.TrackError(
-                    exception,
-                    new Dictionary<string, string>
-                    {
-                        { "Message", message }
-                    }
-                );
+                //Crashes.TrackError(
+                //    exception,
+                //    new Dictionary<string, string>
+                //    {
+                //        { "Message", message }
+                //    }
+                //);
             }
             else
             {

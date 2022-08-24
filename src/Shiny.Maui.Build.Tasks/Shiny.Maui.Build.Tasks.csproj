@@ -5,7 +5,6 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>10.0</LangVersion>
 		<IsPackable>false</IsPackable>
-		<!--<PackageId>Microsoft.Maui.Resizetizer.Sdk</PackageId>-->
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -14,16 +13,19 @@
 		<PackageReference Include="System.Text.Json" Version="6.0.5" />
 	</ItemGroup>
 
+	<!--
 	<Target Name="_CopyToSampeDir" AfterTargets="Build">
 		<ItemGroup>
 			<_CopyItems Include="$(TargetDir)**\*.dll" Exclude="$(TargetDir)System.*.dll" />
-			<!--
+			
 			<_CopyItems Include="$(TargetDir)**\*.so" />
 			<_CopyItems Include="$(TargetDir)**\*.dylib" />
-			-->
+			
 		</ItemGroup>
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ProjectDir)targets" ContinueOnError="true" Retries="0" />
 	</Target>
+	-->
+
 	<!--
 	<ItemGroup>
 		<None Include="@(_ResizetizerFiles)" Visible="false" Pack="true" PackagePath="build/%(Arch)" CopyToOutputDirectory="PreserveNewest" />
