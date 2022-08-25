@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Shiny.BluetoothLE.Internals;
 using Android;
 using Android.Bluetooth;
+using Java.Util;
+using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE;
 
@@ -52,31 +54,14 @@ public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
 
     public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
     {
-        var list = new List<string>();
+        var versionPermissions = GetPlatformPermissions();
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
-        {
-            list.AddRange(new[] {
-                Manifest.Permission.BluetoothScan,
-                Manifest.Permission.BluetoothConnect
-            });
-        }
-        else
-        {
-            list.AddRange(new[] {
-                Manifest.Permission.Bluetooth,
-                Manifest.Permission.BluetoothPrivileged,
-                Manifest.Permission.BluetoothAdmin,
-                Manifest.Permission.AccessFineLocation
-            });
-        }
-
-        if (!list.All(x => this.context.Android.IsInManifest(x)))
+        if (!versionPermissions.All(x => this.context.Android.IsInManifest(x)))
             return AccessState.NotSetup;
 
         var results = await this.context
             .Android
-            .RequestPermissions(list.ToArray())
+            .RequestPermissions(versionPermissions)
             .ToTask(ct)
             .ConfigureAwait(false);
 
@@ -95,9 +80,7 @@ public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
             .RequestAccess()
             .Do(access =>
             {
-                if (access != AccessState.Available)
-                    throw new InvalidOperationException($"Invalid Status: {access} - Ensure you have the following permissions in your AndroidManifest.xml - android.permission.ACCESS_FINE_LOCATION, android.permission.BLUETOOTH_SCAN, & android.permission.BLUETOOTH_CONNECT");
-
+                Assert(access);
                 this.IsScanning = true;
             })
             .SelectMany(_ => this.context.Scan(config ?? new ScanConfig()))
@@ -121,16 +104,37 @@ public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
     );
 
 
-    public IObservable<bool> SetAdapterState(bool enable)
+    static string[] GetPlatformPermissions()
     {
-        var result = false;
-        var ad = this.context.Manager.Adapter!;
-        if (enable && !ad.IsEnabled)
-            result =ad.Enable();
+        var list = new List<string>();
 
-        else if (!enable && ad.IsEnabled)
-            result = ad.Disable();
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        { 
+            return new[]
+            {
+                Manifest.Permission.BluetoothScan,
+                Manifest.Permission.BluetoothConnect
+            };
+        }
+        return new[]
+        {
+            Manifest.Permission.Bluetooth,
+            Manifest.Permission.BluetoothPrivileged,
+            Manifest.Permission.BluetoothAdmin,
+            Manifest.Permission.AccessFineLocation
+        };
+    }
 
-        return Observable.Return(result);
+
+    static void Assert(AccessState access)
+    {
+        if (access == AccessState.NotSetup)
+        {
+            var permissions = GetPlatformPermissions();
+            var msgList = String.Join(", ", permissions);
+            throw new InvalidOperationException("Your AndroidManifest.xml is missing 1 or more of the following permissions for this version of Android: " + msgList);
+        }
+        else if (access != AccessState.Available)
+            throw new InvalidOperationException($"Invalid Status: {access}");
     }
 }
