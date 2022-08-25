@@ -54,31 +54,14 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
         {
-            var list = new List<string>();
+            var versionPermissions = this.GetPlatformPermissions();
 
-            if (this.context.Android.IsMinApiLevel(31))
-            {
-                list.AddRange(new [] {
-                    Manifest.Permission.BluetoothScan,
-                    Manifest.Permission.BluetoothConnect,
-                    Manifest.Permission.BluetoothAdmin
-                });
-            }
-            else
-            {
-                list.AddRange(new [] {
-                    Manifest.Permission.Bluetooth,
-                    Manifest.Permission.BluetoothAdmin,
-                    Manifest.Permission.AccessFineLocation
-                });
-            }
-
-            if (!list.All(x => this.context.Android.IsInManifest(x)))
+            if (!versionPermissions.All(x => this.context.Android.IsInManifest(x)))
                 return AccessState.NotSetup;
 
             var results = await this.context
                 .Android
-                .RequestPermissions(list.ToArray())
+                .RequestPermissions(versionPermissions)
                 .ToTask(ct)
                 .ConfigureAwait(false);
 
@@ -97,9 +80,7 @@ namespace Shiny.BluetoothLE
                 .RequestAccess()
                 .Do(access =>
                 {
-                    if (access != AccessState.Available)
-                        throw new PermissionException("BluetoothLE", access);
-
+                    this.Assert(access);
                     this.IsScanning = true;
                 })
                 .SelectMany(_ => this.context.Scan(config ?? new ScanConfig()))
@@ -134,6 +115,39 @@ namespace Shiny.BluetoothLE
                 result = ad.Disable();
 
             return Observable.Return(result);
+        }
+
+
+        string[] GetPlatformPermissions()
+        {
+            if (this.context.Android.IsMinApiLevel(31))
+            {
+                return new[]
+                {
+                    Manifest.Permission.BluetoothScan,
+                    Manifest.Permission.BluetoothConnect
+                };
+            }
+            return new[]
+            {
+                Manifest.Permission.Bluetooth,
+                Manifest.Permission.BluetoothPrivileged,
+                Manifest.Permission.BluetoothAdmin,
+                Manifest.Permission.AccessFineLocation
+            };
+        }
+
+
+        void Assert(AccessState access)
+        {
+            if (access == AccessState.NotSetup)
+            {
+                var permissions = this.GetPlatformPermissions();
+                var msgList = String.Join(", ", permissions);
+                throw new InvalidOperationException("Your AndroidManifest.xml is missing 1 or more of the following permissions for this version of Android: " + msgList);
+            }
+            else if (access != AccessState.Available)
+                throw new InvalidOperationException($"Invalid Status: {access}");
         }
     }
 }
