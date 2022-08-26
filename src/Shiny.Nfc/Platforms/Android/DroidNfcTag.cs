@@ -58,15 +58,15 @@ namespace Shiny.Nfc
         {
             var ndef = Ndef.Get(this.nativeTag);
             if (ndef == null)
-                return Task.FromResult<NDefRecord[]>(null);
+                return Task.FromResult<NDefRecord[]?>(null);
 
             //ndef.ConnectAsync();
-            var records = ndef.
+            var records = ndef
                 .NdefMessage?
                 .GetRecords();
 
             if (records == null)
-                return Task.FromResult<NDefRecord[]>(null);
+                return Task.FromResult<NDefRecord[]?>(null);
 
             var result = records
                 .Select(record => new NDefRecord
@@ -108,7 +108,7 @@ namespace Shiny.Nfc
                     NDefPayloadType.Uri => NdefRecord.CreateUri(record.Uri),
                     NDefPayloadType.External => NdefRecord.CreateExternal("domain", "type", new byte[0]),
                     NDefPayloadType.Mime => NdefRecord.CreateMime("mimeType", new byte[0]),
-                    _ => throw new InvalidOperationException("")
+                    _ => throw new InvalidOperationException("Invalid payload")
                 };
                 nativeRecords.Add(native!);
             }

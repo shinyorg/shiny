@@ -140,10 +140,10 @@ namespace Shiny.Nfc
             {
                 this.opTag ??= this.nativeTag.Type switch
                 {
-                    NFCTagType.FeliCa => this.nativeTag.AsNFCFeliCaTag!,
-                    NFCTagType.Iso15693 => this.nativeTag.AsNFCIso15693Tag!,
-                    NFCTagType.Iso7816Compatible => this.nativeTag.AsNFCIso7816Tag!,
-                    NFCTagType.MiFare => this.nativeTag.AsNFCMiFareTag!,
+                    NFCTagType.FeliCa => this.nativeTag.GetNFCFeliCaTag()!,
+                    NFCTagType.Iso15693 => this.nativeTag.GetNFCIso15693Tag()!,
+                    NFCTagType.Iso7816Compatible => this.nativeTag.GetNFCIso7816Tag()!,
+                    NFCTagType.MiFare => this.nativeTag.GetNFCMiFareTag()!,
                     _ => throw new InvalidProgramException("Invalid tag type")
                 };
                 return this.opTag;
