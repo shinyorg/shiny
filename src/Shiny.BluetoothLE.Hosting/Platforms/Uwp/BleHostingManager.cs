@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Windows.Storage.Streams;
 using Windows.Devices.Bluetooth.Advertisement;
-
+using Windows.Devices.Enumeration;
+using Windows.Devices.Bluetooth;
 
 namespace Shiny.BluetoothLE.Hosting
 {
@@ -15,42 +16,17 @@ namespace Shiny.BluetoothLE.Hosting
         readonly Dictionary<string, GattService> services = new Dictionary<string, GattService>();
 
 
-        public AccessState Status
+        public async Task<AccessState> RequestAccess(bool advertise = true, bool gattConnect = true)
         {
-            get
-            {
-                return AccessState.Available;
-                //var devices = await DeviceInformation.FindAllAsync(BluetoothAdapter.GetDeviceSelector());
-                //foreach (var dev in devices)
-                //{
-                //    Log.Info(BleLogCategory.Adapter, "found - {dev.Name} ({dev.Kind} - {dev.Id})");
+            var adapter = await BluetoothAdapter.GetDefaultAsync();
+            if (adapter == null)
+                return AccessState.NotSupported;
 
-                //    var native = await BluetoothAdapter.FromIdAsync(dev.Id);
-                //    if (native.IsLowEnergySupported)
-                //    {
-                //        var radio = await native.GetRadioAsync();
-                //        var adapter = new Adapter(native, radio);
-                //        ob.OnNext(adapter);
-                //    }
-                //}
-                //if (this.native == null || !this.native.IsLowEnergySupported)
-                //    return AdapterFeatures.None;
+            if (!adapter.IsLowEnergySupported || !adapter.IsPeripheralRoleSupported)
+                return AccessState.NotSupported;
 
-                //var features = AdapterFeatures.AllClient;
-                //if (!this.native.IsCentralRoleSupported)
-                //    features &= ~AdapterFeatures.AllClient;
-
-                //if (this.native.IsPeripheralRoleSupported)
-                //    features |= AdapterFeatures.AllServer;
-
-                //if (this.native.IsCentralRoleSupported || this.native.IsPeripheralRoleSupported)
-                //    features |= AdapterFeatures.AllControls;
-
-                //return features;
-            }
+            return AccessState.Available;
         }
-
-        
 
 
         public bool IsAdvertising => this.publisher.Status == BluetoothLEAdvertisementPublisherStatus.Started;
@@ -97,20 +73,7 @@ namespace Shiny.BluetoothLE.Hosting
             this.publisher.Advertisement.ManufacturerData.Clear();
             this.publisher.Advertisement.ServiceUuids.Clear();
 
-            if (options.ManufacturerData != null)
-            {
-                using (var writer = new DataWriter())
-                {
-                    writer.WriteBytes(options.ManufacturerData.Data);
-                    var md = new BluetoothLEManufacturerData(options.ManufacturerData.CompanyId, writer.DetachBuffer());
-                    this.publisher.Advertisement.ManufacturerData.Add(md);
-                }
-            }
-            var serviceUuids = options.UseGattServiceUuids
-                ? this.services.Keys.ToList()
-                : options.ServiceUuids;
-
-            foreach (var serviceUuid in serviceUuids)
+            foreach (var serviceUuid in options.ServiceUuids)
             {
                 var uuid = Utils.ToUuidType(serviceUuid);
                 this.publisher.Advertisement.ServiceUuids.Add(uuid);
