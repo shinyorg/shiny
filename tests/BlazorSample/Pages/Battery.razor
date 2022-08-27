@@ -1,0 +1,29 @@
+﻿@page "/battery"
+@implements IDisposable
+@inject Shiny.Power.IBattery battery;
+
+<h1>Battery</h1>
+
+<div>Level: @this.battery.Level</div>
+<div>Status: @this.battery.Status</div>
+
+@code
+{
+    string status = "Unknown";
+    int level = 0;
+    IDisposable? sub;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        this.sub = this.battery
+            .WhenChanged()
+            .Subscribe(
+                _ => this.StateHasChanged(),
+                ex => Console.WriteLine(ex)
+            );
+    }
+
+
+    public void Dispose() => this.sub?.Dispose();
+}

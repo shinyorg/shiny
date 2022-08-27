@@ -1,48 +1,48 @@
-using Microsoft.JSInterop;
+//using Microsoft.JSInterop;
 
-namespace Shiny.Push.Web;
-
-
-public class PushManager : IPushManager, IAsyncDisposable
-{
-    readonly IJSRuntime jsRuntime;
-    IJSObjectReference? jsRef;
+//namespace Shiny.Push.Web;
 
 
-    public PushManager(IJSRuntime jsRuntime)
-    {
-        this.jsRuntime = jsRuntime;
-    }
+//public class PushManager : IPushManager, IAsyncDisposable
+//{
+//    readonly IJSRuntime jsRuntime;
+//    IJSObjectReference? jsRef;
 
 
-    public DateTime? CurrentRegistrationTokenDate => throw new NotImplementedException();
-    public string CurrentRegistrationToken => throw new NotImplementedException();
-
-    async ValueTask<IJSObjectReference> GetModule()
-    {
-        this.jsRef ??= await this.jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Push.Web/push.js");
-        return this.jsRef;
-    }
+//    public PushManager(IJSRuntime jsRuntime)
+//    {
+//        this.jsRuntime = jsRuntime;
+//    }
 
 
-    public async ValueTask DisposeAsync()
-    {
-        if (this.jsRef != null)
-            await this.jsRef.DisposeAsync();
-    }
+//    public DateTime? CurrentRegistrationTokenDate => throw new NotImplementedException();
+//    public string CurrentRegistrationToken => throw new NotImplementedException();
 
-    public IObservable<PushNotification> WhenReceived()
-    {
-        throw new NotImplementedException();
-    }
+//    async ValueTask<IJSObjectReference> GetModule()
+//    {
+//        this.jsRef ??= await this.jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Push.Web/push.js");
+//        return this.jsRef;
+//    }
 
-    public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
-    {
-        throw new NotImplementedException();
-    }
 
-    public Task UnRegister()
-    {
-        throw new NotImplementedException();
-    }
-}
+//    public async ValueTask DisposeAsync()
+//    {
+//        if (this.jsRef != null)
+//            await this.jsRef.DisposeAsync();
+//    }
+
+//    public IObservable<PushNotification> WhenReceived()
+//    {
+//        throw new NotImplementedException();
+//    }
+
+//    public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+//    {
+//        throw new NotImplementedException();
+//    }
+
+//    public Task UnRegister()
+//    {
+//        throw new NotImplementedException();
+//    }
+//}

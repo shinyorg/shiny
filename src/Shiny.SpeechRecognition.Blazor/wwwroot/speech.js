@@ -1,4 +1,5 @@
-﻿//https://www.twilio.com/blog/speech-recognition-browser-web-speech-api
+﻿//https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition
+//https://www.twilio.com/blog/speech-recognition-browser-web-speech-api
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 if (typeof SpeechRecognition === "undefined") {

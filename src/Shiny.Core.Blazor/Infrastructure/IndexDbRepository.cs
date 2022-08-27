@@ -3,6 +3,7 @@
 //using System.Collections.Generic;
 //using System.Threading.Tasks;
 
+//https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
 //namespace Shiny.Web.Infrastructure
 //{
 //    public class IndexDbRepository : IRepository

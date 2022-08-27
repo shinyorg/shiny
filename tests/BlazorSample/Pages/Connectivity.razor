@@ -1,0 +1,27 @@
+﻿@page "/connectivity"
+@implements IDisposable
+@inject Shiny.Net.IConnectivity connectivity;
+
+<h1>Connectivity</h1>
+
+<div>Access: @this.connectivity.Access</div>
+<div>Connection: @this.connectivity.ConnectionTypes</div>
+
+@code
+{
+    string access = "Unknown";
+    IDisposable? sub;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        this.sub = this.connectivity
+            .WhenChanged()
+            .Subscribe(
+                _ => this.StateHasChanged(),
+                ex => Console.WriteLine(ex)
+            );
+    }
+
+    public void Dispose() => this.sub?.Dispose();
+}

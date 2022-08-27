@@ -1,22 +1,82 @@
-﻿//using Microsoft.JSInterop;
-//using Shiny.Net;
+﻿using System;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Microsoft.JSInterop;
+
+namespace Shiny.Net;
 
 
-//namespace Shiny.Web.Infrastructure
-//{
-//    public class Connectivity : NotifyPropertyChanged, IConnectivity
-//    {
-//        public NetworkReach Reach => throw new System.NotImplementedException();
-
-//        public NetworkAccess Access => throw new System.NotImplementedException();
-
-//        public string CellularCarrier => throw new System.NotImplementedException();
+public class Connectivity : IConnectivity, IShinyStartupTask, IDisposable
+{
+    readonly IJSRuntime interop;
+    readonly Subject<Unit> connSubj = new();
+    IJSInProcessObjectReference? module;
 
 
-//        [JSInvokable]
-//        public void OnChange()
-//        {
+    public Connectivity(IJSRuntime interop)
+    {
+        this.interop = interop;
+    }
 
-//        }
-//    }
-//}
+
+    public async void Start()
+    {
+        this.module = await this.interop.ImportInProcess("Shiny.Core.Blazor", "connectivity.js");
+        this.module.InvokeVoid("init");
+    }
+
+
+    public ConnectionTypes ConnectionTypes
+    {
+        get
+        {
+            var type = (this.module?.Invoke<string>("getConnType") ?? "Unknown");
+            return type switch
+            {
+                "bluetooth" => ConnectionTypes.Bluetooth,
+                "ethernet" => ConnectionTypes.Wired,
+                "cellular" => ConnectionTypes.Cellular,
+                "wifi" => ConnectionTypes.Wifi,
+                "wimax" => ConnectionTypes.Wifi,
+                "none" => ConnectionTypes.None,
+                _ => ConnectionTypes.Unknown
+            };
+        }
+    }
+
+
+    public NetworkAccess Access
+    {
+        get
+        {
+            if (this.ConnectionTypes == ConnectionTypes.None)
+                return NetworkAccess.None;
+
+            //'slow-2g', '2g', '3g', or '4g'
+            //var state = this.module?.Invoke<string>("getEffectiveType") ?? "Unknown";
+            var online = this.module?.Invoke<bool>("isConnected") ?? false;
+            return online ? NetworkAccess.Internet : NetworkAccess.None;
+        }
+    }
+
+
+    public IObservable<IConnectivity> WhenChanged() => Observable.Create<IConnectivity>(ob =>
+    {
+        var sub = this.connSubj.Subscribe(_ => ob.OnNext(this));
+        var objRef = DotNetObjectReference.Create(this);
+        this.module!.InvokeVoid("startListener", objRef);
+
+        return () =>
+        {
+            this.module!.InvokeVoid("stopListener");
+            objRef?.Dispose();
+            sub?.Dispose();
+        };
+    });
+
+
+    [JSInvokable]
+    public void OnChange() => this.connSubj.OnNext(Unit.Default);
+    public void Dispose() => this.module?.Dispose();
+}
