@@ -1,16 +1,35 @@
-﻿//https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition
-//https://www.twilio.com/blog/speech-recognition-browser-web-speech-api
+﻿const sr = new SpeechRecognition();
+var dotNetRef;
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-if (typeof SpeechRecognition === "undefined") {
-} else {
-    // good stuff to come here
+
+export function startListener(dotNetRef) {
+    //sr.continuous = true;
+    //sr.interimResults = true;
+    sr.onaudiostart = e => {
+
+    };
+
+    sr.onaudioend = e => {
+
+    };
+
+    sr.onresult = e => {
+
+    };
+
+    sr.onend = e => {
+
+    };
+    sr.start();
 }
 
-speechRecognition = new webkitSpeechRecognition();
-speechRecognition.onresult = console.log;
-speechRecognition.start();
-
-recognition.continuous = true;
-recognition.interimResults = true;
-recognition.addEventListener("result", onResult);
+export function stopListener() {
+    sr.stop();
+}
+//const speechRecognitionList = new SpeechGrammarList();
+//speechRecognitionList.addFromString(grammar, 1);
+//recognition.grammars = speechRecognitionList;
+////recognition.continuous = false;
+//recognition.lang = 'en-US';
+//recognition.interimResults = false;
+//recognition.maxAlternatives = 1;

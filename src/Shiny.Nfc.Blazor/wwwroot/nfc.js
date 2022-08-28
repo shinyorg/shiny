@@ -1,41 +1,25 @@
-//https://googlechrome.github.io/samples/web-nfc/
-shinyNfc = new (function () {
+const reader = new NDEFReader();
 
-    this.requestAccess = function () {
-    }
+export function read(dotNetRef) {
+    var promise = new Promise(
+        () => { },
+        reason => { }
+    );
 
-
-})();
-
-//scanButton.addEventListener("click", async () => {
-//    log("User clicked scan button");
-
-//    try {
-//        const ndef = new NDEFReader();
-//        await ndef.scan();
-//        log("> Scan started");
-
-//        ndef.addEventListener("readingerror", () => {
-//            log("Argh! Cannot read data from the NFC tag. Try another one?");
-//        });
+    const onRead = () => {
 
 //        ndef.addEventListener("reading", ({ message, serialNumber }) => {
 //            log(`> Serial Number: ${serialNumber}`);
 //            log(`> Records: (${message.records.length})`);
 //        });
-//    } catch (error) {
-//        log("Argh! " + error);
-//    }
-//});
+    };
+    reader.addEventListener("readingerror", null);
+    reader.addEventListener("reading", null);
+    reader.scan();
+}
 
-//writeButton.addEventListener("click", async () => {
-//    log("User clicked write button");
-
-//    try {
-//        const ndef = new NDEFReader();
-//        await ndef.write("Hello world!");
-//        log("> Message written");
-//    } catch (error) {
-//        log("Argh! " + error);
-//    }
-//});
+export function write() {
+    //        const ndef = new NDEFReader();
+    //        await ndef.write("Hello world!");
+    //await ndef.makeReadOnly();
+}
