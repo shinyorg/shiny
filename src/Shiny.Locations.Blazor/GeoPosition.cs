@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace Shiny.Locations.Web;
+namespace Shiny.Locations.Blazor;
 
 
 public class GeoPosition

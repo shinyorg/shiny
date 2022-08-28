@@ -31,71 +31,80 @@ public class LocalStorageRepository<TStoreConverter, TEntity> : IRepository<TEnt
     }
 
 
+    IJSInProcessObjectReference? jsRef;
+    async Task<IJSInProcessObjectReference> Mod()
+    {
+        this.jsRef ??= await this.jsRuntime.ImportInProcess("Shiny.Core.Blazor", "storage.js");
+        return this.jsRef;
+    }
+
+
     public async Task<bool> Exists(string key)
     {
-        //var path = this.GetPath(key);
-        //var exists = File.Exists(path);
-        //return Task.FromResult(exists);
-        return false;
+        var fk = GetFullKey(key);
+        return (await this.Mod()).Invoke<bool>("exists", fk);
     }
 
 
     public async Task<TEntity?> Get(string key)
     {
-        var value = this.jsRuntime.Invoke<string>("localStorage.getItem", key);
-        if (value == null)
+        var fk = GetFullKey(key);
+        var json = (await this.Mod()).Invoke<string>("get", fk);
+
+        if (json == null)
             return default;
 
-        this.serializer.Deserialize<TEntity>(value);
-        //TEntity? result = default;
-        //await this.InTransaction(list =>
-        //{
-        //    if (list.ContainsKey(key))
-        //        result = list[key];
-        //});
-        //return result;
-        return default;
+        var obj = this.serializer.Deserialize<TEntity>(json);
+        return obj;
     }
 
 
     public async Task<IList<TEntity>> GetList(Expression<Func<TEntity, bool>>? expression = null)
     {
-        //var result = new List<TEntity>();
-        //await this
-        //    .InTransaction(
-        //        list => result.AddRange(list
-        //            .Values
-        //            .WhereIf(expression)
-        //        )
-        //    )
-        //    .ConfigureAwait(false);
-        //return result;
-        return null;
+        var list = new List<TEntity>();
+        var dict = (await this.Mod()).Invoke<Dictionary<string, string>>("getList");
+
+        if (dict.Count > 0)
+        {
+            var e = expression?.Compile() ?? new Func<TEntity, bool>(_ => true);
+
+            foreach (var pair in dict)
+            {
+                var obj = this.FromJson(pair.Value);
+                if (e(obj))
+                    list.Add(obj);
+            }
+        }
+        return list;
     }
 
 
     public async Task<bool> Set(TEntity entity)
     {
-        //var update = true;
-        //await this.InTransaction(list =>
-        //{
-        //    update = this.Write(entity);
-        //    list[entity.Identifier] = entity;
+        if (entity.Identifier.IsEmpty())
+            throw new InvalidOperationException("Identifier cannot be empty/null");
 
-        //    var action = update ? RepositoryAction.Update : RepositoryAction.Add;
-        //    this.repoSubj.OnNext((action, entity));
-        //});
-        //return update;
-        return true;
+        var action = this.Get(entity.Identifier) == null
+            ? RepositoryAction.Update
+            : RepositoryAction.Add;
+
+        var fk = GetFullKey(entity.Identifier);
+        var json = this.ToJson(entity);
+        (await this.Mod()).InvokeVoid("set", fk, json);
+
+        this.repoSubj.OnNext((action, entity));
+
+        return action == RepositoryAction.Add;
     }
 
 
-    public async Task<bool> Remove(string key)
+    public Task<bool> Remove(string key)
     {
-        // TODO: run get first
-        // TODO: to full key
-        this.jsRuntime.InvokeVoid("localStorage.removeItem", key);
-        return false;
+        var fk = GetFullKey(key);
+        var exists = Get(key) != null;
+
+        this.jsRuntime.InvokeVoid("localStorage.removeItem", fk);
+        return Task.FromResult(exists);
     }
 
 
@@ -110,61 +119,33 @@ public class LocalStorageRepository<TStoreConverter, TEntity> : IRepository<TEnt
     public IObservable<(RepositoryAction Action, TEntity? Entity)> WhenActionOccurs() => this.repoSubj;
 
 
-    //bool Write(TEntity entity)
-    //{
-    //    var path = this.GetPath(entity.Identifier);
-    //    var update = File.Exists(path);
+    TEntity? DoGet(string key)
+    {
+        var fk = GetFullKey(key);
+        var json = this.jsRuntime.Invoke<string>(fk);
+        if (json == null)
+            return default;
 
-    //    var serialize = this.converter.ToStore(entity).ToDictionary(
-    //        x => x.Property,
-    //        x => x.Value
-    //    );
-    //    if (!serialize.ContainsKey(nameof(IStoreEntity.Identifier)))
-    //        serialize.Add(nameof(IStoreEntity.Identifier), entity.Identifier);
-
-    //    var value = this.serializer.Serialize(serialize);
-    //    File.WriteAllText(path, value);
-    //    return update;
-    //}
+        var obj = this.FromJson(json);
+        return obj;
+    }
 
 
-    //Dictionary<string, TEntity> Load()
-    //{
-    //        var dictionary = this.serializer.Deserialize<Dictionary<string, object>>(text);
-    //        foreach (var pair in dictionary)
-    //        {
-    //            var el = (JsonElement)pair.Value;
-    //            switch (el.ValueKind)
-    //            {
-    //                case JsonValueKind.String:
-    //                    dictionary[pair.Key] = el.GetString();
-    //                    break;
+    string ToJson(TEntity entity)
+    {
+        var store = this.converter.ToStore(entity);
+        var json = this.serializer.Serialize(store);
+        return json;
+    }
 
-    //                case JsonValueKind.Number:
-    //                    if (el.TryGetInt64(out var longValue))
-    //                    {
-    //                        dictionary[pair.Key] = longValue;
-    //                    }
-    //                    else
-    //                    {
-    //                        dictionary[pair.Key] = el.GetDouble();
-    //                    }
-    //                    break;
 
-    //                case JsonValueKind.True:
-    //                case JsonValueKind.False:
-    //                    dictionary[pair.Key] = el.GetBoolean();
-    //                    break;
+    TEntity FromJson(string json)
+    {
+        var dict = this.serializer.Deserialize<Dictionary<string, object>>(json);
+        var obj = this.converter.FromStore(dict);
+        return obj;
+    }
 
-    //                default:
-    //                    throw new ArgumentException("Invalid ValueKind - " + el.ValueKind);
-    //            }
-    //        }
 
-    //        var entity = this.converter.FromStore(dictionary);
-    //        if (entity.Identifier.IsEmpty())
-    //            throw new InvalidOperationException("Identifier not set on store entity");
-
-    //        dict.Add(entity.Identifier, entity);
-
+    static string GetFullKey(string key) => $"s_{typeof(TEntity).FullName}_{key}";
 }

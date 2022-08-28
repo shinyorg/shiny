@@ -8,25 +8,25 @@ using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Shiny.Web.Infrastructure;
 
-namespace Shiny.Locations.Web;
+namespace Shiny.Locations.Blazor;
 
 
 public class GpsManager : IGpsManager, IAsyncDisposable
 {
     readonly Subject<GpsReading> readingSubj = new();
-    readonly IJSRuntime js;
+    readonly IJSInProcessRuntime jsRuntime;
 
 
-    public GpsManager(IJSRuntime js)
+    public GpsManager(IJSRuntime runtime)
     {
-        this.js = js;
+        this.jsRuntime = (IJSInProcessRuntime)runtime;
     }
 
 
-    IJSObjectReference? jsRef;
-    async Task<IJSObjectReference> GetModule()
+    IJSInProcessObjectReference? jsRef;
+    async Task<IJSInProcessObjectReference> GetModule()
     {
-        this.jsRef ??= await this.js.Import("Shiny.Gps.Web", "gps");
+        this.jsRef ??= await this.jsRuntime.ImportInProcess("Shiny.Gps.Web", "gps.js");
         return this.jsRef;
     }
 
@@ -46,18 +46,18 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     public IObservable<GpsReading> GetLastReading() => Observable.FromAsync<GpsReading>(async ct =>
     {
         var mod = await this.GetModule();
-        var result = await mod.InvokeAsync<GeoPosition>("shinyGps.getCurrentGps");
-        //return result;
-        return default;
+        var result = await mod.InvokeAsync<GeoPosition>("getCurrent"); // promise
+        var pos = To(result);
+        return pos;
     });
 
 
-    //public async Task<AccessState> RequestAccess(GpsRequest request)
-    //{
-    //    var mod = await this.GetModule();
-    //    var result = await mod.InvokeAsync<string>("shinyGps.requestAccess");
-    //    return Utils.ToAccessState(result);
-    //}
+    public async Task<AccessState> RequestAccess(GpsRequest request)
+    {
+        var mod = await this.GetModule();
+        var result = await mod.InvokeAsync<string>("requestAccess"); // promise
+        return Utils.ToAccessState(result);
+    }
 
 
     CompositeDisposable? disposer;
@@ -73,14 +73,14 @@ public class GpsManager : IGpsManager, IAsyncDisposable
         watch
             .Value
             .WhenResult()
-            .Finally(() => module.InvokeVoidAsync("shinyGps.stopListener"))
+            .Finally(() => module.InvokeVoid("stopListener"))
             .Subscribe(
-                this.readingSubj.OnNext,
-                this.readingSubj.OnError
+                x => this.readingSubj.OnNext(To(x)),
+                ex => this.readingSubj.OnError(ex)
             )
             .DisposedBy(this.disposer);
 
-        await module.InvokeVoidAsync("shinyGps.startListener", watch);
+        module.InvokeVoid("startListener", watch);
     }
 
 
@@ -116,4 +116,19 @@ public class GpsManager : IGpsManager, IAsyncDisposable
         if (this.jsRef != null)
             await this.jsRef.DisposeAsync();
     }
+
+
+    static GpsReading To(GeoPosition pos) => new GpsReading(
+        new Position(
+            pos.Latitude,
+            pos.Longitude
+        ),
+        pos.RawAccuracy ?? -99,
+        pos.Timestamp,
+        pos.RawHeading ?? -99,
+        -1,
+        pos.RawAltitude ?? 0,
+        pos.RawSpeed ?? 0,
+        -1
+    );
 }

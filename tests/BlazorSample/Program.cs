@@ -9,6 +9,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.UseShiny();
+builder.Services.AddGps();
 builder.Services.AddConnectivity();
 builder.Services.AddBattery();
 //builder.Services.AddBluetoothLE();

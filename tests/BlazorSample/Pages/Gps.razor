@@ -1,0 +1,46 @@
+﻿@page "/gps"
+@inject Shiny.Locations.IGpsManager gpsManager
+@using System.Reactive.Threading.Tasks;
+@using Shiny.Locations;
+
+<h1>GPS</h1>
+
+<p role="status">Status: @status</p>
+<p role="log">Latitude: @latitude</p>
+<p role="log">Longitude: @longitude</p>
+<p role="log">Altitude: @altitude</p>
+<p role="log">Speed: @speed</p>
+
+<button class="btn btn-primary" @onclick="@(async () => await RequestAccess())">Request Access</button>
+<button class="btn btn-primary" @onclick="@(async () => await DoCurrent())">Current Position</button>
+
+@code {
+    double latitude = 0;
+    double longitude = 0;
+    double altitude = 0;
+    double speed = 0;
+    string status = "Unknown";
+
+
+    async Task RequestAccess()
+    {
+        this.status = (await this.gpsManager.RequestAccess(GpsRequest.Realtime(true))).ToString();
+    }
+
+
+    async Task DoCurrent()
+    {
+        var pos = await this.gpsManager.GetCurrentPosition().ToTask();
+    }
+
+
+    void Update(GpsReading reading)
+    {
+        this.latitude = reading.Position.Latitude;
+        this.longitude = reading.Position.Longitude;
+        this.altitude = reading.Altitude;
+        this.speed = reading.Speed;
+
+        this.StateHasChanged();
+    }
+}

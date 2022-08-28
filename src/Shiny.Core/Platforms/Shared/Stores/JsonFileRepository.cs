@@ -171,37 +171,8 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         {
             var text = File.ReadAllText(file.FullName);
             var dictionary = this.serializer.Deserialize<Dictionary<string, object>>(text);
-            foreach (var pair in dictionary)
-            {
-                var el = (JsonElement)pair.Value;
-                switch (el.ValueKind)
-                {
-                    case JsonValueKind.String:
-                        dictionary[pair.Key] = el.GetString();
-                        break;
-
-                    case JsonValueKind.Number:
-                        if (el.TryGetInt64(out var longValue))
-                        {
-                            dictionary[pair.Key] = longValue;
-                        }
-                        else
-                        {
-                            dictionary[pair.Key] = el.GetDouble();
-                        }
-                        break;
-
-                    case JsonValueKind.True:
-                    case JsonValueKind.False:
-                        dictionary[pair.Key] = el.GetBoolean();
-                        break;
-
-                    default:
-                        throw new ArgumentException("Invalid ValueKind - " + el.ValueKind);
-                }
-            }
-
             var entity = this.converter.FromStore(dictionary);
+
             if (entity.Identifier.IsEmpty())
                 throw new InvalidOperationException("Identifier not set on store entity");
 
