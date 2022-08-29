@@ -26,7 +26,7 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     IJSInProcessObjectReference? jsRef;
     async Task<IJSInProcessObjectReference> GetModule()
     {
-        this.jsRef ??= await this.jsRuntime.ImportInProcess("Shiny.Gps.Web", "gps.js");
+        this.jsRef ??= await this.jsRuntime.ImportInProcess("Shiny.Locations.Blazor", "gps.js");
         return this.jsRef;
     }
 
@@ -37,10 +37,7 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     public int Total { get; set; }
     public bool IsIndeterministic { get; set; }
     public event PropertyChangedEventHandler PropertyChanged;
-
-
     public GpsRequest CurrentListener => throw new NotImplementedException();
-
 
 
     public IObservable<GpsReading> GetLastReading() => Observable.FromAsync<GpsReading>(async ct =>

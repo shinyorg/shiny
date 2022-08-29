@@ -13,29 +13,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!--<ProjectReference Include="..\..\src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />-->
         <ProjectReference Include="..\..\src\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Jobs.Blazor\Shiny.Jobs.Blazor.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Nfc.Blazor\Shiny.Nfc.Blazor.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Notifications.Blazor\Shiny.Notifications.Blazor.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition.Blazor\Shiny.SpeechRecognition.Blazor.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Jobs.Blazor\Shiny.Jobs.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Nfc.Blazor\Shiny.Nfc.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Notifications.Blazor\Shiny.Notifications.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition.Blazor\Shiny.SpeechRecognition.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj" />
     </ItemGroup>
 
     <ItemGroup>

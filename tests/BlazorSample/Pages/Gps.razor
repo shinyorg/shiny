@@ -1,4 +1,5 @@
 ﻿@page "/gps"
+@implements IDisposable
 @inject Shiny.Locations.IGpsManager gpsManager
 @using System.Reactive.Threading.Tasks;
 @using Shiny.Locations;
@@ -11,8 +12,15 @@
 <p role="log">Altitude: @altitude</p>
 <p role="log">Speed: @speed</p>
 
-<button class="btn btn-primary" @onclick="@(async () => await RequestAccess())">Request Access</button>
 <button class="btn btn-primary" @onclick="@(async () => await DoCurrent())">Current Position</button>
+@if (this.listening)
+{
+    <button class="btn btn-danger" @onclick="@(async () => await Stop())">Stop Listening</button>
+}
+else
+{
+    <button class="btn btn-success" @onclick="@(async () => await Start())">Start Listening</button>
+}
 
 @code {
     double latitude = 0;
@@ -20,19 +28,43 @@
     double altitude = 0;
     double speed = 0;
     string status = "Unknown";
+    bool listening = false;
+    IDisposable sub = null!;
 
-
-    async Task RequestAccess()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
         this.status = (await this.gpsManager.RequestAccess(GpsRequest.Realtime(true))).ToString();
+
+        this.sub = this.gpsManager
+            .WhenReading()
+            .Subscribe(x => this.Update(x));
     }
 
+    public void Dispose()
+    {
+        this.sub.Dispose();
+    }
 
     async Task DoCurrent()
     {
-        var pos = await this.gpsManager.GetCurrentPosition().ToTask();
+        @*var pos = await this.gpsManager.GetCurrentPosition().ToTask();*@
+        var pos = await this.gpsManager.GetLastReading().ToTask();
+        if (pos != null)
+            this.Update(pos);
     }
 
+    async Task Start()
+    {
+        await this.gpsManager.StartListener(GpsRequest.Realtime(true));
+        this.listening = true;
+    }
+
+    async Task Stop()
+    {
+        await this.gpsManager.StopListener();
+        this.listening = false;
+    }
 
     void Update(GpsReading reading)
     {
