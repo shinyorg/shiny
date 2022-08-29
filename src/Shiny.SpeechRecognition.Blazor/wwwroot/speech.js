@@ -13,6 +13,7 @@ export function startListener(lang, continuous, interim, dotNetRef) {
     sr.interimResults = interim;
     sr.lang = lang;
 
+    //sr.onnomatch = () => {};
     //sr.onaudiostart = e => {}
     //sr.onaudioend = e => {}
     //sr.onend = e => { }

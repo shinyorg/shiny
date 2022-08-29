@@ -12,15 +12,16 @@
     string access = "Unknown";
     IDisposable? sub;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnInitialized()
     {
-        base.OnAfterRender(firstRender);
         this.sub = this.connectivity
             .WhenChanged()
             .Subscribe(
                 _ => this.StateHasChanged(),
                 ex => Console.WriteLine(ex)
             );
+
+        base.OnInitialized();
     }
 
     public void Dispose() => this.sub?.Dispose();

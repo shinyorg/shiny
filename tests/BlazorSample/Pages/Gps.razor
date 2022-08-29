@@ -30,18 +30,16 @@ else
     bool listening = false;
     IDisposable sub = null!;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            this.status = (await this.gpsManager.RequestAccess(GpsRequest.Realtime(true))).ToString();
-            this.StateHasChanged();
+        this.status = (await this.gpsManager.RequestAccess(GpsRequest.Realtime(true))).ToString();
+        @*this.StateHasChanged();*@
 
-            this.sub = this.gpsManager
-                .WhenReading()
-                .Subscribe(x => this.Update(x));
-        }
+        this.sub = this.gpsManager
+            .WhenReading()
+            .Subscribe(x => this.Update(x));
+
+        await base.OnInitializedAsync();
     }
 
     public void Dispose()

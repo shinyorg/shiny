@@ -4,7 +4,7 @@
 
 <h1>Battery</h1>
 
-<div>Level: @this.battery.Level</div>
+<div>Level: @(this.battery.Level * 100)%</div>
 <div>Status: @this.battery.Status</div>
 
 @code
@@ -13,15 +13,15 @@
     int level = 0;
     IDisposable? sub;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnInitialized()
     {
-        base.OnAfterRender(firstRender);
+        base.OnInitialized();
         this.sub = this.battery
-            .WhenChanged()
-            .Subscribe(
-                _ => this.StateHasChanged(),
-                ex => Console.WriteLine(ex)
-            );
+        .WhenChanged()
+        .Subscribe(
+            _ => this.StateHasChanged(),
+            ex => Console.WriteLine(ex)
+        );
     }
 
 

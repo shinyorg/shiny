@@ -18,9 +18,10 @@ public static class RegistrationExtensions
     {
         builder.RootComponents.Add<ShinyRootComponent>("head::after");
         builder.Services.TryAddSingleton<ISerializer, DefaultSerializer>();
-        builder.Services.TryAddSingleton<IKeyValueStore, LocalStorageStore>();
         builder.Services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
         builder.Services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
+        builder.Services.AddShinyService<LocalStorageStore>();
+
         return builder;
     }
 

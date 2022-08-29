@@ -6,42 +6,44 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
+using Shiny.Stores;
 
 namespace Shiny.Infrastructure;
 
 
 public class ShinyRootComponent : ComponentBase
 {
-    [Inject]
-    public IServiceProvider Services { get; set; } = null!;
-
-    [Inject]
-    public ILogger<ShinyRootComponent> Logger { get; set; } = null!;
+    [Inject] public IServiceProvider Services { get; set; } = null!;
+    [Inject] public ILoggerFactory LoggerFactory { get; set; } = null!;
+    [Inject] public ILogger<ShinyRootComponent> Logger { get; set; } = null!;
 
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        var tasks = this.Services.GetServices<IShinyStartupTask>();
-        if (tasks.Any())
-        {
-            this.Logger.LogInformation($"Running {tasks.Count()} Shiny Startup Tasks");
+        // keystores must be initialized first to allow all other services to bind properly
+        var services = this.Services
+            .GetServices<IKeyValueStore>()
+            .OfType<IShinyWebAssemblyService>()
+            .ToList();
 
-            foreach (var task in tasks)
-            {
-                try
-                {
-                    task.Start();
-                }
-                catch (Exception ex)
-                {
-                    this.Logger.LogError(ex, $"Failed to start '{task.GetType().FullName}'");
-                }
-            }
-        }
+        await this.IterateServices(services);
 
-        var services = this.Services.GetServices<IShinyWebAssemblyService>();
+        services = this.Services
+            .GetServices<IShinyWebAssemblyService>()
+            .Where(x => x is not IKeyValueStore)
+            .ToList();
+
+        await this.IterateServices(services);
+
+        var host = new Host(this.Services, this.LoggerFactory);
+        host.Run(); // setup default shiny host
+    }
+
+
+    async Task IterateServices(IEnumerable<IShinyWebAssemblyService> services)
+    {
         if (services.Any())
         {
             this.Logger.LogInformation($"Starting '{services.Count()}' Shiny WASM Services");
@@ -57,8 +59,9 @@ public class ShinyRootComponent : ComponentBase
     async Task Execute(IShinyWebAssemblyService service)
     {
         try
-        {
+        {            
             await service.OnStart();
+            this.Logger.LogInformation($"Started up {service.GetType().FullName}");
         }
         catch (Exception ex)
         {
