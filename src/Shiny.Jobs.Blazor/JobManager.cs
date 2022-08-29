@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using Shiny.Infrastructure;
 using Shiny.Net;
 using Shiny.Power;
 using Shiny.Stores;
@@ -11,8 +12,7 @@ using Shiny.Stores;
 namespace Shiny.Jobs.Blazor;
 
 
-// TODO: foreground timer
-public class JobManager : IJobManager, IShinyStartupTask
+public class JobManager : IJobManager, IShinyWebAssemblyService
 {
     readonly IJSRuntime jsRuntime;
     readonly IRepository<JobInfo> repository;
@@ -35,7 +35,12 @@ public class JobManager : IJobManager, IShinyStartupTask
     }
 
 
-    public async void Start() => this.jsRef = await this.jsRuntime.ImportInProcess("Shiny.Jobs", "jobs.js");
+    public async Task OnStart()
+    {
+        // TODO: foreground timer
+        this.jsRef = await this.jsRuntime.ImportInProcess("Shiny.Jobs", "jobs.js");
+    }
+
 
 
     public bool IsRunning => throw new NotImplementedException();

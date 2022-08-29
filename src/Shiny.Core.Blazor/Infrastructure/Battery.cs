@@ -2,13 +2,14 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Shiny.Power;
 
 namespace Shiny.Infrastructure;
 
 
-public class Battery : IBattery, IShinyStartupTask, IDisposable
+public class Battery : IBattery, IShinyWebAssemblyService, IDisposable
 {
     readonly Subject<Unit> changeSubj = new();
     readonly IJSRuntime jsRuntime;
@@ -21,7 +22,7 @@ public class Battery : IBattery, IShinyStartupTask, IDisposable
     }
 
 
-    public async void Start()
+    public async Task OnStart()
     {
         this.module = await this.jsRuntime.ImportInProcess("Shiny.Core.Blazor", "battery.js");
         this.module.InvokeVoid("init");

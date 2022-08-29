@@ -17,6 +17,7 @@
 
     <ItemGroup>
         <PackageReference Update="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
+        <PackageReference Update="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
     </ItemGroup>
 
     <ItemGroup>

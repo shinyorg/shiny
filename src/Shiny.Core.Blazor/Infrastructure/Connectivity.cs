@@ -2,12 +2,14 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using Shiny.Infrastructure;
 
 namespace Shiny.Net;
 
 
-public class Connectivity : IConnectivity, IShinyStartupTask, IDisposable
+public class Connectivity : IConnectivity, IShinyWebAssemblyService, IDisposable
 {
     readonly IJSRuntime interop;
     readonly Subject<Unit> connSubj = new();
@@ -20,7 +22,7 @@ public class Connectivity : IConnectivity, IShinyStartupTask, IDisposable
     }
 
 
-    public async void Start()
+    public async Task OnStart()
     {
         this.module = await this.interop.ImportInProcess("Shiny.Core.Blazor", "connectivity.js");
         this.module.InvokeVoid("init");

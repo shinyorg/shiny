@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Infrastructure;
 using Shiny.Infrastructure.Impl;
@@ -11,15 +12,16 @@ using Shiny.Web.Stores;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class RegistrationExtensions
 {
-    public static IServiceCollection UseShiny(this IServiceCollection services)
+    public static WebAssemblyHostBuilder UseShiny(this WebAssemblyHostBuilder builder)
     {
-        services.TryAddSingleton<ISerializer, DefaultSerializer>();
-        services.TryAddSingleton<IKeyValueStore, LocalStorageStore>();
-        services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
-        services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
-        return services;
+        builder.RootComponents.Add<ShinyRootComponent>("head::after");
+        builder.Services.TryAddSingleton<ISerializer, DefaultSerializer>();
+        builder.Services.TryAddSingleton<IKeyValueStore, LocalStorageStore>();
+        builder.Services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+        builder.Services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
+        return builder;
     }
 
 

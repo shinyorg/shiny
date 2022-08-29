@@ -7,10 +7,12 @@
 <h1>GPS</h1>
 
 <p role="status">Status: @status</p>
-<p role="log">Latitude: @latitude</p>
-<p role="log">Longitude: @longitude</p>
-<p role="log">Altitude: @altitude</p>
-<p role="log">Speed: @speed</p>
+<p role="log">Latitude: @this.reading?.Position.Latitude</p>
+<p role="log">Longitude: @this.reading?.Position.Longitude</p>
+<p role="log">Altitude: @this.reading?.Altitude</p>
+<p role="log">Speed: @this.reading?.Speed</p>
+<p role="log">Heading: @this.reading?.Heading</p>
+<p role="log">Timestamp: @this.reading?.Timestamp.ToLocalTime()</p>
 
 <button class="btn btn-primary" @onclick="@(async () => await DoCurrent())">Current Position</button>
 @if (this.listening)
@@ -23,10 +25,7 @@ else
 }
 
 @code {
-    double latitude = 0;
-    double longitude = 0;
-    double altitude = 0;
-    double speed = 0;
+    GpsReading? reading = null;
     string status = "Unknown";
     bool listening = false;
     IDisposable sub = null!;
@@ -34,11 +33,15 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        this.status = (await this.gpsManager.RequestAccess(GpsRequest.Realtime(true))).ToString();
+        if (firstRender)
+        {
+            this.status = (await this.gpsManager.RequestAccess(GpsRequest.Realtime(true))).ToString();
+            this.StateHasChanged();
 
-        this.sub = this.gpsManager
-            .WhenReading()
-            .Subscribe(x => this.Update(x));
+            this.sub = this.gpsManager
+                .WhenReading()
+                .Subscribe(x => this.Update(x));
+        }
     }
 
     public void Dispose()
@@ -68,11 +71,7 @@ else
 
     void Update(GpsReading reading)
     {
-        this.latitude = reading.Position.Latitude;
-        this.longitude = reading.Position.Longitude;
-        this.altitude = reading.Altitude;
-        this.speed = reading.Speed;
-
+        this.reading = reading;
         this.StateHasChanged();
     }
 }

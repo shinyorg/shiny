@@ -1,4 +1,4 @@
-using System;
+using System;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -6,15 +6,17 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using Shiny.Infrastructure;
 using Shiny.Web.Infrastructure;
 
 namespace Shiny.Locations.Blazor;
 
 
-public class GpsManager : IGpsManager, IAsyncDisposable
+public class GpsManager : IGpsManager, IShinyWebAssemblyService
 {
     readonly Subject<GpsReading> readingSubj = new();
     readonly IJSInProcessRuntime jsRuntime;
+    IJSInProcessObjectReference module = null!;
 
 
     public GpsManager(IJSRuntime runtime)
@@ -23,11 +25,9 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     }
 
 
-    IJSInProcessObjectReference? jsRef;
-    async Task<IJSInProcessObjectReference> GetModule()
+    public async Task OnStart()
     {
-        this.jsRef ??= await this.jsRuntime.ImportInProcess("Shiny.Locations.Blazor", "gps.js");
-        return this.jsRef;
+        this.module = await this.jsRuntime.ImportInProcess("Shiny.Locations.Blazor", "gps.js");
     }
 
 
@@ -37,13 +37,14 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     public int Total { get; set; }
     public bool IsIndeterministic { get; set; }
     public event PropertyChangedEventHandler PropertyChanged;
-    public GpsRequest CurrentListener => throw new NotImplementedException();
+    public GpsRequest CurrentListener { get; private set; } // TODO: restore
 
 
     public IObservable<GpsReading> GetLastReading() => Observable.FromAsync<GpsReading>(async ct =>
     {
-        var mod = await this.GetModule();
-        var result = await mod.InvokeAsync<GeoPosition>("getCurrent"); // promise
+        (await this.RequestAccess(GpsRequest.Foreground)).Assert();
+
+        var result = await this.module.InvokeAsync<GeoPosition>("getCurrent"); // promise
         var pos = To(result);
         return pos;
     });
@@ -51,8 +52,7 @@ public class GpsManager : IGpsManager, IAsyncDisposable
 
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
-        var mod = await this.GetModule();
-        var result = await mod.InvokeAsync<string>("requestAccess"); // promise
+        var result = await this.module.InvokeAsync<string>("requestAccess"); // promise
         return Utils.ToAccessState(result);
     }
 
@@ -61,23 +61,25 @@ public class GpsManager : IGpsManager, IAsyncDisposable
 
     public async Task StartListener(GpsRequest request)
     {
-        //this.CurrentListener = request;
+        // TODO: if already listening
+        (await this.RequestAccess(request)).Assert();
+
+        this.CurrentListener = request;
         this.disposer = new();
-        var module = await this.GetModule();
         var watch = JsCallback<GeoPosition>.CreateInterop();
         this.disposer.Add(this.disposer);
 
         watch
             .Value
             .WhenResult()
-            .Finally(() => module.InvokeVoid("stopListener"))
+            .Finally(() => this.module.InvokeVoid("stopListener"))
             .Subscribe(
                 x => this.readingSubj.OnNext(To(x)),
                 ex => this.readingSubj.OnError(ex)
             )
             .DisposedBy(this.disposer);
 
-        module.InvokeVoid("startListener", watch);
+        this.module.InvokeVoid("startListener", watch);
     }
 
 
@@ -88,31 +90,7 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     }
 
 
-    //public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => this
-    //    .GetModule()
-    //    .ToObservable()
-    //    .Select(mod => Observable.Create<AccessState>(ob =>
-    //    {
-    //        var watch = JsCallback<string>.CreateInterop();
-    //        var sub = watch.Value.WhenResult().Select(Utils.ToAccessState).Subscribe(state => ob.OnNext(state));
-
-    //        mod.InvokeVoidAsync("shinyGps.whenStatusChanged", watch);
-    //        return () =>
-    //        {
-    //            watch?.Dispose();
-    //            sub?.Dispose();
-    //        };
-    //    }))
-    //    .Switch();
-
-
     public IObservable<GpsReading> WhenReading() => this.readingSubj;
-
-    public async ValueTask DisposeAsync()
-    {
-        if (this.jsRef != null)
-            await this.jsRef.DisposeAsync();
-    }
 
 
     static GpsReading To(GeoPosition pos) => new GpsReading(

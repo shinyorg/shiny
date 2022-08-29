@@ -1,6 +1,12 @@
 ﻿const sr = new SpeechRecognition();
 var dotNetRef;
 
+export function requestAccess() {
+    if (window.SpeechRecognition === undefined)
+        return 'notsupported';
+
+    return 'granted';
+}
 
 export function startListener(dotNetRef) {
     //sr.continuous = true;

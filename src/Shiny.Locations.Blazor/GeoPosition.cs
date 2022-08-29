@@ -31,6 +31,7 @@ public class GeoPosition
     public double? RawAltitude { get; set; }
 
     Position? position;
+    [JsonIgnore]
     public Position Position => this.position ??= new Position(this.Latitude, this.Longitude);
 
     [JsonIgnore]

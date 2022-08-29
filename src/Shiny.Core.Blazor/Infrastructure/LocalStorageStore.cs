@@ -2,11 +2,12 @@ using Microsoft.JSInterop;
 using System;
 using Shiny.Stores;
 using Shiny.Infrastructure;
+using System.Threading.Tasks;
 
 namespace Shiny.Web.Stores;
 
 
-public class LocalStorageStore : IKeyValueStore, IShinyStartupTask
+public class LocalStorageStore : IKeyValueStore, IShinyWebAssemblyService
 {
     readonly IJSInProcessRuntime jsProc;
     readonly ISerializer serializer;
@@ -20,7 +21,7 @@ public class LocalStorageStore : IKeyValueStore, IShinyStartupTask
     }
 
 
-    public async void Start()
+    public async Task OnStart()
     {
         this.module = await this.jsProc.ImportInProcess("Shiny.Core.Blazor", "storage.js");
     }

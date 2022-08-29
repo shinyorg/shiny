@@ -12,6 +12,6 @@ public static class ServiceCollectionExtensions
     public static void AddGps(this IServiceCollection services)
     {
         // geofencing can use GPS direct module
-        services.TryAddSingleton<IGpsManager, GpsManager>();
+        services.AddShinyService<GpsManager>();
     }
 }
