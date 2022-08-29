@@ -8,34 +8,23 @@ export function requestAccess() {
     return 'granted';
 }
 
-export function startListener(dotNetRef) {
-    //sr.continuous = true;
-    //sr.interimResults = true;
-    sr.onaudiostart = e => {
+export function startListener(lang, continuous, interim, dotNetRef) {
+    sr.continuous = continuous;
+    sr.interimResults = interim;
+    sr.lang = lang;
 
-    };
-
-    sr.onaudioend = e => {
-
-    };
+    //sr.onaudiostart = e => {}
+    //sr.onaudioend = e => {}
+    //sr.onend = e => { }
 
     sr.onresult = e => {
-
-    };
-
-    sr.onend = e => {
-
+        console.log('SPEECH RESULT', e);
+        //dotNetRef
     };
     sr.start();
 }
 
 export function stopListener() {
     sr.stop();
+    sr.onresult = null;
 }
-//const speechRecognitionList = new SpeechGrammarList();
-//speechRecognitionList.addFromString(grammar, 1);
-//recognition.grammars = speechRecognitionList;
-////recognition.continuous = false;
-//recognition.lang = 'en-US';
-//recognition.interimResults = false;
-//recognition.maxAlternatives = 1;

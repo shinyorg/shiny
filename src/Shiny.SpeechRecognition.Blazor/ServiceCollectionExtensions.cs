@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddSpeechRecognition(this IServiceCollection services)
     {
-        services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizer>();
+        services.AddShinyService<SpeechRecognizer>();
         return services;
     }
 }
