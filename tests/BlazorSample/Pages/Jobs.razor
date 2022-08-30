@@ -1,3 +1,13 @@
 ﻿@page "/jobs"
+@inject Shiny.Jobs.IJobManager jobManager;
 
 <PageTitle>Jobs</PageTitle>
+<h1>Jobs</h1>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await this.OnInitializedAsync();
+    }
+}
