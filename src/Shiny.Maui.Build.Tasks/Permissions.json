@@ -14,11 +14,16 @@
       "READ_CALENDAR"
     ]
   },
-  "Camera": {
-    "AndroidManifest": [
-      "CAMERA"
-    ]
-  },
+    "Camera": {
+        "iOS": {
+            "Info": [
+                "NSCameraUsageDescription"
+            ]
+        },
+        "AndroidManifest": [
+            "CAMERA"
+        ]
+    },
   "ContactsRead": {
     "AndroidManifest": [
       "READ_CONTACTS"
@@ -53,23 +58,29 @@
   "Jobs": {
     "iOS": {
       "BackgroundModes": [
-        "fetch",
         "processing"
       ]
     }
   },
   "BleHosting": {
     "AndroidManifest": [
-      "BLUETOOTH_ADVERTISE"
+        // new
+        "BLUETOOTH_ADVERTISE",
+        "BLUETOOTH_CONNECT",
+
+        // old
+        "BLUETOOTH"
     ]
   },
   "BluetoothLE": {
     "AndroidManifest": [
-      "ACCESS_FINE_LOCATION",
-      "ACCESS_COARSE_LOCATION",
+        // old
+        "ACCESS_FINE_LOCATION",
       "BLUETOOTH",
       "BLUETOOTH_ADMIN",
       "BLUETOOTH_PRIVILEGED",
+
+      //new
       "BLUETOOTH_SCAN",
       "BLUETOOTH_CONNECT"
     ],
@@ -83,12 +94,10 @@
   "BeaconMonitoring": {
     "AndroidManifest": [
       "ACCESS_FINE_LOCATION",
-      "ACCESS_COARSE_LOCATION",
       "BLUETOOTH",
       "BLUETOOTH_ADMIN",
       "BLUETOOTH_PRIVILEGED",
       "BLUETOOTH_SCAN",
-      "BLUETOOTH_CONNECT",
       "FOREGROUND_SERVICE"
     ],
     "iOS": {
@@ -103,8 +112,8 @@
   },
   "BeaconRanging": {
     "AndroidManifest": [
-      "ACCESS_FINE_LOCATION",
-      "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+
       "BLUETOOTH",
       "BLUETOOTH_ADMIN",
       "BLUETOOTH_PRIVILEGED",
