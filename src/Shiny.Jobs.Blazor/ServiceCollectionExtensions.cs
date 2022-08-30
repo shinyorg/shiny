@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
 using Shiny.Jobs.Blazor;
+using Shiny.Jobs.Infrastructure;
 
 namespace Shiny;
 
@@ -13,7 +14,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddBattery();
         services.AddConnectivity();
-        //services.AddRepository
+        services.AddRepository<JobInfoStoreConverter, JobInfo>();
+        //services.AddShinyService<JobsStartup>();
+        //services.AddShinyService<JobLifecycleTask>();
         services.TryAddSingleton<IJobManager, JobManager>();
 
         return services;

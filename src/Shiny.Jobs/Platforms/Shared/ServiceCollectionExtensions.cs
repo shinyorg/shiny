@@ -54,11 +54,12 @@ public static class ServiceCollectionExtensions
 
         services.AddRepository<JobInfoStoreConverter, JobInfo>();
         services.AddShinyService<JobsStartup>();
-        services.TryAddSingleton<IJobManager, JobManager>();
+        services.AddShinyService<JobLifecycleTask>();
 
+        services.TryAddSingleton<IJobManager, JobManager>();
         services.AddBattery();
         services.AddConnectivity();
-        services.AddShinyService<JobLifecycleTask>();
+        
         return services;
     }
 }
