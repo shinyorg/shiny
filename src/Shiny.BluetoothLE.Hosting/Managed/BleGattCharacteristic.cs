@@ -8,6 +8,9 @@ public abstract class BleGattCharacteristic
 {
     public IGattCharacteristic Characteristic { get; internal set; } = null!;
 
+    public virtual Task OnStart() => Task.CompletedTask;
+    public virtual void OnStop() { }
+
     public virtual Task<GattState> OnWrite(WriteRequest request)
         => throw new InvalidOperationException("This method must overridden to use write");
 

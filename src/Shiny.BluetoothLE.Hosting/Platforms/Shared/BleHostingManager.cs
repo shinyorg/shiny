@@ -73,10 +73,8 @@ public partial class BleHostingManager : IShinyStartupTask
         if (!this.gattServices.Any())
             throw new InvalidOperationException("There are no register BLE services");
 
-        foreach (var service in this.gattServices)
-        {
+        foreach (var service in this.gattServices)        
             await this.BuildService(service.Key, service.Value).ConfigureAwait(false);
-        }
     }
 
 
@@ -86,20 +84,29 @@ public partial class BleHostingManager : IShinyStartupTask
             return;
 
         this.IsRegisteredServicesAttached = false;
-        foreach (var serviceUuid in this.gattServices!.Keys)
-        {
+        foreach (var serviceUuid in this.gattServices!.Keys)        
             this.RemoveService(serviceUuid);
-        }
+        
+        foreach (var ch in this.gattChars)
+            ch.OnStop(); // TODO: error trap this for user?
     }
 
 
-    Task BuildService(string serviceUuid, List<(BleGattCharacteristic Characteristic, BleGattCharacteristicAttribute Attribute)> list) => this.AddService(serviceUuid, true, sb =>
+    async Task BuildService(string serviceUuid, List<(BleGattCharacteristic Characteristic, BleGattCharacteristicAttribute Attribute)> list)
     {
-        foreach (var character in list)
-        {
-            this.BuildCharacteristic(sb, character.Characteristic, character.Attribute);
-        }
-    });
+        await this
+            .AddService(serviceUuid, true, sb =>
+            {
+                foreach (var character in list)
+                {
+                    this.BuildCharacteristic(sb, character.Characteristic, character.Attribute);
+                }
+            })
+            .ConfigureAwait(false);
+
+        foreach (var ch in list)
+            await ch.Characteristic.OnStart().ConfigureAwait(false); // TODO: error trap this for user
+    }
 
 
     void BuildCharacteristic(IGattServiceBuilder sb, BleGattCharacteristic characteristic, BleGattCharacteristicAttribute attribute)
