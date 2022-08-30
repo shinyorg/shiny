@@ -50,11 +50,7 @@ public class GpsManager : IGpsManager, IShinyWebAssemblyService
     });
 
 
-    public async Task<AccessState> RequestAccess(GpsRequest request)
-    {
-        var result = await this.module.InvokeAsync<string>("requestAccess"); // promise
-        return Utils.ToAccessState(result);
-    }
+    public Task<AccessState> RequestAccess(GpsRequest request) => this.module.RequestAccess();
 
 
     CompositeDisposable? disposer;

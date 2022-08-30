@@ -28,28 +28,15 @@ public static class Utils
     }
 
 
-    public static AccessState ToAccessState(string value) => value switch
+    public static async Task<AccessState> RequestAccess(this IJSObjectReference jsRef, string methodName = "requestAccess")
     {
-        "granted" => AccessState.Available,
-        "denied" => AccessState.Denied,
-        "notsupported" => AccessState.NotSupported,
-        _ => AccessState.Unknown
-    };
-
-
-    //public static async Task<JsObjectReferenceDynamic> Import<T>(this IJSRuntime jsRuntime, string fileName)
-    //{
-    //    var libraryName = typeof(T).Assembly.GetName().Name;
-    //    var module = await jsRuntime.InvokeAsync<JSObjectReference>(
-    //        "import", $"./_content/{libraryName}/{fileName}.js")
-    //    );
-    //    return new JsObjectReferenceDynamic(module);
-    //}
-
-    //        public IObservable<IJSObjectReference> Import(this IJSRuntime js, string module, string fileName)
-    //        {
-
-    //        }
-
-    // TODO: object binder to editcontext
+        var result = await jsRef.InvokeAsync<string>(methodName);
+        return result switch
+        {
+            "granted" => AccessState.Available,
+            "denied" => AccessState.Denied,
+            "notsupported" => AccessState.NotSupported,
+            _ => AccessState.Unknown
+        };
+    }
 }

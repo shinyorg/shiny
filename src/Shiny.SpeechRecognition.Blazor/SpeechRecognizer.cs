@@ -69,13 +69,7 @@ public class SpeechRecognizer : ISpeechRecognizer, IShinyWebAssemblyService
         .Where(x => x != null);
 
 
-    public Task<AccessState> RequestAccess()
-    {
-        var value = this.module.Invoke<string>("requestAccess"); //not a promise
-        var result = Utils.ToAccessState(value);
-        return Task.FromResult(result);
-    }
-
+    public Task<AccessState> RequestAccess() => this.module.RequestAccess("requestAccess");
 
     // TODO: translate result
     [JSInvokable] public void OnResult() => this.resultSubj.OnNext(Unit.Default);
