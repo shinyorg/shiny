@@ -5,6 +5,39 @@ var dotNetRef;
 export async function init(objRef) {
     reg = await navigator.serviceWorker.ready;
     dotNetRef = objRef;
+
+    reg.pushManager.onpushsubscriptionchange = e => {
+        // TODO: ontokenchanged
+
+        //const subscription = swRegistration.pushManager
+        //    .subscribe(event.oldSubscription.options)
+        //    .then((subscription) =>
+        //        fetch("register", {
+        //            method: "post",
+        //            headers: {
+        //                "Content-type": "application/json",
+        //            },
+        //            body: JSON.stringify({
+        //                endpoint: subscription.endpoint,
+        //            }),
+        //        }),
+        //    );
+        //event.waitUntil(subscription);
+    };
+
+    reg.pushManager.onpush = e => {
+        //let message = e.data.json();
+
+        //switch (message.type) {
+        //    case "init":
+        //        doInit();
+        //        break;
+        //    case "shutdown":
+        //        doShutdown();
+        //        break;
+        //}
+    };
+
     self.addEventListener('push', e => {
         //if (!(self.Notification && self.Notification.permission === 'granted')) {
         //    return;

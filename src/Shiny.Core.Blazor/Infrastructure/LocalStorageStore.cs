@@ -9,21 +9,19 @@ namespace Shiny.Web.Stores;
 
 public class LocalStorageStore : IKeyValueStore, IShinyWebAssemblyService
 {
-    readonly IJSInProcessRuntime jsProc;
     readonly ISerializer serializer;
     IJSInProcessObjectReference module = null!;
 
 
-    public LocalStorageStore(IJSRuntime jsRuntime, ISerializer serializer)
+    public LocalStorageStore(ISerializer serializer)
     {
-        this.jsProc = (IJSInProcessRuntime)jsRuntime;
         this.serializer = serializer;
     }
 
 
-    public async Task OnStart()
+    public async Task OnStart(IJSInProcessRuntime jsRuntime)
     {
-        this.module = await this.jsProc.ImportInProcess("Shiny.Core.Blazor", "storage.js");
+        this.module = await jsRuntime.ImportInProcess("Shiny.Core.Blazor", "storage.js");
     }
 
 

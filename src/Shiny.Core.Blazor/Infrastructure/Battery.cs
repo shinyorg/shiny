@@ -12,19 +12,12 @@ namespace Shiny.Infrastructure;
 public class Battery : IBattery, IShinyWebAssemblyService, IDisposable
 {
     readonly Subject<Unit> changeSubj = new();
-    readonly IJSRuntime jsRuntime;
     IJSInProcessObjectReference module = null!;
 
 
-    public Battery(IJSRuntime jsRuntime)
+    public async Task OnStart(IJSInProcessRuntime jsRuntime)
     {
-        this.jsRuntime = jsRuntime;
-    }
-
-
-    public async Task OnStart()
-    {
-        this.module = await this.jsRuntime.ImportInProcess("Shiny.Core.Blazor", "battery.js");
+        this.module = await jsRuntime.ImportInProcess("Shiny.Core.Blazor", "battery.js");
         this.module.InvokeVoid("init");
     }
 

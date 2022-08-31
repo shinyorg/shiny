@@ -11,20 +11,13 @@ namespace Shiny.Net;
 
 public class Connectivity : IConnectivity, IShinyWebAssemblyService, IDisposable
 {
-    readonly IJSRuntime interop;
     readonly Subject<Unit> connSubj = new();
     IJSInProcessObjectReference? module;
 
 
-    public Connectivity(IJSRuntime interop)
+    public async Task OnStart(IJSInProcessRuntime jsRuntime)
     {
-        this.interop = interop;
-    }
-
-
-    public async Task OnStart()
-    {
-        this.module = await this.interop.ImportInProcess("Shiny.Core.Blazor", "connectivity.js");
+        this.module = await jsRuntime.ImportInProcess("Shiny.Core.Blazor", "connectivity.js");
         this.module.InvokeVoid("init");
     }
 
