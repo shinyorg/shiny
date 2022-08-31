@@ -16,6 +16,7 @@ public class FbMessagingDelegate : NSObject, IMessagingDelegate
     }
 
 
+    [Export("messaging:didReceiveRegistrationToken:")]
     public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
         => this.onToken(fcmToken);
 }

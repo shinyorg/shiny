@@ -18,6 +18,8 @@
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+
+        <XamarinIosFirebaseVersion>8.10.0.1</XamarinIosFirebaseVersion>
     </PropertyGroup>
 
     <PropertyGroup>

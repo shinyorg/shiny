@@ -22,13 +22,15 @@
 
     <ItemGroup>
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
-        <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0.7" />
-        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.1" />
-        <PackageReference Update="Xamarin.Firebase.iOS.InstanceID" Version="4.8.0" />
-        <!--
-        <PackageReference Update="Xamarin.Firebase.iOS.Installations" Version="8.10.0.1" />
-        <PackageReference Update="Xamarin.Firebase.iOS.Core" Version="8.10.0.1" />
-        -->
+        <PackageReference Update="Xamarin.Firebase.Messaging" Version="123.0.7" />
+        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="$(XamarinIosFirebaseVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.2.12" />
+        <PackageReference Update="Xamarin.Firebase.Analytics" Version="120.1.2" />
+        <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="$(XamarinIosFirebaseVersion)" />
+        <PackageReference Update="Xamarin.FireBase.iOS.Analytics" Version="$(XamarinIosFirebaseVersion)" />
     </ItemGroup>
 
     <ItemGroup>
