@@ -22,7 +22,7 @@
 
     <ItemGroup>
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
-        <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0.7" />
+        <PackageReference Update="Xamarin.Firebase.Messaging" Version="123.0.7" />
         <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.1" />
         <PackageReference Update="Xamarin.Firebase.iOS.InstanceID" Version="4.8.0" />
         <!--
