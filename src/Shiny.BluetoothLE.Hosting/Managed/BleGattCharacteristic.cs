@@ -7,6 +7,7 @@ namespace Shiny.BluetoothLE.Hosting.Managed;
 public abstract class BleGattCharacteristic
 {
     public IGattCharacteristic Characteristic { get; internal set; } = null!;
+    protected int SubscriptionCount => this.Characteristic.SubscribedCentrals.Count;
 
     public virtual Task OnStart() => Task.CompletedTask;
     public virtual void OnStop() { }
