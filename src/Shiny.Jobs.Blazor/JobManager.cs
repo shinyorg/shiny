@@ -19,12 +19,10 @@ public class JobManager : AbstractJobManager, IShinyWebAssemblyService
     readonly IJSRuntime jsRuntime;
     readonly IBattery battery;
     readonly IConnectivity connectivity;
-
     IJSInProcessObjectReference jsRef = null!;
 
 
     public JobManager(
-        IJSRuntime jsRuntime,
         IServiceProvider services,
         ILogger<IJobManager> logger,
         IRepository<JobInfo> repository,
@@ -33,16 +31,15 @@ public class JobManager : AbstractJobManager, IShinyWebAssemblyService
     )
     : base(services, repository, logger)
     {
-        this.jsRuntime = jsRuntime;
         this.battery = battery;
         this.connectivity = connectivity;
     }
 
 
-    public async Task OnStart()
+    public async Task OnStart(IJSInProcessRuntime jsRuntime)
     {
         // TODO: foreground timer
-        this.jsRef = await this.jsRuntime.ImportInProcess("Shiny.Jobs", "jobs.js");
+        this.jsRef = await jsRuntime.ImportInProcess("Shiny.Jobs", "jobs.js");
     }
 
     public override Task<AccessState> RequestAccess() => this.jsRef.RequestAccess();

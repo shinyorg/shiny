@@ -1,4 +1,46 @@
 ﻿@page "/speech"
+@inject Shiny.SpeechRecognition.ISpeechRecognizer speech
 
 <PageTitle>Speech Recognition</PageTitle>
 <h1>Speech Recognition</h1>
+
+<div>Status: @status</div>
+
+<button class="btn btn-success" @onclick="Start">Start Continuous</button>
+<button class="btn btn-danger" @onclick="Start">Stop Continuous</button>
+
+<div>@transcript</div>
+
+@code
+{
+    IDisposable sub;
+    string status = "Unknown";
+    string transcript = String.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.status = (await speech.RequestAccess()).ToString();
+    }
+
+
+    public void Start()
+    {
+        this.transcript = String.Empty;
+
+        this.sub = this.speech
+            .ContinuousDictation()
+            .Subscribe(x =>
+            {
+                this.transcript += " " + x;
+                this.StateHasChanged();
+            });
+    }
+
+
+    public void Stop()
+    {
+        this.sub.Dispose();
+    }
+}

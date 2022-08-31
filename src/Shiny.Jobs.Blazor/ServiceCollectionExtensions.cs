@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddRepository<JobInfoStoreConverter, JobInfo>();
         //services.AddShinyService<JobsStartup>();
         //services.AddShinyService<JobLifecycleTask>();
-        services.TryAddSingleton<IJobManager, JobManager>();
+        services.AddShinyService<JobManager>();
 
         return services;
     }

@@ -15,19 +15,12 @@ namespace Shiny.Locations.Blazor;
 public class GpsManager : IGpsManager, IShinyWebAssemblyService
 {
     readonly Subject<GpsReading> readingSubj = new();
-    readonly IJSInProcessRuntime jsRuntime;
     IJSInProcessObjectReference module = null!;
 
 
-    public GpsManager(IJSRuntime runtime)
+    public async Task OnStart(IJSInProcessRuntime jsRuntime)
     {
-        this.jsRuntime = (IJSInProcessRuntime)runtime;
-    }
-
-
-    public async Task OnStart()
-    {
-        this.module = await this.jsRuntime.ImportInProcess("Shiny.Locations.Blazor", "gps.js");
+        this.module = await jsRuntime.ImportInProcess("Shiny.Locations.Blazor", "gps.js");
     }
 
 

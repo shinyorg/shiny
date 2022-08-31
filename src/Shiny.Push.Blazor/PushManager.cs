@@ -1,48 +1,25 @@
-//using Microsoft.JSInterop;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.JSInterop;
+using Shiny.Infrastructure;
 
-//namespace Shiny.Push.Web;
-
-
-//public class PushManager : IPushManager, IAsyncDisposable
-//{
-//    readonly IJSRuntime jsRuntime;
-//    IJSObjectReference? jsRef;
+namespace Shiny.Push.Blazor;
 
 
-//    public PushManager(IJSRuntime jsRuntime)
-//    {
-//        this.jsRuntime = jsRuntime;
-//    }
+public class PushManager : IPushManager, IShinyWebAssemblyService
+{
+    IJSInProcessObjectReference jsModule = null!;
 
 
-//    public DateTime? CurrentRegistrationTokenDate => throw new NotImplementedException();
-//    public string CurrentRegistrationToken => throw new NotImplementedException();
-
-//    async ValueTask<IJSObjectReference> GetModule()
-//    {
-//        this.jsRef ??= await this.jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Push.Web/push.js");
-//        return this.jsRef;
-//    }
+    public async Task OnStart(IJSInProcessRuntime jsRuntime)
+        => this.jsModule = await jsRuntime.ImportInProcess("Shiny.Push.Blazor", "push.js");
 
 
-//    public async ValueTask DisposeAsync()
-//    {
-//        if (this.jsRef != null)
-//            await this.jsRef.DisposeAsync();
-//    }
-
-//    public IObservable<PushNotification> WhenReceived()
-//    {
-//        throw new NotImplementedException();
-//    }
-
-//    public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
-//    {
-//        throw new NotImplementedException();
-//    }
-
-//    public Task UnRegister()
-//    {
-//        throw new NotImplementedException();
-//    }
-//}
+    public DateTime? CurrentRegistrationTokenDate => throw new NotImplementedException();
+    public string? CurrentRegistrationToken => throw new NotImplementedException();
+    
+    public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => throw new NotImplementedException();
+    public Task UnRegister() => throw new NotImplementedException();
+    public IObservable<PushNotification> WhenReceived() => throw new NotImplementedException();
+}

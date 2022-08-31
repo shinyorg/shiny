@@ -1,17 +1,16 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.Nfc;
-using Shiny.Nfc.Blazor;
+using Shiny.Push.Blazor;
 
 namespace Shiny;
 
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddNfc(this IServiceCollection services)
+    public static IServiceCollection AddPush(this IServiceCollection services)
     {
-        services.AddShinyService<NfcManager>();
+        services.AddShinyService<PushManager>();
         return services;
     }
 }

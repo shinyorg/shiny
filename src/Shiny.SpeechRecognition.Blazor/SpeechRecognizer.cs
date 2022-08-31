@@ -15,19 +15,12 @@ public class SpeechRecognizer : ISpeechRecognizer, IShinyWebAssemblyService
 {
     readonly Subject<Unit> speechEndSubj = new();
     readonly Subject<Unit> resultSubj = new();
-    readonly IJSInProcessRuntime jsProc;
-    IJSInProcessObjectReference module = null!;
+    IJSInProcessObjectReference jsModule = null!;
 
 
-    public SpeechRecognizer(IJSRuntime jsRuntime)
+    public async Task OnStart(IJSInProcessRuntime jsRuntime)
     {
-        this.jsProc = (IJSInProcessRuntime)jsRuntime;
-    }
-
-
-    public async Task OnStart()
-    {
-        this.module = await this.jsProc.ImportInProcess("Shiny.SpeechRecognition.Blazor", "speech.js");
+        this.jsModule = await jsRuntime.ImportInProcess("Shiny.SpeechRecognition.Blazor", "speech.js");
     }
 
 
@@ -44,7 +37,7 @@ public class SpeechRecognizer : ISpeechRecognizer, IShinyWebAssemblyService
                 .DisposedBy(d);
 
             var lang = culture?.Name ?? "en-US";
-            this.module.InvokeVoid("startListener", lang, continuous, interim, objRef);
+            this.jsModule.InvokeVoid("startListener", lang, continuous, interim, objRef);
 
             this.resultSubj
                 .Subscribe(x => ob.OnNext("TODO"))
@@ -62,14 +55,14 @@ public class SpeechRecognizer : ISpeechRecognizer, IShinyWebAssemblyService
             }
             return () =>
             {
-                this.module.InvokeVoid("stopListener");
+                this.jsModule.InvokeVoid("stopListener");
                 d.Dispose();
             };
         })
         .Where(x => x != null);
 
 
-    public Task<AccessState> RequestAccess() => this.module.RequestAccess("requestAccess");
+    public Task<AccessState> RequestAccess() => this.jsModule.RequestAccess("requestAccess");
 
     // TODO: translate result
     [JSInvokable] public void OnResult() => this.resultSubj.OnNext(Unit.Default);
