@@ -1,4 +1,63 @@
 ﻿@page "/bluetooth"
-@inject Shiny.BluetoothLE.IBleManager BleManager
+@implements IDisposable
+@using Shiny.BluetoothLE;
+@inject Shiny.BluetoothLE.IBleManager bleManager
 
 <PageTitle>BluetoothLE</PageTitle>
+<h1>Bluetooth LE</h1>
+
+<div>Status: @status</div>
+<button @onclick="ToggleScan">@(this.scanSub == null ? "Start Scan" : "Stop Scan")</button>
+
+@if (this.scanSub != null)
+{
+    <table>
+
+    @foreach (var sr in this.scanResults)
+    {
+        <tr>
+            <td>@sr.Peripheral.Uuid</td>
+            <td>@sr.Peripheral.Name</td>
+        </tr>
+    }
+    </table>
+}
+
+@code {
+    List<ScanResult> scanResults = new();
+    IDisposable? scanSub;
+    string status = "Unknown";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.status = (await bleManager.RequestAccess().ToTask()).ToString();
+    }
+
+
+    void ToggleScan()
+    {
+        if (this.scanSub == null)
+        {
+            this.scanResults.Clear();
+            this.scanSub = this.bleManager
+                .Scan()
+                // TODO: throttle
+                .Subscribe(x =>
+                {
+                    this.scanResults.Add(x);
+                    this.StateHasChanged(); 
+                });
+        }
+        else
+        {
+            this.Dispose();
+        }
+    }
+
+    public void Dispose()
+    {
+        this.scanSub?.Dispose();
+        this.scanSub = null;
+    }
+}

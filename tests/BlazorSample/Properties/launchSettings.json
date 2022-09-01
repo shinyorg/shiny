@@ -11,6 +11,8 @@
     "BlazorSample": {
       "commandName": "Project",
       "launchBrowser": true,
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "applicationUrl": "https://localhost:7284;http://localhost:5085",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

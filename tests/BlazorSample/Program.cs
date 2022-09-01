@@ -12,7 +12,7 @@ builder.UseShiny();
 builder.Services.AddGps();
 builder.Services.AddConnectivity();
 builder.Services.AddBattery();
-//builder.Services.AddBluetoothLE();
+builder.Services.AddBluetoothLE();
 var host = builder.Build();
 
 await host.RunAsync();
