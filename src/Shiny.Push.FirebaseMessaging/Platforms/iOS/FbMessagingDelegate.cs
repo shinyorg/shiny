@@ -5,19 +5,14 @@ using Firebase.CloudMessaging;
 
 namespace Shiny.Push.FirebaseMessaging
 {
-    public class FbMessagingDelegate : NSObject, IMessagingDelegate
+    public class FbMessagingDelegate : MessagingDelegate
     {
         readonly Action<string> onToken;
 
-
         public FbMessagingDelegate(Action<string> onToken)
-        {
-            IMessagingDelegate de;
-            this.onToken = onToken;
-        }
+            => this.onToken = onToken;
 
-
-        public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
+        public override void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
             => this.onToken(fcmToken);
     }
 }
