@@ -1,7 +1,7 @@
 ﻿using Shiny;
 using Microsoft.Extensions.Configuration;
 
-namespace Sample.Push.Maui;
+namespace Sample;
 
 
 public static class MauiProgram

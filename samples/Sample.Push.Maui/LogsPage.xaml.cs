@@ -1,12 +1,10 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample;
 
-namespace Sample
+
+public partial class LogsPage : SampleContentPage
 {
-    public partial class LogsPage : SampleContentPage
+    public LogsPage()
     {
-        public LogsPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

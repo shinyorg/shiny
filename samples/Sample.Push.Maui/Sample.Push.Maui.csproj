@@ -6,6 +6,7 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
 		<UseMaui>true</UseMaui>
+		<Nullable>enable</Nullable>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 
@@ -34,6 +35,14 @@
 		<ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
 		<ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
 	</ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+        <PackageReference Include="SQLitePCLRaw.core" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="2.1.0" />
+    </ItemGroup>
 
 	<PropertyGroup>
 		<DefineConstants Condition="'$(PushProvider)' == 'azure'">$(DefineConstants);AZURE</DefineConstants>

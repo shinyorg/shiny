@@ -13,6 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{7C114E37-36C8-4971-91C6-E2557DDCB4E8}"
+	ProjectSection(SolutionItems) = preProject
+		samples\readme.md = samples\readme.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1BD8-4880-B603-AFDEA8345D7E}"
 	ProjectSection(SolutionItems) = preProject

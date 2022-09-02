@@ -1,12 +1,13 @@
-﻿namespace Sample.Push.Maui;
+﻿namespace Sample;
+
 
 public partial class App : Application
 {
     public App()
     {
-        InitializeComponent();
+        this.InitializeComponent();
 
-        MainPage = new AppShell();
+        this.MainPage = new MainPage();
     }
 }
 

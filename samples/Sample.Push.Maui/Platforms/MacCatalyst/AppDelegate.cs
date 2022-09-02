@@ -1,7 +1,7 @@
 ﻿using Foundation;
 using UIKit;
 
-namespace Sample.Push.Maui;
+namespace Sample;
 
 
 [Register("AppDelegate")]
