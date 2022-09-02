@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
-using Firebase.InstanceID;
 using Microsoft.Extensions.Logging;
 using Shiny.Push.Infrastructure;
 
@@ -67,10 +66,10 @@ namespace Shiny.Push.FirebaseMessaging
             this.lifecycleSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
             {
                 // hijacking firebase because the delegate doesn't seem to fire any longer
-                Messaging.SharedInstance.AppDidReceiveMessage(userInfo);
+                //Messaging.SharedInstance.AppDidReceiveMessage(userInfo);
                 var dict = userInfo.FromNsDictionary();
-                //var pr = new PushNotification(dict, null);
-                //await this.container.OnReceived(pr).ConfigureAwait(false);
+                var pr = new PushNotification(dict, null);
+                await this.container.OnReceived(pr).ConfigureAwait(false);
             });
             if (App.DefaultInstance == null)
             {
@@ -78,7 +77,7 @@ namespace Shiny.Push.FirebaseMessaging
                 {
                     App.Configure();
                     if (Messaging.SharedInstance == null)
-                        throw new ArgumentException("Failed to configure firebase messaging - ensure you have GoogleService-Info.plist included in your iOS project and that it is set to a BundleResource");
+                        throw new InvalidOperationException("Failed to configure firebase messaging - ensure you have GoogleService-Info.plist included in your iOS project and that it is set to a BundleResource");
 
                     Messaging.SharedInstance!.AutoInitEnabled = true;
                 }
@@ -96,6 +95,7 @@ namespace Shiny.Push.FirebaseMessaging
             (
                 async token =>
                 {
+                    // TODO: I don't want this being called when requesting access
                     this.container.SetCurrentToken(token, true);
                     await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
                 }
@@ -109,17 +109,20 @@ namespace Shiny.Push.FirebaseMessaging
             this.TryStartFirebase();
 
             Messaging.SharedInstance.ApnsToken = result.RegistrationToken!;
-            var fcmToken = await InstanceId.SharedInstance.GetInstanceIdAsync();
-            this.container.SetCurrentToken(fcmToken.Token, false);
-
-            return new PushAccessState(result.Status, fcmToken.Token);
+            var fcmToken = Messaging.SharedInstance.FcmToken;
+            if (fcmToken == null)
+                throw new InvalidProgramException("FcmToken is null");
+            
+            this.container.SetCurrentToken(fcmToken, false);
+            return new PushAccessState(result.Status, fcmToken);
         }
 
 
         public async Task UnRegister()
         {
             this.container.ClearRegistration();
-            await InstanceId.SharedInstance.DeleteIdAsync().ConfigureAwait(false);
+            //Messaging.SharedInstance.
+            //await InstanceId.SharedInstance.DeleteIdAsync().ConfigureAwait(false);
             await this.adapter.UnRegister().ConfigureAwait(false);
         }
 
