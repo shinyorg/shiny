@@ -19,14 +19,13 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
     </PropertyGroup>
 
+    <!--
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
     </PropertyGroup>
+    -->
 
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
@@ -74,11 +73,7 @@
         <Compile Remove="Push\FirebaseTests.cs" />
         <Compile Remove="Push\AppleNativeTests.cs" />
         <Compile Remove="Push\AzureNotificationHubTests.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <None Remove="BuildTasks\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="BuildTasks\" />
+        <None Remove="BuildTasks\" />
+        <Folder Include="BuildTasks\" />
     </ItemGroup>
 </Project>

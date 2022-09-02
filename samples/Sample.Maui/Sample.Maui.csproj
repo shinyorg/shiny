@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
+		<OutputType>Exe</OutputType>
+		<RootNamespace>Sample.Maui</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+        <ApplicationTitle>Test Samples</ApplicationTitle>
+        <ApplicationId>org.shiny.samples</ApplicationId>
+        <ApplicationIdGuid>3E54A75D-D399-4272-8326-54510C872263</ApplicationIdGuid>
+
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+
+		<MauiImage Include="Resources\Images\*" />
+		<MauiFont Include="Resources\Fonts\*" />
+	</ItemGroup>
+
+ <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
+        <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
+        <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+        <!--
+        <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
+
+        <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
+        -->
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+        <PackageReference Include="SQLitePCLRaw.core" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.0" />
+        <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="2.1.0" />
+    </ItemGroup>
+</Project>

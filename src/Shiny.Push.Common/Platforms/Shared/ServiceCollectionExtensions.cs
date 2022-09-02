@@ -10,9 +10,9 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static bool AddPush(this IServiceCollection services, Type pushManagerType, Type delegateType)
+    public static IServiceCollection AddPush(this IServiceCollection services, Type pushManagerType, Type delegateType)
     {
-#if IOS || MACCATALYST
+#if APPLE
         // TODO: can I hook these differently dynamically with selector?
         AppleExtensions.AssertAppDelegateHook(
             "application:didReceiveRemoteNotification:fetchCompletionHandler:",
@@ -31,16 +31,12 @@ public static class ServiceCollectionExtensions
             "[SHINY] AppDelegate.FailedToRegisterForRemoteNotifications is not hooked. This is a necessary hook for Shiny Push"
         );
 #endif
-
-#if IOS || MACCATALYST || ANDROID
         services.AddChannelManager();
         services.AddShinyService(delegateType);
         services.TryAddSingleton(typeof(IPushManager), pushManagerType);
         services.AddShinyService<PushContainer>();
         services.AddShinyService<NativeAdapter>();
-        return true;
-#else
-        return false;
-#endif
+
+        return services;
     }
 }

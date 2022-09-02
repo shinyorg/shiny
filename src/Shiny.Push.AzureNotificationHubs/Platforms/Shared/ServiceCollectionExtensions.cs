@@ -11,21 +11,19 @@ public static class ServiceCollectionExtensions
     public static IPushManager Push(this ShinyContainer container) => container.GetService<IPushManager>();
 
 
-    public static bool AddPushAzureNotificationHubs(this IServiceCollection services,
-                                                    Type delegateType,
-                                                    AzureNotificationConfig config)
+    public static IServiceCollection AddPushAzureNotificationHubs(
+        this IServiceCollection services,
+        Type delegateType,
+        AzureNotificationConfig config
+    )
     {
-#if NETSTANDARD
-        return false;
-#else
         services.AddSingleton(config);
         services.AddPush(typeof(Shiny.Push.AzureNotificationHubs.PushManager), delegateType);
-        return true;
-#endif
+        return services;
     }
 
 
-    public static bool AddPushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services, AzureNotificationConfig config)
+    public static IServiceCollection AddPushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services, AzureNotificationConfig config)
         where TPushDelegate : class, IPushDelegate
         => services.AddPushAzureNotificationHubs(
             typeof(TPushDelegate),

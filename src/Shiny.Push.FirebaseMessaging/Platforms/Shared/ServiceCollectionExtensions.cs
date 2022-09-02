@@ -2,49 +2,42 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Push;
 
+namespace Shiny;
 
-namespace Shiny
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddFirebaseMessaging<TPushDelegate>(this IServiceCollection services, FirebaseConfiguration? config = null) where TPushDelegate : class, IPushDelegate
+        => services.AddFirebaseMessaging(typeof(TPushDelegate), config);
+
+
+    public static IServiceCollection AddFirebaseMessaging(this IServiceCollection services, Type delegateType, FirebaseConfiguration? config = null)
     {
-        public static bool UseFirebaseMessaging<TPushDelegate>(this IServiceCollection services, FirebaseConfiguration? config = null) where TPushDelegate : class, IPushDelegate
-            => services.UseFirebaseMessaging(typeof(TPushDelegate), config);
+#if IOS
+        services.AddSingleton(config ?? new(true));
+        services.AddPush(typeof(Shiny.Push.FirebaseMessaging.PushManager), delegateType);
 
+#elif ANDROID
 
-        public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType, FirebaseConfiguration? config = null)
+        if (config == null)
         {
-#if XAMARINIOS
-            services.AddSingleton(config ?? new FirebaseConfiguration {  UseEmbeddedConfiguration = true });
-
-            services.RegisterModule(new PushModule(
-                typeof(Shiny.Push.FirebaseMessaging.PushManager),
-                delegateType
-            ));
-            return true;
-#elif MONOANDROID
-
-            if (config == null)
-            {
-                services.UsePush(delegateType);
-            }
-            else
-            {
-                services.UsePush(
-                    delegateType,
-                    new FirebaseConfig
-                    {
-                        UseEmbeddedConfiguration = config.UseEmbeddedConfiguration,
-                        AppId = config.AppId,
-                        SenderId = config.SenderId,
-                        ProjectId = config.ProjectId,
-                        ApiKey = config.ApiKey
-                    }
-                );
-            }
-            return true;
-#else
-            return false;
-#endif
+            services.AddPush(delegateType, new FirebaseConfig(true));
         }
+        else
+        {
+            services.AddPush(
+                delegateType,
+                new FirebaseConfig(
+                    config.UseEmbeddedConfiguration,
+                    config.AppId,
+                    config.SenderId,
+                    config.ProjectId,
+                    config.ApiKey
+                )
+            );
+        }
+#endif
+
+        return services;
     }
 }

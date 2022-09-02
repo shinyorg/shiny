@@ -1,7 +1,7 @@
 ﻿using System;
 
-
 namespace Shiny.Push;
+
 
 public record FirebaseConfiguration(
     /// <summary>

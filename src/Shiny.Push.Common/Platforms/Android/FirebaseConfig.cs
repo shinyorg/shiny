@@ -5,10 +5,10 @@ namespace Shiny.Push;
 
 public record FirebaseConfig(
     bool UseEmbeddedConfiguration,
-    string? AppId,
-    string? SenderId,
-    string? ApiKey,
-    string? ProjectId
+    string? AppId = null,
+    string? SenderId = null,
+    string? ApiKey = null,
+    string? ProjectId = null
 )
 {
     public void AssertValid()

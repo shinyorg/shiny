@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
-using Firebase.InstanceID;
 using Firebase.Core;
 using Microsoft.Extensions.Logging;
 using Shiny.Push.Infrastructure;
@@ -123,6 +122,7 @@ public class PushManager : IPushManager, IPushTagSupport
     public async Task UnRegister()
     {
         this.container.ClearRegistration();
+        //Messaging.SharedInstance.DeleteFcmTokenAsync(this.config.SenderId);
         //await InstanceId.SharedInstance.DeleteIdAsync().ConfigureAwait(false);
         await this.adapter.UnRegister().ConfigureAwait(false);
     }
