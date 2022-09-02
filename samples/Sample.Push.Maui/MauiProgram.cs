@@ -19,14 +19,20 @@ public static class MauiProgram
             });
 
         builder.Configuration.AddJsonPlatformBundle();
+
 #if FIREBASE
         var cfg = builder
             .Configuration
             .GetSection("firebase")
             .Get<Shiny.Push.FirebaseConfiguration>();
-        builder.Services.AddFirebaseMessaging(cfg);
+        builder.Services.AddFirebaseMessaging<MyPushDelegate>(cfg);
 #elif NATIVE
+        services.AddPush<MyPushDelegate>();
 #elif AZURE
+        services.AddPushAzureNotificationHubs<MyPushDelegate>(
+            builder.Configuration["AzureNotificationHubs:ListenerConnectionString"],
+            builder.Configuration["AzureNotificationHubs:HubName"]
+        );
 #else
         throw new InvalidProgramException("No push provider configuration");
 #endif

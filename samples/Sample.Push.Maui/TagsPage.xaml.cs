@@ -1,14 +1,12 @@
 ﻿using System;
-using Xamarin.Forms;
+
+namespace Sample;
 
 
-namespace Sample
+public partial class TagsPage : SampleContentPage
 {
-    public partial class TagsPage : SampleContentPage
+    public TagsPage()
     {
-        public TagsPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

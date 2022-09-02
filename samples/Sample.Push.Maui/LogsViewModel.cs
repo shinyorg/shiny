@@ -7,9 +7,8 @@ namespace Sample
 {
     public class LogsViewModel : ViewModel
     {
-        public LogsViewModel()
+        public LogsViewModel(SampleSqliteConnection conn)
         {
-            var conn = ShinyHost.Resolve<SampleSqliteConnection>();
             this.Load = this.LoadingCommand(async () =>
             {
                 this.Events = await conn

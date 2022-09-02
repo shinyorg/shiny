@@ -1,6 +1,4 @@
-﻿using System.Windows.Input;
-
-namespace Sample;
+﻿namespace Sample;
 
 public record CommandItem(
     string Text,

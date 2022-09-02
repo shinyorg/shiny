@@ -1,13 +1,11 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample;
 
 
-namespace Sample
+public partial class SetupPage : SampleContentPage
 {
-    public partial class SetupPage : SampleContentPage
+    public SetupPage(SetupViewModel vm)
     {
-        public SetupPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
+        this.BindingContext = vm;
     }
 }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Shiny.Push;
-
-namespace Sample;
+﻿namespace Sample;
 
 
 public class MyPushDelegate : IPushDelegate
 {
-    //readonly SampleSqliteConnection conn;
+    readonly SampleSqliteConnection conn;
     readonly IPushManager pushManager;
 
 
