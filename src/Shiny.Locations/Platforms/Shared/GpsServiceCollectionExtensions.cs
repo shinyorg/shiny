@@ -1,6 +1,7 @@
 ﻿#if PLATFORM
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
 #if ANDROID
 using Android.App;
@@ -35,6 +36,7 @@ public static class GpsServiceCollectionExtensions
             services.AddShinyService<GooglePlayServiceGpsManagerImpl>();
 
 #elif APPLE
+        services.TryAddSingleton<AppleLocationConfiguration>();
         services.AddShinyService<GpsManager>();
 #endif
         return services;

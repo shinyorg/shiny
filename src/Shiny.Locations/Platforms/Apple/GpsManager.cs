@@ -18,13 +18,16 @@ public partial class GpsManager : IGpsManager, IShinyStartupTask
     readonly Lazy<IEnumerable<IGpsDelegate>> delegates;
     readonly CLLocationManager locationManager;
     readonly ILogger logger;
+    readonly AppleLocationConfiguration config;
 
 
     public GpsManager(
         IServiceProvider services,
-        ILogger<IGpsManager> logger
-     )
+        ILogger<IGpsManager> logger,
+        AppleLocationConfiguration config
+    )
     {
+        this.config = config;
         this.delegates = services.GetLazyService<IEnumerable<IGpsDelegate>>();
         this.logger = logger;
         this.locationManager = new CLLocationManager { Delegate = new GpsManagerDelegate(this) };
@@ -162,7 +165,12 @@ public partial class GpsManager : IGpsManager, IShinyStartupTask
                 this.locationManager.DesiredAccuracy = CLLocation.AccuracyThreeKilometers;
                 break;
         }
-        this.locationManager.AllowsBackgroundLocationUpdates = request.BackgroundMode != GpsBackgroundMode.None;
+        if (this.config.ActivityType != null)
+            this.locationManager.ActivityType = this.config.ActivityType.Value;
+
+        var bg = request.BackgroundMode != GpsBackgroundMode.None;
+        this.locationManager.ShowsBackgroundLocationIndicator = bg && this.config.ShowsBackgroundLocationIndicator;
+        this.locationManager.AllowsBackgroundLocationUpdates = bg;
         this.locationManager.StartUpdatingLocation();
         this.CurrentListener = request;
     }
