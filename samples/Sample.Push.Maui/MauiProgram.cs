@@ -18,7 +18,16 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        builder.Configuration.AddJsonPlatformBundle();
+        builder.Configuration.AddJsonPlatformBundle(optional: false);
+
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddTransient<SetupPage>();
+        builder.Services.AddTransient<SetupViewModel>();
+        builder.Services.AddTransient<LogsPage>();
+        builder.Services.AddTransient<LogsViewModel>();
+        builder.Services.AddTransient<TagsPage>();
+        builder.Services.AddTransient<TagsViewModel>();
 
 #if FIREBASE
         var cfg = builder
