@@ -18,7 +18,7 @@ public partial class BleHostingManager : IShinyStartupTask
 {
     readonly ILogger logger;
     readonly IKeyValueStoreFactory keyStore;
-    readonly IEnumerable<BleGattCharacteristic> gattChars;
+    readonly Lazy<IEnumerable<BleGattCharacteristic>> gattChars;
 
     Dictionary<string, List<(BleGattCharacteristic Characteristic, BleGattCharacteristicAttribute Attribute)>>? gattServices;
 
@@ -29,7 +29,7 @@ public partial class BleHostingManager : IShinyStartupTask
 #endif
         IKeyValueStoreFactory keyStore,
         ILogger<IBleHostingManager> logger,
-        IEnumerable<BleGattCharacteristic> gattChars
+        IServiceProvider services
     )
     {
 #if ANDROID
@@ -37,7 +37,7 @@ public partial class BleHostingManager : IShinyStartupTask
 #endif
         this.keyStore = keyStore;
         this.logger = logger;
-        this.gattChars = gattChars;
+        this.gattChars = services.GetLazyService<IEnumerable<BleGattCharacteristic>>();
     }
 
 
@@ -69,7 +69,7 @@ public partial class BleHostingManager : IShinyStartupTask
     {
         (await this.RequestAccess()).Assert();
 
-        this.gattServices ??= CollectServices(this.gattChars);
+        this.gattServices ??= CollectServices(this.gattChars.Value);
         if (!this.gattServices.Any())
             throw new InvalidOperationException("There are no register BLE services");
 
@@ -87,7 +87,7 @@ public partial class BleHostingManager : IShinyStartupTask
         foreach (var serviceUuid in this.gattServices!.Keys)        
             this.RemoveService(serviceUuid);
         
-        foreach (var ch in this.gattChars)
+        foreach (var ch in this.gattChars.Value)
             ch.OnStop(); // TODO: error trap this for user?
     }
 
