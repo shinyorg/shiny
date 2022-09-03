@@ -36,7 +36,7 @@ public class SetupViewModel : ViewModel
         this.ResetBaseUri = new Command(() =>
         {
             //this.apiClient.Reset();
-            this.RaisePropertyChanged(nameof(this.BaseUri));
+            //this.RaisePropertyChanged(nameof(this.BaseUri));
         });
     }
 
@@ -72,11 +72,13 @@ public class SetupViewModel : ViewModel
     }
 
 
-    public string BaseUri
-    {
-        get => this.apiClient.BaseUri;
-        set => this.apiClient.BaseUri = value;
-    }
+    public string BaseUri { get; set; }
+
+    //public string BaseUri
+    //{
+    //    get => this.apiClient.BaseUri;
+    //    set => this.apiClient.BaseUri = value;
+    //}
 
 #if NATIVE
     public bool IsNative => true;
@@ -85,9 +87,9 @@ public class SetupViewModel : ViewModel
 #endif
 
 
-    public override void OnAppearing()
+    public override void OnNavigatedTo()
     {
-        base.OnAppearing();
+        base.OnNavigatedTo();
         this.Refresh();
     }
 

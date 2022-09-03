@@ -3,11 +3,10 @@
 
 public partial class App : Application
 {
-    public App()
+    public App(MainPage mainPage)
     {
         this.InitializeComponent();
-
-        this.MainPage = new MainPage();
+        this.MainPage = mainPage;
     }
 }
 

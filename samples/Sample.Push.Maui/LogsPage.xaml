@@ -6,10 +6,6 @@
                           x:DataType="sample:LogsViewModel"
                           Title="Logs">
 
-    <!--<ContentPage.BindingContext>
-        <sample:LogsViewModel />
-    </ContentPage.BindingContext>-->
-
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Clear" Command="{Binding Clear}" />
     </ContentPage.ToolbarItems>

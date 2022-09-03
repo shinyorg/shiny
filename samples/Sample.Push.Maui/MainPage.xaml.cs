@@ -1,25 +1,23 @@
-﻿namespace Sample.Push.Maui;
+﻿using Shiny.Hosting;
 
-public partial class MainPage : ContentPage
+namespace Sample;
+
+
+public partial class MainPage : TabbedPage
 {
-    int count = 0;
-
-    public MainPage()
+    public MainPage(
+        MainViewModel vm,
+        SetupPage setupPage,
+        LogsPage logsPage,
+        TagsPage tagsPage
+    )
     {
-        InitializeComponent();
-    }
+        this.InitializeComponent();
+        this.BindingContext = vm;
 
-    private void OnCounterClicked(object sender, EventArgs e)
-    {
-        count++;
-
-        if (count == 1)
-            CounterBtn.Text = $"Clicked {count} time";
-        else
-            CounterBtn.Text = $"Clicked {count} times";
-
-        SemanticScreenReader.Announce(CounterBtn.Text);
+        this.Children.Add(setupPage);
+        this.Children.Add(logsPage);
+        if (vm.IsTagsSupported)
+            this.Children.Add(tagsPage);
     }
 }
-
-

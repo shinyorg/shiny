@@ -6,10 +6,6 @@
                           x:Class="Sample.SetupPage"
                           Title="Setup">
 
-    <ContentPage.BindingContext>
-        <sample:SetupViewModel />
-    </ContentPage.BindingContext>
-
     <ContentPage.Content>
         <RefreshView IsRefreshing="{Binding IsBusy}">
             <TableView Intent="Form">

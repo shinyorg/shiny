@@ -52,9 +52,9 @@ public class TagsViewModel : ViewModel
     public ICommand Clear { get; }
     public IList<CommandItem> Tags { get; private set; }
 
-    public override void OnAppearing()
+    public override void OnNavigatedTo()
     {
-        base.OnAppearing();
+        base.OnNavigatedTo();
         this.Load.Execute(null);
     }
 }

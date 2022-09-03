@@ -1,4 +1,8 @@
-﻿namespace Sample;
+﻿using System;
+using Shiny;
+using Shiny.Push;
+
+namespace Sample;
 
 
 public class MainViewModel : ViewModel
@@ -6,15 +10,17 @@ public class MainViewModel : ViewModel
     readonly IPushManager pushManager;
     IDisposable? sub;
 
-
     public MainViewModel(IPushManager pushManager)
     {
         this.pushManager = pushManager;
     }
 
-    public override void OnAppearing()
+
+    public bool IsTagsSupported => this.pushManager is IPushTagSupport;
+
+    public override void OnNavigatedTo()
     {
-        base.OnAppearing();
+        base.OnNavigatedTo();
         this.sub = this.pushManager
             .WhenReceived()
             .Subscribe(async pr =>
@@ -25,9 +31,9 @@ public class MainViewModel : ViewModel
     }
 
 
-    public override void OnDisappearing()
+    public override void OnNavigatedFrom()
     {
-        base.OnDisappearing();
+        base.OnNavigatedFrom();
         this.sub?.Dispose();
     }
 }

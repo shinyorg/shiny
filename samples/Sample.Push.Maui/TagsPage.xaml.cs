@@ -5,8 +5,9 @@ namespace Sample;
 
 public partial class TagsPage : SampleContentPage
 {
-    public TagsPage()
+    public TagsPage(TagsViewModel vm)
     {
         this.InitializeComponent();
+        this.BindingContext = vm;
     }
 }

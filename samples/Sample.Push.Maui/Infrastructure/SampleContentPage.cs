@@ -6,18 +6,13 @@ public class SampleContentPage : ContentPage
     protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
         base.OnNavigatedTo(args);
-        //this.TryFireOnAppearing();
+        (this.BindingContext as ViewModel)?.OnNavigatedTo();
     }
 
 
     protected override void OnNavigatedFrom(NavigatedFromEventArgs args)
     {
         base.OnNavigatedFrom(args);
-        //this.TryFireOnDisappearing();
+        (this.BindingContext as ViewModel)?.OnNavigatedFrom();
     }
 }
-//public static void TryFireOnAppearing(this Page page)
-//    => (page.BindingContext as ViewModel)?.OnNavigatedTo();
-
-//public static void TryFireOnDisappearing(this Page page)
-//    => (page.BindingContext as ViewModel)?.OnNavigatedFrom();
