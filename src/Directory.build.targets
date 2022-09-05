@@ -41,7 +41,7 @@
 
         <PackageReference Update="Xamarin.AndroidX.Core" Version="1.8.0.1" />
         <PackageReference Update="Xamarin.AndroidX.Preference" Version="1.2.0.2" />
-        <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.4.2.1" />
+        <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.5.0" />
         <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4" />
     </ItemGroup>
 
