@@ -9,6 +9,7 @@ export async function init() {
     //});
 }
 
+// TODO: request permission for background-fetch or background-sync
 export async function register() {
     await reg.periodicSync.register('shiny', {
         minInterval: 24 * 60 * 60 * 1000

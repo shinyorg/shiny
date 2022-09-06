@@ -1,25 +1,27 @@
-const reader = new NDEFReader();
+export async function read(dotNetRef) {
+    const reader = new NDEFReader();
 
-export function read(dotNetRef) {
-    var promise = new Promise(
-        () => { },
-        reason => { }
-    );
-
-    const onRead = () => {
-
-//        ndef.addEventListener("reading", ({ message, serialNumber }) => {
+    var promise = new Promise((resolve, reject) => {
+        reader.addEventListener('readingerror', e => reject(e));
+        reader.addEventListener("reading", ({ message, serialNumber }) => {
 //            log(`> Serial Number: ${serialNumber}`);
 //            log(`> Records: (${message.records.length})`);
-//        });
-    };
-    reader.addEventListener("readingerror", null);
-    reader.addEventListener("reading", null);
-    reader.scan();
+
+        });
+        reader.scan();
+    });
+    var reading = await promise;
+    reader = null;
+
+    return reading;
 }
 
-export function write() {
-    //        const ndef = new NDEFReader();
-    //        await ndef.write("Hello world!");
-    //await ndef.makeReadOnly();
+export async function write(msg, readOnly) {
+    const reader = new NDEFReader();
+    await ndef.write(msg);
+
+    if (readOnly)
+        await ndef.makeReadOnly();
+
+    reader = null;
 }
