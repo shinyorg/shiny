@@ -42,7 +42,14 @@ public class BleManager : IBleManager, IShinyWebAssemblyService
                     ob.OnNext(sr);
                 })
         );
-        this.jsModule.InvokeVoid("startScan", callback);
+        this.jsModule
+            .InvokeVoidAsync("startScan", callback)
+            .AsTask()
+            .ContinueWith(x =>
+            {
+                if (x.Exception != null)
+                    ob.OnError(x.Exception);
+            });
 
         return () =>
         {
