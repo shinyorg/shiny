@@ -1,14 +1,18 @@
-﻿const sr = new SpeechRecognition();
+﻿var sr;
 var dotNetRef;
 
 export function requestAccess() {
-    if (window.SpeechRecognition === undefined)
+    if (window.SpeechRecognition === undefined && window.webkitSpeechRecognition === undefined)
         return 'notsupported';
 
     return 'granted';
 }
 
 export function startListener(lang, continuous, interim, dotNetRef) {
+    if (window.SpeechRecognition === undefined)
+        sr = new webkitSpeechRecognition();
+    else
+        sr = new SpeechRecognition();
     sr.continuous = continuous;
     sr.interimResults = interim;
     sr.lang = lang;

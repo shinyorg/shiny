@@ -81,6 +81,6 @@ function toResult(pos) {
         longitude: pos.coords.longitude,
         speed: pos.coords.speed
     };
-    console.log('GEOLOCATION', e);
+    //console.log('GEOLOCATION', e);
     return e;
 }

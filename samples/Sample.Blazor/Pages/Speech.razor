@@ -1,4 +1,5 @@
 ﻿@page "/speech"
+@implements IDisposable
 @inject Shiny.SpeechRecognition.ISpeechRecognizer speech
 
 <PageTitle>Speech Recognition</PageTitle>
@@ -6,14 +7,16 @@
 
 <div>Status: @status</div>
 
-<button class="btn btn-success" @onclick="Start">Start Continuous</button>
-<button class="btn btn-danger" @onclick="Start">Stop Continuous</button>
+<button
+    class="@(isListening ? "btn btn-success" : "btn btn-danger")"
+    @onclick="Toggle">@(isListening ? "Stop" : "Start")</button>
 
 <div>@transcript</div>
 
 @code
 {
-    IDisposable sub;
+    IDisposable? sub;
+    bool isListening = false;
     string status = "Unknown";
     string transcript = String.Empty;
 
@@ -25,22 +28,36 @@
     }
 
 
-    public void Start()
+    void Toggle()
     {
-        this.transcript = String.Empty;
+        if (this.sub == null)
+        {
+            this.transcript = String.Empty;
 
-        this.sub = this.speech
-            .ContinuousDictation()
-            .Subscribe(x =>
-            {
-                this.transcript += " " + x;
-                this.StateHasChanged();
-            });
+            this.sub = this.speech
+                .ContinuousDictation()
+                .Subscribe(x =>
+                {
+                    this.transcript += " " + x;
+                    this.StateHasChanged();
+                });
+
+            this.isListening = true;
+        }
+        else
+        {
+            this.Stop();
+        }
     }
 
 
-    public void Stop()
+    void Stop()
     {
-        this.sub.Dispose();
+        this.isListening = false;
+        this.sub?.Dispose();
+        this.sub = null;
     }
+
+
+    public void Dispose() => this.Stop();
 }

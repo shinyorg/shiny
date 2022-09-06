@@ -87,9 +87,9 @@ public class GpsManager : IGpsManager, IShinyWebAssemblyService
             pos.Latitude,
             pos.Longitude
         ),
-        pos.RawAccuracy ?? -99,
+        pos.RawAccuracy ?? 0,
         pos.Timestamp,
-        pos.RawHeading ?? -99,
+        pos.RawHeading ?? 0,
         -1,
         pos.RawAltitude ?? 0,
         pos.RawSpeed ?? 0,

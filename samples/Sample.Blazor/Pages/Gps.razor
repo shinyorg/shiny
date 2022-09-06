@@ -12,6 +12,7 @@
 <p role="log">Altitude: @this.reading?.Altitude</p>
 <p role="log">Speed: @this.reading?.Speed</p>
 <p role="log">Heading: @this.reading?.Heading</p>
+<p role="log">Accuracy: @this.reading?.PositionAccuracy</p>
 <p role="log">Timestamp: @this.reading?.Timestamp.ToLocalTime()</p>
 
 <button class="btn btn-primary" @onclick="@(async () => await DoCurrent())">Current Position</button>
@@ -33,7 +34,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         this.status = (await this.gpsManager.RequestAccess(GpsRequest.Realtime(true))).ToString();
-        @*this.StateHasChanged();*@
 
         this.sub = this.gpsManager
             .WhenReading()

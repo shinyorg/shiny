@@ -13,6 +13,9 @@ builder.Services.AddGps();
 builder.Services.AddConnectivity();
 builder.Services.AddBattery();
 builder.Services.AddBluetoothLE();
+builder.Services.AddNfc();
+builder.Services.AddSpeechRecognition();
+
 var host = builder.Build();
 
 await host.RunAsync();
