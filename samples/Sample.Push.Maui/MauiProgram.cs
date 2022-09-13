@@ -32,6 +32,7 @@ public static class MauiProgram
 
 #if FIREBASE
 #if USE_PUSH_CONFIG
+        // ios or android
         var cfg = builder.Configuration.GetSection("Firebase");
         builder.Services.AddFirebaseMessaging<MyPushDelegate>(new(
             false,
@@ -49,7 +50,7 @@ public static class MauiProgram
 #endif
 
 #elif NATIVE
-#if USE_PUSH_CONFIG
+#if USE_PUSH_CONFIG && ANDROID
         var cfg = builder.Configuration.GetSection("Firebase");
         builder.Services.AddPush<MyPushDelegate>(new (
             false,
