@@ -19,6 +19,7 @@ public static class MauiProgram
             });
 
         builder.Configuration.AddJsonPlatformBundle(optional: false);
+        builder.Services.AddSingleton<SampleSqliteConnection>();
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<MainViewModel>();
@@ -30,17 +31,41 @@ public static class MauiProgram
         builder.Services.AddTransient<TagsViewModel>();
 
 #if FIREBASE
-        var cfg = builder
-            .Configuration
-            .GetSection("firebase")
-            .Get<Shiny.Push.FirebaseConfiguration>();
-        builder.Services.AddFirebaseMessaging<MyPushDelegate>(cfg);
+#if USE_PUSH_CONFIG
+        var cfg = builder.Configuration.GetSection("Firebase");
+        builder.Services.AddFirebaseMessaging<MyPushDelegate>(new(
+            false,
+#if IOS || MACCATALYST
+            cfg["IosAppId"],
+#else
+            cfg["AppId"],
+#endif
+            cfg["SenderId"],
+            cfg["ProjectId"],
+            cfg["ApiKey"]
+        ));
+#else
+        builder.Services.AddFirebaseMessaging<MyPushDelegate>();
+#endif
+
 #elif NATIVE
-        services.AddPush<MyPushDelegate>();
+#if USE_PUSH_CONFIG
+        var cfg = builder.Configuration.GetSection("Firebase");
+        builder.Services.AddPush<MyPushDelegate>(new (
+            false,
+            cfg["AppId"],
+            cfg["SenderId"],
+            cfg["ProjectId"],
+            cfg["ApiKey"]
+        ));
+#else
+        builder.Services.AddPush<MyPushDelegate>();
+#endif
 #elif AZURE
-        services.AddPushAzureNotificationHubs<MyPushDelegate>(
-            builder.Configuration["AzureNotificationHubs:ListenerConnectionString"],
-            builder.Configuration["AzureNotificationHubs:HubName"]
+        var cfg = builder.Configuration.GetSection("AzureNotificationHubs");
+        builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
+            cfg["ListenerConnectionString"],
+            cfg["HubName"]
         );
 #else
         throw new InvalidProgramException("No push provider configuration");

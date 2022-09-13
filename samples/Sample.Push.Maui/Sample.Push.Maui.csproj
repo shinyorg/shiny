@@ -2,7 +2,13 @@
 
 	<PropertyGroup>
 		<PushProvider>firebase</PushProvider><!--native, firebase, or azure-->
-		<TargetFrameworks>net6.0-android;net6.0-ios</TargetFrameworks>
+
+		<!--if native android or firebase - firebase will look for the embedded configuration-->
+		<FirebaseUseEmbeddedConfiguration>false</FirebaseUseEmbeddedConfiguration>
+
+		<TargetFrameworks>net6.0-ios</TargetFrameworks>
+		<!--<TargetFrameworks>net6.0-android;net6.0-ios</TargetFrameworks>-->
+		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net6.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -12,21 +18,30 @@
 		<SqliteLibVersion>2.1.1</SqliteLibVersion>
 
 		<ApplicationTitle>Shiny Push</ApplicationTitle>
-		<ApplicationId>org.shiny.samplepush</ApplicationId>
+		<ApplicationId>org.shiny.pushsample</ApplicationId>
 		<ApplicationIdGuid>A6C05603-270D-4C88-B2C9-77DABDF2B5F0</ApplicationIdGuid>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<DefineConstants Condition="'$(FirebaseUseEmbeddedConfiguration)' != 'true'">$(DefineConstants);USE_PUSH_CONFIG</DefineConstants>
 	</PropertyGroup>
 
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    </PropertyGroup>
+
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
 		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+		<SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
 		<CodesignEntitlements>Platforms\MacCatalyst\Entitlements.plist</CodesignEntitlements>
+    </PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<SupportedOSPlatformVersion >26.0</SupportedOSPlatformVersion>		
     </PropertyGroup>
 
 	<ItemGroup>
@@ -53,10 +68,10 @@
         <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="$(SqliteLibVersion)" />
     </ItemGroup>
 
-	<PropertyGroup>
+	<PropertyGroup>		
 		<DefineConstants Condition="'$(PushProvider)' == 'azure'">$(DefineConstants);AZURE</DefineConstants>
 		<DefineConstants Condition="'$(PushProvider)' == 'firebase'">$(DefineConstants);FIREBASE</DefineConstants>
-		<DefineConstants Condition="'$(PushProvider)' == 'native'">NATIVE</DefineConstants>
+		<DefineConstants Condition="'$(PushProvider)' == 'native'">$(DefineConstants);NATIVE</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

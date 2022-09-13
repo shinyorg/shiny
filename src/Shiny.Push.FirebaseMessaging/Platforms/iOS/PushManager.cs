@@ -60,16 +60,6 @@ public class PushManager : IPushManager, IPushTagSupport
     IDisposable? lifecycleSub;
     protected virtual void TryStartFirebase()
     {
-        //this.lifecycleSub?.Dispose();
-        //this.lifecycle.RegisterForNotificationPresentation
-        //this.lifecycleSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
-        //{
-        //    // hijacking firebase because the delegate doesn't seem to fire any longer
-        //    Messaging.SharedInstance.AppDidReceiveMessage(userInfo);
-        //    var dict = userInfo.FromNsDictionary();
-        //    //var pr = new PushNotification(dict, null);
-        //    //await this.container.OnReceived(pr).ConfigureAwait(false);
-        //});
         if (App.DefaultInstance == null)
         {
             if (this.config.UseEmbeddedConfiguration)
@@ -86,7 +76,8 @@ public class PushManager : IPushManager, IPushTagSupport
                     this.config.AppId!,
                     this.config.SenderId!
                 ) {
-                    ApiKey = this.config.ApiKey
+                    ApiKey = this.config.ApiKey,
+                    ProjectId = this.config.ProjectId
                 });
             }
         }

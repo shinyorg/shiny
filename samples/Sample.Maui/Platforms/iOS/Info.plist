@@ -28,5 +28,23 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Say something useful here that your users will understand</string>	
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Say something useful here that your users will understand</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Say something useful here that your users will understand</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Say something useful here that your users will understand</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app allows the referee to control the scoreboard through bluetooth</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app allows the referee to control the scoreboard through bluetooth</string>	
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+	</array>
 </dict>
 </plist>

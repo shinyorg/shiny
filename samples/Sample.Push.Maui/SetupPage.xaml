@@ -34,7 +34,7 @@
                                   Detail="{Binding RegDate}" />
                     </TableSection>
 
-                    <TableSection Title="Native Registration">
+                    <!--<TableSection Title="Native Registration">
                         <EntryCell Label="Base URI"
                                    Text="{Binding BaseUri}"
                                    IsEnabled="{Binding IsNative}" />
@@ -42,7 +42,7 @@
                         <TextCell Text="Reset Base URI"
                                   Command="{Binding ResetBaseUri}"
                                   IsEnabled="{Binding IsNative}" />
-                    </TableSection>
+                    </TableSection>-->
                 </TableRoot>
             </TableView>
         </RefreshView>

@@ -16,21 +16,20 @@ public class SetupViewModel : ViewModel
             var result = await this.pushManager.RequestAccess();
             this.AccessStatus = result.Status;
             this.Refresh();
-#if NATIVE
-            if (this.AccessStatus == AccessState.Available)
-                await this.Try(() => this.apiClient.Register(result.RegistrationToken!));
-#endif
+//#if NATIVE
+//            if (this.AccessStatus == AccessState.Available)
+//                await this.Try(() => this.apiClient.Register(result.RegistrationToken!));
+//#endif
         });
 
         this.UnRegister = this.LoadingCommand(async () =>
         {
-            var deviceToken = this.pushManager.CurrentRegistrationToken;
             await this.pushManager.UnRegister();
             this.AccessStatus = AccessState.Disabled;
             this.Refresh();
-#if NATIVE
-            await this.Try(() => this.apiClient.UnRegister(deviceToken!));
-#endif
+//#if NATIVE
+//            await this.Try(() => this.apiClient.UnRegister(deviceToken!));
+//#endif
         });
 
         this.ResetBaseUri = new Command(() =>
@@ -72,7 +71,7 @@ public class SetupViewModel : ViewModel
     }
 
 
-    public string BaseUri { get; set; }
+    //public string BaseUri { get; set; }
 
     //public string BaseUri
     //{
