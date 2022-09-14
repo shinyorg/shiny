@@ -87,7 +87,8 @@ namespace Shiny.Push.FirebaseMessaging
                         this.config.AppId,
                         this.config.SenderId
                     ) {
-                        ApiKey = this.config.ApiKey
+                        ApiKey = this.config.ApiKey,
+                        ProjectId = this.config.ProjectId
                     });
                 }
             }
