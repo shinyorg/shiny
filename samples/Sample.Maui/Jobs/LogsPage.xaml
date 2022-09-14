@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          xmlns:sample="clr-namespace:Sample"
+                          x:Class="Sample.LogsPage"
+                          x:DataType="sample:LogsViewModel"
+                          Title="Logs">
+
+    <ContentPage.BindingContext>
+        <sample:LogsViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear" Command="{Binding Clear}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding Load}">
+            <CollectionView ItemsSource="{Binding Events}">
+
+                <CollectionView.EmptyView>
+                    <Label Text="No Logs Found"
+                           Style="{StaticResource NoDataLabel}"/>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="sample:ShinyEvent">
+                        <StackLayout>
+                            <Label Text="{Binding Text}"
+                                   FontSize="Medium" />
+
+                            <Label Text="{Binding Detail}"
+                                   FontSize="Subtitle" />
+
+                            <Label Text="{Binding Timestamp, StringFormat='{0:MM/dd/yy hh:mm:ss tt}'}" />
+
+                            <BoxView Style="{StaticResource HR}" />
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </ContentPage.Content>
+</sample:SampleContentPage>

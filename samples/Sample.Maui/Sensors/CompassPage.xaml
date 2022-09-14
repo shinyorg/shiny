@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shared:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          xmlns:shared="clr-namespace:Sample;assembly=Sample.Shared"
+                          xmlns:sample="clr-namespace:Sample"
+                          x:DataType="sample:CompassViewModel"
+                          x:Class="Sample.CompassPage"
+                          Title="Compass">
+
+    <ContentPage.BindingContext>
+        <sample:CompassViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Image HorizontalOptions="FillAndExpand"
+                   VerticalOptions="FillAndExpand"
+                   Rotation="{Binding Rotation}"
+                   Source="compass" />
+
+            <Image HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Source="arrow"
+                   Margin="75" />
+
+            <Label Text="{Binding Heading, StringFormat='Heading: {0}'}" />
+        </Grid>
+    </ContentPage.Content>
+</shared:SampleContentPage>

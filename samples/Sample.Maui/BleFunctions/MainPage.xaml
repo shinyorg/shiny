@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Sample.MainPage"
+             Title="Functions">
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Text="Test" Command="{Binding Test}" />
+        </StackLayout>
+
+        <!--
+        <CollectionView ItemsSource="{Binding Functions}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="shiny:CommandItem">
+                    <Grid>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PrimaryCommand}" />
+                        </Grid.GestureRecognizers>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label Text="TEST 1" />
+                        <Label Text="{Binding Text}"
+                               Grid.Column="0"
+                               Grid.Row="0" />
+
+                        <Label Text="{Binding Detail}"
+                               Grid.Column="0"
+                               Grid.Row="1" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <ListView ItemsSource="{Binding Functions}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="shiny:CommandItem">
+                    <TextCell Text="{Binding Text}"
+                              Detail="{Binding Detail}"
+                              Command="{Binding PrimaryCommand}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>-->
+    </ContentPage.Content>
+</ContentPage>

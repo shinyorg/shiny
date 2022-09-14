@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          xmlns:sample="clr-namespace:Sample"
+                          xmlns:create="clr-namespace:Sample.Create"
+                          x:Class="Sample.Create.SchedulePage">
+    
+    <ContentPage.BindingContext>
+        <create:ScheduleViewModel />
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Schedule Date" />
+            <DatePicker Date="{Binding SelectedDate}" />
+
+            <Label Text="Schedule Time" />
+            <TimePicker Time="{Binding SelectedTime}" />
+
+            <Button Text="Set Scheduled Date"
+                    Command="{Binding Use}" />
+        </StackLayout>
+    </ContentPage.Content>
+</sample:SampleContentPage>

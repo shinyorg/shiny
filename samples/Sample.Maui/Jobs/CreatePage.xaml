@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shared:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          x:Class="Sample.CreatePage"
+                          xmlns:sample="clr-namespace:Sample"
+                          xmlns:shared="clr-namespace:Sample;assembly=Sample.Shared"
+                          x:DataType="sample:CreateViewModel"
+                          Title="Create">
+
+    <ContentPage.BindingContext>
+        <sample:CreateViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TableView Intent="Form" Grid.Row="0">
+                <TableSection>
+                    <TextCell Text="Status" Detail="{Binding AccessStatus}" />
+                </TableSection>
+
+                <TableSection>
+                    <EntryCell Label="Job Identifier"
+                               Text="{Binding JobName}" />
+
+                    <EntryCell Label="Seconds to Run"
+                               Text="{Binding SecondsToRun}"
+                               Keyboard="Numeric" />
+                </TableSection>
+
+                <TableSection Title="Criteria">
+                    <SwitchCell Text="Run On Foreground" On="{Binding RunOnForeground}" />
+                    <TextCell Text="Required Internet Access"
+                              Detail="{Binding RequiredInternetAccess}"
+                              Command="{Binding ChangeRequiredInternetAccess}" />
+                    <SwitchCell Text="Battery Not Low" On="{Binding BatteryNotLow}" />
+                    <SwitchCell Text="Peripheral Charging" On="{Binding DeviceCharging}" />
+                    <SwitchCell Text="Repeat" On="{Binding Repeat}" />
+                </TableSection>
+            </TableView>
+
+            <Button Text="Create Job"
+                    Command="{Binding CreateJob}"
+                    Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+</shared:SampleContentPage>

@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          xmlns:sample="clr-namespace:Sample"
+                          xmlns:create="clr-namespace:Sample.Create"
+                          NavigationPage.BackButtonTitle="Back"
+                          x:Class="Sample.Create.CreatePage"
+                          x:DataType="create:CreateViewModel"
+                          Title="Create">
+
+    <ContentPage.BindingContext>
+        <create:CreateViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ScrollView Grid.Row="0">
+                <StackLayout>
+                    <Label Text="ID (Leave blank for auto/default)" />
+                    <Entry Text="{Binding Identifier}" Keyboard="Numeric" />
+
+                    <Label Text="Title" />
+                    <Entry Text="{Binding NotificationTitle}" />
+
+                    <Label Text="Message" />
+                    <Entry Text="{Binding NotificationMessage}" />
+
+                    <Label Text="Image URI" />
+                    <Entry Text="{Binding ImageUri}" />
+
+                    <Label Text="Thread" />
+                    <Entry Text="{Binding Thread}" />
+
+                    <Label Text="Channel" />
+                    <Picker Title="Channel"
+                            ItemsSource="{Binding Channels}"
+                            SelectedItem="{Binding Channel}" />
+
+                    <Label Text="Payload" />
+                    <Entry Text="{Binding Payload}" />
+
+                    <ContentView IsVisible="{Binding IsAndroid}">
+                        <StackLayout>
+                            <Label Text="Android big Text" />
+                            <CheckBox IsChecked="{Binding UseAndroidBigTextStyle}" />
+                        </StackLayout>
+                    </ContentView>
+
+                    <Frame BorderColor="Black"
+                           BackgroundColor="LemonChiffon"
+                           IsVisible="{Binding IsTriggerVisible}">
+                        <Label Text="{Binding TriggerDetails}" TextColor="Black" />
+                    </Frame>
+
+                    <Button Text="Geofence Trigger" Command="{Binding SetGeofence}" />
+                    <Button Text="Repeat Interval Trigger" Command="{Binding SetInterval}" />
+                    <Button Text="Schedule Trigger" Command="{Binding SetScheduleDate}" />
+                    <Button Text="No Trigger" Command="{Binding SetNoTrigger}" />
+                </StackLayout>
+            </ScrollView>
+
+            <StackLayout Grid.Row="1">
+                <Button Text="Send" Command="{Binding Send}" />
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</sample:SampleContentPage>

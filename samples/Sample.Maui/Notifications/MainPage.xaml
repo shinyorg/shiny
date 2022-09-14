@@ -1,0 +1,40 @@
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:sample="clr-namespace:Sample"
+            xmlns:channels="clr-namespace:Sample.Channels"
+            SelectedTabColor="#C2E812"
+            UnselectedTabColor="#4BA677"
+            NavigationPage.BackButtonTitle="Back"
+            x:Class="Sample.MainPage"
+            Title="Notifications">
+
+    <TabbedPage.Children>
+        <sample:PendingPage Title="Pending">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf03a;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </sample:PendingPage>
+
+        <channels:ChannelListPage Title="Channels">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf03a;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </channels:ChannelListPage>
+
+        <sample:OtherPage Title="Use Cases">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf017;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </sample:OtherPage>
+
+        <sample:LogsPage Title="Logs">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf017;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </sample:LogsPage>
+    </TabbedPage.Children>
+</TabbedPage>

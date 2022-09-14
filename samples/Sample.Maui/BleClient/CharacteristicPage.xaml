@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample"
+             x:Class="Sample.CharacteristicPage"
+             x:DataType="sample:CharacteristicViewModel"
+             Title="Characteristic">
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="{Binding ServiceUUID, StringFormat='Service UUID: {0}'}" />
+            <Label Text="{Binding UUID, StringFormat='Service UUID: {0}'}" />
+            <Label Text="{Binding ReadValue, StringFormat='Read Value: {0}'}" />
+            <Label Text="{Binding LastValueTime, StringFormat='Last Value Time: {0}'}" />
+            <Button Text="Read"
+                    Command="{Binding Read}"
+                    IsEnabled="{Binding CanRead}" />
+
+            <Button Text="Start Notifications"
+                    Command="{Binding ToggleNotify}"
+                    IsEnabled="{Binding CanNotify}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button"
+                                 Binding="{Binding IsNotifying}"
+                                 Value="True">
+                        <Setter Property="Text" Value="Stop Notifications" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button"
+                                 Binding="{Binding IsNotifying}"
+                                 Value="False">
+                        <Setter Property="Text" Value="Start Notifications" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+            <Label Text="Write Value" />
+            <Entry Text="{Binding WriteValue}"
+                   IsEnabled="{Binding CanWrite}" />
+
+            <Button Text="Write"
+                    Command="{Binding Write}"
+                    IsEnabled="{Binding CanWrite}" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

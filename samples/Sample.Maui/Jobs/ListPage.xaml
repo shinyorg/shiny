@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          xmlns:sample="clr-namespace:Sample"
+                          xmlns:shiny="clr-namespace:Shiny.Jobs;assembly=Shiny.Jobs"
+                          x:DataType="sample:ListViewModel"
+                          x:Class="Sample.ListPage"
+                          Title="Jobs">
+    <ContentPage.BindingContext>
+        <sample:ListViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Create" Command="{Binding Create}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <RefreshView IsRefreshing="{Binding IsBusy}"
+                         Command="{Binding LoadJobs}">
+                <CollectionView ItemsSource="{Binding Jobs}"
+                                SelectedItem="{Binding SelectedJob}"
+                                SelectionMode="Single"
+                                Grid.Row="0">
+
+                    <CollectionView.EmptyView>
+                        <Label Text="No Job Logs" />
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="shiny:JobInfo">
+                            <StackLayout>
+                                <Label Text="{Binding Identifier}" FontSize="Large" />
+                                <Label Text="{Binding LastRunUtc}" FontSize="Small" />
+                                <BoxView BackgroundColor="WhiteSmoke"
+                                         HorizontalOptions="FillAndExpand"
+                                         HeightRequest="2" />
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <Label Text="{Binding RunningText}"
+                   HorizontalOptions="CenterAndExpand"
+                   HorizontalTextAlignment="Center"
+                   Grid.Row="1" />
+
+            <Button Text="Cancel All Jobs"
+                    Command="{Binding CancelAllJobs}"
+                    Grid.Row="2" />
+
+            <Button Text="Run All Jobs"
+                    Command="{Binding RunAllJobs}"
+                    Grid.Row="3" />
+        </Grid>
+    </ContentPage.Content>
+</sample:SampleContentPage>

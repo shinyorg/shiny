@@ -26,9 +26,22 @@ public static class MauiProgram
         builder.Logging.AddDebug();
         builder.Services.AddSingleton<SampleSqlConnection>();
         builder.Services.AddShinyService<PlatformStateTests>();
+
         builder.Services.AddConnectivity();
         builder.Services.AddBattery();
+
+        builder.Services.AddBluetoothLE();
+        //builder.Services.AddBleHostedCharacteristic
         builder.Services.AddBluetoothLeHosting();
+
+
+        builder.Services.AddGps();
+        //builder.Services.AddGeofencing
+        //builder.Services.AddGpsDirectGeofencing();
+        builder.Services.AddMotionActivity();
+        //builder.Services.AddNotifications<>
+
+        builder.Services.AddAllSensors();
 
         return builder.Build();
     }

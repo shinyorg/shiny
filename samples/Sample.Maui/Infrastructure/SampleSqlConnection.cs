@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace Sample.Maui.Infrastructure;
+namespace Sample.Infrastructure;
 
 
 public class SampleSqlConnection : SQLiteAsyncConnection

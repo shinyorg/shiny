@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<shared:SampleContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:shared="clr-namespace:Sample;assembly=Sample.Shared"
+    xmlns:sample="clr-namespace:Sample"
+    x:DataType="sample:ServiceViewModel"
+    x:Class="Sample.ServicePage"
+    Title="Service">
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Label Text="{Binding Title, StringFormat='Service UUID: {0}'}"
+                   Grid.Row="0" />
+
+            <CollectionView ItemsSource="{Binding Characteristics}"
+                            SelectedItem="{Binding SelectedCharacteristic}"
+                            SelectionMode="Single"
+                            Grid.Row="1">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="sample:CharacteristicViewModel">
+                        <StackLayout>
+                            <Label Text="{Binding UUID}" />
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </ContentPage.Content>
+</shared:SampleContentPage>

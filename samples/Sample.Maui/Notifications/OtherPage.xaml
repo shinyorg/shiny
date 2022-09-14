@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          xmlns:sample="clr-namespace:Sample"
+                          x:DataType="sample:OtherViewModel"
+                          x:Class="Sample.OtherPage"
+                          Title="Other">
+
+    <ContentPage.BindingContext>
+        <sample:OtherViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <TableView>
+            <TableRoot>
+                <TableSection Title="Use-Cases">
+                    <TextCell Text="Quick Send" Command="{Binding QuickSend}" />
+                    <TextCell Text="Start A Chat" Command="{Binding StartChat}" />
+                    <TextCell Text="Request All Permissions" Command="{Binding PermissionCheck}" />
+                </TableSection>
+                
+                <TableSection Title="Badge">
+                    <EntryCell Label="Badge"
+                               Text="{Binding Badge}"
+                               Keyboard="Numeric" />
+                    <TextCell Text="Clear" Command="{Binding ClearBadge}" />
+                </TableSection>
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</sample:SampleContentPage>
