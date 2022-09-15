@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:sample="clr-namespace:Sample"
-                          x:DataType="sample:OtherViewModel"
-                          x:Class="Sample.OtherPage"
-                          Title="Other">
-
-    <ContentPage.BindingContext>
-        <sample:OtherViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample.Notifications"
+             x:DataType="sample:OtherViewModel"
+             x:Class="Sample.Notifications.OtherPage"
+             Title="Other">
 
     <ContentPage.Content>
         <TableView>
@@ -28,4 +24,4 @@
             </TableRoot>
         </TableView>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

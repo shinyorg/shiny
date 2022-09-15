@@ -1,10 +1,10 @@
-﻿namespace Sample
+﻿namespace Sample.BleClient;
+
+
+public partial class ServicePage : ContentPage
 {
-    public partial class ServicePage : SampleContentPage
+    public ServicePage()
     {
-        public ServicePage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

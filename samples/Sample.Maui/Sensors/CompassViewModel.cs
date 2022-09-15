@@ -1,54 +1,35 @@
-﻿using System;
-using Shiny;
-using Shiny.Sensors;
+﻿using Shiny.Sensors;
+
+namespace Sample.Sensors;
 
 
-namespace Sample
+public class CompassViewModel : ViewModel
 {
-    public class CompassViewModel : SampleViewModel
+    readonly ICompass? compass;
+    public CompassViewModel(BaseServices services, ICompass? compass) : base(services) => this.compass = compass;
+
+
+    [Reactive] public double Rotation { get; private set; }
+    [Reactive] public double Heading { get; private set; }
+
+
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
-        readonly ICompass? compass = ShinyHost.Resolve<ICompass>();
-        IDisposable? sub;
-
-
-        double rotation;
-        public double Rotation
+        if (this.compass == null || !this.compass.IsAvailable)
         {
-            get => this.rotation;
-            private set => this.Set(ref this.rotation, value);
+            await this.Alert("Compass is not available");
         }
-
-
-        double heading;
-        public double Heading
+        else
         {
-            get => this.heading;
-            private set => this.Set(ref this.heading, value);
-        }
-
-
-        public override async void OnAppearing()
-        {
-            base.OnAppearing();
-            if (this.compass == null || !this.compass.IsAvailable)
-            {
-                await this.Alert("Compass is not available");
-                return;
-            }
-            this.sub = this.compass
+            this.compass
                 .WhenReadingTaken()
                 .SubOnMainThread(x =>
                 {
                     this.Rotation = 360 - x.MagneticHeading;
                     this.Heading = x.MagneticHeading;
-                });
+                })
+                .DisposedBy(this.DestroyWith);
         }
-
-
-        public override void OnDisappearing()
-        {
-            base.OnDisappearing();
-            this.sub?.Dispose();
-        }
+        return base.InitializeAsync(parameters);
     }
 }

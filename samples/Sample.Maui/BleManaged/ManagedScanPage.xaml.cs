@@ -1,12 +1,9 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample.BleManaged;
 
-namespace Sample
+public partial class ManagedScanPage : ContentPage
 {
-    public partial class ManagedScanPage : ContentPage
+    public ManagedScanPage()
     {
-        public ManagedScanPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

@@ -1,11 +1,9 @@
-﻿using Sample.Maui.Infrastructure;
-
-namespace Sample.Maui;
+﻿namespace Sample;
 
 
-public class LogsViewModel : ReactiveObject, IPageLifecycleAware
+public class LogsViewModel : ViewModel
 {
-    public LogsViewModel(SampleSqlConnection conn)
+    public LogsViewModel(BaseServices services, SampleSqliteConnection conn) : base(services)
     {
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -20,9 +18,12 @@ public class LogsViewModel : ReactiveObject, IPageLifecycleAware
 
 
     public ICommand Load { get; }
-    [Reactive] public bool IsBusy { get; private set; }
     [Reactive] public IList<Log> Logs { get; private set; }
 
-    public void OnAppearing() => this.Load.Execute(null);
-    public void OnDisappearing() { }
+
+    public override Task InitializeAsync(INavigationParameters parameters)
+    {
+        this.Load.Execute(null);
+        return base.InitializeAsync(parameters);
+    }
 }

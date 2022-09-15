@@ -1,61 +1,56 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Windows.Input;
-using Shiny;
+﻿using Shiny;
 using Shiny.BluetoothLE;
 
+namespace Sample.BleClient;
 
-namespace Sample
+
+public class ServiceViewModel : ViewModel
 {
-    public class ServiceViewModel : SampleViewModel
+    public ServiceViewModel(IGattService service)
     {
-        public ServiceViewModel(IGattService service)
+        this.Title = service.Uuid;
+
+        this.Load = this.LoadingCommand(async () =>
         {
-            this.Title = service.Uuid;
+            this.Characteristics = (await service.GetCharacteristicsAsync())
+                .Select(x => new CharacteristicViewModel(x))
+                .ToList();
 
-            this.Load = this.LoadingCommand(async () =>
+            this.RaisePropertyChanged(nameof(this.Characteristics));
+        });
+
+        this.WhenAnyProperty(x => x.SelectedCharacteristic)
+            .Where(x => x != null)
+            .SubOnMainThread(async x =>
             {
-                this.Characteristics = (await service.GetCharacteristicsAsync())
-                    .Select(x => new CharacteristicViewModel(x))
-                    .ToList();
-
-                this.RaisePropertyChanged(nameof(this.Characteristics));
-            });
-
-            this.WhenAnyProperty(x => x.SelectedCharacteristic)
-                .Where(x => x != null)
-                .SubOnMainThread(async x =>
+                this.SelectedCharacteristic = null;
+                await this.Navigation.PushAsync(new CharacteristicPage
                 {
-                    this.SelectedCharacteristic = null;
-                    await this.Navigation.PushAsync(new CharacteristicPage
-                    {
-                        BindingContext = x
-                    });
+                    BindingContext = x
                 });
-        }
+            });
+    }
 
 
-        public string Title { get; }
-        public ICommand Load { get; }
-        public List<CharacteristicViewModel> Characteristics { get; private set; }
+    public string Title { get; }
+    public ICommand Load { get; }
+    public List<CharacteristicViewModel> Characteristics { get; private set; }
 
-        CharacteristicViewModel selected;
-        public CharacteristicViewModel SelectedCharacteristic
+    CharacteristicViewModel selected;
+    public CharacteristicViewModel SelectedCharacteristic
+    {
+        get => this.selected;
+        set
         {
-            get => this.selected;
-            set
-            {
-                this.selected = value;
-                this.RaisePropertyChanged();
-            }
+            this.selected = value;
+            this.RaisePropertyChanged();
         }
+    }
 
 
-        public override void OnAppearing()
-        {
-            base.OnAppearing();
-            this.Load.Execute(null);
-        }
+    public override void OnAppearing()
+    {
+        base.OnAppearing();
+        this.Load.Execute(null);
     }
 }

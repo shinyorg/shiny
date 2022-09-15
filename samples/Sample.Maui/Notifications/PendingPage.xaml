@@ -1,18 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                          xmlns:sample="clr-namespace:Sample"
-                          mc:Ignorable="d"
-                          NavigationPage.BackButtonTitle="Back"
-                          x:DataType="sample:PendingViewModel"
-                          x:Class="Sample.PendingPage"
-                          Title="Pending">
-
-    <ContentPage.BindingContext>
-        <sample:PendingViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample.Notifications"
+             NavigationPage.BackButtonTitle="Back"
+             x:DataType="sample:PendingViewModel"
+             x:Class="Sample.Notifications.PendingPage"
+             Title="Pending">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Create"
@@ -75,4 +68,4 @@
                     Grid.Row="1" />
         </Grid>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

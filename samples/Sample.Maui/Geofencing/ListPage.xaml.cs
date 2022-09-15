@@ -1,14 +1,10 @@
-﻿using System;
-using Xamarin.Forms;
+﻿namespace Sample.Geofencing;
 
 
-namespace Sample
+public partial class ListPage : ContentPage
 {
-	public partial class ListPage : SampleContentPage
+	public ListPage ()
 	{
-		public ListPage ()
-		{
-			this.InitializeComponent();
-		}
+		this.InitializeComponent();
 	}
 }

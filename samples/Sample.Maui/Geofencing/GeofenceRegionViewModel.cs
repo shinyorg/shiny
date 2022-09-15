@@ -1,26 +1,23 @@
-﻿using System;
-using System.Windows.Input;
-using Shiny.Locations;
+﻿using Shiny.Locations;
+
+namespace Sample.Geofencing;
 
 
-namespace Sample
+public class GeofenceRegionViewModel
 {
-    public class GeofenceRegionViewModel
+    public GeofenceRegionViewModel(GeofenceRegion region, ICommand remove, ICommand requestCurrent)
     {
-        public GeofenceRegionViewModel(GeofenceRegion region, ICommand remove, ICommand requestCurrent)
-        {
-            this.Region = region;
-            this.Remove = remove;
-            this.RequestCurrentState = requestCurrent;
-        }
-
-
-        public GeofenceRegion Region { get; }
-        public ICommand RequestCurrentState { get; }
-        public ICommand Remove { get; }
-
-
-        public string Text => this.Region.Identifier;
-        public string Detail => $"{this.Region.Radius.TotalMeters}m from {this.Region.Center.Latitude}/{this.Region.Center.Longitude}";
+        this.Region = region;
+        this.Remove = remove;
+        this.RequestCurrentState = requestCurrent;
     }
+
+
+    public GeofenceRegion Region { get; }
+    public ICommand RequestCurrentState { get; }
+    public ICommand Remove { get; }
+
+
+    public string Text => this.Region.Identifier;
+    public string Detail => $"{this.Region.Radius.TotalMeters}m from {this.Region.Center.Latitude}/{this.Region.Center.Longitude}";
 }

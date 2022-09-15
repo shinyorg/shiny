@@ -1,13 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                           xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:sample="clr-namespace:Sample"
-                          xmlns:create="clr-namespace:Sample.Create"
-                          x:Class="Sample.Create.SchedulePage">
-    
-    <ContentPage.BindingContext>
-        <create:ScheduleViewModel />
-    </ContentPage.BindingContext>
+                          x:Class="Sample.Notifications.Create.SchedulePage">
     
     <ContentPage.Content>
         <StackLayout>
@@ -21,4 +15,4 @@
                     Command="{Binding Use}" />
         </StackLayout>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

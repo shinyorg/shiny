@@ -1,16 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:sample="clr-namespace:Sample"
-                          xmlns:create="clr-namespace:Sample.Create"
-                          NavigationPage.BackButtonTitle="Back"
-                          x:Class="Sample.Create.CreatePage"
-                          x:DataType="create:CreateViewModel"
-                          Title="Create">
-
-    <ContentPage.BindingContext>
-        <create:CreateViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample"
+             xmlns:create="clr-namespace:Sample.Create"
+             NavigationPage.BackButtonTitle="Back"
+             x:Class="Sample.Create.CreatePage"
+             x:DataType="create:CreateViewModel"
+             Title="Create">
 
     <ContentPage.Content>
         <Grid>
@@ -69,4 +65,4 @@
             </StackLayout>
         </Grid>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

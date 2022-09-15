@@ -1,10 +1,10 @@
-﻿namespace Sample
+﻿namespace Sample.Stores;
+
+
+public partial class BasicPage : ContentPage
 {
-    public partial class BasicPage : SampleContentPage
+    public BasicPage()
     {
-        public BasicPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

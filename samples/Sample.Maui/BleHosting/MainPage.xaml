@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:sample="clr-namespace:Sample"
-             x:Class="Sample.MainPage"
+             xmlns:sample="clr-namespace:Sample.BleHosting"
+             x:Class="Sample.BleHosting.MainPage"
              x:DataType="sample:MainViewModel"
              Title="GATT Server">
-
-    <ContentPage.BindingContext>
-        <sample:MainViewModel />
-    </ContentPage.BindingContext>
 
     <ContentPage.Content>
         <TableView>
@@ -18,14 +14,8 @@
                               Detail="A495FF20-C5B1-4B44-B512-1370F02D74DE"
                               DetailColor="Red" />
 
-                    <EntryCell Label="Local Name (iOS/UWP)"
+                    <EntryCell Label="Local Name"
                                Text="{Binding LocalName}" />
-
-                    <SwitchCell Text="Android Include TX"
-                                On="{Binding AndroidIncludeTx}" />
-
-                    <SwitchCell Text="Android Include Device Name"
-                                On="{Binding AndroidIncludeDeviceName}" />
 
                     <TextCell Text="{Binding ServerText}"
                               Command="{Binding ToggleServer}" />

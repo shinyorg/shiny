@@ -3,19 +3,20 @@
 namespace Sample.Infrastructure;
 
 
-public class SampleSqlConnection : SQLiteAsyncConnection
+public class SampleSqliteConnection : SQLiteAsyncConnection
 {
-    public SampleSqlConnection(IPlatform platform) : base(Path.Combine(platform.AppData.FullName, "sample.db"))
+    public SampleSqliteConnection(IPlatform platform) : base(Path.Combine(platform.AppData.FullName, "sample.db"))
     {
         var conn = this.GetConnection();
         var result = conn.CreateTable<Log>();
     }
 
 
-    public Task Log(string detail) => this.InsertAsync(new Log
+    public Task Log(string text, string? detail = null, DateTime? timestamp = null) => this.InsertAsync(new Log
     {
+        Text = text,
         Detail = detail,
-        Timestamp = DateTimeOffset.UtcNow
+        Timestamp = timestamp ?? DateTimeOffset.UtcNow
     });
     public AsyncTableQuery<Log> Logs => this.Table<Log>();
 }
@@ -27,7 +28,7 @@ public class Log
     [PrimaryKey]
     public int Id { get; set; }
 
-
+    public string Text { get; set; }
     public string Detail { get; set; }
     public DateTimeOffset Timestamp { get; set; }
 }

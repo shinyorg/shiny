@@ -1,13 +1,9 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample.Sensors;
 
-
-namespace Sample
+public partial class AllSensorsPage : ContentPage
 {
-    public partial class AllSensorsPage : ContentPage
+    public AllSensorsPage()
     {
-        public AllSensorsPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

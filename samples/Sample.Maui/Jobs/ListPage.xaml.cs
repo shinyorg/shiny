@@ -1,10 +1,10 @@
-﻿namespace Sample
+﻿namespace Sample.Jobs;
+
+
+public partial class ListPage : ContentPage
 {
-	public partial class ListPage : SampleContentPage
+	public ListPage()
 	{
-		public ListPage()
-		{
-			this.InitializeComponent();
-		}
-    }
+		this.InitializeComponent();
+	}
 }

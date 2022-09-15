@@ -1,14 +1,10 @@
-﻿using System;
-using Xamarin.Forms;
+﻿namespace Sample.BleClient;
 
 
-namespace Sample
+public partial class ScanPage : ContentPage
 {
-    public partial class ScanPage : SampleContentPage
+    public ScanPage()
     {
-        public ScanPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

@@ -1,86 +1,80 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Input;
-using Shiny;
+﻿using Shiny;
 using Shiny.Notifications;
-using Xamarin.Forms;
+
+namespace Sample.Notifications;
 
 
-namespace Sample
+public class PendingViewModel : ViewModel
 {
-    public class PendingViewModel : SampleViewModel
+    public PendingViewModel(BaseServices services, INotificationManager notifications) : base(services)
     {
-        public PendingViewModel()
+
+        this.Create = this.NavigateCommand<Create.CreatePage>();
+
+        this.Load = this.LoadingCommand(async () =>
         {
-            var notifications = ShinyHost.Resolve<INotificationManager>();
-
-            this.Create = this.NavigateCommand<Create.CreatePage>();
-
-            this.Load = this.LoadingCommand(async () =>
-            {
-                var pending = await notifications.GetPendingNotifications();
-                this.PendingList = pending
-                    .Select(x => new CommandItem
-                    {
-                        Text = $"[{x.Id}] {x.Title}",
-                        Detail = this.GetDetails(x),
-                        PrimaryCommand = new Command(async () =>
-                        {
-                            await notifications.Cancel(x.Id);
-                            this.Load!.Execute(null);
-                        })
-                    })
-                    .ToList();
-            });
-
-            this.CancelAll = this.ConfirmCommand(
-                "Cancel All Notifications?",
-                async () =>
+            var pending = await notifications.GetPendingNotifications();
+            this.PendingList = pending
+                .Select(x => new CommandItem
                 {
-                    await notifications.Cancel();
-                    this.Load.Execute(null);
-                }
-            );
-        }
+                    Text = $"[{x.Id}] {x.Title}",
+                    Detail = this.GetDetails(x),
+                    PrimaryCommand = new Command(async () =>
+                    {
+                        await notifications.Cancel(x.Id);
+                        this.Load!.Execute(null);
+                    })
+                })
+                .ToList();
+        });
 
-
-        public ICommand Load { get; }
-        public ICommand Create { get; }
-        public ICommand CancelAll { get; }
-
-
-
-        IList<CommandItem> pending;
-        public IList<CommandItem> PendingList
-        {
-            get => this.pending;
-            private set
+        this.CancelAll = this.ConfirmCommand(
+            "Cancel All Notifications?",
+            async () =>
             {
-                this.pending = value;
-                this.RaisePropertyChanged();
+                await notifications.Cancel();
+                this.Load.Execute(null);
             }
-        }
+        );
+    }
 
 
-        public override void OnAppearing()
+    public ICommand Load { get; }
+    public ICommand Create { get; }
+    public ICommand CancelAll { get; }
+
+
+
+    IList<CommandItem> pending;
+    public IList<CommandItem> PendingList
+    {
+        get => this.pending;
+        private set
         {
-            base.OnAppearing();
-            this.Load.Execute(null);
+            this.pending = value;
+            this.RaisePropertyChanged();
         }
+    }
 
 
-        string GetDetails(Notification notification)
-        {
-            if (notification.Geofence != null)
-                return $"Geofence Trigger: {notification.Geofence.Center!.Latitude} / {notification.Geofence.Center!.Longitude}";
+    public override void OnAppearing()
+    {
+        base.OnAppearing();
+        this.Load.Execute(null);
+    }
 
-            if (notification.RepeatInterval != null)
-                return $"Interval Trigger: {notification.RepeatInterval.DayOfWeek} - Hour: {notification.RepeatInterval.TimeOfDay}";
 
-            if (notification.ScheduleDate != null)
-                return $"Schedule Trigger: {notification.ScheduleDate}";
+    string GetDetails(Notification notification)
+    {
+        if (notification.Geofence != null)
+            return $"Geofence Trigger: {notification.Geofence.Center!.Latitude} / {notification.Geofence.Center!.Longitude}";
 
-            return "No Trigger";
-        }
+        if (notification.RepeatInterval != null)
+            return $"Interval Trigger: {notification.RepeatInterval.DayOfWeek} - Hour: {notification.RepeatInterval.TimeOfDay}";
+
+        if (notification.ScheduleDate != null)
+            return $"Schedule Trigger: {notification.ScheduleDate}";
+
+        return "No Trigger";
     }
 }

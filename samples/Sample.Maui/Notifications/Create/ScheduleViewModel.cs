@@ -1,14 +1,6 @@
-﻿using Shiny;
-using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Windows.Input;
-using Xamarin.Forms;
-
-
-namespace Sample.Create
+﻿namespace Sample.Notifications.Create
 {
-    public class ScheduleViewModel : SampleViewModel
+    public class ScheduleViewModel : ViewModel
     {
         CompositeDisposable? disposer;
 

@@ -1,0 +1,166 @@
+﻿using Shiny;
+using Shiny.Beacons;
+
+namespace Sample.Beacons;
+
+
+public class CreateViewModel : ViewModel
+{
+    const string EstimoteUuid = "B9407F30-F5F8-466E-AFF9-25556B57FE6D";
+
+
+    public CreateViewModel(
+        BaseServices services,
+        IBeaconRangingManager rangingManager,
+        IBeaconMonitoringManager? monitorManager = null
+    ) : base(services)
+    {
+        //this.NotificationTitle = monitorManager?.Title;
+        //this.NotificationMessage = monitorManager?.Message;
+        this.IsMonitoringSupported = monitorManager != null;
+
+        this.EstimoteDefaults = ReactiveCommand.Create(() =>
+        {
+            this.Identifier = "Estimote";
+            this.Uuid = EstimoteUuid;
+        });
+
+        this.WhenAnyValue(x => x.Major)
+            .Select(x => !x.IsEmpty() && UInt16.TryParse(x, out _))
+            .ToPropertyEx(this, x => x.IsMajorSet);
+
+        this.StartMonitoring = ReactiveCommand.CreateFromTask(
+            async () =>
+            {
+                var result = await monitorManager.RequestAccess();
+                if (result != AccessState.Available)
+                {
+                    await this.Dialogs.DisplayAlertAsync("Error", $"Invalid Permission: {result}", "OK");
+                }
+                else
+                {
+                    await monitorManager.StartMonitoring(this.GetBeaconRegion());
+                    await this.Navigation.GoBack();
+                }
+            },
+            this.WhenAny(
+                x => x.Identifier,
+                x => x.Uuid,
+                x => x.Major,
+                x => x.Minor,
+                x => x.NotifyOnEntry,
+                x => x.NotifyOnExit,
+                (idValue, uuidValue, majorValue, minorValue, entry, exit) =>
+                {
+                    if (monitorManager == null)
+                        return false;
+
+                    var atLeast1Notification = entry.GetValue() || exit.GetValue();
+                    if (!atLeast1Notification)
+                        return false;
+
+                    return this.IsValid();
+                }
+            )
+        );
+
+
+        this.StartRanging = ReactiveCommand.CreateFromTask(
+            async () =>
+            {
+                var result = await rangingManager.RequestAccess();
+                if (result != AccessState.Available)
+                {
+                    await this.Dialogs.DisplayAlertAsync("Error", $"Invalid Permission: {result}", "OK");
+                }
+                else
+                {
+                    var region = this.GetBeaconRegion();
+                    await this.Navigation.GoBack(false, (nameof(BeaconRegion), region));
+                }
+            },
+            this.WhenAny(
+                x => x.Identifier,
+                x => x.Uuid,
+                x => x.Major,
+                x => x.Minor,
+                (idValue, uuidValue, majorValue, minorValue) => this.IsValid()
+            )
+        );
+
+        //this.WhenAnyValue(x => x.NotificationTitle)
+        //    .Skip(1)
+        //    .Subscribe(x => monitorManager.Title = x)
+        //    .DisposedBy(this.DestroyWith);
+
+        //this.WhenAnyValue(x => x.NotificationMessage)
+        //    .Skip(1)
+        //    .Subscribe(x => monitorManager.Message = x)
+        //    .DisposedBy(this.DestroyWith);
+    }
+
+
+
+    public bool IsMajorSet { [ObservableAsProperty] get; }
+
+    public ICommand StartMonitoring { get; }
+    public ICommand StartRanging { get; }
+    public ICommand EstimoteDefaults { get; }
+    [Reactive] public string Identifier { get; set; }
+    [Reactive] public string Uuid { get; set; }
+    [Reactive] public string Major { get; set; }
+    [Reactive] public string Minor { get; set; }
+    [Reactive] public bool NotifyOnEntry { get; set; } = true;
+    [Reactive] public bool NotifyOnExit { get; set; } = true;
+    [Reactive] public string NotificationTitle { get; set; }
+    [Reactive] public string NotificationMessage { get; set; }
+    public bool IsMonitoringSupported { get; }
+
+
+    BeaconRegion GetBeaconRegion() => new BeaconRegion(
+        this.Identifier,
+        Guid.Parse(this.Uuid),
+        GetNumberAddress(this.Major),
+        GetNumberAddress(this.Minor)
+    )
+    {
+        NotifyOnEntry = this.NotifyOnEntry,
+        NotifyOnExit = this.NotifyOnExit
+    };
+
+
+    bool IsValid()
+    {
+        if (this.Identifier.IsEmpty())
+            return false;
+
+        if (!this.Uuid.IsEmpty() && !Guid.TryParse(this.Uuid, out _))
+            return false;
+
+        if (!ValidateNumberAddress(this.Major))
+            return false;
+
+        if (!ValidateNumberAddress(this.Minor))
+            return false;
+
+        return true;
+    }
+
+
+    static bool ValidateNumberAddress(string value)
+    {
+        if (value.IsEmpty())
+            return true;
+
+        return UInt16.TryParse(value, out _);
+    }
+
+
+    ushort? GetNumberAddress(string value)
+    {
+        if (value.IsEmpty())
+            return null;
+
+        return UInt16.Parse(value);
+    }
+}

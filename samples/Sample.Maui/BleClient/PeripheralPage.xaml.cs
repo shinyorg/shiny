@@ -1,10 +1,10 @@
-﻿namespace Sample
+﻿namespace Sample.BleClient;
+
+
+public partial class PeripheralPage : ContentPage
 {
-    public partial class PeripheralPage : SampleContentPage
+    public PeripheralPage()
     {
-        public PeripheralPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

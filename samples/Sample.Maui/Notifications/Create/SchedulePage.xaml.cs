@@ -1,15 +1,10 @@
-﻿using Xamarin.Forms.PlatformConfiguration;
-using Xamarin.Forms.PlatformConfiguration.iOSSpecific;
+﻿namespace Sample.Notifications.Create;
 
 
-namespace Sample.Create
+public partial class SchedulePage : ContentPage
 {
-    public partial class SchedulePage : SampleContentPage
+    public SchedulePage()
     {
-        public SchedulePage()
-        {
-            this.InitializeComponent();
-            this.On<iOS>().SetModalPresentationStyle(UIModalPresentationStyle.FormSheet);
-        }
+        this.InitializeComponent();
     }
 }

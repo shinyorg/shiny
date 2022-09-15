@@ -1,15 +1,11 @@
-﻿using System;
-using System.Windows.Input;
+﻿namespace Sample.Sensors;
 
 
-namespace Sample
+public interface ISensorViewModel
 {
-    public interface ISensorViewModel
-    {
-        string? Title { get; }
-        ICommand Toggle { get; }
-        string? ValueName { get; }
-        string? Value { get; }
-        string? ToggleText { get; }
-    }
+    string? Title { get; }
+    ICommand Toggle { get; }
+    string? ValueName { get; }
+    string? Value { get; }
+    string? ToggleText { get; }
 }

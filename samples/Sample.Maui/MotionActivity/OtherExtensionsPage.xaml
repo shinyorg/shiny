@@ -1,17 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                          xmlns:sample="clr-namespace:Sample"
-                          x:DataType="sample:OtherExtensionsViewModel"
-                          mc:Ignorable="d"
-                          x:Class="Sample.OtherExtensionsPage"
-                          Title="Extensions">
-
-    <ContentPage.BindingContext>
-        <sample:OtherExtensionsViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample.MotionActivity"
+             x:DataType="sample:OtherExtensionsViewModel"
+             x:Class="Sample.MotionActivity.OtherExtensionsPage"
+             Title="Extensions">
 
     <ContentPage.Content>
         <TableView>
@@ -24,4 +17,4 @@
             </TableRoot>
         </TableView>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

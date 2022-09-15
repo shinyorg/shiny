@@ -1,14 +1,8 @@
-﻿using System;
-using System.Windows.Input;
+﻿namespace Sample.SpeechRecognition;
 
-
-namespace Sample
-{
-    public class ListItemViewModel
-    {
-        public bool IsBot { get; set; }
-        public string? From { get; set; }
-        public string? Text { get; set; }
-        public ICommand? Command { get; set; }
-    }
-}
+public record ListItemViewModel(
+    bool IsBot,
+    string? From,
+    string? Text,
+    ICommand? Command = null
+);

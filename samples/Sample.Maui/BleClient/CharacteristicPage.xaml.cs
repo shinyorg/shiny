@@ -1,13 +1,10 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample.BleClient;
 
 
-namespace Sample
+public partial class CharacteristicPage : ContentPage
 {
-    public partial class CharacteristicPage : ContentPage
+    public CharacteristicPage()
     {
-        public CharacteristicPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

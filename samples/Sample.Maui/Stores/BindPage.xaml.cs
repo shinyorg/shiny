@@ -1,10 +1,10 @@
-﻿namespace Sample
+﻿namespace Sample.Stores;
+
+
+public partial class BindPage : ContentPage
 {
-    public partial class BindPage : SampleContentPage
+    public BindPage()
     {
-        public BindPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<shared:SampleContentPage
-    xmlns="http://xamarin.com/schemas/2014/forms"
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:shared="clr-namespace:Sample;assembly=Sample.Shared"
-    xmlns:sample="clr-namespace:Sample"
+    xmlns:sample="clr-namespace:Sample.BleClient"
     x:DataType="sample:PeripheralViewModel"
-    x:Class="Sample.PeripheralPage"
+    x:Class="Sample.BleClient.PeripheralPage"
     Title="{Binding Title}">
 
     <ContentPage.Content>
@@ -21,4 +20,4 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
     </ContentPage.Content>
-</shared:SampleContentPage>
+</ContentPage>

@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:sample="clr-namespace:Sample"
+             xmlns:sample="clr-namespace:Sample.Geofencing"
              x:DataType="sample:CreateViewModel"
-             x:Class="Sample.CreatePage"
+             x:Class="Sample.Geofencing.CreatePage"
              Title="Create">
-
-    <ContentPage.BindingContext>
-        <sample:CreateViewModel />
-    </ContentPage.BindingContext>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Create" Command="{Binding CreateGeofence}" />

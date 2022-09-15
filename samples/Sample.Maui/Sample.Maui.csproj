@@ -23,6 +23,9 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-ios|AnyCPU'">
+	  <EnableCodeSigning>false</EnableCodeSigning>
+	</PropertyGroup>
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -56,5 +59,13 @@
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="$(SqliteLibVersion)" />
         <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="$(SqliteLibVersion)" />
         <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="$(SqliteLibVersion)" />
+    </ItemGroup>
+    <ItemGroup>
+      <MauiXaml Condition=" '$(EnableDefaultXamlItems)' == 'true' " Update="Beacons\ManagedBeaconPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Condition=" '$(EnableDefaultXamlItems)' == 'true' " Update="Beacons\ManagedRangingPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
     </ItemGroup>
 </Project>

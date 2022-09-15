@@ -1,0 +1,25 @@
+﻿using Shiny.BluetoothLE;
+
+namespace Sample.BleClient;
+
+
+public class MyBleDelegate : BleDelegate
+{
+    readonly SampleSqliteConnection conn;
+    public MyBleDelegate(SampleSqliteConnection conn)
+        => this.conn = conn;
+
+
+    public override Task OnAdapterStateChanged(AccessState state)
+        => this.conn.Log(
+            "BLE Adapter Status",
+            $"New Status: {state}"
+        );
+
+
+    public override Task OnConnected(IPeripheral peripheral)
+        => this.conn.Log(
+            "Peripheral Connected",
+            peripheral.Name
+        );
+}

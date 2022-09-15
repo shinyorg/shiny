@@ -1,14 +1,10 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:sample="clr-namespace:Sample"
-             x:Class="Sample.AllSensorsPage"
+             xmlns:sample="clr-namespace:Sample.Sensors"
+             x:Class="Sample.Sensors.AllSensorsPage"
              x:DataType="sample:AllSensorsViewModel"
              Title="Sensors">
-
-    <ContentPage.BindingContext>
-        <sample:AllSensorsViewModel />
-    </ContentPage.BindingContext>
 
     <ContentPage.Content>
         <StackLayout>

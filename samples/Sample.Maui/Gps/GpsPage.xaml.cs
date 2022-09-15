@@ -1,10 +1,9 @@
-﻿namespace Sample
+﻿namespace Sample.Gps;
+
+public partial class GpsPage : ContentPage
 {
-    public partial class GpsPage : SampleContentPage
+    public GpsPage()
     {
-        public GpsPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

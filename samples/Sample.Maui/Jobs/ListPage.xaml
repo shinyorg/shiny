@@ -1,14 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:sample="clr-namespace:Sample"
-                          xmlns:shiny="clr-namespace:Shiny.Jobs;assembly=Shiny.Jobs"
-                          x:DataType="sample:ListViewModel"
-                          x:Class="Sample.ListPage"
-                          Title="Jobs">
-    <ContentPage.BindingContext>
-        <sample:ListViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample"
+             xmlns:shiny="clr-namespace:Shiny.Jobs;assembly=Shiny.Jobs"
+             x:DataType="sample:ListViewModel"
+             x:Class="Sample.ListPage"
+             Title="Jobs">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Create" Command="{Binding Create}" />
@@ -62,4 +59,4 @@
                     Grid.Row="3" />
         </Grid>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

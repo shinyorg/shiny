@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:sample="clr-namespace:Sample"
-                          x:Class="Sample.ConversationPage"
-                          x:DataType="sample:ConversationViewModel"
-                          Title="Conversation">
-
-    <ContentPage.BindingContext>
-        <sample:ConversationViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample.SpeechRecognition"
+             x:Class="Sample.SpeechRecognition.ConversationPage"
+             x:DataType="sample:ConversationViewModel"
+             Title="Conversation">
 
     <ContentPage.Content>
         <StackLayout>
@@ -29,4 +25,4 @@
             </ListView>
         </StackLayout>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

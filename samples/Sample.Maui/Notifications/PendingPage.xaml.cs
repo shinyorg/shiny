@@ -1,10 +1,10 @@
-﻿namespace Sample
+﻿namespace Sample.Notifications;
+
+
+public partial class PendingPage : ContentPage
 {
-    public partial class PendingPage : SampleContentPage
+    public PendingPage()
     {
-        public PendingPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

@@ -1,15 +1,10 @@
 ﻿using Shiny;
 using Shiny.Locations;
-using System;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Windows.Input;
-using Xamarin.Forms;
 
 
-namespace Sample.Create
+namespace Sample.Notifications.Create
 {
-    public class LocationViewModel : SampleViewModel
+    public class LocationViewModel : ViewModel
     {
         public LocationViewModel()
         {

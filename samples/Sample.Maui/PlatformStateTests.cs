@@ -1,13 +1,12 @@
 ﻿using Shiny.Hosting;
 
-namespace Sample.Maui;
+namespace Sample;
 
 
 #if ANDROID
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Sample.Maui.Infrastructure;
 
 public partial class PlatformStateTests : IAndroidLifecycle.IApplicationLifecycle, IAndroidLifecycle.IOnActivityNewIntent, IAndroidLifecycle.IOnActivityRequestPermissionsResult, IAndroidLifecycle.IOnActivityResult
 {
@@ -20,7 +19,6 @@ public partial class PlatformStateTests : IAndroidLifecycle.IApplicationLifecycl
 
 #elif IOS || MACCATALYST
 using Foundation;
-using Sample.Maui.Infrastructure;
 using UIKit;
 using UserNotifications;
 
@@ -55,11 +53,11 @@ public partial class PlatformStateTests : IIosLifecycle.IApplicationLifecycle, I
 
 public partial class PlatformStateTests
 {
-    readonly SampleSqlConnection data;
+    readonly SampleSqliteConnection data;
     readonly ILogger logger;
 
 
-    public PlatformStateTests(SampleSqlConnection data, ILogger<PlatformStateTests> logger)
+    public PlatformStateTests(SampleSqliteConnection data, ILogger<PlatformStateTests> logger)
     {
         this.data = data;
         this.logger = logger;

@@ -1,54 +1,38 @@
-﻿using System;
-using Shiny;
-using Shiny.Stores;
+﻿using Shiny.Stores;
+
+namespace Sample.Stores;
 
 
-namespace Sample
+public class BindViewModel : ViewModel
 {
-    public class BindViewModel : SampleViewModel
+    readonly IObjectStoreBinder binder;
+
+
+    public BindViewModel(BaseServices services, IObjectStoreBinder binder) : base(services)
     {
-        readonly IObjectStoreBinder binder = ShinyHost.Resolve<IObjectStoreBinder>();
-        IDisposable? sub;
+        this.binder = binder;
+    }
 
 
-        bool isChecked;
-        public bool IsChecked
-        {
-            get => this.isChecked;
-            set => this.Set(ref this.isChecked, value);
-        }
+    [Reactive] public bool IsChecked { get; set; }
+    [Reactive] public string YourText { get; set; }
+    [Reactive] public DateTime? LastUpdated { get; set; }
 
 
-        string yourText;
-        public string YourText
-        {
-            get => this.yourText;
-            set => this.Set(ref this.yourText, value);
-        }
+    public override Task InitializeAsync(INavigationParameters parameters)
+    {
+        this.binder.Bind(this, "settings");
+        this.WhenAnyProperty()
+            .Subscribe(_ => this.LastUpdated = DateTime.Now)
+            .DisposedBy(this.DestroyWith);
+
+        return base.InitializeAsync(parameters);
+    }
 
 
-        DateTime? lastUpdated;
-        public DateTime? LastUpdated
-        {
-            get => this.lastUpdated;
-            set => this.Set(ref this.lastUpdated, value);
-        }
-
-
-        public override void OnAppearing()
-        {
-            base.OnAppearing();
-            this.binder.Bind(this, "settings");
-            this.sub = this.WhenAnyProperty()
-                .Subscribe(_ => this.LastUpdated = DateTime.Now);
-        }
-
-
-        public override void OnDisappearing()
-        {
-            base.OnDisappearing();
-            this.binder.UnBind(this);
-            this.sub?.Dispose();
-        }
+    public override void Dispose()
+    {
+        this.binder.UnBind(this);
+        base.Dispose();
     }
 }

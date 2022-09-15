@@ -1,10 +1,10 @@
-﻿namespace Sample
+﻿namespace Sample.Notifications;
+
+
+public partial class OtherPage : ContentPage
 {
-    public partial class OtherPage : SampleContentPage
+    public OtherPage()
     {
-        public OtherPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

@@ -1,16 +1,10 @@
-﻿using Xamarin.Forms;
-using Xamarin.Forms.PlatformConfiguration;
-using Xamarin.Forms.PlatformConfiguration.iOSSpecific;
+﻿namespace Sample.Notifications.Create;
 
 
-namespace Sample.Create
+public partial class LocationPage : ContentPage
 {
-    public partial class LocationPage : ContentPage
+    public LocationPage()
     {
-        public LocationPage()
-        {
-            this.InitializeComponent();
-            this.On<iOS>().SetModalPresentationStyle(UIModalPresentationStyle.FormSheet);
-        }
+        this.InitializeComponent();
     }
 }

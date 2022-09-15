@@ -1,118 +1,113 @@
-﻿using System;
-using System.Reactive.Linq;
-using System.Windows.Input;
-using Shiny;
+﻿using Shiny;
 using Shiny.Notifications;
-using Xamarin.Forms;
+
+namespace Sample.Notifications;
 
 
-namespace Sample
+public class OtherViewModel : ViewModel
 {
-    public class OtherViewModel : SampleViewModel
+    readonly INotificationManager notifications;
+    IDisposable? sub;
+
+
+    public OtherViewModel(BaseServices services, INotificationManager notifications) : base(services)
     {
-        readonly INotificationManager notifications;
-        IDisposable? sub;
+        this.notifications = notifications;
+        this.ClearBadge = new Command(() => this.Badge = 0);
 
-
-        public OtherViewModel()
+        this.PermissionCheck = new Command(async () =>
         {
-            this.notifications = ShinyHost.Resolve<INotificationManager>();
-            this.ClearBadge = new Command(() => this.Badge = 0);
+            var result = await this.notifications.RequestAccess(AccessRequestFlags.All);
+            await this.Alert("Permission Check Result: " + result);
+        });
 
-            this.PermissionCheck = new Command(async () =>
+        this.QuickSend = this.LoadingCommand(async () =>
+            await this.notifications.Send("QUICK SEND TITLE", "This is a quick message")
+        );
+
+        this.StartChat = this.LoadingCommand(async () => 
+        {
+            await this.notifications.RemoveChannel("ChatName");
+            await this.notifications.RemoveChannel("ChatAnswer");
+
+            await this.notifications.AddChannel(new Channel
             {
-                var result = await this.notifications.RequestAccess(AccessRequestFlags.All);
-                await this.Alert("Permission Check Result: " + result);
+                Identifier = "ChatName",
+                Importance = ChannelImportance.Normal,
+                Actions =
+                {
+                    new ChannelAction
+                    {
+                        Identifier = "name",
+                        Title = "What is your name?",
+                        ActionType = ChannelActionType.TextReply
+                    }
+                }
+
+            });
+            await this.notifications.AddChannel(new Channel
+            {
+                Identifier = "ChatAnswer",
+                Actions =
+                {
+                    new ChannelAction
+                    {
+                        Title = "Yes",
+                        Identifier = "yes",
+                        ActionType = ChannelActionType.None
+                    },
+                    new ChannelAction
+                    {
+                        Title = "No",
+                        Identifier = "no",
+                        ActionType = ChannelActionType.Destructive
+                    }
+                }
             });
 
-            this.QuickSend = this.LoadingCommand(async () =>
-                await this.notifications.Send("QUICK SEND TITLE", "This is a quick message")
+            await this.notifications.Send(
+                "Shiny Chat",
+                "Hi, What's your name?",
+                "ChatName",
+                DateTime.Now.AddSeconds(10)
             );
-
-            this.StartChat = this.LoadingCommand(async () => 
-            {
-                await this.notifications.RemoveChannel("ChatName");
-                await this.notifications.RemoveChannel("ChatAnswer");
-
-                await this.notifications.AddChannel(new Channel
-                {
-                    Identifier = "ChatName",
-                    Importance = ChannelImportance.Normal,
-                    Actions =
-                    {
-                        new ChannelAction
-                        {
-                            Identifier = "name",
-                            Title = "What is your name?",
-                            ActionType = ChannelActionType.TextReply
-                        }
-                    }
-
-                });
-                await this.notifications.AddChannel(new Channel
-                {
-                    Identifier = "ChatAnswer",
-                    Actions =
-                    {
-                        new ChannelAction
-                        {
-                            Title = "Yes",
-                            Identifier = "yes",
-                            ActionType = ChannelActionType.None
-                        },
-                        new ChannelAction
-                        {
-                            Title = "No",
-                            Identifier = "no",
-                            ActionType = ChannelActionType.Destructive
-                        }
-                    }
-                });
-
-                await this.notifications.Send(
-                    "Shiny Chat",
-                    "Hi, What's your name?",
-                    "ChatName",
-                    DateTime.Now.AddSeconds(10)
-                );
-            });
-        }
+        });
+    }
 
 
-        public override async void OnAppearing()
-        {
-            base.OnAppearing();
-            this.Badge = await this.notifications.GetBadge();
+    public override async void OnAppearing()
+    {
+        base.OnAppearing();
+        this.Badge = await this.notifications.GetBadge();
 
-            this.sub = this.WhenAnyProperty(x => x.Badge)
-                .Skip(1)
-                .Throttle(TimeSpan.FromMilliseconds(500))
-                .DistinctUntilChanged()
-                .Select(x => Observable.FromAsync(() => this.notifications.SetBadge(x)))
-                .Switch()
-                .Subscribe();
-        }
-
-
-        public override void OnDisappearing()
-        {
-            base.OnDisappearing();
-            this.sub?.Dispose();
-        }
+        this.sub = this.WhenAnyProperty(x => x.Badge)
+            .Skip(1)
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .DistinctUntilChanged()
+            .Select(x => Observable.FromAsync(() => this.notifications.SetBadge(x)))
+            .Switch()
+            .Subscribe();
+    }
 
 
-        public ICommand QuickSend { get; }
-        public ICommand StartChat { get; }
-        public ICommand PermissionCheck { get; }
-        public ICommand ClearBadge { get; }
+    public override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        this.sub?.Dispose();
+    }
 
 
-        int badge;
-        public int Badge
-        {
-            get => this.badge;
-            set => this.Set(ref this.badge, value);
-        }
+    public ICommand QuickSend { get; }
+    public ICommand StartChat { get; }
+    public ICommand PermissionCheck { get; }
+    public ICommand ClearBadge { get; }
+
+
+    int badge;
+    public int Badge
+    {
+        get => this.badge;
+        set => this.Set(ref this.badge, value);
     }
 }
 

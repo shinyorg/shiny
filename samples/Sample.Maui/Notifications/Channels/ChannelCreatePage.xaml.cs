@@ -1,13 +1,10 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample.Notifications.Channels;
 
 
-namespace Sample.Channels
+public partial class ChannelCreatePage : ContentPage
 {
-    public partial class ChannelCreatePage : ContentPage
+    public ChannelCreatePage()
     {
-        public ChannelCreatePage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

@@ -1,10 +1,7 @@
-﻿using Shiny.Notifications;
+﻿namespace Sample.Notifications.Create;
 
 
-namespace Sample.Create
+public static class State
 {
-    public static class State
-    {
-        public static Notification? CurrentNotification { get; set; }
-    }
+    public static Shiny.Notifications.Notification? CurrentNotification { get; set; }
 }

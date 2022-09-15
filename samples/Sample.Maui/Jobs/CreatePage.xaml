@@ -1,16 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<shared:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          x:Class="Sample.CreatePage"
-                          xmlns:sample="clr-namespace:Sample"
-                          xmlns:shared="clr-namespace:Sample;assembly=Sample.Shared"
-                          x:DataType="sample:CreateViewModel"
-                          Title="Create">
-
-    <ContentPage.BindingContext>
-        <sample:CreateViewModel />
-    </ContentPage.BindingContext>
-
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"             
+             xmlns:sample="clr-namespace:Sample.Jobs"
+             x:DataType="sample:CreateViewModel"
+             x:Class="Sample.Jobs.CreatePage"
+             Title="Create Job"
+             >
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
@@ -48,4 +43,4 @@
                     Grid.Row="1" />
         </Grid>
     </ContentPage.Content>
-</shared:SampleContentPage>
+</ContentPage>

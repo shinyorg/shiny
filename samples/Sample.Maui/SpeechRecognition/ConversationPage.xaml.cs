@@ -1,10 +1,9 @@
-﻿namespace Sample
+﻿namespace Sample.SpeechRecognition;
+
+public partial class ConversationPage : ContentPage
 {
-    public partial class ConversationPage : SampleContentPage
+    public ConversationPage()
     {
-        public ConversationPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

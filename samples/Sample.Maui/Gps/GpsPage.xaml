@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                           xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:sample="clr-namespace:Sample"
+                          xmlns:sample="clr-namespace:Sample.Gps"
                           x:DataType="sample:GpsViewModel"
-                          x:Class="Sample.GpsPage"
-                          Title="Setup">
-
-    <ContentPage.BindingContext>
-        <sample:GpsViewModel />
-    </ContentPage.BindingContext>
+                          x:Class="Sample.Gps.GpsPage"
+                          Title="GPS">
 
     <ContentPage.Content>
         <RefreshView IsRefreshing="{Binding IsBusy}">
@@ -71,4 +67,4 @@
             </Grid>
         </RefreshView>
     </ContentPage.Content>
-</sample:SampleContentPage>
+</ContentPage>

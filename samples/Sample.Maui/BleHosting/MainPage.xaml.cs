@@ -1,12 +1,10 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample.BleHosting;
 
-namespace Sample
+
+public partial class MainPage : ContentPage
 {
-    public partial class MainPage : ContentPage
+    public MainPage()
     {
-        public MainPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

@@ -1,95 +1,90 @@
-﻿using System;
-using System.Windows.Input;
-using Shiny;
-using Shiny.SpeechRecognition;
-using Xamarin.Forms;
+﻿using Shiny.SpeechRecognition;
+
+namespace Sample.SpeechRecognition;
 
 
-namespace Sample
+public class DictationViewModel : ViewModel
 {
-    public class DictationViewModel : SampleViewModel
+    readonly ISpeechRecognizer speech;
+    IDisposable? listenSub;
+    IDisposable? dictSub;
+
+
+    public DictationViewModel(BaseServices services, ISpeechRecognizer speech) : base(services)
     {
-        readonly ISpeechRecognizer speech;
-        IDisposable? listenSub;
-        IDisposable? dictSub;
+        this.speech = speech;
 
-
-        public DictationViewModel()
+        this.ToggleListen = new Command(()  =>
         {
-            this.speech = ShinyHost.Resolve<ISpeechRecognizer>();
-
-            this.ToggleListen = new Command(()  =>
+            if (this.IsListening)
             {
-                if (this.IsListening)
+                this.dictSub?.Dispose();
+            }
+            else
+            {
+                if (this.UseContinuous)
                 {
-                    this.dictSub?.Dispose();
+                    this.dictSub = speech
+                        .ContinuousDictation()
+                        .SubOnMainThread(
+                            x => this.Text += " " + x,
+                            ex => this.Alert(ex.ToString())
+                        );
                 }
                 else
                 {
-                    if (this.UseContinuous)
-                    {
-                        this.dictSub = speech
-                            .ContinuousDictation()
-                            .SubOnMainThread(
-                                x => this.Text += " " + x,
-                                ex => this.Alert(ex.ToString())
-                            );
-                    }
-                    else
-                    {
-                        this.dictSub = speech
-                            .ListenUntilPause()
-                            .SubOnMainThread(
-                                x => this.Text = x,
-                                ex => this.Alert(ex.ToString())
-                            );
-                    }
+                    this.dictSub = speech
+                        .ListenUntilPause()
+                        .SubOnMainThread(
+                            x => this.Text = x,
+                            ex => this.Alert(ex.ToString())
+                        );
                 }
-            });
-        }
+            }
+        });
+    }
 
 
-        public ICommand ToggleListen { get; }
+    public ICommand ToggleListen { get; }
 
 
-        bool listen;
-        public bool IsListening
-        {
-            get => this.listen;
-            private set => this.Set(ref this.listen, value);
-        }
+    bool listen;
+    public bool IsListening
+    {
+        get => this.listen;
+        private set => this.Set(ref this.listen, value);
+    }
 
 
-        bool cont = true;
-        public bool UseContinuous
-        {
-            get => this.cont;
-            set => this.Set(ref this.cont, value);
-        }
+    bool cont = true;
+    public bool UseContinuous
+    {
+        get => this.cont;
+        set => this.Set(ref this.cont, value);
+    }
 
 
-        string text;
-        public string Text
-        {
-            get => this.text;
-            private set => this.Set(ref this.text, value);
-        }
+    string text;
+    public string Text
+    {
+        get => this.text;
+        private set => this.Set(ref this.text, value);
+    }
 
 
-        public override void OnAppearing()
-        {
-            base.OnAppearing();
-            this.listenSub = speech
-                .WhenListeningStatusChanged()
-                .SubOnMainThread(x => this.IsListening = x);
-        }
+    public override void OnAppearing()
+    {
+        base.OnAppearing();
+        this.listenSub = speech
+            .WhenListeningStatusChanged()
+            .SubOnMainThread(x => this.IsListening = x);
+    }
 
 
-        public override void OnDisappearing()
-        {
-            base.OnDisappearing();
-            this.dictSub?.Dispose();
-            this.listenSub?.Dispose();
-        }
+    public override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        this.dictSub?.Dispose();
+        this.listenSub?.Dispose();
     }
 }

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample.Beacons"
+             xmlns:beacons="clr-namespace:Shiny.Beacons.Managed;assembly=Shiny.Beacons"
+             x:Class="Sample.Beacons.ManagedBeaconPage"
+             x:DataType="sample:ManagedRangingViewModel"
+             Title="Beacon Scan (Managed)">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Set Region" Command="{Binding SetRegion}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout IsVisible="{Binding IsBusy}">
+                <Label Text="{Binding Uuid, StringFormat='UUID: {0}'}" />
+                <Label Text="{Binding Major, StringFormat='Major: {0}'}" />
+                <Label Text="{Binding Uuid, StringFormat='Minor: {0}'}" />
+            </StackLayout>
+
+            <ListView ItemsSource="{Binding Beacons}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="beacons:ManagedBeacon">
+                        <TextCell Text="{Binding RegionIdentifier}" Detail="{Binding Proximity}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

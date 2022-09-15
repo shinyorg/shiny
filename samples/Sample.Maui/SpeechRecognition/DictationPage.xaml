@@ -1,15 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<shared:SampleContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-                          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:sample="clr-namespace:Sample"
-                          xmlns:shared="clr-namespace:Sample;assembly=Sample.Shared"
-                          x:Class="Sample.DictationPage"
-                          x:DataType="sample:DictationViewModel"
-                          Title="Dictation">
-
-    <ContentPage.BindingContext>
-        <sample:DictationViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample.SpeechRecognition"
+             x:Class="Sample.SpeechRecognition.DictationPage"
+             x:DataType="sample:DictationViewModel"
+             Title="Dictation">
 
     <ContentPage.Content>
         <StackLayout>
@@ -30,4 +25,4 @@
             <Label Text="{Binding Text}" IsEnabled="false" />
         </StackLayout>
     </ContentPage.Content>
-</shared:SampleContentPage>
+</ContentPage>

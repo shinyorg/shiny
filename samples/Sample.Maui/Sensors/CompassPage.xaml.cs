@@ -1,10 +1,9 @@
-﻿namespace Sample
+﻿namespace Sample.Sensors;
+
+public partial class CompassPage : ContentPage
 {
-    public partial class CompassPage : SampleContentPage
+    public CompassPage()
     {
-        public CompassPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

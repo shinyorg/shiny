@@ -1,14 +1,9 @@
-﻿using System;
-using Xamarin.Forms;
+﻿namespace Sample.SpeechRecognition;
 
-
-namespace Sample
+public partial class DictationPage : ContentPage
 {
-    public partial class DictationPage : SampleContentPage
+    public DictationPage()
     {
-        public DictationPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

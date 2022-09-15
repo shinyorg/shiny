@@ -14,7 +14,7 @@ namespace Shiny;
 
 public static class ShinyCoreExtensions
 {
-    public static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
+    internal static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
     {
 #if ANDROID
         services.AddShinyService<AndroidPlatform>();
@@ -33,7 +33,7 @@ public static class ShinyCoreExtensions
     }
 
 
-    public static IServiceCollection AddCommon(this IServiceCollection services)
+    internal static IServiceCollection AddCommon(this IServiceCollection services)
     {
         services.TryAddSingleton<ISerializer, DefaultSerializer>();
         services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();

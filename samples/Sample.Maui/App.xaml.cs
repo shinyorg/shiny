@@ -1,4 +1,4 @@
-﻿namespace Sample.Maui;
+﻿namespace Sample;
 
 
 public partial class App : Application
