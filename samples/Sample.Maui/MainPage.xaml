@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<FlyoutPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:local="clr-namespace:Sample"
+            x:DataType="local:MainViewModel:"
+            x:Class="Sample.MainPage"
+            Title="Shiny .NET"
+            IsPresented="{Binding IsMenuVisible}">
+
+    <FlyoutPage.Flyout>
+        <ContentPage Title="Menu">
+            <TableView Intent="Menu">
+                <TableRoot>
+                    <TableSection Title="BluetoothLE Client">
+                        <TextCell Text="Scan" Command="{Binding Navigate}" CommandParameter="BletoothLE" />
+
+                    </TableSection>
+
+                </TableRoot>
+            </TableView>
+        </ContentPage>
+    </FlyoutPage.Flyout>
+
+    <FlyoutPage.Detail>
+        <ContentPage />
+    </FlyoutPage.Detail>
+</FlyoutPage>

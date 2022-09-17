@@ -1,4 +1,5 @@
-﻿using Shiny.BluetoothLE.Hosting;
+﻿using System.Text;
+using Shiny.BluetoothLE.Hosting;
 
 namespace Sample.BleHosting;
 
@@ -61,10 +62,6 @@ public class MainViewModel : ViewModel
     [Reactive] public string LastReadTime { get; private set; }
     [Reactive] public int Subscribers { get; private set; }
     [Reactive] public string SubscribersLastValue { get; private set; }
-    {
-        get => this.subLastValue;
-        private set => this.Set(ref this.subLastValue, value);
-    }
 
 
     void BuildService(IGattServiceBuilder serviceBuilder)
@@ -77,7 +74,7 @@ public class MainViewModel : ViewModel
                 {
                     this.LastWriteValue = Encoding.UTF8.GetString(request.Data, 0, request.Data.Length);
                     this.LastWriteTime = DateTime.Now.ToString();
-                    return GattState.Success;
+                    return Task.FromResult(GattState.Success);
                 });
 
                 cb.SetRead(request =>
@@ -89,7 +86,7 @@ public class MainViewModel : ViewModel
                         this.LastReadTime = DateTime.Now.ToString();
                     });
                     var data = BitConverter.GetBytes(ticks);
-                    return ReadResult.Success(data);
+                    return Task.FromResult(ReadResult.Success(data));
                 });
             }
         );
@@ -121,6 +118,7 @@ public class MainViewModel : ViewModel
                             this.SubscribersLastValue = x.ToString()
                         ));
                 }
+                return Task.CompletedTask;
             })
         );
     }

@@ -1,12 +1,10 @@
-﻿using Xamarin.Forms;
+﻿namespace Sample.BleManaged;
 
-namespace Sample
+
+public partial class ManagedPeripheralPage : ContentPage
 {
-    public partial class ManagedPeripheralPage : ContentPage
+    public ManagedPeripheralPage()
     {
-        public ManagedPeripheralPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

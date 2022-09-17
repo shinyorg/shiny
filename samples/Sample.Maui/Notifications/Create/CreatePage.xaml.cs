@@ -1,14 +1,9 @@
-﻿using System;
-using Xamarin.Forms;
+﻿namespace Sample.Notifications.Create;
 
-
-namespace Sample.Create
+public partial class CreatePage : ContentPage
 {
-    public partial class CreatePage : SampleContentPage
+    public CreatePage()
     {
-        public CreatePage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

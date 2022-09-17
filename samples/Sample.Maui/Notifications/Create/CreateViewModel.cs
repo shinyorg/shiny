@@ -1,22 +1,24 @@
 using Shiny.Notifications;
 using Shiny;
+using Notification = Shiny.Notifications.Notification;
 
 namespace Sample.Notifications.Create;
+
 
 public class CreateViewModel : ViewModel
 {
     readonly INotificationManager notificationManager;
 
 
-    public CreateViewModel()
+    public CreateViewModel(BaseServices services, INotificationManager notificationManager) : base(services)
     {
         State.CurrentNotification = new Notification();
 
-        this.notificationManager = ShinyHost.Resolve<INotificationManager>();
+        this.notificationManager = notificationManager;
 
-        this.SetGeofence = this.NavigateCommand<LocationPage>(true);
-        this.SetInterval = this.NavigateCommand<IntervalPage>(true);
-        this.SetScheduleDate = this.NavigateCommand<SchedulePage>(true);
+        this.SetGeofence = this.Navigation.Command(nameof(LocationPage));
+        this.SetInterval = this.Navigation.Command(nameof(IntervalPage));
+        this.SetScheduleDate = this.Navigation.Command(nameof(SchedulePage));
         this.SetNoTrigger = new Command(() =>
         {
             State.CurrentNotification.ScheduleDate = null;
@@ -26,7 +28,7 @@ public class CreateViewModel : ViewModel
             this.IsTriggerVisible = false;
         });
 
-        this.Send = this.LoadingCommand(async () =>
+        this.Send = ReactiveCommand.CreateFromTask(async () =>
         {
             if (this.NotificationTitle.IsEmpty())
             {
@@ -65,8 +67,8 @@ public class CreateViewModel : ViewModel
             else
             {
                 await notificationManager.Send(n);
-                await this.Alert("Notification Sent");
-                await this.Navigation.PopAsync();
+                await this.Dialogs.DisplayAlertAsync("", "Notification Sent", "OK");
+                await this.Navigation.GoBack();
             }
         });
     }
@@ -87,7 +89,7 @@ public class CreateViewModel : ViewModel
             }
             
         }
-        notification.Attachment = new FileInfo(filePath);
+        notification.LocalAttachmentPath = filePath;
     }
 
 
@@ -110,10 +112,8 @@ public class CreateViewModel : ViewModel
     [Reactive] public string[] Channels { get; private set; }
 
 
-    public async override void OnAppearing()
-    {
-        base.OnAppearing();
-
+    public override async Task InitializeAsync(INavigationParameters parameters)
+    { 
         this.Channels = (await this.notificationManager.GetChannels())
             .Select(x => x.Identifier)
             .ToArray();
@@ -146,5 +146,6 @@ public class CreateViewModel : ViewModel
             this.TriggerDetails = null;
             this.IsTriggerVisible = false;
         }
+        await base.InitializeAsync(parameters);
     }
 }

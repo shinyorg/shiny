@@ -67,5 +67,8 @@
       <MauiXaml Condition=" '$(EnableDefaultXamlItems)' == 'true' " Update="Beacons\ManagedRangingPage.xaml">
         <SubType>Designer</SubType>
       </MauiXaml>
+      <MauiXaml Update="MainPage.xaml">
+        <SubType></SubType>
+      </MauiXaml>
     </ItemGroup>
 </Project>

@@ -8,10 +8,9 @@ namespace Sample.MotionActivity;
 public class ListViewModel : ViewModel
 {
     readonly IMotionActivityManager activityManager;
-    CompositeDisposable? disposer;
 
 
-    public ListViewModel(IMotionActivityManager activityManager)
+    public ListViewModel(BaseServices services, IMotionActivityManager activityManager) : base(services)
     {
         this.activityManager = activityManager;
 
@@ -20,7 +19,7 @@ public class ListViewModel : ViewModel
             var result = await this.activityManager.RequestAccess();
             if (result != AccessState.Available)
             {
-                await this.Alert("Motion Activity is not available - " + result);
+                await this.Dialogs.DisplayAlertAsync("ERROR", "Motion Activity is not available - " + result, "OK");
                 return;
             }
 
@@ -39,22 +38,21 @@ public class ListViewModel : ViewModel
     }
 
 
-    public override void OnAppearing()
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
-        base.OnAppearing();
-
         this.Load.Execute(null);
-        this.disposer = new CompositeDisposable();
 
         this.activityManager
             .WhenActivityChanged()
             .SubOnMainThread(x => this.CurrentActivity = $"({x.Confidence}) {x.Types}")
-            .DisposedBy(this.disposer);
+            .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.Date)
             .DistinctUntilChanged()
             .Subscribe(_ => this.Load.Execute(null))
-            .DisposedBy(this.disposer);
+            .DisposedBy(this.DestroyWith);
+
+        return base.InitializeAsync(parameters);
     }
 
 

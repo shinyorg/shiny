@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Infrastructure;
 using Shiny.Logging;
 
 namespace Shiny.Hosting;

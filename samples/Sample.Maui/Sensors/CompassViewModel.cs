@@ -1,4 +1,5 @@
 ﻿using Shiny.Sensors;
+using ICompass = Shiny.Sensors.ICompass;
 
 namespace Sample.Sensors;
 
@@ -13,11 +14,11 @@ public class CompassViewModel : ViewModel
     [Reactive] public double Heading { get; private set; }
 
 
-    public override Task InitializeAsync(INavigationParameters parameters)
+    public override async Task InitializeAsync(INavigationParameters parameters)
     {
         if (this.compass == null || !this.compass.IsAvailable)
         {
-            await this.Alert("Compass is not available");
+            await this.Dialogs.DisplayAlertAsync("ERROR", "Compass is not available", "OK");
         }
         else
         {
@@ -30,6 +31,6 @@ public class CompassViewModel : ViewModel
                 })
                 .DisposedBy(this.DestroyWith);
         }
-        return base.InitializeAsync(parameters);
+        await base.InitializeAsync(parameters);
     }
 }

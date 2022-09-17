@@ -1,14 +1,9 @@
-﻿using System;
-using Xamarin.Forms;
+﻿namespace Sample.MotionActivity;
 
-
-namespace Sample
+public partial class OtherExtensionsPage : ContentPage
 {
-    public partial class OtherExtensionsPage : SampleContentPage
+    public OtherExtensionsPage()
     {
-        public OtherExtensionsPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

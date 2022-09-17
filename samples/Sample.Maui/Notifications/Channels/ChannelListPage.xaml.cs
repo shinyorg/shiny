@@ -1,14 +1,9 @@
-﻿using System;
-using Xamarin.Forms;
+﻿namespace Sample.Notifications.Channels;
 
-
-namespace Sample.Channels
+public partial class ChannelListPage : ContentPage
 {
-    public partial class ChannelListPage : SampleContentPage
+    public ChannelListPage()
     {
-        public ChannelListPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

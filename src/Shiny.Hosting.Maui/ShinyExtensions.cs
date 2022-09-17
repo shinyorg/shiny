@@ -1,5 +1,6 @@
 ﻿using Microsoft.Maui.LifecycleEvents;
 using Shiny.Hosting;
+using Shiny.Infrastructure;
 
 namespace Shiny;
 

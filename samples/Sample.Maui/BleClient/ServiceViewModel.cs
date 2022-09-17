@@ -35,17 +35,7 @@ public class ServiceViewModel : ViewModel
     public string Title { get; }
     public ICommand Load { get; }
     public List<CharacteristicViewModel> Characteristics { get; private set; }
-
-    CharacteristicViewModel selected;
-    public CharacteristicViewModel SelectedCharacteristic
-    {
-        get => this.selected;
-        set
-        {
-            this.selected = value;
-            this.RaisePropertyChanged();
-        }
-    }
+    [Reactive] public CharacteristicViewModel SelectedCharacteristic { get; set; }
 
 
     public override void OnAppearing()

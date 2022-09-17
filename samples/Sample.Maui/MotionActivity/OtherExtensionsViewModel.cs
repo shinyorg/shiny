@@ -7,7 +7,7 @@ namespace Sample.MotionActivity;
 public class OtherExtensionsViewModel : ViewModel
 {
     readonly IMotionActivityManager activityManager;
-    IDisposable? sub;
+
 
     public OtherExtensionsViewModel(BaseServices services, IMotionActivityManager activityManager) : base(services)
     {
@@ -15,11 +15,10 @@ public class OtherExtensionsViewModel : ViewModel
     }
 
 
-    public override void OnAppearing()
+    public override Task InitializeAsync(INavigationParameters parameters) 
     {
-        base.OnAppearing();
-
-        this.sub = Observable
+        // TODO: use observable on manager
+        Observable
             .Interval(TimeSpan.FromSeconds(5))
             .SubOnMainThread(async _ =>
             {
@@ -42,39 +41,16 @@ public class OtherExtensionsViewModel : ViewModel
                 }
                 catch (Exception ex)
                 {
-                    await this.Alert(ex.ToString());
+                    await this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK");
                 }
-            });
+            })
+            .DisposedBy(this.DestroyWith);
+
+        return base.InitializeAsync(parameters);
     }
 
 
-    public override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.sub?.Dispose();
-    }
-
-
-    string text;
-    public string CurrentText
-    {
-        get => this.text;
-        private set => this.Set(ref this.text, value);
-    }
-
-
-    bool auto;
-    public bool IsCurrentAuto
-    {
-        get => this.auto;
-        private set => this.Set(ref this.auto, value);
-    }
-
-
-    bool stationary;
-    public bool IsCurrentStationary
-    {
-        get => this.stationary;
-        private set => this.Set(ref this.stationary, value);
-    }
+    [Reactive] public string CurrentText { get; private set; }
+    [Reactive] public bool IsCurrentAuto { get; private set; }
+    [Reactive] public bool IsCurrentStationary { get; private set; }
 }

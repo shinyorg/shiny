@@ -9,12 +9,12 @@ using Shiny.Power;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
 
-namespace Shiny;
+namespace Shiny.Infrastructure;
 
 
-public static class ShinyCoreExtensions
+public static class ShinyInfrastructureExtensions
 {
-    internal static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
+    public static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
     {
 #if ANDROID
         services.AddShinyService<AndroidPlatform>();
@@ -38,29 +38,6 @@ public static class ShinyCoreExtensions
         services.TryAddSingleton<ISerializer, DefaultSerializer>();
         services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
         services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
-        return services;
-    }
-
-
-    public static IServiceCollection AddRepository<TStoreConverter, TEntity>(this IServiceCollection services)
-        where TStoreConverter : class, IStoreConverter<TEntity>, new()
-        where TEntity : IStoreEntity
-    {
-        services.AddSingleton<IRepository<TEntity>, JsonFileRepository<TStoreConverter, TEntity>>();
-        return services;
-    }
-
-
-    public static IServiceCollection AddBattery(this IServiceCollection services)
-    {
-        services.TryAddSingleton<IBattery, BatteryImpl>();
-        return services;
-    }
-
-
-    public static IServiceCollection AddConnectivity(this IServiceCollection services)
-    {
-        services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
         return services;
     }
 }

@@ -77,5 +77,5 @@ public class CharacteristicViewModel : ViewModel
     [Reactive] public bool IsNotifying { get; private set; }
     [Reactive] public string ReadValue { get; private set; }
     [Reactive] public string WriteValue { get; private set; }
-    [Reactive[ public string LastValueTime { get; private set; }
+    [Reactive] public string LastValueTime { get; private set; }
 }

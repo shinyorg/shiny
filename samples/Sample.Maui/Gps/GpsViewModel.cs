@@ -75,7 +75,7 @@ public class GpsViewModel : ViewModel
                     }
                     catch (Exception ex)
                     {
-                        await this.Alert(ex.ToString());
+                        await this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK");
                     }
                 }
                 this.IsUpdating = this.manager.CurrentListener != null;
@@ -90,43 +90,36 @@ public class GpsViewModel : ViewModel
     }
 
 
-    public override void OnAppearing()
+    public override Task InitializeAsync(INavigationParameters parameters) 
     {
-        base.OnAppearing();
-        this.disposer = new CompositeDisposable();
-
         this.manager
             .WhenReading()
             .SubOnMainThread(this.SetValues)
-            .DisposedBy(this.disposer);
+            .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.IsUpdating)
             .Select(x => x ? "Stop Listening" : "Start Updating")
             .Subscribe(x => this.ListenerText = x)
-            .DisposedBy(this.disposer);
+            .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.NotificationTitle)
             .Skip(1)
             .Subscribe(x => this.manager.Title = x)
-            .DisposedBy(this.disposer);
+            .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.NotificationMessage)
             .Skip(1)
             .Subscribe(x => this.manager.Message = x)
-            .DisposedBy(this.disposer);
+            .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty()
             .Skip(1)
             .Subscribe(_ => this.ToggleUpdates.ChangeCanExecute())
-            .DisposedBy(this.disposer);
+            .DisposedBy(this.DestroyWith);
+
+        return base.InitializeAsync(parameters);
     }
 
-
-    public override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.disposer?.Dispose();
-    }
 
 
     public Command SelectAccuracy { get; }
@@ -136,126 +129,28 @@ public class GpsViewModel : ViewModel
     public Command RequestAccess { get; }
     public Command ToggleUpdates { get; }
 
-    public bool IsAndroid => ShinyHost.Resolve<IPlatform>().IsAndroid();
+    //public bool IsAndroid => ShinyHost.Resolve<IPlatform>().IsAndroid();
+
+    [Reactive] public string ListenerText { get; private set; }
+    [Reactive] public string NotificationTitle { get; set; }
+    [Reactive] public string NotificationMessage { get; set; }
+    [Reactive] public bool UseBackground { get; set; }
+    [Reactive] public bool UseRealtime { get; set; }
+    [Reactive] public GpsAccuracy Accuracy { get; set; }
+    [Reactive] public string Access { get; private set; }
+    [Reactive] public bool IsUpdating { get; private set; }
+
+    [Reactive] public double Latitude { get; private set; }
+    [Reactive] public double Longitude { get; private set; }
+    [Reactive] public double Altitude { get; private set; }
+    [Reactive] public double PositionAccuracy { get; private set; }
+    [Reactive] public double Heading { get; private set; }
+    [Reactive] public double HeadingAccuracy { get; private set; }
+    [Reactive] public double Speed { get; private set; }
+    [Reactive] public DateTime Timestamp { get; private set; }
 
 
-    string listenText;
-    public string ListenerText
-    {
-        get => this.listenText;
-        private set => this.Set(ref this.listenText, value);
-    }
-
-
-    string nTitle;
-    public string NotificationTitle
-    {
-        get => this.nTitle;
-        set => this.Set(ref this.nTitle, value);
-    }
-
-    string nMsg;
-    public string NotificationMessage
-    {
-        get => this.nMsg;
-        set => this.Set(ref this.nMsg, value);
-    }
-
-    bool useBg = true;
-    public bool UseBackground
-    {
-        get => this.useBg;
-        set => this.Set(ref this.useBg, value);
-    }
-
-
-    bool useRealtime = true;
-    public bool UseRealtime
-    {
-        get => this.useRealtime;
-        set => this.Set(ref this.useRealtime, value);
-    }
-
-
-    GpsAccuracy accuracy = GpsAccuracy.Normal;
-    public GpsAccuracy Accuracy
-    {
-        get => this.accuracy;
-        set => this.Set(ref this.accuracy, value);
-    }
-
-    string access;
-    public string Access
-    {
-        get => this.access;
-        private set => this.Set(ref this.access, value);
-    }
-
-    bool updating;
-    public bool IsUpdating
-    {
-        get => this.updating;
-        private set => this.Set(ref this.updating, value);
-    }
-
-    double lat;
-    public double Latitude
-    {
-        get => this.lat;
-        private set => this.Set(ref this.lat, value);
-    }
-
-    double lng;
-    public double Longitude
-    {
-        get => this.lng;
-        private set => this.Set(ref this.lng, value);
-    }
-
-    double alt;
-    public double Altitude
-    {
-        get => this.alt;
-        private set => this.Set(ref this.alt, value);
-    }
-
-    double pAcc;
-    public double PositionAccuracy
-    {
-        get => this.pAcc;
-        private set => this.Set(ref this.pAcc, value);
-    }
-
-    double heading;
-    public double Heading
-    {
-        get => this.heading;
-        private set => this.Set(ref this.heading, value);
-    }
-
-    double hAcc;
-    public double HeadingAccuracy
-    {
-        get => this.hAcc;
-        private set => this.Set(ref this.hAcc, value);
-    }
-
-    double speed;
-    public double Speed
-    {
-        get => this.speed;
-        private set => this.Set(ref this.speed, value);
-    }
-
-    DateTime timestamp;
-    public DateTime Timestamp
-    {
-        get => this.timestamp;
-        private set => this.Set(ref this.timestamp, value);
-    }
-
-
-    void SetValues(IGpsReading reading)
+    void SetValues(GpsReading reading)
     {
         this.Latitude = reading.Position.Latitude;
         this.Longitude = reading.Position.Longitude;

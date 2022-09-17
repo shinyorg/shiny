@@ -5,7 +5,7 @@
     xmlns:sample="clr-namespace:Sample.BleManaged"
     xmlns:ble="clr-namespace:Shiny.BluetoothLE.Managed;assembly=Shiny.BluetoothLE" 
     x:DataType="sample:ManagedScanViewModel"
-    x:Class="Sample.ManagedScanPage"
+    x:Class="Sample.BleManaged.ManagedScanPage"
     Title="BLE Managed"
     NavigationPage.BackButtonTitle="Back">
 

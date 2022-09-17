@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<sample1:SampleContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                           xmlns:sample="clr-namespace:Sample.Channels"
+                           xmlns:sample="clr-namespace:Sample.Notifications.Channels"
                            xmlns:sample1="clr-namespace:Sample"
                            x:DataType="sample:ChannelListViewModel"
-                           x:Class="Sample.Channels.ChannelListPage"
+                           x:Class="Sample.Notifications.Channels.ChannelListPage"
                            Title="Channels">
 
     <ContentPage.BindingContext>
@@ -58,4 +58,4 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
     </ContentPage.Content>
-</sample1:SampleContentPage>
+</ContentPage>

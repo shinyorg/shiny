@@ -1,5 +1,6 @@
 ﻿using Shiny;
 using Shiny.Notifications;
+using Notification = Shiny.Notifications.Notification;
 
 namespace Sample.Notifications;
 
@@ -44,23 +45,13 @@ public class PendingViewModel : ViewModel
     public ICommand CancelAll { get; }
 
 
+    [Reactive] public IList<CommandItem> PendingList { get; private set; }
 
-    IList<CommandItem> pending;
-    public IList<CommandItem> PendingList
+
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
-        get => this.pending;
-        private set
-        {
-            this.pending = value;
-            this.RaisePropertyChanged();
-        }
-    }
-
-
-    public override void OnAppearing()
-    {
-        base.OnAppearing();
         this.Load.Execute(null);
+        return base.InitializeAsync(parameters);
     }
 
 
