@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.2.12" />
+        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.2.13" />
         <PackageReference Update="Xamarin.Firebase.Analytics" Version="120.1.2" />
         <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="$(XamarinIosFirebaseVersion)" />
         <PackageReference Update="Xamarin.FireBase.iOS.Analytics" Version="$(XamarinIosFirebaseVersion)" />
