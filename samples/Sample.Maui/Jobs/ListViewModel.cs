@@ -26,7 +26,7 @@ public class ListViewModel : ViewModel
 
             if (this.jobManager.IsRunning)
             {
-                await this.Alert("Job Manager is already running");
+                await this.Dialogs.DisplayAlertAsync("ERROR", "Job Manager is already running", "OK");
             }
             else
             {

@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:sample="clr-namespace:Sample"
-             xmlns:create="clr-namespace:Sample.Create"
+             xmlns:create="clr-namespace:Sample.Notifications.Create"
              NavigationPage.BackButtonTitle="Back"
              x:Class="Sample.Create.CreatePage"
              x:DataType="create:CreateViewModel"
@@ -40,12 +39,12 @@
                     <Label Text="Payload" />
                     <Entry Text="{Binding Payload}" />
 
-                    <ContentView IsVisible="{Binding IsAndroid}">
+                    <!--<ContentView IsVisible="{Binding IsAndroid}">
                         <StackLayout>
                             <Label Text="Android big Text" />
                             <CheckBox IsChecked="{Binding UseAndroidBigTextStyle}" />
                         </StackLayout>
-                    </ContentView>
+                    </ContentView>-->
 
                     <Frame BorderColor="Black"
                            BackgroundColor="LemonChiffon"

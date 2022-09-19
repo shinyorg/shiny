@@ -10,7 +10,7 @@ public class GpsViewModel : ViewModel
     CompositeDisposable disposer;
 
 
-    public GpsViewModel(IGpsManager manager)
+    public GpsViewModel(BaseServices services, IGpsManager manager) : base(services)
     {
         this.manager = manager;
 
@@ -31,15 +31,16 @@ public class GpsViewModel : ViewModel
 
         this.SelectAccuracy = new Command(async () =>
         {
-            var choice = await this.Choose(
-                "Select Accuracy",
-                GpsAccuracy.Highest.ToString(),
-                GpsAccuracy.High.ToString(),
-                GpsAccuracy.Normal.ToString(),
-                GpsAccuracy.Low.ToString(),
-                GpsAccuracy.Lowest.ToString()
-            );
-            this.Accuracy = (GpsAccuracy)Enum.Parse(typeof(GpsAccuracy), choice);
+            // TODO
+            //var choice = await this.Choose(
+            //    "Select Accuracy",
+            //    GpsAccuracy.Highest.ToString(),
+            //    GpsAccuracy.High.ToString(),
+            //    GpsAccuracy.Normal.ToString(),
+            //    GpsAccuracy.Low.ToString(),
+            //    GpsAccuracy.Lowest.ToString()
+            //);
+            //this.Accuracy = (GpsAccuracy)Enum.Parse(typeof(GpsAccuracy), choice);
         });
 
 
@@ -60,7 +61,7 @@ public class GpsViewModel : ViewModel
 
                     if (access != AccessState.Available)
                     {
-                        await this.Alert("Insufficient permissions - " + access);
+                        await this.Dialogs.DisplayAlertAsync("ERROR", "Insufficient permissions - " + access, "OK");
                         return;
                     }
 
@@ -207,7 +208,7 @@ public class GpsViewModel : ViewModel
         var reading = await observable.ToTask();
 
         if (reading == null)
-            await this.Alert("Could not getting GPS coordinates");
+            await this.Dialogs.DisplayAlertAsync("ERROR", "Could not getting GPS coordinates", "OK");
         else
             this.SetValues(reading);
 

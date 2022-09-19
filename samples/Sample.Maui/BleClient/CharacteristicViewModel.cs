@@ -6,22 +6,16 @@ namespace Sample.BleClient;
 
 public class CharacteristicViewModel : ViewModel
 {
+    IGattCharacteristic characteristic = null!;
     IDisposable? dispose;
 
 
-    public CharacteristicViewModel(IGattCharacteristic characteristic)
+    public CharacteristicViewModel(BaseServices services, IGattCharacteristic characteristic) : base(services)
     {
-        this.ServiceUUID = characteristic.Service.Uuid;
-        this.UUID = characteristic.Uuid;
-
-        this.CanNotify = characteristic.CanNotify();
-        this.CanRead = characteristic.CanRead();
-        this.CanWrite = characteristic.CanWrite();
-
-        this.Read = this.LoadingCommand(async () =>
+        this.Read = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await characteristic.ReadAsync();
-            this.SetRead(result.Data);
+            var result = await this.characteristic!.ReadAsync();
+            this.SetRead(result.Data!);
         });
 
 
@@ -29,9 +23,9 @@ public class CharacteristicViewModel : ViewModel
         {
             if (this.dispose == null)
             {
-                this.dispose = characteristic
+                this.dispose = this.characteristic
                     .Notify()
-                    .SubOnMainThread(x => this.SetRead(x.Data));
+                    .SubOnMainThread(x => this.SetRead(x.Data!));
             }
             else
             {
@@ -41,11 +35,18 @@ public class CharacteristicViewModel : ViewModel
     }
 
 
-    //public override void OnDisappearing()
-    //{
-    //    base.OnDisappearing();
-    //    this.Stop();
-    //}
+    public override Task InitializeAsync(INavigationParameters parameters)
+    {
+        this.characteristic = parameters.GetValue<IGattCharacteristic>("Characteristic");
+        this.ServiceUUID = this.characteristic.Service.Uuid;
+        this.UUID = this.characteristic.Uuid;
+
+        this.CanNotify = this.characteristic.CanNotify();
+        this.CanRead = this.characteristic.CanRead();
+        this.CanWrite = this.characteristic.CanWrite();
+        return base.InitializeAsync(parameters);
+    }
+
 
 
     void Stop()
@@ -63,17 +64,15 @@ public class CharacteristicViewModel : ViewModel
     }
 
 
-    public bool CanRead { get; }
-    public bool CanWrite { get; }
-    public bool CanNotify { get; }
-    public string ServiceUUID { get; }
-    public string UUID { get; }
-
     public ICommand Read { get; }
     public ICommand Write { get; }
     public ICommand ToggleNotify { get; }
 
-    
+    [Reactive] public bool CanRead { get; private set; }
+    [Reactive] public bool CanWrite { get; private set; }
+    [Reactive] public bool CanNotify { get; private set; }
+    [Reactive] public string ServiceUUID { get; private set; }
+    [Reactive] public string UUID { get; private set; }
     [Reactive] public bool IsNotifying { get; private set; }
     [Reactive] public string ReadValue { get; private set; }
     [Reactive] public string WriteValue { get; private set; }

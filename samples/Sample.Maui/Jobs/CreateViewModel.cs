@@ -20,17 +20,17 @@ public class CreateViewModel : ViewModel
         this.jobManager = jobManager;
         this.notifications = notificationManager;
 
-        this.CreateJob = new Command(
+        this.CreateJob = ReactiveCommand.CreateFromTask(
             async _ =>
             {
                 if (this.JobName.IsEmpty())
                 {
-                    await this.Alert("Enter a job name");
+                    await this.Dialogs.DisplayAlertAsync("ERROR", "Enter a job name", "OK");
                     return;
                 }
                 if (this.SecondsToRun < 10)
                 {
-                    await this.Alert("Must be great than 10 seconds");
+                    await this.Dialogs.DisplayAlertAsync("ERROR", "Must be great than 10 seconds", "OK");
                     return;
                 }
 

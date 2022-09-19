@@ -99,8 +99,9 @@ public class ManagedPeripheralViewModel : ViewModel
 
     void DoStop()
     {
+        // TODO
         this.Peripheral?.Dispose();
-        this.Deactivate();
+        //this.Deactivate();
         this.IsStarted = false;
     }
 

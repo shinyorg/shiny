@@ -18,17 +18,13 @@ public class JobLoggerTask : IShinyStartupTask
 
     public void Start()
     {
-        this.jobManager.JobStarted.SubscribeAsync(job => this.conn.InsertAsync(new ShinyEvent
-        {
-            Text = $"{job.Identifier} Started",
-            Detail = "",
-            Timestamp = DateTime.Now,
-        }));
-        this.jobManager.JobFinished.SubscribeAsync(result => this.conn.InsertAsync(new ShinyEvent
-        {
-            Text = result.Job?.Identifier + " " + (result.Success ? "Completed" : "Failed"),
-            Detail = result.Exception?.ToString() ?? "",
-            Timestamp = DateTime.Now
-        }));
+        this.jobManager.JobStarted.SubscribeAsync(job => this.conn.Log(        
+            $"[JOB] {job.Identifier} Started",
+            ""
+        ));
+        this.jobManager.JobFinished.SubscribeAsync(result => this.conn.Log(
+            $"[JOB]: {result.Job?.Identifier} " + (result.Success ? "Completed" : "Failed"),
+            result.Exception?.ToString() ?? ""
+        ));
     }
 }

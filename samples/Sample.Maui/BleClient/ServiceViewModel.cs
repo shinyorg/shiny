@@ -6,29 +6,25 @@ namespace Sample.BleClient;
 
 public class ServiceViewModel : ViewModel
 {
-    public ServiceViewModel(IGattService service)
-    {
-        this.Title = service.Uuid;
+    IGattService service;
 
-        this.Load = this.LoadingCommand(async () =>
+
+    public ServiceViewModel(BaseServices services) : base(services)
+    {
+        // TODO
+        this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
-            this.Characteristics = (await service.GetCharacteristicsAsync())
-                .Select(x => new CharacteristicViewModel(x))
-                .ToList();
+            //this.Characteristics = (await this.service!.GetCharacteristicsAsync())
+            //    .Select(x => new CharacteristicViewModel(x))
+            //    .ToList();
 
             this.RaisePropertyChanged(nameof(this.Characteristics));
         });
 
-        this.WhenAnyProperty(x => x.SelectedCharacteristic)
-            .Where(x => x != null)
-            .SubOnMainThread(async x =>
-            {
-                this.SelectedCharacteristic = null;
-                await this.Navigation.PushAsync(new CharacteristicPage
-                {
-                    BindingContext = x
-                });
-            });
+        this.WhenAnyValueSelected(x => x.SelectedCharacteristic, async x =>
+        {
+            await this.Navigation.Navigate(nameof(CharacteristicPage), ("Characteristic", x));
+        });
     }
 
 
@@ -37,10 +33,12 @@ public class ServiceViewModel : ViewModel
     public List<CharacteristicViewModel> Characteristics { get; private set; }
     [Reactive] public CharacteristicViewModel SelectedCharacteristic { get; set; }
 
-
-    public override void OnAppearing()
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
-        base.OnAppearing();
+        this.service = parameters.GetValue<IGattService>("Service");
         this.Load.Execute(null);
+        //this.Title = service.Uuid;
+
+        return base.InitializeAsync(parameters);
     }
 }

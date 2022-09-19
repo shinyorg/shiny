@@ -13,20 +13,20 @@ public class ScheduleViewModel : ViewModel
         {
             if (this.ScheduledDateTime < DateTime.Now)
             {
-                await this.Alert("Scheduled Date & Time must be in the future");
+                await this.Dialogs.DisplayAlertAsync("ERROR", "Scheduled Date & Time must be in the future", "OK");
                 return;
             }
             State.CurrentNotification!.ScheduleDate = this.ScheduledDateTime;
             State.CurrentNotification!.Geofence = null;
             State.CurrentNotification!.RepeatInterval = null;
 
-            await this.Navigation.PopModalAsync();
+            await this.Navigation.GoBack();
         });
 
     }
 
 
-    public override void OnAppearing()
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
         this.WhenAnyProperty(x => x.SelectedDate)
             .Subscribe(_ => this.CalcDate())
@@ -35,6 +35,8 @@ public class ScheduleViewModel : ViewModel
         this.WhenAnyProperty(x => x.SelectedTime)
             .Subscribe(_ => this.CalcDate())
             .DisposedBy(this.DestroyWith);
+
+        return base.InitializeAsync(parameters);
     }
 
 

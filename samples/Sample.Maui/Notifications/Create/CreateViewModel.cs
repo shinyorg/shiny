@@ -57,7 +57,7 @@ public class CreateViewModel : ViewModel
                     { nameof(this.Payload), this.Payload }
                 };
             }
-            n.Android.UseBigTextStyle = this.UseAndroidBigTextStyle;
+            //n.Android.UseBigTextStyle = this.UseAndroidBigTextStyle;
 
             var result = await notificationManager.RequestRequiredAccess(n);
             if (result != AccessState.Available)

@@ -3,7 +3,7 @@ namespace Shiny.Jobs;
 
 
 public record JobRunResult(
-    JobInfo? JobInfo, 
+    JobInfo? Job, 
     Exception? Exception
 )
 {

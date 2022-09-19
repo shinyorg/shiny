@@ -13,7 +13,7 @@ public class MonitoringViewModel : ViewModel
         {
             if (beaconManager == null)
             {
-                await dialogs.Alert("Beacon monitoring is not supported on this platform");
+                await this.Dialogs.DisplayAlertAsync("ERROR", "Beacon monitoring is not supported on this platform", "OK");
                 return;
             }
             var regions = await beaconManager.GetMonitoredRegions();
