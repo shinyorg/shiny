@@ -4,7 +4,7 @@
         <PackageReference Update="System.Reactive" Version="5.0.0" />
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
-        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
 
         <PackageReference Update="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
         <PackageReference Update="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
