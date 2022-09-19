@@ -6,8 +6,6 @@ namespace Sample.SpeechRecognition;
 public class DictationViewModel : ViewModel
 {
     readonly ISpeechRecognizer speech;
-    IDisposable? listenSub;
-    IDisposable? dictSub;
 
 
     public DictationViewModel(BaseServices services, ISpeechRecognizer speech) : base(services)
@@ -18,27 +16,30 @@ public class DictationViewModel : ViewModel
         {
             if (this.IsListening)
             {
-                this.dictSub?.Dispose();
+                // TODO
+                //this.dictSub?.Dispose();
             }
             else
             {
                 if (this.UseContinuous)
                 {
-                    this.dictSub = speech
+                    this.speech
                         .ContinuousDictation()
                         .SubOnMainThread(
                             x => this.Text += " " + x,
-                            ex => this.Alert(ex.ToString())
-                        );
+                            ex => this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK")
+                        )
+                        .DisposedBy(this.DestroyWith);
                 }
                 else
                 {
-                    this.dictSub = speech
+                    this.speech
                         .ListenUntilPause()
                         .SubOnMainThread(
                             x => this.Text = x,
-                            ex => this.Alert(ex.ToString())
-                        );
+                            ex => this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK")
+                        )
+                        .DisposedBy(this.DestroyWith);
                 }
             }
         });
@@ -46,45 +47,16 @@ public class DictationViewModel : ViewModel
 
 
     public ICommand ToggleListen { get; }
+    [Reactive] public bool IsListening { get; private set; }
+    [Reactive] public bool UseContinuous { get; set; }
+    [Reactive] public string Text { get; private set; }
 
-
-    bool listen;
-    public bool IsListening
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
-        get => this.listen;
-        private set => this.Set(ref this.listen, value);
-    }
-
-
-    bool cont = true;
-    public bool UseContinuous
-    {
-        get => this.cont;
-        set => this.Set(ref this.cont, value);
-    }
-
-
-    string text;
-    public string Text
-    {
-        get => this.text;
-        private set => this.Set(ref this.text, value);
-    }
-
-
-    public override void OnAppearing()
-    {
-        base.OnAppearing();
-        this.listenSub = speech
+        this.speech
             .WhenListeningStatusChanged()
             .SubOnMainThread(x => this.IsListening = x);
-    }
 
-
-    public override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.dictSub?.Dispose();
-        this.listenSub?.Dispose();
+        return base.InitializeAsync(parameters);
     }
 }

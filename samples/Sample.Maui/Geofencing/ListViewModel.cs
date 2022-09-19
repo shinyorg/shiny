@@ -8,7 +8,7 @@ public class ListViewModel : ViewModel
 {
     public ListViewModel(BaseServices services, IGeofenceManager geofenceManager) : base(services)
     {
-        this.Create = this.NavigateCommand<CreatePage>();
+        this.Create = this.Navigation.Command(nameof(CreatePage));
 
         this.DropAllFences = this.ConfirmCommand(
             "Are you sure you wish to drop all geofences?",
@@ -55,9 +55,9 @@ public class ListViewModel : ViewModel
     public IList<GeofenceRegionViewModel> Geofences { get; private set; }
 
 
-    public override void OnAppearing()
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
-        base.OnAppearing();
         this.Load.Execute(null);
+        return base.InitializeAsync(parameters);
     }
 }

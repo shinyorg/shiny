@@ -18,7 +18,7 @@ public class OtherViewModel : ViewModel
         this.PermissionCheck = new Command(async () =>
         {
             var result = await this.notifications.RequestAccess(AccessRequestFlags.All);
-            await this.Alert("Permission Check Result: " + result);
+            await this.Dialogs.DisplayAlertAsync("Permission", "Permission Check Result: " + result, "OK");
         });
 
         this.QuickSend = this.LoadingCommand(async () =>
@@ -75,25 +75,20 @@ public class OtherViewModel : ViewModel
     }
 
 
-    public override async void OnAppearing()
+    public override async Task InitializeAsync(INavigationParameters parameters)
     {
-        base.OnAppearing();
-        this.Badge = await this.notifications.GetBadge();
+        this.Badge = (await this.notifications.TryGetBadge()).Value ?? 0;
 
         this.sub = this.WhenAnyProperty(x => x.Badge)
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .DistinctUntilChanged()
-            .Select(x => Observable.FromAsync(() => this.notifications.SetBadge(x)))
+            .Select(x => Observable.FromAsync(() => this.notifications.TrySetBadge(x)))
             .Switch()
-            .Subscribe();
-    }
+            .Subscribe()
+            .DisposedBy(this.DestroyWith);
 
-
-    public override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.sub?.Dispose();
+        await base.InitializeAsync(parameters);
     }
 
 
@@ -101,13 +96,6 @@ public class OtherViewModel : ViewModel
     public ICommand StartChat { get; }
     public ICommand PermissionCheck { get; }
     public ICommand ClearBadge { get; }
-
-
-    int badge;
-    public int Badge
-    {
-        get => this.badge;
-        set => this.Set(ref this.badge, value);
-    }
+    [Reactive] public int Badge { get; set; }
 }
 

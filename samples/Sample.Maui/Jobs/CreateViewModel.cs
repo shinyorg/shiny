@@ -67,73 +67,19 @@ public class CreateViewModel : ViewModel
     public ICommand RunAsTask { get; }
     public ICommand ChangeRequiredInternetAccess { get; }
 
-    string access;
-    public string AccessStatus
-    {
-        get => this.access;
-        private set => this.Set(ref this.access, value);
-    }
+    [Reactive] public string AccessStatus { get; private set; }
+    [Reactive] public string JobName { get; set; } = "TestJob";
+    [Reactive] public int SecondsToRun { get; set; } = 10;
+    [Reactive] public string RequiredInternetAccess { get; set; } = InternetAccess.None.ToString();
+    [Reactive] public bool BatteryNotLow { get; set; }
+    [Reactive] public bool DeviceCharging { get; set; }
+    [Reactive] public bool Repeat { get; set; } = true;
+    [Reactive] public bool RunOnForeground { get; set; } = true;
 
 
-    string jobName = "TestJob";
-    public string JobName
-    {
-        get => this.jobName;
-        set => this.Set(ref this.jobName, value);
-    }
-
-
-    int seconds = 10;
-    public int SecondsToRun
-    {
-        get => this.seconds;
-        set => this.Set(ref this.seconds, value);
-    }
-
-
-    string inetaccess = InternetAccess.None.ToString();
-    public string RequiredInternetAccess
-    {
-        get => this.inetaccess;
-        set => this.Set(ref this.inetaccess, value);
-    }
-
-
-    bool battery;
-    public bool BatteryNotLow
-    {
-        get => this.battery;
-        set => this.Set(ref this.battery, value);
-    }
-
-
-    bool charging;
-    public bool DeviceCharging
-    {
-        get => this.charging;
-        set => this.Set(ref this.charging, value);
-    }
-
-
-    bool repeat = true;
-    public bool Repeat
-    {
-        get => this.repeat;
-        set => this.Set(ref this.repeat, value);
-    }
-
-
-    bool foreground;
-    public bool RunOnForeground
-    {
-        get => this.foreground;
-        set => this.Set(ref this.foreground, value);
-    }
-
-
-    public override async void OnAppearing()
-    {
-        base.OnAppearing();
-        this.AccessStatus = (await this.jobManager.RequestAccess()).ToString();
-    }
+    //public override async void OnAppearing()
+    //{
+    //    base.OnAppearing();
+    //    this.AccessStatus = (await this.jobManager.RequestAccess()).ToString();
+    //}
 }

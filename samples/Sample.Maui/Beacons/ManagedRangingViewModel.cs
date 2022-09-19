@@ -37,17 +37,17 @@ public class ManagedRangingViewModel : ViewModel
             }
             catch (Exception ex)
             {
-                await this.Dialogs.Alert(ex.ToString());
+                await this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK");
             }
         }
     }
 
 
-    public override void OnDisappearing()
-    {
-        this.IsBusy = false;
-        this.scanner.Stop();
-    }
+    //public override void OnDisappearing()
+    //{
+    //    this.IsBusy = false;
+    //    this.scanner.Stop();
+    //}
 
 
     public ICommand SetRegion { get; }

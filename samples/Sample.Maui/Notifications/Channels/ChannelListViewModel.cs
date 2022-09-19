@@ -6,13 +6,11 @@ namespace Sample.Notifications.Channels;
 
 public class ChannelListViewModel : ViewModel
 {
-    public ChannelListViewModel()
+    public ChannelListViewModel(BaseServices services, INotificationManager notifications) : base(services)
     {
-        var notifications = ShinyHost.Resolve<INotificationManager>();
+        this.Create = this.Navigation.Command(nameof(ChannelCreatePage));
 
-        this.Create = this.NavigateCommand<ChannelCreatePage>();
-
-        this.LoadChannels = this.LoadingCommand(async () =>
+        this.LoadChannels = ReactiveCommand.CreateFromTask(async () =>
         {
             var channels = await notifications.GetChannels();
             this.Channels = channels
@@ -35,23 +33,11 @@ public class ChannelListViewModel : ViewModel
 
     public ICommand Create { get; }
     public ICommand LoadChannels { get; }
+    [Reactive] public IList<CommandItem> Channels { get; private set; }
 
-
-    IList<CommandItem> channels;
-    public IList<CommandItem> Channels
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
-        get => this.channels;
-        private set
-        {
-            this.channels = value;
-            this.RaisePropertyChanged();
-        }
-    }
-
-
-    public override void OnAppearing()
-    {
-        base.OnAppearing();
         this.LoadChannels.Execute(null);
+        return base.InitializeAsync(parameters);
     }
 }

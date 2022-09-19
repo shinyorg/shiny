@@ -23,6 +23,7 @@ public static class MauiProgram
                         registry.RegisterForNavigation<Beacons.ManagedBeaconPage, Beacons.ManagedRangingViewModel>();
                         registry.RegisterForNavigation<Beacons.MonitoringPage, Beacons.MonitoringViewModel>();
                         registry.RegisterForNavigation<Beacons.RangingPage, Beacons.RangingViewModel>();
+                        registry.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>();
 
                         registry.RegisterForNavigation<BleClient.ScanPage, BleClient.ScanViewModel>();
                         registry.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralPage>();

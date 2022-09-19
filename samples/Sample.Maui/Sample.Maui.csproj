@@ -60,15 +60,4 @@
         <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="$(SqliteLibVersion)" />
         <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="$(SqliteLibVersion)" />
     </ItemGroup>
-    <ItemGroup>
-      <MauiXaml Condition=" '$(EnableDefaultXamlItems)' == 'true' " Update="Beacons\ManagedBeaconPage.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-      <MauiXaml Condition=" '$(EnableDefaultXamlItems)' == 'true' " Update="Beacons\ManagedRangingPage.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-      <MauiXaml Update="MainPage.xaml">
-        <SubType></SubType>
-      </MauiXaml>
-    </ItemGroup>
 </Project>

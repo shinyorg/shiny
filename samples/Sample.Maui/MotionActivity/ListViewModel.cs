@@ -56,48 +56,9 @@ public class ListViewModel : ViewModel
     }
 
 
-    public override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.disposer?.Dispose();
-    }
-
-
     public ICommand Load { get; }
-
-
-    DateTime date = DateTime.Now;
-    public DateTime Date
-    {
-        get => this.date;
-        set => this.Set(ref this.date, value);
-    }
-
-
-    int count;
-    public int EventCount
-    {
-        get => this.count;
-        private set => this.Set(ref this.count, value);
-    }
-
-
-    string activity;
-    public string CurrentActivity
-    {
-        get => this.activity;
-        private set => this.Set(ref this.activity, value);
-    }
-
-
-    IList<CommandItem> events;
-    public IList<CommandItem> Events
-    {
-        get => this.events;
-        private set
-        {
-            this.events = value;
-            this.RaisePropertyChanged();
-        }
-    }
+    [Reactive] public DateTime Date { get; set; } = DateTime.Now;
+    [Reactive] public int EventCount { get; private set; }
+    [Reactive] public string CurrentActivity { get; private set; }
+    [Reactive] public IList<CommandItem> Events { get; private set; }
 }

@@ -79,11 +79,11 @@ public class ManagedPeripheralViewModel : ViewModel
     }
 
 
-    public override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.DoStop();
-    }
+    //public override void OnDisappearing()
+    //{
+    //    base.OnDisappearing();
+    //    this.DoStop();
+    //}
 
 
     IPeripheral? peripheral;

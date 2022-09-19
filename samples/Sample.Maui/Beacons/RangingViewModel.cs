@@ -58,16 +58,16 @@ public class RangingViewModel : ViewModel
     }
 
 
-    public override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.StopScan();
-    }
+    //public override void OnDisappearing()
+    //{
+    //    base.OnDisappearing();
+    //    this.StopScan();
+    //}
 
 
     public ICommand ScanToggle { get; }
     public ICommand SetRegion { get; }
-    public ObservableList<BeaconViewModel> Beacons { get; } = new();
+    public ObservableCollection<BeaconViewModel> Beacons { get; } = new();
 
     public bool IsRegionSet { [ObservableAsProperty] get; }
     public bool IsMajorSet { [ObservableAsProperty] get; }
