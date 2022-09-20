@@ -12,8 +12,9 @@ public class SampleSqliteConnection : SQLiteAsyncConnection
     }
 
 
-    public Task Log(string text, string? detail = null, DateTime? timestamp = null) => this.InsertAsync(new Log
+    public Task Log(string category, string text, string? detail = null, DateTime? timestamp = null) => this.InsertAsync(new Log
     {
+        Category = category,
         Text = text,
         Detail = detail,
         Timestamp = timestamp ?? DateTimeOffset.UtcNow
@@ -28,6 +29,7 @@ public class Log
     [PrimaryKey]
     public int Id { get; set; }
 
+    public string Category { get; set; }
     public string Text { get; set; }
     public string Detail { get; set; }
     public DateTimeOffset Timestamp { get; set; }

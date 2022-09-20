@@ -18,16 +18,21 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="log:Log">
                     <VerticalStackLayout>
-                        <Label Text="{Binding Text}"
-                               FontSize="Title"
-                               FontAttributes="Bold" />
+                        <FlexLayout>
+                            <Label Text="{Binding Category}"
+                                   FontSize="Large"
+                                   FontAttributes="Bold" />
+
+                            <Label Text="{Binding Text}"
+                                   FontSize="Large" />
+                        </FlexLayout>
 
                         <Label Text="{Binding Detail}"
-                               FontSize="Subtitle"
+                               FontSize="Medium"
                                FontAttributes="Italic" />
 
                         <Label Text="{Binding Timestamp, StringFormat='{0:MM/dd/yyyy h:mm:ss tt}'}"
-                               FontSize="Medium"
+                               FontSize="Small"
                                FontAttributes="Italic" />
                     </VerticalStackLayout>
                 </DataTemplate>

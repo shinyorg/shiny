@@ -49,8 +49,8 @@ public static class MauiProgram
                         // locations
                         registry.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>("Geofencing");
                         registry.RegisterForNavigation<Geofencing.CreatePage, Geofencing.CreateViewModel>("GeofencingCreate");
-                        registry.RegisterForNavigation<MotionActivity.ListPage, MotionActivity.ListViewModel>("MotionActivity");
-                        //registry.RegisterForNavigation<MotionActivity.OtherExtensionsPage, MotionActivity.OtherExtensionsViewModel>();
+                        registry.RegisterForNavigation<MotionActivity.QueryPage, MotionActivity.QueryViewModel>("MotionActivityQuery");
+                        registry.RegisterForNavigation<MotionActivity.FunctionsPage, MotionActivity.FunctionsViewModel>("MotionActivityFunctions");
                         registry.RegisterForNavigation<Gps.GpsPage, Gps.GpsViewModel>("GPS");
 
                         // notifications

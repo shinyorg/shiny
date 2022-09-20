@@ -1,9 +1,9 @@
 ﻿namespace Sample.MotionActivity;
 
 
-public partial class ListPage : ContentPage
+public partial class QueryPage : ContentPage
 {
-    public ListPage()
+    public QueryPage()
     {
         this.InitializeComponent();
     }

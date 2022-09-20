@@ -18,6 +18,7 @@ namespace Sample
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             await this.notificationManager.Send(
+                "Jobs",
                 "Job Started",
                 $"{jobInfo.Identifier} Started"
             );
@@ -25,6 +26,7 @@ namespace Sample
             await Task.Delay(TimeSpan.FromSeconds(seconds), cancelToken);
 
             await this.notificationManager.Send(
+                "Jobs",
                 "Job Finished",
                 $"{jobInfo.Identifier} Finished"
             );

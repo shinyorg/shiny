@@ -8,7 +8,7 @@ public class ChannelListViewModel : ViewModel
 {
     public ChannelListViewModel(BaseServices services, INotificationManager notifications) : base(services)
     {
-        this.Create = this.Navigation.Command(nameof(ChannelCreatePage));
+        this.Create = this.Navigation.Command("NotificationsChannelCreate");
 
         this.LoadChannels = ReactiveCommand.CreateFromTask(async () =>
         {

@@ -5,12 +5,12 @@ using Shiny.Locations;
 namespace Sample.MotionActivity;
 
 
-public class ListViewModel : ViewModel
+public class QueryViewModel : ViewModel
 {
     readonly IMotionActivityManager activityManager;
 
 
-    public ListViewModel(BaseServices services, IMotionActivityManager activityManager) : base(services)
+    public QueryViewModel(BaseServices services, IMotionActivityManager activityManager) : base(services)
     {
         this.activityManager = activityManager;
 
@@ -18,13 +18,11 @@ public class ListViewModel : ViewModel
         {
             var result = await this.activityManager.RequestAccess();
 
-
             if (result != AccessState.Available)
             {
-                await this.Dialogs.DisplayAlertAsync("ERROR", "Motion Activity is not available - " + result, "OK");
+                await this.Alert("Motion Activity is not available - " + result);
                 return;
             }
-
             var activities = await this.activityManager.QueryByDate(this.Date);
             this.Events = activities
                 .OrderByDescending(x => x.Timestamp)
@@ -43,14 +41,6 @@ public class ListViewModel : ViewModel
     public override Task InitializeAsync(INavigationParameters parameters)
     {
         this.Load.Execute(null);
-
-        this.activityManager
-            .WhenActivityChanged()
-            .SubOnMainThread(
-                x => this.CurrentActivity = $"({x.Confidence}) {x.Types}",
-                ex => { } // TODO
-            )
-            .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.Date)
             .DistinctUntilChanged()

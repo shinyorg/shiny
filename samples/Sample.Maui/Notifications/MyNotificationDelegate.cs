@@ -22,7 +22,8 @@ public class MyNotificationDelegate : INotificationDelegate
     public async Task OnEntry(NotificationResponse response)
     {
         await this.conn.Log(
-            $"[Notification] {response.Notification.Title ?? response.Notification.Message}",
+            "Notifications",
+            $"{response.Notification.Title ?? response.Notification.Message}",
             $"Action: {response.ActionIdentifier} - Reply: {response.Text}"
         );
         await this.DoChat(response);

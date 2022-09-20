@@ -29,10 +29,10 @@
                     </TableSection>
 
                     <TableSection Title="Locations">
-                        <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Geofencing" />                        
+                        <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Geofencing" />
                         <TextCell Text="GPS" Command="{Binding Navigate}" CommandParameter="GPS" />
-                        <!--<TextCell Text="OTHER Motion Activity" Command="{Binding Navigate}" CommandParameter="MotionActivity" />-->
-                        <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="MotionActivity" />
+                        <TextCell Text="Motion Activity (Query)" Command="{Binding Navigate}" CommandParameter="MotionActivityQuery" />
+                        <TextCell Text="Motion Activity (Functions)" Command="{Binding Navigate}" CommandParameter="MotionActivityFunctions" />
                     </TableSection>
 
                     <TableSection Title="Beacons">
@@ -77,7 +77,8 @@
         <NavigationPage>
             <x:Arguments>
                 <ContentPage Title="Welcome">
-                    <Label Text="Welcome to the Shiny.NET Samples" />
+                    <Label Text="Welcome to the Shiny.NET Samples"
+                           Style="{StaticResource NoDataLabel}" />
                 </ContentPage>
             </x:Arguments>
         </NavigationPage>

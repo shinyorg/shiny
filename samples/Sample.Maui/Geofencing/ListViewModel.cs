@@ -8,7 +8,7 @@ public class ListViewModel : ViewModel
 {
     public ListViewModel(BaseServices services, IGeofenceManager geofenceManager) : base(services)
     {
-        this.Create = this.Navigation.Command(nameof(CreatePage));
+        this.Create = this.Navigation.Command("GeofencingCreate");
 
         this.DropAllFences = this.ConfirmCommand(
             "Are you sure you wish to drop all geofences?",

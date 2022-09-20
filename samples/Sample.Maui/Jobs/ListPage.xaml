@@ -28,7 +28,8 @@
                                 Grid.Row="0">
 
                     <CollectionView.EmptyView>
-                        <Label Text="No Job Logs" />
+                        <Label Text="No Job Logs"
+                               Style="{StaticResource NoDataLabel}" />
                     </CollectionView.EmptyView>
 
                     <CollectionView.ItemTemplate>

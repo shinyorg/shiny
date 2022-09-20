@@ -8,10 +8,12 @@ namespace Sample.BleHosting;
 [BleGattCharacteristic(Constants.ManagedServiceUuid, Constants.ManagedCharacteristicUuid)]
 public class MyManagedCharacteristics : BleGattCharacteristic
 {
-    public MyManagedCharacteristics()
-    {
-    }
+    readonly SampleSqliteConnection conn;
 
+    public MyManagedCharacteristics(SampleSqliteConnection conn)
+        => this.conn = conn;
+
+    //TODO
     public override Task OnStart() => base.OnStart();
     public override void OnStop() => base.OnStop();
 

@@ -12,13 +12,15 @@ public class MyBleDelegate : BleDelegate
 
     public override Task OnAdapterStateChanged(AccessState state)
         => this.conn.Log(
-            "BLE Adapter Status",
+            "BLE",
+            "Adapter Status",
             $"New Status: {state}"
         );
 
 
     public override Task OnConnected(IPeripheral peripheral)
         => this.conn.Log(
+            "BLE",
             "Peripheral Connected",
             peripheral.Name
         );

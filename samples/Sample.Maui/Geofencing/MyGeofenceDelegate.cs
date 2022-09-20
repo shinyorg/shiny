@@ -23,6 +23,7 @@ public class MyGeofenceDelegate : IGeofenceDelegate
 
         await this.conn.Log(
             "Geofencing",
+            "State Change",
             $"You {state} the geofence {region.Identifier}" 
         );
         await this.notificationManager.Send(

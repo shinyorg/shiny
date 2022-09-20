@@ -4,12 +4,12 @@ using Shiny.Locations;
 namespace Sample.MotionActivity;
 
 
-public class OtherExtensionsViewModel : ViewModel
+public class FunctionsViewModel : ViewModel
 {
     readonly IMotionActivityManager activityManager;
 
 
-    public OtherExtensionsViewModel(BaseServices services, IMotionActivityManager activityManager) : base(services)
+    public FunctionsViewModel(BaseServices services, IMotionActivityManager activityManager) : base(services)
     {
         this.activityManager = activityManager;
     }
@@ -17,6 +17,15 @@ public class OtherExtensionsViewModel : ViewModel
 
     public override Task InitializeAsync(INavigationParameters parameters) 
     {
+
+        //this.activityManager
+        //    .WhenActivityChanged()
+        //    .SubOnMainThread(
+        //        x => this.CurrentActivity = $"({x.Confidence}) {x.Types}",
+        //        ex => { } // TODO
+        //    )
+        //    .DisposedBy(this.DestroyWith);
+
         // TODO: use observable on manager
         Observable
             .Interval(TimeSpan.FromSeconds(5))

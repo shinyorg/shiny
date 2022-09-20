@@ -4,9 +4,9 @@
              xmlns:sample="clr-namespace:Sample.MotionActivity"
              xmlns:sample1="clr-namespace:Sample"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"             
-             x:DataType="sample:ListViewModel"
-             x:Class="Sample.MotionActivity.ListPage"
-             Title="Motion Activity">
+             x:DataType="sample:QueryViewModel"
+             x:Class="Sample.MotionActivity.QueryPage"
+             Title="Motion Activity (Query)">
 
     <ContentPage.Content>
         <Grid>

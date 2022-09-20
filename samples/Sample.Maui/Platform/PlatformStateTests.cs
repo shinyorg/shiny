@@ -71,6 +71,7 @@ public partial class PlatformStateTests
             this.logger.LogDebug("Logging Event - " + detail);
             this.data.GetConnection().Insert(new Log
             {
+                Category = "Platform",
                 Detail = detail,
                 Timestamp = DateTimeOffset.UtcNow
             });

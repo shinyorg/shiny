@@ -9,8 +9,9 @@ public class MyGpsDelegate : IGpsDelegate
     public MyGpsDelegate(SampleSqliteConnection conn) => this.conn = conn;
 
     public Task OnReading(GpsReading reading) => this.conn.Log(
-        $"GPS: {reading.Position.Latitude} / {reading.Position.Longitude} - H: {reading.Heading}",
-        $"Acc: {reading.PositionAccuracy} - SP: {reading.Speed}",
+        "GPS",
+        $"{reading.Position.Latitude} / {reading.Position.Longitude} - H: {reading.Heading}",
+        $"Accuracy: {reading.PositionAccuracy} - SP: {reading.Speed}",
         reading.Timestamp
     );
 }

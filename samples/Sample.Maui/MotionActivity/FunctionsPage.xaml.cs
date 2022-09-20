@@ -1,8 +1,8 @@
 ﻿namespace Sample.MotionActivity;
 
-public partial class OtherExtensionsPage : ContentPage
+public partial class FunctionsPage : ContentPage
 {
-    public OtherExtensionsPage()
+    public FunctionsPage()
     {
         this.InitializeComponent();
     }
