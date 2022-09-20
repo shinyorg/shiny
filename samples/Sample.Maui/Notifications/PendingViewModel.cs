@@ -10,7 +10,7 @@ public class PendingViewModel : ViewModel
     public PendingViewModel(BaseServices services, INotificationManager notifications) : base(services)
     {
 
-        this.Create = this.NavigateCommand<Create.CreatePage>();
+        //this.Create = this.Navigation.Command(nameof(Create.CreatePage));
 
         this.Load = this.LoadingCommand(async () =>
         {

@@ -8,9 +8,9 @@ public class LocationViewModel : ViewModel
 {
     public LocationViewModel(BaseServices services, IGpsManager gpsManager) : base(services)
     {
-        this.Cancel =  new Command(async () => await this.Navigation.PopModalAsync());
+        this.Cancel =  ReactiveCommand.CreateFromTask(async () => await this.Navigation.GoBack());
 
-        this.Use = new Command(async () =>
+        this.Use = ReactiveCommand.CreateFromTask(async () =>
         {
             if (this.Radius < 150 || this.Radius > 5000)
             {
@@ -29,7 +29,7 @@ public class LocationViewModel : ViewModel
                 Radius = Distance.FromMeters(this.Radius),
                 Repeat = true
             };
-            await this.Navigation.PopModalAsync();
+            await this.Navigation.GoBack();
         });
 
         this.SetCnTower = new Command(() =>
@@ -56,27 +56,7 @@ public class LocationViewModel : ViewModel
     public ICommand SetCnTower { get; }
     public ICommand SetCurrentLocation { get; }
 
-
-    double latitude;
-    public double Latitude
-    {
-        get => this.latitude;
-        set => this.Set(ref this.latitude, value);
-    }
-
-
-    double longitude;
-    public double Longitude
-    {
-        get => this.longitude;
-        set => this.Set(ref this.longitude, value);
-    }
-
-
-    int radius = 1000;
-    public int Radius
-    {
-        get => this.radius;
-        set => this.Set(ref this.radius, value);
-    }
+    [Reactive] public double Latitude { get; set; }
+    [Reactive] public double Longitude { get; set; }
+    [Reactive] public int Radius { get; set; } = 1000;
 }

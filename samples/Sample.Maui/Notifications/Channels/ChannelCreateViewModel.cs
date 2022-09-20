@@ -6,10 +6,8 @@ namespace Sample.Notifications.Channels;
 
 public class ChannelCreateViewModel : ViewModel
 {
-    public ChannelCreateViewModel()
+    public ChannelCreateViewModel(BaseServices services, INotificationManager manager) : base(services)
     {
-        var manager = ShinyHost.Resolve<INotificationManager>();
-
         this.Create = new Command(async () =>
         {
             if (this.Identifier.IsEmpty())
@@ -23,18 +21,18 @@ public class ChannelCreateViewModel : ViewModel
                 return;
             }
             await manager.AddChannel(this.ToChannel());
-            await this.Navigation.PopAsync();
+            await this.Navigation.GoBack();
         });
 
         this.PickImportance = new Command(async () =>
         {
-            this.Importance = await this.Choose(
-                "Importance",
-                ChannelImportance.Critical.ToString(),
-                ChannelImportance.High.ToString(),
-                ChannelImportance.Normal.ToString(),
-                ChannelImportance.Low.ToString()
-            );
+            //this.Importance = await this.Choose(
+            //    "Importance",
+            //    ChannelImportance.Critical.ToString(),
+            //    ChannelImportance.High.ToString(),
+            //    ChannelImportance.Normal.ToString(),
+            //    ChannelImportance.Low.ToString()
+            //);
         });
     }
 
@@ -46,54 +44,12 @@ public class ChannelCreateViewModel : ViewModel
     public ActionViewModel Action2 { get; } = new ActionViewModel();
 
 
-    string id;
-    public string Identifier
-    {
-        get => this.id;
-        set => this.Set(ref this.id, value);
-    }
-
-
-    string desc;
-    public string Description
-    {
-        get => this.desc;
-        set => this.Set(ref this.desc, value);
-    }
-
-
-    string imp = ChannelImportance.Normal.ToString();
-    public string Importance
-    {
-        get => this.imp;
-        private set => this.Set(ref this.imp, value);
-    }
-
-
-    bool embedded;
-    public bool UseEmbeddedSound
-    {
-        get => this.embedded;
-        set => this.Set(ref this.embedded, value);
-    }
-
-
-    bool custom;
-    public bool UseCustomSound
-    {
-        get => this.custom;
-        set => this.Set(ref this.custom, value);
-    }
-
-
-    string sound;
-    public string Sound
-    {
-        get => this.sound;
-        set => this.Set(ref this.sound, value);
-    }
-
-
+    [Reactive] public string Identifier { get; set; }
+    [Reactive] public string Description { get; set; }
+    [Reactive] public string Importance { get; private set; } = ChannelImportance.Normal.ToString();
+    [Reactive] public bool UseEmbeddedSound { get; set; }
+    [Reactive] public bool UseCustomSound { get; set; }
+    [Reactive] public string Sound { get; set; }
     Channel ToChannel()
     {
         var channel = new Channel

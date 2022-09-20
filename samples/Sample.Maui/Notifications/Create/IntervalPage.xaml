@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:create="clr-namespace:Sample.Notifications.Create"
              x:DataType="create:IntervalViewModel"
-             x:Class="Sample.Create.IntervalPage">
+             x:Class="Sample.Notifications.Create.IntervalPage">
     
     <ContentPage.Content>
         <StackLayout>

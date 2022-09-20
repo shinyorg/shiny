@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:create="clr-namespace:Sample.Notifications.Create"
              NavigationPage.BackButtonTitle="Back"
-             x:Class="Sample.Create.CreatePage"
+             x:Class="Sample.Notifications.Create.CreatePage"
              x:DataType="create:CreateViewModel"
              Title="Create">
 

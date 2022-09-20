@@ -4,8 +4,7 @@
              xmlns:sample="clr-namespace:Sample.Jobs"
              x:DataType="sample:CreateViewModel"
              x:Class="Sample.Jobs.CreatePage"
-             Title="Create Job"
-             >
+             Title="Create Job">
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>

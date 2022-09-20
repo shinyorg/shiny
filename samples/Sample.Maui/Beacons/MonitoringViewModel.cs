@@ -35,7 +35,7 @@ public class MonitoringViewModel : ViewModel
         this.StopAllMonitoring = ReactiveCommand.CreateFromTask(
             async () =>
             {
-                var result = await this.Dialogs.Confirm("Are you sure you wish to stop all monitoring");
+                var result = await this.Confirm("Are you sure you wish to stop all monitoring");
                 if (result)
                 {
                     await beaconManager.StopAllMonitoring();

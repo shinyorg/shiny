@@ -32,11 +32,6 @@ public class ManagedPeripheralViewModel : ViewModel
                         this.WriteLog("[RECV]: " + txt);
                     });
 
-                await this.Peripheral.EnableNotifications(
-                    true,
-                    ServiceUuid,
-                    RxCharacteristicUuid
-                );
                 await this.Write("ATZ");
                 await this.Write("AT RV");
                 await this.Write("ATI");
@@ -48,7 +43,7 @@ public class ManagedPeripheralViewModel : ViewModel
                 await this.Write("AT SH 81 10 F0");
                 await this.Write("21 0B 01");
 
-                while (!this.DeactivateToken.IsCancellationRequested)
+                while (!this.CancelToken.IsCancellationRequested)
                 {
                     await this.Write("0100");
                     await Task.Delay(2000);

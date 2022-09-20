@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:platform="clr-namespace:Sample.Platform"
+             x:DataType="platform:BatteryViewModel"
+             x:Class="Sample.Platform.BatteryPage"
+             Title="Battery">
+
+    <VerticalStackLayout>
+        <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+
+        <Label Text="Level" />
+        <ProgressBar Progress="{Binding Level}" />
+    </VerticalStackLayout>
+</ContentPage>

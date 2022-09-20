@@ -8,10 +8,6 @@
     Title="BLE Central"
     NavigationPage.BackButtonTitle="Back">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Test" Command="{Binding NavToTest}" />
-    </ContentPage.ToolbarItems>
-
     <ContentPage.Content>
         <StackLayout>
             <Button Command="{Binding ScanToggle}">

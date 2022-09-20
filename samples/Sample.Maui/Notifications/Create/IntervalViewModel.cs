@@ -3,11 +3,11 @@
 
 public class IntervalViewModel : ViewModel
 {
-    public IntervalViewModel()
+    public IntervalViewModel(BaseServices services) : base(services)
     {
-        this.Cancel = new Command(async () => await this.Navigation.PopModalAsync());
+        this.Cancel = ReactiveCommand.CreateFromTask(async () => await this.Navigation.GoBack());
 
-        this.Use = new Command(async () =>
+        this.Use = ReactiveCommand.CreateFromTask(async () =>
         {
             var trigger = new Shiny.Notifications.IntervalTrigger
             {
@@ -20,7 +20,7 @@ public class IntervalViewModel : ViewModel
             State.CurrentNotification!.Geofence = null;
             State.CurrentNotification!.ScheduleDate = null;
             
-            await this.Navigation.PopModalAsync();
+            await this.Navigation.GoBack();
         });
         
         this.Days = Enum

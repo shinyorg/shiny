@@ -9,6 +9,7 @@ public abstract class ViewModel : ReactiveObject, IInitializeAsync, IConfirmNavi
     protected ViewModel(BaseServices services) => this.services = services;
 
 
+    [Reactive] public string Title { get; protected set; }
     [Reactive] public bool IsBusy { get; protected set; }
     protected IPlatform Platform => this.services.Platform;
     protected IPageDialogService Dialogs => this.services.Dialogs;
@@ -25,14 +26,43 @@ public abstract class ViewModel : ReactiveObject, IInitializeAsync, IConfirmNavi
         }
     }
 
+    CancellationTokenSource? cancelSrc;
+    public CancellationToken CancelToken
+    {
+        get
+        {
+            this.cancelSrc ??= new();
+            return this.cancelSrc.Token;
+        }
+    }
 
-    public CompositeDisposable DestroyWith { get; } = new();
+    CompositeDisposable? destroyWith;
+    public CompositeDisposable DestroyWith
+    {
+        get
+        {
+            this.destroyWith ??= new();
+            return this.destroyWith;
+        }
+    }
     public virtual Task InitializeAsync(INavigationParameters parameters) => Task.CompletedTask;
     public virtual Task<bool> CanNavigateAsync(INavigationParameters parameters) => Task.FromResult(true);
     public virtual void OnNavigatedFrom(INavigationParameters parameters) { }
     public virtual void OnNavigatedTo(INavigationParameters parameters) { }
-    public virtual void Dispose() => this.DestroyWith.Dispose();
+    public virtual void Dispose()
+    {
+        this.cancelSrc?.Cancel();
+        this.cancelSrc = null;
+        this.destroyWith?.Dispose();
+        this.destroyWith = null;
+    }
 
+
+    protected virtual Task Alert(string message, string title = "ERROR", string okBtn = "OK")
+        => this.Dialogs.DisplayAlertAsync(title, message, okBtn);
+
+    protected virtual Task<bool> Confirm(string question, string title = "Confirm")
+        => this.Dialogs.DisplayAlertAsync(title, question, "Yes", "No");
 
     protected virtual async Task SafeExecute(Func<Task> task)
     {

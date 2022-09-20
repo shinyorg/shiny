@@ -22,39 +22,10 @@ public class ActionViewModel : ViewModel
 
     public ICommand SelectType { get; }
 
-
-    bool enabled;
-    public bool IsEnabled
-    {
-        get => this.enabled;
-        set => this.Set(ref this.enabled, value);
-    }
-
-
-    string id;
-    public string Identifier
-    {
-        get => this.id;
-        set => this.Set(ref this.id, value);
-    }
-
-
-    string title;
-    public string Title
-    {
-        get => this.title;
-        set => this.Set(ref this.title, value);
-    }
-
-
-    string type = ChannelActionType.None.ToString();
-    public string Type
-    {
-        get => this.type;
-        private set => this.Set(ref this.type, value);
-    }
-
-
+    [Reactive] public bool IsEnabled { get; set; }
+    [Reactive] public string Identifier { get; set; }
+    [Reactive] public string Title { get; set; }
+    [Reactive] public string Type { get; private set; } = ChannelActionType.None.ToString();
     public ChannelAction ToAction() => new ChannelAction
     {
         Identifier = this.Identifier,

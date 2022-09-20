@@ -19,35 +19,62 @@ public static class MauiProgram
                     {
                         registry.RegisterForNavigation<LogsPage, LogsViewModel>();
 
+                        // platform
+                        registry.RegisterForNavigation<Platform.ConnectivityPage, Platform.ConnectivityViewModel>();
+                        registry.RegisterForNavigation<Platform.BatteryPage, Platform.BatteryViewModel>();
+
+                        // beacons
                         registry.RegisterForNavigation<Beacons.CreatePage, Beacons.CreateViewModel>();
                         registry.RegisterForNavigation<Beacons.ManagedBeaconPage, Beacons.ManagedRangingViewModel>();
                         registry.RegisterForNavigation<Beacons.MonitoringPage, Beacons.MonitoringViewModel>();
                         registry.RegisterForNavigation<Beacons.RangingPage, Beacons.RangingViewModel>();
-                        registry.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>();
 
+                        // ble client
                         registry.RegisterForNavigation<BleClient.ScanPage, BleClient.ScanViewModel>();
                         registry.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralPage>();
                         registry.RegisterForNavigation<BleClient.ServicePage, BleClient.ServiceViewModel>();
                         registry.RegisterForNavigation<BleClient.CharacteristicPage, BleClient.CharacteristicViewModel>();
+                        registry.RegisterForNavigation<BleClient.L2CapPage, BleHosting.L2CapViewModel>();
                         registry.RegisterForNavigation<BleManaged.ManagedScanPage, BleManaged.ManagedScanViewModel>();
                         registry.RegisterForNavigation<BleManaged.ManagedPeripheralPage, BleManaged.ManagedPeripheralViewModel>();
 
-                        registry.RegisterForNavigation<MotionActivity.ListPage, MotionActivity.ListViewModel>();
-                        registry.RegisterForNavigation<MotionActivity.OtherExtensionsPage, MotionActivity.OtherExtensionsViewModel>();
-
+                        // ble hosting
                         registry.RegisterForNavigation<BleHosting.MainPage, BleHosting.MainViewModel>();
-                        // TODO: managed host & beacon advertise
+                        registry.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>();
+                        registry.RegisterForNavigation<BleHosting.ManagedPage, BleHosting.ManagedViewModel>();
+                        registry.RegisterForNavigation<BleHosting.L2CapPage, BleHosting.L2CapViewModel>();
 
+                        // sensors
                         registry.RegisterForNavigation<Sensors.AllSensorsPage, Sensors.AllSensorsViewModel>();
                         registry.RegisterForNavigation<Sensors.CompassPage, Sensors.CompassViewModel>();
 
+                        // locations
+                        registry.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>();
+                        registry.RegisterForNavigation<Geofencing.CreatePage, Geofencing.CreateViewModel>();
+                        registry.RegisterForNavigation<MotionActivity.ListPage, MotionActivity.ListViewModel>();
+                        registry.RegisterForNavigation<MotionActivity.OtherExtensionsPage, MotionActivity.OtherExtensionsViewModel>();
                         registry.RegisterForNavigation<Gps.GpsPage, Gps.GpsViewModel>();
 
+                        // notifications
+                        registry.RegisterForNavigation<Notifications.PendingPage, Notifications.PendingViewModel>();
+                        registry.RegisterForNavigation<Notifications.OtherPage, Notifications.OtherViewModel>();
+                        registry.RegisterForNavigation<Notifications.Create.CreatePage, Notifications.Create.CreateViewModel>();
+                        registry.RegisterForNavigation<Notifications.Create.IntervalPage, Notifications.Create.IntervalViewModel>();
+                        registry.RegisterForNavigation<Notifications.Create.LocationPage, Notifications.Create.LocationViewModel>();
+                        registry.RegisterForNavigation<Notifications.Create.SchedulePage, Notifications.Create.ScheduleViewModel>();
+                        registry.RegisterForNavigation<Notifications.Channels.ChannelListPage, Notifications.Channels.ChannelCreateViewModel>();
+
+                        // speech recoginition
                         registry.RegisterForNavigation<SpeechRecognition.DictationPage, SpeechRecognition.DictationViewModel>();
                         registry.RegisterForNavigation<SpeechRecognition.ConversationPage, SpeechRecognition.ConversationViewModel>();
 
+                        // settings/secure store
                         registry.RegisterForNavigation<Stores.BasicPage, Stores.BasicViewModel>();
                         registry.RegisterForNavigation<Stores.BindPage, Stores.BindViewModel>();
+
+                        // jobs
+                        registry.RegisterForNavigation<Jobs.CreatePage, Jobs.CreateViewModel>();
+                        registry.RegisterForNavigation<Jobs.ListPage, Jobs.ListViewModel>();
                     })
                     .OnAppStart("NavigationPage/LogsPage")
             );
@@ -61,8 +88,6 @@ public static class MauiProgram
 
         // TODO: jobs - system, foreground, etc
         // TODO: notifications
-
-        //builder.Services.AddNotifications<>
         builder.Services.AddConnectivity();
         builder.Services.AddBattery();
         builder.Services.AddNotifications<Notifications.MyNotificationDelegate>();
@@ -87,7 +112,8 @@ public static class MauiProgram
         builder.Services.AddShinyService<Stores.AppSettings>();
 
         // for platform event testing - not needed for general consumption
-        builder.Services.AddShinyService<PlatformStateTests>();
+        builder.Services.AddShinyService<Platform.PlatformStateTests>();
+        builder.Services.AddShinyService<Jobs.JobLoggerTask>();
 
         return builder.Build();
     }

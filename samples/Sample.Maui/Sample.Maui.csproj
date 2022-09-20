@@ -60,4 +60,27 @@
         <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="$(SqliteLibVersion)" />
         <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="$(SqliteLibVersion)" />
     </ItemGroup>
+    <ItemGroup>
+      <MauiXaml Update="BleClient\L2CapPage.xaml">
+        <SubType></SubType>
+      </MauiXaml>
+      <MauiXaml Update="BleHosting\L2CapPage.xaml">
+        <SubType></SubType>
+      </MauiXaml>
+      <MauiXaml Update="BleHosting\ManagedPage.xaml">
+        <SubType></SubType>
+      </MauiXaml>
+      <MauiXaml Update="Platform\BatteryPage.xaml">
+        <SubType></SubType>
+      </MauiXaml>
+      <MauiXaml Update="Platform\ConnectivityPage.xaml">
+        <SubType></SubType>
+      </MauiXaml>
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="Platform\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Platform\" />
+    </ItemGroup>
 </Project>

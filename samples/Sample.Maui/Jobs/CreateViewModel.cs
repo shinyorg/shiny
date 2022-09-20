@@ -46,19 +46,20 @@ public class CreateViewModel : ViewModel
                 };
                 job.SetParameter("SecondsToRun", this.SecondsToRun);
                 await this.jobManager.Register(job);
-                await this.Navigation.PopAsync();
+                await this.Navigation.GoBack();
             }
         );
 
 
         this.ChangeRequiredInternetAccess = new Command(async () =>
         {
-            this.RequiredInternetAccess = await this.Choose(
-                "Internet Access",
-                InternetAccess.None.ToString(),
-                InternetAccess.Any.ToString(),
-                InternetAccess.Unmetered.ToString()
-            );
+            // TODO
+            //this.RequiredInternetAccess = await this.Choose(
+            //    "Internet Access",
+            //    InternetAccess.None.ToString(),
+            //    InternetAccess.Any.ToString(),
+            //    InternetAccess.Unmetered.ToString()
+            //);
         });
     }
 

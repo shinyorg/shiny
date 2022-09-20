@@ -1,17 +1,23 @@
 ﻿using Shiny.Sensors;
+using IAccelerometer = Shiny.Sensors.IAccelerometer;
+using IBarometer = Shiny.Sensors.IBarometer;
+using ICompass = Shiny.Sensors.ICompass;
+using IGyroscope = Shiny.Sensors.IGyroscope;
+using IMagnetometer = Shiny.Sensors.IMagnetometer;
 
 namespace Sample.Sensors;
 
 
 public class AllSensorsViewModel
 {
-    public List<ISensorViewModel> Sensors { get; }
+    readonly IServiceProvider services;
+    public List<ISensorViewModel> Sensors { get; } = new();
     public bool HasSensors => this.Sensors.Any();
 
 
-    public AllSensorsViewModel()
+    public AllSensorsViewModel(IServiceProvider services)
     {
-        this.Sensors = new List<ISensorViewModel>();
+        this.services = services;
 
         this.AddIf<IAccelerometer, MotionReading>("G");
         this.AddIf<IGyroscope, MotionReading>("G");
@@ -28,7 +34,7 @@ public class AllSensorsViewModel
 
     void AddIf<T, U>(string measurement)
     {
-        var sensor = ShinyHost.Resolve<T>() as ISensor<U>;
+        var sensor = this.services.GetService<T>() as ISensor<U>;
         if (sensor != null)
             this.Sensors.Add(new SensorViewModel<U>(sensor, measurement));
     }

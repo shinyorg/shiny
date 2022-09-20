@@ -21,26 +21,26 @@ public class CreateViewModel : ViewModel
             this.CenterLongitude = loc?.Position?.Longitude.ToString() ?? "";
         });
 
-        this.RequestAccess = new Command(async () =>
+        this.RequestAccess = ReactiveCommand.CreateFromTask(async () =>
         {
             this.AccessStatus = await geofenceManager.RequestAccess();
         });
 
-        this.SetCNTower = new Command(() =>
+        this.SetCNTower = ReactiveCommand.Create(() =>
         {
             this.Identifier = "CNTowerToronto";
             this.CenterLatitude = "43.6425662";
             this.CenterLongitude = "-79.3892508";
         });
 
-        this.SetAppleHQ = new Command(() =>
+        this.SetAppleHQ = ReactiveCommand.Create(() =>
         {
             this.Identifier = "AppleHQ";
             this.CenterLatitude = "37.3320045";
             this.CenterLongitude = "-122.0329699";
         });
 
-        this.CreateGeofence = new Command(async () =>
+        this.CreateGeofence = ReactiveCommand.CreateFromTask(async () =>
         {
 
             var access = await geofenceManager.RequestAccess();
@@ -98,7 +98,7 @@ public class CreateViewModel : ViewModel
                         NotifyOnExit = this.NotifyOnExit,
                         SingleUse = this.SingleUse
                     });
-                    await this.Navigation.PopAsync();
+                    await this.Navigation.GoBack();
                 }
                 catch (Exception ex)
                 {
@@ -116,66 +116,12 @@ public class CreateViewModel : ViewModel
     public ICommand SetAppleHQ { get; }
 
 
-    AccessState state;
-    public AccessState AccessStatus
-    {
-        get => this.state;
-        private set => this.Set(ref this.state, value);
-    }
-
-
-    string identifier;
-    public string Identifier
-    {
-        get => this.identifier;
-        set => this.Set(ref this.identifier, value);
-    }
-
-
-    string centerLat;
-    public string CenterLatitude
-    {
-        get => this.centerLat;
-        set => this.Set(ref this.centerLat, value);
-    }
-
-
-    string centerLong;
-    public string CenterLongitude
-    {
-        get => this.centerLong;
-        set => this.Set(ref this.centerLong, value);
-    }
-
-
-    int radius = 200;
-    public int RadiusMeters
-    {
-        get => this.radius;
-        set => this.Set(ref this.radius, value);
-    }
-
-
-    bool singleUse;
-    public bool SingleUse
-    {
-        get => this.singleUse;
-        set => this.Set(ref this.singleUse, value);
-    }
-
-
-    bool notifyEntry = true;
-    public bool NotifyOnEntry
-    {
-        get => this.notifyEntry;
-        set => this.Set(ref this.notifyEntry, value);
-    }
-
-
-    bool notifyExit = true;
-    public bool NotifyOnExit
-    {
-        get => this.notifyExit;
-        set => this.Set(ref this.notifyExit, value);
-    }
+    [Reactive] public AccessState AccessStatus { get; private set; }
+    [Reactive] public string Identifier { get; set; }
+    [Reactive] public string CenterLatitude { get; set; }
+    [Reactive] public string CenterLongitude { get; set; }
+    [Reactive] public int RadiusMeters { get; set; } = 200;
+    [Reactive] public bool SingleUse { get; set; }
+    [Reactive] public bool NotifyOnEntry { get; set; } = true;
+    [Reactive] public bool NotifyOnExit { get; set; } = true;
 }

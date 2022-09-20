@@ -20,35 +20,12 @@ public class ScanViewModel : ViewModel
             {
                 this.SelectedPeripheral = null;
                 this.StopScan();
-                await this.Navigation.PushAsync(new PeripheralPage
-                {
-                    BindingContext = new PeripheralViewModel(x.Peripheral)
-                });
+                // TODO
+                //await this.Navigation.PushAsync(new PeripheralPage
+                //{
+                //    BindingContext = new PeripheralViewModel(x.Peripheral)
+                //});
             });
-
-        this.NavToTest = this.NavigateCommand<TestPage>();
-
-        this.ToggleAdapterState = new Command(
-            async () =>
-            {
-                if (bleManager == null)
-                {
-                    await this.Alert("Platform Not Supported");
-                }
-                else
-                {
-                    var status = await bleManager.RequestAccess();
-                    if (status == AccessState.Available)
-                    {
-                        await bleManager.TrySetAdapterState(false);
-                    }
-                    else
-                    {
-                        await bleManager.TrySetAdapterState(true);
-                    }
-                }
-            }
-        );
 
         this.ScanToggle = new Command(
             async () =>
