@@ -4,5 +4,5 @@
              xmlns:local="clr-namespace:Sample.BleClient"
              x:DataType="local:L2CapViewModel"
              x:Class="Sample.BleClient.L2CapPage"
-             Title="L2Cap Client">
+             Title="BLE Client - L2Cap">
 </ContentPage>

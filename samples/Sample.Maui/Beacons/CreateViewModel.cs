@@ -35,7 +35,7 @@ public class CreateViewModel : ViewModel
                 var result = await monitorManager.RequestAccess();
                 if (result != AccessState.Available)
                 {
-                    await this.Dialogs.DisplayAlertAsync("Error", $"Invalid Permission: {result}", "OK");
+                    await this.Alert($"Invalid Permission: {result}");
                 }
                 else
                 {
@@ -156,7 +156,7 @@ public class CreateViewModel : ViewModel
     }
 
 
-    ushort? GetNumberAddress(string value)
+    static ushort? GetNumberAddress(string value)
     {
         if (value.IsEmpty())
             return null;

@@ -6,7 +6,7 @@
              NavigationPage.BackButtonTitle="Back"
              x:DataType="sample:PendingViewModel"
              x:Class="Sample.Notifications.PendingPage"
-             Title="Pending">
+             Title="Notifications">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Create"
@@ -21,10 +21,7 @@
                 <CollectionView ItemsSource="{Binding PendingList}">
                     <CollectionView.EmptyView>
                         <Label Text="No Pending Notifications"
-                               HorizontalOptions="FillAndExpand"
-                               HorizontalTextAlignment="Center"
-                               VerticalOptions="FillAndExpand"
-                               VerticalTextAlignment="Center" />
+                               Style="{StaticResource NoDataLabel}" />
                     </CollectionView.EmptyView>
 
                     <CollectionView.ItemTemplate>

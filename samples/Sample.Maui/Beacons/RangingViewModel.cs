@@ -27,7 +27,7 @@ public class RangingViewModel : ViewModel
             .ToPropertyEx(this, x => x.IsMinorSet);
 
         this.SetRegion = this.Navigation.Command(
-            "CreatePage",
+            "BeaconCreate",
             p => p
                 .Set(nameof(BeaconRegion), this.region)
                 .Set("IsRanging", true)

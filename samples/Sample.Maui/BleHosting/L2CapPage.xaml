@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:Sample.BleHosting"
              x:DataType="local:L2CapViewModel"
              x:Class="Sample.BleHosting.L2CapPage"
-             Title="L2CapPage">
+             Title="BLE Hosting - L2Cap">
     <VerticalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

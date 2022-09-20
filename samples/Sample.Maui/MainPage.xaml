@@ -11,18 +11,75 @@
         <ContentPage Title="Menu">
             <TableView Intent="Menu">
                 <TableRoot>
-                    <TableSection Title="BluetoothLE Client">
-                        <TextCell Text="Scan" Command="{Binding Navigate}" CommandParameter="BletoothLE" />
-
+                    <TableSection>
+                        <TextCell Text="Logs" Command="{Binding Navigate}" CommandParameter="LogsPage" />
                     </TableSection>
 
+                    <TableSection Title="BluetoothLE - Client">
+                        <TextCell Text="Scan" Command="{Binding Navigate}" CommandParameter="BleScan" />
+                        <TextCell Text="Managed Scan" Command="{Binding Navigate}" CommandParameter="BleManagedScan" />
+                        <TextCell Text="L2Cap Client" Command="{Binding Navigate}" CommandParameter="BleL2Cap" />
+                    </TableSection>
 
+                    <TableSection Title="BluetoothLE - Hosting">
+                        <TextCell Text="Standard Model" Command="{Binding Navigate}" CommandParameter="BleHosting" />
+                        <TextCell Text="Managed Model" Command="{Binding Navigate}" CommandParameter="BleHostingManaged" />
+                        <TextCell Text="Beacon Advertising" Command="{Binding Navigate}" CommandParameter="BleHostingBeaconAdvertise" />
+                        <TextCell Text="L2Cap Hosting" Command="{Binding Navigate}" CommandParameter="BleHostingL2Cap" />
+                    </TableSection>
+
+                    <TableSection Title="Locations">
+                        <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Geofencing" />                        
+                        <TextCell Text="GPS" Command="{Binding Navigate}" CommandParameter="GPS" />
+                        <!--<TextCell Text="OTHER Motion Activity" Command="{Binding Navigate}" CommandParameter="MotionActivity" />-->
+                        <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="MotionActivity" />
+                    </TableSection>
+
+                    <TableSection Title="Beacons">
+                        <TextCell Text="Ranging" Command="{Binding Navigate}" CommandParameter="BeaconRanging" />
+                        <TextCell Text="Monitoring (Background)" Command="{Binding Navigate}" CommandParameter="BeaconMonitoring" />
+                        <TextCell Text="Managed Ranging" Command="{Binding Navigate}" CommandParameter="BeaconRangingManaged" />
+                    </TableSection>
+
+                    <TableSection Title="Jobs">
+                        <TextCell Text="Jobs" Command="{Binding Navigate}" CommandParameter="Jobs" />
+                    </TableSection>
+
+                    <TableSection Title="Speech Recognition">
+                        <TextCell Text="Dictation" Command="{Binding Navigate}" CommandParameter="SrDictation" />
+                        <TextCell Text="Conversation" Command="{Binding Navigate}" CommandParameter="SrConversation" />
+                    </TableSection>
+
+                    <TableSection Title="Notifications">
+                        <TextCell Text="List" Command="{Binding Navigate}" CommandParameter="NotificationsList" />
+                        <TextCell Text="Create" Command="{Binding Navigate}" CommandParameter="NotificationsCreate" />
+                        <TextCell Text="Other Functions" Command="{Binding Navigate}" CommandParameter="NotificationsOther" />
+                        <TextCell Text="Channels" Command="{Binding Navigate}" CommandParameter="NotificationsChannelList" />
+                    </TableSection>
+
+                    <TableSection Title="Sensors">
+                        <TextCell Text="All" Command="{Binding Navigate}" CommandParameter="Sensors" />
+                        <TextCell Text="Compass" Command="{Binding Navigate}" CommandParameter="Compass" />
+                    </TableSection>
+
+                    <TableSection Title="Platform">
+                        <TextCell Text="Connectivity" Command="{Binding Navigate}" CommandParameter="Connectivity" />
+                        <TextCell Text="Battery" Command="{Binding Navigate}" CommandParameter="Battery" />
+                        <TextCell Text="Settings/Secure Storage - Service" Command="{Binding Navigate}" CommandParameter="SettingsBasic" />
+                        <TextCell Text="Stateful ViewModel" Command="{Binding Navigate}" CommandParameter="SettingsBind" />
+                    </TableSection>
                 </TableRoot>
             </TableView>
         </ContentPage>
     </FlyoutPage.Flyout>
 
     <FlyoutPage.Detail>
-        <ContentPage />
+        <NavigationPage>
+            <x:Arguments>
+                <ContentPage Title="Welcome">
+                    <Label Text="Welcome to the Shiny.NET Samples" />
+                </ContentPage>
+            </x:Arguments>
+        </NavigationPage>
     </FlyoutPage.Detail>
 </FlyoutPage>

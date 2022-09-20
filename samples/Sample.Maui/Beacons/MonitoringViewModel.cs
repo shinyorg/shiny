@@ -8,7 +8,7 @@ public class MonitoringViewModel : ViewModel
 {
     public MonitoringViewModel(BaseServices services, IBeaconMonitoringManager? beaconManager = null) : base(services)
     {
-        this.Add = this.Navigation.Command("CreatePage");
+        this.Add = this.Navigation.Command("BeaconCreate");
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
             if (beaconManager == null)

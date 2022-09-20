@@ -14,9 +14,11 @@ public class ListViewModel : ViewModel
     {
         this.activityManager = activityManager;
 
-        this.Load = new Command(async () =>
+        this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
             var result = await this.activityManager.RequestAccess();
+
+
             if (result != AccessState.Available)
             {
                 await this.Dialogs.DisplayAlertAsync("ERROR", "Motion Activity is not available - " + result, "OK");
@@ -44,7 +46,10 @@ public class ListViewModel : ViewModel
 
         this.activityManager
             .WhenActivityChanged()
-            .SubOnMainThread(x => this.CurrentActivity = $"({x.Confidence}) {x.Types}")
+            .SubOnMainThread(
+                x => this.CurrentActivity = $"({x.Confidence}) {x.Types}",
+                ex => { } // TODO
+            )
             .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.Date)

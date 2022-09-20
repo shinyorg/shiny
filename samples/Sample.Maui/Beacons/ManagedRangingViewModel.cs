@@ -14,7 +14,7 @@ public class ManagedRangingViewModel : ViewModel
     {
         this.scanner = beaconManager.CreateManagedScan();
         this.SetRegion = this.Navigation.Command(
-            "CreatePage",
+            "BeaconCreate",
             p => p
                 .Set(nameof(BeaconRegion), this.region)
                 .Set("IsRanging", true)

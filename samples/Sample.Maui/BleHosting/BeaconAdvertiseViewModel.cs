@@ -66,5 +66,5 @@ public class BeaconAdvertiseViewModel : ViewModel
     //[Reactive] public int TxPower { get; set; }
 
 
-    static bool IsValid(int value) => value < 1 || value > ushort.MaxValue;
+    static bool IsValid(int value) => value >= 1 && value <= ushort.MaxValue;
 }
