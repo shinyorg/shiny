@@ -48,4 +48,17 @@ public class JobInfo : IStoreEntity
 
 
     public bool IsValid() => this.TypeName.IsEmpty() || Type.GetType(this.TypeName) != null;
+
+    public void SetParameter(string key, object value)
+        => this.Parameters.Add(key, value.ToString());
+
+    public T GetParameter<T>(string key, T defaultValue = default)
+    {
+        if (!this.Parameters.ContainsKey(key))
+            return defaultValue;
+
+        var value = this.Parameters[key];
+        var obj = Convert.ChangeType(value, typeof(T));
+        return (T)obj;
+    }
 }

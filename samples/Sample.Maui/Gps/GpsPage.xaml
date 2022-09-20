@@ -37,7 +37,7 @@
                             <TextCell Text="Timestamp" Detail="{Binding Timestamp}" />
                         </TableSection>
 
-                        <TableSection Title="Android Foreground Notification">
+                        <!--<TableSection Title="Android Foreground Notification">
                             <EntryCell Label="Title"
                                        Text="{Binding NotificationTitle}"
                                        IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
@@ -45,7 +45,7 @@
                             <EntryCell Label="Message"
                                        Text="{Binding NotificationMessage}"
                                        IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
-                        </TableSection>
+                        </TableSection>-->
 
                         <TableSection Title="Listening">
                             <SwitchCell Text="Background"

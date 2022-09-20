@@ -12,6 +12,9 @@ public abstract class BleGattCharacteristic
     public virtual Task OnStart() => Task.CompletedTask;
     public virtual void OnStop() { }
 
+    // TODO: request/response - OnWrite/notify
+    //public virtual Task<byte[]> Request(WriteRequest request) // error if no sub?
+
     public virtual Task<GattState> OnWrite(WriteRequest request)
         => throw new InvalidOperationException("This method must overridden to use write");
 

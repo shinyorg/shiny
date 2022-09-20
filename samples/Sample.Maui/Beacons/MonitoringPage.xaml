@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
 	         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sample="clr-namespace:Sample.Beacons"
+             xmlns:sample1="clr-namespace:Sample"
              x:DataType="sample:MonitoringViewModel"
 	         x:Class="Sample.Beacons.MonitoringPage"
              Title="Monitoring">
@@ -19,7 +20,7 @@
 
             <ListView ItemsSource="{Binding Regions}" Grid.Row="0">
                 <ListView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="sample1:CommandItem">
                         <TextCell Text="{Binding Text}" Detail="{Binding Detail}">
                             <TextCell.ContextActions>
                                 <MenuItem Text="Remove"

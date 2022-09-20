@@ -19,7 +19,7 @@ public static class NotificationExtensions
     /// <param name="services"></param>
     /// <param name="configuration"></param>
     /// <returns></returns>
-    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, IosConfiguration? configuration) where TDelegate : INotificationDelegate
+    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, IosConfiguration? configuration = null) where TDelegate : INotificationDelegate
         => services.AddNotifications(typeof(TDelegate), configuration);
 
 

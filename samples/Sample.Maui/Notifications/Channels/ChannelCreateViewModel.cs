@@ -8,6 +8,9 @@ public class ChannelCreateViewModel : ViewModel
 {
     public ChannelCreateViewModel(BaseServices services, INotificationManager manager) : base(services)
     {
+        this.Action1 = new ActionViewModel(this.Services);
+        this.Action2 = new ActionViewModel(this.Services);
+
         this.Create = new Command(async () =>
         {
             if (this.Identifier.IsEmpty())
@@ -40,8 +43,8 @@ public class ChannelCreateViewModel : ViewModel
     public ICommand Create { get; }
     public ICommand PickImportance { get; }
 
-    public ActionViewModel Action1 { get; } = new ActionViewModel();
-    public ActionViewModel Action2 { get; } = new ActionViewModel();
+    public ActionViewModel Action1 { get; }
+    public ActionViewModel Action2 { get; }
 
 
     [Reactive] public string Identifier { get; set; }

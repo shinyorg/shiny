@@ -5,23 +5,22 @@ namespace Sample.Infrastructure;
 
 public abstract class ViewModel : ReactiveObject, IInitializeAsync, IConfirmNavigationAsync, INavigationAware, IDisposable
 {
-    readonly BaseServices services;
-    protected ViewModel(BaseServices services) => this.services = services;
+    protected ViewModel(BaseServices services) => this.Services = services;
 
 
     [Reactive] public string Title { get; protected set; }
     [Reactive] public bool IsBusy { get; protected set; }
-    protected IPlatform Platform => this.services.Platform;
-    protected IPageDialogService Dialogs => this.services.Dialogs;
-    protected INavigationService Navigation => this.services.Navigator;
-
+    protected IPlatform Platform => this.Services.Platform;
+    protected IPageDialogService Dialogs => this.Services.Dialogs;
+    protected INavigationService Navigation => this.Services.Navigator;
+    protected BaseServices Services { get; }
 
     ILogger? logger;
     protected ILogger Logger
     {
         get
         {
-            this.logger ??= this.services.LoggerFactory.CreateLogger(this.GetType());
+            this.logger ??= this.Services.LoggerFactory.CreateLogger(this.GetType());
             return this.logger;
         }
     }
@@ -56,6 +55,26 @@ public abstract class ViewModel : ReactiveObject, IInitializeAsync, IConfirmNavi
         this.destroyWith?.Dispose();
         this.destroyWith = null;
     }
+
+
+    protected virtual ICommand LoadingCommand(Func<Task> task, IObservable<bool>? canExecute = null)
+    {
+        var cmd = ReactiveCommand.CreateFromTask(task, canExecute);
+        cmd.Subscribe(
+            x => this.IsBusy = true,
+            _ => this.IsBusy = false,
+            () => this.IsBusy = false
+        );
+        return cmd;
+    }
+
+
+    protected virtual ICommand ConfirmCommand(string question, Func<Task> func, IObservable<bool>? canExecute = null) => ReactiveCommand.CreateFromTask(async () =>
+    {
+        var result = await this.Dialogs.DisplayAlertAsync("", question, "Yes", "No");
+        if (result)
+            await func.Invoke();
+    }, canExecute);
 
 
     protected virtual Task Alert(string message, string title = "ERROR", string okBtn = "OK")

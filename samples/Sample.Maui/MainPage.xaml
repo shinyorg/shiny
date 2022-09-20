@@ -2,7 +2,7 @@
 <FlyoutPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:local="clr-namespace:Sample"
-            x:DataType="local:MainViewModel:"
+            x:DataType="local:MainViewModel"
             x:Class="Sample.MainPage"
             Title="Shiny .NET"
             IsPresented="{Binding IsMenuVisible}">
@@ -15,6 +15,7 @@
                         <TextCell Text="Scan" Command="{Binding Navigate}" CommandParameter="BletoothLE" />
 
                     </TableSection>
+
 
                 </TableRoot>
             </TableView>

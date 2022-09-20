@@ -21,7 +21,7 @@ namespace Sample
                 "Job Started",
                 $"{jobInfo.Identifier} Started"
             );
-            var seconds = jobInfo.Parameters.Get("SecondsToRun", 10);
+            var seconds = jobInfo.GetParameter<int>("SecondsToRun", 10);
             await Task.Delay(TimeSpan.FromSeconds(seconds), cancelToken);
 
             await this.notificationManager.Send(

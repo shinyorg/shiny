@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sample="clr-namespace:Sample.Sensors"
              x:Class="Sample.Sensors.AllSensorsPage"
-             x:DataType="sample:AllSensorsViewModel"
              Title="Sensors">
 
     <ContentPage.Content>

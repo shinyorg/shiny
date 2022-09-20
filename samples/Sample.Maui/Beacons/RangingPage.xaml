@@ -24,7 +24,7 @@
 
             <ListView ItemsSource="{Binding Beacons}">
                 <ListView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="sample:BeaconViewModel">
                         <TextCell Text="{Binding Identifier}" Detail="{Binding Proximity}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
