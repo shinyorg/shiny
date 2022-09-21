@@ -5,4 +5,52 @@
              x:DataType="local:L2CapViewModel"
              x:Class="Sample.BleClient.L2CapPage"
              Title="BLE Client - L2Cap">
+
+    <VerticalStackLayout>
+        <Border>
+            <VerticalStackLayout>
+                <Label Text="Connection Information" />
+
+                <Label Text="Secure Connection" />
+                <CheckBox IsChecked="{Binding Secure}" />
+
+                <Label Text="PSM" />
+                <Entry Text="{Binding Psm}"
+                       MaxLength="5"
+                       Keyboard="Numeric" />
+
+                <Button Command="{Binding Toggle}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsConnected}" Value="True">
+                            <Setter Property="Text" Value="Disconnect" />
+                        </DataTrigger>
+
+                        <DataTrigger TargetType="Button" Binding="{Binding IsConnected}" Value="False">
+                            <Setter Property="Text" Value="Connect" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </VerticalStackLayout>
+        </Border>
+
+        <Border IsVisible="{Binding IsConnected}">
+            <VerticalStackLayout>
+                <Label Text="Input" />
+                <ScrollView>
+                    <Label Text="{Binding Input}" />
+                </ScrollView>
+            </VerticalStackLayout>
+        </Border>
+
+        <Border IsVisible="{Binding IsConnected}">
+            <VerticalStackLayout>
+                <Label Text="Output" />
+                <ScrollView>
+                    <Label Text="{Binding Output}" />
+                </ScrollView>
+                <Entry Text="{Binding WriteValue}" />
+                <Button Text="Send" Command="{Binding Write}" />
+            </VerticalStackLayout>
+        </Border>
+    </VerticalStackLayout>
 </ContentPage>
