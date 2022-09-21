@@ -35,9 +35,5 @@ public class ChannelListViewModel : ViewModel
     public ICommand LoadChannels { get; }
     [Reactive] public IList<CommandItem> Channels { get; private set; }
 
-    public override Task InitializeAsync(INavigationParameters parameters)
-    {
-        this.LoadChannels.Execute(null);
-        return base.InitializeAsync(parameters);
-    }
+    public override void OnNavigatedTo(INavigationParameters parameters) => this.LoadChannels.Execute(null);
 }

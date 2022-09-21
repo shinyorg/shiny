@@ -22,34 +22,25 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="sample1:CommandItem">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Delete"
+                                           BackgroundColor="Red"
+                                           Command="{Binding PrimaryCommand}" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Text}"
+                                   FontSize="Medium"
+                                   FontAttributes="Bold" />
 
-                        <Label Text="{Binding Text}"
-                               FontSize="Medium"
-                               Grid.Column="0"
-                               Grid.Row="0" />
-
-                        <Label Text="{Binding Detail}"
-                               FontSize="Small"
-                               FontAttributes="Italic"
-                               Grid.Column="0"
-                               Grid.Row="1" />
-
-                        <Button Text="Delete"
-                                Command="{Binding PrimaryCommand}"
-                                Grid.Column="1"
-                                Grid.Row="0"
-                                Grid.RowSpan="2" />
-                    </Grid>
+                            <Label Text="{Binding Detail}"
+                                   FontSize="Small"
+                                   FontAttributes="Italic" />
+                        </VerticalStackLayout>
+                    </SwipeView>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
