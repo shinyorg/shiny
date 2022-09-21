@@ -24,11 +24,15 @@ public class ManagedRangingViewModel : ViewModel
 
     public override async void OnNavigatedTo(INavigationParameters parameters)
     {
+        if (!parameters.IsBackNavigation())
+            return;
+
         this.region = parameters.GetValue<BeaconRegion>(nameof(BeaconRegion));
         if (this.region != null)
         {
             try
             {
+                this.Stop(); // stop IF ranging another beacon
                 await this.scanner.Start(this.region, RxApp.MainThreadScheduler);
                 this.Uuid = this.region.Uuid.ToString();
                 this.Major = this.region.Major?.ToString() ?? "-";
@@ -43,11 +47,11 @@ public class ManagedRangingViewModel : ViewModel
     }
 
 
-    //public override void OnDisappearing()
-    //{
-    //    this.IsBusy = false;
-    //    this.scanner.Stop();
-    //}
+    public override void OnNavigatedFrom(INavigationParameters parameters)
+    {
+        this.scanner.Dispose();
+        base.OnNavigatedFrom(parameters);
+    }
 
 
     public ICommand SetRegion { get; }
@@ -55,4 +59,11 @@ public class ManagedRangingViewModel : ViewModel
     [Reactive] public string Major { get; private set; }
     [Reactive] public string Minor { get; private set; }
     public ObservableCollection<ManagedBeacon> Beacons => this.scanner.Beacons;
+
+    void Stop()
+    {
+        this.scanner.Stop();
+        this.IsBusy = false;
+        this.scanner.Beacons.Clear();
+    }
 }

@@ -32,19 +32,11 @@ public class RangingViewModel : ViewModel
                 .Set(nameof(BeaconRegion), this.region)
                 .Set("IsRanging", true)
         );
-        this.ScanToggle = ReactiveCommand.Create(() =>
-        {
-            if (this.scanner == null)
-                this.StartScan();
-            else
-                this.StopScan();
-        });
     }
 
 
     public override void OnNavigatedTo(INavigationParameters parameters)
     {
-        base.OnNavigatedTo(parameters);
         var currentRegion = parameters.GetValue<BeaconRegion>(nameof(BeaconRegion));
         if (currentRegion != null)
         {
@@ -58,11 +50,7 @@ public class RangingViewModel : ViewModel
     }
 
 
-    //public override void OnDisappearing()
-    //{
-    //    base.OnDisappearing();
-    //    this.StopScan();
-    //}
+    public override void OnNavigatedFrom(INavigationParameters parameters) => this.StopScan();
 
 
     public ICommand ScanToggle { get; }
@@ -75,12 +63,10 @@ public class RangingViewModel : ViewModel
     [Reactive] public string Uuid { get; private set; }
     [Reactive] public string Major { get; private set; }
     [Reactive] public string Minor { get; private set; }
-    [Reactive] public string ScanText { get; private set; } = "Scan";
 
 
     void StartScan()
     {
-        this.ScanText = "Stop Scan";
         this.Beacons.Clear();
 
         this.scanner = this.beaconManager
@@ -102,7 +88,6 @@ public class RangingViewModel : ViewModel
 
     void StopScan()
     {
-        this.ScanText = "Scan";
         this.scanner?.Dispose();
         this.scanner = null;
     }

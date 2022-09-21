@@ -13,10 +13,10 @@ namespace Shiny.Jobs;
 
 public abstract class AbstractJobManager : IJobManager
 {
+    readonly Subject<JobRunResult> jobFinished = new();
+    readonly Subject<JobInfo> jobStarted = new();
     readonly IRepository<JobInfo> repository;
     readonly IServiceProvider container;
-    readonly Subject<JobRunResult> jobFinished;
-    readonly Subject<JobInfo> jobStarted;
 
 
     protected AbstractJobManager(
@@ -28,8 +28,6 @@ public abstract class AbstractJobManager : IJobManager
         this.container = container;
         this.repository = repository;
         this.Log = logger;
-        this.jobStarted = new Subject<JobInfo>();
-        this.jobFinished = new Subject<JobRunResult>();
     }
 
 

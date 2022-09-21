@@ -112,7 +112,7 @@ public class CreateViewModel : ViewModel
     [Reactive] public string[] Channels { get; private set; }
 
 
-    public override async Task InitializeAsync(INavigationParameters parameters)
+    public override async void OnNavigatedTo(INavigationParameters parameters)
     { 
         this.Channels = (await this.notificationManager.GetChannels())
             .Select(x => x.Identifier)
@@ -146,6 +146,6 @@ public class CreateViewModel : ViewModel
             this.TriggerDetails = null;
             this.IsTriggerVisible = false;
         }
-        await base.InitializeAsync(parameters);
+        base.OnNavigatedTo(parameters);
     }
 }

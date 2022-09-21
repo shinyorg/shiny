@@ -6,13 +6,13 @@
              x:DataType="sample:ListViewModel"
              Title="Geofences">
 
-    <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Create"
+                     Command="{Binding Create}" />
+    </ContentPage.ToolbarItems>
 
+    <ContentPage.Content>
+        <Grid RowDefinitions="*, Auto">
             <CollectionView ItemsSource="{Binding Geofences}"
                             Grid.Row="0">
 
@@ -23,67 +23,37 @@
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="sample:GeofenceRegionViewModel">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="1*" />
-                            </Grid.ColumnDefinitions>
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Current State"
+                                               Command="{Binding RequestCurrentState}" />
 
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                                    <SwipeItem Text="Remove"
+                                               BackgroundColor="Red"
+                                               Command="{Binding Remove}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
 
-                            <Label Text="{Binding Text}"
-                                   FontSize="Medium"
-                                   Grid.Column="0"
-                                   Grid.ColumnSpan="2"
-                                   Grid.Row="0" />
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Text}"
+                                       FontSize="Medium"
+                                       FontAttributes="Bold" />
 
-                            <Label Text="{Binding Detail}"
-                                   FontSize="Small"
-                                   FontAttributes="Italic"
-                                   Grid.Column="0"
-                                   Grid.ColumnSpan="2"
-                                   Grid.Row="1" />
+                                <Label Text="{Binding Detail}"
+                                       FontSize="Small"
+                                       FontAttributes="Italic" />
 
-                            <Button Text="Check Current State"
-                                    Command="{Binding RequestCurrentState}"
-                                    Grid.Column="0"
-                                    Grid.Row="2" />
-
-                            <Button Text="Remove"
-                                    Command="{Binding Remove}"
-                                    Grid.Column="1"
-                                    Grid.Row="2" />
-
-                            <BoxView Style="{StaticResource HR}"
-                                     Grid.Row="3"
-                                     Grid.ColumnSpan="2"
-                                     Grid.Column="0" />
-                        </Grid>
+                                <BoxView Style="{StaticResource HR}" />
+                            </VerticalStackLayout>
+                        </SwipeView>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Grid Grid.Row="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Text="Create"
-                            Command="{Binding Create}"
-                            Grid.Column="0" />
-
-                    <Button Text="Clear"
-                            Command="{Binding DropAllFences}"
-                            Grid.Column="1" />
-                </Grid>
-            </Grid>
+            <Button Text="Clear"
+                    Command="{Binding DropAllFences}"
+                    Grid.Row="1" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>

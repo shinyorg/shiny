@@ -1,5 +1,6 @@
 ﻿#if PLATFORM
 using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
@@ -36,14 +37,17 @@ public static class ServiceCollectionExtensions
         InternetAccess requiredNetwork = InternetAccess.None,
         bool runInForeground = false,
         bool? clearJobQueueFirst = null,
-        params (string Key, object value)[] parameters
+        params (string Key, object Value)[] parameters
     )
         => services.AddJob(new JobInfo(jobType, identifier)
         {
             RequiredInternetAccess = requiredNetwork,
             RunOnForeground = runInForeground,
             Repeat = true,
-            //Parameters = parameters?.ToDictionary() // TODO
+            Parameters = parameters?.ToDictionary(
+                x => x.Key,
+                x => x.Value?.ToString()
+            )
         }, clearJobQueueFirst);
 
 
@@ -55,8 +59,8 @@ public static class ServiceCollectionExtensions
         services.AddRepository<JobInfoStoreConverter, JobInfo>();
         services.AddShinyService<JobsStartup>();
         services.AddShinyService<JobLifecycleTask>();
+        services.AddShinyService<JobManager>();
 
-        services.TryAddSingleton<IJobManager, JobManager>();
         services.AddBattery();
         services.AddConnectivity();
         

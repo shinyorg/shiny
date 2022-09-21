@@ -12,20 +12,33 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <StackLayout IsVisible="{Binding IsBusy}">
+        <VerticalStackLayout>
+            <VerticalStackLayout IsVisible="{Binding IsBusy}">
                 <Label Text="{Binding Uuid, StringFormat='UUID: {0}'}" />
                 <Label Text="{Binding Major, StringFormat='Major: {0}'}" />
-                <Label Text="{Binding Uuid, StringFormat='Minor: {0}'}" />
-            </StackLayout>
+                <Label Text="{Binding Minor, StringFormat='Minor: {0}'}" />
+            </VerticalStackLayout>
 
-            <ListView ItemsSource="{Binding Beacons}">
-                <ListView.ItemTemplate>
+            <CollectionView ItemsSource="{Binding Beacons}">
+                <CollectionView.EmptyView>
+                    <Label Text="No Beacons Ranged"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="beacons:ManagedBeacon">
-                        <TextCell Text="{Binding RegionIdentifier}" Detail="{Binding Proximity}" />
+                        <VerticalStackLayout>
+                            <Label Text="{Binding RegionIdentifier}"
+                                    FontSize="Medium"
+                                    FontAttributes="Bold" />
+                            <Label Text="{Binding Proximity}"
+                                    FontSize="Small"
+                                    FontAttributes="Italic"/>
+                            <BoxView Style="{StaticResource HR}" />
+                        </VerticalStackLayout>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackLayout>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
     </ContentPage.Content>
 </ContentPage>

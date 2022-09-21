@@ -38,6 +38,9 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
         <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
@@ -59,28 +62,5 @@
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="$(SqliteLibVersion)" />
         <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="$(SqliteLibVersion)" />
         <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="$(SqliteLibVersion)" />
-    </ItemGroup>
-    <ItemGroup>
-      <MauiXaml Update="BleClient\L2CapPage.xaml">
-        <SubType></SubType>
-      </MauiXaml>
-      <MauiXaml Update="BleHosting\L2CapPage.xaml">
-        <SubType></SubType>
-      </MauiXaml>
-      <MauiXaml Update="BleHosting\ManagedPage.xaml">
-        <SubType></SubType>
-      </MauiXaml>
-      <MauiXaml Update="Platform\BatteryPage.xaml">
-        <SubType></SubType>
-      </MauiXaml>
-      <MauiXaml Update="Platform\ConnectivityPage.xaml">
-        <SubType></SubType>
-      </MauiXaml>
-    </ItemGroup>
-    <ItemGroup>
-      <None Remove="Platform\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Platform\" />
     </ItemGroup>
 </Project>

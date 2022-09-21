@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <ResourceDictionary>
                     <infrastructure:InvertedBoolConverter x:Key="Not" />
+
                     <Style x:Key="NoDataLabel" TargetType="Label">
                         <Setter Property="HorizontalOptions" Value="FillAndExpand" />
                         <Setter Property="HorizontalTextAlignment" Value="Center" />
@@ -17,6 +18,13 @@
                         <Setter Property="VerticalTextAlignment" Value="Center" />
                         <Setter Property="FontSize" Value="Large" />
                         <Setter Property="FontAttributes" Value="Bold" />
+                    </Style>
+
+                    <Style x:Key="HR" TargetType="BoxView">
+                        <Setter Property="Color" Value="LightGray" />
+                        <Setter Property="HeightRequest" Value="1" />
+                        <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                        <Setter Property="VerticalOptions" Value="Center" />
                     </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>

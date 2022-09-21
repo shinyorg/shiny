@@ -6,17 +6,26 @@ namespace Sample.Beacons;
 
 public class MonitoringViewModel : ViewModel
 {
+    readonly IBeaconMonitoringManager? beaconManager;
+
+
     public MonitoringViewModel(BaseServices services, IBeaconMonitoringManager? beaconManager = null) : base(services)
     {
-        this.Add = this.Navigation.Command("BeaconCreate");
+        this.beaconManager = beaconManager;
+
+        this.Add = this.Navigation.Command(
+            "BeaconCreate",
+            p => p.Add("Monitoring", true)
+        );
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
-            if (beaconManager == null)
+            if (this.beaconManager == null)
             {
                 await this.Dialogs.DisplayAlertAsync("ERROR", "Beacon monitoring is not supported on this platform", "OK");
                 return;
             }
-            var regions = await beaconManager.GetMonitoredRegions();
+
+            var regions = await this.beaconManager.GetMonitoredRegions();
 
             this.Regions = regions
                 .Select(x => new CommandItem
@@ -25,7 +34,7 @@ public class MonitoringViewModel : ViewModel
                     Detail = $"{x.Uuid}/{x.Major ?? 0}/{x.Minor ?? 0}",
                     PrimaryCommand = ReactiveCommand.CreateFromTask(async () =>
                     {
-                        await beaconManager.StopMonitoring(x.Identifier);
+                        await this.beaconManager.StopMonitoring(x.Identifier);
                         this.Load.Execute(null);
                     })
                 })
@@ -38,11 +47,11 @@ public class MonitoringViewModel : ViewModel
                 var result = await this.Confirm("Are you sure you wish to stop all monitoring");
                 if (result)
                 {
-                    await beaconManager.StopAllMonitoring();
+                    await this.beaconManager.StopAllMonitoring();
                     this.Load.Execute(null);
                 }
             },
-            Observable.Return(beaconManager != null)
+            Observable.Return(this.beaconManager != null)
         );
     }
 
@@ -53,9 +62,20 @@ public class MonitoringViewModel : ViewModel
     [Reactive] public IList<CommandItem> Regions { get; private set; }
 
 
-    public override Task InitializeAsync(INavigationParameters parameters)
+    public override async void OnNavigatedTo(INavigationParameters parameters)
     {
+        if (parameters.IsBackNavigation())
+        {
+            var region = parameters.GetValue<BeaconRegion>(nameof(BeaconRegion));
+            if (region != null && this.beaconManager != null)
+            {
+                var access = await this.beaconManager.RequestAccess();
+                if (access == AccessState.Available)
+                    await this.beaconManager.StartMonitoring(region);
+                else
+                    await this.Alert("Invalid Permissions: " + access);
+            }
+        }
         this.Load.Execute(null);
-        return base.InitializeAsync(parameters);
     }
 }

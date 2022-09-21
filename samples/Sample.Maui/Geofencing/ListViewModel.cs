@@ -53,11 +53,5 @@ public class ListViewModel : ViewModel
     public ICommand Load { get; }
     public ICommand DropAllFences { get; }
     public IList<GeofenceRegionViewModel> Geofences { get; private set; }
-
-
-    public override Task InitializeAsync(INavigationParameters parameters)
-    {
-        this.Load.Execute(null);
-        return base.InitializeAsync(parameters);
-    }
+    public override void OnNavigatedTo(INavigationParameters parameters) => this.Load.Execute(null);
 }

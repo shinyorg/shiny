@@ -42,9 +42,18 @@
 	<string>This app allows the referee to control the scoreboard through bluetooth</string>	
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>processing</string>
+		<string>fetch</string>	
 		<string>location</string>
 		<string>bluetooth-central</string>
 		<string>bluetooth-peripheral</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.shiny.job</string>
+		<string>com.shiny.jobpower</string>
+		<string>com.shiny.jobnet</string>
+		<string>com.shiny.jobpowernet</string>
 	</array>
 </dict>
 </plist>

@@ -13,7 +13,7 @@ public class ListViewModel : ViewModel
     {
         this.jobManager = jobManager;
 
-        this.Create = this.Navigation.Command("CreatePage");
+        this.Create = this.Navigation.Command("JobsCreate");
 
         this.LoadJobs = ReactiveCommand.CreateFromTask(async () =>
             this.Jobs = (await jobManager.GetJobs()).ToList()
@@ -58,11 +58,9 @@ public class ListViewModel : ViewModel
     [Reactive] public string RunningText { get; private set; }
     [Reactive] public JobInfo? SelectedJob { get; set; }
 
-
+    public override void OnNavigatedTo(INavigationParameters parameters) => this.LoadJobs.Execute(null);
     public override Task InitializeAsync(INavigationParameters parameters)
     {
-        this.LoadJobs.Execute(null);
-
         this.jobManager
             .JobStarted
             .SubOnMainThread(x =>
@@ -83,7 +81,7 @@ public class ListViewModel : ViewModel
             .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.SelectedJob)
-            .Where(x => x != null)
+            .WhereNotNull()
             .SubscribeAsync(async x =>
             {
                 this.SelectedJob = null;
@@ -93,7 +91,6 @@ public class ListViewModel : ViewModel
 
         return base.InitializeAsync(parameters);
     }
-
 
 
     async Task<bool> AssertJobs()

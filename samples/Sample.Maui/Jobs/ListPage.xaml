@@ -12,20 +12,13 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
+        <Grid RowDefinitions="*, Auto, Auto, Auto">
             <RefreshView IsRefreshing="{Binding IsBusy}"
-                         Command="{Binding LoadJobs}">
+                         Command="{Binding LoadJobs}"
+                         Grid.Row="0">
                 <CollectionView ItemsSource="{Binding Jobs}"
                                 SelectedItem="{Binding SelectedJob}"
-                                SelectionMode="Single"
-                                Grid.Row="0">
+                                SelectionMode="Single">
 
                     <CollectionView.EmptyView>
                         <Label Text="No Job Logs"
@@ -37,9 +30,7 @@
                             <StackLayout>
                                 <Label Text="{Binding Identifier}" FontSize="Large" />
                                 <Label Text="{Binding LastRun}" FontSize="Small" />
-                                <BoxView BackgroundColor="WhiteSmoke"
-                                         HorizontalOptions="FillAndExpand"
-                                         HeightRequest="2" />
+                                <BoxView Style="{StaticResource HR}"/>
                             </StackLayout>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

@@ -29,11 +29,11 @@
             <TableSection Title="Monitoring">
                 <SwitchCell Text="Entry"
                             On="{Binding NotifyOnEntry}"
-                            IsEnabled="{Binding IsMonitoringSupported}" />
+                            IsEnabled="{Binding ForMonitoring}" />
 
                 <SwitchCell Text="Exit"
                             On="{Binding NotifyOnExit}"
-                            IsEnabled="{Binding IsMonitoringSupported}" />
+                            IsEnabled="{Binding ForMonitoring}" />
             </TableSection>
 
             <TableSection>
@@ -41,15 +41,11 @@
             </TableSection>
 
             <TableSection>
-                <TextCell x:Name="MonitorButton"
-                          Text="Start Monitor"
-                          Command="{Binding StartMonitoring}" />
-
-                <TextCell Text="Start Ranging"
-                          Command="{Binding StartRanging}" />
+                <TextCell Text="Use Region"
+                          Command="{Binding Use}" />
             </TableSection>
 
-            <TableSection Title="Android Notification">
+            <!--<TableSection Title="Android Notification">
                 <EntryCell Label="Title"
                            Text="{Binding NotificationTitle}"
                            IsEnabled="{Binding IsMonitoringSupported}" />
@@ -57,7 +53,7 @@
                 <EntryCell Label="Message"
                            Text="{Binding NotificationMessage}"
                            IsEnabled="{Binding IsMonitoringSupported}" />
-            </TableSection>
+            </TableSection>-->
         </TableView>
     </ContentPage.Content>
 </ContentPage>

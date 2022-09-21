@@ -11,24 +11,33 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <Button Text="{Binding ScanText}"
-                    Command="{Binding ScanToggle}"
-                    IsVisible="{Binding IsRegionSet}" />
-
-            <StackLayout IsVisible="{Binding IsRegionSet}">
+        <VerticalStackLayout>
+            <VerticalStackLayout IsVisible="{Binding IsRegionSet}">
                 <Label Text="{Binding Uuid, StringFormat='UUID: {0}'}" />
                 <Label Text="{Binding Major, StringFormat='Major: {0}'}" IsVisible="{Binding IsMajorSet}" />
-                <Label Text="{Binding Uuid, StringFormat='Minor: {0}'}" IsVisible="{Binding IsMinorSet}" />
-            </StackLayout>
+                <Label Text="{Binding Minor, StringFormat='Minor: {0}'}" IsVisible="{Binding IsMinorSet}" />
+            </VerticalStackLayout>
 
-            <ListView ItemsSource="{Binding Beacons}">
-                <ListView.ItemTemplate>
+            <CollectionView ItemsSource="{Binding Beacons}">
+                <CollectionView.EmptyView>
+                    <Label Text="No Beacons Ranged"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="sample:BeaconViewModel">
-                        <TextCell Text="{Binding Identifier}" Detail="{Binding Proximity}" />
+                        <VerticalStackLayout>
+                            <Label Text="{Binding RegionIdentifier}"
+                                    FontSize="Medium"
+                                    FontAttributes="Bold" />
+                            <Label Text="{Binding Proximity}"
+                                    FontSize="Small"
+                                    FontAttributes="Italic"/>
+                            <BoxView Style="{StaticResource HR}" />
+                        </VerticalStackLayout>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackLayout>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
 	</ContentPage.Content>
 </ContentPage>

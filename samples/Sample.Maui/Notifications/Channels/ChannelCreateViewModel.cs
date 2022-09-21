@@ -26,22 +26,18 @@ public class ChannelCreateViewModel : ViewModel
             await manager.AddChannel(this.ToChannel());
             await this.Navigation.GoBack();
         });
-
-        this.PickImportance = new Command(async () =>
-        {
-            //this.Importance = await this.Choose(
-            //    "Importance",
-            //    ChannelImportance.Critical.ToString(),
-            //    ChannelImportance.High.ToString(),
-            //    ChannelImportance.Normal.ToString(),
-            //    ChannelImportance.Low.ToString()
-            //);
-        });
     }
 
 
     public ICommand Create { get; }
-    public ICommand PickImportance { get; }
+    public ChannelImportance[] Importances => new[]
+    {
+        ChannelImportance.Critical,
+        ChannelImportance.High,
+        ChannelImportance.Normal,
+        ChannelImportance.Low
+    };
+    [Reactive] public ChannelImportance SelectedImportance { get; set; } = ChannelImportance.Normal;
 
     public ActionViewModel Action1 { get; }
     public ActionViewModel Action2 { get; }

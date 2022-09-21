@@ -48,11 +48,7 @@ public class PendingViewModel : ViewModel
     [Reactive] public IList<CommandItem> PendingList { get; private set; }
 
 
-    public override Task InitializeAsync(INavigationParameters parameters)
-    {
-        this.Load.Execute(null);
-        return base.InitializeAsync(parameters);
-    }
+    public override void OnNavigatedTo(INavigationParameters parameters) => this.Load.Execute(null);
 
 
     string GetDetails(Notification notification)

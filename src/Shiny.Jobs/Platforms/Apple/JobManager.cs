@@ -44,26 +44,6 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
         }
     }
 
-    protected void Assert()
-    {
-        if (!this.registeredSuccessfully)
-            throw new Exception(EX_MSG);
-    }
-
-
-    public static bool IsAvailable
-    {
-        get
-        {
-            var result = (
-                UIDevice.CurrentDevice.CheckSystemVersion(13, 0) &&
-                //Runtime.Arch != Arch.SIMULATOR &&
-                AppleExtensions.HasBackgroundMode("processing")
-            );
-            return result;
-        }
-    }
-
 
     public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
     {
@@ -101,6 +81,9 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
         else if (!AppleExtensions.HasBackgroundMode("processing"))
             result = AccessState.NotSetup;
 
+        else if (!this.registeredSuccessfully)
+            result = AccessState.NotSetup;
+
         return Task.FromResult(result);
     }
 
@@ -111,8 +94,6 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
 
     protected override void RegisterNative(JobInfo jobInfo)
     {
-        this.Assert();
-
         var identifier = this.GetIdentifier(
             jobInfo.DeviceCharging,
             jobInfo.RequiredInternetAccess == InternetAccess.Any
@@ -122,7 +103,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
         request.RequiresNetworkConnectivity = jobInfo.RequiredInternetAccess == InternetAccess.Any;
 
         if (!BGTaskScheduler.Shared.Submit(request, out var e))
-            throw new ArgumentException(e.LocalizedDescription.ToString());
+            throw new InvalidOperationException(e.LocalizedDescription.ToString());
     }
 
 

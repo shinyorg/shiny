@@ -6,59 +6,97 @@
              x:Class="Sample.Notifications.Channels.ChannelCreatePage"
              Title="Create Channel">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="HorizontalStackLayout">
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <VerticalStackLayout>
+            <ScrollView>
+                <VerticalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Identifier" />
+                        <Entry Text="{Binding Identifier}" />
+                    </HorizontalStackLayout>
 
-            <TableView Grid.Row="0">
-                <TableRoot>
-                    <TableSection Title="Channel Info">
-                        <EntryCell Label="Identifier" Text="{Binding Identifier}" />
-                        <EntryCell Label="Description" Text="{Binding Description}" />
-                        <TextCell Text="Importance"
-                                  Detail="{Binding Importance}"
-                                  Command="{Binding PickImportance}" />
-                    </TableSection>
+                    <HorizontalStackLayout>
+                        <Label Text="Description" />
+                        <Entry Text="{Binding Description}" />
+                    </HorizontalStackLayout>
 
-                    <TableSection Title="Custom Sound">
-                        <SwitchCell Text="Use" On="{Binding UseCustomSound}" />
-                        <SwitchCell Text="Embedded (use native if not selected)"
-                                    On="{Binding UseEmbeddedSound}"
-                                    IsEnabled="{Binding UseCustomSound}" />
-                    </TableSection>
+                    <HorizontalStackLayout>
+                        <Label Text="Importance" />
+                        <Picker ItemsSource="{Binding Importances}"
+                                SelectedItem="{Binding SelectedImportance}" />
+                    </HorizontalStackLayout>
 
-                    <TableSection Title="Action 1">
-                        <SwitchCell Text="Use"
-                                    On="{Binding Action1.IsEnabled}" />
-                        <EntryCell Label="Identifier"
-                                   Text="{Binding Action1.Identifier}"
-                                   IsEnabled="{Binding Action1.IsEnabled}" />
-                        <TextCell Text="Action Type"
-                                  Detail="{Binding Action1.Type}"
-                                  IsEnabled="{Binding Action1.IsEnabled}"
-                                  Command="{Binding Action1.SelectType}" />
-                    </TableSection>
+                    <HorizontalStackLayout>
+                        <Label Text="Use Custom Sound" />
+                        <CheckBox IsChecked="{Binding UseCustomSound}" />
+                    </HorizontalStackLayout>
 
-                    <TableSection Title="Action 2">
-                        <SwitchCell Text="Use"
-                                    On="{Binding Action2.IsEnabled}" />
-                        <EntryCell Label="Identifier"
-                                   Text="{Binding Action2.Identifier}"
-                                   IsEnabled="{Binding Action2.IsEnabled}" />
-                        <TextCell Text="Action Type"
-                                  Detail="{Binding Action2.Type}"
-                                  IsEnabled="{Binding Action2.IsEnabled}"
-                                  Command="{Binding Action2.SelectType}" />
-                    </TableSection>
-                </TableRoot>
-            </TableView>
+                    <HorizontalStackLayout>
+                        <Label Text="Embedded (use native if not selected)" />
+                        <CheckBox IsChecked="{Binding UseEmbeddedSound}"
+                                  IsEnabled="{Binding UseCustomSound}" />
+                    </HorizontalStackLayout>
+
+                    <Border BackgroundColor="Black">
+                        <VerticalStackLayout>
+                            <Label Text="Action 1"
+                                   FontSize="Large" />
+
+                            <HorizontalStackLayout>
+                                <Label Text="Use" />
+                                <CheckBox IsChecked="{Binding Action1.IsEnabled}" />
+                            </HorizontalStackLayout>
+
+                            <HorizontalStackLayout>
+                                <Label Text="Identifier" />
+                                <Entry Text="{Binding Action1.Identifier}"
+                                       IsEnabled="{Binding Action1.IsEnabled}" />
+                            </HorizontalStackLayout>
+
+                            <HorizontalStackLayout>
+                                <Label Text="Action Type" />
+                                <Picker ItemsSource="{Binding Action1.Types}"
+                                        SelectedItem="{Binding Action1.SelectedType}" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border BackgroundColor="Black">
+                        <VerticalStackLayout>
+                            <Label Text="Action 2"
+                                   FontSize="Large" />
+
+                            <HorizontalStackLayout>
+                                <Label Text="Use" />
+                                <CheckBox IsChecked="{Binding Action2.IsEnabled}" />
+                            </HorizontalStackLayout>
+
+                            <HorizontalStackLayout>
+                                <Label Text="Identifier" />
+                                <Entry Text="{Binding Action2.Identifier}"
+                                       IsEnabled="{Binding Action2.IsEnabled}" />
+                            </HorizontalStackLayout>
+
+                            <HorizontalStackLayout>
+                                <Label Text="Action Type" />
+                                <Picker ItemsSource="{Binding Action2.Types}"
+                                        SelectedItem="{Binding Action2.SelectedType}" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
 
             <Button Text="Create"
-                    Command="{Binding Create}"
-                    Grid.Row="1" />
-        </Grid>
+                    Command="{Binding Create}" />
+        </VerticalStackLayout>
     </ContentPage.Content>
 </ContentPage>
