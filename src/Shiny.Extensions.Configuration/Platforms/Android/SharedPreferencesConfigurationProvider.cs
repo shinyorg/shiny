@@ -7,15 +7,12 @@ namespace Shiny.Extensions.Configuration;
 
 public class SharedPreferencesConfigurationProvider : ConfigurationProvider
 {
-    bool loaded = false;
-
-
     public override void Load()
     {
-        // TODO: do I have to also trigger the load?
-        // TODO: do I have to populate data?
+        // do I have to also trigger the load?
+        // do I have to populate data?
         PreferenceManager
-            .GetDefaultSharedPreferences(Application.Context)
+            .GetDefaultSharedPreferences(Application.Context)!
             .RegisterOnSharedPreferenceChangeListener(new PrefChangeListener(() => this.OnReload()));
 
         this.DoLoad();
@@ -27,7 +24,7 @@ public class SharedPreferencesConfigurationProvider : ConfigurationProvider
     {
         using (var prefs = PreferenceManager.GetDefaultSharedPreferences(Application.Context))
         {
-            using (var editor = prefs.Edit()!)
+            using (var editor = prefs!.Edit()!)
             {
                 editor.PutString(key, value);
                 editor.Apply();

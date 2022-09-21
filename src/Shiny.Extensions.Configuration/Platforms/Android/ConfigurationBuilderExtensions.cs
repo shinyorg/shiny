@@ -18,8 +18,8 @@ public static partial class ConfigurationBuilderExtensions
     public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, string fileName = "appsettings.json", bool optional = true)
     {
         var assets = Application.Context.Assets;
-        var exists = assets
-            .List("")
+        var exists = assets!
+            .List("")!
             .Any(x => x.Equals(fileName, StringComparison.InvariantCultureIgnoreCase));
 
         if (exists)
