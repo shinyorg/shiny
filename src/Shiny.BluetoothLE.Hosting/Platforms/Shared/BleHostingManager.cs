@@ -75,6 +75,8 @@ public partial class BleHostingManager : IShinyStartupTask
 
         foreach (var service in this.gattServices)        
             await this.BuildService(service.Key, service.Value).ConfigureAwait(false);
+
+        this.IsRegisteredServicesAttached = true;
     }
 
 

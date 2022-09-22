@@ -7,7 +7,6 @@ namespace Sample.BleClient;
 public class L2CapViewModel : ViewModel
 {
     IPeripheral peripheral = null!;
-    Task readerTask = null!;
     L2CapChannel? channel;
     
 
@@ -17,7 +16,7 @@ public class L2CapViewModel : ViewModel
             async () =>
             {
                 var bytes = Encoding.UTF8.GetBytes(this.WriteValue!);
-                await this.channel!.OutputStream.WriteAsync(bytes);
+                await this.channel!.Write(bytes);
 
                 this.Output = $"{this.WriteValue}{Environment.NewLine}{this.Output}";
                 this.WriteValue = String.Empty;
@@ -46,15 +45,13 @@ public class L2CapViewModel : ViewModel
                     if (this.channel == null)
                         throw new InvalidOperationException("Could not open L2Cap channel");
 
-                    this.readerTask = Task.Run(async () =>
-                    {
-                        var buffer = new Memory<byte>();
-                        while (this.peripheral.IsConnected() && this.IsConnected)
+                    this.channel
+                        .DataReceived
+                        .SubOnMainThread(data =>
                         {
-                            await this.channel.InputStream.ReadAsync(buffer, CancellationToken.None).ConfigureAwait(false);
-                            this.AppendToInput(buffer.ToArray());                        
-                        }
-                    });
+                            var value = Encoding.UTF8.GetString(data.ToArray());
+                            this.Input = $"{value}{Environment.NewLine}{this.Input}";
+                        });
 
                     this.IsConnected = true;
                 }
@@ -63,7 +60,6 @@ public class L2CapViewModel : ViewModel
                     this.IsConnected = false;
                     this.channel?.Dispose();
                     this.channel = null;
-                    this.readerTask = null!;
                     this.peripheral.CancelConnection();
                 }
             },
@@ -90,11 +86,4 @@ public class L2CapViewModel : ViewModel
         this.peripheral = parameters.GetValue<IPeripheral>("Peripheral");
         return base.InitializeAsync(parameters);
     }
-
-
-    void AppendToInput(byte[] data) => this.Platform.InvokeOnMainThread(() =>
-    {
-        var value = Encoding.UTF8.GetString(data.ToArray());
-        this.Input = $"{value}{Environment.NewLine}{this.Input}";
-    });
 }

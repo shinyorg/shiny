@@ -49,10 +49,12 @@ public class Peripheral : AbstractPeripheral, ICanL2Cap
     {
         var handler = new EventHandler<CBPeripheralOpenL2CapChannelEventArgs>((sender, args) =>
         {
+            var c = args.Channel!;
+
             ob.Respond(new L2CapChannel(
                 args.Channel!.Psm,
-                args.Channel!.InputStream.ToStream(),
-                args.Channel!.OutputStream.ToStream()
+                data => Observable.FromAsync(ct => c.OutputStream.WriteAsync(data, 0, data.Length, ct)),
+                c.InputStream.ListenForData()
             ));
         });
 

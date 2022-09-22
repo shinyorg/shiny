@@ -21,16 +21,20 @@ public class L2CapViewModel : ViewModel
             }
             else
             {
+                // TODO: multiple channels can connect
                 this.instance = await hostingManager.OpenL2Cap(this.Secure, channel =>
                 {
                     this.channel = channel;
                     this.IsConnected = true;
 
-                    this.readerTask = Task.Run(() =>
-                    {
-                        // TODO: while connect - how to determine when channel closes?
-                        //this.Input = $"{Environment.NewLine}{this.Input}";
-                    });
+                    this.channel
+                        .DataReceived
+                        .SubOnMainThread(data =>
+                        {
+                            this.IsConnected = true;
+                            var value = Encoding.UTF8.GetString(data);
+                            this.Input = $"{value}{Environment.NewLine}{this.Input}";
+                        });
                 });
                 this.Psm = this.instance.Value.Psm;
                 this.IsBroadcasting = true;
@@ -41,7 +45,7 @@ public class L2CapViewModel : ViewModel
             async () =>
             {
                 var data = Encoding.UTF8.GetBytes(this.WriteValue!);
-                await this.channel!.OutputStream.WriteAsync(data);
+                await this.channel!.Write(data).ToTask();
 
                 this.Output = $"{this.WriteValue}{Environment.NewLine}{this.Output}";
                 this.WriteValue = String.Empty;

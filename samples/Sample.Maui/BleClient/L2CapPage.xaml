@@ -35,20 +35,30 @@
 
         <Border IsVisible="{Binding IsConnected}">
             <VerticalStackLayout>
-                <Label Text="Input" />
+                <Label Text="Input"
+                       FontSize="Large"
+                       FontAttributes="Bold" />
+
                 <ScrollView>
-                    <Label Text="{Binding Input}" />
+                    <Label Text="{Binding Input}"
+                           HorizontalOptions="FillAndExpand"
+                           VerticalOptions="FillAndExpand" />
                 </ScrollView>
             </VerticalStackLayout>
         </Border>
 
         <Border IsVisible="{Binding IsConnected}">
             <VerticalStackLayout>
-                <Label Text="Output" />
+                <Label Text="Output"
+                       FontSize="Large"
+                       FontAttributes="Bold" />
+
                 <ScrollView>
-                    <Label Text="{Binding Output}" />
+                    <Label Text="{Binding Output}"
+                           HorizontalOptions="FillAndExpand"
+                           VerticalOptions="FillAndExpand" />
                 </ScrollView>
-                <Entry Text="{Binding WriteValue}" />
+                <Entry Text="{Binding WriteValue}" Placeholder="Write Value" />
                 <Button Text="Send" Command="{Binding Write}" />
             </VerticalStackLayout>
         </Border>

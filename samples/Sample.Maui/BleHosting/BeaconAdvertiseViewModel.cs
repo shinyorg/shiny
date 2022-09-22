@@ -12,7 +12,7 @@ public class BeaconAdvertiseViewModel : ViewModel
         this.Toggle = ReactiveCommand.CreateFromTask(
             async () =>
             {
-                if (hostingManager.IsAdvertising)
+                if (this.IsAdvertising)
                 {
                     hostingManager.StopAdvertising();
                 }
@@ -24,7 +24,7 @@ public class BeaconAdvertiseViewModel : ViewModel
                         (ushort)this.Minor
                     );
                 }
-                this.IsAdvertising = hostingManager.IsAdvertising;
+                this.IsAdvertising = !this.IsAdvertising;
             },
             this.WhenAny(
                 x => x.Uuid,

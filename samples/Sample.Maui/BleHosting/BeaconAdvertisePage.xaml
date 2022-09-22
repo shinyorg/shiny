@@ -26,13 +26,13 @@
             <Button.Triggers>
                 <DataTrigger TargetType="Button"
                              Binding="{Binding IsAdvertising}"
-                             Value="true">
+                             Value="True">
                     <Setter Property="Text"
                             Value="Stop Advertising" />
                 </DataTrigger>
                 <DataTrigger TargetType="Button"
                              Binding="{Binding IsAdvertising}"
-                             Value="false">
+                             Value="False">
                     <Setter Property="Text"
                             Value="Start Advertising" />
                 </DataTrigger>

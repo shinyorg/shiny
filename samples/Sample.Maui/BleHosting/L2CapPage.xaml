@@ -18,7 +18,7 @@
                 <CheckBox IsChecked="{Binding Secure}"
                           Grid.Row="0"
                           Grid.Column="1"
-                          IsEnabled="{Binding IsConnected, Converter={StaticResource Not}}" />
+                          IsEnabled="{Binding IsBroadcasting, Converter={StaticResource Not}}" />
         
                 <Button Command="{Binding Toggle}"
                         Grid.Row="1"

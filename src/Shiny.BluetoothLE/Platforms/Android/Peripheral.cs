@@ -46,13 +46,14 @@ namespace Shiny.BluetoothLE
 
             ob.Respond(new L2CapChannel(
                 psm,
-                socket.InputStream!,
-                socket.OutputStream!,
+                data => Observable.FromAsync(ct => socket.InputStream!.WriteAsync(data, 0, data.Length, ct)),
+                socket.ListenForData(),
                 () => socket.Dispose()
             ));
 
             return Disposable.Empty;
         });
+
 
         public override void Connect(ConnectionConfig? config)
         {

@@ -9,6 +9,20 @@
         <Label Text="Broadcast Local Name" />
         <Entry Text="{Binding BroadcastLocalName}" MaxLength="8" />
 
-        <Button Text="" Command="{Binding Toggle}" />
+        <Button Command="{Binding Toggle}">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button"
+                             Binding="{Binding IsBroadcasting}"
+                             Value="True">
+                    <Setter Property="Text" Value="Stop Broadcasting" />
+                </DataTrigger>
+
+                <DataTrigger TargetType="Button"
+                             Binding="{Binding IsBroadcasting}"
+                             Value="False">
+                    <Setter Property="Text" Value="Start Broadcasting" />
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
     </VerticalStackLayout>
 </ContentPage>

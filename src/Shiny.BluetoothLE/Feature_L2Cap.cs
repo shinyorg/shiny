@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reactive;
 using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE;
@@ -7,8 +8,8 @@ namespace Shiny.BluetoothLE;
 
 public record L2CapChannel(
     ushort Psm,
-    Stream InputStream,
-    Stream OutputStream,    
+    Func<byte[], IObservable<Unit>> Write,
+    IObservable<byte[]> DataReceived,
     Action? OnDispose = null
 ) : IDisposable
 {
@@ -29,6 +30,7 @@ public interface ICanL2Cap : IPeripheral
     /// <returns></returns>
     IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure);
 }
+
 
 public static class FeatureL2Cap
 {
