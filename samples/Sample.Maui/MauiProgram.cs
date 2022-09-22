@@ -17,6 +17,8 @@ public static class MauiProgram
                 prism => prism
                     .RegisterTypes(registry =>
                     {
+                        // TODO: HTTP Transfers
+
                         // jobs
                         registry.RegisterForNavigation<Jobs.ListPage, Jobs.ListViewModel>("Jobs");
                         registry.RegisterForNavigation<Jobs.CreatePage, Jobs.CreateViewModel>("JobsCreate");
@@ -41,6 +43,10 @@ public static class MauiProgram
                         registry.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
                         registry.RegisterForNavigation<BleHosting.ManagedPage, BleHosting.ManagedViewModel>("BleHostingManaged");
                         registry.RegisterForNavigation<BleHosting.L2CapPage, BleHosting.L2CapViewModel>("BleHostingL2Cap");
+
+                        // ble perf testing
+                        registry.RegisterForNavigation<BlePerf.ClientPage, BlePerf.ClientViewModel>("BlePerfClient");
+                        registry.RegisterForNavigation<BlePerf.ServerPage, BlePerf.ServerViewModel>("BlePerfServer");
 
                         // sensors
                         registry.RegisterForNavigation<Sensors.AllSensorsPage, Sensors.AllSensorsViewModel>("Sensors");
@@ -119,10 +125,11 @@ public static class MauiProgram
 
         // services needed for samples - not shiny
         builder.Logging.AddDebug();
+        builder.Logging.AddProvider(new SqliteLoggerProvider(LogLevel.Trace));
         builder.Services.AddSingleton<SampleSqliteConnection>();
         builder.Services.AddShinyService<CommandExceptionHandler>();
         builder.Services.AddScoped<BaseServices>();
-        builder.Services.AddSingleton<ITextToSpeech>(TextToSpeech.Default);
+        builder.Services.AddSingleton(TextToSpeech.Default);
 
         return builder.Build();
     }

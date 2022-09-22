@@ -68,6 +68,11 @@
                         <TextCell Text="Settings/Secure Storage - Service" Command="{Binding Navigate}" CommandParameter="SettingsBasic" />
                         <TextCell Text="Stateful ViewModel" Command="{Binding Navigate}" CommandParameter="SettingsBind" />
                     </TableSection>
+
+                    <TableSection Title="BluetoothLE - Perf Testing">
+                        <TextCell Text="Server" Command="{Binding Navigate}" CommandParameter="BlePerfServer" />
+                        <TextCell Text="Client" Command="{Binding Navigate}" CommandParameter="BlePerfClient" />
+                    </TableSection>
                 </TableRoot>
             </TableView>
         </ContentPage>
