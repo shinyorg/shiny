@@ -8,6 +8,8 @@ using CoreBluetooth;
 using Foundation;
 using CoreLocation;
 using Microsoft.Extensions.Options;
+using ObjCRuntime;
+using System.Threading;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -63,10 +65,16 @@ public partial class BleHostingManager : IBleHostingManager
 
         var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
         {
+            //args.Channel.InputStream.Status == NSStreamStatus.Open
+            var c = args.Channel!;
+            c.InputStream.Open();
+            c.OutputStream.Open();
+
             onOpen(new L2CapChannel(
-                args.Channel!.Psm,
-                args.Channel!.InputStream.ToStream(),
-                args.Channel!.OutputStream.ToStream()
+                c.Psm,
+                c.Peer.Identifier.ToString(),
+                data => Observable.FromAsync(ct => c.OutputStream.WriteAsync(data, 0, data.Length, ct)),
+                c.InputStream.ListenForData()
             ));
         });
         this.Manager.DidOpenL2CapChannel += handler;
@@ -79,7 +87,7 @@ public partial class BleHostingManager : IBleHostingManager
                 this.Manager.DidOpenL2CapChannel -= handler;
             }
         );
-    }
+    } 
 
 
     public bool IsAdvertising => this.Manager.Advertising;

@@ -9,6 +9,7 @@ using Android.OS;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 using static Android.Manifest;
+using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -36,7 +37,6 @@ public partial class BleHostingManager : IBleHostingManager
 
         var psm = Convert.ToUInt16(serverSocket!.Psm);
 
-        // TODO: error trap
         _ = Task.Run(() =>
         {
             while (!ct.IsCancellationRequested)
@@ -46,14 +46,21 @@ public partial class BleHostingManager : IBleHostingManager
                     var socket = serverSocket.Accept(30000);
                     if (socket != null && !ct.IsCancellationRequested)
                     {
+                        //socket.MaxReceivePacketSize
+                        //socket.MaxTransmitPacketSize
                         onOpen(new L2CapChannel(
                             psm,
-                            socket.InputStream!,
-                            socket.OutputStream!
+                            socket.RemoteDevice!.Address!,
+                            data => Observable.FromAsync(ct => socket.InputStream!.WriteAsync(data, 0, data.Length, ct)),
+                            socket.ListenForData()
                         ));
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    // error opening connection, but it's fine
+                    Console.WriteLine("Error opening connection - " + ex.ToString());
+                }
             }
         });
 
@@ -149,7 +156,7 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
-        options ??= new AdvertisementOptions();
+        options ??= new();
 
         var settings = new AdvertiseSettings.Builder()!
             .SetAdvertiseMode(AdvertiseMode.Balanced)!
