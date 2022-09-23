@@ -5,4 +5,54 @@
              x:DataType="bleperf:ClientViewModel"
              x:Class="Sample.BlePerf.ClientPage"
              Title="BLE Perf - Client">
+
+    <TableView>
+        <TableRoot>
+            <TableSection Title="Info">
+                <SwitchCell Text="Connected"
+                            On="{Binding IsConnected}"
+                            IsEnabled="False" />
+
+                <TextCell Text="Status"
+                          Detail="{Binding Status}" />
+
+                <TextCell Text="Packets"
+                          Detail="{Binding PacketCount}" />
+
+                <TextCell Text="Bytes Sent"
+                          Detail="{Binding BytesSent}" />
+
+                <TextCell Text="Transfer Speed"
+                          Detail="{Binding TransferSpeed}" />
+            </TableSection>
+
+            <TableSection Title="GATT">
+                <TextCell Text="MTU"
+                          Detail="{Binding Mtu}" />
+
+                <SwitchCell Text="Write With Response"
+                            On="{Binding WriteWithResponse}"
+                            IsEnabled="{Binding IsConnected, Converter={StaticResource Not}}" />
+
+                <TextCell Text="Toggle GATT Connection"
+                          Command="{Binding ToggleGatt}"
+                          IsEnabled="{Binding IsConnected, Converter={StaticResource Not}}" />
+            </TableSection>
+
+            <TableSection Title="L2Cap">
+                <SwitchCell Text="Secure"
+                            On="{Binding Secure}"
+                            IsEnabled="{Binding IsConnected, Converter={StaticResource Not}}" />
+
+                <EntryCell Label="PSM"
+                           Text="{Binding Psm}"
+                           Keyboard="Numeric"
+                           IsEnabled="{Binding IsConnected, Converter={StaticResource Not}}" />
+
+                <TextCell Text="Toggle L2Cap Connection"
+                          Command="{Binding ToggleL2Cap}"
+                          IsEnabled="{Binding IsConnected, Converter={StaticResource Not}}" />
+            </TableSection>
+        </TableRoot>
+    </TableView>
 </ContentPage>

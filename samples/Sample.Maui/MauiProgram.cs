@@ -125,7 +125,7 @@ public static class MauiProgram
 
         // services needed for samples - not shiny
         builder.Logging.AddDebug();
-        builder.Logging.AddProvider(new SqliteLoggerProvider(LogLevel.Trace));
+        //builder.Logging.AddProvider(new SqliteLoggerProvider(LogLevel.Trace));
         builder.Services.AddSingleton<SampleSqliteConnection>();
         builder.Services.AddShinyService<CommandExceptionHandler>();
         builder.Services.AddScoped<BaseServices>();

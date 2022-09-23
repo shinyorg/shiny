@@ -38,6 +38,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
         <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
+        <PackageReference Include="Humanizer" Version="2.14.1" />
     </ItemGroup>
 
     <ItemGroup>

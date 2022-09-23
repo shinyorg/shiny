@@ -5,6 +5,50 @@
              x:DataType="bleperf:ServerViewModel"
              x:Class="Sample.BlePerf.ServerPage"
              Title="BLE Perf - Server">
-    <VerticalStackLayout>
-    </VerticalStackLayout>
+
+    <TableView>
+        <TableRoot>
+            <TableSection Title="Info">
+                <SwitchCell Text="Broadcasting"
+                            On="{Binding IsBroadcasting}"
+                            IsEnabled="False" />
+
+                <TextCell Text="Broadcast Type"
+                          Detail="{Binding BroadcastType}" />
+
+                <TextCell Text="Packets Received"
+                          Detail="{Binding PacketCount}" />
+
+                <TextCell Text="Bytes Received"
+                          Detail="{Binding BytesReceived}" />
+
+                <TextCell Text="Transfer Speed"
+                          Detail="{Binding TransferSpeed}" />
+            </TableSection>
+
+            <TableSection Title="GATT">
+                <TextCell Text="MTU"
+                          Detail="{Binding Mtu}" />
+
+                <SwitchCell Text="Write With Response"
+                            On="{Binding WriteWithResponse}"
+                            IsEnabled="{Binding IsBroadcasting, Converter={StaticResource Not}}" />
+
+                <TextCell Text="Toggle GATT Server"
+                          Command="{Binding ToggleGatt}" />
+            </TableSection>
+
+            <TableSection Title="L2Cap">
+                <TextCell Text="Psm"
+                          Detail="{Binding Psm}" />
+
+                <SwitchCell Text="Secure"
+                            On="{Binding Secure}"
+                            IsEnabled="{Binding IsBroadcasting, Converter={StaticResource Not}}" />
+
+                <TextCell Text="Toggle L2Cap Server"
+                          Command="{Binding ToggleL2Cap}" />
+            </TableSection>
+        </TableRoot>
+    </TableView>
 </ContentPage>
