@@ -13,7 +13,7 @@ public interface IGattCharacteristicBuilder
 
 
     IGattCharacteristicBuilder SetWrite(
-        Func<WriteRequest, Task<GattState>> request,
+        Func<WriteRequest, Task> request,
         WriteOptions options = WriteOptions.Write
     );
 

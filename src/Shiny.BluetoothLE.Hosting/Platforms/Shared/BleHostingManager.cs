@@ -118,6 +118,9 @@ public partial class BleHostingManager : IShinyStartupTask
         characteristic.Characteristic = sb.AddCharacteristic(attribute.CharacteristicUuid, cb =>
         {
             var read = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnRead));
+            var requester = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.Request));
+            var write = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnWrite));
+            var notify = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnSubscriptionChanged));
 
             if (read)
             {
@@ -140,7 +143,8 @@ public partial class BleHostingManager : IShinyStartupTask
                 }, attribute.IsReadSecure);
             }
 
-            var write = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnWrite));
+            if (requester && write)
+                throw new InvalidOperationException("You cannot have a request & onwrite override for this characteristic");
 
             if (write)
             {
@@ -148,22 +152,19 @@ public partial class BleHostingManager : IShinyStartupTask
                 {
                     try
                     {
-                        var status = await characteristic
+                        await characteristic
                             .OnWrite(request)
                             .ConfigureAwait(false);
-
-                        return status;
                     }
                     catch (Exception ex)
                     {
                         this.logger.LogError("Error executing BleGattService write request", ex);
-                        return GattState.Failure;
+                        request.Respond(GattState.Failure);
                     }
                 }, attribute.Write);
             }
 
-            var notify = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnSubscriptionChanged));
-
+            
             if (notify)
             {
                 cb.SetNotification(async x =>
@@ -179,6 +180,32 @@ public partial class BleHostingManager : IShinyStartupTask
                         this.logger.LogError("Error executing BleGattService notification subscription", ex);
                     }
                 }, attribute.Notifications);
+            }
+
+            if (requester)
+            {
+                cb.SetWrite(async request =>
+                {
+                    var writeSuccess = false;
+                    try
+                    {
+                        var result = await characteristic
+                            .Request(request)
+                            .ConfigureAwait(false);
+
+                        writeSuccess = true;
+                        // TODO: what if no subscriber, they have failed the protocol
+                        await characteristic
+                            .Characteristic
+                            .Notify(result.Data!, request.Peripheral);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError("Error executing BleGattService request", ex);
+                        if (!writeSuccess)
+                            request.Respond(GattState.Failure);
+                    }
+                }, attribute.Write);
             }
         });
     }

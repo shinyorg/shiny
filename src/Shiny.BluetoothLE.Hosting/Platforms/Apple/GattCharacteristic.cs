@@ -15,7 +15,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
     CBMutableCharacteristic? native;
     Func<CharacteristicSubscription, Task>? onSubscribe;
-    Func<WriteRequest, Task<GattState>>? onWrite;
+    Func<WriteRequest, Task>? onWrite;
     Func<ReadRequest, Task<ReadResult>>? onRead;
 
     CBAttributePermissions permissions = 0;
@@ -113,7 +113,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, Task<GattState>> onWrite, WriteOptions options = WriteOptions.Write)
+    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, Task> onWrite, WriteOptions options = WriteOptions.Write)
     {
         this.onWrite = onWrite;
         this.permissions |= options.HasFlag(WriteOptions.EncryptionRequired)
@@ -189,15 +189,23 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         {
             if (this.IsThis(req.Characteristic))
             {
+                var responded = false;
                 var peripheral = this.cache.GetOrAdd(req.Central);
-                var result = await this.onWrite!.Invoke(new WriteRequest(
+                await this.onWrite!.Invoke(new WriteRequest(
                     this,
                     peripheral,
                     req.Value?.ToArray(),
-                    (int) req.Offset,
-                    true
+                    (int)req.Offset,
+                    true,
+                    (status) =>
+                    {
+                        responded = true;
+                        var nativeStatus = Enum.Parse<CBATTError>(status.ToString(), true);
+                        this.manager.RespondToRequest(req, nativeStatus);
+                    }
                 ));
-                this.manager.RespondToRequest(req, CBATTError.Success);
+                if (!responded)
+                    this.manager.RespondToRequest(req, CBATTError.Success);
             }
         }
     }

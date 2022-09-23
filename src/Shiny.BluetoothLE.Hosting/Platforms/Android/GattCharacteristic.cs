@@ -17,7 +17,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     readonly CompositeDisposable disposer = new();
     readonly Dictionary<string, IPeripheral> subscribers = new();
     Func<CharacteristicSubscription, Task>? onSubscribe;
-    Func<WriteRequest, Task<GattState>>? onWrite;
+    Func<WriteRequest, Task>? onWrite;
     Func<ReadRequest, Task<ReadResult>>? onRead;
     GattProperty properties = 0;
     GattPermission permissions = 0;
@@ -72,7 +72,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, Task<GattState>> onWrite, WriteOptions options = WriteOptions.Write)
+    public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, Task> onWrite, WriteOptions options = WriteOptions.Write)
     {
         this.onWrite = onWrite;
         if (options.HasFlag(WriteOptions.EncryptionRequired))
@@ -223,16 +223,33 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             .Where(x => x.Characteristic.Equals(this.Native))
             .Subscribe(async ch =>
             {
+                var responded = false;
                 var peripheral = new Peripheral(ch.Device);
-                var request = new WriteRequest(this, peripheral, ch.Value, ch.Offset, ch.ResponseNeeded);
-                var state = await this.onWrite(request).ConfigureAwait(false);
-
-                if (request.IsReplyNeeded)
+                var request = new WriteRequest(
+                    this,
+                    peripheral,
+                    ch.Value,
+                    ch.Offset,
+                    ch.ResponseNeeded,
+                    (status) =>
+                    {
+                        responded = true;
+                        this.context.Server.SendResponse(
+                            ch.Device,
+                            ch.RequestId,
+                            status.ToNative(),
+                            ch.Offset,
+                            ch.Value
+                        );
+                    }
+                );
+                await this.onWrite(request).ConfigureAwait(false);
+                if (request.IsReplyNeeded && !responded)
                 {
                     this.context.Server.SendResponse(
                         ch.Device,
                         ch.RequestId,
-                        state.ToNative(),
+                        GattStatus.Success,
                         ch.Offset,
                         ch.Value
                     );

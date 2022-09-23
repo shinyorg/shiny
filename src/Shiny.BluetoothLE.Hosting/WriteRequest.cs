@@ -7,5 +7,6 @@ public record WriteRequest(
     IPeripheral Peripheral,
     byte[] Data,
     int Offset,
-    bool IsReplyNeeded
+    bool IsReplyNeeded,
+    Action<GattState> Respond
 );

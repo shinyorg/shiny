@@ -20,5 +20,5 @@ public class BleGattCharacteristicAttribute : Attribute
     //public bool Primary { get; set; } d
     public bool IsReadSecure { get; set; }
     public NotificationOptions Notifications { get; set; } = NotificationOptions.Notify;
-    public WriteOptions Write { get; set; } = WriteOptions.Write;
+    public WriteOptions Write { get; set; } = WriteOptions.WriteWithoutResponse;
 }
