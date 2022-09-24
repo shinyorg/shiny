@@ -80,13 +80,13 @@ public class MainViewModel : ViewModel
                 cb.SetRead(request =>
                 {
                     var ticks = DateTime.Now.Ticks;
-                    Device.BeginInvokeOnMainThread(() =>
+                    this.Platform.InvokeOnMainThread(() =>
                     {
                         this.LastReadValue = ticks.ToString();
                         this.LastReadTime = DateTime.Now.ToString();
                     });
                     var data = BitConverter.GetBytes(ticks);
-                    return Task.FromResult(ReadResult.Success(data));
+                    return Task.FromResult(GattResult.Success(data));
                 });
             }
         );
@@ -96,7 +96,7 @@ public class MainViewModel : ViewModel
             cb => cb.SetNotification(cs =>
             {
                 var c = cs.Characteristic.SubscribedCentrals.Count;
-                Device.BeginInvokeOnMainThread(() => this.Subscribers = c);
+                this.Platform.InvokeOnMainThread(() => this.Subscribers = c);
 
                 if (c == 0)
                 {
@@ -114,9 +114,9 @@ public class MainViewModel : ViewModel
 
                             return ticks;
                         }))
-                        .Subscribe(x => Device.BeginInvokeOnMainThread(() =>
-                            this.SubscribersLastValue = x.ToString()
-                        ));
+                        .SubOnMainThread(x =>
+                            this.SubscribersLastValue = x.ToString()!
+                        );
                 }
                 return Task.CompletedTask;
             })

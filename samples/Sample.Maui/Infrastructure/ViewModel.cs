@@ -101,6 +101,22 @@ public abstract class ViewModel : ReactiveObject, IInitializeAsync, IConfirmNavi
         this.Logger.LogError(ex, "Error");
         await this.Dialogs.DisplayAlertAsync("Error", ex.ToString(), "OK");
     }
+
+
+    public bool IsApple => this.IsIos || this.IsMacCatalyst;
+#if IOS
+    public bool IsIos => true;
+    public bool IsMacCatalyst => false;
+    public bool IsAndroid => false;
+#elif MACCATALYST
+    public bool IsIos => false;
+    public bool IsMacCatalyst => true;
+    public bool IsAndroid => false;
+#elif ANDROID
+    public bool IsIos => false;
+    public bool IsMacCatalyst => false;
+    public bool IsAndroid => true;
+#endif
 }
 
 

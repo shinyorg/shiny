@@ -138,7 +138,7 @@ public partial class BleHostingManager : IShinyStartupTask
                     catch (Exception ex)
                     {
                         this.logger.LogError("Error executing BleGattService read request", ex);
-                        return ReadResult.Error(GattState.Failure);
+                        return GattResult.Error(GattState.Failure);
                     }
                 }, attribute.IsReadSecure);
             }
@@ -189,12 +189,14 @@ public partial class BleHostingManager : IShinyStartupTask
                     var writeSuccess = false;
                     try
                     {
+                        if (!characteristic.Characteristic.SubscribedCentrals.Any(x => x.Uuid.Equals(request.Characteristic.Uuid, StringComparison.InvariantCultureIgnoreCase)))
+                            throw new InvalidOperationException("No subscription to notification");
+
                         var result = await characteristic
                             .Request(request)
                             .ConfigureAwait(false);
 
                         writeSuccess = true;
-                        // TODO: what if no subscriber, they have failed the protocol
                         await characteristic
                             .Characteristic
                             .Notify(result.Data!, request.Peripheral);

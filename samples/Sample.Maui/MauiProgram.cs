@@ -107,6 +107,7 @@ public static class MauiProgram
         // shiny.bluetoothle & shiny.bluetoothle.hosting
         builder.Services.AddBluetoothLE<BleClient.MyBleDelegate>();
         builder.Services.AddBleHostedCharacteristic<BleHosting.MyManagedCharacteristics>();
+        builder.Services.AddBleHostedCharacteristic<BleHosting.MyManagedRequestCharacteristic>();
         builder.Services.AddBluetoothLeHosting(); // you don't need this if using AddBleHostedCharacteristic
 
         // shiny.beacons

@@ -19,7 +19,7 @@ public interface IGattCharacteristicBuilder
 
 
     IGattCharacteristicBuilder SetRead(
-        Func<ReadRequest, Task<ReadResult>> request,
+        Func<ReadRequest, Task<GattResult>> request,
         bool encrypted = false
     );
 }

@@ -16,7 +16,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     CBMutableCharacteristic? native;
     Func<CharacteristicSubscription, Task>? onSubscribe;
     Func<WriteRequest, Task>? onWrite;
-    Func<ReadRequest, Task<ReadResult>>? onRead;
+    Func<ReadRequest, Task<GattResult>>? onRead;
 
     CBAttributePermissions permissions = 0;
     CBCharacteristicProperties properties = 0;
@@ -100,7 +100,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, Task<ReadResult>> onRead, bool encrypted = false)
+    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, Task<GattResult>> onRead, bool encrypted = false)
     {
         this.onRead = onRead;
         this.permissions |= encrypted

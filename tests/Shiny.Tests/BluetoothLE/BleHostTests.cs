@@ -99,7 +99,7 @@ public class BleHostTests : AbstractBleTests
                     {
                         this.Log("Read Received");
                         subj.OnNext(true);
-                        return Task.FromResult(ReadResult.Success(new byte[] { 0x0 }));
+                        return Task.FromResult(GattResult.Success(new byte[] { 0x0 }));
                     })
                     .SetWrite(x =>
                     {
@@ -192,12 +192,12 @@ public class ManagedTestCharacteristicReadOnly : BleGattCharacteristic
     public static Func<Task>? Callback { get; set; }
 
 
-    public override async Task<ReadResult> OnRead(ReadRequest request)
+    public override async Task<GattResult> OnRead(ReadRequest request)
     {
         if (Callback != null)
             await Callback.Invoke();
 
-        return ReadResult.Success(new byte[] { 0x01 });
+        return GattResult.Success(new byte[] { 0x01 });
     }
 }
 

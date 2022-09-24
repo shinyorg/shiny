@@ -18,7 +18,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     readonly Dictionary<string, IPeripheral> subscribers = new();
     Func<CharacteristicSubscription, Task>? onSubscribe;
     Func<WriteRequest, Task>? onWrite;
-    Func<ReadRequest, Task<ReadResult>>? onRead;
+    Func<ReadRequest, Task<GattResult>>? onRead;
     GattProperty properties = 0;
     GattPermission permissions = 0;
 
@@ -96,7 +96,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, Task<ReadResult>> onRead, bool encrypted = false)
+    public IGattCharacteristicBuilder SetRead(Func<ReadRequest, Task<GattResult>> onRead, bool encrypted = false)
     {
         this.onRead = onRead;
         this.properties |= GattProperty.Read;
