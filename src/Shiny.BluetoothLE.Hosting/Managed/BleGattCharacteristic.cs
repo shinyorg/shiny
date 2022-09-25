@@ -16,7 +16,7 @@ public abstract class BleGattCharacteristic
     public virtual Task<GattResult> Request(WriteRequest request)
         => throw new InvalidOperationException("This method must overridden to use request");
 
-    public virtual Task<GattState> OnWrite(WriteRequest request)
+    public virtual Task OnWrite(WriteRequest request)
         => throw new InvalidOperationException("This method must overridden to use write");
 
     // if overridden, add read property & hook to this
