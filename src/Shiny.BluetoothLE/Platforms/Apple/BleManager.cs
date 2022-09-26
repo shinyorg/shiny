@@ -75,13 +75,13 @@ public class BleManager : AbstractBleManager
 
     static readonly PeripheralScanningOptions PeripheralScanningOptions = new PeripheralScanningOptions { AllowDuplicatesKey = true };
 
-    public override IObservable<ScanResult> Scan(ScanConfig? config = null)
+    public override IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(ob =>
     {
         if (this.IsScanning)
             throw new ArgumentException("There is already an existing scan");
 
         config ??= new ScanConfig();
-        return this.RequestAccess()
+        var sub = this.RequestAccess()
             .Do(access =>
             {
                 if (access != AccessState.Available)
@@ -103,10 +103,18 @@ public class BleManager : AbstractBleManager
                 }
                 return this.context.ScanResultReceived;
             })
-            .Finally(() =>
-                this.context.Manager.StopScan()
+            .Subscribe(
+                x => ob.OnNext(x),
+                ex => ob.OnError(ex),
+                () => ob.OnCompleted()
             );
-    }
+
+        return () =>
+        {
+            this.context.Manager.StopScan();
+            sub?.Dispose();
+        };
+    });
 
 
     public override void StopScan() => this.context.Manager.StopScan();
