@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 using Shiny.BluetoothLE.Hosting.Managed;
+#if APPLE
 using CoreBluetooth;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Java.Util;
+#endif
 #if ANDROID
+using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 #endif
 
