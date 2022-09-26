@@ -26,6 +26,7 @@ namespace Shiny.Jobs.Infrastructure
         }
 
 
+
         readonly IPowerManager powerManager;
         readonly IConnectivity connectivity;
         readonly Timer timer;
@@ -49,26 +50,24 @@ namespace Shiny.Jobs.Infrastructure
                     await jobManager.RunJobAsTask(job.Identifier).ConfigureAwait(false);
 
                 if (this.IsInForeground)
-                    this.timer.Start();
+                    this.EnsureTimer();
             };
         }
 
 
-        public override void Start()
+        public override void Start() => this.EnsureTimer();
+        public override void OnForeground() => this.EnsureTimer();
+        public override void OnBackground() => this.timer.Stop();
+
+
+        void EnsureTimer()
         {
+            if (this.timer.Enabled)
+                return;
 
-        }
-
-
-        public override void OnForeground()
-        {
             this.timer.Interval = Interval.TotalMilliseconds;
             this.timer.Start();
         }
-
-
-        public override void OnBackground() => this.timer.Stop();
-
 
         bool CanRun(JobInfo job)
         {
