@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 using Shiny.BluetoothLE.Hosting.Managed;
+using CoreBluetooth;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Java.Util;
 #if ANDROID
 using Shiny.BluetoothLE.Hosting.Internals;
 #endif
@@ -224,10 +227,10 @@ public partial class BleHostingManager : IShinyStartupTask
             if (attr == null)
                 throw new InvalidOperationException($"'{type.FullName}' does not have a BleGattCharacteristicAttribute defined on it");
 
-            if (!Guid.TryParse(attr.ServiceUuid, out var _))
+            if (!IsValidUuid(attr.ServiceUuid))
                 throw new InvalidOperationException($"ServiceUUID on '{type.FullName}' is invalid");
 
-            if (!Guid.TryParse(attr.CharacteristicUuid, out var _))
+            if (!IsValidUuid(attr.CharacteristicUuid))
                 throw new InvalidOperationException($"CharacteristicUUID on '{type.FullName}' is invalid");
 
             if (!services.ContainsKey(attr.ServiceUuid))
@@ -236,6 +239,37 @@ public partial class BleHostingManager : IShinyStartupTask
             services[attr.ServiceUuid].Add((ch, attr));
         }
         return services;
+    }
+
+
+    static bool IsValidUuid(string value)
+    {
+        if (value.IsEmpty())
+            return false;
+
+#if APPLE
+        try
+        { 
+            CBUUID.FromString(value);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+#elif ANDROID
+        try
+        { 
+            UUID.FromString(value);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+#else
+        return Guid.TryParse(value, out var _);
+#endif
     }
 }
 #endif
