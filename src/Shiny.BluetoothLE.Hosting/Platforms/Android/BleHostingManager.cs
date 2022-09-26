@@ -23,6 +23,12 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
+        if (!OperatingSystemShim.IsAndroidVersionAtLeast(26))
+            throw new InvalidOperationException("L2Cap hosting is only available on Android API26+");
+
+        if (!OperatingSystemShim.IsAndroidVersionAtLeast(29) && secure)
+            throw new InvalidOperationException("Secure L2Cap hosting is only available on Android API29+");
+
         (await this.RequestAccess()).Assert();
 
         var ct = new CancellationTokenSource();
