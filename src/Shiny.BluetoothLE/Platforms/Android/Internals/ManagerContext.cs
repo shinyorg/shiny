@@ -26,7 +26,7 @@ public class ManagerContext : IShinyStartupTask
     public ManagerContext(
         AndroidPlatform platform,
         IServiceProvider serviceProvider,
-        BleConfiguration config,
+        AndroidBleConfiguration config,
         ILoggerFactory loggerFactory,
         ILogger<ManagerContext> logger
     )
@@ -40,7 +40,7 @@ public class ManagerContext : IShinyStartupTask
     }
 
 
-    public BleConfiguration Configuration { get; }
+    public AndroidBleConfiguration Configuration { get; }
     public BluetoothManager Manager { get; }
     public AndroidPlatform Android { get; }
     public ILoggerFactory Logging { get; }
@@ -161,14 +161,21 @@ public class ManagerContext : IShinyStartupTask
             errorCode => ob.OnError(new BleException("Error during scan: " + errorCode.ToString()))
         );
 
+        AndroidScanConfig cfg = null!;
+        if (config == null)
+            cfg = new();
+        else if (config is AndroidScanConfig cfg1)
+            cfg = cfg1;
+        else
+            cfg = new AndroidScanConfig(ServiceUuids: config.ServiceUuids);
+        
         var builder = new ScanSettings.Builder();
-        var scanMode = this.ToNative(config.ScanType);
-        builder.SetScanMode(scanMode);
+        builder.SetScanMode(cfg.ScanMode);
 
         var scanFilters = new List<ScanFilter>();
-        if (config.ServiceUuids != null && config.ServiceUuids.Length > 0)
+        if (cfg.ServiceUuids.Length > 0)
         {
-            foreach (var uuid in config.ServiceUuids)
+            foreach (var uuid in cfg.ServiceUuids)
             {
                 var fullUuid = Utils.ToUuidType(uuid);
                 var parcel = new ParcelUuid(fullUuid);
@@ -179,10 +186,10 @@ public class ManagerContext : IShinyStartupTask
             }
         }
 
-        if (config.AndroidUseScanBatching && this.Manager.Adapter.IsOffloadedScanBatchingSupported)
+        if (cfg.UseScanBatching && this.Manager.Adapter!.IsOffloadedScanBatchingSupported)
             builder.SetReportDelay(100);
 
-        this.Manager.Adapter.BluetoothLeScanner.StartScan(
+        this.Manager.Adapter!.BluetoothLeScanner!.StartScan(
             scanFilters,
             builder.Build(),
             this.callbacks
@@ -197,7 +204,7 @@ public class ManagerContext : IShinyStartupTask
         if (this.callbacks == null)
             return;
 
-        this.Manager.Adapter.BluetoothLeScanner?.StopScan(this.callbacks);
+        this.Manager.Adapter!.BluetoothLeScanner?.StopScan(this.callbacks);
         this.callbacks = null;
     }
 
@@ -208,13 +215,4 @@ public class ManagerContext : IShinyStartupTask
         var result = new ScanResult(dev, rssi, ad);
         return result;
     }
-
-
-    protected virtual ScanMode ToNative(BleScanType scanType) => scanType switch
-    {
-        BleScanType.LowPowered => ScanMode.LowPower,
-        BleScanType.Balanced   => ScanMode.Balanced,
-        BleScanType.LowLatency => ScanMode.LowLatency,
-        _                      => throw new ArgumentException("Invalid BleScanType")
-    };
 }

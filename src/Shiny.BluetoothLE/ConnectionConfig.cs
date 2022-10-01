@@ -8,10 +8,5 @@ public record ConnectionConfig(
     /// connections signficantly (defaults to true)
     /// iOS: Controls whether or not to reconnect automatically
     /// </summary>
-    bool AutoConnect = true,
-
-    /// <summary>
-    /// Control the android GATT connection priority
-    /// </summary>
-    ConnectionPriority AndroidConnectionPriority = ConnectionPriority.Normal
+    bool AutoConnect = true
 );

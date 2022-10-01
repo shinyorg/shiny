@@ -51,13 +51,19 @@ namespace Shiny.BluetoothLE.Internals
         {
             try
             {
+                AndroidConnectionConfig cfg = null!;
+                if (config == null)
+                    cfg = new();
+                else if (config is AndroidConnectionConfig cfg1)
+                    cfg = cfg1;
+                else
+                    cfg = new AndroidConnectionConfig(cfg.AutoConnect);
+
                 this.CreateGatt(config?.AutoConnect ?? true);
                 if (this.Gatt == null)
                     throw new BleException("GATT connection could not be established");
 
-                var priority = config?.AndroidConnectionPriority ?? ConnectionPriority.Normal;
-                if (priority != ConnectionPriority.Normal)
-                    this.Gatt.RequestConnectionPriority(this.ToNative(priority));
+                this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
             }
             catch (Exception ex)
             {
@@ -66,7 +72,7 @@ namespace Shiny.BluetoothLE.Internals
         });
 
 
-        readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+        readonly SemaphoreSlim semaphore = new(1, 1);
 
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
@@ -93,7 +99,7 @@ namespace Shiny.BluetoothLE.Internals
         }
 
 
-        readonly Handler handler = new Handler(Looper.MainLooper);
+        readonly Handler handler = new(Looper.MainLooper!);
         public void InvokeOnMainThread(Action action)
         {
             if (this.ManagerContext.Configuration.AndroidShouldInvokeOnMainThread)
@@ -127,21 +133,6 @@ namespace Shiny.BluetoothLE.Internals
             BluetoothTransports.Le
         );
 
-
-        GattConnectionPriority ToNative(ConnectionPriority priority)
-        {
-            switch (priority)
-            {
-                case ConnectionPriority.Low:
-                    return GattConnectionPriority.LowPower;
-
-                case ConnectionPriority.High:
-                    return GattConnectionPriority.High;
-
-                default:
-                    return GattConnectionPriority.Balanced;
-            }
-        }
     }
 }
 

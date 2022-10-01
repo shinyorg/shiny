@@ -19,7 +19,7 @@ public class ManagerContext : CBCentralManagerDelegate
 
     public ManagerContext(
         IServiceProvider services,
-        BleConfiguration config,
+        AppleBleConfiguration config,
         ILogger<IBleManager> logger
     )
     {
@@ -40,8 +40,8 @@ public class ManagerContext : CBCentralManagerDelegate
 
             var opts = new CBCentralInitOptions
             {
-                ShowPowerAlert = config.iOSShowPowerAlert,
-                RestoreIdentifier = config.iOSRestoreIdentifier ?? "shinyble"
+                ShowPowerAlert = config.ShowPowerAlert,
+                RestoreIdentifier = config.RestoreIdentifier ?? "shinyble"
             };
 
             return new CBCentralManager(this, null, opts);
