@@ -12,7 +12,7 @@ using UIKit;
 namespace Shiny.Locations;
 
 
-public partial class GpsManager : IGpsManager, IShinyStartupTask
+public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
     readonly Subject<GpsReading> readingSubj = new();
     readonly Lazy<IEnumerable<IGpsDelegate>> delegates;

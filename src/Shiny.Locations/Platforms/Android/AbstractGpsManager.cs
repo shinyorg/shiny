@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Locations;
 
 
-public abstract partial class AbstractGpsManager : IGpsManager, IShinyStartupTask
+public abstract class AbstractGpsManager : IGpsManager, IShinyStartupTask
 {
     readonly Subject<GpsReading> readingSubj;
     readonly ILogger logger;

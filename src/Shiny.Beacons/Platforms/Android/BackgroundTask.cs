@@ -103,7 +103,7 @@ public class BackgroundTask : IDisposable
         try
         {
             this.scanSub = this.bleManager
-                .ScanForBeacons(true) // TODO
+                .ScanForBeacons(true)
                 .Buffer(TimeSpan.FromSeconds(5))
                 .SubscribeAsyncConcurrent(this.CheckStates);
 
@@ -191,6 +191,7 @@ public class BackgroundTask : IDisposable
             }
         }
     }
+
 
     public void Dispose()
     {

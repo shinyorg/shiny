@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -14,12 +15,12 @@ using Shiny.Hosting;
 namespace Shiny;
 
 
-public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Service where TService : IShinyForegroundManager
+public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Service
 {
     static int idCount = 7999;
     int? notificationId;
 
-    protected T Resolve<T>() => Host.Current.Services.GetRequiredService<T>();
+    protected T Resolve<T>() => Host.Current.Services.GetRequiredService<T>()!;
     protected IEnumerable<T> ResolveAll<T>() => Host.Current.Services.GetServices<T>();
     protected CompositeDisposable? DestroyWith { get; private set; }
     protected NotificationManagerCompat? NotificationManager { get; private set; }
@@ -70,12 +71,12 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
         {
-            this.Service
-                .WhenAnyProperty()
-                .Skip(1)
-                .Throttle(TimeSpan.FromMilliseconds(400))
-                .Subscribe(_ => this.SetNotification())
-                .DisposedBy(this.DestroyWith);
+            //this.Service
+            //    .WhenAnyProperty()
+            //    .Skip(1)
+            //    .Throttle(TimeSpan.FromMilliseconds(400))
+            //    .Subscribe(_ => this.SetNotification())
+            //    .DisposedBy(this.DestroyWith);
 
             this.SetNotification();
         }
@@ -117,7 +118,7 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
 
     protected virtual void EnsureChannel()
     {
-        if (this.NotificationManager.GetNotificationChannel(NotificationChannelId) != null)
+        if (this.NotificationManager!.GetNotificationChannel(NotificationChannelId) != null)
             return;
 
         var channel = new NotificationChannel(
@@ -137,14 +138,24 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
             .SetOngoing(true);
 
         this.builder
-            .SetProgress(
-                this.Service!.Total,
-                this.Service.Progress,
-                this.Service.IsIndeterministic
-            )
-            .SetContentTitle(this.Service.Title ?? "Shiny Service")
-            .SetTicker("..")
-            .SetContentText(this.Service.Message ?? "Shiny service is continuing to process data in the background");
+            .SetTicker("...")
+            .SetContentTitle("Shiny Service")
+            .SetContentText("Shiny service is continuing to process data in the background");
+
+        this.Delegates
+            .OfType<IAndroidForegroundServiceDelegate>()
+            .ToList()
+            .ForEach(x => x.Configure(this.builder));
+
+        //this.builder
+        //    .SetProgress(
+        //        this.Service!.Total,
+        //        this.Service.Progress,
+        //        this.Service.IsIndeterministic
+        //    )
+        //    .SetContentTitle(this.Service.Title ?? "Shiny Service")
+        //    .SetTicker("..")
+        //    .SetContentText(this.Service.Message ?? "Shiny service is continuing to process data in the background");
 
         if (this.notificationId == null)
         {
@@ -153,7 +164,7 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         }
         else
         {
-            this.NotificationManager.Notify(this.notificationId.Value, this.builder.Build());
+            this.NotificationManager!.Notify(this.notificationId.Value, this.builder.Build());
         }
     }
 
@@ -171,3 +182,21 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         throw new InvalidOperationException("Unable to find notification icon for Shiny foreground service - ensure you have your application icon set or a drawable resource named notification");
     }
 }
+
+//using System;
+//using System.ComponentModel;
+
+//namespace Shiny;
+
+
+//public interface IShinyForegroundManager : INotifyPropertyChanged
+//{
+//    string? Title { get; set; }
+//    string? Message { get; set; }
+
+//    int Progress { get; set; }
+//    int Total { get; set; }
+//    bool IsIndeterministic { get; set; }
+//    //string? Channel { get; }
+//    //string? Ticker { get; }
+//}
