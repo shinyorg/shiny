@@ -1,9 +1,0 @@
-Shiny.Net.Http
-* Replace android http download/upload with httpclient and foreground service
-
-NFC
-* Finish write
-* Add backgrounding
-
-Repository Conversion
-* HTTP Transfers

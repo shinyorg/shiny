@@ -39,7 +39,7 @@
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<SupportedOSPlatformVersion >26.0</SupportedOSPlatformVersion>		
+		<SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>		
     </PropertyGroup>
 
 	<ItemGroup>
