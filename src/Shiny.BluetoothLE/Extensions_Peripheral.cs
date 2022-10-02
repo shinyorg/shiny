@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -10,7 +11,23 @@ namespace Shiny.BluetoothLE;
 public static class PeripheralExtensions
 {
     /// <summary>
-    ///
+    /// Write blob stream to a characteristic
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="stream">The stream to send</param>
+    /// <param name="packetSendTimeout">How long to wait before timing out a packet send - defaults to 5 seconds</param>
+    /// <returns></returns>
+    public static IObservable<BleWriteSegment> WriteCharacteristicBlob(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null) =>
+        => peripheral
+            .GetKnownCharacteristic(serviceUuid, characteristicUuid, true)
+            .Select(x => x!.WriteBlobWithProgress(stream, packetSendTimeout))
+            .Switch();
+
+
+    /// <summary>
+    /// Write to a known characteristic
     /// </summary>
     /// <param name="peripheral"></param>
     /// <param name="serviceUuid"></param>
@@ -21,12 +38,12 @@ public static class PeripheralExtensions
     public static IObservable<GattCharacteristicResult> WriteCharacteristic(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true)
         => peripheral
             .GetKnownCharacteristic(serviceUuid, characteristicUuid, true)
-            .Select(x => x.Write(data, withResponse))
+            .Select(x => x!.Write(data, withResponse))
             .Switch();
 
 
     /// <summary>
-    ///
+    /// Read from a known characteristic
     /// </summary>
     /// <param name="peripheral"></param>
     /// <param name="serviceUuid"></param>

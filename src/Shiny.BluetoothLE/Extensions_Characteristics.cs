@@ -71,24 +71,6 @@ public static class CharacteristicExtensions
 
 
     /// <summary>
-    /// Sends a stream in packets to the characteristic
-    /// </summary>
-    /// <param name="characteristic">The characteristic to send to</param>
-    /// <param name="stream">The stream you are sending</param>
-    /// <param name="packetSendTimeout">How long each packet should wait before timing out/erroring</param>
-    /// <returns></returns>
-    public static IObservable<IGattCharacteristic> WriteBlob(this IGattCharacteristic characteristic, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<IGattCharacteristic>(ob =>
-        characteristic
-            .WriteBlobWithProgress(stream)
-            .Subscribe(
-                _ => { },
-                ex => ob.OnError(ex),
-                () => ob.Respond(characteristic)
-            )
-    );
-
-
-    /// <summary>
     /// Used for writing blobs
     /// </summary>
     /// <param name="ch">The characteristic to write on</param>
