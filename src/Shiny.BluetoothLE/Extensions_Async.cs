@@ -43,10 +43,6 @@ public static class AsyncExtensions
             .ToTask(cancelToken);
 
 
-    public static Task WriteBlobAsync(this IGattCharacteristic characteristic, Stream stream, TimeSpan? sendPacketTimeout = null, CancellationToken cancelToken = default)
-        => characteristic.WriteBlob(stream, sendPacketTimeout).ToTask(cancelToken);
-
-
     public static Task<GattCharacteristicResult> WriteAsync(this IGattCharacteristic characteristic, byte[] data, bool withResponse, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => characteristic
             .Write(data, withResponse)

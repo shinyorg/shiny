@@ -19,7 +19,7 @@ public static class PeripheralExtensions
     /// <param name="stream">The stream to send</param>
     /// <param name="packetSendTimeout">How long to wait before timing out a packet send - defaults to 5 seconds</param>
     /// <returns></returns>
-    public static IObservable<BleWriteSegment> WriteCharacteristicBlob(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null) =>
+    public static IObservable<BleWriteSegment> WriteCharacteristicBlob(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null)
         => peripheral
             .GetKnownCharacteristic(serviceUuid, characteristicUuid, true)
             .Select(x => x!.WriteBlobWithProgress(stream, packetSendTimeout))

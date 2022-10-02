@@ -143,11 +143,10 @@ public class ManagedPeripheral : NotifyPropertyChanged, IDisposable, IManagedPer
     public IReadOnlyList<GattCharacteristicInfo> Characteristics => this.characteristics.AsReadOnly();
 
 
-    public IObservable<IManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream) => this
+    public IObservable<BleWriteSegment> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null) => this
         .GetChar(serviceUuid, characteristicUuid)
-        .Select(x => x.WriteBlob(stream))
-        .Switch()
-        .Select(_ => this);
+        .Select(x => x.WriteBlobWithProgress(stream, packetSendTimeout))
+        .Switch();
 
 
     public IObservable<IManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
