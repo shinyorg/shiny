@@ -7,6 +7,7 @@ namespace Sample.BleManaged;
 public class ManagedScanViewModel : ViewModel
 {
     readonly IManagedScan scanner;
+    const string ServiceUuid = "FFF0";
 
 
     public ManagedScanViewModel(BaseServices services, IBleManager bleManager) : base(services)
@@ -16,7 +17,17 @@ public class ManagedScanViewModel : ViewModel
             .CreateManagedScanner(
                 RxApp.MainThreadScheduler,
                 TimeSpan.FromSeconds(10),
-                new ScanConfig(BleScanType.Balanced, false, "FFF0")
+#if ANDROID
+                new AndroidScanConfig(
+                    Android.Bluetooth.LE.ScanMode.Opportunistic,
+                    true,
+                    ServiceUuid
+                )
+#else
+                new ScanConfig(
+                    ServiceUuids: ServiceUuid
+                )
+#endif
             )
             .DisposedBy(this.DestroyWith);
 
@@ -30,7 +41,7 @@ public class ManagedScanViewModel : ViewModel
             {
                 this.scanner.Stop();
                 await this.Navigation.Navigate(
-                    nameof(ManagedPeripheralPage),
+                    "BleManagedPeripheral",
                     ("Peripheral", x!.Peripheral)
                 );
             }

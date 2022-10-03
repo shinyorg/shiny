@@ -21,11 +21,17 @@ public class BleManagerTests : AbstractBleTests
     public async Task Scan_Filter()
     {
         var result = await this.Manager
-            .Scan(new ScanConfig(
-                BleScanType.Balanced,
-                false,
-                this.Config.ServiceUuid
-            ))
+            .Scan(
+#if ANDROID
+                new AndroidScanConfig(
+                    Android.Bluetooth.LE.ScanMode.Opportunistic,                    
+                    false,
+#else
+                new ScanConfig(
+#endif
+                    this.Config.ServiceUuid
+                )
+            )
             .Take(1)
             .Timeout(TimeSpan.FromSeconds(20))
             .ToTask();

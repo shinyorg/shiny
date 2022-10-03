@@ -10,8 +10,9 @@
     NavigationPage.BackButtonTitle="Back">
 
     <ContentPage.Content>
-        <StackLayout>
-            <Button Command="{Binding Toggle}" Text="Scan">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <Button Command="{Binding Toggle}"
+                    Grid.Row="0">
                 <Button.Triggers>
                     <DataTrigger TargetType="Button" Binding="{Binding IsBusy}" Value="True">
                         <Setter Property="Text" Value="Stop Scan" />
@@ -26,7 +27,8 @@
                             ItemSizingStrategy="MeasureFirstItem"
                             SelectedItem="{Binding SelectedPeripheral}"
                             SelectionMode="Single"
-                            VerticalOptions="FillAndExpand">
+                            VerticalOptions="FillAndExpand"
+                            Grid.Row="1">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="ble:ManagedScanResult">
                         <Grid>
@@ -74,7 +76,9 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <ActivityIndicator IsRunning="{Binding IsBusy}" />
-        </StackLayout>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               Grid.Row="2" />
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

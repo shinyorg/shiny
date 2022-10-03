@@ -4,6 +4,8 @@ namespace Sample.Gps;
 
 
 public class MyGpsDelegate : IGpsDelegate
+#if ANDROID
+#endif
 {
     readonly SampleSqliteConnection conn;
     public MyGpsDelegate(SampleSqliteConnection conn) => this.conn = conn;

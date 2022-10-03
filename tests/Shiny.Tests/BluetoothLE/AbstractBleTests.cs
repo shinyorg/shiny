@@ -41,11 +41,7 @@ public abstract class AbstractBleTests : AbstractShinyTests
     {
         this.Log("Scanning for peripheral");
         this.Peripheral = await this.Manager
-            .Scan(new(
-                BleScanType.Balanced,
-                false,
-                serviceUuid
-            ))
+            .Scan(new(serviceUuid))
             .Select(x => x.Peripheral)
             .Take(1)
             .Timeout(TimeSpan.FromSeconds(30))

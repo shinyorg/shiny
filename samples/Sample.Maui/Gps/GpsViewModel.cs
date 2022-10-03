@@ -22,9 +22,6 @@ public class GpsViewModel : ViewModel
         this.UseRealtime = mode == GpsBackgroundMode.Realtime;
         this.Accuracy = l?.Accuracy ?? GpsAccuracy.Normal;
 
-        this.NotificationTitle = manager.Title;
-        this.NotificationMessage = manager.Message;
-
         this.GetCurrentPosition = this.CreateOneReading(LocationRetrieve.Current);
         this.GetLastReading = this.CreateOneReading(LocationRetrieve.Last);
         this.GetLastOrCurrent = this.CreateOneReading(LocationRetrieve.LastOrCurrent);
@@ -101,16 +98,6 @@ public class GpsViewModel : ViewModel
         this.WhenAnyProperty(x => x.IsUpdating)
             .Select(x => x ? "Stop Listening" : "Start Updating")
             .Subscribe(x => this.ListenerText = x)
-            .DisposedBy(this.DestroyWith);
-
-        this.WhenAnyProperty(x => x.NotificationTitle)
-            .Skip(1)
-            .Subscribe(x => this.manager.Title = x)
-            .DisposedBy(this.DestroyWith);
-
-        this.WhenAnyProperty(x => x.NotificationMessage)
-            .Skip(1)
-            .Subscribe(x => this.manager.Message = x)
             .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty()
