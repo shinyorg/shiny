@@ -152,9 +152,9 @@ public class ManagedScan : IDisposable, IManagedScan
             this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
         }
 
+        this.IsScanning = true;
         this.scanSub = this.bleManager
             .Scan(this.ScanConfig)
-            .Do(_ => this.IsScanning = true)
             .Buffer(this.BufferTimeSpan)
             .Where(x => x?.Any() ?? false)
             .ObserveOnIf(this.Scheduler)
