@@ -103,7 +103,7 @@ public class ManagerContext : CBCentralManagerDelegate
 
 
     public Subject<CBPeripheral> PeripheralDisconnected { get; } = new();
-    public override void DisconnectedPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError error) => this.PeripheralDisconnected.OnNext(peripheral);
+    public override void DisconnectedPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError? error) => this.PeripheralDisconnected.OnNext(peripheral);
 
 
     public Subject<ScanResult> ScanResultReceived { get; } = new();
@@ -119,7 +119,7 @@ public class ManagerContext : CBCentralManagerDelegate
 
 
     public Subject<PeripheralConnectionFailed> FailedConnection { get; } = new();
-    public override void FailedToConnectPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError error)
+    public override void FailedToConnectPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError? error)
         => this.FailedConnection.OnNext(new PeripheralConnectionFailed(peripheral, error));
 
 

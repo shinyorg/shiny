@@ -16,7 +16,7 @@ public static class ManagedExtensions
         => new ManagedPeripheral(peripheral, scheduler);
 
 
-    public static async Task<bool> Toggle(this IManagedScan scan)
+    public static async ValueTask<bool> Toggle(this IManagedScan scan)
     {
         if (scan.IsScanning)
             scan.Stop();

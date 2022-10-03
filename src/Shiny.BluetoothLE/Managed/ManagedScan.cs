@@ -41,7 +41,7 @@ public class ManagedScan : IDisposable, IManagedScan
 
 
     public IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan() => this.actionSubj;
-    public ObservableCollection<ManagedScanResult> Peripherals { get; } = new ObservableCollection<ManagedScanResult>();
+    public ObservableCollection<ManagedScanResult> Peripherals { get; } = new();
     public bool IsScanning { get; private set; }
     public TimeSpan BufferTimeSpan { get; set; } = TimeSpan.FromSeconds(3);
 
