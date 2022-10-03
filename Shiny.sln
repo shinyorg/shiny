@@ -55,8 +55,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Core", "src\Shiny.Core\Shiny.Core.csproj", "{5CBF580C-B30C-4279-8E77-80D23AB2EF93}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TODO", "TODO", "{EAEDB66B-49EF-4B06-902E-F414E0A4DAEF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{898146BC-8FA9-4CAD-B995-95811275A692}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.Common", "src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj", "{D9128F4A-8A8D-4586-9DD7-22BD6221B03E}"

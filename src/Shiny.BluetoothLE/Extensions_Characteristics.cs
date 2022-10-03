@@ -76,7 +76,7 @@ public static class CharacteristicExtensions
     /// <param name="ch">The characteristic to write on</param>
     /// <param name="stream">The stream to send</param>
     /// <param name="packetSendTimeout">How long to wait before timing out a packet send - defaults to 5 seconds</param>
-    public static IObservable<BleWriteSegment> WriteBlobWithProgress(this IGattCharacteristic ch, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
+    public static IObservable<BleWriteSegment> WriteBlob(this IGattCharacteristic ch, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
     {
         var mtu = ch.Service.Peripheral.MtuSize;
         var buffer = new byte[mtu];
