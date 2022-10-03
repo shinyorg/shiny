@@ -22,7 +22,7 @@ public static class PeripheralExtensions
     public static IObservable<BleWriteSegment> WriteCharacteristicBlob(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null)
         => peripheral
             .GetKnownCharacteristic(serviceUuid, characteristicUuid, true)
-            .Select(x => x!.WriteBlobWithProgress(stream, packetSendTimeout))
+            .Select(x => x!.WriteBlob(stream, packetSendTimeout))
             .Switch();
 
 

@@ -145,7 +145,7 @@ public class ManagedPeripheral : NotifyPropertyChanged, IDisposable, IManagedPer
 
     public IObservable<BleWriteSegment> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null) => this
         .GetChar(serviceUuid, characteristicUuid)
-        .Select(x => x.WriteBlobWithProgress(stream, packetSendTimeout))
+        .Select(x => x.WriteBlob(stream, packetSendTimeout))
         .Switch();
 
 
