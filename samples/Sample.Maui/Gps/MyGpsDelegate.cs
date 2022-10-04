@@ -3,9 +3,7 @@
 namespace Sample.Gps;
 
 
-public class MyGpsDelegate : IGpsDelegate
-#if ANDROID
-#endif
+public partial class MyGpsDelegate : IGpsDelegate
 {
     readonly SampleSqliteConnection conn;
     public MyGpsDelegate(SampleSqliteConnection conn) => this.conn = conn;
@@ -17,3 +15,13 @@ public class MyGpsDelegate : IGpsDelegate
         reading.Timestamp
     );
 }
+
+#if ANDROID
+public partial class MyGpsDelegate : IAndroidForegroundServiceDelegate
+{
+    public void Configure(AndroidX.Core.App.NotificationCompat.Builder builder)
+    {
+        
+    }
+}
+#endif

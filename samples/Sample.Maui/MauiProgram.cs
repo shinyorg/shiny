@@ -14,124 +14,145 @@ public static class MauiProgram
             .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
             .UsePrism(
                 new DryIocContainerExtension(),
-                prism => prism
-                    .RegisterTypes(registry =>
-                    {
-                        // TODO: HTTP Transfers
-
-                        // jobs
-                        registry.RegisterForNavigation<Jobs.ListPage, Jobs.ListViewModel>("Jobs");
-                        registry.RegisterForNavigation<Jobs.CreatePage, Jobs.CreateViewModel>("JobsCreate");
-
-                        // beacons
-                        registry.RegisterForNavigation<Beacons.CreatePage, Beacons.CreateViewModel>("BeaconCreate");
-                        registry.RegisterForNavigation<Beacons.ManagedBeaconPage, Beacons.ManagedRangingViewModel>("BeaconRangingManaged");
-                        registry.RegisterForNavigation<Beacons.MonitoringPage, Beacons.MonitoringViewModel>("BeaconMonitoring");
-                        registry.RegisterForNavigation<Beacons.RangingPage, Beacons.RangingViewModel>("BeaconRanging");
-
-                        // ble client
-                        registry.RegisterForNavigation<BleClient.ScanPage, BleClient.ScanViewModel>("BleScan");
-                        registry.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralPage>("BlePeripheral");
-                        registry.RegisterForNavigation<BleClient.ServicePage, BleClient.ServiceViewModel>("BlePeripheralService");
-                        registry.RegisterForNavigation<BleClient.CharacteristicPage, BleClient.CharacteristicViewModel>("BlePeripheralCharacteristic");
-                        registry.RegisterForNavigation<BleClient.L2CapPage, BleHosting.L2CapViewModel>("BleL2Cap");
-                        registry.RegisterForNavigation<BleManaged.ManagedScanPage, BleManaged.ManagedScanViewModel>("BleManagedScan");
-                        registry.RegisterForNavigation<BleManaged.ManagedPeripheralPage, BleManaged.ManagedPeripheralViewModel>("BleManagedPeripheral");
-
-                        // ble hosting
-                        registry.RegisterForNavigation<BleHosting.MainPage, BleHosting.MainViewModel>("BleHosting");
-                        registry.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
-                        registry.RegisterForNavigation<BleHosting.ManagedPage, BleHosting.ManagedViewModel>("BleHostingManaged");
-                        registry.RegisterForNavigation<BleHosting.L2CapPage, BleHosting.L2CapViewModel>("BleHostingL2Cap");
-
-                        // ble perf testing
-                        registry.RegisterForNavigation<BlePerf.ClientPage, BlePerf.ClientViewModel>("BlePerfClient");
-                        registry.RegisterForNavigation<BlePerf.ServerPage, BlePerf.ServerViewModel>("BlePerfServer");
-
-                        // sensors
-                        registry.RegisterForNavigation<Sensors.AllSensorsPage, Sensors.AllSensorsViewModel>("Sensors");
-                        registry.RegisterForNavigation<Sensors.CompassPage, Sensors.CompassViewModel>("Compass");
-
-                        // locations
-                        registry.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>("Geofencing");
-                        registry.RegisterForNavigation<Geofencing.CreatePage, Geofencing.CreateViewModel>("GeofencingCreate");
-                        registry.RegisterForNavigation<MotionActivity.QueryPage, MotionActivity.QueryViewModel>("MotionActivityQuery");
-                        registry.RegisterForNavigation<MotionActivity.FunctionsPage, MotionActivity.FunctionsViewModel>("MotionActivityFunctions");
-                        registry.RegisterForNavigation<Gps.GpsPage, Gps.GpsViewModel>("GPS");
-
-                        // notifications
-                        registry.RegisterForNavigation<Notifications.PendingPage, Notifications.PendingViewModel>("NotificationsList");
-                        registry.RegisterForNavigation<Notifications.OtherPage, Notifications.OtherViewModel>("NotificationsOther");
-                        registry.RegisterForNavigation<Notifications.Create.CreatePage, Notifications.Create.CreateViewModel>("NotificationsCreate");
-                        registry.RegisterForNavigation<Notifications.Create.IntervalPage, Notifications.Create.IntervalViewModel>("NotificationsInterval");
-                        registry.RegisterForNavigation<Notifications.Create.LocationPage, Notifications.Create.LocationViewModel>("NotificationsLocation");
-                        registry.RegisterForNavigation<Notifications.Create.SchedulePage, Notifications.Create.ScheduleViewModel>("NotificationsSchedule");                        
-                        registry.RegisterForNavigation<Notifications.Channels.ChannelListPage, Notifications.Channels.ChannelListViewModel>("NotificationsChannelList");
-                        registry.RegisterForNavigation<Notifications.Channels.ChannelCreatePage, Notifications.Channels.ChannelCreateViewModel>("NotificationsChannelCreate");
-
-                        // speech recoginition
-                        registry.RegisterForNavigation<SpeechRecognition.DictationPage, SpeechRecognition.DictationViewModel>("SrDictation");
-                        registry.RegisterForNavigation<SpeechRecognition.ConversationPage, SpeechRecognition.ConversationViewModel>("SrConversation");
-
-                        // settings/secure store
-                        registry.RegisterForNavigation<Stores.BasicPage, Stores.BasicViewModel>("SettingsBasic");
-                        registry.RegisterForNavigation<Stores.BindPage, Stores.BindViewModel>("SettingsBind");
-                        
-                        // platform
-                        registry.RegisterForNavigation<Platform.ConnectivityPage, Platform.ConnectivityViewModel>("Connectivity");
-                        registry.RegisterForNavigation<Platform.BatteryPage, Platform.BatteryViewModel>("Battery");
-
-                        registry.RegisterForNavigation<MainPage, MainViewModel>();
-                        registry.RegisterForNavigation<LogsPage, LogsViewModel>();
-                    })
-                    .OnAppStart("MainPage")
+                prism => prism.OnAppStart("MainPage")
             );
 
-        // shiny.jobs
-        builder.Services.AddJobs();
-
-        // shiny.core
-        builder.Services.AddConnectivity();
-        builder.Services.AddBattery();
-        builder.Services.AddShinyService<Stores.AppSettings>(); // shiny's version of how to do settings
-
-        // shiny.notifications
-        builder.Services.AddNotifications<Notifications.MyNotificationDelegate>();
-
-        // shiny.sensors
-        builder.Services.AddAllSensors();
-
-        // shiny.speechrecognition
-        builder.Services.AddSpeechRecognition();
-
-        // shiny.bluetoothle & shiny.bluetoothle.hosting
-        builder.Services.AddBluetoothLE<BleClient.MyBleDelegate>();
-        builder.Services.AddBleHostedCharacteristic<BleHosting.MyManagedCharacteristics>();
-        builder.Services.AddBleHostedCharacteristic<BleHosting.MyManagedRequestCharacteristic>();
-        builder.Services.AddBluetoothLeHosting(); // you don't need this if using AddBleHostedCharacteristic
-
-        // shiny.beacons
-        builder.Services.AddBeaconRanging();
-        builder.Services.AddBeaconMonitoring<Beacons.MyBeaconMonitorDelegate>();
-
-        // shiny.locations
-        builder.Services.AddGps<Gps.MyGpsDelegate>();
-        builder.Services.AddGeofencing<Geofencing.MyGeofenceDelegate>();
-        //builder.Services.AddGpsDirectGeofencing<Geofencing.MyGeofenceDelegate>(); // if you don't know why this exists, don't use it!
-        builder.Services.AddMotionActivity();
-        
-        // for platform event testing - not needed for general consumption
-        builder.Services.AddShinyService<Platform.PlatformStateTests>();
-        builder.Services.AddShinyService<Jobs.JobLoggerTask>();
-
-        // services needed for samples - not shiny
+#if DEBUG
         builder.Logging.AddDebug();
-        //builder.Logging.AddProvider(new SqliteLoggerProvider(LogLevel.Trace));
-        builder.Services.AddSingleton<SampleSqliteConnection>();
-        builder.Services.AddShinyService<CommandExceptionHandler>();
-        builder.Services.AddScoped<BaseServices>();
-        builder.Services.AddSingleton(TextToSpeech.Default);
+#endif
+        //builder.Logging.AddAppCenter("")
+
+        RegisterServices(builder.Services);
+        RegisterShinyServices(builder.Services);
+        RegisterRoutes(builder.Services);
 
         return builder.Build();
+    }
+
+
+    static void RegisterShinyServices(IServiceCollection s)
+    {
+        // shiny.jobs
+        s.AddJobs();
+
+        // shiny.core
+        s.AddConnectivity();
+        s.AddBattery();
+        s.AddShinyService<Stores.AppSettings>(); // shiny's version of how to do settings
+
+        // shiny.notifications
+        s.AddNotifications<Notifications.MyNotificationDelegate>();
+
+        // shiny.sensors
+        s.AddAllSensors();
+
+        // shiny.speechrecognition
+        s.AddSpeechRecognition();
+
+        // shiny.net.http
+        //s.AddHttpTransfers<HttpTransfers.MyHttpTransferDelegate>();
+
+        // shiny.bluetoothle & shiny.bluetoothle.hosting
+        s.AddBluetoothLE<BleClient.MyBleDelegate>();
+        s.AddBleHostedCharacteristic<BleHosting.MyManagedCharacteristics>();
+        s.AddBleHostedCharacteristic<BleHosting.MyManagedRequestCharacteristic>();
+        s.AddBluetoothLeHosting(); // you don't need this if using AddBleHostedCharacteristic
+
+        // shiny.beacons
+        s.AddBeaconRanging();
+        s.AddBeaconMonitoring<Beacons.MyBeaconMonitorDelegate>();
+
+        // shiny.locations
+        s.AddGps<Gps.MyGpsDelegate>();
+        s.AddGeofencing<Geofencing.MyGeofenceDelegate>();
+        //s.AddGpsDirectGeofencing<Geofencing.MyGeofenceDelegate>(); // if you don't know why this exists, don't use it!
+        s.AddMotionActivity();
+
+        // for platform event testing - not needed for general consumption
+        s.AddShinyService<Platform.PlatformStateTests>();
+        s.AddShinyService<Jobs.JobLoggerTask>();
+    }
+
+
+    static void RegisterServices(IServiceCollection s)
+    {
+        //builder.Logging.AddProvider(new SqliteLoggerProvider(LogLevel.Trace));
+        s.AddSingleton<SampleSqliteConnection>();
+        s.AddShinyService<CommandExceptionHandler>();
+        s.AddScoped<BaseServices>();
+        s.AddSingleton(TextToSpeech.Default);
+    }
+
+
+    static void RegisterRoutes(IServiceCollection s)
+    {
+        // HTTP Transfers
+        s.RegisterForNavigation<HttpTransfers.CreatePage, HttpTransfers.CreateViewModel>("HttpTransfersCreate");
+        s.RegisterForNavigation<HttpTransfers.PendingPage, HttpTransfers.PendingViewModel>("HttpTransfers");
+
+        // jobs
+        s.RegisterForNavigation<Jobs.ListPage, Jobs.ListViewModel>("Jobs");
+        s.RegisterForNavigation<Jobs.CreatePage, Jobs.CreateViewModel>("JobsCreate");
+
+        // beacons
+        s.RegisterForNavigation<Beacons.CreatePage, Beacons.CreateViewModel>("BeaconCreate");
+        s.RegisterForNavigation<Beacons.ManagedBeaconPage, Beacons.ManagedRangingViewModel>("BeaconRangingManaged");
+        s.RegisterForNavigation<Beacons.MonitoringPage, Beacons.MonitoringViewModel>("BeaconMonitoring");
+        s.RegisterForNavigation<Beacons.RangingPage, Beacons.RangingViewModel>("BeaconRanging");
+
+        // ble client
+        s.RegisterForNavigation<BleClient.ScanPage, BleClient.ScanViewModel>("BleScan");
+        s.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralPage>("BlePeripheral");
+        s.RegisterForNavigation<BleClient.ServicePage, BleClient.ServiceViewModel>("BlePeripheralService");
+        s.RegisterForNavigation<BleClient.CharacteristicPage, BleClient.CharacteristicViewModel>("BlePeripheralCharacteristic");
+        s.RegisterForNavigation<BleClient.L2CapPage, BleHosting.L2CapViewModel>("BleL2Cap");
+        s.RegisterForNavigation<BleManaged.ManagedScanPage, BleManaged.ManagedScanViewModel>("BleManagedScan");
+        s.RegisterForNavigation<BleManaged.ManagedPeripheralPage, BleManaged.ManagedPeripheralViewModel>("BleManagedPeripheral");
+
+        // ble hosting
+        s.RegisterForNavigation<BleHosting.MainPage, BleHosting.MainViewModel>("BleHosting");
+        s.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
+        s.RegisterForNavigation<BleHosting.ManagedPage, BleHosting.ManagedViewModel>("BleHostingManaged");
+        s.RegisterForNavigation<BleHosting.L2CapPage, BleHosting.L2CapViewModel>("BleHostingL2Cap");
+
+        // ble perf testing
+        s.RegisterForNavigation<BlePerf.ClientPage, BlePerf.ClientViewModel>("BlePerfClient");
+        s.RegisterForNavigation<BlePerf.ServerPage, BlePerf.ServerViewModel>("BlePerfServer");
+
+        // sensors
+        s.RegisterForNavigation<Sensors.AllSensorsPage, Sensors.AllSensorsViewModel>("Sensors");
+        s.RegisterForNavigation<Sensors.CompassPage, Sensors.CompassViewModel>("Compass");
+
+        // locations
+        s.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>("Geofencing");
+        s.RegisterForNavigation<Geofencing.CreatePage, Geofencing.CreateViewModel>("GeofencingCreate");
+        s.RegisterForNavigation<MotionActivity.QueryPage, MotionActivity.QueryViewModel>("MotionActivityQuery");
+        s.RegisterForNavigation<MotionActivity.FunctionsPage, MotionActivity.FunctionsViewModel>("MotionActivityFunctions");
+        s.RegisterForNavigation<Gps.GpsPage, Gps.GpsViewModel>("GPS");
+
+        // notifications
+        s.RegisterForNavigation<Notifications.PendingPage, Notifications.PendingViewModel>("NotificationsList");
+        s.RegisterForNavigation<Notifications.OtherPage, Notifications.OtherViewModel>("NotificationsOther");
+        s.RegisterForNavigation<Notifications.Create.CreatePage, Notifications.Create.CreateViewModel>("NotificationsCreate");
+        s.RegisterForNavigation<Notifications.Create.IntervalPage, Notifications.Create.IntervalViewModel>("NotificationsInterval");
+        s.RegisterForNavigation<Notifications.Create.LocationPage, Notifications.Create.LocationViewModel>("NotificationsLocation");
+        s.RegisterForNavigation<Notifications.Create.SchedulePage, Notifications.Create.ScheduleViewModel>("NotificationsSchedule");
+        s.RegisterForNavigation<Notifications.Channels.ChannelListPage, Notifications.Channels.ChannelListViewModel>("NotificationsChannelList");
+        s.RegisterForNavigation<Notifications.Channels.ChannelCreatePage, Notifications.Channels.ChannelCreateViewModel>("NotificationsChannelCreate");
+
+        // speech recoginition
+        s.RegisterForNavigation<SpeechRecognition.DictationPage, SpeechRecognition.DictationViewModel>("SrDictation");
+        s.RegisterForNavigation<SpeechRecognition.ConversationPage, SpeechRecognition.ConversationViewModel>("SrConversation");
+
+        // settings/secure store
+        s.RegisterForNavigation<Stores.BasicPage, Stores.BasicViewModel>("SettingsBasic");
+        s.RegisterForNavigation<Stores.BindPage, Stores.BindViewModel>("SettingsBind");
+
+        // platform
+        s.RegisterForNavigation<Platform.ConnectivityPage, Platform.ConnectivityViewModel>("Connectivity");
+        s.RegisterForNavigation<Platform.BatteryPage, Platform.BatteryViewModel>("Battery");
+
+        s.RegisterForNavigation<MainPage, MainViewModel>();
+        s.RegisterForNavigation<LogsPage, LogsViewModel>();
     }
 }

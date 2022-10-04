@@ -41,8 +41,9 @@
                         <TextCell Text="Managed Ranging" Command="{Binding Navigate}" CommandParameter="BeaconRangingManaged" />
                     </TableSection>
 
-                    <TableSection Title="Jobs">
+                    <TableSection Title="Other Functions">
                         <TextCell Text="Jobs" Command="{Binding Navigate}" CommandParameter="Jobs" />
+                        <TextCell Text="HTTP Transfers" Command="{Binding Navigate}" CommandParameter="HttpTransfers" />
                     </TableSection>
 
                     <TableSection Title="Speech Recognition">

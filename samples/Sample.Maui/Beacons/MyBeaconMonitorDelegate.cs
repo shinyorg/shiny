@@ -3,7 +3,7 @@
 namespace Sample.Beacons;
 
 
-public class MyBeaconMonitorDelegate : IBeaconMonitorDelegate
+public partial class MyBeaconMonitorDelegate : IBeaconMonitorDelegate
 {
     readonly SampleSqliteConnection conn;
     public MyBeaconMonitorDelegate(SampleSqliteConnection conn) => this.conn = conn;
@@ -13,3 +13,13 @@ public class MyBeaconMonitorDelegate : IBeaconMonitorDelegate
         $"UUID: {region.Uuid} - M: {region.Major} - m: {region.Minor}"
     );
 }
+
+#if ANDROID
+public partial class MyBeaconMonitorDelegate : IAndroidForegroundServiceDelegate
+{
+    public void Configure(AndroidX.Core.App.NotificationCompat.Builder builder)
+    {
+
+    }
+}
+#endif
