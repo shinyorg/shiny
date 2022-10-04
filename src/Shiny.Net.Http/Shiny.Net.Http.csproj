@@ -2,7 +2,7 @@
     <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework><!--temp hack-->
+        <TargetFramework>net6.0</TargetFramework>
         <!--<TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>-->
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
     </PropertyGroup>
