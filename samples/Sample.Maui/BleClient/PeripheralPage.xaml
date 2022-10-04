@@ -8,16 +8,22 @@
     Title="{Binding Title}">
 
     <ContentPage.Content>
-        <CollectionView ItemsSource="{Binding Services}"
-                        SelectedItem="{Binding SelectedService}"
-                        SelectionMode="Single">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="sample:ServiceViewModel">
-                    <StackLayout>
-                        <Label Text="{Binding Title}" />
-                    </StackLayout>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        <Grid RowDefinitions="Auto, *">
+            <Button Text="Get Device Info"
+                    Command="{Binding GetDeviceInfo}" />
+
+            <CollectionView ItemsSource="{Binding Services}"
+                            SelectedItem="{Binding SelectedService}"
+                            SelectionMode="Single"
+                            Grid.Row="1">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="sample:ServiceViewModel">
+                        <StackLayout>
+                            <Label Text="{Binding Title}" />
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

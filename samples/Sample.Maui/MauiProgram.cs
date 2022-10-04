@@ -102,7 +102,7 @@ public static class MauiProgram
 
         // ble client
         s.RegisterForNavigation<BleClient.ScanPage, BleClient.ScanViewModel>("BleScan");
-        s.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralPage>("BlePeripheral");
+        s.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralViewModel>("BlePeripheral");
         s.RegisterForNavigation<BleClient.ServicePage, BleClient.ServiceViewModel>("BlePeripheralService");
         s.RegisterForNavigation<BleClient.CharacteristicPage, BleClient.CharacteristicViewModel>("BlePeripheralCharacteristic");
         s.RegisterForNavigation<BleClient.L2CapPage, BleHosting.L2CapViewModel>("BleL2Cap");

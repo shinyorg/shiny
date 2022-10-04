@@ -13,21 +13,13 @@ public class ScanViewModel : ViewModel
     {
         this.IsScanning = bleManager?.IsScanning ?? false;
 
-        this.WhenAnyProperty(x => x.SelectedPeripheral)
-            .Skip(1)
-            .Where(x => x != null)
-            .Subscribe(async x =>
-            {
-                this.SelectedPeripheral = null;
-                this.StopScan();
-                // TODO
-                //await this.Navigation.PushAsync(new PeripheralPage
-                //{
-                //    BindingContext = new PeripheralViewModel(x.Peripheral)
-                //});
-            });
+        this.WhenAnyValueSelected(x => x.SelectedPeripheral, async x =>
+        {
+            this.StopScan();
+            await this.Navigation.Navigate("BlePeripheral", ("Peripheral", x.Peripheral));
+        });
 
-        this.ScanToggle = new Command(
+        this.ScanToggle = ReactiveCommand.CreateFromTask(
             async () =>
             {
                 if (bleManager == null)
