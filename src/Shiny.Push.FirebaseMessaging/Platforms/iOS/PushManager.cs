@@ -100,7 +100,7 @@ public class PushManager : IPushManager, IPushTagSupport
         this.TryStartFirebase();
         
         Messaging.SharedInstance.ApnsToken = result.RegistrationToken!;
-        var fcmToken = Messaging.SharedInstance.FcmToken;
+        var fcmToken = await Messaging.SharedInstance.FetchTokenAsync();
 
         if (fcmToken == null)
             throw new InvalidOperationException("FCM Token is null");
@@ -113,8 +113,7 @@ public class PushManager : IPushManager, IPushTagSupport
     public async Task UnRegister()
     {
         this.container.ClearRegistration();
-        //Messaging.SharedInstance.DeleteFcmTokenAsync(this.config.SenderId);
-        //await InstanceId.SharedInstance.DeleteIdAsync().ConfigureAwait(false);
+        await Messaging.SharedInstance.DeleteTokenAsync();
         await this.adapter.UnRegister().ConfigureAwait(false);
     }
 
