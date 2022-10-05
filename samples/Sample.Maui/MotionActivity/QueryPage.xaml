@@ -2,8 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sample="clr-namespace:Sample.MotionActivity"
-             xmlns:sample1="clr-namespace:Sample"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"             
+             xmlns:sample1="clr-namespace:Sample"          
              x:DataType="sample:QueryViewModel"
              x:Class="Sample.MotionActivity.QueryPage"
              Title="Motion Activity (Query)">
@@ -17,11 +16,10 @@
 
             <Frame BorderColor="Black"
                    Grid.Row="0">
-                <StackLayout>
+                <VerticalStackLayout>
                     <DatePicker Date="{Binding Date}"
-                                MaximumDate="{x:Static sys:DateTime.Now}"
                                 HorizontalOptions="CenterAndExpand"
-                                FontSize="Large"/>
+                                FontSize="Large" />
 
                     <Label Text="{Binding CurrentActivity, StringFormat='Currently: {0}'}"
                             FontSize="Medium"
@@ -31,7 +29,7 @@
                             FontSize="Medium"
                             HorizontalOptions="Center"
                             HorizontalTextAlignment="Center"  />
-                </StackLayout>
+                </VerticalStackLayout>
             </Frame>
 
             <RefreshView IsRefreshing="{Binding IsBusy}"

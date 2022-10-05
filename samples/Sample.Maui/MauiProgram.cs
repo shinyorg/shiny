@@ -81,6 +81,7 @@ public static class MauiProgram
         s.AddShinyService<CommandExceptionHandler>();
         s.AddScoped<BaseServices>();
         s.AddSingleton(TextToSpeech.Default);
+        s.AddSingleton(FilePicker.Default);
     }
 
 

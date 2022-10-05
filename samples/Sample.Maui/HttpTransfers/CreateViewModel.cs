@@ -10,7 +10,11 @@ public class CreateViewModel : ViewModel
     IDisposable? sub;
 
 
-    public CreateViewModel(BaseServices services, IHttpTransferManager manager) : base(services)
+    public CreateViewModel(
+        BaseServices services,
+        IFilePicker filePicker,
+        IHttpTransferManager manager
+    ) : base(services)
     {
 
         this.SelectUpload = new Command(async () =>
