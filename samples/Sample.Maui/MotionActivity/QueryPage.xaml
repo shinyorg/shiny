@@ -11,11 +11,18 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <Frame BorderColor="LemonChiffon"
+                   BackgroundColor="LemonChiffon">
+                <Label Text="{Binding CurrentActivity}"
+                       TextColor="Black" />
+            </Frame>
+
             <Frame BorderColor="Black"
-                   Grid.Row="0">
+                    Grid.Row="1">
                 <VerticalStackLayout>
                     <DatePicker Date="{Binding Date}"
                                 HorizontalOptions="CenterAndExpand"
