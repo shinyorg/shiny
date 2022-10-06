@@ -42,6 +42,14 @@ public class QueryViewModel : ViewModel
     {
         this.Load.Execute(null);
 
+        this.activityManager?
+            .WhenActivityChanged()
+            .SubOnMainThread(
+                x => this.CurrentActivity = $"({x.Confidence}) {x.Types}",
+                ex => { } // TODO
+            )
+            .DisposedBy(this.DestroyWith);
+
         this.WhenAnyProperty(x => x.Date)
             .DistinctUntilChanged()
             .Subscribe(_ => this.Load.Execute(null))

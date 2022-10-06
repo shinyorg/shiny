@@ -1,5 +1,4 @@
 ﻿using Prism.DryIoc;
-using Sample.Infrastructure;
 
 namespace Sample;
 
@@ -81,6 +80,7 @@ public static class MauiProgram
         s.AddShinyService<CommandExceptionHandler>();
         s.AddScoped<BaseServices>();
         s.AddSingleton(TextToSpeech.Default);
+        s.AddSingleton(FilePicker.Default);
     }
 
 
@@ -127,7 +127,6 @@ public static class MauiProgram
         s.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>("Geofencing");
         s.RegisterForNavigation<Geofencing.CreatePage, Geofencing.CreateViewModel>("GeofencingCreate");
         s.RegisterForNavigation<MotionActivity.QueryPage, MotionActivity.QueryViewModel>("MotionActivityQuery");
-        s.RegisterForNavigation<MotionActivity.FunctionsPage, MotionActivity.FunctionsViewModel>("MotionActivityFunctions");
         s.RegisterForNavigation<Gps.GpsPage, Gps.GpsViewModel>("GPS");
 
         // notifications
