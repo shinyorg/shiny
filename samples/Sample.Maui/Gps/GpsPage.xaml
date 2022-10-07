@@ -7,64 +7,47 @@
              Title="GPS">
 
     <ContentPage.Content>
-        <RefreshView IsRefreshing="{Binding IsBusy}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <VerticalStackLayout>
+            <Label Text="Access" />
+            <Label Text="{Binding Access}" />
+            <Button Text="Request Access" Command="{Binding RequestAccess}" />
 
-                <TableView Grid.Row="0" Intent="Form">
-                    <TableRoot>
-                        <TableSection>
-                            <TextCell Text="Access" Detail="{Binding Access}" Command="{Binding RequestAccess}" />
-                            <TextCell Text="Get Current Position" Command="{Binding GetCurrentPosition}" />
-                            <TextCell Text="Get Last Reading" Command="{Binding GetLastReading}" />
-                            <TextCell Text="Get Last Or Current" Command="{Binding GetLastOrCurrent}" />
-                        </TableSection>
+            <Button Text="Get Current Position" Command="{Binding GetCurrentPosition}" />
+            <Button Text="Get Last Reading" Command="{Binding GetLastReading}" />
+            <Button Text="Get Last Or Current" Command="{Binding GetLastOrCurrent}" />
 
-                        <TableSection>
-                            <TextCell Text="Latitude" Detail="{Binding Latitude}" />
-                            <TextCell Text="Longitude" Detail="{Binding Longitude}" />
-                            <TextCell Text="Altitude" Detail="{Binding Altitude}" />
-                            <TextCell Text="Accuracy" Detail="{Binding PositionAccuracy}" />
-                        </TableSection>
+            <Label Text="{Binding Latitude, StringFormat='Latitude: {0}'}" />
+            <Label Text="{Binding Longitude, StringFormat='Longitude: {0}'}" />
+            <Label Text="{Binding Speed, StringFormat='Speed (m/s): {0}'}" />
+            <Label Text="{Binding Heading, StringFormat='Heading: {0}'}" />
+            <Label Text="{Binding HeadingAccuracy, StringFormat='Heading Accuracy: {0}'}" />
+            <Label Text="{Binding Timestamp, StringFormat='Timestamp: {0}'}" />
 
-                        <TableSection>
-                            <TextCell Text="Speed (m/s)" Detail="{Binding Speed}" />
-                            <TextCell Text="Heading" Detail="{Binding Heading}" />
-                            <TextCell Text="Accuracy" Detail="{Binding HeadingAccuracy}" />
-                            <TextCell Text="Timestamp" Detail="{Binding Timestamp}" />
-                        </TableSection>
+            <Label Text="Background" />
+            <CheckBox IsChecked="{Binding UseBackground}" />
 
-                        <!--<TableSection Title="Android Foreground Notification">
-                            <EntryCell Label="Title"
-                                       Text="{Binding NotificationTitle}"
-                                       IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
+            <Label Text="Real-Time Background" />
+            <CheckBox IsChecked="{Binding UseRealtime}" />
 
-                            <EntryCell Label="Message"
-                                       Text="{Binding NotificationMessage}"
-                                       IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
-                        </TableSection>-->
+            <Label Text="Priority/Accuracy" />
+            <Picker ItemsSource="{Binding Accuracies}"
+                    SelectedItem="{Binding SelectedAccuracy}" />
 
-                        <TableSection Title="Listening">
-                            <SwitchCell Text="Background"
-                                        On="{Binding UseBackground}" />
+            <Button Text="{Binding ListenerText}"
+                    Command="{Binding ToggleUpdates}" />
+            <!--
+            <TableSection Title="Android Foreground Notification">
+                <EntryCell Label="Title"
+                            Text="{Binding NotificationTitle}"
+                            IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
 
-                            <SwitchCell Text="Real-Time Background"
-                                        On="{Binding UseRealtime}" />
+                <EntryCell Label="Message"
+                            Text="{Binding NotificationMessage}"
+                            IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
+            </TableSection>
+            -->
 
-                            <TextCell Text="Priority/Accuracy"
-                                      Detail="{Binding Accuracy}"
-                                      Command="{Binding SelectAccuracy}"/>
-                        </TableSection>
-                    </TableRoot>
-                </TableView>
 
-                <Button Text="{Binding ListenerText}"
-                        Command="{Binding ToggleUpdates}"
-                        Grid.Row="1" />
-            </Grid>
-        </RefreshView>
+        </VerticalStackLayout>
     </ContentPage.Content>
 </ContentPage>

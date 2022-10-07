@@ -7,7 +7,6 @@ namespace Sample.Gps;
 public class GpsViewModel : ViewModel
 {
     readonly IGpsManager manager;
-    CompositeDisposable disposer;
 
 
     public GpsViewModel(BaseServices services, IGpsManager manager) : base(services)
@@ -20,26 +19,19 @@ public class GpsViewModel : ViewModel
         var mode = l?.BackgroundMode ?? GpsBackgroundMode.None;
         this.UseBackground = mode != GpsBackgroundMode.None;
         this.UseRealtime = mode == GpsBackgroundMode.Realtime;
-        this.Accuracy = l?.Accuracy ?? GpsAccuracy.Normal;
+        this.SelectedAccuracy = (l?.Accuracy ?? GpsAccuracy.Normal).ToString();
 
         this.GetCurrentPosition = this.CreateOneReading(LocationRetrieve.Current);
         this.GetLastReading = this.CreateOneReading(LocationRetrieve.Last);
         this.GetLastOrCurrent = this.CreateOneReading(LocationRetrieve.LastOrCurrent);
-
-        this.SelectAccuracy = new Command(async () =>
+        this.Accuracies = new[]
         {
-            // TODO
-            //var choice = await this.Choose(
-            //    "Select Accuracy",
-            //    GpsAccuracy.Highest.ToString(),
-            //    GpsAccuracy.High.ToString(),
-            //    GpsAccuracy.Normal.ToString(),
-            //    GpsAccuracy.Low.ToString(),
-            //    GpsAccuracy.Lowest.ToString()
-            //);
-            //this.Accuracy = (GpsAccuracy)Enum.Parse(typeof(GpsAccuracy), choice);
-        });
-
+            GpsAccuracy.Highest.ToString(),
+            GpsAccuracy.High.ToString(),
+            GpsAccuracy.Normal.ToString(),
+            GpsAccuracy.Low.ToString(),
+            GpsAccuracy.Lowest.ToString()
+        };
 
         this.ToggleUpdates = new Command(
             async () =>
@@ -62,10 +54,11 @@ public class GpsViewModel : ViewModel
                         return;
                     }
 
+                    var accuracy = (GpsAccuracy)Enum.Parse(typeof(GpsAccuracy), this.SelectedAccuracy);
                     var request = new GpsRequest
                     {
                         BackgroundMode = this.GetMode(),
-                        Accuracy = this.Accuracy,
+                        Accuracy = accuracy
                     };
                     try
                     {
@@ -88,7 +81,7 @@ public class GpsViewModel : ViewModel
     }
 
 
-    public override Task InitializeAsync(INavigationParameters parameters) 
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
         this.manager
             .WhenReading()
@@ -109,7 +102,6 @@ public class GpsViewModel : ViewModel
     }
 
 
-
     public Command SelectAccuracy { get; }
     public Command GetLastReading { get; }
     public Command GetCurrentPosition { get; }
@@ -117,14 +109,13 @@ public class GpsViewModel : ViewModel
     public Command RequestAccess { get; }
     public Command ToggleUpdates { get; }
 
-    //public bool IsAndroid => ShinyHost.Resolve<IPlatform>().IsAndroid();
-
+    public string[] Accuracies { get; }
+    [Reactive] public string SelectedAccuracy { get; set; }
     [Reactive] public string ListenerText { get; private set; }
     [Reactive] public string NotificationTitle { get; set; }
     [Reactive] public string NotificationMessage { get; set; }
     [Reactive] public bool UseBackground { get; set; }
     [Reactive] public bool UseRealtime { get; set; }
-    [Reactive] public GpsAccuracy Accuracy { get; set; }
     [Reactive] public string Access { get; private set; }
     [Reactive] public bool IsUpdating { get; private set; }
 
@@ -162,25 +153,6 @@ public class GpsViewModel : ViewModel
                 : GpsBackgroundMode.Standard;
         }
         return mode;
-    }
-
-    static bool IsNumeric(string value)
-    {
-        if (value.IsEmpty())
-            return false;
-
-        if (Int32.TryParse(value, out var r))
-            return r > 0;
-
-        return false;
-    }
-
-
-    static TimeSpan ToInterval(string value)
-    {
-        var i = Int32.Parse(value);
-        var ts = TimeSpan.FromSeconds(i);
-        return ts;
     }
 
 
