@@ -11,6 +11,11 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            })
             .UsePrism(
                 new DryIocContainerExtension(),
                 prism => prism.OnAppStart("MainPage")

@@ -97,35 +97,35 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShinyBuild", "build\ShinyBu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazor", "Blazor", "{38F35C40-8FF5-477B-B997-4DAD731812AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Maui.Build.Tasks", "src\Shiny.Maui.Build.Tasks\Shiny.Maui.Build.Tasks.csproj", "{4E744034-1CB6-4390-97A6-71EBEB1B03E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Maui.Build.Tasks", "src\Shiny.Maui.Build.Tasks\Shiny.Maui.Build.Tasks.csproj", "{4E744034-1CB6-4390-97A6-71EBEB1B03E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Core.Blazor", "src\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj", "{A0F60200-0553-4BBA-B704-FED7B55E79B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Core.Blazor", "src\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj", "{A0F60200-0553-4BBA-B704-FED7B55E79B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.BluetoothLE.Blazor", "src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj", "{BEA5F39B-2BE8-441C-8D79-2C1B6B3DD7A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.Blazor", "src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj", "{BEA5F39B-2BE8-441C-8D79-2C1B6B3DD7A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Jobs.Blazor", "src\Shiny.Jobs.Blazor\Shiny.Jobs.Blazor.csproj", "{0114BAEF-27D7-4D9C-B231-2D88DD57628E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Jobs.Blazor", "src\Shiny.Jobs.Blazor\Shiny.Jobs.Blazor.csproj", "{0114BAEF-27D7-4D9C-B231-2D88DD57628E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Nfc.Blazor", "src\Shiny.Nfc.Blazor\Shiny.Nfc.Blazor.csproj", "{6F2C790C-0AAB-4951-AED4-159A3B243968}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Nfc.Blazor", "src\Shiny.Nfc.Blazor\Shiny.Nfc.Blazor.csproj", "{6F2C790C-0AAB-4951-AED4-159A3B243968}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Push.Blazor", "src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj", "{9CD84B7B-E503-4E51-B844-4BB17F05F5DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.Blazor", "src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj", "{9CD84B7B-E503-4E51-B844-4BB17F05F5DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.SpeechRecognition.Blazor", "src\Shiny.SpeechRecognition.Blazor\Shiny.SpeechRecognition.Blazor.csproj", "{A8509EA7-59CE-4CC4-BC91-1FBF51F0F6D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.SpeechRecognition.Blazor", "src\Shiny.SpeechRecognition.Blazor\Shiny.SpeechRecognition.Blazor.csproj", "{A8509EA7-59CE-4CC4-BC91-1FBF51F0F6D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Logging.AppCenter", "src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj", "{7A3AF2C7-1EDF-4BE2-ACC2-CC4C91A87601}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.AppCenter", "src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj", "{7A3AF2C7-1EDF-4BE2-ACC2-CC4C91A87601}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Notifications.Blazor", "src\Shiny.Notifications.Blazor\Shiny.Notifications.Blazor.csproj", "{64DE0A46-F8F5-4AE5-86A6-29D772FE5F0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Notifications.Blazor", "src\Shiny.Notifications.Blazor\Shiny.Notifications.Blazor.csproj", "{64DE0A46-F8F5-4AE5-86A6-29D772FE5F0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Locations.Blazor", "src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj", "{9C9E2572-4FE3-4688-AA62-F637DABF1056}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Locations.Blazor", "src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj", "{9C9E2572-4FE3-4688-AA62-F637DABF1056}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Push.FirebaseMessaging", "src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj", "{A0FE3674-202B-4D78-8D1B-5BA65172AD82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.FirebaseMessaging", "src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj", "{A0FE3674-202B-4D78-8D1B-5BA65172AD82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Logging.Firebase", "src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj", "{CFD6F1CB-720F-4060-B057-4B44CB0CC809}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.Firebase", "src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj", "{CFD6F1CB-720F-4060-B057-4B44CB0CC809}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Blazor", "samples\Sample.Blazor\Sample.Blazor.csproj", "{EF0C5191-B929-42D0-88CB-5A23EF12A4B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Blazor", "samples\Sample.Blazor\Sample.Blazor.csproj", "{EF0C5191-B929-42D0-88CB-5A23EF12A4B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Maui", "samples\Sample.Maui\Sample.Maui.csproj", "{0E712AE3-FF27-4EE4-B10A-8921C48651AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Maui", "samples\Sample.Maui\Sample.Maui.csproj", "{0E712AE3-FF27-4EE4-B10A-8921C48651AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Push.Maui", "samples\Sample.Push.Maui\Sample.Push.Maui.csproj", "{EFFA6FF3-3447-44EB-8DCA-B20A6499FD85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Push.Maui", "samples\Sample.Push.Maui\Sample.Push.Maui.csproj", "{EFFA6FF3-3447-44EB-8DCA-B20A6499FD85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2121,6 +2121,7 @@ Global
 		{0E712AE3-FF27-4EE4-B10A-8921C48651AD}.AppStore|x86.Build.0 = Debug|Any CPU
 		{0E712AE3-FF27-4EE4-B10A-8921C48651AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E712AE3-FF27-4EE4-B10A-8921C48651AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E712AE3-FF27-4EE4-B10A-8921C48651AD}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{0E712AE3-FF27-4EE4-B10A-8921C48651AD}.Debug|ARM.ActiveCfg = Debug|Any CPU
 		{0E712AE3-FF27-4EE4-B10A-8921C48651AD}.Debug|ARM.Build.0 = Debug|Any CPU
 		{0E712AE3-FF27-4EE4-B10A-8921C48651AD}.Debug|ARM64.ActiveCfg = Debug|Any CPU
@@ -2233,13 +2234,13 @@ Global
 		{452F676E-22B7-49A6-9603-D39689F0EAAD} = {3A15354E-BAD2-4195-BE6B-49ED2B4E56E6}
 		{38F35C40-8FF5-477B-B997-4DAD731812AC} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{4E744034-1CB6-4390-97A6-71EBEB1B03E1} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
-		{7A3AF2C7-1EDF-4BE2-ACC2-CC4C91A87601} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{A0F60200-0553-4BBA-B704-FED7B55E79B7} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
 		{BEA5F39B-2BE8-441C-8D79-2C1B6B3DD7A4} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
 		{0114BAEF-27D7-4D9C-B231-2D88DD57628E} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
 		{6F2C790C-0AAB-4951-AED4-159A3B243968} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
 		{9CD84B7B-E503-4E51-B844-4BB17F05F5DC} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
 		{A8509EA7-59CE-4CC4-BC91-1FBF51F0F6D9} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
+		{7A3AF2C7-1EDF-4BE2-ACC2-CC4C91A87601} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{64DE0A46-F8F5-4AE5-86A6-29D772FE5F0F} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
 		{9C9E2572-4FE3-4688-AA62-F637DABF1056} = {38F35C40-8FF5-477B-B997-4DAD731812AC}
 		{A0FE3674-202B-4D78-8D1B-5BA65172AD82} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
