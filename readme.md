@@ -20,9 +20,12 @@ things like dependency injection & logging in a structured way to your code!
 ## Links
 * [Documentation](https://shinylib.net)
 * [Change Log](https://shinylib.net/release-notes/)
-* [Samples](https://samples.shinylib.net)
 * [Community Support](https://github.com/shinyorg/shiny/discussions)
 * [NuGets](https://www.nuget.org/profiles/ShinyLib)
+* Samples
+    * [MAUI - Kitchen Sink](https://github.com/shinyorg/shiny/tree/master/samples/Sample.Maui)
+    * [Push](https://github.com/shinyorg/shiny/tree/master/samples/Sample.Push.Maui)
+    * [BLE Client & Hosting](https://github.com/aritchie/digitalscoreboard)
 
 ## Support Shiny!
 
