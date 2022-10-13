@@ -21,7 +21,7 @@ public interface IManagedScan : IDisposable
     TimeSpan? ClearTime { get; set; }
     TimeSpan BufferTimeSpan { get; set; }
     bool IsScanning { get; }
-    ObservableCollection<ManagedScanResult> Peripherals { get; }
+    INotifyReadOnlyCollection<ManagedScanResult> Peripherals { get; }
     ScanConfig? ScanConfig { get; set; }
     IScheduler? Scheduler { get; set; }
 

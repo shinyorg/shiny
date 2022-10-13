@@ -14,6 +14,7 @@ namespace Shiny.BluetoothLE.Managed;
 public class ManagedScan : IDisposable, IManagedScan
 {
     readonly Subject<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> actionSubj = new();
+    readonly ObservableList<ManagedScanResult> list = new();
     readonly IBleManager bleManager;
     IDisposable? scanSub;
     IDisposable? clearSub;
@@ -34,14 +35,14 @@ public class ManagedScan : IDisposable, IManagedScan
     }
 
 
-    public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.Peripherals
+    public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.list
         .ToList()
         .Where(x => x.Peripheral.IsConnected())
         .Select(x => x.Peripheral);
 
 
     public IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan() => this.actionSubj;
-    public ObservableCollection<ManagedScanResult> Peripherals { get; } = new();
+    public INotifyReadOnlyCollection<ManagedScanResult> Peripherals => this.list;
     public bool IsScanning { get; private set; }
     public TimeSpan BufferTimeSpan { get; set; } = TimeSpan.FromSeconds(3);
 
@@ -76,7 +77,7 @@ public class ManagedScan : IDisposable, IManagedScan
                 this.clearSub = Observable
                     .Interval(TimeSpan.FromSeconds(10))
                     .ObserveOnIf(this.Scheduler)
-                    .Synchronize(this.Peripherals)
+                    .Synchronize(this.list)
                     .Subscribe(
                         _ =>
                         {
@@ -85,8 +86,8 @@ public class ManagedScan : IDisposable, IManagedScan
 
                             foreach (var p in tmp)
                             {
-                                this.Peripherals.Remove(p);
                                 this.actionSubj.OnNext((ManagedScanListAction.Remove, p));
+                                this.list.Remove(p);                                
                             }
                         },
                         ex =>
@@ -119,7 +120,7 @@ public class ManagedScan : IDisposable, IManagedScan
     public void Dispose()
     {
         this.Stop();
-        this.Peripherals.Clear();
+        this.list.Clear();
     }
 
 
@@ -148,7 +149,7 @@ public class ManagedScan : IDisposable, IManagedScan
         this.ClearTime = this.ClearTime;
         if (this.Peripherals.Count > 0)
         {
-            this.Peripherals.Clear();
+            this.list.Clear();
             this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
         }
 
@@ -175,7 +176,7 @@ public class ManagedScan : IDisposable, IManagedScan
                                 ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
                                 ServiceData = scanResult.AdvertisementData?.ServiceData
                             };
-                            this.Peripherals.Add(result);
+                            this.list.Add(result);
                         }
                         result.IsConnectable = scanResult.AdvertisementData?.IsConnectable;
                         result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
