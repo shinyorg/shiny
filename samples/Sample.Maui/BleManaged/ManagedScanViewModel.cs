@@ -10,7 +10,11 @@ public class ManagedScanViewModel : ViewModel
     const string ServiceUuid = "FFF0";
 
 
-    public ManagedScanViewModel(BaseServices services, IBleManager bleManager) : base(services)
+    public ManagedScanViewModel(
+        BaseServices services,
+        IBleManager bleManager,
+        ILogger<ManagedScanViewModel> logger
+    ) : base(services)
     {
         // we are specifically scanning for VeePeak BLE OBD device
         this.scanner = bleManager
@@ -22,11 +26,11 @@ public class ManagedScanViewModel : ViewModel
             if (this.IsBusy)
             {
                 this.scanner.Stop();
-                Console.WriteLine("Stop Scan");
+                logger.LogTrace("Stop Scan");
             }
             else
             {
-                Console.WriteLine("Start Scan");
+                logger.LogTrace("Start Scan");
                 await this.scanner.Start(
 #if ANDROID
                     new AndroidScanConfig(
@@ -44,7 +48,7 @@ public class ManagedScanViewModel : ViewModel
                         // optional predicate filter
                         var found = true;
                         var pName = (x.Peripheral.Name ?? "None");
-                        Console.WriteLine("Peripheral Name: " + pName);
+                        logger.LogTrace("Peripheral Name: " + pName);
                         return found;
                     },
                     RxApp.MainThreadScheduler,
