@@ -90,11 +90,12 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
             }
             catch (Exception ex)
             {
-                this.logger.LogError("Failed to execute lifecycle call", ex);
+                this.logger.LogError($"Failed to execute lifecycle call - '{handler!.GetType().FullName}' for lifecycle event '{typeof(T).FullName}'", ex);
             }
         }
         return false;
     }
+
 
     void Execute<T>(IEnumerable<T> services, Action<T> action)
     {
@@ -103,10 +104,11 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
             try
             {
                 action(handler);
+                this.logger.LogDebug($"{handler!.GetType().FullName} handling lifecycle event for {typeof(T).FullName}");
             }
             catch (Exception ex)
             {
-                this.logger.LogError("Failed to execute lifecycle call", ex);
+                this.logger.LogError($"Failed to execute lifecycle call - '{handler!.GetType().FullName}' for lifecycle event '{typeof(T).FullName}'", ex);
             }
         }
     }
