@@ -25,6 +25,9 @@ public class TagsViewModel : ViewModel
 
         this.Load = this.LoadingCommand(async () =>
         {
+            if (push.RegisteredTags == null)
+                return;
+
             this.Tags = push
                 .RegisteredTags
                 .Select(tag => new CommandItem

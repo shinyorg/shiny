@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<PushProvider>native</PushProvider><!--native, firebase, or azure-->
+		<PushProvider>firebase</PushProvider><!--native, firebase, or azure-->
 
 		<!--if native android or firebase - firebase will look for the embedded configuration-->
 		<FirebaseUseEmbeddedConfiguration>false</FirebaseUseEmbeddedConfiguration>
@@ -13,7 +13,7 @@
 		<Nullable>enable</Nullable>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<SqliteLibVersion>2.1.1</SqliteLibVersion>
+		<SqliteLibVersion>2.1.2</SqliteLibVersion>
 
 		<ApplicationTitle>Shiny Push</ApplicationTitle>
 		<ApplicationId>org.shiny.pushsample</ApplicationId>
