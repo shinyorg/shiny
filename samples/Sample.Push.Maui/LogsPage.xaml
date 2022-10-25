@@ -36,12 +36,12 @@
                             </Grid.ColumnDefinitions>
 
                             <Label Text="{Binding Text}"
-                                   FontSize="Title"
+                                   FontSize="Medium"
                                    Grid.Column="0"
                                    Grid.Row="0" />
 
                             <Label Text="{Binding Detail}"
-                                   FontSize="Subtitle"
+                                   FontSize="Small"
                                    Grid.ColumnSpan="2"
                                    Grid.Row="1" />
 

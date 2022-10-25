@@ -15,9 +15,9 @@ public partial class MainPage : TabbedPage
         this.InitializeComponent();
         this.BindingContext = vm;
 
-        this.Children.Add(setupPage);
-        this.Children.Add(logsPage);
+        this.Children.Add(new NavigationPage(setupPage) { Title = "Push" });
+        this.Children.Add(new NavigationPage(logsPage) { Title = "Logs" });
         if (vm.IsTagsSupported)
-            this.Children.Add(tagsPage);
+            this.Children.Add(new NavigationPage(tagsPage) { Title = "Tags" });
     }
 }

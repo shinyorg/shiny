@@ -6,10 +6,6 @@
                           x:Class="Sample.TagsPage"
                           Title="Tags">
 
-    <!--<ContentPage.BindingContext>
-        <sample:TagsViewModel />
-    </ContentPage.BindingContext>-->
-
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Add" Command="{Binding Add}" />
     </ContentPage.ToolbarItems>

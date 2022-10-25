@@ -36,7 +36,7 @@ public class PushManager : IPushManager, IPushTagSupport
 
 
     public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
-    public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken; // TODO: could/should use Messaging.SharedInstance.FcmToken
+    public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken;
     public string[]? RegisteredTags => this.container.RegisteredTags;
     public IObservable<PushNotification> WhenReceived() => this.container.WhenReceived();
 
@@ -57,7 +57,6 @@ public class PushManager : IPushManager, IPushTagSupport
     }
 
 
-    IDisposable? lifecycleSub;
     protected virtual void TryStartFirebase()
     {
         if (App.DefaultInstance == null)

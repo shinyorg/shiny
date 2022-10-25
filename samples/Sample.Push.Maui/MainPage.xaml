@@ -8,20 +8,4 @@
             UnselectedTabColor="#4BA677"
             BarTextColor="White"
             Title="Push">
-
-    <!--<TabbedPage.Children>
-        <sample:SetupPage>
-            <ContentPage.IconImageSource>
-                <FontImageSource Glyph="&#xf013;"
-                                 FontFamily="FAS" />
-            </ContentPage.IconImageSource>
-        </sample:SetupPage>
-
-        <sample:LogsPage>
-            <ContentPage.IconImageSource>
-                <FontImageSource Glyph="&#xf017;"
-                                 FontFamily="FAS" />
-            </ContentPage.IconImageSource>
-        </sample:LogsPage>
-    </TabbedPage.Children>-->
 </TabbedPage>
