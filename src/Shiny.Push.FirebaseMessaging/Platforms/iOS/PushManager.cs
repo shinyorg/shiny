@@ -13,14 +13,14 @@ namespace Shiny.Push.FirebaseMessaging;
 
 public class PushManager : IPushManager, IPushTagSupport
 {
-    readonly INativeAdapter adapter;
+    readonly NativeAdapter adapter;
     readonly PushContainer container;
     readonly ILogger logger;
     readonly FirebaseConfiguration config;
 
 
     public PushManager(
-        INativeAdapter adapter,
+        NativeAdapter adapter,
         PushContainer container,
         ILogger<PushManager> logger,
         FirebaseConfiguration config
@@ -41,13 +41,15 @@ public class PushManager : IPushManager, IPushTagSupport
     public IObservable<PushNotification> WhenReceived() => this.container.WhenReceived();
 
 
-    public void Start()
+    public async void Start()
     {
         if (this.CurrentRegistrationToken != null)
         {
             try
             {
                 this.TryStartFirebase();
+                var fcmToken = await this.GetFcmToken().ConfigureAwait(false);
+                this.container.SetCurrentToken(fcmToken, true);
             }
             catch (Exception ex)
             {
@@ -81,32 +83,14 @@ public class PushManager : IPushManager, IPushTagSupport
                 });
             }
         }
-
-        // TODO: I really only want this set AFTER RequestAccess
-        Messaging.SharedInstance!.Delegate = new FbMessagingDelegate
-        (
-            async token =>
-            {
-                this.container.SetCurrentToken(token, true);
-                await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
-            }
-        );
     }
 
 
     public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
-        var result = await this.adapter.RequestAccess().ConfigureAwait(false);
-        this.TryStartFirebase();
-        
-        Messaging.SharedInstance.ApnsToken = result.RegistrationToken!;
-        var fcmToken = await Messaging.SharedInstance.FetchTokenAsync();
-
-        if (fcmToken == null)
-            throw new InvalidOperationException("FCM Token is null");
-
+        var fcmToken = await this.GetFcmToken().ConfigureAwait(false);
         this.container.SetCurrentToken(fcmToken, false);
-        return new PushAccessState(result.Status, fcmToken);
+        return new PushAccessState(AccessState.Available, fcmToken);
     }
 
 
@@ -168,5 +152,21 @@ public class PushManager : IPushManager, IPushTagSupport
             foreach (var tag in tags)
                 await this.AddTag(tag).ConfigureAwait(false);
         }
+    }
+
+
+    protected async Task<string> GetFcmToken()
+    {
+        var rawToken = await this.adapter.RequestRawToken().ConfigureAwait(false);
+        var result = await this.adapter.RequestAccess().ConfigureAwait(false);
+        this.TryStartFirebase();
+
+        Messaging.SharedInstance.ApnsToken = rawToken;
+        var fcmToken = await Messaging.SharedInstance.FetchTokenAsync();
+
+        if (fcmToken == null)
+            throw new InvalidOperationException("FCM Token is null");
+
+        return fcmToken;
     }
 }
