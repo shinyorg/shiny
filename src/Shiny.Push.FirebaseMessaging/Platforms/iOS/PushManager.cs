@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
 using Microsoft.Extensions.Logging;
-using Shiny.Push.Infrastructure;
 
 namespace Shiny.Push.FirebaseMessaging;
 
@@ -157,7 +156,6 @@ public class PushManager : IPushManager, IPushTagSupport
     protected async Task<string> GetFcmToken()
     {
         var rawToken = await this.adapter.RequestRawToken().ConfigureAwait(false);
-        var result = await this.adapter.RequestAccess().ConfigureAwait(false);
         this.TryStartFirebase();
 
         Messaging.SharedInstance.ApnsToken = rawToken;
