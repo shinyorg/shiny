@@ -9,15 +9,21 @@ namespace Shiny.BluetoothLE.Managed
 {
     public interface IManagedScan : IDisposable
     {
-        TimeSpan? ClearTime { get; set; }
-        TimeSpan BufferTimeSpan { get; set; }
-        bool IsScanning { get; }
         ObservableCollection<ManagedScanResult> Peripherals { get; }
-        ScanConfig? ScanConfig { get; set; }
-        IScheduler? Scheduler { get; set; }
+        TimeSpan? ClearTime { get; }
+        TimeSpan BufferTimeSpan { get; }
+        bool IsScanning { get; }
+        ScanConfig? ScanConfig { get; }
+        IScheduler? Scheduler { get; }
 
         IEnumerable<IPeripheral> GetConnectedPeripherals();
-        Task Start();
+        Task Start(
+            ScanConfig? scanConfig = null,
+            Func<ScanResult, bool>? predicate = null,
+            IScheduler? scheduler = null,
+            TimeSpan? bufferTime = null,
+            TimeSpan? clearTime = null
+        );
         void Stop();
         IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan();
     }

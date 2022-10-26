@@ -7,10 +7,11 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-
+using Shiny.Hosting;
 
 namespace Shiny.BluetoothLE.Managed
 {
+
 
     public class ManagedPeripheral : NotifyPropertyChanged, IDisposable, IManagedPeripheral
     {
@@ -101,70 +102,52 @@ namespace Shiny.BluetoothLE.Managed
 
         public bool IsMonitoringRssi => this.rssiSub != null;
 
-        // TODO: how to fire multiple whenReadys, doonce? // finally could remove whenReady?
-        public IObservable<byte[]?> WhenNotificationReceived(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvalable, Action? whenReady) =>
-            this.GetNotificationObservable(serviceUuid, characteristicUuid, useIndicationsIfAvalable);
 
-
-        readonly Dictionary<string, IObservable<byte[]?>> observables = new Dictionary<string, IObservable<byte[]?>>();
-        protected IObservable<byte[]?> GetNotificationObservable(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvalable)
-        {
-            var key = $"{serviceUuid}-{characteristicUuid}";
-            if (!this.observables.ContainsKey(key))
-            {
-                lock (this.observables)
+        public IObservable<byte[]?> WhenNotificationReceived(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvalable, Action? whenReady) => this
+            .Peripheral
+                .WhenConnected()
+                .Select(x => this.GetChar(serviceUuid, characteristicUuid))
+                .Switch()
+                .Select(x => x.EnableNotifications(true, useIndicationsIfAvalable))
+                .Switch()
+                .Select(x =>
                 {
-                    this.observables[key] = this.Peripheral
-                        .WhenConnected()
-                        .Select(x => this.GetChar(serviceUuid, characteristicUuid))
-                        .Switch()
-                        .Select(x => x.EnableNotifications(true, useIndicationsIfAvalable))
-                        .Switch()
-                        .Select(x =>
-                        {
-                            var ch = this.GetInfo(serviceUuid, characteristicUuid);
-                            ch.IsNotificationsEnabled = true;
-                            ch.UseIndicationIfAvailable = useIndicationsIfAvalable;
+                    var ch = this.GetInfo(serviceUuid, characteristicUuid);
+                    ch.IsNotificationsEnabled = true;
+                    ch.UseIndicationIfAvailable = useIndicationsIfAvalable;
 
-                            //whenReady?.Invoke();
-                            return x.WhenNotificationReceived();
-                        })
-                        .Switch()
-                        .Select(x => x.Data)
-                        .Finally(async () =>
-                        {
-                            var ch = this.GetInfo(serviceUuid, characteristicUuid);
-                            ch.IsNotificationsEnabled = false;
-                            ch.UseIndicationIfAvailable = false;
+                    whenReady?.Invoke();
+                    return x.WhenNotificationReceived();
+                })
+                .Switch()
+                .Select(x => x.Data)
+                .Finally(async () =>
+                {
+                    var ch = this.GetInfo(serviceUuid, characteristicUuid);
+                    ch.IsNotificationsEnabled = false;
+                    ch.UseIndicationIfAvailable = false;
 
-                            if (ch.Characteristic != null)
-                            {
-                                try
-                                {
-                                    await ch.Characteristic.EnableNotifications(false).ToTask();
-                                }
-                                catch (Exception ex)
-                                {
-                                    this.logger.LogWarning("Unable to cleanly unhook peripheral", ex);
-                                }
-                            }
-                        })
-                        .Publish()
-                        .RefCount();
-                }
-            }
-            return this.observables[key];
-        }
+                    if (ch.Characteristic != null)
+                    {
+                        try
+                        {
+                            await ch.Characteristic.EnableNotifications(false).ToTask();
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger.LogWarning("Unable to cleanly unhook peripheral", ex);
+                        }
+                    }
+                });
 
 
         public IReadOnlyList<GattCharacteristicInfo> Characteristics => this.characteristics.AsReadOnly();
 
 
-        public IObservable<IManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream) => this
+        public IObservable<BleWriteSegment> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null) => this
             .GetChar(serviceUuid, characteristicUuid)
-            .Select(x => x.WriteBlob(stream))
-            .Switch()
-            .Select(_ => this);
+            .Select(x => x.WriteBlob(stream, packetSendTimeout))
+            .Switch();
 
 
         public IObservable<IManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this

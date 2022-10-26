@@ -25,6 +25,6 @@ namespace Shiny.BluetoothLE.Managed
         bool ToggleRssi();
         IObservable<byte[]?> WhenNotificationReceived(string serviceUuid, string characteristicUuid, bool useIndicationIfAvailable = false, Action? onReady = null);
         IObservable<IManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
-        IObservable<IManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream);
+        IObservable<IManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null);
     }
 }
