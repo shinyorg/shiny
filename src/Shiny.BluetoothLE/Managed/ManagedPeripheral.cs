@@ -7,12 +7,10 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Shiny.Hosting;
+
 
 namespace Shiny.BluetoothLE.Managed
 {
-
-
     public class ManagedPeripheral : NotifyPropertyChanged, IDisposable, IManagedPeripheral
     {
         readonly List<GattCharacteristicInfo> characteristics;

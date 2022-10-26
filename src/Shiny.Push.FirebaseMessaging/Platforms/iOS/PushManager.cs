@@ -42,7 +42,7 @@ namespace Shiny.Push.FirebaseMessaging
         public IObservable<PushNotification> WhenReceived() => this.container.WhenReceived();
 
 
-        public void Start()
+        public async void Start()
         {
             if (this.CurrentRegistrationToken != null)
             {

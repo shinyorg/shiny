@@ -29,7 +29,7 @@
 
     <ItemGroup>
         <PackageReference Update="Xamarin.Firebase.iOS.Core" Version="8.10.0" />
-        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0" />
+        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.2" />
         <PackageReference Update="Xamarin.Firebase.iOS.InstanceID" Version="4.8.0" />
         <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="8.10.0" />
         <PackageReference Update="Xamarin.Firebase.iOS.Analytics" Version="8.10.0" />

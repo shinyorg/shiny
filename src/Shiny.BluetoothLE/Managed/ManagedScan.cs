@@ -24,7 +24,7 @@ namespace Shiny.BluetoothLE.Managed
             => this.bleManager = bleManager;
 
 
-        public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.list
+        public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.Peripherals
             .ToList()
             .Where(x => x.Peripheral.IsConnected())
             .Select(x => x.Peripheral);
@@ -62,7 +62,7 @@ namespace Shiny.BluetoothLE.Managed
                 .ConfigureAwait(false);
 
             access.Assert();
-            this.list.Clear();
+            this.Peripherals.Clear();
             this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
             this.disposer = new();
 
