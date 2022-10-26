@@ -49,6 +49,8 @@ namespace Shiny.Push.FirebaseMessaging
                 try
                 {
                     this.TryStartFirebase();
+                    var fcmToken = await this.GetFcmToken().ConfigureAwait(false);
+                    this.container.SetCurrentToken(fcmToken, true);
                 }
                 catch (Exception ex)
                 {
@@ -92,30 +94,15 @@ namespace Shiny.Push.FirebaseMessaging
                     });
                 }
             }
-            Messaging.SharedInstance!.Delegate = new FbMessagingDelegate
-            (
-                async token =>
-                {
-                    // TODO: I don't want this being called when requesting access
-                    this.container.SetCurrentToken(token, true);
-                    await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
-                }
-            );
         }
 
 
         public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var result = await this.adapter.RequestAccess().ConfigureAwait(false);
             this.TryStartFirebase();
-
-            Messaging.SharedInstance.ApnsToken = result.RegistrationToken!;
-            var fcmToken = Messaging.SharedInstance.FcmToken;
-            if (fcmToken == null)
-                throw new InvalidProgramException("FcmToken is null");
-            
+            var fcmToken = await this.GetFcmToken().ConfigureAwait(false);
             this.container.SetCurrentToken(fcmToken, false);
-            return new PushAccessState(result.Status, fcmToken);
+            return new PushAccessState(AccessState.Available, fcmToken);
         }
 
 
@@ -178,6 +165,22 @@ namespace Shiny.Push.FirebaseMessaging
                 foreach (var tag in tags)
                     await this.AddTag(tag).ConfigureAwait(false);
             }
+        }
+
+
+        protected async Task<string> GetFcmToken()
+        {
+            // HACK: cleaner in v3
+            var rawToken = await ((NativeAdapter)this.adapter).RequestRawToken().ConfigureAwait(false);
+            this.TryStartFirebase();
+
+            Messaging.SharedInstance.ApnsToken = rawToken;
+            var fcmToken = await Messaging.SharedInstance.FetchTokenAsync();
+
+            if (fcmToken == null)
+                throw new InvalidOperationException("FCM Token is null");
+
+            return fcmToken;
         }
     }
 }
