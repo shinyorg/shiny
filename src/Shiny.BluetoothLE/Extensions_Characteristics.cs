@@ -71,30 +71,12 @@ namespace Shiny.BluetoothLE
 
 
         /// <summary>
-        /// Sends a stream in packets to the characteristic
-        /// </summary>
-        /// <param name="characteristic">The characteristic to send to</param>
-        /// <param name="stream">The stream you are sending</param>
-        /// <param name="packetSendTimeout">How long each packet should wait before timing out/erroring</param>
-        /// <returns></returns>
-        public static IObservable<IGattCharacteristic> WriteBlob(this IGattCharacteristic characteristic, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<IGattCharacteristic>(ob =>
-            characteristic
-                .WriteBlobWithProgress(stream)
-                .Subscribe(
-                    _ => { },
-                    ex => ob.OnError(ex),
-                    () => ob.Respond(characteristic)
-                )
-        );
-
-
-        /// <summary>
         /// Used for writing blobs
         /// </summary>
         /// <param name="ch">The characteristic to write on</param>
         /// <param name="stream">The stream to send</param>
         /// <param name="packetSendTimeout">How long to wait before timing out a packet send - defaults to 5 seconds</param>
-        public static IObservable<BleWriteSegment> WriteBlobWithProgress(this IGattCharacteristic ch, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
+        public static IObservable<BleWriteSegment> WriteBlob(this IGattCharacteristic ch, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
         {
             var mtu = ch.Service.Peripheral.MtuSize;
             var buffer = new byte[mtu];
