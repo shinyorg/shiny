@@ -66,10 +66,12 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching,
 
     public async Task<bool> RequestPermission()
     {
+        // TODO: make this configurable
         var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
             UNAuthorizationOptions.Alert |
             UNAuthorizationOptions.Badge |
             UNAuthorizationOptions.Sound
+            //UNAuthorizationOptions.CarPlay
         );
         return result.Item1;
     }
