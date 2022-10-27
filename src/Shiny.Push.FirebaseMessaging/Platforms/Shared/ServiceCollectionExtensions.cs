@@ -31,8 +31,8 @@ public static class ServiceCollectionExtensions
                     config.UseEmbeddedConfiguration,
                     config.AppId,
                     config.SenderId,
-                    config.ProjectId,
-                    config.ApiKey
+                    config.ApiKey,
+                    config.ProjectId
                 )
             );
         }
