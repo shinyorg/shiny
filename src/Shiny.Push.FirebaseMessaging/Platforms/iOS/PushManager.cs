@@ -44,6 +44,9 @@ namespace Shiny.Push.FirebaseMessaging
 
         public async void Start()
         {
+            this.adapter.OnReceived = push => this.container.OnReceived(push);
+            this.adapter.OnEntry = push => this.container.OnEntry(push);
+
             if (this.CurrentRegistrationToken != null)
             {
                 try
