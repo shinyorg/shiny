@@ -37,26 +37,28 @@ public class PushManager : IPushManager,
 
     public async void Start()
     {
-        // this only runs on Android/Firebase
-        this.native.OnTokenRefreshed = async token =>
+        this.native.OnReceived = push => this.container.OnReceived(push);
+        this.native.OnEntry = push => this.container.OnEntry(push);
+
+        if (!this.CurrentRegistrationToken.IsEmpty())
         {
-            this.container.SetCurrentToken(token, false);
             try
             {
-                // if this fails, we should have a backup plan like a job
-                await this.Update(token).ConfigureAwait(false);
+                // TODO: if native token changes, we need to update anh or kill the token?
+                var result = await this.native.RequestAccess();
+
+                if (result.Status == AccessState.Available && !result.RegistrationToken!.Equals(this.NativeToken))
+                {
+                    // token is not changing on anh, so we don't need to fire events
+                    await this.Update(result.RegistrationToken!).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
                 this.logger.LogError("Failed to register new native push token with Azure Notification Hubs", ex);
+                //await this.UnRegister(); // TODO:??
             }
-        };
-
-        this.native.OnReceived = push => this.container.OnReceived(push);
-        this.native.OnEntry = push => this.container.OnEntry(push);
-        await this.container
-            .TryAutoStart(this.native, this.logger)
-            .ConfigureAwait(false);
+        }
     }
 
 
@@ -70,6 +72,11 @@ public class PushManager : IPushManager,
         private set => this.container.Store.SetOrRemove(nameof(this.InstallationId), value);
     }
 
+    string NativeToken
+    {
+        get => this.container.Store.Get<string>(nameof(this.NativeToken));
+        set => this.container.Store.SetOrRemove(nameof(this.NativeToken), value);
+    }
 
     public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
@@ -81,6 +88,8 @@ public class PushManager : IPushManager,
         if (access.Status == AccessState.Available)
         {
             this.InstallationId ??= Guid.NewGuid().ToString().Replace("-", "");
+            this.NativeToken = access.RegistrationToken!;
+
             await this
                 .Update(access.RegistrationToken!)
                 .ConfigureAwait(false);
@@ -108,7 +117,8 @@ public class PushManager : IPushManager,
             }
             catch (MessagingEntityNotFoundException)
             {
-                // who cares - it was already unregistered somehow
+                // who cares ??
+                // retry??  does it matter?  native token is killed
             }
             this.InstallationId = null;
         }
@@ -181,9 +191,9 @@ public class PushManager : IPushManager,
             PushChannel = nativeRegToken,
             ExpirationTime = date,
             Tags = this.RegisteredTags?.ToList(),
-#if __IOS__
+#if APPLE
             Platform = NotificationPlatform.Apns
-#elif __ANDROID__
+#elif ANDROID
             Platform = NotificationPlatform.Fcm
 #endif
         };

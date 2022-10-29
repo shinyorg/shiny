@@ -11,5 +11,4 @@ public interface INativeAdapter
 
     Func<PushNotification, Task>? OnReceived { get; set; }
     Func<PushNotification, Task>? OnEntry { get; set; }
-    Func<string, Task>? OnTokenRefreshed { get; set; }
 }

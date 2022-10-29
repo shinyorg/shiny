@@ -33,12 +33,6 @@ public sealed partial class PushManager : IPushManager, IShinyStartupTask
 
     public async void Start()
     {
-        this.adapter.OnTokenRefreshed = async token =>
-        {
-            this.container.SetCurrentToken(token, false);
-            await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
-        };
-
         this.adapter.OnReceived = push => this.container.OnReceived(push);
         this.adapter.OnEntry = push => this.container.OnEntry(push);
 

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Push.FirebaseMessaging;
 
 
-public class PushManager : IPushManager, IPushTagSupport
+public class PushManager : IPushManager, IPushTagSupport, IShinyStartupTask
 {
     readonly NativeAdapter adapter;
     readonly PushContainer container;
@@ -42,6 +42,9 @@ public class PushManager : IPushManager, IPushTagSupport
 
     public async void Start()
     {
+        this.adapter.OnReceived = push => this.container.OnReceived(push);
+        this.adapter.OnEntry = push => this.container.OnEntry(push);
+
         if (this.CurrentRegistrationToken != null)
         {
             try

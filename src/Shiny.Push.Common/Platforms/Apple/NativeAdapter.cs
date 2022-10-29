@@ -29,7 +29,6 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching,
     }
 
 
-    public Func<string, Task>? OnTokenRefreshed { get; set; }
     public Func<PushNotification, Task>? OnReceived { get; set; }
     public Func<PushNotification, Task>? OnEntry { get; set; }
 
@@ -75,6 +74,7 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching,
         );
         return result.Item1;
     }
+
 
     public async Task<NSData> RequestRawToken(CancellationToken cancelToken = default)
     {
