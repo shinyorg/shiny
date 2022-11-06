@@ -7,8 +7,8 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var builder = MauiApp.CreateBuilder();
-        builder
+        var builder = MauiApp
+            .CreateBuilder()
             .UseMauiApp<App>()
             .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
             .ConfigureFonts(fonts =>
