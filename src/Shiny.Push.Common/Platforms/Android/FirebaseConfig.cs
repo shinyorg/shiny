@@ -27,7 +27,7 @@ namespace Shiny.Push
         /// <summary>
         /// If you have included a GoogleService-Info.plist (iOS) or google-services.json (Android), set this to true (default)
         /// </summary>
-        public bool UseEmbeddedConfiguration { get; set; }
+        public bool UseEmbeddedConfiguration { get; set; } = true;
         public string? AppId { get; set; }
         public string? SenderId { get; set; }
         public string? ApiKey { get; set; }
