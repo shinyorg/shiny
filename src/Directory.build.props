@@ -36,8 +36,8 @@
         <AndroidTargetFrameworks Condition="'$(CI)' == 'true'">$(AndroidTargetFrameworks);net6.0-android</AndroidTargetFrameworks>
         <AndroidTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(AndroidTargetFrameworks);monoandroid12.0</AndroidTargetFrameworks>
 
-        <MauiPlatformTargetFrameworks>net7.0-android;net-ios7.0;net7.0-maccatalyst</MauiPlatformTargetFrameworks>
-        <MauiPlatformTargetFrameworks Condition="'$(CI)' == 'true'">$(MauiPlatformTargetFrameworks);net6.0-android;net-ios6.0;net6.0-maccatalyst</MauiPlatformTargetFrameworks>
+        <MauiPlatformTargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</MauiPlatformTargetFrameworks>
+        <MauiPlatformTargetFrameworks Condition="'$(CI)' == 'true'">$(MauiPlatformTargetFrameworks);net6.0-android;net6.0-ios;net6.0-maccatalyst</MauiPlatformTargetFrameworks>
 
         <AppleTargetFrameworks>$(IosTargetFrameworks);net7.0-maccatalyst</AppleTargetFrameworks>
         <AppleTargetFrameworks Condition="'$(CI)' == 'true'">$(AppleTargetFrameworks);net6.0-maccatalyst</AppleTargetFrameworks>
@@ -46,7 +46,6 @@
         <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
         <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>
 
-        <WasmTargetFramework>net7.0</WasmTargetFramework>
         <MSBuildSdkExtrasVersion>3.0.44</MSBuildSdkExtrasVersion>
     </PropertyGroup>
 
