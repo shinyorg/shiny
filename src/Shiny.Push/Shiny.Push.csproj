@@ -11,26 +11,5 @@
         <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Platforms\WebAssembly\" />
-      <None Remove="Platforms\WebAssembly\wwwroot\push.js" />
-      <None Remove="Platforms\WebAssembly\wwwroot\" />
-      <None Remove="Platforms\WebAssembly\PushManager.cs" />
-      <None Remove="Platforms\WebAssembly\ServiceCollectionExtensions.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Platforms\WebAssembly\" />
-      <Folder Include="Platforms\WebAssembly\wwwroot\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="Platforms\WebAssembly\wwwroot\push.js">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Include="Platforms\WebAssembly\PushManager.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-      <Compile Include="Platforms\WebAssembly\ServiceCollectionExtensions.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

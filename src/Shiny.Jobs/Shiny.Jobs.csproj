@@ -14,26 +14,5 @@
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Platforms\Jobs\" />
-      <None Remove="Platforms\Jobs\wwwroot\jobs.js" />
-      <None Remove="Platforms\Jobs\wwwroot\" />
-      <None Remove="Platforms\Jobs\JobManager.cs" />
-      <None Remove="Platforms\Jobs\ServiceCollectionExtensions.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Platforms\Jobs\" />
-      <Folder Include="Platforms\Jobs\wwwroot\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="Platforms\Jobs\wwwroot\jobs.js">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Include="Platforms\Jobs\JobManager.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-      <Compile Include="Platforms\Jobs\ServiceCollectionExtensions.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

@@ -68,7 +68,7 @@
 
 	<ItemGroup Condition="'$(IsWebAssembly)' == 'true'">
         <Compile Include="Platforms\WebAssembly\**\*.cs" />
-        <WasmExtraFilesToDeploy Include="Platforms\WebAssembly\Script\*.css" />
-		<WasmExtraFilesToDeploy Include="Platforms\WebAssembly\Script\*.js" />
+        <WasmExtraFilesToDeploy Include="Platforms\WebAssembly\*.css" />
+		<WasmExtraFilesToDeploy Include="Platforms\WebAssembly\*.js" />
 	</ItemGroup>
 </Project>

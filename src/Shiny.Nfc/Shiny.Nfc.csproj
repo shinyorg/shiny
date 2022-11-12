@@ -10,26 +10,5 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Platforms\WebAssembly\" />
-      <None Remove="Platforms\WebAssembly\wwwroot\nfc.js" />
-      <None Remove="Platforms\WebAssembly\wwwroot\" />
-      <None Remove="Platforms\WebAssembly\NfcManager.cs" />
-      <None Remove="Platforms\WebAssembly\ServiceCollectionExtensions.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Platforms\WebAssembly\" />
-      <Folder Include="Platforms\WebAssembly\wwwroot\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="Platforms\WebAssembly\wwwroot\nfc.js">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Include="Platforms\WebAssembly\NfcManager.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-      <Compile Include="Platforms\WebAssembly\ServiceCollectionExtensions.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

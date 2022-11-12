@@ -11,32 +11,5 @@
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Platforms\WebAssembly\" />
-      <None Remove="Platforms\WebAssembly\wwwroot\ble.js" />
-      <None Remove="Platforms\WebAssembly\wwwroot\" />
-      <None Remove="Platforms\WebAssembly\AdvertisementData.cs" />
-      <None Remove="Platforms\WebAssembly\BleManager.cs" />
-      <None Remove="Platforms\WebAssembly\JsScanResult.cs" />
-      <None Remove="Platforms\WebAssembly\Peripheral.cs" />
-      <None Remove="Platforms\WebAssembly\ServiceCollectionExtensions.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Platforms\WebAssembly\" />
-      <Folder Include="Platforms\WebAssembly\wwwroot\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="Platforms\WebAssembly\wwwroot\ble.js">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Include="Platforms\WebAssembly\AdvertisementData.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-      <Compile Include="Platforms\WebAssembly\BleManager.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-      <Compile Include="Platforms\WebAssembly\JsScanResult.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-      <Compile Include="Platforms\WebAssembly\Peripheral.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-      <Compile Include="Platforms\WebAssembly\ServiceCollectionExtensions.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>
