@@ -9,8 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="System.Reactive" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
@@ -23,5 +23,48 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Platforms\WebAssembly\" />
+      <None Remove="Platforms\WebAssembly\Infrastructure\Battery.cs" />
+      <None Remove="Platforms\WebAssembly\Infrastructure\Connectivity.cs" />
+      <None Remove="Platforms\WebAssembly\Infrastructure\Interop.cs" />
+      <None Remove="Platforms\WebAssembly\Infrastructure\LocalStorageRepository.cs" />
+      <None Remove="Platforms\WebAssembly\Infrastructure\LocalStorageStore.cs" />
+      <None Remove="Platforms\WebAssembly\Infrastructure\ShinyRootComponent.cs" />
+      <None Remove="Platforms\WebAssembly\Infrastructure\" />
+      <None Remove="Platforms\WebAssembly\wwwroot\battery.js" />
+      <None Remove="Platforms\WebAssembly\wwwroot\connectivity.js" />
+      <None Remove="Platforms\WebAssembly\wwwroot\storage.js" />
+      <None Remove="Platforms\WebAssembly\wwwroot\" />
+      <None Remove="Platforms\WebAssembly\RegistrationExtensions.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Platforms\WebAssembly\" />
+      <Folder Include="Platforms\WebAssembly\Infrastructure\" />
+      <Folder Include="Platforms\WebAssembly\wwwroot\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="Platforms\WebAssembly\Infrastructure\Battery.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+      <Compile Include="Platforms\WebAssembly\Infrastructure\Connectivity.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+      <Compile Include="Platforms\WebAssembly\Infrastructure\Interop.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+      <Compile Include="Platforms\WebAssembly\Infrastructure\LocalStorageRepository.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+      <Compile Include="Platforms\WebAssembly\Infrastructure\LocalStorageStore.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+      <Compile Include="Platforms\WebAssembly\Infrastructure\ShinyRootComponent.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+      <Compile Include="Platforms\WebAssembly\RegistrationExtensions.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Platforms\WebAssembly\wwwroot\battery.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="Platforms\WebAssembly\wwwroot\connectivity.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="Platforms\WebAssembly\wwwroot\storage.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

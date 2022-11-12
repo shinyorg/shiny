@@ -1,29 +1,23 @@
 <Project>
     <ItemGroup>
-        <PackageReference Update="System.Text.Json" Version="6.0.5" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
-        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-        <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
-        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-
-        <PackageReference Update="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
-        <PackageReference Update="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+        <PackageReference Update="System.Text.Json" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Update="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Update="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-        <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.109" PrivateAssets="All" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Update="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
-        <PackageReference Update="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
+        <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.119" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="123.0.7" />
-        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.2" />
+        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.3" />
     </ItemGroup>
 
     <ItemGroup>

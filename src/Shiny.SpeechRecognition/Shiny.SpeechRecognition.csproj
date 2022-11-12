@@ -10,5 +10,26 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Platforms\WebAssembly\" />
+      <None Remove="Platforms\WebAssembly\wwwroot\speech.js" />
+      <None Remove="Platforms\WebAssembly\wwwroot\" />
+      <None Remove="Platforms\WebAssembly\ServiceCollectionExtensions.cs" />
+      <None Remove="Platforms\WebAssembly\SpeechRecognizer.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Platforms\WebAssembly\" />
+      <Folder Include="Platforms\WebAssembly\wwwroot\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Platforms\WebAssembly\wwwroot\speech.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="Platforms\WebAssembly\ServiceCollectionExtensions.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+      <Compile Include="Platforms\WebAssembly\SpeechRecognizer.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

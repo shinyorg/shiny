@@ -36,12 +36,12 @@ jobs:
       with:
           fetch-depth: 0
 
-    - name: Setup .NET 6.0
+    - name: Setup .NET 7.0
       uses: actions/setup-dotnet@v1
       with:
-          dotnet-version: '6.0.400'
+          dotnet-version: '7.0.100'
 
-    - name: Add .NET 6 Workloads
+    - name: Add .NET Workloads
       run: dotnet workload install maui ios android maccatalyst
 
     - name: Build

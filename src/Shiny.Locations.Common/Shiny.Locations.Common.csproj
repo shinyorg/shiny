@@ -2,11 +2,16 @@
     <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
-        <TargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(TargetFrameworks);xamarin.ios10;$(ClassicAndroidTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(PlatformOnlyTargetFrameworks)</TargetFrameworks>
         <Description>Shiny Locations - Common components for Beacons and Locations</Description>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>

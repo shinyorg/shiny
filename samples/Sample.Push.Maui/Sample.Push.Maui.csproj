@@ -5,7 +5,8 @@
 
 		<!--if native android or firebase - firebase will look for the embedded configuration-->
 		<FirebaseUseEmbeddedConfiguration>false</FirebaseUseEmbeddedConfiguration>
-		<TargetFrameworks>net6.0-android;net6.0-ios</TargetFrameworks>
+		<!--<TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>-->
+		<TargetFrameworks>net7.0-ios</TargetFrameworks>
 		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net6.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>

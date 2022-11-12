@@ -2,8 +2,7 @@
     <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net6.0-ios;net6.0-android</TargetFrameworks>
-        <TargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(TargetFrameworks);$(ClassicTargets)</TargetFrameworks>
+        <TargetFrameworks>$(DefaultMobileTargetFrameworks)</TargetFrameworks>
         <Description>Shiny Push Integration - Google Firebase Cloud Messaging</Description>
     </PropertyGroup>
 

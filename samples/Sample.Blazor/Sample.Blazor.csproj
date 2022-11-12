@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Sample</RootNamespace>
@@ -17,18 +17,42 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.8" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Jobs.Blazor\Shiny.Jobs.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Nfc.Blazor\Shiny.Nfc.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Notifications.Blazor\Shiny.Notifications.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition.Blazor\Shiny.SpeechRecognition.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition.Blazor\Shiny.SpeechRecognition.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
+        <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.csproj">
+          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+        </ProjectReference>
     </ItemGroup>
 </Project>

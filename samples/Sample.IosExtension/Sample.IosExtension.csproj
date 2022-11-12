@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net7.0-ios</TargetFrameworks>
+        <OutputType>Library</OutputType>
+        <ApplicationId>YOUR-APPLICATION-ID-FROM-INFO.PLIST</ApplicationId>
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsAppExtension>true</IsAppExtension>
+        <IsWatchExtension>false</IsWatchExtension>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
+</Project>

@@ -1,4 +1,23 @@
 ﻿<Project>
+	<!--<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+		<WasmMainJSPath>main.js</WasmMainJSPath>
+		<OutputType>Exe</OutputType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>full</TrimMode>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<WasmExtraFilesToDeploy Include="index.html" />
+		<WasmExtraFilesToDeploy Include="*.js" />
+		<WasmExtraFilesToDeploy Include="*.css" />
+	</ItemGroup>-->
+
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
@@ -17,38 +36,34 @@
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
+        <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
+        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
         <XamarinIosFirebaseVersion>8.10.0.1</XamarinIosFirebaseVersion>
+        <MicrosoftExtensionsVersion>7.0.0</MicrosoftExtensionsVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <!--
-        To compile classic targets on Mac:
-            1. UseMSBuild = true
-            2. Comment out net6 related from DefaultTargetFrameworks
-            3. You may need to enable msbuild
-
-        To compile modern targets on Mac:
-            1. UseMSBuild = false
-            2. Leave only net6.0 related targets
-            3. You may need to disable msbuild
-
-        To compile everything on Windows
-            1. UseMSBuild = true
-            2. Set all DefaultTargetFrameworks
-        -->
-
-        <!--what about nfc & configuration-->
         <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>
-        <ClassicAndroidTargetFramework>monoandroid12.0</ClassicAndroidTargetFramework>
-        <ClassicTargets>netstandard2.1;xamarin.ios10;$(ClassicAndroidTargetFramework)</ClassicTargets>
-        <DefaultTargetFrameworks>$(DefaultTargetFrameworks);net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</DefaultTargetFrameworks>
-        <DefaultTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(DefaultTargetFrameworks);$(ClassicTargets)</DefaultTargetFrameworks>
+        <StandardTargetFrameworks>net7.0</StandardTargetFrameworks>
+        <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);net6.0;netstandard2.1</StandardTargetFrameworks>
 
+        <IosTargetFrameworks>net7.0-ios</IosTargetFrameworks>
+        <IosTargetFrameworks Condition="'$(CI)' == 'true'">$(IosTargetFrameworks);net6.0-ios</IosTargetFrameworks>
+        <IosTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(IosTargetFrameworks);xamarin.ios10</IosTargetFrameworks>
+
+        <AndroidTargetFrameworks>net7.0-android</AndroidTargetFrameworks>
+        <AndroidTargetFrameworks Condition="'$(CI)' == 'true'">$(AndroidTargetFrameworks);net6.0-android</AndroidTargetFrameworks>
+        <AndroidTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(AndroidTargetFrameworks);monoandroid12.0</AndroidTargetFrameworks>
+
+        <AppleTargetFrameworks>$(IosTargetFrameworks);net7.0-maccatalyst</AppleTargetFrameworks>
+        <AppleTargetFrameworks Condition="'$(CI)' == 'true'">$(AppleTargetFrameworks);net6.0-maccatalyst</AppleTargetFrameworks>
+
+        <PlatformOnlyTargetFrameworks>$(AppleTargetFrameworks);$(AndroidTargetFrameworks)</PlatformOnlyTargetFrameworks>
+        <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
+        <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>
+
+        <WasmTargetFramework>net7.0</WasmTargetFramework>
         <MSBuildSdkExtrasVersion>3.0.44</MSBuildSdkExtrasVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
