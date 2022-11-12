@@ -46,11 +46,11 @@
           <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
           <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition.Blazor\Shiny.SpeechRecognition.csproj">
+        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
           <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
           <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.csproj">
+        <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj">
           <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
           <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>

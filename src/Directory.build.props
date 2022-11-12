@@ -1,23 +1,4 @@
 ﻿<Project>
-	<!--<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
-		<WasmMainJSPath>main.js</WasmMainJSPath>
-		<OutputType>Exe</OutputType>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<LangVersion>preview</LangVersion>
-		<PublishTrimmed>true</PublishTrimmed>
-		<TrimMode>full</TrimMode>
-		<RunAOTCompilation>true</RunAOTCompilation>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<WasmExtraFilesToDeploy Include="index.html" />
-		<WasmExtraFilesToDeploy Include="*.js" />
-		<WasmExtraFilesToDeploy Include="*.css" />
-	</ItemGroup>-->
-
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
@@ -115,4 +96,17 @@
         <IsIosBuild>true</IsIosBuild>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
+
+    <!--
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+        <IsWebAssembly>true</IsWebAssembly>
+	    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+        <WasmMainJSPath>main.js</WasmMainJSPath>
+		<OutputType>Exe</OutputType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>full</TrimMode>
+		<RunAOTCompilation>true</RunAOTCompilation>
+	</PropertyGroup>
+    -->
 </Project>
