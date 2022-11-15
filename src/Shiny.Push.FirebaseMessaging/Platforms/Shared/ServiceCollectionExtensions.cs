@@ -19,20 +19,19 @@ public static class ServiceCollectionExtensions
 
 #elif ANDROID
 
-        if (config == null)
+        if (config == null || config.UseEmbeddedConfiguration)
         {
-            services.AddPush(delegateType, new FirebaseConfig(true));
+            services.AddPush(delegateType, FirebaseConfig.Embedded);
         }
         else
         {
             services.AddPush(
                 delegateType,
-                new FirebaseConfig(
-                    config.UseEmbeddedConfiguration,
+                FirebaseConfig.FromValues(
                     config.AppId,
                     config.SenderId,
-                    config.ApiKey,
-                    config.ProjectId
+                    config.ProjectId,
+                    config.ApiKey
                 )
             );
         }

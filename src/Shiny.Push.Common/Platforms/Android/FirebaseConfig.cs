@@ -4,13 +4,22 @@ namespace Shiny.Push;
 
 
 public record FirebaseConfig(
-    bool UseEmbeddedConfiguration,
+    bool UseEmbeddedConfiguration = true,
     string? AppId = null,
     string? SenderId = null,
-    string? ApiKey = null,
-    string? ProjectId = null
+    string? ProjectId = null,
+    string? ApiKey = null
 )
 {
+    public static FirebaseConfig Embedded { get; } = new(true);
+    public static FirebaseConfig FromValues(string appId, string senderId, string projectId, string apiKey)
+    {
+        var cfg = new FirebaseConfig(false, appId, senderId, projectId, apiKey);
+        cfg.AssertValid();
+        return cfg;
+    }
+
+
     public void AssertValid()
     {
         if (this.UseEmbeddedConfiguration)

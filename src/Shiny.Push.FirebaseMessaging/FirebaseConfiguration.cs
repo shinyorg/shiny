@@ -7,7 +7,7 @@ public record FirebaseConfiguration(
     /// <summary>
     /// If you have included a GoogleService-Info.plist (iOS) or google-services.json (Android)
     /// </summary>
-    bool UseEmbeddedConfiguration,
+    bool UseEmbeddedConfiguration = true,
 
     string? AppId = null,
     string? SenderId = null,
@@ -15,6 +15,14 @@ public record FirebaseConfiguration(
     string? ApiKey = null
 )
 {
+    public static FirebaseConfiguration Embedded { get; } = new(true);
+    public static FirebaseConfiguration FromValues(string apiId, string senderId, string projectId, string apiKey)
+    {
+        var cfg = new FirebaseConfiguration(false, apiId, senderId, projectId, apiKey);
+        cfg.AssertValid();
+        return cfg;
+    }
+
 
     public void AssertValid()
     {
