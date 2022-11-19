@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Infrastructure;
@@ -6,7 +6,6 @@ using Shiny.Infrastructure.Impl;
 using Shiny.Net;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
-using Shiny.Web.Infrastructure;
 using Shiny.Web.Stores;
 
 namespace Shiny;
@@ -14,15 +13,17 @@ namespace Shiny;
 
 public static class RegistrationExtensions
 {
-    public static WebAssemblyHostBuilder UseShiny(this WebAssemblyHostBuilder builder)
+    public static IServiceCollection UseShiny(this IServiceCollection services)
     {
-        builder.RootComponents.Add<ShinyRootComponent>("head::after");
-        builder.Services.TryAddSingleton<ISerializer, DefaultSerializer>();
-        builder.Services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
-        builder.Services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
-        builder.Services.AddShinyService<LocalStorageStore>();
+        if (!OperatingSystem.IsBrowser())
+            throw new InvalidProgramException("You are not within a browser environment to be able to load webassembly");
 
-        return builder;
+        services.TryAddSingleton<ISerializer, DefaultSerializer>();
+        services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+        services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
+        services.AddShinyService<LocalStorageStore>();
+
+        return services;
     }
 
 

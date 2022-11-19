@@ -11,13 +11,18 @@ using System.Threading.Tasks;
 namespace Shiny.Infrastructure;
 
 
+[SupportedOSPlatform("browser")]
 static partial class Interop
 {
-    [JSImport("", "")]
-    internal static partial void SetItem(string json);
+    //[JSImport("", "")]
+    //internal static partial void SetItem(string json);
 
 
+    [JSImport("getLevel", "battery")]
+    internal static partial double GetBatteryLevel();
 
+    [JSImport("isCharging", "battery")]
+    internal static partial bool IsBatteryCharging();
 }
 
 //using System.Runtime.InteropServices.JavaScript;

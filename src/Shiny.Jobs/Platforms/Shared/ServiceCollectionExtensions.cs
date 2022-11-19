@@ -11,6 +11,19 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
+   //public static IServiceCollection AddJobs(this IServiceCollection services)
+   // {
+   //     services.AddBattery();
+   //     services.AddConnectivity();
+   //     services.AddRepository<JobInfoStoreConverter, JobInfo>();
+   //     //services.AddShinyService<JobsStartup>();
+   //     //services.AddShinyService<JobLifecycleTask>();
+   //     services.AddShinyService<JobManager>();
+
+   //     return services;
+   // }
+
+
     /// <summary>
     /// Register a job on the job manager
     /// </summary>

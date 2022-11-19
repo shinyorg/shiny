@@ -66,9 +66,9 @@
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
-	<ItemGroup Condition="'$(IsWebAssembly)' == 'true'">
+<!--	<ItemGroup Condition="'$(IsWebAssembly)' == 'true'">
         <Compile Include="Platforms\WebAssembly\**\*.cs" />
         <WasmExtraFilesToDeploy Include="Platforms\WebAssembly\*.css" />
 		<WasmExtraFilesToDeploy Include="Platforms\WebAssembly\*.js" />
-	</ItemGroup>
+	</ItemGroup>-->
 </Project>

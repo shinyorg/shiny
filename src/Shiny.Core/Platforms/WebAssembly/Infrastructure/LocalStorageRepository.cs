@@ -7,7 +7,6 @@ using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.JSInterop;
 using Shiny.Infrastructure;
 
 namespace Shiny.Stores.Impl;
@@ -20,49 +19,52 @@ public class LocalStorageRepository<TStoreConverter, TEntity> : IRepository<TEnt
     readonly Subject<(RepositoryAction Action, TEntity? Entity)> repoSubj = new();
     readonly TStoreConverter converter = new();
 
-    readonly IJSInProcessRuntime jsRuntime;
+    //readonly IJSInProcessRuntime jsRuntime;
     readonly ISerializer serializer;
 
 
-    public LocalStorageRepository(IJSRuntime jsRuntime, ISerializer serializer)
-    {
-        this.jsRuntime = (IJSInProcessRuntime)jsRuntime;
-        this.serializer = serializer;
-    }
+    //public LocalStorageRepository(IJSRuntime jsRuntime, ISerializer serializer)
+    //{
+    //    this.jsRuntime = (IJSInProcessRuntime)jsRuntime;
+    //    this.serializer = serializer;
+    //}
 
 
-    IJSInProcessObjectReference? jsRef;
-    async Task<IJSInProcessObjectReference> Mod()
-    {
-        this.jsRef ??= await this.jsRuntime.ImportInProcess("Shiny.Core.Blazor", "storage.js");
-        return this.jsRef;
-    }
+    //IJSInProcessObjectReference? jsRef;
+    //async Task<IJSInProcessObjectReference> Mod()
+    //{
+    //    this.jsRef ??= await this.jsRuntime.ImportInProcess("Shiny.Core.Blazor", "storage.js");
+    //    return this.jsRef;
+    //}
 
 
     public async Task<bool> Exists(string key)
     {
         var fk = GetFullKey(key);
-        return (await this.Mod()).Invoke<bool>("exists", fk);
+        //return (await this.Mod()).Invoke<bool>("exists", fk);
+        return false;
     }
 
 
     public async Task<TEntity?> Get(string key)
     {
         var fk = GetFullKey(key);
-        var json = (await this.Mod()).Invoke<string>("get", fk);
+        //var json = (await this.Mod()).Invoke<string>("get", fk);
 
-        if (json == null)
-            return default;
+        //if (json == null)
+        //    return default;
 
-        var obj = this.serializer.Deserialize<TEntity>(json);
-        return obj;
+        //var obj = this.serializer.Deserialize<TEntity>(json);
+        //return obj;
+        return default;
     }
 
 
     public async Task<IList<TEntity>> GetList(Expression<Func<TEntity, bool>>? expression = null)
     {
         var list = new List<TEntity>();
-        var dict = (await this.Mod()).Invoke<Dictionary<string, string>>("getList");
+        //var dict = (await this.Mod()).Invoke<Dictionary<string, string>>("getList");
+        var dict = new Dictionary<string, string>();
 
         if (dict.Count > 0)
         {
@@ -90,7 +92,7 @@ public class LocalStorageRepository<TStoreConverter, TEntity> : IRepository<TEnt
 
         var fk = GetFullKey(entity.Identifier);
         var json = this.ToJson(entity);
-        (await this.Mod()).InvokeVoid("set", fk, json);
+        //(await this.Mod()).InvokeVoid("set", fk, json);
 
         this.repoSubj.OnNext((action, entity));
 
@@ -103,14 +105,14 @@ public class LocalStorageRepository<TStoreConverter, TEntity> : IRepository<TEnt
         var fk = GetFullKey(key);
         var exists = Get(key) != null;
 
-        this.jsRuntime.InvokeVoid("localStorage.removeItem", fk);
+        //this.jsRuntime.InvokeVoid("localStorage.removeItem", fk);
         return Task.FromResult(exists);
     }
 
 
     public Task Clear()
     {
-        this.jsRuntime.InvokeVoid("localStorage.clear");
+        //this.jsRuntime.InvokeVoid("localStorage.clear");
         this.repoSubj.OnNext((RepositoryAction.Clear, default));
         return Task.CompletedTask;
     }
@@ -122,12 +124,13 @@ public class LocalStorageRepository<TStoreConverter, TEntity> : IRepository<TEnt
     TEntity? DoGet(string key)
     {
         var fk = GetFullKey(key);
-        var json = this.jsRuntime.Invoke<string>(fk);
-        if (json == null)
-            return default;
+        //var json = this.jsRuntime.Invoke<string>(fk);
+        //if (json == null)
+        //    return default;
 
-        var obj = this.FromJson(json);
-        return obj;
+        //var obj = this.FromJson(json);
+        //return obj;
+        return default;
     }
 
 

@@ -180,8 +180,11 @@ public partial class BleHostingManager : IBleHostingManager
 
         if (options.LocalName != null)
         {
-            var adapter = this.context.Platform.GetBluetoothAdapter()!;
-            adapter.SetName(options.LocalName); // TODO: verify name length with exception
+            // TODO: verify name length with exception
+            this.context
+                .Platform
+                .GetBluetoothAdapter()!
+                .SetName(options.LocalName);
         }
     }
 
@@ -245,12 +248,15 @@ public partial class BleHostingManager : IBleHostingManager
             () => tcs.SetResult(true),
             ex => tcs.SetException(ex)
         );
-        var adapter = this.context.Platform.GetBluetoothAdapter()!;
-        adapter.BluetoothLeAdvertiser!.StartAdvertising(
-            settings.Build(),
-            data.Build(),
-            this.adCallbacks
-        );
+        this.context
+            .Platform
+            .GetBluetoothAdapter()!
+            .BluetoothLeAdvertiser!
+            .StartAdvertising(
+                settings.Build(),
+                data.Build(),
+                this.adCallbacks
+            );
 
         await tcs.Task.ConfigureAwait(false);
     }

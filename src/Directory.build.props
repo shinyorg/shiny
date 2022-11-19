@@ -99,16 +99,19 @@
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
-    <!--
+    
     <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
         <IsWebAssembly>true</IsWebAssembly>
-	    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <!--
+        <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
         <WasmMainJSPath>main.js</WasmMainJSPath>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>full</TrimMode>
 		<RunAOTCompilation>true</RunAOTCompilation>
+        -->
 	</PropertyGroup>
-    -->
+    
 </Project>
