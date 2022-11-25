@@ -93,8 +93,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.Common", "src\Sh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShinyBuild", "build\ShinyBuild.csproj", "{452F676E-22B7-49A6-9603-D39689F0EAAD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazor", "Blazor", "{38F35C40-8FF5-477B-B997-4DAD731812AC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.AppCenter", "src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj", "{7A3AF2C7-1EDF-4BE2-ACC2-CC4C91A87601}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.FirebaseMessaging", "src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj", "{A0FE3674-202B-4D78-8D1B-5BA65172AD82}"
@@ -111,13 +109,13 @@ Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Sample.Blazor", "samples\Sa
 EndProject
 Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{7E012CA4-443D-4868-AB19-AB0CD12C0564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Hosting.Uno", "Shiny.Hosting.Uno\Shiny.Hosting.Uno.csproj", "{29813950-000D-4568-A41B-AF2633D3E07B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Hosting.Uno", "src\Shiny.Hosting.Uno\Shiny.Hosting.Uno.csproj", "{29813950-000D-4568-A41B-AF2633D3E07B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosting", "Hosting", "{EAE14AAE-C5AB-4980-90FF-C5E5467C3A3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Hosting.Xamarin", "Shiny.Hosting.Xamarin\Shiny.Hosting.Xamarin.csproj", "{022C14DA-694D-437B-B5A1-F1FC8051E44B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Hosting.Xamarin", "src\Shiny.Hosting.Xamarin\Shiny.Hosting.Xamarin.csproj", "{022C14DA-694D-437B-B5A1-F1FC8051E44B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Hosting.Avalonia", "Shiny.Hosting.Avalonia\Shiny.Hosting.Avalonia.csproj", "{363C24BF-EFF3-4A77-8848-35DDCA888C77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Hosting.Avalonia", "src\Shiny.Hosting.Avalonia\Shiny.Hosting.Avalonia.csproj", "{363C24BF-EFF3-4A77-8848-35DDCA888C77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1943,7 +1941,6 @@ Global
 		{DA452A0B-08F8-4809-95F4-9CD583F30FEA} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{880ADE07-EEE7-4C59-BE36-197C207E10C0} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{452F676E-22B7-49A6-9603-D39689F0EAAD} = {3A15354E-BAD2-4195-BE6B-49ED2B4E56E6}
-		{38F35C40-8FF5-477B-B997-4DAD731812AC} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{7A3AF2C7-1EDF-4BE2-ACC2-CC4C91A87601} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{A0FE3674-202B-4D78-8D1B-5BA65172AD82} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{CFD6F1CB-720F-4060-B057-4B44CB0CC809} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
