@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using Foundation;
 using Microsoft.UI.Xaml;
-using ObjCRuntime;
 using Shiny.Hosting;
+#if IOS
+using Foundation;
+using ObjCRuntime;
 using UIKit;
+#endif
 using static Uno.CompositionConfiguration;
 
 
