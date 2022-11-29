@@ -34,10 +34,6 @@
           <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
           <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
-        </ProjectReference>
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
           <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
           <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
