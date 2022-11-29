@@ -347,14 +347,17 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 
     public void Handle(NSDictionary options)
     {
-        if (options.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
-        {
-            var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
-            if (data != null)
-            {
-                // TODO: need to parse this back into a notification
-                //data.FromNsDictionary();
-            }
-        }
+        if (options == null)
+            return;
+
+        if (!options.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
+            return;
+
+        var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
+        if (data == null)
+            return;
+
+        // TODO: need to parse this back into a notification
+        //data.FromNsDictionary();
     }
 }
