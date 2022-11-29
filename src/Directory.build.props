@@ -24,24 +24,20 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>
+        <!--<UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>-->
+        <UseMSBuild>false</UseMSBuild>
+        
         <StandardTargetFrameworks>net7.0</StandardTargetFrameworks>
-        <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);net6.0;netstandard2.1</StandardTargetFrameworks>
+        <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);netstandard2.1</StandardTargetFrameworks>
 
         <IosTargetFrameworks>net7.0-ios</IosTargetFrameworks>
-        <IosTargetFrameworks Condition="'$(CI)' == 'true'">$(IosTargetFrameworks);net6.0-ios</IosTargetFrameworks>
         <IosTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(IosTargetFrameworks);xamarin.ios10</IosTargetFrameworks>
 
         <AndroidTargetFrameworks>net7.0-android</AndroidTargetFrameworks>
-        <AndroidTargetFrameworks Condition="'$(CI)' == 'true'">$(AndroidTargetFrameworks);net6.0-android</AndroidTargetFrameworks>
         <AndroidTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(AndroidTargetFrameworks);monoandroid12.0</AndroidTargetFrameworks>
 
         <MauiPlatformTargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</MauiPlatformTargetFrameworks>
-        <MauiPlatformTargetFrameworks Condition="'$(CI)' == 'true'">$(MauiPlatformTargetFrameworks);net6.0-android;net6.0-ios;net6.0-maccatalyst</MauiPlatformTargetFrameworks>
-
         <AppleTargetFrameworks>$(IosTargetFrameworks);net7.0-maccatalyst</AppleTargetFrameworks>
-        <AppleTargetFrameworks Condition="'$(CI)' == 'true'">$(AppleTargetFrameworks);net6.0-maccatalyst</AppleTargetFrameworks>
-
         <PlatformOnlyTargetFrameworks>$(AppleTargetFrameworks);$(AndroidTargetFrameworks)</PlatformOnlyTargetFrameworks>
         <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
         <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>
