@@ -47,9 +47,6 @@ public static class MauiProgram
         // shiny.notifications
         s.AddNotifications<Notifications.MyNotificationDelegate>();
 
-        // shiny.sensors
-        s.AddAllSensors();
-
         // shiny.speechrecognition
         s.AddSpeechRecognition();
 
@@ -123,10 +120,6 @@ public static class MauiProgram
         // ble perf testing
         s.RegisterForNavigation<BlePerf.ClientPage, BlePerf.ClientViewModel>("BlePerfClient");
         s.RegisterForNavigation<BlePerf.ServerPage, BlePerf.ServerViewModel>("BlePerfServer");
-
-        // sensors
-        s.RegisterForNavigation<Sensors.AllSensorsPage, Sensors.AllSensorsViewModel>("Sensors");
-        s.RegisterForNavigation<Sensors.CompassPage, Sensors.CompassViewModel>("Compass");
 
         // locations
         s.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>("Geofencing");

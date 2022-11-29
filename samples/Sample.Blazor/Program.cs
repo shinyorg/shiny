@@ -8,13 +8,12 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.UseShiny();
-builder.Services.AddGps();
-builder.Services.AddConnectivity();
-builder.Services.AddBattery();
-builder.Services.AddBluetoothLE();
-builder.Services.AddNfc();
-builder.Services.AddSpeechRecognition();
+//builder.UseShiny();
+//builder.Services.AddGps();
+//builder.Services.AddConnectivity();
+//builder.Services.AddBattery();
+//builder.Services.AddBluetoothLE();
+//builder.Services.AddSpeechRecognition();
 
 var host = builder.Build();
 
