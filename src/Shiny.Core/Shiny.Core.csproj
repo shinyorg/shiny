@@ -5,6 +5,8 @@
         <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
         <RootNamespace>Shiny</RootNamespace>
+
+        <UseMauiEssentials>true</UseMauiEssentials>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +17,8 @@
 
     <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
         <PackageReference Include="System.Text.Json" />
+        <!--TODO-->
+        <!--<PackageReference Include="Xamarin.Essentials" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
