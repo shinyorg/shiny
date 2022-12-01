@@ -1,6 +1,8 @@
 ﻿# Shiny for Xamarin & Windows 
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
 
+## THIS IS THE STABLE BRANCH.  IF YOU ARE LOOKING FOR MAUI SUPPORT, IT IS STILL IN ALPHA [HERE](https://github.com/shinyorg/shiny/tree/master)
+
 Shiny is a cross platform framework designed for Xamarin & UWP to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
 
