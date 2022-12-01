@@ -13,15 +13,14 @@ public static partial class ConfigurationBuilderExtensions
     ///
     /// </summary>
     /// <param name="builder"></param>
-    /// <param name="fileName"></param>
     /// <param name="optional"></param>
     /// <returns></returns>
-    public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, bool optional = true, bool reloadOnChange = true, bool includePlatformSpecific = true)
+    public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, bool optional = true, bool includePlatformSpecific = true)
     {
         if (includePlatformSpecific)
-            builder.AddJsonAssetInternal("appsettings.android.json", true, reloadOnChange);
+            builder.AddJsonAssetInternal("appsettings.android.json", true);
 
-        return builder.AddJsonAssetInternal("appsettings.json", optional, reloadOnChange);
+        return builder.AddJsonAssetInternal("appsettings.json", optional);
     }
 
 
@@ -34,7 +33,7 @@ public static partial class ConfigurationBuilderExtensions
         => builder.Add(new SharedPreferencesConfigurationSource());
 
 
-    static IConfigurationBuilder AddJsonAssetInternal(this IConfigurationBuilder builder, string fileName, bool optional, bool reloadOnChange)
+    static IConfigurationBuilder AddJsonAssetInternal(this IConfigurationBuilder builder, string fileName, bool optional)
     {
         var assets = Application.Context.Assets;
         var exists = assets!
