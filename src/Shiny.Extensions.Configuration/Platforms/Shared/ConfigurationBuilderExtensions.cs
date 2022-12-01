@@ -4,12 +4,12 @@ namespace Microsoft.Extensions.Configuration;
 
 public static partial class ConfigurationBuilderExtensions
 {
-    public static IConfigurationBuilder AddJsonPlatformBundle(this IConfigurationBuilder builder, string fileName = "appsettings.json", bool optional = true)
+    public static IConfigurationBuilder AddJsonPlatformBundle(this IConfigurationBuilder builder, bool optional = true, bool addPlatformSpecific = true)
     {
 #if APPLE
-        builder.AddJsonIosBundle(fileName, optional);
+        builder.AddJsonIosBundle(optional, addPlatformSpecific);
 #elif ANDROID
-        builder.AddJsonAndroidAsset(fileName, optional);
+        builder.AddJsonAndroidAsset(optional, addPlatformSpecific);
 #endif
         return builder;
     }
