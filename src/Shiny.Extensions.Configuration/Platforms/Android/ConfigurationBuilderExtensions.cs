@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Java.Nio.FileNio.Attributes;
 using Shiny.Extensions.Configuration;
 using System;
 using System.Linq;
@@ -15,7 +16,25 @@ public static partial class ConfigurationBuilderExtensions
     /// <param name="fileName"></param>
     /// <param name="optional"></param>
     /// <returns></returns>
-    public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, string fileName = "appsettings.json", bool optional = true)
+    public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, bool optional = true, bool reloadOnChange = true, bool includePlatformSpecific = true)
+    {
+        if (includePlatformSpecific)
+            builder.AddJsonAssetInternal("appsettings.android.json", true, reloadOnChange);
+
+        return builder.AddJsonAssetInternal("appsettings.json", optional, reloadOnChange);
+    }
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static IConfigurationBuilder AddAndroidPreferences(this IConfigurationBuilder builder)
+        => builder.Add(new SharedPreferencesConfigurationSource());
+
+
+    static IConfigurationBuilder AddJsonAssetInternal(this IConfigurationBuilder builder, string fileName, bool optional, bool reloadOnChange)
     {
         var assets = Application.Context.Assets;
         var exists = assets!
@@ -30,13 +49,4 @@ public static partial class ConfigurationBuilderExtensions
 
         return builder;
     }
-
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
-    public static IConfigurationBuilder AddAndroidPreferences(this IConfigurationBuilder builder)
-        => builder.Add(new SharedPreferencesConfigurationSource());
 }

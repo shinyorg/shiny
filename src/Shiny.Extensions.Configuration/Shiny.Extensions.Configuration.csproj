@@ -6,12 +6,14 @@
         <Description>Xamarin Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	  <CreatePackage>false</CreatePackage>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	  <CreatePackage>false</CreatePackage>
-	</PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Include="Platforms\**\*.cs" />
 		<Compile Remove="Platforms\**\*.cs" />
