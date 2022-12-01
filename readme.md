@@ -1,5 +1,7 @@
-﻿# Shiny for Microsoft Application UI (MAUI), Xamarin Forms, Xamarin Native, & Blazor WebAssembly
+﻿# Shiny v3 ALPHA for Microsoft Application UI (MAUI), Xamarin, & WebAssembly
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
+
+## THIS IS THE ALPHA/UNSTABLE BRANCH - FOR STABLE XAMARIN [GO HERE](https://github.com/shinyorg/shiny/tree/v2.7.0)
 
 Shiny is a cross platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
@@ -14,8 +16,6 @@ things like dependency injection & logging in a structured way to your code!
 * Locations - GPS, Geofencing, & Activity Monitoring (driving, walking, etc)
 * Push Notification - Native, Azure Notifications Hubs, Firebase, and more
 * Local Notifications - best of breed local notifications supporting almost all features across all of the supported platforms
-* Near Field Communications (NFC) - easy to use NFC tag reader
-* Sensors - every sensor available on your mobile phone is here
 
 ## Links
 * [Documentation](https://shinylib.net)
