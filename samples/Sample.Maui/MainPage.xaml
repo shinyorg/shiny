@@ -57,11 +57,6 @@
                         <TextCell Text="Channels" Command="{Binding Navigate}" CommandParameter="NotificationsChannelList" />
                     </TableSection>
 
-                    <TableSection Title="Shiny.Sensors">
-                        <TextCell Text="All" Command="{Binding Navigate}" CommandParameter="Sensors" />
-                        <TextCell Text="Compass" Command="{Binding Navigate}" CommandParameter="Compass" />
-                    </TableSection>
-
                     <TableSection Title="Shiny.Core">
                         <TextCell Text="Connectivity" Command="{Binding Navigate}" CommandParameter="Connectivity" />
                         <TextCell Text="Battery" Command="{Binding Navigate}" CommandParameter="Battery" />
