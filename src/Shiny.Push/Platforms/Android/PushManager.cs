@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Android;
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
@@ -17,7 +18,7 @@ namespace Shiny.Push;
 
 public class PushManager : IPushManager, IAndroidLifecycle.IOnActivityNewIntent
 {
-    //    readonly AndroidPlatform platform;
+    readonly AndroidPlatform platform;
     //    readonly IKeyValueStore settings;
     //    readonly FirebaseConfig config;
     readonly ILogger logger;
@@ -25,10 +26,12 @@ public class PushManager : IPushManager, IAndroidLifecycle.IOnActivityNewIntent
 
 
     public PushManager(
+        AndroidPlatform platform,
         ILogger<PushManager> logger,
         IPushProvider provider
     )
     {
+        this.platform = platform;
         this.logger = logger;
         //        this.platform = platform;
         //        this.settings = settings;
@@ -64,6 +67,10 @@ public class PushManager : IPushManager, IAndroidLifecycle.IOnActivityNewIntent
     
     public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
+        {
+            //Manifest.Permission.PostNotifications
+        }
         //        if (!this.initialized)
         //        {
         //            if (this.config.UseEmbeddedConfiguration)
