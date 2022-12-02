@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="build\*.targets" Pack="True" PackagePath="buildTransitive" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
