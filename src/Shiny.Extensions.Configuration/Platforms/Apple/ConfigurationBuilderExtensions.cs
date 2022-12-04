@@ -18,11 +18,11 @@ public static partial class ConfigurationBuilderExtensions
     {
         if (includePlatformSpecific)
         {
-            builder.AddJsonFileInternal("appsettings.apple.json", false, reloadOnChange);
+            builder.AddJsonFileInternal("appsettings.apple.json", true, reloadOnChange);
 #if IOS
-            builder.AddJsonFileInternal("appsettings.ios.json", false, reloadOnChange);
+            builder.AddJsonFileInternal("appsettings.ios.json", true, reloadOnChange);
 #elif MACCATALYST
-            builder.AddJsonFileInternal("appsettings.maccatalyst.json", optional, reloadOnChange);
+            builder.AddJsonFileInternal("appsettings.maccatalyst.json", true, reloadOnChange);
 #endif
         }
         return builder.AddJsonFileInternal("appsettings.json", optional, reloadOnChange);
