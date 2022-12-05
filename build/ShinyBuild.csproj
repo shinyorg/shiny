@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Cake.Frosting" Version="2.2.0" />
+        <PackageReference Include="Cake.Frosting" Version="3.0.0" />
         <PackageReference Include="Cake.Git" Version="2.0.0" />
         <PackageReference Include="Cake.GitVersioning" Version="3.5.109" />
         <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0182" />
