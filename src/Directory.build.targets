@@ -57,7 +57,7 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
 
         <!--hack-->
-        <PackageReference Include="Xamarin.Build.Download" Version="0.11.3" PrivateAssets="All" />
+        <!--<PackageReference Include="Xamarin.Build.Download" Version="0.11.4" PrivateAssets="All" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsIosBuild)' == 'true'">

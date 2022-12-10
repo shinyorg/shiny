@@ -109,5 +109,12 @@
 		<RunAOTCompilation>true</RunAOTCompilation>
         -->
 	</PropertyGroup>
-    
+
+    <!--<Target Name="_DisableRemoteBuildForLibraries" BeforeTargets="BeforeBuild;_SayHello" Condition="'$(OutputType)' == 'Library'">-->
+    <Target Name="_DisableRemoteBuildForLibraries" BeforeTargets="BeforeBuild;_SayHello">
+		<PropertyGroup>
+			<IsRemoteBuild>false</IsRemoteBuild>
+			<ServerAddress></ServerAddress>
+		</PropertyGroup>
+	</Target>
 </Project>
