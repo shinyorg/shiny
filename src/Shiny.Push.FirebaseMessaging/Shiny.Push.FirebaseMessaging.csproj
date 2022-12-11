@@ -15,11 +15,5 @@
         <PackageReference Include="Xamarin.Firebase.iOS.CloudMessaging" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Platforms\Shared\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Platforms\Shared\" />
-    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

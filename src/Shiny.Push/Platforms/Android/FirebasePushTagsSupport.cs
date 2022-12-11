@@ -1,12 +1,19 @@
-﻿
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Android.Gms.Extensions;
+using Firebase.Messaging;
 
 namespace Shiny.Push;
 
 
 public class FirebasePushTagsSupport : IPushTagSupport
 {
+    public string[]? RegisteredTags => throw new NotImplementedException();
+
+    public Task<string> Register(string nativeToken) => Task.FromResult(nativeToken);
+    public Task UnRegister() => Task.CompletedTask;
+
+
     public async Task AddTag(string tag)
     {
         //var tags = this.container.RegisteredTags?.ToList() ?? new List<string>(1);
@@ -62,4 +69,3 @@ public class FirebasePushTagsSupport : IPushTagSupport
         }
     }
 }
-

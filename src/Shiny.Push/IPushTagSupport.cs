@@ -3,7 +3,7 @@
 namespace Shiny.Push;
 
 
-public interface IPushTagSupport : IPushManager
+public interface IPushTagSupport : IPushProvider
 {
     /// <summary>
     /// This will clear all current tags and set the new array

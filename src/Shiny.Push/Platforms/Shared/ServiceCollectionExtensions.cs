@@ -8,12 +8,10 @@ namespace Shiny;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
-        => services.AddPush(typeof(TDelegate));
+        => services.AddSingleton(typeof(IPushManager), typeof(TDelegate));
 
-
-    public static IServiceCollection AddPush(this IServiceCollection services, Type delegateType)
-        => services.AddPush(typeof(PushManager), delegateType);
-
+    public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, Type delegateType)
+        => services.AddSingleton(typeof(IPushManager), delegateType);
 
 #if ANDROID
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, FirebaseConfig config) where TDelegate : class, IPushDelegate
@@ -23,7 +21,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush(this IServiceCollection services, Type delegateType, FirebaseConfig config)
     {
         services.AddSingleton(config);
-        services.AddPush(delegateType);
+        services.AddSingleton(typeof(IPushManager), delegateType);
         return services;
     }
 #endif

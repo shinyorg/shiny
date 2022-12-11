@@ -12,33 +12,39 @@ using UserNotifications;
 namespace Shiny.Push;
 
 
-public class PushManager : NotifyPropertyChanged, IPushManager, IIosLifecycle.IOnFinishedLaunching, IIosLifecycle.IRemoteNotifications, IIosLifecycle.INotificationHandler
+public class PushManager : NotifyPropertyChanged,
+                           IApplePushManager,
+                           IIosLifecycle.IOnFinishedLaunching,
+                           IIosLifecycle.IRemoteNotifications,
+                           IIosLifecycle.INotificationHandler
 {
     static readonly NSString apsKey = new NSString("aps");
     static readonly NSString alertKey = new NSString("alert");
 
+    readonly IServiceProvider services;
     readonly IPlatform platform;
     readonly ILogger logger;
     readonly IPushProvider? provider;
-    readonly IEnumerable<IPushDelegate> delegates;
+    
     TaskCompletionSource<NSData>? tokenSource;
 
 
     public PushManager(
+        IServiceProvider services,
         IPlatform platform,
         ILogger<PushManager> logger,
-        IPushProvider? provider,
-        IEnumerable<IPushDelegate> delegates
+        IPushProvider? provider
     )
     {
+        this.services = services;
         this.platform = platform;
         this.logger = logger;
         this.provider = provider;
-        this.delegates = delegates;
     }
 
 
-    public IPushTagSupport? Tags => this.provider?.Tags;
+    public IPushTagSupport? Tags => (this.provider as IPushTagSupport);
+
 
     string? registrationToken;
     public string? RegistrationToken
@@ -55,13 +61,15 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IIosLifecycle.IO
 
         try
         {
-            // TODO: this will already have stored, could monitor the change?
-            var result = await this.RequestAccess().ConfigureAwait(false);
-            if (result.Status == AccessState.Available)
+            // TODO: native token may already have been saved
+            var result = await this.RequestAccessInternal().ConfigureAwait(false);
+            if (result.Status == AccessState.Available && result.RegistrationToken != this.RegistrationToken)
             {
-
+                this.RegistrationToken = result.RegistrationToken;
+                await this.services
+                    .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(result.RegistrationToken!))
+                    .ConfigureAwait(false);
             }
-            // TODO: call OnTokenChanged event if provider token changes (or native if no provider)
         }
         catch (Exception ex)
         {
@@ -70,28 +78,22 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IIosLifecycle.IO
     }
 
 
-    public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+    public async Task<PushAccessState> RequestAccess(UNAuthorizationOptions options, CancellationToken cancelToken = default)
     {
-        //        // TODO: make this configurable
-        //        var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
-        //            UNAuthorizationOptions.Alert |
-        //            UNAuthorizationOptions.Badge |
-        //            UNAuthorizationOptions.Sound
-        //        //UNAuthorizationOptions.CarPlay
-        //        );
-        //        return result.Item1;
+        var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(options);
+        if (!result.Item1)
+            return PushAccessState.Denied; // or just restricted?
 
-        //var npermission = await this.RequestPermission().ConfigureAwait(false);
-        //var result = npermission ? AccessState.Available : AccessState.Restricted;
-        var deviceToken = await this.RequestRawToken(cancelToken).ConfigureAwait(false);
-
-        if (this.provider != null)
-            await this.provider.Register(deviceToken);
-
-        // TODO: store provider & native tokens
-        var token = this.FromNative(deviceToken);
-        return new PushAccessState(AccessState.Available, token);
+        var access = await this.RequestAccessInternal(cancelToken).ConfigureAwait(false);
+        if (access.Status == AccessState.Available)
+            this.RegistrationToken = access.RegistrationToken;
+        
+        return access;
     }
+
+
+    public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+        => RequestAccess(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, cancelToken);
 
 
     public async Task UnRegister()
@@ -102,6 +104,17 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IIosLifecycle.IO
 
         if (this.provider != null)
             await this.provider.UnRegister().ConfigureAwait(false);
+    }
+
+
+    protected async Task<PushAccessState> RequestAccessInternal(CancellationToken cancelToken = default)
+    {
+        var deviceToken = await this.RequestRawToken(cancelToken).ConfigureAwait(false);
+        if (this.provider != null)
+            await this.provider.Register(deviceToken);
+
+        var token = this.FromNative(deviceToken);
+        return new PushAccessState(AccessState.Available, token);
     }
 
 
@@ -148,37 +161,32 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IIosLifecycle.IO
     public void OnFailedToRegister(NSError error) => this.tokenSource?.TrySetException(new Exception(error.LocalizedDescription));
     public async void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
     {
-        //if (this.OnReceived == null)
-        //    return;
-
         var dict = userInfo.FromNsDictionary();
         var data = new PushNotification(dict, null);
-        //await this.OnReceived.Invoke(data).ConfigureAwait(false);
+        await this.services.RunDelegates<IPushDelegate>(x => x.OnReceived(data)).ConfigureAwait(false);
         completionHandler.Invoke(UIBackgroundFetchResult.NewData);
     }
 
 
-
     public async void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
     {
-        //if (this.OnEntry == null)
-        //    return;
+        // if this errors, high level event hub will catch
+        if (response?.Notification?.Request?.Trigger is not UNPushNotificationTrigger push)
+            return;
 
-        //if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
-        //{
-        //    this.logger.LogDebug("Foreground remote notification entry detected");
-        //    var c = response.Notification.Request.Content;
+        this.logger.LogDebug("Foreground remote notification entry detected");
+        var c = response.Notification.Request.Content;
 
-        //    var notification = new Notification(
-        //        c.Title,
-        //        c.Body
-        //    );
+        var notification = new Notification(
+            c.Title,
+            c.Body
+        );
 
-        //    var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
-        //    var data = new PushNotification(dict, notification);
-        //    await this.OnEntry.Invoke(data).ConfigureAwait(false);
-        //    completionHandler();
-        //}
+        var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
+        var data = new PushNotification(dict, notification);
+        await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(data)).ConfigureAwait(false);
+
+        completionHandler();
     }
 
 

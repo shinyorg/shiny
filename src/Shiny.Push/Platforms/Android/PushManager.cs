@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Android;
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
+using Android.Runtime;
 using AndroidX.Core.App;
 using Firebase;
 using Firebase.Messaging;
@@ -16,9 +18,12 @@ using Shiny.Hosting;
 namespace Shiny.Push;
 
 
-public class PushManager : IPushManager, IAndroidLifecycle.IOnActivityNewIntent
+public class PushManager : IPushManager,
+                           IShinyStartupTask,
+                           IAndroidLifecycle.IOnActivityNewIntent
 {
     readonly AndroidPlatform platform;
+    readonly IServiceProvider services;
     //    readonly IKeyValueStore settings;
     //    readonly FirebaseConfig config;
     readonly ILogger logger;
@@ -27,78 +32,104 @@ public class PushManager : IPushManager, IAndroidLifecycle.IOnActivityNewIntent
 
     public PushManager(
         AndroidPlatform platform,
+        IServiceProvider services,
         ILogger<PushManager> logger,
         IPushProvider provider
     )
     {
         this.platform = platform;
+        this.services = services;
         this.logger = logger;
         //        this.platform = platform;
         //        this.settings = settings;
         //        this.config = config;
-        this.provider = provider;
+        this.provider = provider ?? new FirebasePushTagsSupport();
     }
 
-    //                ShinyFirebaseService.NewToken = token => this.onToken.Invoke(token);
-    //                ShinyFirebaseService.MessageReceived = async msg =>
-    //                {
-    //                    Notification? notification = null;
-    //                    var native = msg.GetNotification();
 
-    //                    if (native != null)
-    //                    {
-    //                        //native.ChannelId
-    //                        //native.ImageUrl
-    //                        notification = new Notification(
-    //                            native.Title,
-    //                            native.Body
-    //                        );
-    //                        this.TryTriggerNotification(msg);
-    //                    }
-    //                    var push = new PushNotification(msg.Data, notification);
-    //                    await this.onReceived.Invoke(push).ConfigureAwait(false);
-    //                };
+    public void Start()
+    {
+        ShinyFirebaseService.NewToken = async token =>
+        {
+
+        };
+
+        ShinyFirebaseService.MessageReceived = async msg =>
+        {
+            Notification? notification = null;
+            var native = msg.GetNotification();
+
+            if (native != null)
+            {
+                //native.ChannelId
+                //native.ImageUrl
+                notification = new Notification(
+                    native.Title,
+                    native.Body
+                );
+                //this.TryTriggerNotification(msg);
+            }
+            var push = new PushNotification(msg.Data, notification);
+            //await this.onReceived.Invoke(push).ConfigureAwait(false);
+        };
+
+        // TODO: detect token change?
+    }
 
 
-    public IPushTagSupport? Tags => this.provider.Tags;
+
+
+    public IPushTagSupport? Tags => (this.provider as IPushTagSupport);
 
     public string? RegistrationToken => throw new NotImplementedException();
 
-    
-    public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+
+    bool initialized = false;
+    public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
-            //Manifest.Permission.PostNotifications
-        }
-        //        if (!this.initialized)
-        //        {
-        //            if (this.config.UseEmbeddedConfiguration)
-        //            {
-        //                FirebaseApp.InitializeApp(this.platform.AppContext);
-        //                if (FirebaseApp.Instance == null)
-        //                    throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
-        //            }
-        //            else
-        //            {
-        //                var options = new FirebaseOptions.Builder()
-        //                    .SetApplicationId(this.config.AppId)
-        //                    .SetProjectId(this.config.ProjectId)
-        //                    .SetApiKey(this.config.ApiKey)
-        //                    .SetGcmSenderId(this.config.SenderId)
-        //                    .Build();
+            var access = await this.platform
+                .RequestAccess(Manifest.Permission.PostNotifications)
+                .ToTask(cancelToken);
 
-        //                FirebaseApp.InitializeApp(this.platform.AppContext, options);
-        //            }
-        //            this.initialized = true;
-        //        }
-        //        var task = await FirebaseMessaging.Instance.GetToken();
-        //        var token = task.JavaCast<Java.Lang.String>().ToString();
-        //        return new PushAccessState(AccessState.Available, token);
-        return null;
+            if (access != AccessState.Available)
+                return PushAccessState.Denied;
+        }
+        if (!this.initialized)
+        {
+            //if (this.config.UseEmbeddedConfiguration)
+            //{
+                FirebaseApp.InitializeApp(this.platform.AppContext);
+                if (FirebaseApp.Instance == null)
+                    throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
+            //}
+            //else
+            //{
+            //    var options = new FirebaseOptions.Builder()
+            //        .SetApplicationId(this.config.AppId)
+            //        .SetProjectId(this.config.ProjectId)
+            //        .SetApiKey(this.config.ApiKey)
+            //        .SetGcmSenderId(this.config.SenderId)
+            //        .Build();
+
+            //    FirebaseApp.InitializeApp(this.platform.AppContext, options);
+            //}
+            this.initialized = true;
+        }
+        var task = await FirebaseMessaging.Instance.GetToken();
+        var token = task.JavaCast<Java.Lang.String>().ToString();
+        var providerToken = await this.provider.Register(token); // never null on firebase
+
+        return new PushAccessState(AccessState.Available, token);
     }
 
-    public Task UnRegister() => Task.Run(() => FirebaseMessaging.Instance.DeleteToken());
+    public async Task UnRegister()
+    {
+        await this.provider.UnRegister();
+        await FirebaseMessaging.Instance.DeleteToken().AsAsync();
+    }
+
 
     public async void Handle(Activity activity, Intent intent)
     {
@@ -107,34 +138,22 @@ public class PushManager : IPushManager, IAndroidLifecycle.IOnActivityNewIntent
             return;
 
         this.logger.LogDebug("Detected incoming remote notification intent");
+        var dict = new Dictionary<string, string>();
 
-        //if (this.OnEntry == null)
-        //{
-        //    this.logger.LogWarning("OnEntry is not hooked");
-        //}
-        //else
-        //{
-            try
+        if (intent.Extras != null)
+        {
+            foreach (var key in intent.Extras!.KeySet()!)
             {
-                var dict = new Dictionary<string, string>();
-                if (intent.Extras != null)
-                {
-                    foreach (var key in intent.Extras!.KeySet()!)
-                    {
-                        var value = intent.Extras.Get(key)?.ToString();
-                        if (value != null)
-                            dict.Add(key, value);
-                    }
-                }
-                // TODO: can I extract the notification here?
-                var push = new PushNotification(dict, null);
-                //await this.OnEntry.Invoke(push).ConfigureAwait(false);
+                var value = intent.Extras.Get(key)?.ToString();
+                if (value != null)
+                    dict.Add(key, value);
             }
-            catch (Exception ex)
-            {
-                this.logger.LogError("Error processing onEntry", ex);
-            }
-        //}
+        }
+        // TODO: can I extract the notification here?
+        var data = new PushNotification(dict, null);
+        await this.services
+            .RunDelegates<IPushDelegate>(x => x.OnEntry(data))
+            .ConfigureAwait(false);
     }
 
     //    protected virtual void TryTriggerNotification(RemoteMessage message)

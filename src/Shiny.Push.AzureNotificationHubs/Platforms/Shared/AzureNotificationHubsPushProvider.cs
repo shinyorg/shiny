@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Push;
 
 
-public class AzureNotificationHubsPushProvider : IPushProvider
+public class AzureNotificationHubsPushProvider //: IPushProvider, IPushTagSupport
 {
 }
 
