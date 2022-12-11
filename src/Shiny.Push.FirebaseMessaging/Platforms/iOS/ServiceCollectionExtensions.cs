@@ -1,13 +1,18 @@
-﻿//using System;
-//using Microsoft.Extensions.DependencyInjection;
-//using Shiny.Push;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Shiny.Push;
 
-//namespace Shiny;
+namespace Shiny;
 
 
-//public static class ServiceCollectionExtensions
-//{
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddPushFirebaseMessaging(this IServiceCollection services)
+    {
+        return services;
+    }
+}
 //    public static IServiceCollection AddFirebaseMessaging<TPushDelegate>(this IServiceCollection services, FirebaseConfiguration? config = null) where TPushDelegate : class, IPushDelegate
+
 //        => services.AddFirebaseMessaging(typeof(TPushDelegate), config);
 
 

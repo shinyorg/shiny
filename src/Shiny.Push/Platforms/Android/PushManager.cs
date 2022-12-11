@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +8,6 @@ using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
 using Android.Runtime;
-using AndroidX.Core.App;
 using Firebase;
 using Firebase.Messaging;
 using Microsoft.Extensions.Logging;
@@ -18,73 +16,76 @@ using Shiny.Hosting;
 namespace Shiny.Push;
 
 
-public class PushManager : IPushManager,
+public class PushManager : NotifyPropertyChanged,
+                           IPushManager,
                            IShinyStartupTask,
                            IAndroidLifecycle.IOnActivityNewIntent
 {
     readonly AndroidPlatform platform;
     readonly IServiceProvider services;
-    //    readonly IKeyValueStore settings;
-    //    readonly FirebaseConfig config;
+        readonly FirebaseConfig config;
     readonly ILogger logger;
     readonly IPushProvider provider;
 
 
     public PushManager(
         AndroidPlatform platform,
+        FirebaseConfig config,
         IServiceProvider services,
         ILogger<PushManager> logger,
         IPushProvider provider
     )
     {
         this.platform = platform;
+        this.config = config;
         this.services = services;
         this.logger = logger;
-        //        this.platform = platform;
-        //        this.settings = settings;
-        //        this.config = config;
-        this.provider = provider ?? new FirebasePushTagsSupport();
+        this.provider = provider ?? new FirebasePushProvider();
     }
 
 
-    public void Start()
+    public async void Start()
     {
-        ShinyFirebaseService.NewToken = async token =>
+        if (this.RegistrationToken.IsEmpty())
+            return;
+
+        try
         {
-
-        };
-
-        ShinyFirebaseService.MessageReceived = async msg =>
-        {
-            Notification? notification = null;
-            var native = msg.GetNotification();
-
-            if (native != null)
+            this.NativeToken = await this.RequestNativeToken();
+            var regToken = await this.provider.Register(this.NativeToken); // never null on firebase
+            if (regToken != this.RegistrationToken)
             {
-                //native.ChannelId
-                //native.ImageUrl
-                notification = new Notification(
-                    native.Title,
-                    native.Body
-                );
-                //this.TryTriggerNotification(msg);
+                this.RegistrationToken = regToken;
+                await this.services
+                    .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(regToken))
+                    .ConfigureAwait(false);
             }
-            var push = new PushNotification(msg.Data, notification);
-            //await this.onReceived.Invoke(push).ConfigureAwait(false);
-        };
-
-        // TODO: detect token change?
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "There was an error restarting push services");
+        }
     }
-
-
 
 
     public IPushTagSupport? Tags => (this.provider as IPushTagSupport);
 
-    public string? RegistrationToken => throw new NotImplementedException();
+    string? regToken;
+    public string? RegistrationToken
+    {
+        get => this.regToken;
+        set => this.Set(ref this.regToken, value);
+    }
 
 
-    bool initialized = false;
+    string? nativeToken;
+    public string? NativeToken
+    {
+        get => this.nativeToken;
+        set => this.Set(ref this.nativeToken, value);
+    }
+
+
     public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
@@ -96,38 +97,21 @@ public class PushManager : IPushManager,
             if (access != AccessState.Available)
                 return PushAccessState.Denied;
         }
-        if (!this.initialized)
-        {
-            //if (this.config.UseEmbeddedConfiguration)
-            //{
-                FirebaseApp.InitializeApp(this.platform.AppContext);
-                if (FirebaseApp.Instance == null)
-                    throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
-            //}
-            //else
-            //{
-            //    var options = new FirebaseOptions.Builder()
-            //        .SetApplicationId(this.config.AppId)
-            //        .SetProjectId(this.config.ProjectId)
-            //        .SetApiKey(this.config.ApiKey)
-            //        .SetGcmSenderId(this.config.SenderId)
-            //        .Build();
+        
+        this.NativeToken = await this.RequestNativeToken();
+        this.RegistrationToken = await this.provider.Register(this.NativeToken); // never null on firebase
 
-            //    FirebaseApp.InitializeApp(this.platform.AppContext, options);
-            //}
-            this.initialized = true;
-        }
-        var task = await FirebaseMessaging.Instance.GetToken();
-        var token = task.JavaCast<Java.Lang.String>().ToString();
-        var providerToken = await this.provider.Register(token); // never null on firebase
-
-        return new PushAccessState(AccessState.Available, token);
+        return new PushAccessState(AccessState.Available, this.RegistrationToken);
     }
+
 
     public async Task UnRegister()
     {
-        await this.provider.UnRegister();
-        await FirebaseMessaging.Instance.DeleteToken().AsAsync();
+        this.NativeToken = null;
+        this.RegistrationToken = null;
+
+        await this.provider.UnRegister().ConfigureAwait(false);
+        await FirebaseMessaging.Instance.DeleteToken().AsAsync().ConfigureAwait(false);
     }
 
 
@@ -140,7 +124,7 @@ public class PushManager : IPushManager,
         this.logger.LogDebug("Detected incoming remote notification intent");
         var dict = new Dictionary<string, string>();
 
-        if (intent.Extras != null)
+        if (intent!.Extras != null)
         {
             foreach (var key in intent.Extras!.KeySet()!)
             {
@@ -155,6 +139,80 @@ public class PushManager : IPushManager,
             .RunDelegates<IPushDelegate>(x => x.OnEntry(data))
             .ConfigureAwait(false);
     }
+
+    
+    async Task<string> RequestNativeToken()
+    {
+        this.DoInit();
+        var task = await FirebaseMessaging.Instance.GetToken();
+        var native = task.JavaCast<Java.Lang.String>().ToString();
+
+        return native;
+    }
+
+
+    bool initialized = false;
+    void DoInit()
+    {
+        if (this.initialized)
+            return;
+
+        if (this.config.UseEmbeddedConfiguration)
+        {
+            FirebaseApp.InitializeApp(this.platform.AppContext);
+            if (FirebaseApp.Instance == null)
+                throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
+        }
+        else
+        {
+            var options = new FirebaseOptions.Builder()
+                .SetApplicationId(this.config.AppId)
+                .SetProjectId(this.config.ProjectId)
+                .SetApiKey(this.config.ApiKey)
+                .SetGcmSenderId(this.config.SenderId)
+                .Build();
+
+            FirebaseApp.InitializeApp(this.platform.AppContext, options);
+        }
+
+        ShinyFirebaseService.NewToken = async token =>
+        {
+            await this.services
+                .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(token))
+                .ConfigureAwait(false);
+        };
+
+        ShinyFirebaseService.MessageReceived = async msg =>
+        {
+            try
+            {
+                Notification? notification = null;
+                var native = msg.GetNotification();
+
+                if (native != null)
+                {
+                    //native.ChannelId
+                    //native.ImageUrl
+                    notification = new Notification(
+                        native.Title,
+                        native.Body
+                    );
+                    //this.TryTriggerNotification(msg);
+                }
+                var push = new PushNotification(msg.Data, notification);
+                await this.services
+                    .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        };
+
+        this.initialized = true;
+    }
+
 
     //    protected virtual void TryTriggerNotification(RemoteMessage message)
     //    {

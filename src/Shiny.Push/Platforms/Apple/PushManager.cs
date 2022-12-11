@@ -54,6 +54,14 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
+    string? nativeToken;
+    public string? NativeToken
+    {
+        get => this.nativeToken;
+        set => this.Set(ref this.nativeToken, value);
+    }
+
+
     public async void Start()
     {
         if (this.RegistrationToken.IsEmpty())
@@ -93,7 +101,7 @@ public class PushManager : NotifyPropertyChanged,
 
 
     public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
-        => RequestAccess(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, cancelToken);
+        => this.RequestAccess(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, cancelToken);
 
 
     public async Task UnRegister()
@@ -113,7 +121,7 @@ public class PushManager : NotifyPropertyChanged,
         if (this.provider != null)
             await this.provider.Register(deviceToken);
 
-        var token = this.FromNative(deviceToken);
+        var token = deviceToken.ToPushTokenString();
         return new PushAccessState(AccessState.Available, token);
     }
 
@@ -136,26 +144,6 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    protected string FromNative(NSData deviceToken)
-    {
-        string token = null!;
-        if (deviceToken.Length > 0)
-        {
-            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-            {
-                var data = deviceToken.ToArray();
-                token = BitConverter
-                    .ToString(data)
-                    .Replace("-", "")
-                    .Replace("\"", "");
-            }
-            else if (!deviceToken.Description.IsEmpty())
-            {
-                token = deviceToken.Description.Trim('<', '>');
-            }
-        }
-        return token;
-    }
     public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) { }
     public void OnRegistered(NSData deviceToken) => this.tokenSource?.TrySetResult(deviceToken);
     public void OnFailedToRegister(NSError error) => this.tokenSource?.TrySetException(new Exception(error.LocalizedDescription));
@@ -192,9 +180,6 @@ public class PushManager : NotifyPropertyChanged,
 
     public async void Handle(NSDictionary options)
     {
-        //if (this.OnEntry == null)
-        //    return;
-
         if (!options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
             return;
 
@@ -211,9 +196,10 @@ public class PushManager : NotifyPropertyChanged,
             dict.Remove("aps");
         }
         var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
-        //await this.OnEntry.Invoke(push).ConfigureAwait(false);
+        await this.services
+            .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
+            .ConfigureAwait(false);
     }
-
 
 
     protected virtual Notification? ToNotification(NSDictionary data)
@@ -238,70 +224,3 @@ public class PushManager : NotifyPropertyChanged,
         return null;
     }
 }
-
-//public static async Task<PermissionStatus> RequestAsync(UNAuthorizationOptions authorizationOptions)
-//{
-//    var (_, error) = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(authorizationOptions);
-//    if (error != null)
-//    {
-//        throw new NSErrorException(error);
-//    }
-
-//    return await CheckStatusAsync();
-//}
-
-//public static async Task<PermissionStatus> CheckStatusAsync()
-//{
-//    var settings = await UNUserNotificationCenter.Current.GetNotificationSettingsAsync();
-//    var authorizationStatus = settings.AuthorizationStatus;
-//    return authorizationStatus switch
-//    {
-//        UNAuthorizationStatus.NotDetermined => PermissionStatus.Unknown,
-//        UNAuthorizationStatus.Denied => PermissionStatus.Denied,
-//        UNAuthorizationStatus.Authorized => PermissionStatus.Granted,
-//        UNAuthorizationStatus.Provisional => PermissionStatus.Restricted,
-//        UNAuthorizationStatus.Ephemeral => PermissionStatus.Granted,
-//        _ => throw new ArgumentOutOfRangeException(
-//            paramName: nameof(UNNotificationSettings.AuthorizationStatus),
-//            actualValue: authorizationStatus,
-//            message: null),
-//    };
-//}
-//        }
-
-//        public partial class PushNotification : BasePlatformPermission
-//{
-//    public override Task<PermissionStatus> RequestAsync()
-//    {
-//        EnsureDeclared();
-//        EnsureMainThread();
-//        return PushNotificationPermissions.RequestAsync(UNAuthorizationOptions.Alert |
-//                                                        UNAuthorizationOptions.Sound |
-//                                                        UNAuthorizationOptions.Badge);
-//    }
-
-//    public override Task<PermissionStatus> CheckStatusAsync()
-//    {
-//        EnsureDeclared();
-//        return PushNotificationPermissions.CheckStatusAsync();
-//    }
-//}
-
-//public partial class ProvisionalPushNotification : BasePlatformPermission
-//{
-//    public override Task<PermissionStatus> RequestAsync()
-//    {
-//        EnsureDeclared();
-//        EnsureMainThread();
-//        return PushNotificationPermissions.RequestAsync(UNAuthorizationOptions.Alert |
-//                                                        UNAuthorizationOptions.Sound |
-//                                                        UNAuthorizationOptions.Badge |
-//                                                        UNAuthorizationOptions.Provisional);
-//    }
-
-//    public override Task<PermissionStatus> CheckStatusAsync()
-//    {
-//        EnsureDeclared();
-//        return PushNotificationPermissions.CheckStatusAsync();
-//    }
-//}
