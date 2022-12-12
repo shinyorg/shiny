@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
