@@ -64,6 +64,22 @@ public class PushManager : NotifyPropertyChanged,
 
     public async void Start()
     {
+        //AppleExtensions.AssertAppDelegateHook(
+        //    "application:didReceiveRemoteNotification:fetchCompletionHandler:",
+        //    "[SHINY] AppDelegate.DidReceiveRemoteNotification is not hooked - background notifications will not work without this!"
+        //);
+
+        //// application:didRegisterForRemoteNotificationsWithDeviceToken:"
+        //AppleExtensions.AssertAppDelegateHook(
+        //    "application:didRegisterForRemoteNotificationsWithDeviceToken:",
+        //    "[SHINY] AppDelegate.RegisteredForRemoteNotifications is not hooked. This is a necessary hook for Shiny Push"
+        //);
+
+        ////application: didFailToRegisterForRemoteNotificationsWithError
+        //AppleExtensions.AssertAppDelegateHook(
+        //    "application:didFailToRegisterForRemoteNotificationsWithError:",
+        //    "[SHINY] AppDelegate.FailedToRegisterForRemoteNotifications is not hooked. This is a necessary hook for Shiny Push"
+        //);
         if (this.RegistrationToken.IsEmpty())
             return;
 

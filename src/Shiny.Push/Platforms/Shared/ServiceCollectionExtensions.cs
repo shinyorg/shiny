@@ -1,6 +1,7 @@
 ﻿using Shiny.Push;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Notifications;
 
 namespace Shiny;
 
@@ -15,6 +16,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush(this IServiceCollection services)
     {
 #if APPLE
+        services.AddChannelManager();
         services.TryAddSingleton<IPushManager, PushManager>();
 #endif
 #if ANDROID
@@ -47,6 +49,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush(this IServiceCollection services, FirebaseConfig config)
     {
         services.AddSingleton(config);
+        services.AddChannelManager();
         services.TryAddSingleton<IPushManager, PushManager>();
         return services;
     }
