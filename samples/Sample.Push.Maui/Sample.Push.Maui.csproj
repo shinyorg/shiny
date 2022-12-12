@@ -14,7 +14,7 @@
 		<Nullable>enable</Nullable>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<SqliteLibVersion>2.1.2</SqliteLibVersion>
+		<SqliteLibVersion>2.1.3</SqliteLibVersion>
 
 		<ApplicationTitle>Shiny Push</ApplicationTitle>
 		<ApplicationId>org.shiny.pushsample</ApplicationId>
