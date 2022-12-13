@@ -10,5 +10,11 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Old\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Old\" />
+    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>
