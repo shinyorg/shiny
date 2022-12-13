@@ -43,7 +43,7 @@ public class SetupViewModel : ViewModel
     public ICommand RequestAccess { get; }
     public ICommand UnRegister { get; }
     public ICommand ResetBaseUri { get; }
-    public bool IsTagsSupported => this.pushManager.IsTagsSupport();
+    public bool IsTagsSupported => this.pushManager.Tags != null;
     public string Implementation => this.pushManager.GetType().FullName;
 
 
@@ -52,14 +52,6 @@ public class SetupViewModel : ViewModel
     {
         get => this.regToken;
         private set => this.Set(ref this.regToken, value);
-    }
-
-
-    DateTime? regDate;
-    public DateTime? RegDate
-    {
-        get => this.regDate;
-        private set => this.Set(ref this.regDate, value);
     }
 
 
@@ -95,8 +87,7 @@ public class SetupViewModel : ViewModel
 
     void Refresh()
     {
-        this.RegToken = this.pushManager.CurrentRegistrationToken ?? "-";
-        this.RegDate = this.pushManager.CurrentRegistrationTokenDate?.ToLocalTime();
+        this.RegToken = this.pushManager.RegistrationToken ?? "-";
     }
 
 

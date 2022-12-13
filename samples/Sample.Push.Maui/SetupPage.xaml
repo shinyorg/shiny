@@ -30,8 +30,6 @@
                                   Detail="{Binding Implementation}" />
                         <TextCell Text="Registration Token"
                                   Detail="{Binding RegToken}" />
-                        <TextCell Text="Registration Date"
-                                  Detail="{Binding RegDate}" />
                     </TableSection>
 
                     <!--<TableSection Title="Native Registration">

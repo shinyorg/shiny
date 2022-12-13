@@ -5,30 +5,13 @@ public class TagsViewModel : ViewModel
 {
     public TagsViewModel(IPushManager pushManager)
     {
-        var push = pushManager as IPushTagSupport;
-
-        this.Add = new Command(async () =>
-        {
-            var result = await this.Prompt("Name of tag?");
-            if (!result.IsEmpty())
-            {
-                await this.Loading(() => push.AddTag(result));
-                this.Load.Execute(null);
-            }
-        });
-
-        this.Clear = this.ConfirmCommand("Are you sure you wish to clear all tags?", async () =>
-        {
-            await this.Loading(() => push.ClearTags());
-            this.Load.Execute(null);
-        });
-
         this.Load = this.LoadingCommand(async () =>
         {
-            if (push.RegisteredTags == null)
+            if (pushManager.Tags!.RegisteredTags == null)
                 return;
 
-            this.Tags = push
+            this.Tags = pushManager
+                .Tags!
                 .RegisteredTags
                 .Select(tag => new CommandItem
                 (
@@ -38,8 +21,8 @@ public class TagsViewModel : ViewModel
                         $"Are you sure you wish to remove tag '{tag}'?",
                         async () =>
                         {
-                            await push.TryRemoveTag(tag);
-                            this.Load.Execute(null);
+                            await pushManager.Tags!.RemoveTag(tag);
+                            this.Load!.Execute(null);
                         }
                     )
                 ))
@@ -47,13 +30,29 @@ public class TagsViewModel : ViewModel
 
             this.RaisePropertyChanged(nameof(this.Tags));
         });
+
+        this.Add = new Command(async () =>
+        {
+            var result = await this.Prompt("Name of tag?");
+            if (!result.IsEmpty())
+            {
+                await this.Loading(() => pushManager.Tags!.AddTag(result));
+                this.Load!.Execute(null);
+            }
+        });
+
+        this.Clear = this.ConfirmCommand("Are you sure you wish to clear all tags?", async () =>
+        {
+            await this.Loading(() => pushManager.Tags!.ClearTags());
+            this.Load.Execute(null);
+        });
     }
 
 
     public ICommand Load { get; }
     public ICommand Add { get; }
     public ICommand Clear { get; }
-    public IList<CommandItem> Tags { get; private set; }
+    public IList<CommandItem> Tags { get; private set; } = null!;
 
     public override void OnNavigatedTo()
     {
