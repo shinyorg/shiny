@@ -1,7 +1,9 @@
 ﻿using Shiny.Push;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Notifications;
+using Microsoft.Extensions.DependencyInjection;
+#if ANDROID
+using Microsoft.Extensions.DependencyInjection.Extensions;
+#endif
 
 namespace Shiny;
 
@@ -17,7 +19,7 @@ public static class ServiceCollectionExtensions
     {
 #if APPLE
         services.AddChannelManager();
-        services.TryAddSingleton<IPushManager, PushManager>();
+        services.AddShinyService<PushManager>();
 #endif
 #if ANDROID
         services.AddPush(new FirebaseConfig());
@@ -34,7 +36,7 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
     {
-        services.AddSingleton<IPushDelegate, TDelegate>();
+        services.AddShinyService<TDelegate>();
         return services.AddPush();
     }
 
@@ -50,7 +52,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton(config);
         services.AddChannelManager();
-        services.TryAddSingleton<IPushManager, PushManager>();
+        services.AddShinyService<PushManager>();
         return services;
     }
 
@@ -65,7 +67,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, FirebaseConfig config)
         where TDelegate : class, IPushDelegate
     {        
-        services.AddSingleton<IPushDelegate, TDelegate>();
+        services.AddShinyService<TDelegate>();
         services.AddPush(config);   
         return services;
     }
