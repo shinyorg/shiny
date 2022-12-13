@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.BluetoothLE.Hosting;
 using Shiny.BluetoothLE.Hosting.Managed;
 
@@ -10,24 +8,17 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static IBleHostingManager BleHosting(this ShinyContainer container) => container.GetService<IBleHostingManager>();
-
-
     /// <summary>
     /// Registers the IPeripheralManager service that allows you to be a host BLE device
     /// </summary>
     /// <param name="builder"></param>
     /// <returns></returns>
-    public static bool AddBluetoothLeHosting(this IServiceCollection services)
+    public static IServiceCollection AddBluetoothLeHosting(this IServiceCollection services)
     {
-#if IOS || ANDROID || MACCATALYST
         if (!services.Any(x => x.ServiceType == typeof(IBleHostingManager)))
             services.AddShinyService<BleHostingManager>();
 
-        return true;
-#else
-        return false;
-#endif
+        return services;
     }
 
 
