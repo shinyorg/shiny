@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Foundation;
 
 namespace Shiny.Net.Http;
 
 
-public class HttpTransfer : IHttpTransfer
+public class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 {
     NSUrlSessionDownloadTask? downloadTask;
     NSUrlSessionUploadTask? uploadTask;
+
 
     public HttpTransfer(HttpTransferRequest request, NSUrlSessionUploadTask uploadTask)
     {
@@ -26,12 +28,11 @@ public class HttpTransfer : IHttpTransfer
     public string Identifier => this.downloadTask?.TaskDescription! ?? this.uploadTask?.TaskDescription!;
     public HttpTransferRequest Request { get; }
 
-    public HttpTransferState Status => HttpTransferState.Unknown;// (this.uploadTask ?? this.downloadTask).GetStatus();
-    public ulong BytesTransferred => throw new NotImplementedException();
-    public ulong BytesPerSeconds => throw new NotImplementedException();
-    public TimeSpan EstimateTimeRemaining => throw new NotImplementedException();
+    public HttpTransferState Status => throw new NotImplementedException();
+    public long BytesTransferred => throw new NotImplementedException();
+    public long BytesToTransfer => throw new NotImplementedException();
 
-    public void Cancel()
+    public Task Cancel()
     {
         this.downloadTask?.Cancel();
         this.uploadTask?.Cancel();
@@ -40,9 +41,10 @@ public class HttpTransfer : IHttpTransfer
 
         //this.uploadTask.State
         //var task = this.session.CreateDownloadTask(null);
+        return Task.CompletedTask;
     }
 
 
-    public void Pause() => throw new NotImplementedException();
-    public void Resume() => throw new NotImplementedException();
+    public Task Pause() => throw new NotImplementedException();
+    public Task Resume() => throw new NotImplementedException();
 }

@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
-using Shiny.Infrastructure;
-using Shiny.Stores;
 
 namespace Shiny.Net.Http;
 
@@ -43,9 +41,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var tasks = await this.Session.GetAllTasksAsync();
         foreach (var task in tasks)
         {
+            //task.Progress
+            //task.OriginalRequest
 
             if (Guid.TryParse(task.TaskDescription!, out var id))
             {
+                
                 //this.uploadTask.Resume();
                 //this.downloadTask.Resume();
 
@@ -82,6 +83,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 .CreateUploadTaskAsync(NSUrlRequest.FromUrl(url), fileUri, out var task)
                 .ConfigureAwait(false);
 
+            //task.Progress.EstimatedTimeRemaining
+            //task.Progress.Finished
             task.TaskDescription = Guid.NewGuid().ToString();
             ht = new HttpTransfer(request, task);
         }
@@ -91,11 +94,14 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 .CreateDownloadTaskAsync(url, out var task)
                 .ConfigureAwait(false);
 
+            //this.Session.GetTasksAsync()
+            //task.Progress.
             task.TaskDescription = Guid.NewGuid().ToString();
+
             ht = new HttpTransfer(request, task);
         }
         this.transfers.Add(ht);
-        ht.Resume();
+        await ht.Resume();
 
         return ht;
     }
@@ -106,7 +112,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var transfer = this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier));
         if (transfer != null)
         {
-            transfer.Cancel();
+            await transfer.Cancel();
             //this.transfers.Remove(transfer);
         }
     }
