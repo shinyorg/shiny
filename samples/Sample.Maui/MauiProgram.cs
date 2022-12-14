@@ -89,8 +89,8 @@ public static class MauiProgram
     static void RegisterRoutes(IServiceCollection s)
     {
         // HTTP Transfers
-        //s.RegisterForNavigation<HttpTransfers.CreatePage, HttpTransfers.CreateViewModel>("HttpTransfersCreate");
-        //s.RegisterForNavigation<HttpTransfers.PendingPage, HttpTransfers.PendingViewModel>("HttpTransfers");
+        s.RegisterForNavigation<HttpTransfers.CreatePage, HttpTransfers.CreateViewModel>("HttpTransfersCreate");
+        s.RegisterForNavigation<HttpTransfers.PendingPage, HttpTransfers.PendingViewModel>("HttpTransfers");
 
         // jobs
         s.RegisterForNavigation<Jobs.ListPage, Jobs.ListViewModel>("Jobs");

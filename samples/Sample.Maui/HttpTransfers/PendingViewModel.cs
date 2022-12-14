@@ -8,7 +8,7 @@ public class PendingViewModel : ViewModel
 {
     public PendingViewModel(BaseServices services, IHttpTransferManager httpTransfers) : base(services)
     {
-        this.Create = this.Navigation.Command("HttpTransferCreate");
+        this.Create = this.Navigation.Command("HttpTransfersCreate");
         this.Load = this.LoadingCommand(async () =>
         {            
             this.Transfers = httpTransfers

@@ -65,32 +65,24 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         NSUrlSessionTask task;
         var url = NSUrl.FromString(request.Uri)!;
 
+        // TODO: setup post, body, headers, etc 
         if (request.IsUpload)
         {
             // TODO: I actually need both the temp file and the regular file
             //var fileUri = NSUrl.FromFilename(request.LocalFile.FullName);
             var tempFileUri = await this.CreateUploadTempFile(request).ConfigureAwait(false);
 
-            await this.Session
-                .CreateUploadTaskAsync(
-                    NSUrlRequest.FromUrl(url),
-                    tempFileUri,
-                    out var upload
-                )
-                .ConfigureAwait(false);
-            
-            task = upload;
+            task = this.Session.CreateUploadTask(NSUrlRequest.FromUrl(url), tempFileUri);
         }
         else
         {
-            await this.Session
-                .CreateDownloadTaskAsync(url, out var dl)
-                .ConfigureAwait(false);
-
-            task = dl;
+            task = this.Session.CreateDownloadTask(url);
         }
 
-        task.TaskDescription = request.LocalFile.FullName;        
+        task.TaskDescription = request.LocalFile.FullName;
+//#if IOS
+        //task.Delegate = this;
+//#endif
         var ht = new HttpTransfer(request, task);
         this.transfers.Add(ht);
         ht.Resume();
@@ -213,28 +205,27 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     //}
 
 
-    public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-    {
-        this.logger.LogDebug($"DidReceiveChallenge");
-        completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
-    }
+    //public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
+    //{
+    //    this.logger.LogDebug($"DidReceiveChallenge");
+    //    completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
+    //}
 
 
-    public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-    {
-        this.logger.LogDebug($"DidReceiveChallenge for task");
-        completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
-    }
-
+    //public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
+    //{
+    //    this.logger.LogDebug($"DidReceiveChallenge for task");
+    //    completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
+    //}
 
     public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
     {
         this.logger.LogDebug($"DidFinishEventsForBackgroundSession");
-        this.completionHandler?.Invoke();
+        //this.completionHandler?.Invoke();
     }
 
 
-    public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
+    public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
     {
         this.logger.LogDebug($"DidCompleteWithError");
         var transfer = task.FromNative();
@@ -295,8 +286,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
             // TODO: should thread safety collection
             this.transfers.Remove(ht);
-            await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht));
-            
+            await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht));            
         }
     }
 

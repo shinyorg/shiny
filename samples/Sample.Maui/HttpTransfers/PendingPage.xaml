@@ -21,7 +21,7 @@
                             Grid.Row="0">
 
                 <CollectionView.EmptyView>
-                    <Label Text="No Uploads"
+                    <Label Text="No Pending Transfers"
                            Style="{StaticResource NoDataLabel}" />
                 </CollectionView.EmptyView>
 

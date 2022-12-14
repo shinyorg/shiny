@@ -15,16 +15,21 @@ public class CreateViewModel : ViewModel
         IHttpTransferManager manager
     ) : base(services)
     {
-
-        this.SelectUpload = new Command(async () =>
-        {
-            var result = await FilePicker.PickAsync(new PickOptions
+        this.SelectUpload = ReactiveCommand.CreateFromTask(
+            async () =>
             {
-                PickerTitle = "Select a file to upload"
-            });
-            if (result != null)
-                this.FilePath = result.FullPath;
-        });
+                var result = await FilePicker.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Select a file to upload"
+                });
+                if (result != null)
+                    this.FilePath = result.FullPath;
+            },
+            this.WhenAny(
+                x => x.IsUpload,
+                x => x.GetValue()
+            )
+        );
 
         this.Save = this.LoadingCommand(async () =>
         {
@@ -71,16 +76,24 @@ public class CreateViewModel : ViewModel
             await this.Navigation.GoBack();
         });
 
-        this.CreateRandom = this.LoadingCommand(async () =>
-        {
-            if (this.SizeInMegabytes <= 0)
-            {
-                await this.Alert("Invalid File Size");
-                return;
-            }
-            await this.GenerateRandom();
-            this.FilePath = this.GetRandomFilePath();
-        });
+        this.CreateRandom = ReactiveCommand.CreateFromTask(
+            async () =>
+            {                
+                if (this.SizeInMegabytes <= 0)
+                {
+                    await this.Alert("Invalid File Size");
+                    return;
+                }
+                this.IsBusy = true;
+                await this.GenerateRandom();
+                this.FilePath = this.GetRandomFilePath();
+                this.IsBusy = false;
+            },
+            this.WhenAny(
+                x => x.IsUpload,
+                x => x.GetValue()
+            )
+        );
     }
 
 
@@ -121,7 +134,7 @@ public class CreateViewModel : ViewModel
     [Reactive] public bool UseMeteredConnection { get; set; }
     [Reactive] public bool IsUpload { get; set; }
     [Reactive] public string FilePath { get; set; }
-    [Reactive] public int SizeInMegabytes { get; set; }
+    [Reactive] public int SizeInMegabytes { get; set; } = 100;
 
 
     string GetRandomFilePath() => Path.Combine(this.Platform.AppData.FullName, RANDOM_FILE_NAME);
