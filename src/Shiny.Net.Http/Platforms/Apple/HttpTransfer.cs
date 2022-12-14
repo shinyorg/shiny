@@ -15,7 +15,7 @@ public class HttpTransfer : IHttpTransfer
 
 
     public NSUrlSessionTask NSTask { get; }
-    public string Identifier => this.NSTask.TaskDescription!;
+    public string Identifier => this.NSTask.TaskIdentifier.ToString();
     public HttpTransferRequest Request { get; }
 
     public HttpTransferState Status => this.NSTask.GetStatus();

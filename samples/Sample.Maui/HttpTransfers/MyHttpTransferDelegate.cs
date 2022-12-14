@@ -41,7 +41,7 @@ public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
 {
     public void Configure(AndroidX.Core.App.NotificationCompat.Builder builder)
     {
-
+        builder.SetContentText("Overriding HTTP Tranfer text from Sample");
     }
 }
 #endif

@@ -1,23 +1,15 @@
 ﻿namespace Shiny.Net.Http;
 
 
-public enum DirectionFilter
-{
-    Both,
-    Upload,
-    Download
-}
-
-
 public enum HttpTransferState
 {
     Unknown,
     Pending,
     Paused,
-    PausedByNoNetwork,
-    PausedByCostedNetwork,
+    //PausedByNoNetwork,
+    //PausedByCostedNetwork,
     InProgress,
-    Retrying,
+    //Retrying,
     Error,
     Canceled,
     Completed

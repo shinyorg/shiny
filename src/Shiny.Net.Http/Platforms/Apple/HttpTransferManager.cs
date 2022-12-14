@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -17,20 +19,24 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     Action? completionHandler;
 
     readonly ILogger logger;
+    readonly IPlatform platform;
     readonly IServiceProvider services;
 
 
     public HttpTransferManager(
         ILogger<HttpTransferManager> logger,
+        IPlatform platform,
         IServiceProvider services
     )
     {
         this.logger = logger;
+        this.platform = platform;
         this.services = services;
 
         var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
 
         this.Session = NSUrlSession.FromConfiguration(cfg, this, new NSOperationQueue());
+        // TODO: allow OS configuration
         //        this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
         //        this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;
     }
@@ -41,6 +47,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var tasks = await this.Session.GetAllTasksAsync();
         foreach (var task in tasks)
         {
+            // TODO: I actually need both the temp file and the regular file - if upload
             var shinyTask = task.FromNative(); // TODO: force resume? probably
             this.transfers.Add(shinyTask);
         }
@@ -60,12 +67,18 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
         if (request.IsUpload)
         {
-            var fileUri = NSUrl.FromFilename(request.LocalFile.FullName);
+            // TODO: I actually need both the temp file and the regular file
+            //var fileUri = NSUrl.FromFilename(request.LocalFile.FullName);
+            var tempFileUri = await this.CreateUploadTempFile(request).ConfigureAwait(false);
 
             await this.Session
-                .CreateUploadTaskAsync(NSUrlRequest.FromUrl(url), fileUri, out var upload)
+                .CreateUploadTaskAsync(
+                    NSUrlRequest.FromUrl(url),
+                    tempFileUri,
+                    out var upload
+                )
                 .ConfigureAwait(false);
-
+            
             task = upload;
         }
         else
@@ -77,7 +90,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             task = dl;
         }
 
-        task.TaskDescription = Guid.NewGuid().ToString();
+        task.TaskDescription = request.LocalFile.FullName;        
         var ht = new HttpTransfer(request, task);
         this.transfers.Add(ht);
         ht.Resume();
@@ -137,57 +150,53 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     HttpTransfer? Get(string identifier)
         => this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier)) as HttpTransfer;
 
-    //    protected override async Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
-    //    {
-    //        if (request.HttpMethod != System.Net.Http.HttpMethod.Post && request.HttpMethod != System.Net.Http.HttpMethod.Put)
-    //            throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 
-    //        var boundary = Guid.NewGuid().ToString("N");
+    async Task<NSUrl> CreateUploadTempFile(HttpTransferRequest request)
+    {
+        if (request.HttpMethod != HttpMethod.Post && request.HttpMethod != HttpMethod.Put)
+            throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 
-    //        var native = request.ToNative();
-    //        native["Content-Type"] = $"multipart/form-data; boundary={boundary}";
+        var boundary = Guid.NewGuid().ToString("N");
 
-    //        var tempPath = this.platform.GetUploadTempFilePath(request);
+        var native = request.ToNative();
+        native["Content-Type"] = $"multipart/form-data; boundary={boundary}";
 
-    //        this.logger.LogInformation("Writing temp form data body to " + tempPath);
+        var tempPath = this.platform.GetUploadTempFilePath(request);
 
-    //        using var fs = new FileStream(tempPath, FileMode.Create);
-    //        if (!request.PostData.IsEmpty())
-    //        {
-    //            fs.WriteString("--" + boundary);
-    //            fs.WriteString("Content-Type: text/plain; charset=utf-8");
-    //            fs.WriteString("Content-Disposition: form-data;");
-    //            fs.WriteLine();
-    //            fs.WriteString(request.PostData!);
-    //            fs.WriteLine();
-    //        }
+        this.logger.LogInformation("Writing temp form data body to " + tempPath);
 
-    //        using var uploadFile = request.LocalFile.OpenRead();
-    //        fs.WriteString("--" + boundary);
-    //        fs.WriteString("Content-Type: application/octet-stream");
-    //        fs.WriteString($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFile.Name}\"");
-    //        fs.WriteLine();
-    //        await uploadFile.CopyToAsync(fs);
-    //        fs.WriteLine();
-    //        fs.WriteString($"--{boundary}--");
+        using var fs = new FileStream(tempPath, FileMode.Create);
+        if (!request.PostData.IsEmpty())
+        {
+            fs.WriteString("--" + boundary);
+            fs.WriteString("Content-Type: text/plain; charset=utf-8");
+            fs.WriteString("Content-Disposition: form-data;");
+            fs.WriteLine();
+            fs.WriteString(request.PostData!);
+            fs.WriteLine();
+        }
 
-    //        this.logger.LogInformation("Form body written");
-    //        var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
+        using var uploadFile = request.LocalFile.OpenRead();
+        fs.WriteString("--" + boundary);
+        fs.WriteString("Content-Type: application/octet-stream");
+        fs.WriteString($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFile.Name}\"");
+        fs.WriteLine();
+        await uploadFile.CopyToAsync(fs);
 
-    //        var task = this.Session.CreateUploadTask(native, tempFileUrl);
-    //        var taskId = TaskIdentifier.Create(request.LocalFile);
-    //        task.TaskDescription = taskId.ToString();
-    //        var transfer = task.FromNative();
-    //        task.Resume();
+        fs.WriteLine();
+        fs.WriteString($"--{boundary}--");
 
-    //        return transfer;
-    //    }
+        this.logger.LogInformation("Form body written");
+        var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
+
+        return tempFileUrl;
+    }
 
 
     public override void DidBecomeInvalid(NSUrlSession session, NSError error)
     {
         this.logger.LogDebug($"DidBecomeInvalid");
-        //this.manager.CompleteSession();
+        //this.manager.CompleteSession(); // TODO: restart session?
         if (error != null)
             this.logger.LogError(new Exception(error.LocalizedDescription), "DidBecomeInvalid reported an error");
     }
@@ -225,53 +234,53 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
-    //    public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
-    //    {
-    //        this.logger.LogDebug($"DidCompleteWithError");
-    //        var transfer = task.FromNative();
+    public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
+    {
+        this.logger.LogDebug($"DidCompleteWithError");
+        var transfer = task.FromNative();
 
-    //        switch (transfer.Status)
-    //        {
-    //            case HttpTransferState.Canceled:
-    //                this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
-    //                break;
+        switch (transfer.Status)
+        {
+            case HttpTransferState.Canceled:
+                this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
+                break;
 
-    //            case HttpTransferState.Completed:
-    //                this.logger.LogInformation($"Transfer {transfer.Identifier} completed successfully");
-    //                await this.shinyDelegates.Value.RunDelegates(
-    //                    x => x.OnCompleted(transfer)
-    //                );
-    //                break;
+            case HttpTransferState.Completed:
+                this.logger.LogInformation($"Transfer {transfer.Identifier} completed successfully");
+                //await this.shinyDelegates.Value.RunDelegates(
+                //    x => x.OnCompleted(transfer)
+                //);
+                break;
 
-    //            default:
-    //                await this.HandleError(transfer, error);
-    //                break;
-    //        }
-    //        this.TryDeleteUploadTempFile(transfer);
-    //        this.onEvent.OnNext(transfer);
-    //    }
-
-
-    //    public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
-    //    {
-    //        this.logger.LogDebug($"DidSendBodyData");
-    //        var transfer = task.FromNative();
-    //        this.onEvent.OnNext(transfer);
-    //    }
+            default:
+                //await this.HandleError(transfer, error);
+                break;
+        }
+        this.TryDeleteUploadTempFile(transfer);
+        //this.onEvent.OnNext(transfer);
+    }
 
 
-    //    public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
-    //    {
-    //        this.logger.LogDebug("DidWriteData");
-    //        this.onEvent.OnNext(downloadTask.FromNative());
-    //    }
+    public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
+    {
+        this.logger.LogDebug($"DidSendBodyData");
+        //var transfer = task.FromNative();
+        //this.onEvent.OnNext(transfer);
+    }
 
 
-    //    public override void DidResume(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long resumeFileOffset, long expectedTotalBytes)
-    //    {
-    //        this.logger.LogDebug("DidResume");
-    //        this.onEvent.OnNext(downloadTask.FromNative());
-    //    }
+    public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
+    {
+        this.logger.LogDebug("DidWriteData");
+        //this.onEvent.OnNext(downloadTask.FromNative());
+    }
+
+
+    public override void DidResume(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long resumeFileOffset, long expectedTotalBytes)
+    {
+        this.logger.LogDebug("DidResume");
+        //this.onEvent.OnNext(downloadTask.FromNative());
+    }
 
 
     public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
@@ -284,7 +293,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             //    // if you are debugging, the base path tends to change, so the destination path changes too
             //    File.Copy(location.Path, transfer.LocalFilePath, true);
 
+            // TODO: should thread safety collection
+            this.transfers.Remove(ht);
             await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht));
+            
         }
     }
 
@@ -298,26 +310,27 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     //}
 
 
-    //    void TryDeleteUploadTempFile(HttpTransfer transfer)
-    //    {
-    //        if (!transfer.IsUpload)
-    //            return;
+    void TryDeleteUploadTempFile(HttpTransfer transfer)
+    {
+        if (!transfer.Request.IsUpload)
+            return;
 
-    //        var path = this.platform.GetUploadTempFilePath(transfer);
-    //        if (File.Exists(path))
-    //        {
-    //            try
-    //            {
-    //                this.logger.LogDebug($"Deleting temporary upload file - {transfer.Identifier}");
+        var path = this.platform.GetUploadTempFilePath(transfer.Request);
 
-    //                // sometimes iOS will hold a file lock a bit longer than it should
-    //                File.Delete(path);
-    //                this.logger.LogDebug($"Temporary upload file deleted - {transfer.Identifier}");
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                this.logger.LogWarning($"Unable to delete temporary upload file - {transfer.Identifier}", ex);
-    //            }
-    //        }
-    //    }
+        if (File.Exists(path))
+        {
+            try
+            {
+                this.logger.LogDebug($"Deleting temporary upload file - {transfer.Identifier}");
+
+                // sometimes iOS will hold a file lock a bit longer than it should
+                File.Delete(path);
+                this.logger.LogDebug($"Temporary upload file deleted - {transfer.Identifier}");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning($"Unable to delete temporary upload file - {transfer.Identifier}", ex);
+            }
+        }
+    }
 }

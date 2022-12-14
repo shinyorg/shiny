@@ -57,12 +57,10 @@ static class PlatformExtensions
 
     public static HttpTransfer FromNative(this NSUrlSessionTask task)
     {
-        // TODO: need to get original file URI out - cheated with TaskDescription before
-            // TODO: switch back to Task.Identifier.ToString() and use taskdescription
         var request = new HttpTransferRequest(
             task.OriginalRequest!.Url.ToString(),
             task is NSUrlSessionUploadTask,
-            new FileInfo(""),
+            new FileInfo(task.TaskDescription!),
             task.OriginalRequest.AllowsExpensiveNetworkAccess,
             task.OriginalRequest.Body?.ToString(),
             new HttpMethod(task.OriginalRequest.HttpMethod),
@@ -73,21 +71,15 @@ static class PlatformExtensions
             task
         );
     }
+
+
+    public static string GetUploadTempFilePath(this IPlatform platform, HttpTransferRequest request)
+        => GetUploadTempFilePath(platform, request.LocalFile.Name);
+
+
+    static string GetUploadTempFilePath(IPlatform platform, string fileName)
+    {
+        var tempPath = Path.Combine(platform.Cache.FullName, fileName + ".tmp");
+        return tempPath;
+    }
 }
-
-
-//public static string GetUploadTempFilePath(this IPlatform platform, HttpTransferRequest request)
-//    => GetUploadTempFilePath(platform, request.LocalFile.Name);
-
-
-//public static string GetUploadTempFilePath(this IPlatform platform, HttpTransfer transfer)
-//    => GetUploadTempFilePath(platform, transfer.LocalFilePath);
-
-
-//static string GetUploadTempFilePath(IPlatform platform, string fileName)
-//{
-//    var tempPath = Path.Combine(platform.Cache.FullName, fileName + ".tmp");
-//    return tempPath;
-//}
-
-

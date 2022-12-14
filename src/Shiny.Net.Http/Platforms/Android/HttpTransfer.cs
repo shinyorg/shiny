@@ -161,7 +161,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         catch (HttpRequestException ex)
         {
             // TODO: if 400's - error out, if 500 keep trying
-            this.Status = HttpTransferState.Retrying; // TODO: or pending
+            this.Status = HttpTransferState.Pending; 
             //ex.StatusCode.
         }
         catch (Exception ex)
@@ -186,7 +186,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
             var response = await this.httpClient.SendAsync(request).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-            // TODO: on complete
+            // TODO: on complete            
         }
         catch (TaskCanceledException) { }
         catch (HttpRequestException ex)
@@ -210,6 +210,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
             foreach (var header in this.Request.Headers)
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value);
 
+        // TODO: allow content type?
         if (!this.Request.PostData.IsEmpty())
             request.Content = new StringContent(this.Request.PostData!);
 

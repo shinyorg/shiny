@@ -134,7 +134,7 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
     protected virtual void SendNotification()
     {
         this.builder ??= new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
-            .SetSmallIcon(this.GetNotificationIcon())
+            .SetSmallIcon(this.Platform.GetNotificationIconResource())
             .SetOngoing(true);
 
         this.builder
@@ -166,20 +166,6 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         {
             this.NotificationManager!.Notify(this.notificationId.Value, this.builder.Build());
         }
-    }
-
-
-    protected virtual int GetNotificationIcon()
-    {
-        var id = this.Platform.GetResourceIdByName("notification");
-        if (id > 0)
-            return id;
-
-        id = this.Platform.AppContext.ApplicationInfo?.Icon ?? 0;
-        if (id > 0)
-            return id;
-
-        throw new InvalidOperationException("Unable to find notification icon for Shiny foreground service - ensure you have your application icon set or a drawable resource named notification");
     }
 }
 

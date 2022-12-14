@@ -36,7 +36,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
 
     public async Task<IHttpTransfer> Queue(HttpTransferRequest request)
-    {
+    {        
         var identifier = Guid.NewGuid().ToString();
         var ht = new HttpTransfer(this.services, request, identifier);
         await this.repository.Set(new BlobStore<HttpTransferRequest>
@@ -44,6 +44,8 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             identifier,
             request
         ));
+        this.transfers.Add(ht);
+
         return ht;
     }
 
@@ -51,16 +53,22 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     public Task CancelAll()
     {
         foreach (HttpTransfer transfer in this.Transfers)
-            transfer.Cancel();
+            transfer.Cancel();        
 
         this.transfers.Clear();
-        return Task.CompletedTask;
+        return this.repository.Clear();
     }
 
 
     public Task Cancel(string identifier)
     {
-        this.Get(identifier)?.Cancel();
+        var ht = this.Get(identifier);
+
+        if (ht != null)
+        { 
+            ht.Cancel();
+            this.transfers.Remove(ht);
+        }
         return this.repository.Remove(identifier);
     }
 
@@ -81,5 +89,5 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
 
     HttpTransfer? Get(string identifier)
-           => this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier)) as HttpTransfer;
+        => this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier)) as HttpTransfer;
 }

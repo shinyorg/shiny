@@ -15,6 +15,20 @@ public static class AndroidExtensions
     public static AndroidLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<AndroidLifecycleExecutor>();
 
 
+    public static int GetNotificationIconResource(this AndroidPlatform platform)
+    {
+        var id = platform.GetResourceIdByName("notification");
+        if (id > 0)
+            return id;
+
+        id = platform.AppContext.ApplicationInfo?.Icon ?? 0;
+        if (id > 0)
+            return id;
+
+        throw new InvalidOperationException("Unable to find notification icon - ensure you have your application icon set or a drawable resource named notification");
+    }
+
+
     public static PendingIntent GetBroadcastPendingIntent<T>(this AndroidPlatform platform, string intentAction, PendingIntentFlags flags, int requestCode = 0, Action<Intent>? modifyIntent = null)
     {
         var intent = platform.CreateIntent<T>(intentAction);
