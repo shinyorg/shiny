@@ -41,7 +41,7 @@
                         <Label Text="Post Data" />
                         <Entry Text="{Binding PostData}" />
 
-                        <Label Text="HTTP Verb" />
+                        <Label Text="HTTP Method" />
                         <Entry Text="{Binding HttpVerb}" />
 
                         <Label Text="Allow Metered Connections" />

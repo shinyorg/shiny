@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.Net.Http;
+﻿using Shiny.Net.Http;
 
 namespace Sample.HttpTransfers;
 
@@ -46,25 +45,28 @@ public class CreateViewModel : ViewModel
                 return;
             }
 
-            //var verb = this.HttpVerb.ToLower() switch
-            //{
-            //    "post" => HttpMethod.Post,
-            //    "get" => HttpMethod.Get,
-            //    "put" => HttpMethod.Put,
-            //    _ => null
-            //};
-            //if (verb == null)
-            //{
-            //    await this.Alert("Invalid HTTP Verb - " + this.HttpVerb);
-            //    return;
-            //}
-            //var request = new HttpTransferRequest(this.Url, this.FilePath, this.IsUpload)
-            //{
-            //    UseMeteredConnection = this.UseMeteredConnection,
-            //    PostData = this.PostData,
-            //    HttpMethod = verb
-            //};
-            //await httpTransfers.Enqueue(request);
+            var verb = this.HttpVerb?.ToLower() switch
+            {
+                "post" => HttpMethod.Post,
+                "get" => HttpMethod.Get,
+                "put" => HttpMethod.Put,
+                _ => null
+            };
+            if (verb == null)
+            {
+                await this.Alert("Invalid HTTP Verb - " + this.HttpVerb);
+                return;
+            }
+            var request = new HttpTransferRequest //(this.Url, this.FilePath, this.IsUpload)
+            (
+                this.Url,
+                this.IsUpload,
+                new FileInfo(this.FilePath!),
+                this.UseMeteredConnection,
+                this.PostData,
+                verb
+            );
+            await manager.Queue(request);
 
             await this.Navigation.GoBack();
         });
@@ -114,7 +116,6 @@ public class CreateViewModel : ViewModel
 
     [Reactive] public string PostData { get; set; }
     [Reactive] public string HttpVerb { get; set; }
-    [Reactive] public string Title { get; set; }
     [Reactive] public string ErrorMessage { get; private set; }
     [Reactive] public string Url { get; set; }
     [Reactive] public bool UseMeteredConnection { get; set; }
