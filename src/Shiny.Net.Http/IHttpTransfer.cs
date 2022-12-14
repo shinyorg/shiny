@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
+﻿using System;
 
 namespace Shiny.Net.Http;
 
 
-public interface IHttpTransfer : INotifyPropertyChanged
+public interface IHttpTransfer
 {
     HttpTransferRequest Request { get; }
 
@@ -13,5 +13,5 @@ public interface IHttpTransfer : INotifyPropertyChanged
     long BytesToTransfer { get; }
 
     double PercentComplete { get; }
-    //IObservable<object> WatchMetrics();
+    IObservable<HttpTransferMetrics> ListenToMetrics();
 }

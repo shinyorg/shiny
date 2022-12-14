@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using Foundation;
 
 namespace Shiny.Net.Http;
 
 
-public class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
+public class HttpTransfer : IHttpTransfer
 {
     public HttpTransfer(HttpTransferRequest request, NSUrlSessionTask task)
     {
@@ -31,7 +30,8 @@ public class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 
     public double PercentComplete => this.NSTask.Progress.FractionCompleted;
 
-    public IObservable<(TimeSpan EstimateTimeRemaining, double BytesPerSecond)> WatchMetrics() => Observable
+
+    public IObservable<HttpTransferMetrics> ListenToMetrics() => Observable
         .Interval(TimeSpan.FromSeconds(2))
         .Select(x =>
         {
@@ -39,30 +39,22 @@ public class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
             //this.NSTask.Progress.Indeterminate
             //this.NSTask.Progress.Throughput
             var ts = TimeSpan.FromSeconds((int)this.NSTask.Progress.EstimatedTimeRemaining!);
-            var bps = (double)this.NSTask.Progress.Throughput; // TODO: should be long
-            return (ts, bps);
+            var bps = (long)this.NSTask.Progress.Throughput!;
+            return new HttpTransferMetrics(
+                ts,
+                bps,
+                this.BytesToTransfer,
+                this.BytesTransferred,
+                this.PercentComplete,
+                this.Status
+            );
         });
 
 
-    internal void Cancel()
-    {
-        // TODO: uploads cannot be paused
-        this.NSTask.Cancel();
-        this.RaisePropertyChanged(nameof(this.Status));
-    }
+    
+    internal void Cancel() => this.NSTask.Cancel();
 
-
-    internal void Pause()
-    {
-        // TODO: uploads cannot be paused
-        this.NSTask.Suspend();
-        this.RaisePropertyChanged(nameof(this.Status));
-    }
-
-
-    internal void Resume()
-    {
-        this.NSTask.Resume();
-        this.RaisePropertyChanged(nameof(this.Status));
-    }
+    // TODO: uploads cannot be paused/resumed
+    internal void Pause() => this.NSTask.Suspend();
+    internal void Resume() => this.NSTask.Resume();
 }

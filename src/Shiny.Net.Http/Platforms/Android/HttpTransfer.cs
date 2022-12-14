@@ -60,38 +60,44 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
     {
         get
         {
-            //if (this.BytesTransferred <= 0 || this.FileSize <= 0)
-            //    return 0;
+            if (this.BytesTransferred <= 0 || this.BytesTransferred <= 0)
+                return 0;
 
-            //var raw = ((double)this.BytesTransferred / (double)this.FileSize);
-            //return Math.Round(raw, 2);
-            return 0;
+            var raw = ((double)this.BytesTransferred / (double)this.BytesToTransfer);
+            return Math.Round(raw, 2);
         }
     }
 
 
-    public IObservable<(TimeSpan EstimateTimeRemaining, double BytesPerSecond)> WatchMetrics() =>
+    public IObservable<HttpTransferMetrics> ListenToMetrics() =>
         this.WhenAnyProperty()
             .Select(x => (x.Object.BytesTransferred, x.Object.BytesToTransfer))
             .Buffer(TimeSpan.FromSeconds(2))
             .Select(results =>
             {
                 var timeRemaining = TimeSpan.Zero;
-                double bytesPerSecond = 0;
+                var bytesPerSecond = 0L;
 
                 if (results.Count > 0)
                 {
                     // total bytes to transfer - all bytes transferred = delta
                     // add all deltas over the past 2 seconds for total bytes xfer
                     var totalBytes = results.Sum(x => x.BytesToTransfer - x.BytesTransferred);
-                    bytesPerSecond = (double)totalBytes / 2; // in two seconds
+                    bytesPerSecond = Convert.ToInt64((double)totalBytes / 2); // in two seconds
 
                     var latest = results.Last();
                     var remainingBytes = latest.BytesToTransfer - latest.BytesTransferred;
                     var secondsRemaining = remainingBytes / bytesPerSecond;
                     timeRemaining = TimeSpan.FromSeconds(secondsRemaining);
                 }
-                return (timeRemaining, bytesPerSecond);
+                return new HttpTransferMetrics(
+                    timeRemaining,
+                    bytesPerSecond,
+                    this.BytesToTransfer,
+                    this.BytesTransferred,
+                    this.PercentComplete,
+                    this.Status
+                );
             });
 
 
