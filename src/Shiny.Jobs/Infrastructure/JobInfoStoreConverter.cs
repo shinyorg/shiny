@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using Shiny.Stores;
 
 namespace Shiny.Jobs.Infrastructure;
@@ -8,7 +7,7 @@ namespace Shiny.Jobs.Infrastructure;
 
 public class JobInfoStoreConverter : StoreConverter<JobInfo>
 {
-    public override JobInfo FromStore(IDictionary<string, object> values)
+    public override JobInfo FromStore(IDictionary<string, object> values, ISerializer serializer)
     {
         var info = new JobInfo((string)values[nameof(JobInfo.TypeName)], (string)values[nameof(JobInfo.Identifier)])
         {
@@ -23,13 +22,13 @@ public class JobInfoStoreConverter : StoreConverter<JobInfo>
         };
 
         if (values.ContainsKey(nameof(JobInfo.Parameters)))
-            info.Parameters = JsonSerializer.Deserialize<Dictionary<string, string>>((string)values[nameof(JobInfo.Parameters)])!;
+            info.Parameters = serializer.Deserialize<Dictionary<string, string>>((string)values[nameof(JobInfo.Parameters)])!;
 
         return info;
     }
 
 
-    public override IEnumerable<(string Property, object Value)> ToStore(JobInfo entity)
+    public override IEnumerable<(string Property, object Value)> ToStore(JobInfo entity, ISerializer serializer)
     {
         yield return (nameof(JobInfo.TypeName), entity.TypeName);
         yield return (nameof(JobInfo.IsSystemJob), entity.IsSystemJob);
@@ -40,7 +39,7 @@ public class JobInfoStoreConverter : StoreConverter<JobInfo>
         yield return (nameof(JobInfo.BatteryNotLow), entity.BatteryNotLow);
 
         if ((entity.Parameters?.Count ?? 0) > 0)
-            yield return (nameof(JobInfo.Parameters), JsonSerializer.Serialize(entity.Parameters));
+            yield return (nameof(JobInfo.Parameters), serializer.Serialize(entity.Parameters!));
 
         if (entity.LastRun != null)
             yield return (nameof(JobInfo.LastRun), this.ConvertToStoreValue(entity.LastRun));

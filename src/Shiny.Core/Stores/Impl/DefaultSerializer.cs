@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Shiny.Infrastructure.Impl;
+namespace Shiny.Stores.Impl;
 
 
 public class DefaultSerializer : ISerializer

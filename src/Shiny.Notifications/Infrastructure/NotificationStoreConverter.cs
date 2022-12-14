@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using Shiny.Stores;
 
 namespace Shiny.Notifications.Infrastructure;
@@ -8,7 +7,7 @@ namespace Shiny.Notifications.Infrastructure;
 
 public class NotificationStoreConverter : StoreConverter<Notification>
 {
-    public override Notification FromStore(IDictionary<string, object> values)
+    public override Notification FromStore(IDictionary<string, object> values, ISerializer serializer)
     {
         var result = new Notification
         {
@@ -22,19 +21,19 @@ public class NotificationStoreConverter : StoreConverter<Notification>
             ScheduleDate = this.ConvertFromStoreValue<DateTimeOffset?>(values, nameof(Notification.ScheduleDate))
         };
         if (values.ContainsKey(nameof(Notification.Payload)))
-            result.Payload = JsonSerializer.Deserialize<Dictionary<string, string>>((string)values[nameof(Notification.Payload)]);
+            result.Payload = serializer.Deserialize<Dictionary<string, string>>((string)values[nameof(Notification.Payload)]);
 
         if (values.ContainsKey(nameof(Notification.Geofence)))
-            result.Geofence = JsonSerializer.Deserialize<GeofenceTrigger>((string)values[nameof(Notification.Geofence)]);
+            result.Geofence = serializer.Deserialize<GeofenceTrigger>((string)values[nameof(Notification.Geofence)]);
 
         if (values.ContainsKey(nameof(Notification.RepeatInterval)))
-            result.RepeatInterval = JsonSerializer.Deserialize<IntervalTrigger>((string)values[nameof(Notification.RepeatInterval)]);
+            result.RepeatInterval = serializer.Deserialize<IntervalTrigger>((string)values[nameof(Notification.RepeatInterval)]);
 
         return result;
     }
 
 
-    public override IEnumerable<(string Property, object Value)> ToStore(Notification entity)
+    public override IEnumerable<(string Property, object Value)> ToStore(Notification entity, ISerializer serializer)
     {
         yield return (nameof(entity.Channel), entity.Channel!);
         yield return (nameof(entity.Message), entity.Message!);
@@ -55,9 +54,9 @@ public class NotificationStoreConverter : StoreConverter<Notification>
             yield return (nameof(entity.Payload), this.ConvertToStoreValue(entity.Payload));
 
         if (entity.Geofence != null)
-            yield return (nameof(entity.Geofence), JsonSerializer.Serialize(entity.Geofence));
+            yield return (nameof(entity.Geofence), serializer.Serialize(entity.Geofence));
 
         if (entity.RepeatInterval != null)
-            yield return (nameof(entity.RepeatInterval), JsonSerializer.Serialize(entity.RepeatInterval));
+            yield return (nameof(entity.RepeatInterval), serializer.Serialize(entity.RepeatInterval));
     }
 }

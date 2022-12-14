@@ -160,6 +160,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         catch (TaskCanceledException) { }
         catch (HttpRequestException ex)
         {
+            // TODO: if 400's - error out, if 500 keep trying
             this.Status = HttpTransferState.Retrying; // TODO: or pending
             //ex.StatusCode.
         }

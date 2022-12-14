@@ -7,7 +7,7 @@ namespace Shiny.Beacons.Infrastructure;
 
 public class BeaconRegionStoreConverter : StoreConverter<BeaconRegion>
 {
-    public override BeaconRegion FromStore(IDictionary<string, object> values)
+    public override BeaconRegion FromStore(IDictionary<string, object> values, ISerializer serializer)
     {
         var major = this.ConvertFromStoreValue<ushort?>(values, nameof(BeaconRegion.Major));
         var minor = this.ConvertFromStoreValue<ushort?>(values, nameof(BeaconRegion.Minor));
@@ -25,7 +25,7 @@ public class BeaconRegionStoreConverter : StoreConverter<BeaconRegion>
     }
 
 
-    public override IEnumerable<(string Property, object Value)> ToStore(BeaconRegion entity)
+    public override IEnumerable<(string Property, object Value)> ToStore(BeaconRegion entity, ISerializer serializer)
     {
         //entity.Validate();
         yield return (nameof(BeaconRegion.Uuid), entity.Uuid);

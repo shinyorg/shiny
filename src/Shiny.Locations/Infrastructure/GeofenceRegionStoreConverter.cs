@@ -10,7 +10,7 @@ public class GeofenceRegionStoreConverter : IStoreConverter<GeofenceRegion>
     const string LongitudeKey = "CenterLongitude";
 
 
-    public GeofenceRegion FromStore(IDictionary<string, object> values) => new GeofenceRegion(
+    public GeofenceRegion FromStore(IDictionary<string, object> values, ISerializer serializer) => new GeofenceRegion(
         (string)values[nameof(GeofenceRegion.Identifier)],
         new Position(
             (double)values[LatitudeKey],
@@ -25,7 +25,7 @@ public class GeofenceRegionStoreConverter : IStoreConverter<GeofenceRegion>
     };
 
 
-    public IEnumerable<(string Property, object Value)> ToStore(GeofenceRegion entity)
+    public IEnumerable<(string Property, object Value)> ToStore(GeofenceRegion entity, ISerializer serializer)
     {
         yield return (nameof(GeofenceRegion.Identifier), entity.Identifier);
         yield return (nameof(GeofenceRegion.Radius), entity.Radius.TotalKilometers);

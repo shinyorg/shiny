@@ -8,10 +8,10 @@ namespace Shiny.Stores;
 
 public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEntity
 {
-    public abstract T FromStore(IDictionary<string, object> values);
+    public abstract T FromStore(IDictionary<string, object> values, ISerializer serializer);
 
 
-    public virtual IEnumerable<(string Property, object Value)> ToStore(T entity)
+    public virtual IEnumerable<(string Property, object Value)> ToStore(T entity, ISerializer serializer)
     {
         var props = typeof(T).GetProperties().Where(x => x.GetMethod != null).ToList();
         foreach (var prop in props)

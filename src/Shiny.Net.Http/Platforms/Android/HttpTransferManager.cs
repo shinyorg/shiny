@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Shiny.Stores;
+using Shiny.Stores.Impl;
 
 namespace Shiny.Net.Http;
 
@@ -8,16 +10,24 @@ namespace Shiny.Net.Http;
 class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 {
     readonly IServiceProvider services;
+    readonly IRepository<BlobStore<HttpTransferRequest>> repository;
 
 
-    public HttpTransferManager(IServiceProvider services)
+    public HttpTransferManager(IServiceProvider services, IRepository<BlobStore<HttpTransferRequest>> repository)
     {
         this.services = services;
+        this.repository = repository;
     }
 
 
-    public void Start()
+    public async void Start()
     {
+        var requestBlobs = await this.repository.GetList();
+        foreach (var blob in requestBlobs)
+        {
+            var ht = new HttpTransfer(this.services, blob.Object, blob.Identifier);
+            this.transfers.Add(ht);
+        }
     }
 
 
@@ -25,31 +35,15 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     public INotifyReadOnlyCollection<IHttpTransfer> Transfers => this.transfers;
 
 
-    public async Task<IHttpTransfer> AddToQueue(HttpTransferRequest request)
-    {
-        // TODO: persistent notifications with progress
-        //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
-        //native.SetNotificationVisibility(DownloadVisibility.Visible);
-        //native.SetRequiresDeviceIdle
-        //native.SetRequiresCharging
-        //native.SetTitle("")
-        //native.SetDescription()
-        //native.SetVisibleInDownloadsUi(true);
-        //native.SetShowRunningNotification
-        //Task<HttpTransfer> Enqueue(HttpTransferRequest request);
-        //Task<HttpTransfer> GetTransfer(string id);
-        //Task<IList<HttpTransfer>> GetTransfers(QueryFilter? filter = null);
-        //Task Cancel(string id);
-        //Task Cancel(QueryFilter? filter = null);
-        //IObservable<HttpTransfer> WhenUpdated();
-        return null;
-    }
-
-
     public async Task<IHttpTransfer> Queue(HttpTransferRequest request)
     {
-        // TODO: save
-        var ht = new HttpTransfer(this.services, request, Guid.NewGuid().ToString());
+        var identifier = Guid.NewGuid().ToString();
+        var ht = new HttpTransfer(this.services, request, identifier);
+        await this.repository.Set(new BlobStore<HttpTransferRequest>
+        (
+            identifier,
+            request
+        ));
         return ht;
     }
 
@@ -67,7 +61,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     public Task Cancel(string identifier)
     {
         this.Get(identifier)?.Cancel();
-        return Task.CompletedTask;
+        return this.repository.Remove(identifier);
     }
 
 
