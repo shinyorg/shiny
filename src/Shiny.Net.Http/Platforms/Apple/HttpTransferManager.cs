@@ -41,25 +41,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var tasks = await this.Session.GetAllTasksAsync();
         foreach (var task in tasks)
         {
-            //task.Progress
-            //task.OriginalRequest
-
-            if (Guid.TryParse(task.TaskDescription!, out var id))
-            {
-                
-                //this.uploadTask.Resume();
-                //this.downloadTask.Resume();
-
-                if (task is NSUrlSessionUploadTask upload)
-                {
-
-                    //upload.TaskIdentifier
-                }
-                else if (task is NSUrlSessionDownloadTask download)
-                {
-
-                }
-            }
+            var shinyTask = task.FromNative(); // TODO: force resume? probably
+            this.transfers.Add(shinyTask);
         }
     }
 
@@ -70,9 +53,9 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public INotifyReadOnlyCollection<IHttpTransfer> Transfers => this.transfers;
 
 
-    public async Task<IHttpTransfer> Add(HttpTransferRequest request)
+    public async Task<IHttpTransfer> Queue(HttpTransferRequest request)
     {
-        HttpTransfer ht;
+        NSUrlSessionTask task;
         var url = NSUrl.FromString(request.Uri)!;
 
         if (request.IsUpload)
@@ -80,41 +63,62 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             var fileUri = NSUrl.FromFilename(request.LocalFile.FullName);
 
             await this.Session
-                .CreateUploadTaskAsync(NSUrlRequest.FromUrl(url), fileUri, out var task)
+                .CreateUploadTaskAsync(NSUrlRequest.FromUrl(url), fileUri, out var upload)
                 .ConfigureAwait(false);
 
-            //task.Progress.EstimatedTimeRemaining
-            //task.Progress.Finished
-            task.TaskDescription = Guid.NewGuid().ToString();
-            ht = new HttpTransfer(request, task);
+            task = upload;
         }
         else
         {
             await this.Session
-                .CreateDownloadTaskAsync(url, out var task)
+                .CreateDownloadTaskAsync(url, out var dl)
                 .ConfigureAwait(false);
 
-            //this.Session.GetTasksAsync()
-            //task.Progress.
-            task.TaskDescription = Guid.NewGuid().ToString();
-
-            ht = new HttpTransfer(request, task);
+            task = dl;
         }
+
+        task.TaskDescription = Guid.NewGuid().ToString();
+        var ht = new HttpTransfer(request, task);
         this.transfers.Add(ht);
-        await ht.Resume();
+        ht.Resume();
 
         return ht;
     }
 
 
-    public async Task Remove(string identifier)
+    public Task CancelAll()
     {
-        var transfer = this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier));
+        foreach (HttpTransfer transfer in this.Transfers)
+            transfer.Cancel();
+
+        this.transfers.Clear();
+        return Task.CompletedTask;
+    }
+
+
+    public Task Cancel(string identifier)
+    {
+        var transfer = this.Get(identifier);
         if (transfer != null)
         {
-            await transfer.Cancel();
-            //this.transfers.Remove(transfer);
+            transfer.Cancel();
+            this.transfers.Remove(transfer);
         }
+        return Task.CompletedTask;
+    }
+
+
+    public Task Pause(string identifier)
+    {
+        this.Get(identifier)?.Pause();
+        return Task.CompletedTask;
+    }
+
+
+    public Task Resume(string identifier)
+    {
+        this.Get(identifier)?.Resume();
+        return Task.CompletedTask;
     }
 
 
@@ -128,6 +132,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         }
         return false;
     }
+
+
+    HttpTransfer? Get(string identifier)
+        => this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier)) as HttpTransfer;
 
     //    protected override async Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
     //    {
@@ -185,28 +193,28 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
-    //    // this is tough to implement due to NSInputStream & CFStream delegates
-    //    // reauthorize?
-    //    //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, Action<NSInputStream> completionHandler)
-    //    //{
-    //    //    var transfer = task.FromNative();
-    //    //    var file = new FileInfo(transfer.LocalFilePath);
-    //    //    //var stream = new BodyStream(file);
-    //    //    //completionHandler(stream);
-    //    //}
+    // this is tough to implement due to NSInputStream & CFStream delegates
+    // reauthorize?
+    //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, Action<NSInputStream> completionHandler)
+    //{
+    //    var transfer = task.FromNative();
+    //    var file = new FileInfo(transfer.LocalFilePath);
+    //    //var stream = new BodyStream(file);
+    //    //completionHandler(stream);
+    //}
 
 
     public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
     {
         this.logger.LogDebug($"DidReceiveChallenge");
-        completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
     }
 
 
     public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
     {
         this.logger.LogDebug($"DidReceiveChallenge for task");
-        completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
     }
 
 

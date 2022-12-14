@@ -1,13 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shiny.Net.Http;
 
 
-public class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
+class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 {
     CancellationTokenSource? cts;
     readonly HttpClient httpClient = new();
@@ -54,23 +56,60 @@ public class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
     }
 
 
-    public Task Cancel()
+    public double PercentComplete
+    {
+        get
+        {
+            //if (this.BytesTransferred <= 0 || this.FileSize <= 0)
+            //    return 0;
+
+            //var raw = ((double)this.BytesTransferred / (double)this.FileSize);
+            //return Math.Round(raw, 2);
+            return 0;
+        }
+    }
+
+
+    public IObservable<(TimeSpan EstimateTimeRemaining, double BytesPerSecond)> WatchMetrics() =>
+        this.WhenAnyProperty()
+            .Select(x => (x.Object.BytesTransferred, x.Object.BytesToTransfer))
+            .Buffer(TimeSpan.FromSeconds(2))
+            .Select(results =>
+            {
+                var timeRemaining = TimeSpan.Zero;
+                double bytesPerSecond = 0;
+
+                if (results.Count > 0)
+                {
+                    // total bytes to transfer - all bytes transferred = delta
+                    // add all deltas over the past 2 seconds for total bytes xfer
+                    var totalBytes = results.Sum(x => x.BytesToTransfer - x.BytesTransferred);
+                    bytesPerSecond = (double)totalBytes / 2; // in two seconds
+
+                    var latest = results.Last();
+                    var remainingBytes = latest.BytesToTransfer - latest.BytesTransferred;
+                    var secondsRemaining = remainingBytes / bytesPerSecond;
+                    timeRemaining = TimeSpan.FromSeconds(secondsRemaining);
+                }
+                return (timeRemaining, bytesPerSecond);
+            });
+
+
+    internal void Cancel()
     {
         this.Status = HttpTransferState.Canceled;
         this.cts?.Cancel();
-        return Task.CompletedTask;
     }
 
 
-    public Task Pause()
+    internal void Pause()
     {
         this.Status = HttpTransferState.Paused;
         this.cts?.Cancel();
-        return Task.CompletedTask;
     }
 
 
-    public async Task Resume()
+    internal async Task Resume()
     {
         this.Status = HttpTransferState.InProgress;
         if (this.Request.IsUpload)

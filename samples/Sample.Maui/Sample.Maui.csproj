@@ -64,16 +64,4 @@
         <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />        
     </ItemGroup>
-    <ItemGroup>
-      <Compile Remove="HttpTransfers\PendingViewModel.cs" />
-      <Compile Remove="HttpTransfers\CreateViewModel.cs" />
-      <Compile Remove="HttpTransfers\HttpTransferViewModel.cs" />
-      <Compile Remove="HttpTransfers\MyHttpTransferDelegate.cs" />
-      <Compile Remove="HttpTransfers\CreatePage.xaml.cs" />
-      <Compile Remove="HttpTransfers\PendingPage.xaml.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <MauiXaml Remove="HttpTransfers\PendingPage.xaml" />
-      <MauiXaml Remove="HttpTransfers\CreatePage.xaml" />
-    </ItemGroup>
 </Project>

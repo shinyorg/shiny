@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Foundation;
 
@@ -7,44 +8,61 @@ namespace Shiny.Net.Http;
 
 public class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 {
-    NSUrlSessionDownloadTask? downloadTask;
-    NSUrlSessionUploadTask? uploadTask;
-
-
-    public HttpTransfer(HttpTransferRequest request, NSUrlSessionUploadTask uploadTask)
+    public HttpTransfer(HttpTransferRequest request, NSUrlSessionTask task)
     {
         this.Request = request;
-        this.uploadTask = uploadTask;
+        this.NSTask = task;
     }
 
 
-    public HttpTransfer(HttpTransferRequest request, NSUrlSessionDownloadTask downloadTask)
-    {
-        this.Request = request;
-        this.downloadTask = downloadTask;
-    }
-
-
-    public string Identifier => this.downloadTask?.TaskDescription! ?? this.uploadTask?.TaskDescription!;
+    public NSUrlSessionTask NSTask { get; }
+    public string Identifier => this.NSTask.TaskDescription!;
     public HttpTransferRequest Request { get; }
 
-    public HttpTransferState Status => throw new NotImplementedException();
-    public long BytesTransferred => throw new NotImplementedException();
-    public long BytesToTransfer => throw new NotImplementedException();
+    public HttpTransferState Status => this.NSTask.GetStatus();
+    public long BytesTransferred => this.Request.IsUpload
+        ? this.NSTask.BytesExpectedToSend
+        : this.NSTask.BytesExpectedToReceive;
 
-    public Task Cancel()
+    public long BytesToTransfer => this.Request.IsUpload
+        ? this.NSTask.BytesSent
+        : this.NSTask.BytesReceived;
+
+
+    public double PercentComplete => this.NSTask.Progress.FractionCompleted;
+
+    public IObservable<(TimeSpan EstimateTimeRemaining, double BytesPerSecond)> WatchMetrics() => Observable
+        .Interval(TimeSpan.FromSeconds(2))
+        .Select(x =>
+        {
+            // TODO: return null if indeterminate
+            //this.NSTask.Progress.Indeterminate
+            //this.NSTask.Progress.Throughput
+            var ts = TimeSpan.FromSeconds((int)this.NSTask.Progress.EstimatedTimeRemaining!);
+            var bps = (double)this.NSTask.Progress.Throughput; // TODO: should be long
+            return (ts, bps);
+        });
+
+
+    internal void Cancel()
     {
-        this.downloadTask?.Cancel();
-        this.uploadTask?.Cancel();
-
-
-
-        //this.uploadTask.State
-        //var task = this.session.CreateDownloadTask(null);
-        return Task.CompletedTask;
+        // TODO: uploads cannot be paused
+        this.NSTask.Cancel();
+        this.RaisePropertyChanged(nameof(this.Status));
     }
 
 
-    public Task Pause() => throw new NotImplementedException();
-    public Task Resume() => throw new NotImplementedException();
+    internal void Pause()
+    {
+        // TODO: uploads cannot be paused
+        this.NSTask.Suspend();
+        this.RaisePropertyChanged(nameof(this.Status));
+    }
+
+
+    internal void Resume()
+    {
+        this.NSTask.Resume();
+        this.RaisePropertyChanged(nameof(this.Status));
+    }
 }

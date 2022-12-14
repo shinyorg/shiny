@@ -51,7 +51,7 @@ public static class MauiProgram
         s.AddSpeechRecognition();
 
         // shiny.net.http
-        //s.AddHttpTransfers<HttpTransfers.MyHttpTransferDelegate>();
+        s.AddHttpTransfers<HttpTransfers.MyHttpTransferDelegate>();
 
         // shiny.bluetoothle & shiny.bluetoothle.hosting
         s.AddBluetoothLE<BleClient.MyBleDelegate>();

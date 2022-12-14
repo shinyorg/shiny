@@ -13,35 +13,35 @@ public class PendingViewModel : ViewModel
     public PendingViewModel(BaseServices services, IHttpTransferManager httpTransfers) : base(services)
     {
         this.Create = this.Navigation.Command("");
-        this.Load = this.LoadingCommand(async () =>
-        {
-            var transfers = await httpTransfers.GetTransfers();
-            this.Transfers = transfers
-                .Select(transfer =>
-                {
-                    var vm = new HttpTransferViewModel
-                    {
-                        Identifier = transfer.Identifier,
-                        Uri = transfer.Uri,
-                        IsUpload = transfer.IsUpload,
-                        Cancel = this.ConfirmCommand(
-                            "Are you sure you want to cancel all transfers?",
-                            async () =>
-                            {
-                                await this.httpTransfers.Cancel(transfer.Identifier);
-                                this.Load.Execute(null);
-                            }
-                        )
-                    };
+        //this.Load = this.LoadingCommand(async () =>
+        //{
+        //    var transfers = await httpTransfers.GetTransfers();
+        //    this.Transfers = transfers
+        //        .Select(transfer =>
+        //        {
+        //            var vm = new HttpTransferViewModel
+        //            {
+        //                Identifier = transfer.Identifier,
+        //                Uri = transfer.Uri,
+        //                IsUpload = transfer.IsUpload,
+        //                Cancel = this.ConfirmCommand(
+        //                    "Are you sure you want to cancel all transfers?",
+        //                    async () =>
+        //                    {
+        //                        await this.httpTransfers.Cancel(transfer.Identifier);
+        //                        this.Load.Execute(null);
+        //                    }
+        //                )
+        //            };
 
-                    ToViewModel(vm, transfer);
-                    return vm;
-                })
-                .ToList();
-        });
+        //            ToViewModel(vm, transfer);
+        //            return vm;
+        //        })
+        //        .ToList();
+        //});
         this.CancelAll = this.LoadingCommand(async () =>
         {
-            await httpTransfers.Cancel();
+            await httpTransfers.CancelAll();
             this.Load.Execute(null);
         });
     }
@@ -91,7 +91,7 @@ public class PendingViewModel : ViewModel
     //}
 
 
-    static void ToViewModel(HttpTransferViewModel viewModel, HttpTransfer transfer)
+    static void ToViewModel(HttpTransferViewModel viewModel, IHttpTransfer transfer)
     {
         viewModel.PercentComplete = transfer.PercentComplete;
         //viewModel.PercentCompleteText = $"{transfer.PercentComplete * 100}%";

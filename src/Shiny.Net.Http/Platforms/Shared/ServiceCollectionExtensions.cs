@@ -10,9 +10,10 @@ public static class ServiceCollectionExtensions
         where TDelegate : class, IHttpTransferDelegate
     {
         services.AddConnectivity();
-        //services.AddShinyService<HttpTransferManager>();
+        services.AddShinyService<HttpTransferManager>();
         services.AddShinyService(typeof(TDelegate));
         //services.AddRepository<HttpTransferStoreConverter, HttpTransfer>();
+
         return services;
     }
 }
