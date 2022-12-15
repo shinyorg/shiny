@@ -5,39 +5,37 @@ namespace Sample;
 
 public static class MauiProgram
 {
-    public static MauiApp CreateMauiApp()
-    {
-        var builder = MauiApp
-            .CreateBuilder()
-            .UseMauiApp<App>()
-            .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            })
-            .UsePrism(
-                new DryIocContainerExtension(),
-                prism => prism.OnAppStart("MainPage")
-            );
+    public static MauiApp CreateMauiApp() => MauiApp
+        .CreateBuilder()
+        .UseMauiApp<App>()
+        .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
+        .ConfigureFonts(fonts =>
+        {
+            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+        })
+        .UsePrism(
+            new DryIocContainerExtension(),
+            prism => prism.OnAppStart("MainPage")
+        )
+        .RegisterServices()
+        .RegisterShinyServices()
+        .RegisterRoutes()
+        .Build();
 
+
+    static MauiAppBuilder RegisterShinyServices(this MauiAppBuilder builder)
+    {
+        var s = builder.Services;
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
         //builder.Logging.AddAppCenter("")
 
-        RegisterServices(builder.Services);
-        RegisterShinyServices(builder.Services);
-        RegisterRoutes(builder.Services);
+        s.AddJob(typeof(SampleJob));
 
-        return builder.Build();
-    }
-
-
-    static void RegisterShinyServices(IServiceCollection s)
-    {
         // shiny.jobs
-        s.AddJobs();
+        //s.AddJobs();
 
         // shiny.core
         s.AddConnectivity();
@@ -72,22 +70,30 @@ public static class MauiProgram
         // for platform event testing - not needed for general consumption
         s.AddShinyService<Platform.PlatformStateTests>();
         s.AddShinyService<Jobs.JobLoggerTask>();
+
+        return builder;
     }
 
 
-    static void RegisterServices(IServiceCollection s)
+    static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
     {
+        var s = builder.Services;
+
         //builder.Logging.AddProvider(new SqliteLoggerProvider(LogLevel.Trace));
         s.AddSingleton<SampleSqliteConnection>();
         s.AddShinyService<CommandExceptionHandler>();
         s.AddScoped<BaseServices>();
         s.AddSingleton(TextToSpeech.Default);
         s.AddSingleton(FilePicker.Default);
+
+        return builder;
     }
 
 
-    static void RegisterRoutes(IServiceCollection s)
+    static MauiAppBuilder RegisterRoutes(this MauiAppBuilder builder)
     {
+        var s = builder.Services;
+
         // HTTP Transfers
         s.RegisterForNavigation<HttpTransfers.CreatePage, HttpTransfers.CreateViewModel>("HttpTransfersCreate");
         s.RegisterForNavigation<HttpTransfers.PendingPage, HttpTransfers.PendingViewModel>("HttpTransfers");
@@ -151,5 +157,7 @@ public static class MauiProgram
 
         s.RegisterForNavigation<MainPage, MainViewModel>();
         s.RegisterForNavigation<LogsPage, LogsViewModel>();
+
+        return builder;
     }
 }
