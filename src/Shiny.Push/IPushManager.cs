@@ -8,20 +8,14 @@ namespace Shiny.Push;
 public interface IPushManager
 {
     /// <summary>
-    /// This is an observable intended for use in the foreground
+    /// Ability to tag current registration - null if not supported by provider
     /// </summary>
-    /// <returns></returns>
-    IObservable<PushNotification> WhenReceived();
-
-    /// <summary>
-    /// This is when the token was registered
-    /// </summary>
-    DateTime? CurrentRegistrationTokenDate { get; }
+    IPushTagSupport? Tags { get; }
 
     /// <summary>
     /// The current registration token
     /// </summary>
-    string? CurrentRegistrationToken { get; }
+    string? RegistrationToken { get; }
 
     /// <summary>
     /// Requests platform permission to send push notifications

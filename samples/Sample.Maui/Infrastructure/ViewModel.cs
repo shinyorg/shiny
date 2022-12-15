@@ -3,17 +3,26 @@
 namespace Sample.Infrastructure;
 
 
-public abstract class ViewModel : ReactiveObject, IInitializeAsync, IConfirmNavigationAsync, INavigationAware, IDisposable
+public abstract class ViewModel : ReactiveObject,
+                                  IInitializeAsync,
+                                  IConfirmNavigationAsync,
+                                  INavigationAware,
+                                  IPageLifecycleAware,
+                                  IDisposable
 {
     protected ViewModel(BaseServices services) => this.Services = services;
 
 
-    [Reactive] public string Title { get; protected set; }
+    [Reactive] public string Title { get; protected set; } = null!;
     [Reactive] public bool IsBusy { get; protected set; }
     protected IPlatform Platform => this.Services.Platform;
     protected IPageDialogService Dialogs => this.Services.Dialogs;
     protected INavigationService Navigation => this.Services.Navigator;
     protected BaseServices Services { get; }
+
+    public virtual void OnAppearing() { }
+    public virtual void OnDisappearing() { }
+
 
     ILogger? logger;
     protected ILogger Logger

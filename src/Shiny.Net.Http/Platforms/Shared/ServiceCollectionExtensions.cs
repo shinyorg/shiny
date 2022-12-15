@@ -1,28 +1,23 @@
-﻿#if PLATFORM
-using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Shiny.Net.Http;
-using Shiny.Stores;
+using Shiny.Stores.Impl;
 
 namespace Shiny;
 
 
 public static class ServiceCollectionExtensions
 {
-    public static IHttpTransferManager HttpTransfers(this ShinyContainer container) => container.GetService<IHttpTransferManager>();
-
-
-    public static IServiceCollection AddHttpTransfers(this IServiceCollection services, Type transferDelegateType)
+    public static IServiceCollection AddHttpTransfers<TDelegate>(this IServiceCollection services)
+        where TDelegate : class, IHttpTransferDelegate
     {
         services.AddConnectivity();
-        //services.AddShinyService<HttpTransferManager>();
-        services.AddShinyService(transferDelegateType);
-        services.AddRepository<HttpTransferStoreConverter, HttpTransfer>();
+        services.AddShinyService<HttpTransferManager>();
+        services.AddShinyService(typeof(TDelegate));
+
+#if ANDROID
+        services.AddJob(typeof(TransferJob), requiredNetwork: Jobs.InternetAccess.Any, runInForeground: true);
+        services.AddRepository<BlobStoreConverter<HttpTransferRequest>, BlobStore<HttpTransferRequest>>();
+#endif
         return services;
     }
-
-
-    public static IServiceCollection AddHttpTransfers<T>(this IServiceCollection services) where T : class, IHttpTransferDelegate
-        => services.AddHttpTransfers(typeof(T));
 }
-#endif

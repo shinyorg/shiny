@@ -33,21 +33,18 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
     }
 
 
-    public void Start()
+    public async void Start()
     {
         this.logger.LogInformation("Initializing channel manager");
-
-        this.Add(Channel.Default).ContinueWith(x =>
+        try
         {
-            if (x.IsFaulted)
-            {
-                this.logger.LogError("Failed to create default channel", x.Exception);
-            }
-            else
-            {
-                this.logger.LogDebug("Channel manager initialized successfully");
-            }
-        });
+            await this.Add(Channel.Default).ConfigureAwait(false);
+            this.logger.LogInformation("Default notification channel created");
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Failed to create default channel");
+        }
     }
 
 

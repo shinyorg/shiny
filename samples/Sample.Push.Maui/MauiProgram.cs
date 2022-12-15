@@ -34,7 +34,7 @@ public static class MauiProgram
 #if USE_PUSH_CONFIG
         // ios or android
         var cfg = builder.Configuration.GetSection("Firebase");
-        builder.Services.AddFirebaseMessaging<MyPushDelegate>(new(
+        builder.Services.AddPushFirebaseMessaging<MyPushDelegate>(new(
             false,
 #if IOS || MACCATALYST
             cfg["IosAppId"],

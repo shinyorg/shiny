@@ -14,7 +14,6 @@
 		<Nullable>enable</Nullable>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<SqliteLibVersion>2.1.2</SqliteLibVersion>
 
 		<ApplicationTitle>Shiny Push</ApplicationTitle>
 		<ApplicationId>org.shiny.pushsample</ApplicationId>
@@ -50,22 +49,16 @@
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
         <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
+		<MauiAsset Include="appsettings.apple.json" LogicalName="appsettings.apple.json" />
+		<MauiAsset Include="appsettings.android.json" LogicalName="appsettings.android.json" />
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 
 		<ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
-		<ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
 		<ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
 		<ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
 		<ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
 	</ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
-        <PackageReference Include="SQLitePCLRaw.core" Version="$(SqliteLibVersion)" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="$(SqliteLibVersion)" />
-        <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="$(SqliteLibVersion)" />
-        <PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="$(SqliteLibVersion)" />
-    </ItemGroup>
 
 	<PropertyGroup>		
 		<DefineConstants Condition="'$(PushProvider)' == 'azure'">$(DefineConstants);AZURE</DefineConstants>
@@ -74,9 +67,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Condition="'$(PushProvider)' == 'native'" Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
-		<ProjectReference Condition="'$(PushProvider)' == 'firebase'" Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
-		<ProjectReference Condition="'$(PushProvider)' == 'azure'" Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
+		<ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
+		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
     </ItemGroup>
-
 </Project>

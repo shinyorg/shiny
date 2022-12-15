@@ -137,7 +137,7 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         var path = this.GetPath(entity.Identifier);
         var update = File.Exists(path);
 
-        var serialize = this.converter.ToStore(entity).ToDictionary(
+        var serialize = this.converter.ToStore(entity, this.serializer).ToDictionary(
             x => x.Property,
             x => x.Value
         );
@@ -171,7 +171,7 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         {
             var text = File.ReadAllText(file.FullName);
             var dictionary = this.serializer.Deserialize<Dictionary<string, object>>(text);
-            var entity = this.converter.FromStore(dictionary);
+            var entity = this.converter.FromStore(dictionary, this.serializer);
 
             if (entity.Identifier.IsEmpty())
                 throw new InvalidOperationException("Identifier not set on store entity");

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shiny.Infrastructure;
+namespace Shiny.Stores;
 
 
 public interface ISerializer

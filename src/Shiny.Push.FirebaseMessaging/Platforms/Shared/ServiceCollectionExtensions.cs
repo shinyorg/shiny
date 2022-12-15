@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Shiny.Push;
 
 namespace Shiny;
@@ -7,36 +6,37 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddFirebaseMessaging<TPushDelegate>(this IServiceCollection services, FirebaseConfiguration? config = null) where TPushDelegate : class, IPushDelegate
-        => services.AddFirebaseMessaging(typeof(TPushDelegate), config);
-
-
-    public static IServiceCollection AddFirebaseMessaging(this IServiceCollection services, Type delegateType, FirebaseConfiguration? config = null)
+    public static IServiceCollection AddPushFirebaseMessaging(this IServiceCollection services, FirebaseConfiguration? config = null)
     {
 #if IOS
         services.AddSingleton(config ?? new(true));
-        services.AddPush(typeof(Shiny.Push.FirebaseMessaging.PushManager), delegateType);
-
-#elif ANDROID
-
+        services.AddShinyService<FirebasePushProvider>();
+        services.AddPush();
+#endif
+#if ANDROID
         if (config == null || config.UseEmbeddedConfiguration)
         {
-            services.AddPush(delegateType, FirebaseConfig.Embedded);
+            services.AddPush(FirebaseConfig.Embedded);
         }
         else
         {
-            services.AddPush(
-                delegateType,
-                FirebaseConfig.FromValues(
-                    config.AppId,
-                    config.SenderId,
-                    config.ProjectId,
-                    config.ApiKey
-                )
-            );
+            services.AddPush(FirebaseConfig.FromValues(
+                config.AppId,
+                config.SenderId,
+                config.ProjectId,
+                config.ApiKey
+            ));
         }
 #endif
+        return services;
+    }
 
+
+    public static IServiceCollection AddPushFirebaseMessaging<TPushDelegate>(this IServiceCollection services, FirebaseConfiguration? config = null)
+         where TPushDelegate : class, IPushDelegate
+    {
+        services.AddSingleton<IPushDelegate, TPushDelegate>();
+        services.AddPushFirebaseMessaging(config);
         return services;
     }
 }

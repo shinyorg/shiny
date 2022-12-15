@@ -10,9 +10,6 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static IBeaconRangingManager BeaconRanging(this ShinyContainer container) => container.GetService<IBeaconRangingManager>();
-    public static IBeaconMonitoringManager BeaconMonitoring(this ShinyContainer container) => container.GetService<IBeaconMonitoringManager>();
-
     /// <summary>
     /// Register the beacon service with this if you only plan to use ranging
     /// </summary>

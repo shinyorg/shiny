@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json;
 using Shiny.Stores;
 
 namespace Shiny.Notifications.Infrastructure;
@@ -7,7 +6,7 @@ namespace Shiny.Notifications.Infrastructure;
 
 public class ChannelStoreConverter : StoreConverter<Channel>
 {
-    public override Channel FromStore(IDictionary<string, object> values)
+    public override Channel FromStore(IDictionary<string, object> values, ISerializer serializer)
     {
         var channel = new Channel
         {
@@ -19,12 +18,12 @@ public class ChannelStoreConverter : StoreConverter<Channel>
         };
 
         if (values.ContainsKey(nameof(Channel.Actions)))
-            channel.Actions = JsonSerializer.Deserialize<List<ChannelAction>>((string)values[nameof(channel.Actions)])!;
+            channel.Actions = serializer.Deserialize<List<ChannelAction>>((string)values[nameof(channel.Actions)])!;
 
         return channel;
     }
 
-    public override IEnumerable<(string Property, object Value)> ToStore(Channel entity)
+    public override IEnumerable<(string Property, object Value)> ToStore(Channel entity, ISerializer serializer)
     {
         yield return (nameof(entity.Importance), entity.Importance);
         yield return (nameof(entity.Sound), entity.Sound);
@@ -36,6 +35,6 @@ public class ChannelStoreConverter : StoreConverter<Channel>
             yield return (nameof(entity.Description), entity.Description);
 
         if (entity.Actions.Count > 0)
-            yield return (nameof(entity.Actions), JsonSerializer.Serialize(entity.Actions));
+            yield return (nameof(entity.Actions), serializer.Serialize(entity.Actions));
     }
 }

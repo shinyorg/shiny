@@ -1,4 +1,4 @@
-﻿#if PLATFORM
+﻿
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -9,10 +9,6 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-
-    public static IBleManager BluetoothLE(this ShinyContainer container) => container.GetService<IBleManager>();
-
-
     /// <summary>
     /// Register the IBleManager service that allows you to connect to other BLE devices - Delegates used here are intended for background usage
     /// </summary>
@@ -54,6 +50,4 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBluetoothLE<TCentralDelegate>(this IServiceCollection services, AndroidBleConfiguration? config = null) where TCentralDelegate : class, IBleDelegate
         => services.AddBluetoothLE(typeof(TCentralDelegate), config);
 #endif
-
 }
-#endif

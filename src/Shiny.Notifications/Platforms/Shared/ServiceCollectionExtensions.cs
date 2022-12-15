@@ -7,11 +7,8 @@ using Shiny.Notifications.Infrastructure;
 namespace Shiny;
 
 
-public static class NotificationExtensions
+public static class ServiceCollectionExtensions
 {
-    public static INotificationManager Notifications(this ShinyContainer container) => container.GetService<INotificationManager>();
-
-
 #if IOS || MACCATALYST
     /// <summary>
     /// Registers notification manager with Shiny
@@ -42,8 +39,9 @@ public static class NotificationExtensions
 
         return services;
     }
+#endif
 
-#elif ANDROID
+#if ANDROID
 
     /// <summary>
     /// Registers notification manager with Shiny

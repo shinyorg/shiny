@@ -25,7 +25,7 @@ public class MyPushDelegate : IPushDelegate
     Task Insert(string info) => this.conn.InsertAsync(new ShinyEvent
     {
         Text = info,
-        Detail = "Token: " + this.pushManager.CurrentRegistrationToken,
+        Detail = "Token: " + this.pushManager.RegistrationToken,
         Timestamp = DateTime.UtcNow
     });
 }

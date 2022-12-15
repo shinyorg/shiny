@@ -16,13 +16,13 @@
 
     <ItemGroup>
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
-        <PackageReference Update="Xamarin.Firebase.Messaging" Version="123.0.7" />
+        <PackageReference Update="Xamarin.Firebase.Messaging" Version="123.0.8" />
         <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.2.12" />
-        <PackageReference Update="Xamarin.Firebase.Analytics" Version="120.1.2" />
+        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.2.13" />
+        <PackageReference Update="Xamarin.Firebase.Analytics" Version="121.1.1" />
         <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="$(XamarinIosFirebaseVersion)" />
         <PackageReference Update="Xamarin.FireBase.iOS.Analytics" Version="$(XamarinIosFirebaseVersion)" />
     </ItemGroup>
@@ -30,12 +30,12 @@
     <ItemGroup>
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="120.0.0" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.5.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.5.1.1" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1.1" />
 
         <PackageReference Update="Xamarin.AndroidX.Core" Version="1.9.0" />
-        <PackageReference Update="Xamarin.AndroidX.Preference" Version="1.2.0.2" />
-        <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.4.2.1" />
+        <PackageReference Update="Xamarin.AndroidX.Preference" Version="1.2.0.3" />
+        <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.5.1.1" />
         <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4" />
     </ItemGroup>
 
@@ -57,7 +57,7 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
 
         <!--hack-->
-        <PackageReference Include="Xamarin.Build.Download" Version="0.11.3" PrivateAssets="All" />
+        <!--<PackageReference Include="Xamarin.Build.Download" Version="0.11.4" PrivateAssets="All" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsIosBuild)' == 'true'">

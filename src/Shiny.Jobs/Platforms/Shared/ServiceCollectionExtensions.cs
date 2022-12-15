@@ -66,17 +66,21 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddJobs(this IServiceCollection services, bool? clearPrevJobs = null)
     {
-        if (clearPrevJobs != null)
-            JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
+        if (!services.Any(x => x.ImplementationType?.Equals(typeof(JobLifecycleTask)) ?? false))
+        {
+            if (clearPrevJobs != null)
+                JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
 
-        services.AddRepository<JobInfoStoreConverter, JobInfo>();
-        services.AddShinyService<JobsStartup>();
-        services.AddShinyService<JobLifecycleTask>();
-        services.AddShinyService<JobManager>();
+            services.AddRepository<JobInfoStoreConverter, JobInfo>();
 
-        services.AddBattery();
-        services.AddConnectivity();
-        
+            services.AddShinyService<JobsStartup>();
+            services.AddShinyService<JobLifecycleTask>();
+            services.AddShinyService<JobManager>();
+
+            services.AddBattery();
+            services.AddConnectivity();
+        }
+
         return services;
     }
 }

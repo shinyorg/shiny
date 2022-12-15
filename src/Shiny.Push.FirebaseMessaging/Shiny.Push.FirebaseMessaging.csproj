@@ -7,16 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
+        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
         <PackageReference Include="Xamarin.Firebase.iOS.CloudMessaging" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />

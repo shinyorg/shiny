@@ -41,7 +41,7 @@
                         <Label Text="Post Data" />
                         <Entry Text="{Binding PostData}" />
 
-                        <Label Text="HTTP Verb" />
+                        <Label Text="HTTP Method" />
                         <Entry Text="{Binding HttpVerb}" />
 
                         <Label Text="Allow Metered Connections" />
@@ -50,17 +50,16 @@
                         <Label Text="Upload" />
                         <CheckBox IsChecked="{Binding IsUpload}" />
 
-                        <Frame IsVisible="{Binding IsUpload}">
-                            <StackLayout>
-                                <Label Text="Upload Info" FontSize="Large" />
+                        <Button Text="Test Download" Command="{Binding TestDownload}" />
 
-                                <Button Text="Select Upload" Command="{Binding SelectUpload}" />
+                        <BoxView Style="{StaticResource HR}" />
+                        <Label Text="Upload Info" FontSize="Large" />
 
-                                <Label Text="File Size (MB)" />
-                                <Entry Text="{Binding SizeInMegabytes}" Keyboard="Numeric" />
-                                <Button Text="Create New Random File" Command="{Binding CreateRandom}" />
-                            </StackLayout>
-                        </Frame>
+                        <Button Text="Select Upload" Command="{Binding SelectUpload}" />
+
+                        <Label Text="File Size (MB)" />
+                        <Entry Text="{Binding SizeInMegabytes}" Keyboard="Numeric" />
+                        <Button Text="Create New Random File" Command="{Binding CreateRandom}" />
                     </StackLayout>
                 </ScrollView>
             </Grid>

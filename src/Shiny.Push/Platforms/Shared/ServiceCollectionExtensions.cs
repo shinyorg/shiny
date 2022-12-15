@@ -1,29 +1,74 @@
-﻿using System;
+﻿using Shiny.Push;
+using Shiny.Notifications;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Push;
+#if ANDROID
+using Microsoft.Extensions.DependencyInjection.Extensions;
+#endif
 
 namespace Shiny;
 
 
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Adds Native Push Notification services without any background handling
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddPush(this IServiceCollection services)
+    {
+#if APPLE
+        services.AddChannelManager();
+        services.AddShinyService<PushManager>();
+#endif
+#if ANDROID
+        services.AddPush(new FirebaseConfig());
+#endif
+        return services;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TDelegate"></typeparam>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
-        => services.AddPush(typeof(TDelegate));
-
-
-    public static IServiceCollection AddPush(this IServiceCollection services, Type delegateType)
-        => services.AddPush(typeof(PushManager), delegateType);
-
+    {
+        services.AddShinyService<TDelegate>();
+        return services.AddPush();
+    }
 
 #if ANDROID
-    public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, FirebaseConfig config) where TDelegate : class, IPushDelegate
-        => services.AddPush(typeof(TDelegate), config);
 
-
-    public static IServiceCollection AddPush(this IServiceCollection services, Type delegateType, FirebaseConfig config)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="config"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddPush(this IServiceCollection services, FirebaseConfig config)
     {
         services.AddSingleton(config);
-        services.AddPush(delegateType);
+        services.AddChannelManager();
+        services.AddShinyService<PushManager>();
+        return services;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TDelegate"></typeparam>
+    /// <param name="services"></param>
+    /// <param name="config"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, FirebaseConfig config)
+        where TDelegate : class, IPushDelegate
+    {        
+        services.AddShinyService<TDelegate>();
+        services.AddPush(config);   
         return services;
     }
 #endif

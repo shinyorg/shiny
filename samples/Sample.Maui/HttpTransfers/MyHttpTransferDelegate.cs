@@ -17,21 +17,21 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
     }
 
 
-    public Task OnError(HttpTransfer transfer, Exception ex)
+    public Task OnError(IHttpTransfer transfer, Exception ex)
+        => this.CreateHttpTransferEvent(transfer, ex);
+
+
+    public Task OnCompleted(IHttpTransfer transfer)
         => this.CreateHttpTransferEvent(transfer);
 
 
-    public Task OnCompleted(HttpTransfer transfer)
-        => this.CreateHttpTransferEvent(transfer);
-
-
-    async Task CreateHttpTransferEvent(HttpTransfer transfer)
+    async Task CreateHttpTransferEvent(IHttpTransfer transfer, Exception? exception = null)
     {
         var state = transfer.Status == HttpTransferState.Completed ? $"Completed" : "Failed";
-        var direction = transfer.IsUpload ? "Upload" : "Download";
-        var msg = $"{direction} of {Path.GetFileName(transfer.LocalFilePath)} {state}";
+        var direction = transfer.Request.IsUpload ? "Upload" : "Download";
+        var msg = $"{direction} of {Path.GetFileName(transfer.Request.LocalFilePath)} {state}";
 
-        await this.conn.Log("HTTP Transfer", msg);
+        await this.conn.Log("HTTP Transfer", msg, exception?.ToString());
         await this.notificationManager.Send("HTTP Transfer", msg);
     }
 }
@@ -41,7 +41,7 @@ public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
 {
     public void Configure(AndroidX.Core.App.NotificationCompat.Builder builder)
     {
-
+        builder.SetContentText("Overriding HTTP Tranfer text from Sample");
     }
 }
 #endif

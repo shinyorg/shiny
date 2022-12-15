@@ -1,47 +1,40 @@
-﻿using Shiny.Net.Http;
-using Shiny.Notifications;
+﻿using System.Reactive.Disposables;
+using Shiny.Net.Http;
 
 namespace Sample.HttpTransfers;
 
 
 public class PendingViewModel : ViewModel
 {
-    readonly IHttpTransferManager httpTransfers;
-    IDisposable? sub;
-
-
     public PendingViewModel(BaseServices services, IHttpTransferManager httpTransfers) : base(services)
     {
-        this.Create = this.Navigation.Command("");
+        this.Create = this.Navigation.Command("HttpTransfersCreate");
         this.Load = this.LoadingCommand(async () =>
-        {
-            var transfers = await httpTransfers.GetTransfers();
-            this.Transfers = transfers
-                .Select(transfer =>
-                {
-                    var vm = new HttpTransferViewModel
-                    {
-                        Identifier = transfer.Identifier,
-                        Uri = transfer.Uri,
-                        IsUpload = transfer.IsUpload,
-                        Cancel = this.ConfirmCommand(
-                            "Are you sure you want to cancel all transfers?",
-                            async () =>
-                            {
-                                await this.httpTransfers.Cancel(transfer.Identifier);
-                                this.Load.Execute(null);
-                            }
-                        )
-                    };
-
-                    ToViewModel(vm, transfer);
-                    return vm;
-                })
+        {            
+            this.Transfers = httpTransfers
+                .Transfers
+                .Select(transfer => new HttpTransferViewModel(
+                    transfer,
+                    this.DestroyWith,
+                    this.ConfirmCommand(
+                        "Are you sure you want to resume this transfer?",
+                        () => httpTransfers.Resume(transfer.Identifier)
+                    ),
+                    this.ConfirmCommand(
+                        "Are you sure you wish to pause this transfer?",
+                        () => httpTransfers.Pause(transfer.Identifier)
+                    ),
+                    this.ConfirmCommand(
+                        "Are you sure you want to cancel this transfer?",
+                        () => httpTransfers.Cancel(transfer.Identifier)
+                    )
+                ))
                 .ToList();
         });
+
         this.CancelAll = this.LoadingCommand(async () =>
         {
-            await httpTransfers.Cancel();
+            await httpTransfers.CancelAll();
             this.Load.Execute(null);
         });
     }
@@ -52,7 +45,7 @@ public class PendingViewModel : ViewModel
     public ICommand CancelAll { get; }
 
 
-    IList<HttpTransferViewModel> transfers;
+    IList<HttpTransferViewModel> transfers = null!;
     public IList<HttpTransferViewModel> Transfers
     {
         get => this.transfers;
@@ -63,38 +56,51 @@ public class PendingViewModel : ViewModel
         }
     }
 
-
-    //public override void OnAppearing()
-    //{
-    //    base.OnAppearing();
-    //    this.Load.Execute(null);
-    //    ShinyHost
-    //        .Resolve<INotificationManager>()
-    //        .RequestAccess();
-
-    //    this.sub = this.httpTransfers
-    //        .WhenUpdated()
-    //        .WithMetrics()
-    //        .SubOnMainThread(
-    //            transfer =>
-    //            {
-    //                var vm = this.Transfers.FirstOrDefault(x => x.Identifier == transfer.Transfer.Identifier);
-    //                if (vm != null)
-    //                {
-    //                    ToViewModel(vm, transfer.Transfer);
-    //                    vm.TransferSpeed = Math.Round((decimal)transfer.BytesPerSecond / 1024, 2) + "Kb/s";
-    //                    vm.EstimateTimeRemaining = Math.Round(transfer.EstimatedTimeRemaining.TotalMinutes, 1) + " min(s)";
-    //                }
-    //            },
-    //            ex => this.Alert(ex.ToString())
-    //        );
-    //}
+    public override void OnAppearing() => this.Load.Execute(null);
+}
 
 
-    static void ToViewModel(HttpTransferViewModel viewModel, HttpTransfer transfer)
+
+public class HttpTransferViewModel : ReactiveObject
+{
+    readonly IHttpTransfer transfer;
+
+
+    public HttpTransferViewModel(
+        IHttpTransfer transfer,
+        CompositeDisposable disposer,
+        ICommand resume,
+        ICommand pause,
+        ICommand cancel
+    )
     {
-        viewModel.PercentComplete = transfer.PercentComplete;
-        //viewModel.PercentCompleteText = $"{transfer.PercentComplete * 100}%";
-        viewModel.Status = transfer.Status.ToString();
+        this.transfer = transfer;
+        this.Resume = resume;
+        this.Pause = pause;
+        this.Cancel = cancel;
+
+        this.transfer
+            .ListenToMetrics()
+            .SubOnMainThread(x =>
+            {
+                this.TransferSpeed = Math.Round((decimal)x.BytesPerSecond / 1024, 2) + "Kb/s";
+                this.EstimateTimeRemaining = Math.Round(x.EstimatedTimeRemaining.TotalMinutes, 1) + " min(s)";
+                this.PercentComplete = x.PercentComplete;
+                this.Status = x.Status.ToString();
+            })
+            .DisposedBy(disposer);
     }
+
+    public ICommand Resume { get; }
+    public ICommand Pause { get; }
+    public ICommand Cancel { get; }
+
+    public string Identifier => this.transfer.Identifier;
+    public bool IsUpload => this.transfer.Request.IsUpload;
+    public string Uri => this.transfer.Request.Uri;
+
+    [Reactive] public double PercentComplete { get; private set; }
+    [Reactive] public string Status { get; private set; } = null!;
+    [Reactive] public string TransferSpeed { get; private set; } = null!;
+    [Reactive] public string EstimateTimeRemaining { get; private set; } = null!;
 }

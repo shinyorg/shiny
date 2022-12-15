@@ -1,8 +1,4 @@
-﻿using Shiny;
-using System.Collections.Generic;
-using System.Windows.Input;
-
-namespace Sample;
+﻿namespace Sample;
 
 
 public class LogsViewModel : ViewModel
