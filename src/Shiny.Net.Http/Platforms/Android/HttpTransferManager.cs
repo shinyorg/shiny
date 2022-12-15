@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
 
@@ -9,12 +10,18 @@ namespace Shiny.Net.Http;
 
 class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 {
+    readonly ILogger logger;
     readonly IServiceProvider services;
     readonly IRepository<BlobStore<HttpTransferRequest>> repository;
 
 
-    public HttpTransferManager(IServiceProvider services, IRepository<BlobStore<HttpTransferRequest>> repository)
+    public HttpTransferManager(
+        ILogger<HttpTransferManager> logger,
+        IServiceProvider services,
+        IRepository<BlobStore<HttpTransferRequest>> repository
+    )
     {
+        this.logger = logger;
         this.services = services;
         this.repository = repository;
     }
@@ -22,11 +29,18 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
     public async void Start()
     {
-        var requestBlobs = await this.repository.GetList();
-        foreach (var blob in requestBlobs)
+        try
         {
-            var ht = new HttpTransfer(this.services, blob.Object, blob.Identifier);
-            this.transfers.Add(ht);
+            var requestBlobs = await this.repository.GetList();
+            foreach (var blob in requestBlobs)
+            {
+                var ht = new HttpTransfer(this.services, blob.Object, blob.Identifier);
+                this.transfers.Add(ht);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Could not restart HTTP Transfers");
         }
     }
 

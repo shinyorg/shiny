@@ -135,7 +135,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         {
             // TODO: could try resume download instead of recreating file?
             // TODO: write to cache instead & move after?
-            using var localFile = File.OpenWrite(this.Request.LocalFile.FullName);
+            using var localFile = File.OpenWrite(this.Request.LocalFilePath);
 
             using var response = await this.httpClient
                 .SendAsync(request, this.cts.Token)
@@ -181,7 +181,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
             var progress = new Action<int>(sent => this.BytesTransferred += sent);
 
             var request = this.GetRequest();
-            request.Content = new ProgressStreamContent(this.Request.LocalFile.OpenRead(), progress, 8192);
+            request.Content = new ProgressStreamContent(File.OpenRead(this.Request.LocalFilePath), progress, 8192);
 
             var response = await this.httpClient.SendAsync(request).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
@@ -201,8 +201,12 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 
     HttpRequestMessage GetRequest()
     {
+        var httpMethod = HttpMethod.Get;
+        if (!this.Request.HttpMethod.IsEmpty())
+            httpMethod = new HttpMethod(this.Request.HttpMethod!);
+
         var request = new HttpRequestMessage(
-            this.Request.HttpMethod ?? HttpMethod.Get,
+            httpMethod,
             this.Request.Uri
         );
 

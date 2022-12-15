@@ -25,12 +25,16 @@ static class PlatformExtensions
     public static NSMutableUrlRequest ToNative(this HttpTransferRequest request)
     {
         var url = NSUrl.FromString(request.Uri)!;
+
         var native = new NSMutableUrlRequest(url)
         {
-            HttpMethod = request.HttpMethod?.Method ?? HttpMethod.Get.Method,
+            HttpMethod = request.HttpMethod ?? HttpMethod.Get.Method,
             AllowsExpensiveNetworkAccess = request.UseMeteredConnection
         };
 
+        if (!request.IsUpload && !request.PostData.IsEmpty())        
+            native.Body = NSData.FromString(request.PostData!);
+        
         if (request.Headers?.Any() ?? false)
         {
             native.Headers = NSDictionary.FromObjectsAndKeys(
@@ -56,7 +60,7 @@ static class PlatformExtensions
 
 
     public static string GetUploadTempFilePath(this IPlatform platform, HttpTransferRequest request)
-        => GetUploadTempFilePath(platform, request.LocalFile.Name);
+        => GetUploadTempFilePath(platform, request.LocalFilePath);
 
 
     static string GetUploadTempFilePath(IPlatform platform, string fileName)

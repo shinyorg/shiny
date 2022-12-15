@@ -44,28 +44,35 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public async void Start()
     {
-        var tasks = await this.Session.GetAllTasksAsync();
-        foreach (var task in tasks)
+        try
         {
-            // TODO: I actually need both the temp file and the regular file - if upload
-            // TODO: force resume? probably
-            var upload = task.Description?.StartsWith("BackgroundUploadTask") ?? false;
-            
-            var request = new HttpTransferRequest(
-                task.OriginalRequest!.Url.ToString(),
-                upload,
-                new FileInfo(task.TaskDescription!),
-                task.OriginalRequest.AllowsExpensiveNetworkAccess,
-                task.OriginalRequest.Body?.ToString(),
-                new HttpMethod(task.OriginalRequest.HttpMethod),
-                task.OriginalRequest.Headers?.FromNsDictionary()
-            );
-            var ht = new HttpTransfer(
-                request,
-                task
-            );
+            var tasks = await this.Session.GetAllTasksAsync();
+            foreach (var task in tasks)
+            {
+                // TODO: I actually need both the temp file and the regular file - if upload
+                // TODO: force resume? probably
+                var upload = task.Description?.StartsWith("BackgroundUploadTask") ?? false;
 
-            this.transfers.Add(ht);
+                var request = new HttpTransferRequest(
+                    task.OriginalRequest!.Url.ToString(),
+                    upload,
+                    task.TaskDescription!,
+                    task.OriginalRequest.AllowsExpensiveNetworkAccess,
+                    task.OriginalRequest.Body?.ToString(),
+                    task.OriginalRequest.HttpMethod,
+                    task.OriginalRequest.Headers?.FromNsDictionary()
+                );
+                var ht = new HttpTransfer(
+                    request,
+                    task
+                );
+
+                this.transfers.Add(ht);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Could not restart HTTP Transfers");
         }
     }
 
@@ -79,23 +86,22 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public async Task<IHttpTransfer> Queue(HttpTransferRequest request)
     {
         NSUrlSessionTask task;
-        var url = NSUrl.FromString(request.Uri)!;
+        var nativeRequest = request.ToNative();
 
-        // TODO: setup post, body, headers, etc 
         if (request.IsUpload)
         {
             // TODO: I actually need both the temp file and the regular file
             //var fileUri = NSUrl.FromFilename(request.LocalFile.FullName);
             var tempFileUri = await this.CreateUploadTempFile(request).ConfigureAwait(false);
-            task = this.Session.CreateUploadTask(NSUrlRequest.FromUrl(url), tempFileUri);
-            task.TaskDescription = request.LocalFile.FullName;
+            task = this.Session.CreateUploadTask(nativeRequest, tempFileUri);
+            task.TaskDescription = request.LocalFilePath;
         }
         else
         {
-            task = this.Session.CreateDownloadTask(url);
+            task = this.Session.CreateDownloadTask(nativeRequest);
         }
 
-        task.TaskDescription = request.LocalFile.FullName;
+        task.TaskDescription = request.LocalFilePath;
         var ht = new HttpTransfer(request, task);
         this.transfers.Add(ht);
         ht.Resume();
@@ -145,7 +151,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         if (SessionName.Equals(sessionIdentifier))
         {
             this.completionHandler = completionHandler;
-            // TODO: call completion handler when all tasks complete
             return true;
         }
         return false;
@@ -158,7 +163,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     async Task<NSUrl> CreateUploadTempFile(HttpTransferRequest request)
     {
-        if (request.HttpMethod != HttpMethod.Post && request.HttpMethod != HttpMethod.Put)
+        var httpMethod = new HttpMethod(request.HttpMethod ?? "GET");
+        if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put)
             throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 
         var boundary = Guid.NewGuid().ToString("N");
@@ -181,10 +187,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             fs.WriteLine();
         }
 
-        using var uploadFile = request.LocalFile.OpenRead();
+        using var uploadFile = File.OpenRead(request.LocalFilePath);
         fs.WriteString("--" + boundary);
         fs.WriteString("Content-Type: application/octet-stream");
-        fs.WriteString($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFile.Name}\"");
+        fs.WriteString($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFilePath}\"");
         fs.WriteLine();
         await uploadFile.CopyToAsync(fs);
 

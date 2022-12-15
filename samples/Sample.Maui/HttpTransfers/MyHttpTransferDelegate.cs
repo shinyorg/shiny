@@ -29,7 +29,7 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
     {
         var state = transfer.Status == HttpTransferState.Completed ? $"Completed" : "Failed";
         var direction = transfer.Request.IsUpload ? "Upload" : "Download";
-        var msg = $"{direction} of {Path.GetFileName(transfer.Request.LocalFile.FullName)} {state}";
+        var msg = $"{direction} of {Path.GetFileName(transfer.Request.LocalFilePath)} {state}";
 
         await this.conn.Log("HTTP Transfer", msg);
         await this.notificationManager.Send("HTTP Transfer", msg);

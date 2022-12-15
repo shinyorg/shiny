@@ -56,26 +56,26 @@ public class CreateViewModel : ViewModel
                 return;
             }
 
-            var verb = this.HttpVerb?.ToLower() switch
-            {
-                "post" => HttpMethod.Post,
-                "get" => HttpMethod.Get,
-                "put" => HttpMethod.Put,
-                _ => null
-            };
-            if (verb == null)
-            {
-                await this.Alert("Invalid HTTP Verb - " + this.HttpVerb);
-                return;
-            }
+            //var verb = this.HttpVerb?.ToLower() switch
+            //{
+            //    "post" => HttpMethod.Post,
+            //    "get" => HttpMethod.Get,
+            //    "put" => HttpMethod.Put,
+            //    _ => null
+            //};
+            //if (verb == null)
+            //{
+            //    await this.Alert("Invalid HTTP Verb - " + this.HttpVerb);
+            //    return;
+            //}
             var request = new HttpTransferRequest //(this.Url, this.FilePath, this.IsUpload)
             (
                 this.Url,
                 this.IsUpload,
-                new FileInfo(this.FilePath!),
+                this.FilePath!,
                 this.UseMeteredConnection,
                 this.PostData,
-                verb
+                this.HttpVerb
             );
             await manager.Queue(request);
 

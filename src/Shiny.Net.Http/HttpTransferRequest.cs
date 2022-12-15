@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
 
 namespace Shiny.Net.Http;
 
@@ -8,9 +6,9 @@ namespace Shiny.Net.Http;
 public record HttpTransferRequest(
     string Uri,
     bool IsUpload,
-    FileInfo LocalFile,
+    string LocalFilePath,
     bool UseMeteredConnection = true,
     string? PostData = null,
-    HttpMethod? HttpMethod = null,
+    string? HttpMethod = null,
     IDictionary<string, string>? Headers = null
 );
