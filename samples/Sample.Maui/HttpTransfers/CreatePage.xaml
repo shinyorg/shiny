@@ -50,6 +50,7 @@
                         <Label Text="Upload" />
                         <CheckBox IsChecked="{Binding IsUpload}" />
 
+                        <Button Text="Test Download" Command="{Binding TestDownload}" />
 
                         <BoxView Style="{StaticResource HR}" />
                         <Label Text="Upload Info" FontSize="Large" />

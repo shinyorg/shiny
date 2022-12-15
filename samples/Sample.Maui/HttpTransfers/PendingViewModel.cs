@@ -85,7 +85,7 @@ public class HttpTransferViewModel : ReactiveObject
             {
                 this.TransferSpeed = Math.Round((decimal)x.BytesPerSecond / 1024, 2) + "Kb/s";
                 this.EstimateTimeRemaining = Math.Round(x.EstimatedTimeRemaining.TotalMinutes, 1) + " min(s)";
-                this.PercentComplete = $"{x.PercentComplete * 100}%";
+                this.PercentComplete = x.PercentComplete;
                 this.Status = x.Status.ToString();
             })
             .DisposedBy(disposer);
@@ -99,7 +99,7 @@ public class HttpTransferViewModel : ReactiveObject
     public bool IsUpload => this.transfer.Request.IsUpload;
     public string Uri => this.transfer.Request.Uri;
 
-    [Reactive] public string PercentComplete { get; private set; } = null!;
+    [Reactive] public double PercentComplete { get; private set; }
     [Reactive] public string Status { get; private set; } = null!;
     [Reactive] public string TransferSpeed { get; private set; } = null!;
     [Reactive] public string EstimateTimeRemaining { get; private set; } = null!;

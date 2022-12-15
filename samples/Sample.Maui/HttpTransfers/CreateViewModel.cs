@@ -15,6 +15,12 @@ public class CreateViewModel : ViewModel
         IHttpTransferManager manager
     ) : base(services)
     {
+        this.TestDownload = ReactiveCommand.Create(() =>
+        {
+            this.IsUpload = false;
+            this.Url = "https://speed.hetzner.de/10GB.bin";
+        });
+
         this.SelectUpload = ReactiveCommand.CreateFromTask(
             async () =>
             {
@@ -121,6 +127,7 @@ public class CreateViewModel : ViewModel
     }
 
 
+    public ICommand TestDownload { get; }
     public ICommand Save { get; }
     public ICommand SelectUpload { get; }
     public ICommand Delete { get; }
