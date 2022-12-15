@@ -35,11 +35,15 @@ public class HttpTransfer : IHttpTransfer
         .Interval(TimeSpan.FromSeconds(2))
         .Select(x =>
         {
-            // TODO: return null if indeterminate
-            //this.NSTask.Progress.Indeterminate
-            //this.NSTask.Progress.Throughput
-            var ts = TimeSpan.FromSeconds((int)this.NSTask.Progress.EstimatedTimeRemaining!);
-            var bps = (long)this.NSTask.Progress.Throughput!;
+            var prg = this.NSTask.Progress;
+            var ts = prg.EstimatedTimeRemaining == null
+                ? TimeSpan.Zero
+                : TimeSpan.FromSeconds((int)prg.EstimatedTimeRemaining!);
+
+            var bps = prg.Throughput == null
+                ? 0L
+                : (long)prg.Throughput!;
+
             return new HttpTransferMetrics(
                 ts,
                 bps,

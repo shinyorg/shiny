@@ -77,12 +77,23 @@
                                          Grid.ColumnSpan="4"
                                          Grid.Row="3" />
 
+                            <Button Text="Resume"
+                                    Command="{Binding Resume}"
+                                    HorizontalOptions="FillAndExpand"
+                                    Grid.Row="4"
+                                    Grid.Column="0" />
+
+                            <Button Text="Pause"
+                                    Command="{Binding Pause}"
+                                    HorizontalOptions="FillAndExpand"
+                                    Grid.Row="4"
+                                    Grid.Column="1" />
+
                             <Button Text="Cancel"
                                     Command="{Binding Cancel}"
                                     HorizontalOptions="FillAndExpand"
                                     Grid.Row="4"
-                                    Grid.ColumnSpan="3"
-                                    Grid.Column="0" />
+                                    Grid.Column="2" />
 
                             <BoxView Style="{StaticResource HR}"
                                      Grid.Row="5"

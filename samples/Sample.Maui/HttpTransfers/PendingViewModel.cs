@@ -17,12 +17,16 @@ public class PendingViewModel : ViewModel
                     transfer,
                     this.DestroyWith,
                     this.ConfirmCommand(
-                        "Are you sure you want to cancel all transfers?",
-                        async () =>
-                        {
-                            await httpTransfers.Cancel(transfer.Identifier);
-                            this.Load!.Execute(null);
-                        }
+                        "Are you sure you want to resume this transfer?",
+                        () => httpTransfers.Resume(transfer.Identifier)
+                    ),
+                    this.ConfirmCommand(
+                        "Are you sure you wish to pause this transfer?",
+                        () => httpTransfers.Pause(transfer.Identifier)
+                    ),
+                    this.ConfirmCommand(
+                        "Are you sure you want to cancel this transfer?",
+                        () => httpTransfers.Cancel(transfer.Identifier)
                     )
                 ))
                 .ToList();
@@ -62,9 +66,17 @@ public class HttpTransferViewModel : ReactiveObject
     readonly IHttpTransfer transfer;
 
 
-    public HttpTransferViewModel(IHttpTransfer transfer, CompositeDisposable disposer, ICommand cancel)
+    public HttpTransferViewModel(
+        IHttpTransfer transfer,
+        CompositeDisposable disposer,
+        ICommand resume,
+        ICommand pause,
+        ICommand cancel
+    )
     {
         this.transfer = transfer;
+        this.Resume = resume;
+        this.Pause = pause;
         this.Cancel = cancel;
 
         this.transfer
@@ -79,7 +91,8 @@ public class HttpTransferViewModel : ReactiveObject
             .DisposedBy(disposer);
     }
 
-
+    public ICommand Resume { get; }
+    public ICommand Pause { get; }
     public ICommand Cancel { get; }
 
     public string Identifier => this.transfer.Identifier;

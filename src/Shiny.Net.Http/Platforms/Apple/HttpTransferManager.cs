@@ -48,8 +48,24 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         foreach (var task in tasks)
         {
             // TODO: I actually need both the temp file and the regular file - if upload
-            var shinyTask = task.FromNative(); // TODO: force resume? probably
-            this.transfers.Add(shinyTask);
+            // TODO: force resume? probably
+            var upload = task.Description?.StartsWith("BackgroundUploadTask") ?? false;
+            
+            var request = new HttpTransferRequest(
+                task.OriginalRequest!.Url.ToString(),
+                upload,
+                new FileInfo(task.TaskDescription!),
+                task.OriginalRequest.AllowsExpensiveNetworkAccess,
+                task.OriginalRequest.Body?.ToString(),
+                new HttpMethod(task.OriginalRequest.HttpMethod),
+                task.OriginalRequest.Headers?.FromNsDictionary()
+            );
+            var ht = new HttpTransfer(
+                request,
+                task
+            );
+
+            this.transfers.Add(ht);
         }
     }
 
@@ -71,8 +87,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             // TODO: I actually need both the temp file and the regular file
             //var fileUri = NSUrl.FromFilename(request.LocalFile.FullName);
             var tempFileUri = await this.CreateUploadTempFile(request).ConfigureAwait(false);
-
             task = this.Session.CreateUploadTask(NSUrlRequest.FromUrl(url), tempFileUri);
+            task.TaskDescription = request.LocalFile.FullName;
         }
         else
         {
@@ -80,9 +96,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         }
 
         task.TaskDescription = request.LocalFile.FullName;
-//#if IOS
-        //task.Delegate = this;
-//#endif
         var ht = new HttpTransfer(request, task);
         this.transfers.Add(ht);
         ht.Resume();
@@ -221,33 +234,33 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
     {
         this.logger.LogDebug($"DidFinishEventsForBackgroundSession");
-        //this.completionHandler?.Invoke();
+        this.completionHandler?.Invoke();
     }
 
 
     public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
     {
         this.logger.LogDebug($"DidCompleteWithError");
-        var transfer = task.FromNative();
+        //var transfer = task.FromNative();
 
-        switch (transfer.Status)
-        {
-            case HttpTransferState.Canceled:
-                this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
-                break;
+        //switch (transfer.Status)
+        //{
+        //    case HttpTransferState.Canceled:
+        //        this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
+        //        break;
 
-            case HttpTransferState.Completed:
-                this.logger.LogInformation($"Transfer {transfer.Identifier} completed successfully");
-                //await this.shinyDelegates.Value.RunDelegates(
-                //    x => x.OnCompleted(transfer)
-                //);
-                break;
+        //    case HttpTransferState.Completed:
+        //        this.logger.LogInformation($"Transfer {transfer.Identifier} completed successfully");
+        //        //await this.shinyDelegates.Value.RunDelegates(
+        //        //    x => x.OnCompleted(transfer)
+        //        //);
+        //        break;
 
-            default:
-                //await this.HandleError(transfer, error);
-                break;
-        }
-        this.TryDeleteUploadTempFile(transfer);
+        //    default:
+        //        //await this.HandleError(transfer, error);
+        //        break;
+        //}
+        //this.TryDeleteUploadTempFile(transfer);
         //this.onEvent.OnNext(transfer);
     }
 

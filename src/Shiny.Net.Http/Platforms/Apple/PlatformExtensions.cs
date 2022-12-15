@@ -55,24 +55,6 @@ static class PlatformExtensions
     };
 
 
-    public static HttpTransfer FromNative(this NSUrlSessionTask task)
-    {
-        var request = new HttpTransferRequest(
-            task.OriginalRequest!.Url.ToString(),
-            task is NSUrlSessionUploadTask,
-            new FileInfo(task.TaskDescription!),
-            task.OriginalRequest.AllowsExpensiveNetworkAccess,
-            task.OriginalRequest.Body?.ToString(),
-            new HttpMethod(task.OriginalRequest.HttpMethod),
-            task.OriginalRequest.Headers?.FromNsDictionary()
-        );
-        return new HttpTransfer(
-            request,
-            task
-        );
-    }
-
-
     public static string GetUploadTempFilePath(this IPlatform platform, HttpTransferRequest request)
         => GetUploadTempFilePath(platform, request.LocalFile.Name);
 
