@@ -241,6 +241,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
     {
         this.logger.LogDebug($"DidCompleteWithError");
+        var ht = this.Get(task.TaskIdentifier.ToString());
+        if (ht == null)
+            return;
+
         //var transfer = task.FromNative();
 
         //switch (transfer.Status)
@@ -260,7 +264,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         //        //await this.HandleError(transfer, error);
         //        break;
         //}
-        //this.TryDeleteUploadTempFile(transfer);
+        this.TryDeleteUploadTempFile(ht);
         //this.onEvent.OnNext(transfer);
     }
 
@@ -268,15 +272,14 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
     {
         this.logger.LogDebug($"DidSendBodyData");
-        //var transfer = task.FromNative();
-        //this.onEvent.OnNext(transfer);
+        this.Get(task.TaskIdentifier.ToString())?.OnBytesTransferred.OnNext(bytesSent);
     }
 
 
     public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
     {
         this.logger.LogDebug("DidWriteData");
-        //this.onEvent.OnNext(downloadTask.FromNative());
+        this.Get(downloadTask.TaskIdentifier.ToString())?.OnBytesTransferred.OnNext(bytesWritten);
     }
 
 
