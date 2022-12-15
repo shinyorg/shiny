@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Jobs.Infrastructure;
@@ -9,7 +10,7 @@ public class JobsStartup : IShinyStartupTask
 
     public static bool ClearJobsBeforeRegistering { get; set; }
 
-    static readonly List<JobInfo> jobs = new List<JobInfo>();
+    static readonly List<JobInfo> jobs = new();
     public static void AddJob(JobInfo jobInfo) => jobs.Add(jobInfo);
 
 
