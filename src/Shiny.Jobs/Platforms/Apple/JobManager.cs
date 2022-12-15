@@ -25,10 +25,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
         container,
         repository,
         logger
-    ) {}
-
-
-    public void Start()
+    )
     {
         try
         {
@@ -43,6 +40,10 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
             this.Log.LogCritical(new Exception(EX_MSG, ex), "Background tasks are not setup properly");
         }
     }
+
+
+    // jobstartuptask can run before this startup, we use this to force the constructor to happen first
+    public void Start() {}
 
 
     public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
@@ -88,9 +89,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
     }
 
 
-    protected override void CancelNative(JobInfo jobInfo)
-        => BGTaskScheduler.Shared.Cancel(jobInfo.Identifier);
-
+    protected override void CancelNative(JobInfo jobInfo) { }
 
     protected override void RegisterNative(JobInfo jobInfo)
     {
@@ -107,7 +106,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
     }
 
 
-    protected void Register(string identifier)
+    void Register(string identifier)
     {
         BGTaskScheduler.Shared.Register(
             identifier,
@@ -181,7 +180,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
     }
 
 
-    protected string GetIdentifier(bool extPower, bool network)
+    string GetIdentifier(bool extPower, bool network)
     {
         //"com.shiny.job"
         //"com.shiny.jobpower"
