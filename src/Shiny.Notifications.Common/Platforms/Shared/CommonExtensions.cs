@@ -32,7 +32,7 @@ public static class CommonExtensions
     public static IServiceCollection AddChannelManager(this IServiceCollection services)
     {
         services.AddRepository<ChannelStoreConverter, Channel>();
-        services.TryAddSingleton<IChannelManager, ChannelManager>();
+        services.AddShinyService<ChannelManager>();
 
         return services;
     }
