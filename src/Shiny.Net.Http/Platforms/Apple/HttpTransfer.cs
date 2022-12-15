@@ -41,10 +41,13 @@ public class HttpTransfer : IHttpTransfer
             if (results.Count > 0)
             {
                 var totalBytes = results.Sum();
-                bytesPerSecond = Convert.ToInt64((double)totalBytes / 2);
+                if (totalBytes > 0)
+                {
+                    bytesPerSecond = Convert.ToInt64((double)totalBytes / 2);
 
-                var secondsRemaining = (this.BytesToTransfer - this.BytesTransferred) / bytesPerSecond;
-                timeRemaining = TimeSpan.FromSeconds(secondsRemaining);
+                    var secondsRemaining = (this.BytesToTransfer - this.BytesTransferred) / bytesPerSecond;
+                    timeRemaining = TimeSpan.FromSeconds(secondsRemaining);
+                }
             }
             return new HttpTransferMetrics(
                 timeRemaining,

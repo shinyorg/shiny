@@ -83,12 +83,14 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
                     // total bytes to transfer - all bytes transferred = delta
                     // add all deltas over the past 2 seconds for total bytes xfer
                     var totalBytes = results.Sum(x => x.BytesToTransfer - x.BytesTransferred);
-                    bytesPerSecond = Convert.ToInt64((double)totalBytes / 2); // in two seconds
+                    if (totalBytes > 0)
+                    {
+                        bytesPerSecond = Convert.ToInt64((double)totalBytes / 2); // in two seconds
 
-                    var latest = results.Last();
-                    var remainingBytes = latest.BytesToTransfer - latest.BytesTransferred;
-                    var secondsRemaining = remainingBytes / bytesPerSecond;
-                    timeRemaining = TimeSpan.FromSeconds(secondsRemaining);
+                        var remainingBytes = this.BytesToTransfer - this.BytesTransferred;
+                        var secondsRemaining = remainingBytes / bytesPerSecond;
+                        timeRemaining = TimeSpan.FromSeconds(secondsRemaining);
+                    }
                 }
                 return new HttpTransferMetrics(
                     timeRemaining,
