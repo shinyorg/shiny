@@ -45,7 +45,7 @@ public class JobLifecycleTask : ShinyLifecycleTask
         this.timer.Elapsed += async (sender, args) =>
         {
             this.timer.Stop();
-            var jobs = await jobManager.GetJobs().ConfigureAwait(false);
+            var jobs = jobManager.GetJobs();
             var toRun = jobs.Where(this.CanRun).ToList();
 
             foreach (var job in toRun)

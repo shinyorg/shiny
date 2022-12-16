@@ -31,9 +31,7 @@ public class JobsStartup : IShinyStartupTask
         {
             try
             {
-                await this.jobManager
-                    .CancelAll()
-                    .ConfigureAwait(false);
+                this.jobManager.CancelAll();
             }
             catch (Exception ex)
             {
@@ -50,10 +48,8 @@ public class JobsStartup : IShinyStartupTask
             if (access == AccessState.Available)
             {
                 foreach (var job in jobs)
-                { 
-                    await this.jobManager
-                        .Register(job)
-                        .ConfigureAwait(false);
+                {
+                    this.jobManager.Register(job);
                 }
             }
             else

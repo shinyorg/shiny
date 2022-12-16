@@ -37,9 +37,9 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     }
 
 
-    public async void Start()
+    public void Start()
     {
-        var regions = await this.GetMonitoredRegions().ConfigureAwait(false);
+        var regions = this.GetMonitoredRegions();
         if (regions.Any())
             this.StartService();
     }
@@ -47,26 +47,25 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public async Task StartMonitoring(BeaconRegion region)
     {
-        await this.repository.Set(region).ConfigureAwait(false);
+#if ANDROID
+        await this.bleManager
+            .RequestAccess()
+            .ToTask()
+            .ConfigureAwait(false);
+#endif
+        this.repository.Set(region);
         this.StartService();
     }
 
 
-    public async Task StopMonitoring(string identifier)
+    public void StopMonitoring(string identifier)
     {
-        var region = await this.repository
-            .Get(identifier)
-            .ConfigureAwait(false);
+        var region = this.repository.Get(identifier);
 
         if (region != null)
         {
-            await this.repository
-                .Remove(identifier)
-                .ConfigureAwait(false);
-
-            var regions = await this.repository
-                .GetList()
-                .ConfigureAwait(false);
+            this.repository.Remove(identifier);
+            var regions = this.repository.GetList();
 
             if (regions.Count == 0)
                 this.StopService();
@@ -74,21 +73,22 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     }
 
 
-    public async Task StopAllMonitoring()
+    public void StopAllMonitoring()
     {
-        await this.repository.Clear().ConfigureAwait(false);
+        this.repository.Clear();
         this.StopService();
     }
 
 
     public async Task<AccessState> RequestAccess()
     {
+        // TODO: fix permission check for iOS
+#if ANDROID
         var access = await this.bleManager
             .RequestAccess()
             .ToTask()
             .ConfigureAwait(false);
 
-#if ANDROID
         await this.platform.RequestLocationAccess(LocationPermissionType.Fine);
         if ((access == AccessState.Available && access == AccessState.Restricted) && OperatingSystemShim.IsAndroidVersionAtLeast(26))
         {
@@ -102,8 +102,8 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     }
 
 
-    public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
-        => await this.repository.GetList().ConfigureAwait(false);
+    public IList<BeaconRegion> GetMonitoredRegions()
+        => this.repository.GetList();
 
 
     void StartService()

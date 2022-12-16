@@ -39,7 +39,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     }
 
 
-    public Task StopMonitoring(string identifier)
+    public void StopMonitoring(string identifier)
     {
         var region = this.repository.Get(identifier);
 
@@ -48,11 +48,10 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
             this.repository.Remove(region.Identifier);
             this.manager.StopMonitoring(region.ToNative());
         }
-        return Task.CompletedTask;
     }
 
 
-    public Task StopAllMonitoring()
+    public void StopAllMonitoring()
     {
         this.repository.Clear();
 
@@ -63,10 +62,8 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
 
         foreach (var region in allRegions)
             this.manager.StopMonitoring(region);
-
-        return Task.CompletedTask;
     }
 
-    public Task<IList<BeaconRegion>> GetMonitoredRegions()
-        => Task.FromResult(repository.GetList());
+    public IList<BeaconRegion> GetMonitoredRegions()
+        => repository.GetList();
 }

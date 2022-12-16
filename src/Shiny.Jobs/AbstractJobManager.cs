@@ -58,9 +58,7 @@ public abstract class AbstractJobManager : IJobManager
         JobInfo? actual = null;
         try
         {
-            var job = await this.repository
-                .Get(jobName)
-                .ConfigureAwait(false);
+            var job = this.repository.Get(jobName);
 
             if (job == null)
                 throw new ArgumentException("No job found named " + jobName);
@@ -77,44 +75,42 @@ public abstract class AbstractJobManager : IJobManager
     }
 
 
-    public Task<IList<JobInfo>> GetJobs()
+    public IList<JobInfo> GetJobs()
         => this.repository.GetList();
 
 
-    public Task<JobInfo?> GetJob(string jobIdentifier)
+    public JobInfo? GetJob(string jobIdentifier)
         => this.repository.Get(jobIdentifier);
 
 
-    public async Task Cancel(string jobIdentifier)
+    public void Cancel(string jobIdentifier)
     {
-        var job = await this.repository.Get(jobIdentifier).ConfigureAwait(false);
+        var job = this.repository.Get(jobIdentifier);
         if (job != null)
         {
             this.CancelNative(job);
-            await this.repository.Remove(jobIdentifier).ConfigureAwait(false);
+            this.repository.Remove(jobIdentifier);
         }
     }
 
 
-    public virtual async Task CancelAll()
+    public virtual void CancelAll()
     {
-        var jobs = await this.repository.GetList().ConfigureAwait(false);
+        var jobs = this.repository.GetList();
         foreach (var job in jobs)
         {
             if (!job.IsSystemJob)
             {
-                await this
-                    .CancelJob(job)
-                    .ConfigureAwait(false);
+                this.CancelJob(job);
             }
         }
     }
 
 
-    Task CancelJob(JobInfo job)
+    void CancelJob(JobInfo job)
     {
         this.CancelNative(job);
-        return this.repository.Remove(job.Identifier);
+        this.repository.Remove(job.Identifier);
     }
 
 
@@ -124,11 +120,11 @@ public abstract class AbstractJobManager : IJobManager
     public IObservable<JobRunResult> JobFinished => this.jobFinished;
 
 
-    public async Task Register(JobInfo jobInfo)
+    public void Register(JobInfo jobInfo)
     {
         this.ResolveJob(jobInfo);
         this.RegisterNative(jobInfo);
-        await this.repository.Set(jobInfo).ConfigureAwait(false);
+        this.repository.Set(jobInfo);
     }
 
 
@@ -141,7 +137,7 @@ public abstract class AbstractJobManager : IJobManager
             try
             {
                 this.IsRunning = true;
-                var jobs = await this.repository.GetList().ConfigureAwait(false);
+                var jobs = this.repository.GetList();
                 var tasks = new List<Task<JobRunResult>>();
 
                 if (runSequentially)
@@ -197,7 +193,7 @@ public abstract class AbstractJobManager : IJobManager
 
             if (!job.Repeat)
             {
-                await this.Cancel(job.Identifier);
+                this.Cancel(job.Identifier);
                 cancel = true;
             }
             this.LogJob(JobState.Finish, job);
@@ -213,7 +209,7 @@ public abstract class AbstractJobManager : IJobManager
             if (!cancel)
             {
                 job.LastRun = DateTimeOffset.UtcNow;
-                await this.repository.Set(job).ConfigureAwait(false);
+                this.repository.Set(job);
             }
         }
         this.jobFinished.OnNext(result);
@@ -231,9 +227,11 @@ public abstract class AbstractJobManager : IJobManager
     }
 
 
-    protected virtual void LogJob(JobState state,
-                                  JobInfo job,
-                                  Exception? exception = null)
+    protected virtual void LogJob(
+        JobState state,
+        JobInfo job,
+        Exception? exception = null
+    )
     {
         if (exception == null)
             this.Log.LogInformation(state == JobState.Finish ? "Job Success" : $"Job {state}", ("JobName", job.Identifier));

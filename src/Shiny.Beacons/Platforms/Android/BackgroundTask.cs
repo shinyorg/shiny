@@ -84,16 +84,13 @@ public class BackgroundTask : IDisposable
     }
 
 
-    public async void StartScan()
+    public void StartScan()
     {
         if (this.scanSub != null)
             return;
 
         this.logger.LogInformation("Beacon Monitoring Scan Starting");
-        var regions = await this.repository
-            .GetList()
-            .ConfigureAwait(false);
-
+        var regions = this.repository.GetList();
         if (!regions.Any())
             return;
 

@@ -95,7 +95,7 @@ public static class ServiceProviderExtensions
                     sp.GetRequiredService<IObjectStoreBinder>().Bind(npc);
 
                 if (instance is IShinyComponentStartup startup)
-                    startup.Start();
+                    startup.ComponentStart();
 
                 return instance;
             });
