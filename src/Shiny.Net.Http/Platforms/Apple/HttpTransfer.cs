@@ -22,12 +22,13 @@ public class HttpTransfer : IHttpTransfer
 
     public HttpTransferState Status => this.NSTask.GetStatus();
     public long BytesTransferred => this.Request.IsUpload
+        ? this.NSTask.BytesSent
+        : this.NSTask.BytesReceived;
+
+    public long BytesToTransfer => this.Request.IsUpload
         ? this.NSTask.BytesExpectedToSend
         : this.NSTask.BytesExpectedToReceive;
 
-    public long BytesToTransfer => this.Request.IsUpload
-        ? this.NSTask.BytesSent
-        : this.NSTask.BytesReceived;
 
     public double PercentComplete => this.NSTask.Progress.FractionCompleted;
 
