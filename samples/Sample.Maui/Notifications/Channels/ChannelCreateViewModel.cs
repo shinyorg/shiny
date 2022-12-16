@@ -23,7 +23,7 @@ public class ChannelCreateViewModel : ViewModel
                 await this.Alert("Description is required");
                 return;
             }
-            await manager.AddChannel(this.ToChannel());
+            manager.AddChannel(this.ToChannel());
             await this.Navigation.GoBack();
         });
     }

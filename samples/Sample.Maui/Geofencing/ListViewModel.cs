@@ -19,9 +19,9 @@ public class ListViewModel : ViewModel
             }
         );
 
-        this.Load = this.LoadingCommand(async () =>
+        this.Load = this.LoadingCommand(() =>
         {
-            var geofences = await geofenceManager.GetMonitorRegions();
+            var geofences = geofenceManager.GetMonitorRegions();
 
             this.Geofences = geofences
                 .Select(region => new GeofenceRegionViewModel

@@ -38,7 +38,7 @@ public class AndroidNotificationManager
 
     public virtual async Task Send(Notification notification)
     {
-        var channel = await this.channelManager.Get(notification.Channel!).ConfigureAwait(false);
+        var channel = this.channelManager.Get(notification.Channel!);
         var builder = await this.CreateNativeBuilder(notification, channel!).ConfigureAwait(false);
         this.NativeManager.Notify(notification.Id, builder.Build());
     }

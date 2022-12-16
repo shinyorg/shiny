@@ -23,14 +23,14 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     }
 
 
-    public void Start()
+    public void ComponentStart()
     {
         this.logger.LogInformation("Starting iOS channel manager");
         try
         {
             // watch - this is a controlled scenario where not everything needs to go async
             // this also ensures the default channel is present before any services start running
-            //this.Add(Channel.Default).GetAwaiter().GetResult();
+            this.Add(Channel.Default);
             this.logger.LogDebug("Channel manager initialized successfully");
         }
         catch (Exception ex)
@@ -40,42 +40,41 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     }
 
 
-    public async Task Add(Channel channel)
+    public void Add(Channel channel)
     {
         channel.AssertValid();
-        await this.repository.Set(channel).ConfigureAwait(false);
-        await this.RebuildNativeCategories().ConfigureAwait(false);
+        this.repository.Set(channel);
+        this.RebuildNativeCategories();
     }
 
 
-    public async Task Clear()
+    public void Clear()
     {
-        await this.repository.Clear().ConfigureAwait(false);
+        this.repository.Clear();
 
         // there must always be a default
-        await this.Add(Channel.Default).ConfigureAwait(false);
+        this.Add(Channel.Default);
     }
 
 
-    public Task<Channel?> Get(string channelId) => this.repository.Get(channelId);
-    public Task<IList<Channel>> GetAll() => this.repository.GetList();
+    public Channel? Get(string channelId) => this.repository.Get(channelId);
+    public IList<Channel> GetAll() => this.repository.GetList();
 
 
-    public async Task Remove(string channelId)
+    public void Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);
 
-        await this.repository.Remove(channelId).ConfigureAwait(false);
-        await this.RebuildNativeCategories().ConfigureAwait(false);
+        this.repository.Remove(channelId);
+        this.RebuildNativeCategories();
     }
 
 
-    protected async Task RebuildNativeCategories()
+    protected void RebuildNativeCategories()
     {
-        var channels = await this.GetAll().ConfigureAwait(false);
-        var list = channels.ToList();
-
+        var list = this.GetAll();
         var categories = new List<UNNotificationCategory>();
+
         foreach (var channel in list)
         {
             var actions = new List<UNNotificationAction>();

@@ -25,17 +25,16 @@ public class MonitoringViewModel : ViewModel
                 return;
             }
 
-            var regions = await this.beaconManager.GetMonitoredRegions();
-
-            this.Regions = regions
+            this.Regions = this.beaconManager
+                .GetMonitoredRegions()
                 .Select(x => new CommandItem
                 {
                     Text = $"{x.Identifier}",
                     Detail = $"{x.Uuid}/{x.Major ?? 0}/{x.Minor ?? 0}",
-                    PrimaryCommand = ReactiveCommand.CreateFromTask(async () =>
+                    PrimaryCommand = ReactiveCommand.Create(() =>
                     {
-                        await this.beaconManager.StopMonitoring(x.Identifier);
-                        this.Load.Execute(null);
+                        this.beaconManager.StopMonitoring(x.Identifier);
+                        this.Load!.Execute(null);
                     })
                 })
                 .ToList();
@@ -47,7 +46,7 @@ public class MonitoringViewModel : ViewModel
                 var result = await this.Confirm("Are you sure you wish to stop all monitoring");
                 if (result)
                 {
-                    await this.beaconManager.StopAllMonitoring();
+                    this.beaconManager!.StopAllMonitoring();
                     this.Load.Execute(null);
                 }
             },

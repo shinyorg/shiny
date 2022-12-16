@@ -17,7 +17,7 @@ public static class NotificationExtensions
         if (notification.ScheduleDate != null)
         {
             var channelId = notification.Channel ?? Channel.Default.Identifier;
-            var channel = await notificationManager.GetChannel(channelId)!;
+            var channel = notificationManager.GetChannel(channelId)!;
 
             if (channel!.Importance == ChannelImportance.High)
                 request |= AccessRequestFlags.TimeSensitivity;
@@ -67,37 +67,4 @@ public static class NotificationExtensions
             Channel = channel,
             ScheduleDate = scheduleDate
         });
-
-
-    internal static Task DeleteAllChannels(this INotificationManager notificationManager, IChannelManager channelManager) => Task.WhenAll(
-        notificationManager.Cancel(CancelScope.All),
-        channelManager.Clear()
-    );
-
-
-    internal static async Task DeleteChannel(this INotificationManager notificationManager, IChannelManager channelManager, string channelId)
-    {
-        await channelManager
-            .Remove(channelId)
-            .ConfigureAwait(false);
-
-        var pending = await notificationManager
-            .GetNotificationsByChannel(channelId)
-            .ConfigureAwait(false);
-
-        foreach (var notification in pending)
-            await notificationManager.Cancel(notification.Id).ConfigureAwait(false);
-    }
-
-
-    internal static async Task<IList<Notification>> GetNotificationsByChannel(this INotificationManager notificationManager, string channelId)
-    {
-        var pending = await notificationManager.GetPendingNotifications().ConfigureAwait(false);
-        return pending
-            .Where(x =>
-                x.Channel != null &&
-                x.Channel.Equals(channelId, StringComparison.InvariantCultureIgnoreCase)
-            )
-            .ToList();
-    }
 }

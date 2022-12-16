@@ -66,6 +66,18 @@ public abstract class ViewModel : ReactiveObject,
     }
 
 
+    protected virtual ICommand LoadingCommand(Action action, IObservable<bool>? canExecute = null)
+    {
+        var cmd = ReactiveCommand.Create(action, canExecute);
+        cmd.Subscribe(
+            x => this.IsBusy = true,
+            _ => this.IsBusy = false,
+            () => this.IsBusy = false
+        );
+        return cmd;
+    }
+
+
     protected virtual ICommand LoadingCommand(Func<Task> task, IObservable<bool>? canExecute = null)
     {
         var cmd = ReactiveCommand.CreateFromTask(task, canExecute);

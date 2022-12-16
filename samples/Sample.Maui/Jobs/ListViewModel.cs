@@ -12,11 +12,10 @@ public class ListViewModel : ViewModel
     public ListViewModel(BaseServices services, IJobManager jobManager) : base(services)
     {
         this.jobManager = jobManager;
-
         this.Create = this.Navigation.Command("JobsCreate");
 
-        this.LoadJobs = ReactiveCommand.CreateFromTask(async () =>
-            this.Jobs = (await jobManager.GetJobs()).ToList()
+        this.LoadJobs = ReactiveCommand.Create(() =>
+            this.Jobs = jobManager.GetJobs()
         );
 
         this.RunAllJobs = new Command(async () =>
@@ -43,7 +42,7 @@ public class ListViewModel : ViewModel
             var confirm = await this.Confirm("Are you sure you wish to cancel all jobs?");
             if (confirm)
             {
-                await this.jobManager.CancelAll();
+                this.jobManager.CancelAll();
                 this.LoadJobs.Execute(null);
             }
         });
@@ -53,7 +52,7 @@ public class ListViewModel : ViewModel
     public ICommand CancelAllJobs { get; }
     public ICommand RunAllJobs { get; }
     public ICommand Create { get; }
-    public List<JobInfo> Jobs { get; private set; }
+    public IList<JobInfo> Jobs { get; private set; }
 
     [Reactive] public string RunningText { get; private set; }
     [Reactive] public JobInfo? SelectedJob { get; set; }
@@ -95,7 +94,7 @@ public class ListViewModel : ViewModel
 
     async Task<bool> AssertJobs()
     {
-        var jobs = await this.jobManager.GetJobs();
+        var jobs = this.jobManager.GetJobs();
         if (!jobs.Any())
         {
             await this.Alert("There are no jobs");

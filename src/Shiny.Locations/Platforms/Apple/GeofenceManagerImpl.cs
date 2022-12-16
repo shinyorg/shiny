@@ -16,16 +16,19 @@ namespace Shiny.Locations;
 public class GeofenceManagerImpl : IGeofenceManager
 {
     readonly CLLocationManager locationManager;
-    readonly Lazy<IEnumerable<IGeofenceDelegate>> delegates;
+    readonly IPlatform platform;
+    readonly IServiceProvider services;
     readonly IRepository<GeofenceRegion> repository;
 
 
     public GeofenceManagerImpl(
+        IPlatform platform,
         IServiceProvider services,
         IRepository<GeofenceRegion> repository
     )
     {
-        this.delegates = services.GetLazyService<IEnumerable<IGeofenceDelegate>>();
+        this.platform = platform;
+        this.services = services;
         this.repository = repository;
         this.locationManager = new CLLocationManager
         {
@@ -46,16 +49,13 @@ public class GeofenceManagerImpl : IGeofenceManager
     {
         if (region is CLCircularRegion native)
         {
-            var geofence = await this.repository
-                .Get(native.Identifier)
-                .ConfigureAwait(false);
+            var geofence = this.repository.Get(native.Identifier);
 
             if (geofence != null)
             {
                 var status = entered ? GeofenceState.Entered : GeofenceState.Exited;
-                await this.delegates
-                    .Value
-                    .RunDelegates(x => x.OnStatusChanged(status, geofence))
+                await this.services
+                    .RunDelegates<IGeofenceDelegate>(x => x.OnStatusChanged(status, geofence))
                     .ConfigureAwait(false);
 
                 if (geofence.SingleUse)
@@ -73,7 +73,7 @@ public class GeofenceManagerImpl : IGeofenceManager
         => this.locationManager.RequestAccess(true);
 
 
-    public Task<IList<GeofenceRegion>> GetMonitorRegions()
+    public IList<GeofenceRegion> GetMonitorRegions()
         => this.repository.GetList();
 
 
@@ -106,13 +106,13 @@ public class GeofenceManagerImpl : IGeofenceManager
         (await this.RequestAccess()).Assert();
         var native = region.ToNative();
 
-        var tcs = new TaskCompletionSource<object>();
-        UIApplication.SharedApplication.BeginInvokeOnMainThread(async () =>
+        var tcs = new TaskCompletionSource();
+        this.platform.InvokeOnMainThread(() =>
         {
             try
             {
                 this.locationManager.StartMonitoring(native);
-                tcs.SetResult(null);
+                tcs.SetResult();
             }
             catch (Exception ex)
             {
@@ -122,34 +122,26 @@ public class GeofenceManagerImpl : IGeofenceManager
         });
         await tcs.Task.ConfigureAwait(false);
 
-        await this.repository
-            .Set(region)
-            .ConfigureAwait(false);
+        this.repository.Set(region);
     }
 
 
-    public async Task StopMonitoring(string identifier)
+    public Task StopMonitoring(string identifier)
     {
-        var region = await this.repository
-            .Get(identifier)
-            .ConfigureAwait(false);
+        var region = this.repository.Get(identifier);
 
         if (region != null)
         {
-            await this.repository
-                .Remove(region.Identifier)
-                .ConfigureAwait(false);
-
+            this.repository.Remove(region.Identifier);
             this.locationManager.StopMonitoring(region.ToNative());
         }
+        return Task.CompletedTask;
     }
 
 
-    public async Task StopAllMonitoring()
+    public Task StopAllMonitoring()
     {
-        await this.repository
-            .Clear()
-            .ConfigureAwait(false);
+        this.repository.Clear();
 
         var natives = this
             .locationManager
@@ -159,5 +151,7 @@ public class GeofenceManagerImpl : IGeofenceManager
 
         foreach (var native in natives)
             this.locationManager.StopMonitoring(native);
+
+        return Task.CompletedTask;
     }
 }

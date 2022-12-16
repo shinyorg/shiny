@@ -38,11 +38,11 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     }
 
 
-    public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
-    public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
-    public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);
-    public Task<Channel?> GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
+    public void AddChannel(Channel channel) => this.channelManager.Add(channel);
+    public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
+    public void ClearChannels() => this.channelManager.Clear();
+    public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
+    public IList<Channel> GetChannels() => this.channelManager.GetAll();
 
 
     public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
@@ -82,14 +82,14 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-    public Task<IEnumerable<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
+    public Task<IList<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
     {
         var requests = await UNUserNotificationCenter
             .Current
             .GetPendingNotificationRequestsAsync()
             .ConfigureAwait(false);
 
-        var notifications = requests.Select(x => x.FromNative());
+        var notifications = (IList<Notification>)requests.Select(x => x.FromNative()).ToList();
         return notifications;
     });
 
@@ -104,7 +104,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         var channel = Channel.Default;
         if (!notification.Channel.IsEmpty())
         {
-            channel = await this.channelManager.Get(notification.Channel!);
+            channel = this.channelManager.Get(notification.Channel!);
             if (channel == null)
                 throw new InvalidOperationException($"{notification.Channel} does not exist");
         }
