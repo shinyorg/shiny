@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     readonly ILogger logger;
     readonly AndroidPlatform platform;
     readonly IServiceProvider services;
+    readonly IConnectivity connectivity;
     readonly IRepository<BlobStore<HttpTransferRequest>> repository;
 
 
@@ -21,27 +23,33 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
         ILogger<HttpTransferManager> logger,
         AndroidPlatform platform,
         IServiceProvider services,
+        IConnectivity connectivity,
         IRepository<BlobStore<HttpTransferRequest>> repository
     )
     {
         this.logger = logger;
         this.platform = platform;
         this.services = services;
+        this.connectivity = connectivity;
         this.repository = repository;
     }
 
 
-    public async void Start()
+    public void Start()
     {
         try
         {
-            var requestBlobs = await this.repository.GetList();
+            // TODO: danger - moving back to an async GetList will stop this.  We need to force the collection to load BEFORE the job runs which is a problem
+            // the job may not see the collection is loaded.  Switching to GetList method also removes need to be thread safe on the collection
+            var requestBlobs = this.repository.GetList().GetAwaiter().GetResult();
             foreach (var blob in requestBlobs)
             {
-                var ht = new HttpTransfer(this.services, blob.Object, blob.Identifier);
-                this.transfers.Add(ht);
+                // TODO: anything that was inprogress, should auto resume - must save that state though,
+                // so we know manual 'manual pause' from 'paused by network'?  'Paused by network' could just move back to pending/inprogress
 
-                // TODO: anything that was inprogress, should auto resume - must save that state
+                // job will deal with auto restart
+                var ht = this.Create(blob.Object, blob.Identifier);
+                this.transfers.Add(ht);
             }
         }
         catch (Exception ex)
@@ -66,7 +74,8 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             .ToTask();
 
         var identifier = Guid.NewGuid().ToString();
-        var ht = new HttpTransfer(this.services, request, identifier);
+        var ht = this.Create(request, identifier);
+
         await this.repository.Set(new BlobStore<HttpTransferRequest>
         (
             identifier,
@@ -115,6 +124,13 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             await transfer.Resume().ConfigureAwait(false);
     }
 
+
+    HttpTransfer Create(HttpTransferRequest request, string identifier) => new HttpTransfer(
+        this.services,
+        this.connectivity,
+        request,
+        identifier
+    );
 
     HttpTransfer? Get(string identifier)
         => this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier)) as HttpTransfer;

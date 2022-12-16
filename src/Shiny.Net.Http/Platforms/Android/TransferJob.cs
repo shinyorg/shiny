@@ -51,32 +51,25 @@ class TransferJob : IJob
         // TODO: reloop for new transfers, check for cancelled transfers
         // TODO: anything that is paused manually should NOT be looked at
         // TODO: anything that was paused due to server issue (retry) or network change, should be looped
-        while (this.manager.Transfers.Count > 0)
-        {
-            // TODO: this may infinite loop, so we only jobs that can run
-            var transfer = this.manager.Transfers.First();
+        //while (this.manager.Transfers.Count > 0)
+        //{
+        //    // TODO: this may infinite loop, so we only jobs that can run
+        //    var transfer = this.manager.Transfers.First();
 
-            if (transfer.Request.UseMeteredConnection || !this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet))
-            {
-                await this.RunTransfer(transfer, cancelToken);
-            }
-        }
+        //    if (transfer.Request.UseMeteredConnection || !this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet))
+        //    {
+        //        await this.RunTransfer(transfer, cancelToken);
+        //    }
+        //}
     }
 
 
-    // TODO: consider moving a chunk of this into the HttpTransfer implementation with a cancel token
+    // TODO: consider moving notifications into transfer as well
     async Task RunTransfer(IHttpTransfer transfer, CancellationToken cancelToken)
     {
+        // a cancellation from the job likely means loss of internet
         using var _ = cancelToken.Register(() => this.manager.Pause(transfer.Identifier));
         IDisposable? sub = null;
-
-        if (!transfer.Request.UseMeteredConnection)
-        {
-            sub = this.connectivity
-                .WhenChanged()
-                .Where(x => x.Access == NetworkAccess.ConstrainedInternet)
-                .SubscribeAsync(_ => this.manager.Pause(transfer.Identifier));
-        }
 
         await this.manager.Resume(transfer.Identifier);
         var builder = this.StartNotification(transfer);

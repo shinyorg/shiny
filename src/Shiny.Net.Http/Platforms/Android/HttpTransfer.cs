@@ -14,10 +14,12 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
     CancellationTokenSource? cts;
     readonly HttpClient httpClient = new();
     readonly IServiceProvider services;
+    readonly IConnectivity connectivity;
 
 
     public HttpTransfer(
         IServiceProvider services,
+        IConnectivity connectivity,
         HttpTransferRequest request,
         string identifier
     )
@@ -25,6 +27,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         this.services = services;
         this.Request = request;
         this.Identifier = identifier;
+        this.connectivity = connectivity;
     }
 
 
@@ -119,22 +122,42 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 
     internal async Task Resume()
     {
-        this.Status = HttpTransferState.InProgress;
+        
         if (this.Request.IsUpload)
             await this.Upload();
         else
-            await this.Download();
+            await this.Download(CancellationToken.None);
     }
 
 
-    async Task Download()
+    public async Task Download(CancellationToken cancelToken)
     {
+        
         this.cts = new();
         var buffer = new byte[8192];
         var request = this.GetRequest();
 
+        var sub = this.connectivity
+            .WhenChanged()
+            .Subscribe(x =>
+            {
+                if (!x.IsInternetAvailable())
+                {
+                    // an error code may also put this in place - watch
+                    this.Status = HttpTransferState.PausedByNoNetwork;
+                    this.cts.Cancel();
+                }
+                else if (!this.Request.UseMeteredConnection && x.Access == NetworkAccess.ConstrainedInternet)
+                {
+                    this.Status = HttpTransferState.PausedByCostedNetwork;
+                    this.cts.Cancel();
+                }
+            });
+
         try
         {
+            this.Status = HttpTransferState.InProgress;
+
             // TODO: could try resume download instead of recreating file?
             // TODO: write to cache instead & move after?
             using var localFile = File.OpenWrite(this.Request.LocalFilePath);
@@ -163,13 +186,17 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         catch (HttpRequestException ex)
         {
             // TODO: if 400's - error out, if 500 keep trying
-            this.Status = HttpTransferState.Pending; 
+            this.Status = HttpTransferState.Pending;
             //ex.StatusCode.
         }
         catch (Exception ex)
         {
             this.Status = HttpTransferState.Error;
             await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(this, ex));
+        }
+        finally
+        {
+            sub?.Dispose();
         }
     }
 
