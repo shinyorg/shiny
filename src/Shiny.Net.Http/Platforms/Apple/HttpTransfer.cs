@@ -62,8 +62,6 @@ public class HttpTransfer : IHttpTransfer
 
 
     internal void Cancel() => this.NSTask.Cancel();
-
-    // TODO: uploads cannot be paused/resumed
     internal void Pause() => this.NSTask.Suspend();
     internal void Resume() => this.NSTask.Resume();
 }

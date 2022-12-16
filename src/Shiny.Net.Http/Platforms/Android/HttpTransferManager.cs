@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
@@ -11,17 +12,20 @@ namespace Shiny.Net.Http;
 class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 {
     readonly ILogger logger;
+    readonly AndroidPlatform platform;
     readonly IServiceProvider services;
     readonly IRepository<BlobStore<HttpTransferRequest>> repository;
 
 
     public HttpTransferManager(
         ILogger<HttpTransferManager> logger,
+        AndroidPlatform platform,
         IServiceProvider services,
         IRepository<BlobStore<HttpTransferRequest>> repository
     )
     {
         this.logger = logger;
+        this.platform = platform;
         this.services = services;
         this.repository = repository;
     }
@@ -36,6 +40,8 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             {
                 var ht = new HttpTransfer(this.services, blob.Object, blob.Identifier);
                 this.transfers.Add(ht);
+
+                // TODO: anything that was inprogress, should auto resume - must save that state
             }
         }
         catch (Exception ex)
@@ -50,7 +56,15 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
 
     public async Task<IHttpTransfer> Queue(HttpTransferRequest request)
-    {        
+    {
+        await this.platform
+            .RequestFilteredPermissions(new AndroidPermission(
+                Android.Manifest.Permission.PostNotifications,
+                33,
+                null
+            ))
+            .ToTask();
+
         var identifier = Guid.NewGuid().ToString();
         var ht = new HttpTransfer(this.services, request, identifier);
         await this.repository.Set(new BlobStore<HttpTransferRequest>

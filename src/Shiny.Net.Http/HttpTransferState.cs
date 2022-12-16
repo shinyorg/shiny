@@ -6,10 +6,9 @@ public enum HttpTransferState
     Unknown,
     Pending,
     Paused,
-    //PausedByNoNetwork,
-    //PausedByCostedNetwork,
+    PausedByNoNetwork,
+    PausedByCostedNetwork,
     InProgress,
-    //Retrying,
     Error,
     Canceled,
     Completed
