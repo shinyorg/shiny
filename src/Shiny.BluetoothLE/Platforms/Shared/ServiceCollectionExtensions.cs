@@ -25,9 +25,11 @@ public static class ServiceCollectionExtensions
     {
         services.TryAddSingleton(config ?? new AndroidBleConfiguration());
 #endif
-        services.AddShinyService<Shiny.BluetoothLE.Internals.ManagerContext>();
-        services.AddShinyService<BleManager>();
-
+        if (!services.HasImplementation<Shiny.BluetoothLE.Internals.ManagerContext>())
+        {
+            services.AddShinyService<Shiny.BluetoothLE.Internals.ManagerContext>();
+            services.AddShinyService<BleManager>();
+        }
         if (delegateType != null)
             services.AddShinyService(delegateType);
 
