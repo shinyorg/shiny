@@ -16,7 +16,7 @@ public interface IBeaconMonitoringManager
     /// <summary>
     /// Current set of geofences being monitored
     /// </summary>
-    Task<IEnumerable<BeaconRegion>> GetMonitoredRegions();
+    Task<IList<BeaconRegion>> GetMonitoredRegions();
 
 
     /// <summary>

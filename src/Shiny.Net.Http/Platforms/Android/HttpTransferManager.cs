@@ -10,7 +10,7 @@ using Shiny.Stores.Impl;
 namespace Shiny.Net.Http;
 
 
-class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
+class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyComponentStartup
 {
     readonly ILogger logger;
     readonly AndroidPlatform platform;
@@ -35,13 +35,14 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     }
 
 
-    public void Start()
+    public void Start() { }
+    public void ComponentStart()
     {
         try
         {
             // TODO: danger - moving back to an async GetList will stop this.  We need to force the collection to load BEFORE the job runs which is a problem
             // the job may not see the collection is loaded.  Switching to GetList method also removes need to be thread safe on the collection
-            var requestBlobs = this.repository.GetList().GetAwaiter().GetResult();
+            var requestBlobs = this.repository.GetList();
             foreach (var blob in requestBlobs)
             {
                 // TODO: anything that was inprogress, should auto resume - must save that state though,
@@ -71,12 +72,13 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
                 33,
                 null
             ))
-            .ToTask();
+            .ToTask()
+            .ConfigureAwait(false);
 
         var identifier = Guid.NewGuid().ToString();
         var ht = this.Create(request, identifier);
 
-        await this.repository.Set(new BlobStore<HttpTransferRequest>
+        this.repository.Set(new BlobStore<HttpTransferRequest>
         (
             identifier,
             request
@@ -93,7 +95,8 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             transfer.Cancel();        
 
         this.transfers.Clear();
-        return this.repository.Clear();
+        this.repository.Clear();
+        return Task.CompletedTask;
     }
 
 
@@ -106,7 +109,8 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             ht.Cancel();
             this.transfers.Remove(ht);
         }
-        return this.repository.Remove(identifier);
+        this.repository.Remove(identifier);
+        return Task.CompletedTask;
     }
 
 

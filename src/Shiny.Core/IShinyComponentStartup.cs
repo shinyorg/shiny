@@ -2,5 +2,5 @@
 
 public interface IShinyComponentStartup
 {
-    void Start();
+    void ComponentStart();
 }

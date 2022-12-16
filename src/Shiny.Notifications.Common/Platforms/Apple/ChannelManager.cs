@@ -10,7 +10,7 @@ using Shiny.Stores;
 namespace Shiny.Notifications;
 
 
-public class ChannelManager : IChannelManager, IShinyStartupTask
+public class ChannelManager : IChannelManager, IShinyComponentStartup
 {
     readonly IRepository<Channel> repository;
     readonly ILogger<ChannelManager> logger;
@@ -26,17 +26,17 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
     public void Start()
     {
         this.logger.LogInformation("Starting iOS channel manager");
-        this.Add(Channel.Default).ContinueWith(x =>
+        try
         {
-            if (x.IsFaulted)
-            {
-                this.logger.LogError("Failed to create default channel", x.Exception);
-            }
-            else
-            {
-                this.logger.LogDebug("Channel manager initialized successfully");
-            }
-        });
+            // watch - this is a controlled scenario where not everything needs to go async
+            // this also ensures the default channel is present before any services start running
+            //this.Add(Channel.Default).GetAwaiter().GetResult();
+            this.logger.LogDebug("Channel manager initialized successfully");
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError("Failed to create default channel", ex);
+        }
     }
 
 

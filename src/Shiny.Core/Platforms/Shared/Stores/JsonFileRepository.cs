@@ -29,18 +29,18 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
     }
 
 
-    public Task<bool> Exists(string key)
+    public bool Exists(string key)
     {
         var path = this.GetPath(key);
         var exists = File.Exists(path);
-        return Task.FromResult(exists);
+        return exists;
     }
 
 
-    public async Task<TEntity?> Get(string key)
+    public TEntity? Get(string key)
     {
         TEntity? result = default;
-        await this.InTransaction(list =>
+        this.InTransaction(list =>
         {
             if (list.ContainsKey(key))
                 result = list[key];
@@ -49,25 +49,21 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
     }
 
 
-    public async Task<IList<TEntity>> GetList(Expression<Func<TEntity, bool>>? expression = null)
+    public IList<TEntity> GetList(Expression<Func<TEntity, bool>>? expression = null)
     {
         var result = new List<TEntity>();
-        await this
-            .InTransaction(
-                list => result.AddRange(list
-                    .Values
-                    .WhereIf(expression)
-                )
-            )
-            .ConfigureAwait(false);
+        this.InTransaction(list => result.AddRange(list
+            .Values
+            .WhereIf(expression)
+        ));
         return result;
     }
 
 
-    public async Task<bool> Set(TEntity entity)
+    public bool Set(TEntity entity)
     {
         var update = true;
-        await this.InTransaction(list =>
+        this.InTransaction(list =>
         {
             update = this.Write(entity);
             list[entity.Identifier] = entity;
@@ -79,32 +75,28 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
     }
 
 
-    public Task<bool> Remove(string key)
+    public bool Remove(string key)
     {
-        var tcs = new TaskCompletionSource<bool>();
+        var removed = false;
         this.InTransaction(list =>
         {
             var path = this.GetPath(key);
 
-            if (!File.Exists(path))
-            {
-                tcs.TrySetResult(false);
-            }
-            else
+            if (File.Exists(path))
             {
                 var entity = list[key];
                 list.Remove(key);
                 File.Delete(path);
-                tcs.TrySetResult(true);
+                removed = true;
 
                 this.repoSubj.OnNext((RepositoryAction.Remove, entity));
             }
         });
-        return tcs.Task;
+        return removed;
     }
 
 
-    public Task Clear() => this.InTransaction(list =>
+    public void Clear() => this.InTransaction(list =>
     {
         if (!list.Any())
             return;
@@ -152,14 +144,14 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
 
     readonly object syncLock = new();
     Dictionary<string, TEntity>? memory;
-    Task InTransaction(Action<Dictionary<string, TEntity>> action) => Task.Run(() =>
+    void InTransaction(Action<Dictionary<string, TEntity>> action) 
     {
         lock (this.syncLock)
         {
             this.memory ??= this.Load();
             action(this.memory);
         }
-    });
+    }
 
 
     Dictionary<string, TEntity> Load()

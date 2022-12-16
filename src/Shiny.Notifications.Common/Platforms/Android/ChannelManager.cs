@@ -38,7 +38,9 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
         this.logger.LogInformation("Initializing channel manager");
         try
         {
-            await this.Add(Channel.Default).ConfigureAwait(false);
+            // watch - this is a controlled scenario where not everything needs to go async
+            // this also ensures the default channel is present before any services start running
+            this.Add(Channel.Default).GetAwaiter().GetResult();
             this.logger.LogInformation("Default notification channel created");
         }
         catch (Exception ex)
