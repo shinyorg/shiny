@@ -119,9 +119,10 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         if (notification.Id == 0)
             notification.Id = this.settings.IncrementValue("NotificationId");
 
-        var channel = this.channelManager.Get(notification.Channel ?? Channel.Default.Identifier);
+        var channelId = notification.Channel ?? Channel.Default.Identifier;
+        var channel = this.channelManager.Get(channelId);
         if (channel == null)
-            throw new InvalidProgramException("There is no default channel!!");
+            throw new InvalidProgramException("No channel found for " + channelId);
 
         var builder = await this.manager
             .CreateNativeBuilder(notification, channel!)
@@ -182,7 +183,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         }
         catch (Exception ex)
         {
-
+            
         }
     }
 }

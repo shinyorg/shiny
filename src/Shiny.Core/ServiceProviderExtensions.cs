@@ -86,7 +86,7 @@ public static class ServiceProviderExtensions
         {
             services.AddSingleton(implementationType);
         }
-        else if (interfaces.Any(x => x == typeof(INotifyPropertyChanged) || interfaces.Any(x => x == typeof(IShinyComponentStartup))))
+        else if (interfaces.Any(x => x == typeof(INotifyPropertyChanged)) || interfaces.Any(x => x == typeof(IShinyComponentStartup)))
         {
             services.AddSingleton(implementationType, sp =>
             {
