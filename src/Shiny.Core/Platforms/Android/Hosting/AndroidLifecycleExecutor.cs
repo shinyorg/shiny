@@ -4,7 +4,6 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Runtime;
-
 using AndroidX.Lifecycle;
 using Java.Interop;
 using Microsoft.Extensions.Logging;

@@ -23,17 +23,15 @@ public partial class ShinyLifecycleTask
     public void OnBackground()
     {
         this.IsInForeground = false;
-        this.OnStateChanged(false);
+        this.OnStateChanged(true);
     }
 
 
     public virtual void OnForeground()
     {
         this.IsInForeground = true;
-        this.OnStateChanged(true);
+        this.OnStateChanged(false);
     }
 
 }
-
-
 #endif
