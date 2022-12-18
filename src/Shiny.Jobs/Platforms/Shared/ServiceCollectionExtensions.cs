@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddJobs(this IServiceCollection services, bool? clearPrevJobs = null)
     {
-        if (!services.Any(x => x.ImplementationType?.Equals(typeof(JobLifecycleTask)) ?? false))
+        if (!services.HasService<IJobManager>())
         {
             if (clearPrevJobs != null)
                 JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
