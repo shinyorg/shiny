@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
     </ItemGroup>
 
