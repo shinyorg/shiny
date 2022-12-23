@@ -80,13 +80,14 @@ public static class ServiceProviderExtensions
     /// <returns></returns>
     public static IServiceCollection AddShinyService(this IServiceCollection services, Type implementationType)
     {
-        var interfaces = implementationType.GetInterfaces();
+        var interfaces = implementationType
+            .GetInterfaces()
+            .Where(x => x != typeof(IDisposable))
+            .ToList();
 
-        if (interfaces.Length == 0)
-        {
-            services.AddSingleton(implementationType);
-        }
-        else if (interfaces.Any(x => x == typeof(INotifyPropertyChanged)) || interfaces.Any(x => x == typeof(IShinyComponentStartup)))
+        services.AddSingleton(implementationType);
+
+        if (interfaces.Any(x => x == typeof(INotifyPropertyChanged)) || interfaces.Any(x => x == typeof(IShinyComponentStartup)))
         {
             services.AddSingleton(implementationType, sp =>
             {
@@ -99,13 +100,8 @@ public static class ServiceProviderExtensions
 
                 return instance;
             });
-
-            interfaces = interfaces
-                .Where(x =>
-                    x != typeof(INotifyPropertyChanged) &&
-                    x != typeof(IShinyComponentStartup)
-                )
-                .ToArray();
+            interfaces.Remove(typeof(INotifyPropertyChanged));
+            interfaces.Remove(typeof(IShinyComponentStartup));
         }
         foreach (var iface in interfaces)
             services.AddSingleton(iface, sp => sp.GetRequiredService(implementationType));
