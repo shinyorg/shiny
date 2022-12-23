@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
@@ -8,33 +10,46 @@ using Shiny.Stores.Impl;
 namespace Shiny.Net.Http;
 
 
-class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
+class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyComponentStartup
 {
     readonly ILogger logger;
+    readonly AndroidPlatform platform;
     readonly IServiceProvider services;
+    readonly IConnectivity connectivity;
     readonly IRepository<BlobStore<HttpTransferRequest>> repository;
 
 
     public HttpTransferManager(
         ILogger<HttpTransferManager> logger,
+        AndroidPlatform platform,
         IServiceProvider services,
+        IConnectivity connectivity,
         IRepository<BlobStore<HttpTransferRequest>> repository
     )
     {
         this.logger = logger;
+        this.platform = platform;
         this.services = services;
+        this.connectivity = connectivity;
         this.repository = repository;
     }
 
 
-    public async void Start()
+    public void Start() { }
+    public void ComponentStart()
     {
         try
         {
-            var requestBlobs = await this.repository.GetList();
+            // TODO: danger - moving back to an async GetList will stop this.  We need to force the collection to load BEFORE the job runs which is a problem
+            // the job may not see the collection is loaded.  Switching to GetList method also removes need to be thread safe on the collection
+            var requestBlobs = this.repository.GetList();
             foreach (var blob in requestBlobs)
             {
-                var ht = new HttpTransfer(this.services, blob.Object, blob.Identifier);
+                // TODO: anything that was inprogress, should auto resume - must save that state though,
+                // so we know manual 'manual pause' from 'paused by network'?  'Paused by network' could just move back to pending/inprogress
+
+                // job will deal with auto restart
+                var ht = this.Create(blob.Object, blob.Identifier);
                 this.transfers.Add(ht);
             }
         }
@@ -50,10 +65,20 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
 
     public async Task<IHttpTransfer> Queue(HttpTransferRequest request)
-    {        
+    {
+        await this.platform
+            .RequestFilteredPermissions(new AndroidPermission(
+                Android.Manifest.Permission.PostNotifications,
+                33,
+                null
+            ))
+            .ToTask()
+            .ConfigureAwait(false);
+
         var identifier = Guid.NewGuid().ToString();
-        var ht = new HttpTransfer(this.services, request, identifier);
-        await this.repository.Set(new BlobStore<HttpTransferRequest>
+        var ht = this.Create(request, identifier);
+
+        this.repository.Set(new BlobStore<HttpTransferRequest>
         (
             identifier,
             request
@@ -70,7 +95,8 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             transfer.Cancel();        
 
         this.transfers.Clear();
-        return this.repository.Clear();
+        this.repository.Clear();
+        return Task.CompletedTask;
     }
 
 
@@ -83,7 +109,8 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             ht.Cancel();
             this.transfers.Remove(ht);
         }
-        return this.repository.Remove(identifier);
+        this.repository.Remove(identifier);
+        return Task.CompletedTask;
     }
 
 
@@ -101,6 +128,13 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             await transfer.Resume().ConfigureAwait(false);
     }
 
+
+    HttpTransfer Create(HttpTransferRequest request, string identifier) => new HttpTransfer(
+        this.services,
+        this.connectivity,
+        request,
+        identifier
+    );
 
     HttpTransfer? Get(string identifier)
         => this.transfers.FirstOrDefault(x => x.Identifier.Equals(identifier)) as HttpTransfer;

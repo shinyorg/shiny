@@ -112,9 +112,10 @@ public class CreateViewModel : ViewModel
     [Reactive] public string[] Channels { get; private set; }
 
 
-    public override async void OnNavigatedTo(INavigationParameters parameters)
+    public override void OnNavigatedTo(INavigationParameters parameters)
     { 
-        this.Channels = (await this.notificationManager.GetChannels())
+        this.Channels = this.notificationManager
+            .GetChannels()
             .Select(x => x.Identifier)
             .ToArray();
 

@@ -55,7 +55,7 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
                 foreach (var triggeringGeofence in e.TriggeringGeofences)
                 {
                     var state = (GeofenceState)e.GeofenceTransition;
-                    var region = await this.repository.Get(triggeringGeofence.RequestId);
+                    var region = this.repository.Get(triggeringGeofence.RequestId);
 
                     if (region == null)
                     {
@@ -73,7 +73,7 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
                 }
             }
         };
-        var regions = await this.repository.GetList().ConfigureAwait(false);
+        var regions = this.repository.GetList();
         foreach (var region in regions)
             await this.Create(region);
     }
@@ -83,32 +83,33 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
         => this.platform.RequestBackgroundLocationAccess(LocationPermissionType.FineRequired);
 
 
-    public Task<IList<GeofenceRegion>> GetMonitorRegions()
+    public IList<GeofenceRegion> GetMonitorRegions()
         => this.repository.GetList();
+
 
     public async Task StartMonitoring(GeofenceRegion region)
     {
         (await this.RequestAccess().ConfigureAwait(false)).Assert();
         await this.Create(region).ConfigureAwait(false);
-        await this.repository.Set(region).ConfigureAwait(false);
+        this.repository.Set(region);
     }
 
 
-    public async Task StopMonitoring(string identifier)
+    public Task StopMonitoring(string identifier)
     {
-        await this.repository.Remove(identifier).ConfigureAwait(false);
-        await this.client.RemoveGeofencesAsync(new List<string> { identifier }).ConfigureAwait(false);
+        this.repository.Remove(identifier);
+        return this.client.RemoveGeofencesAsync(new List<string> { identifier });
     }
 
 
     public async Task StopAllMonitoring()
     {
-        var regions = await this.repository.GetList().ConfigureAwait(false);
+        var regions = this.repository.GetList();
         var regionIds = regions.Select(x => x.Identifier).ToArray();
         if (regionIds.Any())
             await this.client.RemoveGeofencesAsync(regionIds).ConfigureAwait(false);
 
-        await this.repository.Clear().ConfigureAwait(false);
+        this.repository.Clear();
     }
 
 
@@ -128,7 +129,7 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     }
 
 
-    protected virtual async Task Create(GeofenceRegion region)
+    protected virtual Task Create(GeofenceRegion region)
     {
         var transitions = this.GetTransitions(region);
 
@@ -148,12 +149,10 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
             .AddGeofence(geofence)
             .Build();
 
-        await this.client
-            .AddGeofencesAsync(
-                request,
-                this.GetPendingIntent()
-            )
-            .ConfigureAwait(false);
+        return this.client.AddGeofencesAsync(
+            request,
+            this.GetPendingIntent()
+        );
     }
 
 

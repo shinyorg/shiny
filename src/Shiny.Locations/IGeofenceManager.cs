@@ -16,7 +16,7 @@ public interface IGeofenceManager
     /// <summary>
     /// Current set of geofences being monitored
     /// </summary>
-    Task<IList<GeofenceRegion>> GetMonitorRegions();
+    IList<GeofenceRegion> GetMonitorRegions();
 
     /// <summary>
     /// Start monitoring a geofence

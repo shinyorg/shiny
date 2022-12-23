@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<PushProvider>firebase</PushProvider><!--native, firebase, or azure-->
+		<PushProvider>native</PushProvider><!--native, firebase, or azure-->
 
 		<!--if native android or firebase - firebase will look for the embedded configuration-->
 		<FirebaseUseEmbeddedConfiguration>false</FirebaseUseEmbeddedConfiguration>
-		<!--<TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>-->
-		<TargetFrameworks>net7.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net6.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>
+		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -24,13 +23,11 @@
 		<DefineConstants Condition="'$(FirebaseUseEmbeddedConfiguration)' != 'true'">$(DefineConstants);USE_PUSH_CONFIG</DefineConstants>
 	</PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-    </PropertyGroup>
-
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
 		<SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
 		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<RuntimeIdentifier Condition="'$(Configuration)' == 'Debug'">iossimulator-x64</RuntimeIdentifier>
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
@@ -39,7 +36,7 @@
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>		
+		<SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
 	<ItemGroup>
@@ -68,7 +65,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
-		<ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
-		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+		<ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" Condition="'$(PushProvider)' == 'firebase'" />
+		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj"  Condition="'$(PushProvider)' == 'azure'" />
     </ItemGroup>
 </Project>

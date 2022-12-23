@@ -42,20 +42,20 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
     }
 
 
-    public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
-    public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
-    public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);
-    public Task<Channel?> GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
+    public void AddChannel(Channel channel) => this.channelManager.Add(channel);
+    public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
+    public void ClearChannels() => this.channelManager.Clear();
+    public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
+    public IList<Channel> GetChannels() => this.channelManager.GetAll();
 
 
     public async Task Cancel(int id)
     {
-        var notification = await this.repository.Get(id.ToString()).ConfigureAwait(false);
+        var notification = this.repository.Get(id.ToString());
         if (notification != null)
         {
             await this.CancelInternal(notification).ConfigureAwait(false);
-            await this.repository.Remove(id.ToString()).ConfigureAwait(false);
+            this.repository.Remove(id.ToString());
         }
     }
 
@@ -68,24 +68,22 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         }
         if (scope == CancelScope.All || scope == CancelScope.Pending)
         {
-            var notifications = await this.repository.GetList();
+            var notifications = this.repository.GetList();
             foreach (var notification in notifications)
             {
                 await this.CancelInternal(notification).ConfigureAwait(false);
             }
-            await this.repository
-                .Clear()
-                .ConfigureAwait(false);
+            this.repository.Clear();
         }
     }
 
 
     public Task<Notification?> GetNotification(int notificationId)
-        => this.repository.Get(notificationId.ToString());
+        => Task.FromResult(this.repository.Get(notificationId.ToString()));
 
 
-    public async Task<IEnumerable<Notification>> GetPendingNotifications()
-        => await this.repository.GetList().ConfigureAwait(false);
+    public Task<IList<Notification>> GetPendingNotifications()
+        => Task.FromResult(this.repository.GetList());
 
 
     public async Task<AccessState> RequestAccess(AccessRequestFlags access)
@@ -121,9 +119,10 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         if (notification.Id == 0)
             notification.Id = this.settings.IncrementValue("NotificationId");
 
-        var channel = await this.channelManager.Get(notification.Channel ?? Channel.Default.Identifier);
+        var channelId = notification.Channel ?? Channel.Default.Identifier;
+        var channel = this.channelManager.Get(channelId);
         if (channel == null)
-            throw new InvalidProgramException("There is no default channel!!");
+            throw new InvalidProgramException("No channel found for " + channelId);
 
         var builder = await this.manager
             .CreateNativeBuilder(notification, channel!)
@@ -152,7 +151,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         {
             // ensure a channel is set
             notification.Channel = channel!.Identifier;
-            await this.repository.Set(notification).ConfigureAwait(false);
+            this.repository.Set(notification);
 
             if (notification.ScheduleDate != null)
                 this.manager.SetAlarm(notification);
@@ -184,7 +183,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         }
         catch (Exception ex)
         {
-
+            
         }
     }
 }

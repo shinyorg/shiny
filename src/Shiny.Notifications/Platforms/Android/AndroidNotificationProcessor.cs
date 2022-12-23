@@ -69,14 +69,15 @@ public class AndroidNotificationProcessor
     public async Task ProcessPending()
     {
         // fire any missed/pending alarms?
-        var missed = await this.repository
-            .GetList(x => x.ScheduleDate != null && x.ScheduleDate < DateTime.UtcNow)
-            .ConfigureAwait(false);
+        var missed = this.repository.GetList(
+            x => x.ScheduleDate != null &&
+            x.ScheduleDate < DateTime.UtcNow
+        );
 
         foreach (var notification in missed)
         {
             await this.notificationManager.Send(notification).ConfigureAwait(false);
-            await this.DeleteOrReschedule(notification).ConfigureAwait(false);
+            this.DeleteOrReschedule(notification);
         }
     }
 
@@ -88,7 +89,7 @@ public class AndroidNotificationProcessor
             return;
 
         var notificationId = region.Identifier.Replace(GeofenceKey, String.Empty);
-        var notification = await this.repository.Get(notificationId).ConfigureAwait(false);
+        var notification = this.repository.Get(notificationId);
 
         if (notification?.Geofence != null)
         {
@@ -96,8 +97,10 @@ public class AndroidNotificationProcessor
 
             if (!notification.Geofence.Repeat)
             {
-                await this.repository.Remove(notificationId).ConfigureAwait(false);
-                await this.geofenceManager.StopMonitoring(region.Identifier).ConfigureAwait(false);
+                this.repository.Remove(notificationId);
+                await this.geofenceManager
+                    .StopMonitoring(region.Identifier)
+                    .ConfigureAwait(false);
             }
         }
     }
@@ -109,29 +112,27 @@ public class AndroidNotificationProcessor
         var id = intent.GetIntExtra(IntentNotificationKey, 0);
         if (id > 0)
         {
-            var notification = await this.repository.Get(id.ToString()).ConfigureAwait(false);
+            var notification = this.repository.Get(id.ToString());
             if (notification != null)
             {
                 await this.notificationManager.Send(notification).ConfigureAwait(false);
-                await this.DeleteOrReschedule(notification).ConfigureAwait(false);
+                this.DeleteOrReschedule(notification);
             }
         }
     }
 
 
-    async Task DeleteOrReschedule(Notification notification)
+    void DeleteOrReschedule(Notification notification)
     {
         if (notification.RepeatInterval == null)
         {
-            await this.repository
-                .Remove(notification.Id.ToString())
-                .ConfigureAwait(false);
+            this.repository.Remove(notification.Id.ToString());
         }
         else
         {
             // if repeating, set next time
             notification.ScheduleDate = notification.RepeatInterval.CalculateNextAlarm();
-            await this.repository.Set(notification).ConfigureAwait(false);
+            this.repository.Set(notification);
 
             this.notificationManager.SetAlarm(notification);
         }

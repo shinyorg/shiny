@@ -5,31 +5,28 @@ using Shiny;
 using Shiny.Jobs;
 using Shiny.Notifications;
 
+namespace Sample;
 
-namespace Sample
+
+public class SampleJob : IJob
 {
-    public class SampleJob : IJob
+    readonly INotificationManager notificationManager;
+    public SampleJob(INotificationManager notificationManager)
+        => this.notificationManager = notificationManager;
+
+
+    public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
-        readonly INotificationManager notificationManager;
-        public SampleJob(INotificationManager notificationManager)
-            => this.notificationManager = notificationManager;
+        await this.notificationManager.Send(
+            "Jobs",
+            $"Job Started - {jobInfo.Identifier}"
+        );
+        var seconds = jobInfo.GetParameter<int>("SecondsToRun", 10);
+        await Task.Delay(TimeSpan.FromSeconds(seconds), cancelToken);
 
-
-        public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
-        {
-            await this.notificationManager.Send(
-                "Jobs",
-                "Job Started",
-                $"{jobInfo.Identifier} Started"
-            );
-            var seconds = jobInfo.GetParameter<int>("SecondsToRun", 10);
-            await Task.Delay(TimeSpan.FromSeconds(seconds), cancelToken);
-
-            await this.notificationManager.Send(
-                "Jobs",
-                "Job Finished",
-                $"{jobInfo.Identifier} Finished"
-            );
-        }
+        await this.notificationManager.Send(
+            "Jobs",
+            $"Job Finished - {jobInfo.Identifier}"
+        );
     }
 }

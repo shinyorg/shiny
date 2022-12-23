@@ -64,32 +64,32 @@ public interface IJobManager
     /// </summary>
     /// <param name="jobIdentifier"></param>
     /// <returns></returns>
-    Task<JobInfo?> GetJob(string jobIdentifier);
+    JobInfo? GetJob(string jobIdentifier);
 
 
     /// <summary>
     /// Gets current registered jobs
     /// </summary>
     /// <returns></returns>
-    Task<IList<JobInfo>> GetJobs();
+    IList<JobInfo> GetJobs();
 
 
     /// <summary>
     /// Create a new job
     /// </summary>
     /// <param name="jobInfo"></param>
-    Task Register(JobInfo jobInfo);
+    void Register(JobInfo jobInfo);
 
 
     /// <summary>
     /// Cancel a job
     /// </summary>
     /// <param name="jobName"></param>
-    Task Cancel(string jobName);
+    void Cancel(string jobName);
 
 
     /// <summary>
     /// Cancel All Jobs
     /// </summary>
-    Task CancelAll();
+    void CancelAll();
 }

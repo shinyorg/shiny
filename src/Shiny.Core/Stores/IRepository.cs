@@ -22,7 +22,7 @@ public interface IRepository<TEntity> where TEntity : IStoreEntity
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    Task<bool> Exists(string key);
+    bool Exists(string key);
 
     /// <summary>
     /// Returns a specific entity by its key value
@@ -30,7 +30,7 @@ public interface IRepository<TEntity> where TEntity : IStoreEntity
     /// <typeparam name="T"></typeparam>
     /// <param name="key"></param>
     /// <returns></returns>
-    Task<TEntity?> Get(string key);
+    TEntity? Get(string key);
 
     /// <summary>
     /// Gets all entities from storage of a given type
@@ -38,14 +38,14 @@ public interface IRepository<TEntity> where TEntity : IStoreEntity
     /// <typeparam name="T"></typeparam>
     /// <param name="expression"></param>
     /// <returns></returns>
-    Task<IList<TEntity>> GetList(Expression<Func<TEntity, bool>>? expression = null);
+    IList<TEntity> GetList(Expression<Func<TEntity, bool>>? expression = null);
 
     /// <summary>
     /// Returns true if updating otherwise false if new
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    Task<bool> Set(TEntity entity);
+    bool Set(TEntity entity);
 
     /// <summary>
     /// Removes an entity from storage - if the entity exists, returns true, otherwise false
@@ -53,14 +53,14 @@ public interface IRepository<TEntity> where TEntity : IStoreEntity
     /// <typeparam name="T"></typeparam>
     /// <param name="key"></param>
     /// <returns></returns>
-    Task<bool> Remove(string key);
+    bool Remove(string key);
 
     /// <summary>
     /// Clears all entities of a given type
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    Task Clear();
+    void Clear();
 
 
     /// <summary>

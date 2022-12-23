@@ -12,7 +12,7 @@ using Shiny.Stores;
 namespace Shiny.Notifications;
 
 
-public class ChannelManager : IChannelManager, IShinyStartupTask
+public class ChannelManager : IChannelManager, IShinyComponentStartup
 {
     readonly IRepository<Channel> repository;
     readonly AndroidPlatform platform;
@@ -33,12 +33,12 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
     }
 
 
-    public async void Start()
+    public void ComponentStart()
     {
         this.logger.LogInformation("Initializing channel manager");
         try
         {
-            await this.Add(Channel.Default).ConfigureAwait(false);
+            this.Add(Channel.Default);
             this.logger.LogInformation("Default notification channel created");
         }
         catch (Exception ex)
@@ -48,7 +48,7 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
     }
 
 
-    public async Task Add(Channel channel)
+    public void Add(Channel channel)
     {
         channel.AssertValid();
 
@@ -94,32 +94,29 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
                 break;
         }
         this.nativeManager.CreateNotificationChannel(native);
-        await this.repository.Set(channel).ConfigureAwait(false);
+        this.repository.Set(channel);
     }
 
 
-    public async Task Clear()
+    public void Clear()
     {
-        var channels = await this.GetAll().ConfigureAwait(false);
+        var channels = this.GetAll();
         foreach (var channel in channels)
             this.nativeManager.DeleteNotificationChannel(channel.Identifier);
 
-        await this.repository
-            .Clear()
-            .ConfigureAwait(false);
-
-        await this.Add(Channel.Default).ConfigureAwait(false);
+        this.repository.Clear();
+        this.Add(Channel.Default);
     }
 
 
-    public Task<Channel?> Get(string channelId) => this.repository.Get(channelId);
-    public Task<IList<Channel>> GetAll() => this.repository.GetList();
-    public Task Remove(string channelId)
+    public Channel? Get(string channelId) => this.repository.Get(channelId);
+    public IList<Channel> GetAll() => this.repository.GetList();
+    public void Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);
 
         this.nativeManager.DeleteNotificationChannel(channelId);
-        return this.repository.Remove(channelId);
+        this.repository.Remove(channelId);
     }
 
 

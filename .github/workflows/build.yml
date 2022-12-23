@@ -24,6 +24,9 @@ env:
   DiscordToken: ${{secrets.DISCORD_TOKEN}}
   DiscordGuildId: '679761126598115336'
   DiscordChannelId: '803717285986566174'
+  MastodonClientId: ${{secrets.MASTODON_CLIENT_ID}}
+  MastodonClientSecret: ${{secrets.MASTODON_CLIENT_SECRET}}
+  MastodonInstance: 'dotnet.social'
 
 jobs:
   build:

@@ -21,9 +21,7 @@ public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
 
     public async Task OnReading(GpsReading reading)
     {
-        var geofences = await this.geofenceManager
-            .GetMonitorRegions()
-            .ConfigureAwait(false);
+        var geofences = this.geofenceManager.GetMonitorRegions();
 
         foreach (var geofence in geofences)
         {

@@ -27,10 +27,10 @@ public class OtherViewModel : ViewModel
 
         this.StartChat = this.LoadingCommand(async () => 
         {
-            await this.notifications.RemoveChannel("ChatName");
-            await this.notifications.RemoveChannel("ChatAnswer");
+            this.notifications.RemoveChannel("ChatName");
+            this.notifications.RemoveChannel("ChatAnswer");
 
-            await this.notifications.AddChannel(new Channel
+            this.notifications.AddChannel(new Channel
             {
                 Identifier = "ChatName",
                 Importance = ChannelImportance.Normal,
@@ -45,7 +45,7 @@ public class OtherViewModel : ViewModel
                 }
 
             });
-            await this.notifications.AddChannel(new Channel
+            this.notifications.AddChannel(new Channel
             {
                 Identifier = "ChatAnswer",
                 Actions =

@@ -7,10 +7,6 @@ namespace Shiny.Notifications;
 
 public class Notification : IStoreEntity
 {
-    public static string? DefaultChannel { get; set; }
-
-    public static string? DefaultTitle { get; set; }
-
     /// <summary>
     /// You do not have to set this - it will be automatically set from the library if you do not supply one
     /// </summary>
@@ -19,7 +15,7 @@ public class Notification : IStoreEntity
     /// <summary>
     /// The title of the message
     /// </summary>
-    public string? Title { get; set; } = DefaultTitle;
+    public string? Title { get; set; }
 
     /// <summary>
     /// The body of the notification - can be blank
@@ -29,7 +25,7 @@ public class Notification : IStoreEntity
     /// <summary>
     /// The channel ID
     /// </summary>
-    public string? Channel { get; set; } = DefaultChannel;
+    public string? Channel { get; set; }
 
     /// <summary>
     /// Additional data you can add to your notification

@@ -124,9 +124,9 @@ public class JobManager : AbstractJobManager
         => this.Instance.CancelUniqueWork(jobInfo.Identifier);
 
 
-    public override async Task CancelAll()
+    public override void CancelAll()
     {
-        await base.CancelAll().ConfigureAwait(false);
+        base.CancelAll();
         this.Instance.CancelAllWork();
     }
 

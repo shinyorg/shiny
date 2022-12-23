@@ -45,7 +45,7 @@ public class CreateViewModel : ViewModel
                     RequiredInternetAccess = (InternetAccess)Enum.Parse(typeof(InternetAccess), this.RequiredInternetAccess)
                 };
                 job.SetParameter("SecondsToRun", this.SecondsToRun);
-                await this.jobManager.Register(job);
+                this.jobManager.Register(job);
                 await this.Navigation.GoBack();
             }
         );

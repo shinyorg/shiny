@@ -10,10 +10,9 @@ public class ChannelListViewModel : ViewModel
     {
         this.Create = this.Navigation.Command("NotificationsChannelCreate");
 
-        this.LoadChannels = ReactiveCommand.CreateFromTask(async () =>
-        {
-            var channels = await notifications.GetChannels();
-            this.Channels = channels
+        this.LoadChannels = ReactiveCommand.Create(() =>
+            this.Channels = notifications
+                .GetChannels()
                 .Select(x => new CommandItem
                 {
                     Text = x.Identifier,
@@ -21,13 +20,13 @@ public class ChannelListViewModel : ViewModel
                         "Are you sure you wish to delete this channel?",
                         async () =>
                         {
-                            await notifications.RemoveChannel(x.Identifier);
-                            this.LoadChannels.Execute(null);
+                            notifications.RemoveChannel(x.Identifier);
+                            this.LoadChannels!.Execute(null);
                         }
                     )
                 })
-                .ToList();
-        });
+                .ToList()
+        );
     }
 
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Jobs.Infrastructure;
+
 
 public class JobsStartup : IShinyStartupTask
 {
@@ -27,18 +27,22 @@ public class JobsStartup : IShinyStartupTask
 
     public async void Start()
     {
-        if (ClearJobsBeforeRegistering)
+
+        try
         {
-            try
+            var jobs = this.jobManager.GetJobs();
+            foreach (var job in jobs)
             {
-                await this.jobManager
-                    .CancelAll()
-                    .ConfigureAwait(false);
+                if (Type.GetType(job.TypeName) == null)
+                {
+                    this.logger.LogWarning($"Job '{job.Identifier}' with type '{job.TypeName}' cannot be found and has been removed");
+                    this.jobManager.Cancel(job.Identifier);
+                }
             }
-            catch (Exception ex)
-            {
-                this.logger.LogWarning(ex, "Unable to cancel all existing jobs");
-            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Unable to clear dead jobs");
         }
 
         if (jobs.Count > 0)
@@ -50,10 +54,8 @@ public class JobsStartup : IShinyStartupTask
             if (access == AccessState.Available)
             {
                 foreach (var job in jobs)
-                { 
-                    await this.jobManager
-                        .Register(job)
-                        .ConfigureAwait(false);
+                {
+                    this.jobManager.Register(job);
                 }
             }
             else

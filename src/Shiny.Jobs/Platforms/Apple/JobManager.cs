@@ -117,7 +117,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
 
                 task.ExpirationHandler = cancelSrc.Cancel;
 
-                var jobs = await this.GetJobs();
+                var jobs = this.GetJobs();
                 List<JobInfo>? jobList = null;
 
                 switch (task.Identifier)

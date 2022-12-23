@@ -31,34 +31,29 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     public Task<AccessState> RequestAccess() => this.manager.RequestAccess(true);
 
 
-    public async Task StartMonitoring(BeaconRegion region)
+    public Task StartMonitoring(BeaconRegion region)
     {
-        await this.repository.Set(region).ConfigureAwait(false);
+        this.repository.Set(region);
         this.manager.StartMonitoring(region.ToNative());
+        return Task.CompletedTask;
     }
 
 
-    public async Task StopMonitoring(string identifier)
+    public void StopMonitoring(string identifier)
     {
-        var region = await this.repository
-            .Get(identifier)
-            .ConfigureAwait(false);
+        var region = this.repository.Get(identifier);
 
         if (region != null)
         {
-            await this.repository
-                .Remove(region.Identifier)
-                .ConfigureAwait(false);
+            this.repository.Remove(region.Identifier);
             this.manager.StopMonitoring(region.ToNative());
         }
     }
 
 
-    public async Task StopAllMonitoring()
+    public void StopAllMonitoring()
     {
-        await this.repository
-            .Clear()
-            .ConfigureAwait(false);
+        this.repository.Clear();
 
         var allRegions = this
            .manager
@@ -69,6 +64,6 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
             this.manager.StopMonitoring(region);
     }
 
-    public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
-        => await this.repository.GetList().ConfigureAwait(false);
+    public IList<BeaconRegion> GetMonitoredRegions()
+        => repository.GetList();
 }

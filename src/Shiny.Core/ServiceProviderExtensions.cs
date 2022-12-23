@@ -11,8 +11,47 @@ using Shiny.Stores;
 namespace Shiny;
 
 
-public static class ServiceExtensions
+public static class ServiceProviderExtensions
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TImpl"></typeparam>
+    /// <param name="services"></param>
+    /// <param name="implementationType"></param>
+    /// <returns></returns>
+    public static bool HasService<TService>(this IServiceCollection services)
+        => services.HasService(typeof(TService));
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="implementationType"></param>
+    /// <returns></returns>
+    public static bool HasService(this IServiceCollection services, Type serviceType)
+        => services.Any(x => x.ServiceType == serviceType);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TImpl"></typeparam>
+    /// <param name="services"></param>
+    /// <param name="implementationType"></param>
+    /// <returns></returns>
+    public static bool HasImplementation<TImpl>(this IServiceCollection services)
+        => services.HasImplementation(typeof(TImpl));
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="implementationType"></param>
+    /// <returns></returns>
+    public static bool HasImplementation(this IServiceCollection services, Type implementationType)
+        => services.Any(x => x.ImplementationType == implementationType);
+
+
     /// <summary>
     /// Lazily resolves a service - helps in prevent resolve loops with delegates/services internal to Shiny
     /// </summary>
@@ -41,22 +80,28 @@ public static class ServiceExtensions
     /// <returns></returns>
     public static IServiceCollection AddShinyService(this IServiceCollection services, Type implementationType)
     {
-        var interfaces = implementationType.GetInterfaces();
+        var interfaces = implementationType
+            .GetInterfaces()
+            .Where(x => x != typeof(IDisposable))
+            .ToList();
 
-        if (interfaces.Length == 0 || !interfaces.Any(x => x == typeof(INotifyPropertyChanged)))
-        {
-            services.AddSingleton(implementationType);
-        }
-        else
+        services.AddSingleton(implementationType);
+
+        if (interfaces.Any(x => x == typeof(INotifyPropertyChanged)) || interfaces.Any(x => x == typeof(IShinyComponentStartup)))
         {
             services.AddSingleton(implementationType, sp =>
             {
-                var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, implementationType);
-                sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
+                var instance = ActivatorUtilities.CreateInstance(sp, implementationType);
+                if (instance is INotifyPropertyChanged npc)
+                    sp.GetRequiredService<IObjectStoreBinder>().Bind(npc);
+
+                if (instance is IShinyComponentStartup startup)
+                    startup.ComponentStart();
+
                 return instance;
             });
-
-            interfaces = interfaces.Where(x => x != typeof(INotifyPropertyChanged)).ToArray();
+            interfaces.Remove(typeof(INotifyPropertyChanged));
+            interfaces.Remove(typeof(IShinyComponentStartup));
         }
         foreach (var iface in interfaces)
             services.AddSingleton(iface, sp => sp.GetRequiredService(implementationType));

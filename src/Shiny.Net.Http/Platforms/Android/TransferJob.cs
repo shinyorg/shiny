@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
-using Android.OS;
 using AndroidX.Core.App;
 using Microsoft.Extensions.Logging;
 using Shiny.Jobs;
-using Shiny.Stores;
-using Shiny.Stores.Impl;
 
 namespace Shiny.Net.Http;
 
@@ -46,69 +41,80 @@ class TransferJob : IJob
     }
 
 
-    // TODO: what if we drop to an expensive network - we need to watch that as well
+
+    // TODO: ensure job does not run multiple times
     // TODO: allow configurable amount of transfer at a time
     // TODO: check if progress is interdeterminate
     public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
-        // this job is purely in android, so we have access to all android stuff        
-        var expensiveNetwork = this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet);
-        //this.connectivity
-        //    .WhenInternetStatusChanged()
-        //    .Subscribe(x =>
-        //    {
-        //        // TODO: a loss of internet will cause top level cancelToken to fire from Android
-        //        // so only cancel if expensive network detected and current transfer ignore expensive network
-        //    });
-
+        // TODO: always loop again if it has been several mins since the last full loop
         // TODO: reloop for new transfers, check for cancelled transfers
-        var currentTransfers = this.manager.Transfers.ToList();
-        foreach (var transfer in currentTransfers)
-        {
-            if (transfer.Request.UseMeteredConnection || !expensiveNetwork)
-            {                
-                await this.manager.Resume(transfer.Identifier);                
-                var builder = this.StartNotification(transfer);
-                if (builder != null)
-                    this.notifications.Notify(NOTIFICATION_ID, builder.Build());
+        // TODO: anything that is paused manually should NOT be looked at
+        // TODO: anything that was paused due to server issue (retry) or network change, should be looped
+        //while (this.manager.Transfers.Count > 0)
+        //{
+        //    // TODO: this may infinite loop, so we only jobs that can run
+        //    var transfer = this.manager.Transfers.First();
 
-                // wait for pause/complete/error/cancel then move to next transfer
-                await transfer
-                    .ListenToMetrics()
-                    .Do(x =>
-                    {                        
-                        if (x.Status == HttpTransferState.InProgress)
-                        {
-                            if (builder != null)
-                            {
-                                builder.SetProgress(100, Convert.ToInt32(x.PercentComplete * 100), false);
-                                this.notifications.Notify(NOTIFICATION_ID, builder.Build());
-                            }
-                        }
-                    })
-                    .Where(x =>
-                        x.Status != HttpTransferState.InProgress &&
-                        x.Status != HttpTransferState.Pending
-                    )
-                    .Take(1)
-                    .ToTask(cancelToken)
-                    .ConfigureAwait(false);
-
-                // cancel notification
-                this.notifications.Cancel(NOTIFICATION_ID);
-            }
-        }
+        //    if (transfer.Request.UseMeteredConnection || !this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet))
+        //    {
+        //        await this.RunTransfer(transfer, cancelToken);
+        //    }
+        //}
     }
 
+
+    // TODO: consider moving notifications into transfer as well
+    async Task RunTransfer(IHttpTransfer transfer, CancellationToken cancelToken)
+    {
+        // a cancellation from the job likely means loss of internet
+        using var _ = cancelToken.Register(() => this.manager.Pause(transfer.Identifier));
+        IDisposable? sub = null;
+
+        await this.manager.Resume(transfer.Identifier);
+        var builder = this.StartNotification(transfer);
+        if (builder != null)
+            this.notifications.Notify(NOTIFICATION_ID, builder.Build());
+
+        try
+        {
+            // wait for pause/complete/error/cancel then move to next transfer
+            await transfer
+                .ListenToMetrics()
+                .Do(x =>
+                {
+                    if (x.Status == HttpTransferState.InProgress)
+                    {
+                        if (builder != null)
+                        {
+                            builder.SetProgress(100, Convert.ToInt32(x.PercentComplete * 100), false);
+                            this.notifications.Notify(NOTIFICATION_ID, builder.Build());
+                        }
+                    }
+                })
+                .Where(x =>
+                    x.Status != HttpTransferState.InProgress &&
+                    x.Status != HttpTransferState.Pending
+                )
+                .Take(1)
+                .ToTask(cancelToken)
+                .ConfigureAwait(false);
+        }
+        finally
+        {
+            this.notifications.Cancel(NOTIFICATION_ID);
+            sub?.Dispose();
+        }
+    }
 
     
     NotificationCompat.Builder? StartNotification(IHttpTransfer transfer)
     {
+        this.EnsureChannel();
         NotificationCompat.Builder? builder = null;
         try
         {
-            // TODO: android 13 POST_NOTIFICATION permissions
-            builder = new NotificationCompat.Builder(this.platform.AppContext, "TODO: DEFAULT CHANNEL")
+            builder = new NotificationCompat.Builder(this.platform.AppContext, NotificationChannelId)
                 .SetSmallIcon(this.platform.GetNotificationIconResource())
                 .SetOngoing(true)
                 .SetTicker("...")
@@ -129,20 +135,18 @@ class TransferJob : IJob
     }
 
 
-    //    static int idCount = 7999;
+    public static string NotificationChannelId { get; set; } = "Transfers";
+    protected virtual void EnsureChannel()
+    {
+        if (this.notifications!.GetNotificationChannel(NotificationChannelId) != null)
+            return;
 
-    //    public static string NotificationChannelId { get; set; } = "Service";
-    //    protected virtual void EnsureChannel()
-    //    {
-    //        if (this.NotificationManager!.GetNotificationChannel(NotificationChannelId) != null)
-    //            return;
-
-    //        var channel = new NotificationChannel(
-    //            NotificationChannelId,
-    //            NotificationChannelId,
-    //            NotificationImportance.Default
-    //        );
-    //        channel.SetShowBadge(false);
-    //        this.NotificationManager.CreateNotificationChannel(channel);
-    //    }
+        var channel = new NotificationChannel(
+            NotificationChannelId,
+            NotificationChannelId,
+            NotificationImportance.Default
+        );
+        channel.SetShowBadge(false);
+        this.notifications.CreateNotificationChannel(channel);
+    }
 }

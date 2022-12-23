@@ -11,7 +11,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseShiny()            
+            .UseShiny()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -36,11 +36,7 @@ public static class MauiProgram
         var cfg = builder.Configuration.GetSection("Firebase");
         builder.Services.AddPushFirebaseMessaging<MyPushDelegate>(new(
             false,
-#if IOS || MACCATALYST
-            cfg["IosAppId"],
-#else
             cfg["AppId"],
-#endif
             cfg["SenderId"],
             cfg["ProjectId"],
             cfg["ApiKey"]

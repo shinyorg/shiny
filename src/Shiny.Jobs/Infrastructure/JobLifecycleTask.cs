@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Timers;
+using Microsoft.Extensions.Logging;
 using Shiny.Net;
 using Shiny.Power;
 
@@ -27,30 +28,51 @@ public class JobLifecycleTask : ShinyLifecycleTask
     }
 
 
+    readonly ILogger logger;
     readonly IBattery battery;
     readonly IConnectivity connectivity;
     readonly Timer timer;
 
 
     public JobLifecycleTask(
+        ILogger<JobLifecycleTask> logger,
         IJobManager jobManager,
         IBattery battery,
         IConnectivity connectivity
     )
     {
+        this.logger = logger;
         this.battery = battery;
         this.connectivity = connectivity;
 
         this.timer = new Timer();
         this.timer.Elapsed += async (sender, args) =>
         {
+            this.logger.LogInformation("Starting foreground jobs");
             this.timer.Stop();
-            var jobs = await jobManager.GetJobs().ConfigureAwait(false);
-            var toRun = jobs.Where(this.CanRun).ToList();
+            var jobs = jobManager
+                .GetJobs()
+                .Where(this.CanRun)
+                .ToList();
 
-            foreach (var job in toRun)
-                await jobManager.RunJobAsTask(job.Identifier).ConfigureAwait(false);
+            foreach (var job in jobs)
+            {
+                try
+                {
+                    this.logger.LogInformation($"Job '{job.Identifier}' Foreground Started");
+                    await jobManager
+                        .RunJobAsTask(job.Identifier)
+                        .ConfigureAwait(false);
 
+                    this.logger.LogInformation($"Job '{job.Identifier}' Foreground Finished Successfully");
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning(ex, $"Job '{job.Identifier}' Foreground Error");
+                }
+            }
+
+            this.logger.LogInformation("Foreground jobs finished");
             if (this.IsInForeground)
                 this.timer.Start();
         };
@@ -77,14 +99,20 @@ public class JobLifecycleTask : ShinyLifecycleTask
             return false;
 
         if (!this.HasPowerLevel(job))
+        {
+            this.logger.LogDebug($"Job '{job.Identifier}' won't run because of insufficient power level");
             return false;
-
+        }
         if (!this.HasReqInternet(job))
+        {
+            this.logger.LogDebug($"Job '{job.Identifier}' won't run because of insufficient internet requirement");
             return false;
-
+        }
         if (!this.HasChargeStatus(job))
+        {
+            this.logger.LogDebug($"Job '{job.Identifier}' won't run because of insufficient charge status");
             return false;
-
+        }
         return true;
     }
 

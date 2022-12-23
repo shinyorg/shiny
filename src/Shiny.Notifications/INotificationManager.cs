@@ -11,21 +11,21 @@ public interface INotificationManager
     /// </summary>
     /// <param name="channel"></param>
     /// <returns></returns>
-    Task AddChannel(Channel channel);
+    void AddChannel(Channel channel);
 
 
     /// <summary>
     /// Remove a specific channel - any pending notifications on this channel will also be removed
     /// </summary>
     /// <returns></returns>
-    Task RemoveChannel(string channelId);
+    void RemoveChannel(string channelId);
 
 
     /// <summary>
     /// Removes all channels and any pending notifications
     /// </summary>
     /// <returns></returns>
-    Task ClearChannels();
+    void ClearChannels();
 
 
     /// <summary>
@@ -33,14 +33,14 @@ public interface INotificationManager
     /// </summary>
     /// <param name="channelId"></param>
     /// <returns></returns>
-    Task<Channel?> GetChannel(string channelId);
+    Channel? GetChannel(string channelId);
 
 
     /// <summary>
     /// Gets list of channels
     /// </summary>
     /// <returns></returns>
-    Task<IList<Channel>> GetChannels();
+    IList<Channel> GetChannels();
 
 
     /// <summary>
@@ -56,7 +56,7 @@ public interface INotificationManager
     /// </summary>
     /// <param name="notificationId"></param>
     /// <returns>null if not found</returns>
-    Task<Notification?> GetNotification(int notificationId);
+    Task<Notification>? GetNotification(int notificationId);
 
 
     /// <summary>
@@ -79,7 +79,7 @@ public interface INotificationManager
     /// Gets all pending notifications
     /// </summary>
     /// <returns></returns>
-    Task<IEnumerable<Notification>> GetPendingNotifications();
+    Task<IList<Notification>> GetPendingNotifications();
 
 
     /// <summary>

@@ -5,6 +5,8 @@ using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using Discord;
 using Discord.WebSocket;
+using Mastonet;
+using Mastonet.Entities;
 using Tweetinvi;
 
 namespace ShinyBuild.Tasks.Library;
@@ -26,7 +28,8 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
         return Task.WhenAll(
             this.Twitter(context, message),
-            this.Discord(context, message)
+            this.Discord(context, message),
+            this.Mastodon(context, message)
         );
     }
 
@@ -69,6 +72,37 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
         {
             // don't fail the build because of a failed tweet
             context.Log.Error($"Error publishing release Tweet - {ex}");
+        }
+    }
+
+
+    async Task Mastodon(BuildContext context, string message)
+    {
+        try
+        {
+            context.Log.Information("Attempting to publish to Mastodon");
+
+            var clientId = context.ArgumentOrEnvironment<string>("MastodonClientId");
+            var clientSecret = context.ArgumentOrEnvironment<string>("MastodonClientSecret");
+            var instance = context.ArgumentOrEnvironment<string>("MastodonClientSecret") ?? "dotnet.social";
+
+            var appReg = new AppRegistration
+            {
+                Instance = instance,
+                ClientId = clientId,
+                ClientSecret = clientSecret
+            };
+            var authClient = new AuthenticationClient(appReg);
+            var auth = await authClient.CreateApp("ShinyBot", Scope.Write);
+
+            var client = new MastodonClient(auth.Instance, authClient.AccessToken);
+            await client.PublishStatus(message, Visibility.Public);
+
+            context.Log.Information("Toot Published - " + message);
+        }
+        catch (Exception ex)
+        {
+            context.Log.Error($"Error publishing release Toot - {ex}");
         }
     }
 
