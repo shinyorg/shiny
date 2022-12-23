@@ -23,13 +23,11 @@
 		<DefineConstants Condition="'$(FirebaseUseEmbeddedConfiguration)' != 'true'">$(DefineConstants);USE_PUSH_CONFIG</DefineConstants>
 	</PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-    </PropertyGroup>
-
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
 		<SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
 		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<RuntimeIdentifier Condition="'$(Configuration)' == 'Debug'">iossimulator-x64</RuntimeIdentifier>
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
@@ -38,7 +36,7 @@
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>		
+		<SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
 	<ItemGroup>
