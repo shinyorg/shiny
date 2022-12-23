@@ -23,7 +23,7 @@ public class PushManager : NotifyPropertyChanged,
 {
     readonly AndroidPlatform platform;
     readonly IServiceProvider services;
-        readonly FirebaseConfig config;
+    readonly FirebaseConfig config;
     readonly ILogger logger;
     readonly IPushProvider provider;
 
@@ -33,7 +33,7 @@ public class PushManager : NotifyPropertyChanged,
         FirebaseConfig config,
         IServiceProvider services,
         ILogger<PushManager> logger,
-        IPushProvider provider
+        IPushProvider? provider = null
     )
     {
         this.platform = platform;

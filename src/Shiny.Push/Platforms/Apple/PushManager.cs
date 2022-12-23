@@ -32,7 +32,7 @@ public class PushManager : NotifyPropertyChanged,
         IServiceProvider services,
         IPlatform platform,
         ILogger<PushManager> logger,
-        IPushProvider? provider
+        IPushProvider? provider = null
     )
     {
         this.services = services;
