@@ -11,7 +11,7 @@ using Shiny.Stores;
 namespace Shiny.Jobs;
 
 
-public class JobManager : AbstractJobManager, IShinyStartupTask
+public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStartupTask
 {
     const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
     bool registeredSuccessfully = false;
@@ -27,6 +27,18 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
         logger
     )
     {
+    }
+
+
+    // jobstartuptask can run before this startup, we use this to force the constructor to happen first
+    public void Start() {}
+    public void ComponentStart()
+    {
+#if IOS
+        if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
+            return;
+#endif
+
         try
         {
             this.Register(this.GetIdentifier(false, false));
@@ -40,10 +52,6 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
             this.Log.LogCritical(new Exception(EX_MSG, ex), "Background tasks are not setup properly");
         }
     }
-
-
-    // jobstartuptask can run before this startup, we use this to force the constructor to happen first
-    public void Start() {}
 
 
     public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
@@ -76,8 +84,10 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
         if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             result = AccessState.NotSupported;
 
-        //else if (Runtime.Arch == Arch.SIMULATOR)
-        //    result = AccessState.NotSupported;
+#if IOS
+        else if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
+            result = AccessState.NotSupported;
+#endif
 
         else if (!AppleExtensions.HasBackgroundMode("processing"))
             result = AccessState.NotSetup;
@@ -93,6 +103,11 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
 
     protected override void RegisterNative(JobInfo jobInfo)
     {
+#if IOS
+        if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
+            return;
+#endif
+
         var identifier = this.GetIdentifier(
             jobInfo.DeviceCharging,
             jobInfo.RequiredInternetAccess == InternetAccess.Any
