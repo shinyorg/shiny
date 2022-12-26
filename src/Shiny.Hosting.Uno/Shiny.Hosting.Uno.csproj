@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Uno.WinUI" Version="4.6.19" />
+        <PackageReference Include="Uno.WinUI" Version="4.6.39" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
