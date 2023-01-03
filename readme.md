@@ -11,6 +11,7 @@ things like dependency injection & logging in a structured way to your code!
 * Brings your infrastructure to the background
 * Provides logging to ensure you know when your services fail in the background 
 * Gives a clean & testable API surface for your code
+* Periodic Background Jobs
 * BLE Client & Hosting
 * Beacons Ranging & Monitoring
 * Locations - GPS, Geofencing, & Activity Monitoring (driving, walking, etc)
