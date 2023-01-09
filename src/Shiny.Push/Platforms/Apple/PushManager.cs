@@ -195,7 +195,7 @@ public class PushManager : NotifyPropertyChanged,
 
     public async void Handle(NSDictionary options)
     {
-        if (!options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
+        if (options==null || !options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
             return;
 
         this.logger.LogDebug("App entry remote notification detected");
