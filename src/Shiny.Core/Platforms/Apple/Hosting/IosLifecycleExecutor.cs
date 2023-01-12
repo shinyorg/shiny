@@ -48,7 +48,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     }
 
 
-    public bool FinishedLaunching(NSDictionary options)
+    public bool FinishedLaunching(NSDictionary? options)
     {
         this.Execute(this.finishLaunchingHandlers, handler => handler.Handle(options));
         return true;

@@ -16,7 +16,7 @@ public interface IIosLifecycle
 
     public interface IOnFinishedLaunching
     {
-        void Handle(NSDictionary options);
+        void Handle(NSDictionary? options);
     }
 
     public interface IRemoteNotifications
