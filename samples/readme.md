@@ -18,6 +18,13 @@ A kitchen sink using all of the support libraries that don't require special ext
 
 ### Azure Notification Hubs
 * Edit appsettings.json and add the appropriate values to the AzureNotificationHubs section
+* Send a payload to an active app with `content-available:1` and then it will be received via `DidReceiveRemoteNotification` of AppDelegate class.
+```json
+{"aps":{
+  "alert":"Notification Hub test notification",
+  "content-available": 1
+}}
+```
 
 ### Firebase
 * Edit appsettings.json - add the appropriate values to the Firebase section - The AppId from firebase will be different between Android & iOS
