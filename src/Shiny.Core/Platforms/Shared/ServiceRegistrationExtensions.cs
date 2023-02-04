@@ -18,19 +18,5 @@ public static class ServiceRegistrationExtensions
         services.AddSingleton<IRepository<TEntity>, JsonFileRepository<TStoreConverter, TEntity>>();
         return services;
     }
-
-
-    public static IServiceCollection AddBattery(this IServiceCollection services)
-    {
-        services.TryAddSingleton<IBattery, BatteryImpl>();
-        return services;
-    }
-
-
-    public static IServiceCollection AddConnectivity(this IServiceCollection services)
-    {
-        services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-        return services;
-    }
 }
 

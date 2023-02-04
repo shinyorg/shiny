@@ -71,9 +71,6 @@ public static class ServiceCollectionExtensions
             services.AddShinyService<JobsStartup>();
             services.AddShinyService<JobLifecycleTask>();
             services.AddShinyService<JobManager>();
-
-            services.AddBattery();
-            services.AddConnectivity();
         }
 
         return services;

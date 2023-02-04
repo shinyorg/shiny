@@ -38,8 +38,6 @@ public static class MauiProgram
         //s.AddJobs();
 
         // shiny.core
-        s.AddConnectivity();
-        s.AddBattery();
         s.AddShinyService<Stores.AppSettings>(); // shiny's version of how to do settings
 
         // shiny.notifications

@@ -10,6 +10,8 @@ public static class ShinyExtensions
     public static MauiAppBuilder UseShiny(this MauiAppBuilder builder)
     {
         builder.Services.AddSingleton<IMauiInitializeService, ShinyInitializationService>();
+        builder.Services.AddSingleton<Shiny.Power.IBattery, Shiny.Power.BatteryImpl>();
+        builder.Services.AddSingleton<Shiny.Net.IConnectivity, Shiny.Net.ConnectivityImpl>();
         builder.Services.AddShinyCoreServices();
 
         builder.ConfigureLifecycleEvents(events =>

@@ -5,8 +5,6 @@
         <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
         <RootNamespace>Shiny</RootNamespace>
-
-        <UseMauiEssentials>true</UseMauiEssentials>
     </PropertyGroup>
 
     <ItemGroup>
