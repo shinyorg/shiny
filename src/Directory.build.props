@@ -24,8 +24,8 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <!--<UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>-->
-        <UseMSBuild>false</UseMSBuild>
+        <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>
+        <!--<UseMSBuild>false</UseMSBuild>-->
         
         <StandardTargetFrameworks>net7.0</StandardTargetFrameworks>
         <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);netstandard2.1</StandardTargetFrameworks>
