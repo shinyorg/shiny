@@ -40,6 +40,9 @@ public class Peripheral : AbstractPeripheral,
 
     public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
     {
+        if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
+            throw new InvalidOperationException("L2Cap requires Android API Level 23+");
+
         var socket = secure
             ? this.Native.CreateL2capChannel(psm)
             : this.Native.CreateInsecureL2capChannel(psm);
@@ -123,7 +126,7 @@ public class Peripheral : AbstractPeripheral,
                 .ServicesDiscovered
                 .Select(x => x.Gatt!.Services)
                 .Where(x => x != null)
-                .Select(x => x
+                .Select(x => x!
                     .Select(native => new GattService(this, this.Context, native))
                     .Cast<IGattService>()
                     .ToList()
@@ -142,7 +145,7 @@ public class Peripheral : AbstractPeripheral,
     {
         this.AssertConnection();
 
-        return this.Context.Invoke<int>(Observable.Create<int>(ob =>
+        return this.Context.Invoke(Observable.Create<int>(ob =>
         {
             var sub = this.Context
                 .Callbacks
@@ -272,7 +275,7 @@ public class Peripheral : AbstractPeripheral,
     public override string ToString() => $"Peripheral: {this.Uuid}";
 
 
-    #region Internals
+#region Internals
 
     void AssertConnection()
     {
@@ -296,5 +299,5 @@ public class Peripheral : AbstractPeripheral,
         return new Guid(deviceGuid);
     }        
 
-    #endregion
+#endregion
 }
