@@ -26,7 +26,11 @@ namespace Shiny.BluetoothLE.Internals
         public ManagerContext ManagerContext { get; }
         public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
-        
+
+
+        ILogger? logger;
+        ILogger Logger => this.logger ??= this.ManagerContext.Logging.CreateLogger(this.GetType());
+
 
         public ConnectionState Status
         {
@@ -76,7 +80,7 @@ namespace Shiny.BluetoothLE.Internals
 
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
-            if (!this.ManagerContext.Configuration.AndroidUseInternalSyncQueue)
+            if (!this.ManagerContext.Configuration.UseInternalSyncQueue)
                 return observable;
 
             return Observable.FromAsync(async ct =>
@@ -102,7 +106,7 @@ namespace Shiny.BluetoothLE.Internals
         readonly Handler handler = new(Looper.MainLooper!);
         public void InvokeOnMainThread(Action action)
         {
-            if (this.ManagerContext.Configuration.AndroidShouldInvokeOnMainThread)
+            if (this.ManagerContext.Configuration.InvokeCallsOnMainThread)
                 this.handler.Post(action);
             else
                 action();
@@ -118,10 +122,30 @@ namespace Shiny.BluetoothLE.Internals
             }
             catch (Exception ex)
             {
-                this.ManagerContext
-                    .Logging
-                    .CreateLogger("PeripheralContext")
-                    .LogWarning(ex, "BLE Peripheral did not cleanly disconnect");
+                this.Logger.LogWarning(ex, "BLE Peripheral did not cleanly disconnect");
+            }
+        }
+
+
+        public void RefreshServices()
+        {
+            if (this.Gatt == null || !this.ManagerContext.Configuration.FlushServicesBetweenConnections)
+                return;
+
+            // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
+            try
+            {
+                //Log.Warn(BleLogCategory.Device, "Try to clear Android cache");
+                var method = this.Gatt.Class.GetMethod("refresh");
+                if (method != null)
+                {
+                    var result = (bool)method.Invoke(this.Gatt);
+                    this.Logger.LogWarning("Clear Internal Cache Refresh Result: " + result);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.Logger.LogWarning(ex, "Failed to clear internal device cache");
             }
         }
 
@@ -135,29 +159,6 @@ namespace Shiny.BluetoothLE.Internals
 
     }
 }
-
-//public void RefreshServices()
-//{
-//    if (this.Gatt == null) //|| !this.CentralContext.Configuration.AndroidRefreshServices)
-//        return;
-
-//    // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
-//    try
-//    {
-//        Log.Write(BleLogCategory.Device, "Try to clear Android cache");
-//        var method = this.Gatt.Class.GetMethod("refresh");
-//        if (method != null)
-//        {
-//            var result = (bool)method.Invoke(this.Gatt);
-//            Log.Write(BleLogCategory.Device, "Cache result = " + result);
-//        }
-//    }
-//    catch (Exception ex)
-//    {
-//        Log.Write(BleLogCategory.Device, "Failed to refresh services - " + ex);
-//    }
-//}
-
 
 //bool running;
 //async void ProcessQueue()

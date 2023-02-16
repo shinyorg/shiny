@@ -136,6 +136,7 @@ public class Peripheral : AbstractPeripheral,
                     ob.OnError
                 );
 
+            this.Context.RefreshServices();
             this.Context.Gatt!.DiscoverServices();
             return sub;
         }));
