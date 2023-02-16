@@ -88,6 +88,7 @@ public class PushManager : NotifyPropertyChanged,
 
     public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
+#if ANDROID
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             var access = await this.platform
@@ -97,7 +98,7 @@ public class PushManager : NotifyPropertyChanged,
             if (access != AccessState.Available)
                 return PushAccessState.Denied;
         }
-        
+#endif
         this.NativeToken = await this.RequestNativeToken();
         this.RegistrationToken = await this.provider.Register(this.NativeToken); // never null on firebase
 
