@@ -106,13 +106,13 @@ public class GeofenceManagerImpl : IGeofenceManager
         (await this.RequestAccess()).Assert();
         var native = region.ToNative();
 
-        var tcs = new TaskCompletionSource();
+        var tcs = new TaskCompletionSource<object?>();
         this.platform.InvokeOnMainThread(() =>
         {
             try
             {
                 this.locationManager.StartMonitoring(native);
-                tcs.SetResult();
+                tcs.SetResult(null);
             }
             catch (Exception ex)
             {

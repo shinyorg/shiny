@@ -167,7 +167,8 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
                 .ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
-            using var stream = response.Content.ReadAsStream(this.cts.Token);
+            using var stream = await response.Content.ReadAsStreamAsync(this.cts.Token);
+            //using var stream = response.Content.ReadAsStream(this.cts.Token);
 
             this.BytesToTransfer = response.Content.Headers.ContentLength ?? 0;
             var read = stream.Read(buffer, 0, buffer.Length);

@@ -87,7 +87,7 @@ public class PushManager : NotifyPropertyChanged,
 
     public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
-        if (OperatingSystem.IsAndroidVersionAtLeast(33))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             var access = await this.platform
                 .RequestAccess(AndroidPermissions.PostNotifications)
