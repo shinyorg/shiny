@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -68,7 +67,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
     {
         await this.platform
             .RequestFilteredPermissions(new AndroidPermission(
-                Android.Manifest.Permission.PostNotifications,
+                AndroidPermissions.PostNotifications,
                 33,
                 null
             ))

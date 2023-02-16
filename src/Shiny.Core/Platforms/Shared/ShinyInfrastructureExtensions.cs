@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Hosting;
-using Shiny.Net;
-using Shiny.Power;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
 
