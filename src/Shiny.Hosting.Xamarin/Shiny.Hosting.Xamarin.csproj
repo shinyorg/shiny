@@ -7,10 +7,4 @@
     <ItemGroup>
         <PackageReference Include="Xamarin.Forms" Version="5.0.0.2515" />
     </ItemGroup>
-    <ItemGroup>
-      <Compile Remove="ShinyContainer.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <None Include="ShinyContainer.cs" />
-    </ItemGroup>
 </Project>

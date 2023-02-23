@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
-using Shiny.Infrastructure.Impl;
+﻿using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
 

@@ -1,5 +1,4 @@
-﻿using Shiny.Infrastructure.Impl;
-using Shiny.Stores;
+﻿using Shiny.Stores;
 using Shiny.Stores.Impl;
 
 namespace Shiny.Tests.Core.Stores;

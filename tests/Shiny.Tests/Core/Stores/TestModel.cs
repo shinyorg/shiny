@@ -12,14 +12,14 @@ public class TestModel : IStoreEntity
 
 public class TestModelStore : IStoreConverter<TestModel>
 {
-    public TestModel FromStore(IDictionary<string, object> values) => new TestModel
+    public TestModel FromStore(IDictionary<string, object> values, ISerializer serializer) => new TestModel
     {
         Identifier = (string)values[nameof(TestModel.Identifier)],
         IntValue = Convert.ToInt32(values[nameof(TestModel.IntValue)]),
     };
 
 
-    public IEnumerable<(string Property, object Value)> ToStore(TestModel entity)
+    public IEnumerable<(string Property, object Value)> ToStore(TestModel entity, ISerializer serializer)
     {
         yield return (nameof(TestModel.Identifier), entity.Identifier);
         yield return (nameof(TestModel.IntValue), entity.IntValue);

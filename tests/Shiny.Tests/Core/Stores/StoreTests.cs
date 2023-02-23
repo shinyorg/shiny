@@ -1,4 +1,3 @@
-using Shiny.Infrastructure.Impl;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
 
