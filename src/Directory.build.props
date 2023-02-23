@@ -26,7 +26,7 @@
     <PropertyGroup>
         <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>
         <!--<UseMSBuild>false</UseMSBuild>-->
-        
+
         <StandardTargetFrameworks>net7.0</StandardTargetFrameworks>
         <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);netstandard2.1</StandardTargetFrameworks>
 
@@ -95,7 +95,7 @@
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
-    
+
     <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
         <IsWebAssembly>true</IsWebAssembly>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Android;
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
@@ -90,12 +91,17 @@ public class PushManager : NotifyPropertyChanged,
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             var access = await this.platform
-                .RequestAccess(AndroidPermissions.PostNotifications)
+#if NET7_0_OR_GREATER
+                .RequestAccess(Manifest.Permission.PostNotifications)
+#else
+                .RequestAccess("android.permission.POST_NOTIFICATIONS")
+#endif
                 .ToTask(cancelToken);
 
             if (access != AccessState.Available)
                 return PushAccessState.Denied;
         }
+
         this.NativeToken = await this.RequestNativeToken();
         this.RegistrationToken = await this.provider.Register(this.NativeToken); // never null on firebase
 
@@ -138,7 +144,7 @@ public class PushManager : NotifyPropertyChanged,
             .ConfigureAwait(false);
     }
 
-    
+
     async Task<string> RequestNativeToken()
     {
         this.DoInit();
