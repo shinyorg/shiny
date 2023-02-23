@@ -68,7 +68,11 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
     {
         await this.platform
             .RequestFilteredPermissions(new AndroidPermission(
+#if NET7_0_OR_GREATER
                 Android.Manifest.Permission.PostNotifications,
+#else
+                "android.permission.POST_NOTIFICATIONS",
+#endif
                 33,
                 null
             ))
@@ -92,7 +96,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
     public Task CancelAll()
     {
         foreach (HttpTransfer transfer in this.Transfers)
-            transfer.Cancel();        
+            transfer.Cancel();
 
         this.transfers.Clear();
         this.repository.Clear();
@@ -105,7 +109,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
         var ht = this.Get(identifier);
 
         if (ht != null)
-        { 
+        {
             ht.Cancel();
             this.transfers.Remove(ht);
         }

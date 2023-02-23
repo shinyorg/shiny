@@ -42,7 +42,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         private set => this.Set(ref this.status, value);
     }
 
-    
+
     long bytesXfer;
     public long BytesTransferred
     {
@@ -122,7 +122,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 
     internal async Task Resume()
     {
-        
+
         if (this.Request.IsUpload)
             await this.Upload();
         else
@@ -132,7 +132,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
 
     public async Task Download(CancellationToken cancelToken)
     {
-        
+
         this.cts = new();
         var buffer = new byte[8192];
         var request = this.GetRequest();
@@ -167,7 +167,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
                 .ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
-            using var stream = response.Content.ReadAsStream(this.cts.Token);
+            using var stream = await response.Content.ReadAsStreamAsync(); //.ReadAsStream(this.cts.Token);
 
             this.BytesToTransfer = response.Content.Headers.ContentLength ?? 0;
             var read = stream.Read(buffer, 0, buffer.Length);
@@ -215,7 +215,7 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
             var response = await this.httpClient.SendAsync(request).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-            // TODO: on complete            
+            // TODO: on complete
         }
         catch (TaskCanceledException) { }
         catch (HttpRequestException ex)
@@ -240,9 +240,10 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         );
 
         if (this.Request.Headers != null)
+        {
             foreach (var header in this.Request.Headers)
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-
+        }
         // TODO: allow content type?
         if (!this.Request.PostData.IsEmpty())
             request.Content = new StringContent(this.Request.PostData!);
