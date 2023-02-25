@@ -4,6 +4,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android;
 using Android.Content;
+using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Locations;
 using Shiny.Stores;
@@ -20,6 +21,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
     readonly IRepository<Notification> repository;
     readonly IGeofenceManager geofenceManager;
     readonly IKeyValueStore settings;
+    readonly ILogger logger;
 
 
     public NotificationManager(
@@ -29,7 +31,8 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         IRepository<Notification> repository,
         IChannelManager channelManager,
         IGeofenceManager geofenceManager,
-        IKeyValueStoreFactory keystore
+        IKeyValueStoreFactory keystore,
+        ILogger<NotificationManager> logger
     )
     {
         this.processor = services.GetLazyService<AndroidNotificationProcessor>();
@@ -39,6 +42,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         this.channelManager = channelManager;
         this.geofenceManager = geofenceManager;
         this.settings = keystore.DefaultStore;
+        this.logger = logger;
     }
 
 
@@ -183,7 +187,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         }
         catch (Exception ex)
         {
-            
+            this.logger.LogError(ex, "Error trying to process intent");
         }
     }
 }

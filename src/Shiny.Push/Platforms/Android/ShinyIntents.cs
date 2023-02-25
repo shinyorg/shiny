@@ -1,7 +1,6 @@
-﻿namespace Shiny.Push
+﻿namespace Shiny.Push;
+
+public static class ShinyIntents
 {
-    public static class ShinyIntents
-    {
-        public const string NotificationClickAction = "SHINY_NOTIFICATION_CLICK";
-    }
+    public const string NotificationClickAction = "SHINY_NOTIFICATION_CLICK";
 }

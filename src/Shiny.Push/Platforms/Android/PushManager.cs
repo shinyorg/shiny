@@ -119,7 +119,7 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    public async void Handle(Activity activity, Intent intent)
+    public void Handle(Activity activity, Intent intent)
     {
         var clickAction = intent?.Action?.Equals(ShinyIntents.NotificationClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false;
         if (!clickAction)
@@ -137,11 +137,11 @@ public class PushManager : NotifyPropertyChanged,
                     dict.Add(key, value);
             }
         }
-        // TODO: can I extract the notification here?
+        // can I extract the notification here?
         var data = new PushNotification(dict, null);
-        await this.services
+        this.services
             .RunDelegates<IPushDelegate>(x => x.OnEntry(data))
-            .ConfigureAwait(false);
+            .ContinueWith(x => this.logger.LogInformation("Finished executing push delegates"));
     }
 
 
