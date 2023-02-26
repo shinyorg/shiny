@@ -180,7 +180,11 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
             }
 
             this.Status = HttpTransferState.Completed;
-            await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(this));
+            await this.services.RunDelegates<IHttpTransferDelegate>(
+                x => x.OnCompleted(this),
+                null // TODO
+                //this.logger
+            );
         }
         catch (TaskCanceledException) { }
         catch (HttpRequestException ex)
@@ -192,7 +196,11 @@ class HttpTransfer : NotifyPropertyChanged, IHttpTransfer
         catch (Exception ex)
         {
             this.Status = HttpTransferState.Error;
-            await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(this, ex));
+            await this.services.RunDelegates<IHttpTransferDelegate>(
+                x => x.OnError(this, ex),
+                null // TODO
+                //this.logger
+            );
         }
         finally
         {

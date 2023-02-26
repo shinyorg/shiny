@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using CoreLocation;
+using Microsoft.Extensions.Logging;
 using Shiny.Locations;
 using Shiny.Stores;
 
@@ -17,10 +18,14 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     readonly BeaconLocationManagerDelegate gdelegate;
 
 
-    public BeaconMonitoringManager(IServiceProvider services, IRepository<BeaconRegion> repository)
+    public BeaconMonitoringManager(
+        IServiceProvider services,
+        ILogger<BeaconLocationManagerDelegate> logger,
+        IRepository<BeaconRegion> repository
+    )
     {
         this.repository = repository;
-        this.gdelegate = new BeaconLocationManagerDelegate(services);
+        this.gdelegate = new BeaconLocationManagerDelegate(services, logger);
         this.manager = new CLLocationManager
         {
             Delegate = this.gdelegate
@@ -65,5 +70,5 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     }
 
     public IList<BeaconRegion> GetMonitoredRegions()
-        => repository.GetList();
+        => this.repository.GetList();
 }

@@ -7,6 +7,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using CoreLocation;
+using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 using UIKit;
 
@@ -18,18 +19,21 @@ public class GeofenceManagerImpl : IGeofenceManager
     readonly CLLocationManager locationManager;
     readonly IPlatform platform;
     readonly IServiceProvider services;
+    readonly ILogger logger;
     readonly IRepository<GeofenceRegion> repository;
 
 
     public GeofenceManagerImpl(
         IPlatform platform,
         IServiceProvider services,
-        IRepository<GeofenceRegion> repository
+        IRepository<GeofenceRegion> repository,
+        ILogger<GeofenceManagerImpl> logger
     )
     {
         this.platform = platform;
         this.services = services;
         this.repository = repository;
+        this.logger = logger;
         this.locationManager = new CLLocationManager
         {
             Delegate = new GeofenceManagerDelegate(this)
@@ -55,7 +59,10 @@ public class GeofenceManagerImpl : IGeofenceManager
             {
                 var status = entered ? GeofenceState.Entered : GeofenceState.Exited;
                 await this.services
-                    .RunDelegates<IGeofenceDelegate>(x => x.OnStatusChanged(status, geofence))
+                    .RunDelegates<IGeofenceDelegate>(
+                        x => x.OnStatusChanged(status, geofence),
+                        this.logger
+                    )
                     .ConfigureAwait(false);
 
                 if (geofence.SingleUse)

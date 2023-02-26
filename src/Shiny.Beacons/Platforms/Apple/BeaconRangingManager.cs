@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using CoreLocation;
+using Microsoft.Extensions.Logging;
 using Shiny.Locations;
 
 namespace Shiny.Beacons;
@@ -14,9 +15,9 @@ public class BeaconRangingManager : IBeaconRangingManager
     readonly BeaconLocationManagerDelegate gdelegate;
 
 
-    public BeaconRangingManager(IServiceProvider services)
+    public BeaconRangingManager(IServiceProvider services, ILogger<BeaconLocationManagerDelegate> logger)
     {
-        this.gdelegate = new BeaconLocationManagerDelegate(services);
+        this.gdelegate = new BeaconLocationManagerDelegate(services, logger);
         this.manager = new CLLocationManager
         {
             Delegate = this.gdelegate

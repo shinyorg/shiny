@@ -90,7 +90,10 @@ public class PushManager : NotifyPropertyChanged,
             {
                 this.RegistrationToken = result.RegistrationToken;
                 await this.services
-                    .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(result.RegistrationToken!))
+                    .RunDelegates<IPushDelegate>(x =>
+                        x.OnTokenRefreshed(result.RegistrationToken!),
+                        this.logger
+                    )
                     .ConfigureAwait(false);
             }
         }
@@ -166,7 +169,12 @@ public class PushManager : NotifyPropertyChanged,
     {
         var dict = userInfo.FromNsDictionary();
         var data = new PushNotification(dict, null);
-        await this.services.RunDelegates<IPushDelegate>(x => x.OnReceived(data)).ConfigureAwait(false);
+        await this.services
+            .RunDelegates<IPushDelegate>(
+                x => x.OnReceived(data),
+                this.logger
+            )
+            .ConfigureAwait(false);
         completionHandler.Invoke(UIBackgroundFetchResult.NewData);
     }
 
@@ -187,7 +195,12 @@ public class PushManager : NotifyPropertyChanged,
 
         var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
         var data = new PushNotification(dict, notification);
-        await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(data)).ConfigureAwait(false);
+        await this.services
+            .RunDelegates<IPushDelegate>(
+                x => x.OnEntry(data),
+                this.logger
+            )
+            .ConfigureAwait(false);
 
         completionHandler();
     }
@@ -212,7 +225,10 @@ public class PushManager : NotifyPropertyChanged,
         }
         var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
         this.services
-            .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
+            .RunDelegates<IPushDelegate>(
+                x => x.OnReceived(push),
+                this.logger
+            )
             .ContinueWith(x =>
             {
                 if (x.Exception != null)

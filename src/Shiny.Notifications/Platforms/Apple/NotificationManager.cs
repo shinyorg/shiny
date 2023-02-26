@@ -9,6 +9,7 @@ using UserNotifications;
 using CoreLocation;
 using Shiny.Hosting;
 using Shiny.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Notifications;
 
@@ -18,6 +19,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
     readonly IosConfiguration configuration;
     readonly IPlatform platform;
+    readonly ILogger logger;
     readonly IChannelManager channelManager;
     readonly IKeyValueStore settings;
 
@@ -25,6 +27,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     public NotificationManager(
         IosConfiguration configuration,
         IServiceProvider services,
+        ILogger<NotificationManager> logger,
         IPlatform platform,
         IChannelManager channelManager,
         IKeyValueStoreFactory keystore
@@ -32,6 +35,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     {
         this.configuration = configuration;
         this.delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
+        this.logger = logger;
         this.platform = platform;
         this.channelManager = channelManager;
         this.settings = keystore.DefaultStore;
@@ -327,7 +331,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             var shiny = response.FromNative();
             await this.delegates
                 .Value
-                .RunDelegates(x => x.OnEntry(shiny))
+                .RunDelegates(x => x.OnEntry(shiny), this.logger)
                 .ConfigureAwait(false);
 
             completionHandler.Invoke();

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Shiny.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Shiny.Locations;
 using Shiny.Stores;
 
@@ -21,6 +21,7 @@ public class AndroidNotificationProcessor
     readonly IGeofenceManager geofenceManager;
     readonly IRepository<Notification> repository;
     readonly ISerializer serializer;
+    readonly ILogger logger;
     readonly IEnumerable<INotificationDelegate> delegates;
 
 
@@ -29,6 +30,7 @@ public class AndroidNotificationProcessor
         IGeofenceManager geofenceManager,
         IRepository<Notification> repository,
         ISerializer serializer,
+        ILogger<AndroidNotificationProcessor> logger,
         IEnumerable<INotificationDelegate> delegates
     )
     {
@@ -36,6 +38,7 @@ public class AndroidNotificationProcessor
         this.geofenceManager = geofenceManager;
         this.repository = repository;
         this.serializer = serializer;
+        this.logger = logger;
         this.delegates = delegates;
     }
 
@@ -59,7 +62,12 @@ public class AndroidNotificationProcessor
             var response = new NotificationResponse(notification, action, text);
 
             // the notification lives within the intent since it has already been removed from the repo
-            await this.delegates.RunDelegates(x => x.OnEntry(response)).ConfigureAwait(false);
+            await this.delegates
+                .RunDelegates(
+                    x => x.OnEntry(response),
+                    this.logger
+                )
+                .ConfigureAwait(false);
 
             this.notificationManager.NativeManager.Cancel(notification.Id);
         }

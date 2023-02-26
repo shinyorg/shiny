@@ -308,7 +308,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
             // TODO: should thread safety collection
             this.transfers.Remove(ht);
-            await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht));            
+            await this.services.RunDelegates<IHttpTransferDelegate>(
+                x => x.OnCompleted(ht),
+                this.logger
+            );
         }
     }
 

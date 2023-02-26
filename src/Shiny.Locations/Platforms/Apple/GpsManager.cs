@@ -39,7 +39,7 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
         var reading = locations.Last().FromNative();
         await this.delegates
             .Value
-            .RunDelegates(x => x.OnReading(reading))
+            .RunDelegates(x => x.OnReading(reading), this.logger)
             .ConfigureAwait(false);
 
         this.readingSubj.OnNext(reading);

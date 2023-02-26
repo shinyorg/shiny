@@ -86,7 +86,10 @@ public class ManagerContext : CBCentralManagerDelegate
             var item = peripheralArray.GetItem<CBPeripheral>(i);
             var peripheral = this.GetPeripheral(item);
             await this.Services
-                .RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral))
+                .RunDelegates<IBleDelegate>(
+                    x => x.OnConnected(peripheral),
+                    this.logger
+                )
                 .ConfigureAwait(false);
         }
         // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
@@ -97,7 +100,7 @@ public class ManagerContext : CBCentralManagerDelegate
     public override async void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
     {
         var p = this.GetPeripheral(peripheral);
-        await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(p));
+        await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(p), this.logger);
         this.PeripheralConnected.OnNext(peripheral);
     }
 
@@ -131,6 +134,9 @@ public class ManagerContext : CBCentralManagerDelegate
             return;
 
         this.StateUpdated.OnNext(state);
-        await this.Services.RunDelegates<IBleDelegate>(x => x.OnAdapterStateChanged(state));
+        await this.Services.RunDelegates<IBleDelegate>(
+            x => x.OnAdapterStateChanged(state),
+            this.logger
+        );
     }
 }

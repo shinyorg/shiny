@@ -22,7 +22,8 @@ public class ShinyGpsService : ShinyAndroidForegroundService<IGpsManager, IGpsDe
             .WhenReading()
             .SubscribeAsync(
                 reading => this.Delegates!.RunDelegates(
-                    x => x.OnReading(reading)
+                    x => x.OnReading(reading),
+                    this.Logger
                 )
             )
             .DisposedBy(this.DestroyWith!);

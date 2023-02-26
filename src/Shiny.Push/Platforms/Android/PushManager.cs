@@ -57,7 +57,10 @@ public class PushManager : NotifyPropertyChanged,
             {
                 this.RegistrationToken = regToken;
                 await this.services
-                    .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(regToken))
+                    .RunDelegates<IPushDelegate>(
+                        x => x.OnTokenRefreshed(regToken),
+                        this.logger
+                    )
                     .ConfigureAwait(false);
             }
         }
@@ -140,7 +143,10 @@ public class PushManager : NotifyPropertyChanged,
         // can I extract the notification here?
         var data = new PushNotification(dict, null);
         this.services
-            .RunDelegates<IPushDelegate>(x => x.OnEntry(data))
+            .RunDelegates<IPushDelegate>(
+                x => x.OnEntry(data),
+                this.logger
+            )
             .ContinueWith(x => this.logger.LogInformation("Finished executing push delegates"));
     }
 
@@ -182,7 +188,10 @@ public class PushManager : NotifyPropertyChanged,
         ShinyFirebaseService.NewToken = async token =>
         {
             await this.services
-                .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(token))
+                .RunDelegates<IPushDelegate>(
+                    x => x.OnTokenRefreshed(token),
+                    this.logger
+                )
                 .ConfigureAwait(false);
         };
 
@@ -205,7 +214,10 @@ public class PushManager : NotifyPropertyChanged,
                 }
                 var push = new PushNotification(msg.Data, notification);
                 await this.services
-                    .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
+                    .RunDelegates<IPushDelegate>(
+                        x => x.OnReceived(push),
+                        this.logger
+                    )
                     .ConfigureAwait(false);
             }
             catch (Exception ex)

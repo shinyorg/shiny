@@ -66,7 +66,7 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
                         await this.services
                             .RunDelegates<IGeofenceDelegate>(
                                 x => x.OnStatusChanged(state, region),
-                                ex => this.logger.LogError($"Error in geofence delegate - Region: {region.Identifier} State: {state}")
+                                this.logger
                             )
                             .ConfigureAwait(false);
                     }

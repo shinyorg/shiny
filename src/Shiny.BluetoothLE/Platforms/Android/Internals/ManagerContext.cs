@@ -69,7 +69,12 @@ public class ManagerContext : IShinyStartupTask
                 x != State.TurningOff
             )
             .Select(x => x.FromNative())
-            .SubscribeAsync(status => this.Services.RunDelegates<IBleDelegate>(del => del.OnAdapterStateChanged(status)));
+            .SubscribeAsync(status =>
+                this.Services.RunDelegates<IBleDelegate>(
+                    del => del.OnAdapterStateChanged(status),
+                    this.logger
+                )
+            );
     }
 
 
@@ -95,7 +100,10 @@ public class ManagerContext : IShinyStartupTask
             if (intent.Action?.Equals(BluetoothDevice.ActionAclConnected) ?? false)
             {
                 await this.Services
-                    .RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral))
+                    .RunDelegates<IBleDelegate>(
+                        x => x.OnConnected(peripheral),
+                        this.logger
+                    )
                     .ConfigureAwait(false);
             }
             this.peripheralSubject.OnNext((intent, peripheral));

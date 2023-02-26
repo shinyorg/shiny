@@ -159,7 +159,8 @@ public class BackgroundTask : IDisposable
                         {
                             await this.delegates
                                 .RunDelegates(
-                                    x => x.OnStatusChanged(BeaconRegionState.Entered, state.Region)
+                                    x => x.OnStatusChanged(BeaconRegionState.Entered, state.Region),
+                                    this.logger
                                 )
                                 .ConfigureAwait(false);
                         }
@@ -181,7 +182,8 @@ public class BackgroundTask : IDisposable
                             x => x.OnStatusChanged(
                                 BeaconRegionState.Exited,
                                 state.Region
-                            )
+                            ),
+                            this.logger
                         )
                         .ConfigureAwait(false);
                 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reactive.Subjects;
 using CoreLocation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Beacons;
 
@@ -8,13 +10,15 @@ namespace Shiny.Beacons;
 public class BeaconLocationManagerDelegate : ShinyLocationDelegate
 {
     readonly IServiceProvider services;
-    readonly Subject<Beacon> rangeSubject;
+    readonly ILogger logger;
+    readonly Subject<Beacon> rangeSubject = new();
+    
 
 
-    public BeaconLocationManagerDelegate(IServiceProvider services)
+    public BeaconLocationManagerDelegate(IServiceProvider services, ILogger<BeaconLocationManagerDelegate> logger)
     {
         this.services = services;
-        this.rangeSubject = new Subject<Beacon>();
+        this.logger = logger;
     }
 
 
@@ -25,7 +29,7 @@ public class BeaconLocationManagerDelegate : ShinyLocationDelegate
         {
             this.rangeSubject.OnNext(new Beacon
             (
-                native.ProximityUuid.ToGuid(),
+                native.ProximityUuid!.ToGuid(),
                 native.Major.UInt16Value,
                 native.Minor.UInt16Value,
                 native.Proximity.FromNative(),
@@ -46,12 +50,13 @@ public class BeaconLocationManagerDelegate : ShinyLocationDelegate
         {
             var beaconRegion = new BeaconRegion(
                 native.Identifier,
-                native.ProximityUuid.ToGuid(),
+                native.ProximityUuid!.ToGuid(),
                 native.Major?.UInt16Value,
                 native.Minor?.UInt16Value
             );
             await this.services.RunDelegates<IBeaconMonitorDelegate>(
-                x => x.OnStatusChanged(status, beaconRegion)
+                x => x.OnStatusChanged(status, beaconRegion),
+                this.logger
             );
         }
     }
