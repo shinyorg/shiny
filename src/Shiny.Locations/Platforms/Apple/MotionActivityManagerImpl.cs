@@ -96,14 +96,16 @@ public class MotionActivityManagerImpl : IMotionActivityManager
                     }
                     else
                     {
+                        this.activityManager.StopActivityUpdates();
                         this.activityManager.StartActivityUpdates(
-                            NSOperationQueue.CurrentQueue,
+                            NSOperationQueue.MainQueue,
                             e => ob.OnNext(ToEvent(e))
                         );
                     }
                 });
                 return () => this.activityManager.StopActivityUpdates();
             })
+            .DistinctUntilChanged(x => (x.Types, x.Confidence))
             .Publish()
             .RefCount();
 
