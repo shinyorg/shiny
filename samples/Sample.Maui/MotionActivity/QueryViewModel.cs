@@ -33,7 +33,7 @@ public class QueryViewModel : ViewModel
                 })
                 .ToList();
 
-            this.EventCount = this.Events.Count;
+            this.EventCount = activities.Count;
         });
     }
 
@@ -45,23 +45,27 @@ public class QueryViewModel : ViewModel
         this.activityManager?
             .WhenActivityChanged()
             .SubOnMainThread(
-                x => this.CurrentActivity = $"({x.Confidence}) {x.Types}",
-                ex => { } // TODO
+                x =>
+                {
+                    this.CurrentActivity = $"({x.Confidence}) {x.Types}";
+                },
+                async ex => await this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK")
             )
             .DisposedBy(this.DestroyWith);
 
         this.WhenAnyProperty(x => x.Date)
+            .Skip(1)
             .DistinctUntilChanged()
             .Subscribe(_ => this.Load.Execute(null))
             .DisposedBy(this.DestroyWith);
 
-        return base.InitializeAsync(parameters);
+        return Task.CompletedTask;
     }
 
 
     public ICommand Load { get; }
     [Reactive] public DateTime Date { get; set; } = DateTime.Now;
     [Reactive] public int EventCount { get; private set; }
-    [Reactive] public string CurrentActivity { get; private set; }
+    [Reactive] public string CurrentActivity { get; private set; } = "None";
     [Reactive] public IList<CommandItem> Events { get; private set; }
 }

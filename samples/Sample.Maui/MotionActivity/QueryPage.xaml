@@ -17,7 +17,7 @@
 
             <Frame BorderColor="LemonChiffon"
                    BackgroundColor="LemonChiffon">
-                <Label Text="{Binding CurrentActivity}"
+                <Label Text="{Binding CurrentActivity, StringFormat='Current Activity: {0}'}"
                        TextColor="Black" />
             </Frame>
 
@@ -39,29 +39,26 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <RefreshView IsRefreshing="{Binding IsBusy}"
-                         Command="{Binding Load}"
-                         Grid.Row="1">
-                <CollectionView ItemsSource="{Binding Events}">
+            <CollectionView ItemsSource="{Binding Events}"
+                            Grid.Row="2">
 
-                    <CollectionView.EmptyView>
-                        <Label Text="No Events Found"
-                               Style="{StaticResource NoDataLabel}" />
-                    </CollectionView.EmptyView>
+                <CollectionView.EmptyView>
+                    <Label Text="No Events Found"
+                            Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <StackLayout x:DataType="sample1:CommandItem">
-                                <Label Text="{Binding Text}" FontSize="Title" />
-                                <Label Text="{Binding Detail}" FontSize="Subtitle" />
-                                <BoxView HeightRequest="1"
-                                         BackgroundColor="Black"
-                                         HorizontalOptions="CenterAndExpand" />
-                            </StackLayout>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </RefreshView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout x:DataType="sample1:CommandItem">
+                            <Label Text="{Binding Text}" FontSize="Title" />
+                            <Label Text="{Binding Detail}" FontSize="Subtitle" />
+                            <BoxView HeightRequest="1"
+                                        BackgroundColor="Black"
+                                        HorizontalOptions="CenterAndExpand" />
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
