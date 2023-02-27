@@ -24,7 +24,7 @@
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		<!--<RuntimeIdentifier Condition="'$(Configuration)' == 'Debug'">iossimulator-x64</RuntimeIdentifier>-->
+		<!--<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>-->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
