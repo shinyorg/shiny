@@ -14,15 +14,16 @@ public static class MotionActivityExtensions
     /// <param name="activity"></param>
     /// <param name="maxAge">Timespan containing max age of "current"</param>
     /// <returns></returns>
-    public static async Task<MotionActivityEvent> GetCurrentActivity(this IMotionActivityManager activity, TimeSpan? maxAge = null)
+    public static async Task<MotionActivityEvent?> GetCurrentActivity(this IMotionActivityManager activity, TimeSpan? maxAge = null)
     {
-        maxAge = maxAge ?? TimeSpan.FromMinutes(120);
+        maxAge = maxAge ?? TimeSpan.FromSeconds(30);
         var end = DateTimeOffset.UtcNow;
         var start = end.Subtract(maxAge.Value);
         var result = (await activity.Query(start, end))
             .Where(x => x.Types != MotionActivityType.Unknown)
             .OrderByDescending(x => x.Timestamp)
             .FirstOrDefault();
+
         return result;
     }
 
@@ -107,8 +108,9 @@ public static class MotionActivityExtensions
     public static async Task<bool> IsCurrentActivity(this IMotionActivityManager activity, MotionActivityType type, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
     {
         var result = await activity.GetCurrentActivity(maxAge);
-        //if (result == default(MotionActivityEvent))
-            //return false;
+        if (result == null)
+            return false;
+
         if (result.Confidence < minConfidence)
             return false;
 
@@ -136,6 +138,39 @@ public static class MotionActivityExtensions
     /// <returns></returns>
     public static Task<bool> IsCurrentStationary(this IMotionActivityManager activity, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
         => activity.IsCurrentActivity(MotionActivityType.Stationary, maxAge, minConfidence);
+
+
+    /// <summary>
+    /// Queries if most recent activity is cycling
+    /// </summary>
+    /// <param name="activity"></param>
+    /// <param name="maxAge"></param>
+    /// <param name="minConfidence"></param>
+    /// <returns></returns>
+    public static Task<bool> IsCurrentCycling(this IMotionActivityManager activity, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        => activity.IsCurrentActivity(MotionActivityType.Cycling, maxAge, minConfidence);
+
+
+    /// <summary>
+    /// Queries if most recent activity is running
+    /// </summary>
+    /// <param name="activity"></param>
+    /// <param name="maxAge"></param>
+    /// <param name="minConfidence"></param>
+    /// <returns></returns>
+    public static Task<bool> IsCurrentRunning(this IMotionActivityManager activity, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        => activity.IsCurrentActivity(MotionActivityType.Running, maxAge, minConfidence);
+
+
+    /// <summary>
+    /// Queries if most recent activity is walking
+    /// </summary>
+    /// <param name="activity"></param>
+    /// <param name="maxAge"></param>
+    /// <param name="minConfidence"></param>
+    /// <returns></returns>
+    public static Task<bool> IsCurrentWalking(this IMotionActivityManager activity, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        => activity.IsCurrentActivity(MotionActivityType.Walking, maxAge, minConfidence);
 
 
     /// <summary>

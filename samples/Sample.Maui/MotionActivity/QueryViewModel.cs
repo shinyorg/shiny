@@ -38,16 +38,17 @@ public class QueryViewModel : ViewModel
     }
 
 
-    public override Task InitializeAsync(INavigationParameters parameters)
+    public override async Task InitializeAsync(INavigationParameters parameters)
     {
         this.Load.Execute(null);
 
         this.activityManager?
             .WhenActivityChanged()
             .SubOnMainThread(
-                x =>
+                async x =>
                 {
                     this.CurrentActivity = $"({x.Confidence}) {x.Types}";
+                    await this.SetChecks();
                 },
                 async ex => await this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK")
             )
@@ -59,7 +60,7 @@ public class QueryViewModel : ViewModel
             .Subscribe(_ => this.Load.Execute(null))
             .DisposedBy(this.DestroyWith);
 
-        return Task.CompletedTask;
+        await this.SetChecks();
     }
 
 
@@ -68,4 +69,31 @@ public class QueryViewModel : ViewModel
     [Reactive] public int EventCount { get; private set; }
     [Reactive] public string CurrentActivity { get; private set; } = "None";
     [Reactive] public IList<CommandItem> Events { get; private set; }
+
+    [Reactive] public bool IsAutomotive { get; private set; }
+    [Reactive] public bool IsCycling { get; private set; }
+    [Reactive] public bool IsRunning { get; private set; }
+    [Reactive] public bool IsWalking { get; private set; }
+    [Reactive] public bool IsStationary { get; private set; }
+
+    async Task SetChecks()
+    {
+        await Task.WhenAll(
+            this.DoCheck(MotionActivityType.Automotive, x => this.IsAutomotive = x),
+            this.DoCheck(MotionActivityType.Cycling, x => this.IsCycling = x),
+            this.DoCheck(MotionActivityType.Running, x => this.IsRunning = x),
+            this.DoCheck(MotionActivityType.Walking, x => this.IsWalking = x),
+            this.DoCheck(MotionActivityType.Stationary, x => this.IsStationary = x)
+        );
+    }
+
+    async Task DoCheck(MotionActivityType type, Action<bool> setter)
+    {
+        var result = await this.activityManager.IsCurrentActivity(
+            type,
+            TimeSpan.FromSeconds(30),
+            MotionActivityConfidence.Low
+        );
+        setter(result);
+    }
 }
