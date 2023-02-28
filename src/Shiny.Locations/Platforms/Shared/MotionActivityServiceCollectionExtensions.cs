@@ -14,6 +14,9 @@ public static class MotionActivityServiceCollectionExtensions
     /// <returns></returns>
      public static IServiceCollection AddMotionActivity(this IServiceCollection services)
     {
+        if (services.HasService<IMotionActivityManager>())
+            return services;
+
 #if ANDROID
         services.AddSingleton<AndroidSqliteDatabase>();
 #endif
