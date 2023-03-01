@@ -30,10 +30,10 @@ public static class GpsServiceCollectionExtensions
             .Instance
             .IsGooglePlayServicesAvailable(Application.Context);
 
-        if (resultCode == ConnectionResult.ServiceMissing)
-            services.AddShinyService<LocationServicesGpsManagerImpl>();
-        else
+        if (resultCode == ConnectionResult.Success)
             services.AddShinyService<GooglePlayServiceGpsManagerImpl>();
+        else
+            services.AddShinyService<LocationServicesGpsManagerImpl>();
 
 #elif APPLE
         services.TryAddSingleton<AppleLocationConfiguration>();
