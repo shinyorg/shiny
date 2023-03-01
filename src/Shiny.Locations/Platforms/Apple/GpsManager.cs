@@ -98,10 +98,15 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
         set
         {
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
-            if (bg == GpsBackgroundMode.None)
-                this.request = value;
-            else
+            if (bg != GpsBackgroundMode.None)
+            {
                 this.Set(ref this.request, value);
+            }
+            else
+            {
+                this.Set(ref this.request, null);
+                this.request = value;
+            }
         }
     }
 
