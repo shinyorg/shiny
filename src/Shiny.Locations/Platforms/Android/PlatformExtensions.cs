@@ -1,4 +1,5 @@
 ﻿using System;
+using Android.Gms.Location;
 using Android.Locations;
 using LocationRequest = Android.Gms.Location.LocationRequest;
 
@@ -27,36 +28,35 @@ static class PlatformExtensions
         {
             case GpsAccuracy.Lowest:
                 nativeRequest
-                    .SetPriority(LocationRequest.PriorityLowPower)
+                    .SetPriority(Priority.PriorityLowPower)
                     .SetInterval(1000 * 120) // 2 mins
                     .SetSmallestDisplacement(3000);
                 break;
 
             case GpsAccuracy.Low:
                 nativeRequest
-                    .SetPriority(LocationRequest.PriorityLowPower)
+                    .SetPriority(Priority.PriorityLowPower)
                     .SetInterval(1000 * 60) // 1 min
                     .SetSmallestDisplacement(1000);
                 break;
 
             case GpsAccuracy.Normal:
                 nativeRequest
-                    .SetPriority(LocationRequest.PriorityBalancedPowerAccuracy)
+                    .SetPriority(Priority.PriorityBalancedPowerAccuracy)
                     .SetInterval(1000 * 30) // 30 seconds
                     .SetSmallestDisplacement(100);
                 break;
 
             case GpsAccuracy.High:
                 nativeRequest
-                    .SetPriority(LocationRequest.PriorityHighAccuracy)
+                    .SetPriority(Priority.PriorityHighAccuracy)
                     .SetInterval(1000 * 10) // 10 seconds
                     .SetSmallestDisplacement(10);
                 break;
 
             case GpsAccuracy.Highest:
-                nativeRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
                 nativeRequest
-                    .SetPriority(LocationRequest.PriorityHighAccuracy)
+                    .SetPriority(Priority.PriorityHighAccuracy)
                     .SetInterval(1000) // every second
                     .SetSmallestDisplacement(1);
 
