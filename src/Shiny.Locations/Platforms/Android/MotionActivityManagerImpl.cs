@@ -124,7 +124,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
                 .ToTask()
                 .ConfigureAwait(false);
 
-            if (result == AccessState.Available)
+            if (result == AccessState.Available && !this.IsStarted)
             {
                 await this.client
                     .RequestActivityUpdatesAsync(
@@ -132,10 +132,21 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
                         this.GetPendingIntent()
                     )
                     .ConfigureAwait(false);
+
+                this.IsStarted = true;
             }
         }
-        this.IsStarted = result == AccessState.Available;
+        else if (!this.IsStarted)
+        {
+            await this.client
+                .RequestActivityUpdatesAsync(
+                    Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                    this.GetPendingIntent()
+                )
+                .ConfigureAwait(false);
 
+            this.IsStarted = true;
+        }
         return result;
     }
 
