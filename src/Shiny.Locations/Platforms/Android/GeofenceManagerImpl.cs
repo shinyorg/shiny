@@ -8,6 +8,8 @@ using Android.App;
 using Android.Gms.Location;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
+using P = Android.Manifest.Permission;
+using System.Reactive.Threading.Tasks;
 
 namespace Shiny.Locations;
 
@@ -79,8 +81,19 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     }
 
 
-    public Task<AccessState> RequestAccess()
-        => this.platform.RequestBackgroundLocationAccess(LocationPermissionType.FineRequired);
+    public async Task<AccessState> RequestAccess()
+    {
+        var status = AccessState.Denied;
+        var result = await this.platform.RequestPermissions(P.AccessCoarseLocation, P.AccessFineLocation).ToTask();
+        if (result.IsSuccess())
+        {
+            status = AccessState.Available;
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+                status = await this.platform.RequestAccess(P.AccessBackgroundLocation);
+        }
+
+        return status;
+    }        
 
 
     public IList<GeofenceRegion> GetMonitorRegions()

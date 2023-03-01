@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Android.Content;
+using Android.Locations;
 using Microsoft.Extensions.Logging;
+using P = Android.Manifest.Permission;
 
 namespace Shiny.Locations;
 
@@ -51,10 +57,15 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         set
         {
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
-            if (bg == GpsBackgroundMode.None)
-                this.request = value;
-            else
+            if (bg != GpsBackgroundMode.None)
+            {
                 this.Set(ref this.request, value);
+            }
+            else
+            {
+                this.Set(ref this.request, null); // don't track across app restarts
+                this.request = value;
+            }
         }
     }
 
@@ -62,24 +73,49 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
         var status = AccessState.Denied;
-        var type = request.Accuracy > GpsAccuracy.Low
-            ? LocationPermissionType.Fine
-            : LocationPermissionType.Coarse;
+        var requestBg = false;
+        var permissionSet = new List<string> { P.AccessCoarseLocation };
+        if (request.Accuracy > GpsAccuracy.Low)
+            permissionSet.Add(P.AccessFineLocation);
 
         switch (request.BackgroundMode)
         {
-            case GpsBackgroundMode.None:
-                status = await this.Platform.RequestLocationAccess(type);
-                break;
-
             case GpsBackgroundMode.Standard:
-                status = await this.Platform.RequestBackgroundLocationAccess(type);
+                requestBg = OperatingSystemShim.IsAndroidVersionAtLeast(29);
                 break;
 
             case GpsBackgroundMode.Realtime:
-                status = await this.Platform.RequestBackgroundLocationAccess(LocationPermissionType.Fine);
+                if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+                    permissionSet.Add(P.ForegroundService);
+
+                if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+                    permissionSet.Add(AndroidPermissions.PostNotifications);
                 break;
         }
+
+        var result = await this.Platform.RequestPermissions(permissionSet.ToArray()).ToTask();
+        if (result.IsGranted(P.AccessCoarseLocation))
+        {
+            status = AccessState.Available;
+
+            if (permissionSet.Contains(P.AccessFineLocation) && !result.IsGranted(P.AccessFineLocation))
+            {
+                status = AccessState.Restricted;
+            }
+
+            if (requestBg)
+            {
+                // bg permission must be requested independently from others
+                var bgResult = await this.Platform.RequestAccess(P.AccessBackgroundLocation).ToTask();
+                if (bgResult != AccessState.Available)
+                    status = AccessState.Restricted;
+            }
+
+            if (permissionSet.Contains(AndroidPermissions.PostNotifications) && !result.IsGranted(AndroidPermissions.PostNotifications))
+                status = AccessState.Denied; // without post notifications, foreground service will fail
+        }
+
+        //if (this.Platform.GetSystemService<LocationManager>(Context.LocationService)!.IsLocationEnabled)
         return status;
     }
 

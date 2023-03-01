@@ -91,7 +91,7 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
 
     public void StartService(Type serviceType)
     {
-        //ActionServiceStart
+        // TODO: need POST_NOTIFICATIONS permission on Android
         var intent = new Intent(this.AppContext, serviceType);
         if (OperatingSystemShim.IsAndroidVersionAtLeast(26) && this.IsShinyForegroundService(serviceType))
         {

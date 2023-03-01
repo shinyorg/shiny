@@ -94,11 +94,7 @@ public class PushManager : NotifyPropertyChanged,
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             var access = await this.platform
-#if NET7_0_OR_GREATER
-                .RequestAccess(Manifest.Permission.PostNotifications)
-#else
-                .RequestAccess("android.permission.POST_NOTIFICATIONS")
-#endif
+                .RequestAccess(AndroidPermissions.PostNotifications)
                 .ToTask(cancelToken);
 
             if (access != AccessState.Available)

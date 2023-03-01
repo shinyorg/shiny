@@ -16,11 +16,10 @@ public static class MotionActivityExtensions
     /// <returns></returns>
     public static async Task<MotionActivityEvent?> GetCurrentActivity(this IMotionActivityManager activity, TimeSpan? maxAge = null)
     {
-        maxAge = maxAge ?? TimeSpan.FromSeconds(30);
-        var end = DateTimeOffset.UtcNow;
+        maxAge = maxAge ?? TimeSpan.FromMinutes(3);
+        var end = DateTimeOffset.UtcNow.AddSeconds(20); // build a slight buffer around "now"
         var start = end.Subtract(maxAge.Value);
         var result = (await activity.Query(start, end))
-            .Where(x => x.Types != MotionActivityType.Unknown)
             .OrderByDescending(x => x.Timestamp)
             .FirstOrDefault();
 

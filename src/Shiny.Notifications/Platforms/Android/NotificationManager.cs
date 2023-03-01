@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Locations;
 using Shiny.Stores;
+using P = Android.Manifest.Permission;
 
 namespace Shiny.Notifications;
 
@@ -92,24 +93,39 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
 
     public async Task<AccessState> RequestAccess(AccessRequestFlags access)
     {
-        if (!this.manager.NativeManager.AreNotificationsEnabled())
-            return AccessState.Disabled;
+        var list = new List<string>();
+
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+            list.Add(AndroidPermissions.PostNotifications); // required
+
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31) && access.HasFlag(AccessRequestFlags.TimeSensitivity))
+            list.Add(P.ScheduleExactAlarm); // if denied, restricted
+
+        if (access.HasFlag(AccessRequestFlags.LocationAware))
+            list.AddRange(new[] { P.AccessCoarseLocation, P.AccessFineLocation }); // required, along with access bg
+        
+        var result = await this.platform.RequestPermissions(list.ToArray()).ToTask();
+        if (list.Contains(AndroidPermissions.PostNotifications) && !result.IsGranted(AndroidPermissions.PostNotifications))
+            return AccessState.Denied;
 
         if (access.HasFlag(AccessRequestFlags.LocationAware))
         {
-            var locPermission = await this.geofenceManager.RequestAccess();
-            if (locPermission != AccessState.Available)
-                return AccessState.Restricted;
-        }
-        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && OperatingSystemShim.IsAndroidVersionAtLeast(31))
-        {
-            var schedulePermission = await this.platform
-                .RequestPermissions(Manifest.Permission.ScheduleExactAlarm)
-                .ToTask();
+            if (!result.IsGranted(P.AccessFineLocation))
+                return AccessState.Denied;
 
-            if (!schedulePermission.IsSuccess())
-                return AccessState.Restricted;
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            {
+                var bgResult = await this.platform.RequestAccess(P.AccessBackgroundLocation).ToTask();
+                if (bgResult != AccessState.Available)
+                    return AccessState.Denied;
+            }
         }
+
+        if (!this.manager.NativeManager.AreNotificationsEnabled())
+            return AccessState.Disabled;
+
+        if (list.Contains(P.ScheduleExactAlarm) && !result.IsGranted(P.ScheduleExactAlarm))
+            return AccessState.Restricted;
 
         return AccessState.Available;
     }

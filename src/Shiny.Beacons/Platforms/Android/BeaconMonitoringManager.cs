@@ -5,9 +5,8 @@ using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
 using Shiny.Stores;
 using System.Linq;
-#if ANDROID
 using Shiny.Locations;
-#endif
+using P = Android.Manifest.Permission;
 
 namespace Shiny.Beacons;
 
@@ -16,24 +15,18 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 {
     readonly IRepository<BeaconRegion> repository;
     readonly IBleManager bleManager;
-#if ANDROID
     readonly AndroidPlatform platform;
-#endif
 
 
     public BeaconMonitoringManager(
         IBleManager bleManager,
-        IRepository<BeaconRegion> repository
-#if ANDROID
-       , AndroidPlatform platform
-#endif
+        IRepository<BeaconRegion> repository,
+        AndroidPlatform platform
     )
     {
         this.bleManager = bleManager;
         this.repository = repository;
-#if ANDROID
         this.platform = platform;
-#endif
     }
 
 
@@ -47,12 +40,8 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public async Task StartMonitoring(BeaconRegion region)
     {
-#if ANDROID
-        await this.bleManager
-            .RequestAccess()
-            .ToTask()
-            .ConfigureAwait(false);
-#endif
+        (await this.RequestAccess()).Assert();
+
         this.repository.Set(region);
         this.StartService();
     }
@@ -82,22 +71,23 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public async Task<AccessState> RequestAccess()
     {
-        // TODO: fix permission check for iOS
-#if ANDROID
         var access = await this.bleManager
             .RequestAccess()
             .ToTask()
             .ConfigureAwait(false);
 
-        await this.platform.RequestLocationAccess(LocationPermissionType.Fine);
-        if ((access == AccessState.Available && access == AccessState.Restricted) && OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        if (access == AccessState.Available)
         {
-            access = await this.platform
-                .RequestAccess(Android.Manifest.Permission.ForegroundService)
-                .ToTask()
-                .ConfigureAwait(false);
+            var result = await this.platform
+                .RequestFilteredPermissions(
+                    new(P.ForegroundService, 29, null),
+                    new(AndroidPermissions.PostNotifications, 33, null)
+                )
+                .ToTask();
+
+            if (!result.IsSuccess())
+                access = AccessState.Denied;
         }
-#endif
         return access;
     }
 
@@ -108,19 +98,15 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     void StartService()
     {
-#if ANDROID
-        if (!ShinyBeaconMonitoringService.IsStarted)
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(29) && !ShinyBeaconMonitoringService.IsStarted)
             this.platform.StartService(typeof(ShinyBeaconMonitoringService));
-#endif
     }
 
 
     void StopService()
     {
-#if ANDROID
-        if (ShinyBeaconMonitoringService.IsStarted)
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(29) && ShinyBeaconMonitoringService.IsStarted)
             this.platform.StopService(typeof(ShinyBeaconMonitoringService));
-#endif
     }
 }
 
