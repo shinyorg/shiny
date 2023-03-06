@@ -76,7 +76,7 @@
         <DefineConstants>$(DefineConstants);ANDROID;PLATFORM</DefineConstants>
     </PropertyGroup>
 
-   <PropertyGroup Condition="$(TargetFramework.Contains('xamarin.ios'))">
+    <PropertyGroup Condition="$(TargetFramework.Contains('xamarin.ios'))">
         <IsIosBuild>true</IsIosBuild>
         <IsClassicTarget>true</IsClassicTarget>
         <DefineConstants>$(DefineConstants);IOS;APPLE;PLATFORM;XAMARIN</DefineConstants>
