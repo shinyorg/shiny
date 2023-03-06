@@ -119,7 +119,7 @@ public class BleManager : AbstractBleManager, ICanViewPairedPeripherals
         return new[]
         {
             Manifest.Permission.Bluetooth,
-            Manifest.Permission.BluetoothPrivileged,
+            //Manifest.Permission.BluetoothPrivileged,
             Manifest.Permission.BluetoothAdmin,
             Manifest.Permission.AccessFineLocation
         };
