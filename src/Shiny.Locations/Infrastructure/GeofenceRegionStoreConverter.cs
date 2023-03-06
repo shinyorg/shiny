@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Shiny.Stores;
 
 namespace Shiny.Locations.Infrastructure;
@@ -10,20 +11,21 @@ public class GeofenceRegionStoreConverter : IStoreConverter<GeofenceRegion>
     const string LongitudeKey = "CenterLongitude";
 
 
-    public GeofenceRegion FromStore(IDictionary<string, object> values, ISerializer serializer) => new GeofenceRegion(
-        (string)values[nameof(GeofenceRegion.Identifier)],
-        new Position(
-            (double)values[LatitudeKey],
-            (double)values[LongitudeKey]
-        ),
-        Distance.FromKilometers((double)values[nameof(GeofenceRegion.Radius)])
-    )
+    public GeofenceRegion FromStore(IDictionary<string, object> values, ISerializer serializer)
     {
-        NotifyOnEntry = (bool)values[nameof(GeofenceRegion.NotifyOnEntry)],
-        NotifyOnExit = (bool)values[nameof(GeofenceRegion.NotifyOnExit)],
-        SingleUse = (bool)values[nameof(GeofenceRegion.SingleUse)]
-    };
+        var id = (string)values[nameof(GeofenceRegion.Identifier)];
+        var lat = (double)values[LatitudeKey];
+        var lng = (double)values[LongitudeKey];
+        var radiusKm = Convert.ToDouble(values[nameof(GeofenceRegion.Radius)]);
+        var dist = Distance.FromKilometers(radiusKm);
 
+        var region = new GeofenceRegion(id, new Position(lat, lng), dist);
+        region.NotifyOnEntry = (bool)values[nameof(GeofenceRegion.NotifyOnEntry)];
+        region.NotifyOnExit = (bool)values[nameof(GeofenceRegion.NotifyOnExit)];
+        region.SingleUse = (bool)values[nameof(GeofenceRegion.SingleUse)];
+
+        return region;
+    }
 
     public IEnumerable<(string Property, object Value)> ToStore(GeofenceRegion entity, ISerializer serializer)
     {
