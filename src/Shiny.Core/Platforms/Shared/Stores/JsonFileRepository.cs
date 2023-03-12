@@ -4,9 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Subjects;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Shiny.Infrastructure;
 
 namespace Shiny.Stores.Impl;
 
@@ -17,16 +14,20 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
 {
     readonly Subject<(RepositoryAction Action, TEntity? Entity)> repoSubj = new();
     readonly TStoreConverter converter = new();
-
-    readonly IPlatform platform;
     readonly ISerializer serializer;
+    readonly DirectoryInfo rootDir;
 
 
-    public JsonFileRepository(IPlatform platform, ISerializer serializer)
+    public JsonFileRepository(IPlatform platform, ISerializer serializer) // : this(platform.AppData.FullName, serializer) {}
     {
-        this.platform = platform;
         this.serializer = serializer;
+        this.rootDir = platform.AppData;
     }
+
+    //public JsonFileRepository(string basePath, ISerializer serializer)
+    //{
+
+    //}
 
 
     public bool Exists(string key)
@@ -113,13 +114,13 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
     public IObservable<(RepositoryAction Action, TEntity? Entity)> WhenActionOccurs() => this.repoSubj;
 
 
-    FileInfo[] GetFiles() => this.platform.AppData.GetFiles($"{typeof(TEntity).Name}_*.shiny");
+    FileInfo[] GetFiles() => this.rootDir.GetFiles($"{typeof(TEntity).Name}_*.shiny");
 
 
     string GetPath(string key)
     {
         var fileName = $"{typeof(TEntity).Name}_{key}.shiny";
-        var path = Path.Combine(this.platform.AppData.FullName, fileName);
+        var path = Path.Combine(this.rootDir.FullName, fileName);
         return path;
     }
 
