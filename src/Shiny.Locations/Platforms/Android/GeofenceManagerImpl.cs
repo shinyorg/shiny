@@ -45,39 +45,46 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     public async void Start()
     {
-        GeofenceBroadcastReceiver.Process = async e =>
+        try
         {
-            if (e.HasError)
+            GeofenceBroadcastReceiver.Process = async e =>
             {
-                var err = GeofenceStatusCodes.GetStatusCodeString(e.ErrorCode);
-                this.logger.LogWarning("Geofence OS error - " + err);
-            }
-            else if (e.TriggeringGeofences != null)
-            {
-                foreach (var triggeringGeofence in e.TriggeringGeofences)
+                if (e.HasError)
                 {
-                    var state = (GeofenceState)e.GeofenceTransition;
-                    var region = this.repository.Get(triggeringGeofence.RequestId);
+                    var err = GeofenceStatusCodes.GetStatusCodeString(e.ErrorCode);
+                    this.logger.LogWarning("Geofence OS error - " + err);
+                }
+                else if (e.TriggeringGeofences != null)
+                {
+                    foreach (var triggeringGeofence in e.TriggeringGeofences)
+                    {
+                        var state = (GeofenceState)e.GeofenceTransition;
+                        var region = this.repository.Get(triggeringGeofence.RequestId);
 
-                    if (region == null)
-                    {
-                        this.logger.LogWarning("Geofence reported by OS not found in Shiny Repository - RequestID: " + triggeringGeofence.RequestId);
-                    }
-                    else
-                    {
-                        await this.services
-                            .RunDelegates<IGeofenceDelegate>(
-                                x => x.OnStatusChanged(state, region),
-                                this.logger
-                            )
-                            .ConfigureAwait(false);
+                        if (region == null)
+                        {
+                            this.logger.LogWarning("Geofence reported by OS not found in Shiny Repository - RequestID: " + triggeringGeofence.RequestId);
+                        }
+                        else
+                        {
+                            await this.services
+                                .RunDelegates<IGeofenceDelegate>(
+                                    x => x.OnStatusChanged(state, region),
+                                    this.logger
+                                )
+                                .ConfigureAwait(false);
+                        }
                     }
                 }
-            }
-        };
-        var regions = this.repository.GetList();
-        foreach (var region in regions)
-            await this.Create(region);
+            };
+            var regions = this.repository.GetList();
+            foreach (var region in regions)
+                await this.Create(region);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Failed to restart geofencing");
+        }
     }
 
 
