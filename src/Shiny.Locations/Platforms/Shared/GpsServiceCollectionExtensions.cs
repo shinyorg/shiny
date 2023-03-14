@@ -36,7 +36,6 @@ public static class GpsServiceCollectionExtensions
             services.AddShinyService<LocationServicesGpsManagerImpl>();
 
 #elif APPLE
-        services.TryAddSingleton<AppleLocationConfiguration>();
         services.AddShinyService<GpsManager>();
 #endif
         return services;

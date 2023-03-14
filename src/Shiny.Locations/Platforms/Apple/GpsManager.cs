@@ -18,16 +18,10 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
     readonly Lazy<IEnumerable<IGpsDelegate>> delegates;
     readonly CLLocationManager locationManager;
     readonly ILogger logger;
-    readonly AppleLocationConfiguration config;
 
 
-    public GpsManager(
-        IServiceProvider services,
-        ILogger<IGpsManager> logger,
-        AppleLocationConfiguration config
-    )
+    public GpsManager(IServiceProvider services, ILogger<IGpsManager> logger)
     {
-        this.config = config;
         this.delegates = services.GetLazyService<IEnumerable<IGpsDelegate>>();
         this.logger = logger;
         this.locationManager = new CLLocationManager { Delegate = new GpsManagerDelegate(this) };
@@ -91,24 +85,27 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
         => this.locationManager.GetCurrentStatus(request.BackgroundMode != GpsBackgroundMode.None);
 
 
-    GpsRequest? request;
-    public GpsRequest? CurrentListener
+    AppleGpsRequest? currentSettings;
+    public AppleGpsRequest? CurrentSettings
     {
-        get => this.request;
+        get => this.currentSettings;
         set
         {
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
             if (bg != GpsBackgroundMode.None)
             {
-                this.Set(ref this.request, value);
+                this.Set(ref this.currentSettings, value);
             }
             else
             {
-                this.Set(ref this.request, null);
-                this.request = value;
+                this.Set(ref this.currentSettings, null);
+                this.currentSettings = value;
             }
         }
     }
+
+
+    public GpsRequest? CurrentListener => this.currentSettings;
 
 
     public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async ct =>
@@ -134,7 +131,7 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
     {
         this.locationManager.AllowsBackgroundLocationUpdates = false;
         this.locationManager.StopUpdatingLocation();
-        this.CurrentListener = null;
+        this.CurrentSettings = null;
 
         return Task.CompletedTask;
     }
@@ -170,13 +167,27 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
                 this.locationManager.DesiredAccuracy = CLLocation.AccuracyThreeKilometers;
                 break;
         }
-        if (this.config.ActivityType != null)
-            this.locationManager.ActivityType = this.config.ActivityType.Value;
 
         var bg = request.BackgroundMode != GpsBackgroundMode.None;
-        this.locationManager.ShowsBackgroundLocationIndicator = bg && this.config.ShowsBackgroundLocationIndicator;
-        this.locationManager.AllowsBackgroundLocationUpdates = bg;
+        if (request is AppleGpsRequest appleRequest)
+        {
+            this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
+            this.locationManager.ShowsBackgroundLocationIndicator = bg && appleRequest.ShowsBackgroundLocationIndicator;
+
+            if (appleRequest.ActivityType != null)
+                this.locationManager.ActivityType = appleRequest.ActivityType.Value;
+
+            this.CurrentSettings = appleRequest;
+        }
+        else
+        {
+            this.CurrentSettings = new AppleGpsRequest(
+                BackgroundMode: request.BackgroundMode,
+                Accuracy: request.Accuracy
+            );
+        }
+        //this.locationManager.ShouldDisplayHeadingCalibration = true;
+        //this.locationManager.AllowDeferredLocationUpdatesUntil
         this.locationManager.StartUpdatingLocation();
-        this.CurrentListener = request;
     }
 }
