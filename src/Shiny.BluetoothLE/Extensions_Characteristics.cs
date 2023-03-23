@@ -67,7 +67,10 @@ public static class CharacteristicExtensions
             .EnableNotifications(true, useIndicationsIfAvailable)
             .Select(_ => characteristic.WhenNotificationReceived())
             .Switch()
-            .Finally(() => characteristic.EnableNotifications(false).Subscribe());
+            .Finally(() => characteristic.EnableNotifications(false).Subscribe(
+                _ => { },
+                _ => { } // swallow
+            ));
 
 
     /// <summary>
