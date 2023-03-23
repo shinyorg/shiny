@@ -15,6 +15,8 @@ namespace Shiny.Locations;
 public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
 {
     public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromSeconds(10);
+    public static TimeSpan OldEventPurgeTime { get; set; } = TimeSpan.FromDays(60);
+
     public const string IntentAction = ReceiverName + ".INTENT_ACTION";
     public const string ReceiverName = "com.shiny.locations." + nameof(MotionActivityBroadcastReceiver);
     public static int HighConfidenceValue { get; set; } = 70;
@@ -87,7 +89,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
             }
             var confidence = ToConfidence(result.MostProbableActivity.Confidence);
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            // DELETE FROM motion_activity WHERE Timestamp < DateTimeOffset.UtcNow.AddDays(-30).Ticks
+            
             await this.database
                 .ExecuteNonQuery(
                     $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
@@ -98,12 +100,17 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
         {
             try
             {
+                // TODO
+                //this.client.RequestActivityTransitionUpdates()
                 await this.client
                     .RequestActivityUpdatesAsync(
                         Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
                         this.GetPendingIntent()
                     )
                     .ConfigureAwait(false);
+
+                var last = DateTimeOffset.UtcNow.Subtract(OldEventPurgeTime);
+                await this.database.ExecuteNonQuery("DELETE FROM motion_activity WHERE Timestamp < " + last.Ticks);
             }
             catch (Exception ex)
             {
