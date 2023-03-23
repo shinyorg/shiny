@@ -149,10 +149,6 @@ public static class MauiProgram
         s.RegisterForNavigation<Stores.BasicPage, Stores.BasicViewModel>("SettingsBasic");
         s.RegisterForNavigation<Stores.BindPage, Stores.BindViewModel>("SettingsBind");
 
-        // platform
-        s.RegisterForNavigation<Platform.ConnectivityPage, Platform.ConnectivityViewModel>("Connectivity");
-        s.RegisterForNavigation<Platform.BatteryPage, Platform.BatteryViewModel>("Battery");
-
         s.RegisterForNavigation<MainPage, MainViewModel>();
         s.RegisterForNavigation<LogsPage, LogsViewModel>();
 
