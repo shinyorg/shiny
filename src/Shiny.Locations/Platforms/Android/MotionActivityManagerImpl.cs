@@ -14,7 +14,7 @@ namespace Shiny.Locations;
 
 public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
 {
-    public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromSeconds(10);
+    public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromMinutes(1);
     public static TimeSpan OldEventPurgeTime { get; set; } = TimeSpan.FromDays(60);
 
     public const string IntentAction = ReceiverName + ".INTENT_ACTION";
@@ -57,64 +57,28 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
             MotionActivityManagerImpl.IntentAction,
             Intent.ActionBootCompleted
         );
-        MotionActivityBroadcastReceiver.Process = async result =>
-        {
-            var type = MotionActivityType.Unknown;
 
-            foreach (var activity in result.ProbableActivities)
-            {
-                switch (activity.Type)
-                {
-                    case DetectedActivity.InVehicle:
-                        type |= MotionActivityType.Automotive;
-                        break;
 
-                    case DetectedActivity.OnBicycle:
-                        type |= MotionActivityType.Cycling;
-                        break;
-
-                    case DetectedActivity.OnFoot:
-                    case DetectedActivity.Walking:
-                        type |= MotionActivityType.Walking;
-                        break;
-
-                    case DetectedActivity.Running:
-                        type |= MotionActivityType.Running;
-                        break;
-
-                    case DetectedActivity.Still:
-                        type |= MotionActivityType.Stationary;
-                        break;
-                }
-            }
-            var confidence = ToConfidence(result.MostProbableActivity.Confidence);
-            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            
-            await this.database
-                .ExecuteNonQuery(
-                    $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
-                )
-                .ConfigureAwait(false);
-        };
         if (this.IsStarted)
         {
             try
             {
-                // TODO
-                //this.client.RequestActivityTransitionUpdates()
-                await this.client
-                    .RequestActivityUpdatesAsync(
-                        Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
-                        this.GetPendingIntent()
-                    )
-                    .ConfigureAwait(false);
-
-                var last = DateTimeOffset.UtcNow.Subtract(OldEventPurgeTime);
-                await this.database.ExecuteNonQuery("DELETE FROM motion_activity WHERE Timestamp < " + last.Ticks);
+                await this.StartActivityMonitor();
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Error restarting motion activity logging");
+            }
+
+            try
+            {
+                var last = DateTimeOffset.UtcNow.Subtract(OldEventPurgeTime);
+                var sql = "DELETE FROM motion_activity WHERE Timestamp < " + last.ToUnixTimeSeconds();
+                await this.database.ExecuteNonQuery(sql);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to purge old motion activity events");
             }
         }
     }
@@ -133,25 +97,13 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
 
             if (result == AccessState.Available && !this.IsStarted)
             {
-                await this.client
-                    .RequestActivityUpdatesAsync(
-                        Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
-                        this.GetPendingIntent()
-                    )
-                    .ConfigureAwait(false);
-
+                await this.StartActivityMonitor();
                 this.IsStarted = true;
             }
         }
         else if (!this.IsStarted)
         {
-            await this.client
-                .RequestActivityUpdatesAsync(
-                    Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
-                    this.GetPendingIntent()
-                )
-                .ConfigureAwait(false);
-
+            await this.StartActivityMonitor();
             this.IsStarted = true;
         }
         return result;
@@ -162,18 +114,20 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
     {
         (await this.RequestAccess().ConfigureAwait(false)).Assert();
 
-        var st = start.ToUnixTimeSeconds();
-        var et = (end ?? DateTimeOffset.UtcNow).ToUnixTimeSeconds();
-        var sql = $@"SELECT 
-    Confidence, 
-    Event, 
-    Timestamp 
-FROM 
-    motion_activity 
-WHERE
-    Timestamp > {st} AND Timestamp < {et}
-ORDER BY 
-    Timestamp DESC";
+        var st = start.ToUnixTimeSeconds().ToString();
+        var et = (end ?? DateTimeOffset.UtcNow).ToUnixTimeSeconds().ToString();
+        var sql = $$"""
+            SELECT 
+                Confidence, 
+                Event, 
+                Timestamp 
+            FROM 
+                motion_activity 
+            WHERE
+                Timestamp > ? AND Timestamp < ?
+            ORDER BY 
+                Timestamp DESC
+            """;
 
         return await this.database
             .RawQuery(
@@ -190,7 +144,9 @@ ORDER BY
                         (MotionActivityConfidence)confidence,
                         dt
                     );
-                }
+                },
+                st,
+                et
             )
             .ConfigureAwait(false);
     }
@@ -201,6 +157,115 @@ ORDER BY
 
     protected virtual PendingIntent GetPendingIntent()
         => this.pendingIntent ??= this.platform.GetBroadcastPendingIntent<MotionActivityBroadcastReceiver>(IntentAction, PendingIntentFlags.UpdateCurrent);
+
+
+    //protected virtual async Task StartActivityMonitor()
+    //{
+
+    //    MotionActivityBroadcastReceiver.ProcessTransition = async result =>
+    //    {
+    //        foreach (var e in result.TransitionEvents)
+    //        {
+    //            //e.ActivityType
+    //        }
+    //        //e.TransitionType == ActivityTransition.ActivityTransitionEnter // don't care
+    //        //e.ActivityType = DetectedActivity.InVehicle
+    //        //        await this.database
+    //        //            .ExecuteNonQuery(
+    //        //                $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
+    //        //            )
+    //        //            .ConfigureAwait(false);
+    //    };
+
+    //    //e.ElapsedRealTimeNanos
+
+    //    // we only care about enter events since we're tracking all types
+    //    var list = new List<ActivityTransition>
+    //    {
+    //        GetTransition(DetectedActivity.InVehicle),
+    //        GetTransition(DetectedActivity.OnBicycle),
+    //        GetTransition(DetectedActivity.OnFoot),
+    //        GetTransition(DetectedActivity.Running),
+    //        GetTransition(DetectedActivity.Still),
+    //        GetTransition(DetectedActivity.Tilting),
+    //        GetTransition(DetectedActivity.Unknown),
+    //        GetTransition(DetectedActivity.Walking)
+    //    };
+
+    //    // TODO: android task
+    //    this.client.RequestActivityTransitionUpdates(
+    //        new ActivityTransitionRequest(list),
+    //        this.GetPendingIntent()
+    //    );
+    //}
+
+
+    //protected static ActivityTransition GetTransition(int activityType)
+    //    => new ActivityTransition.Builder()
+    //        .SetActivityType(activityType)
+    //        .SetActivityTransition(ActivityTransition.ActivityTransitionEnter)
+    //        .Build();
+
+
+    protected virtual async Task StartActivityMonitor()
+    {
+        MotionActivityBroadcastReceiver.ProcessRecognition = async result =>
+        {
+            var type = result.MostProbableActivity.Type switch
+            {
+                DetectedActivity.InVehicle => MotionActivityType.Automotive,
+                DetectedActivity.OnBicycle => MotionActivityType.Cycling,
+                DetectedActivity.OnFoot => MotionActivityType.Walking,
+                DetectedActivity.Running => MotionActivityType.Running,
+                DetectedActivity.Still => MotionActivityType.Stationary,
+                _ => MotionActivityType.Unknown
+            };
+
+            //foreach (var activity in result.ProbableActivities)
+            //{
+            //    switch (activity.Type)
+            //    {
+            //        case DetectedActivity.InVehicle:
+            //            type |= MotionActivityType.Automotive;
+            //            break;
+
+            //        case DetectedActivity.OnBicycle:
+            //            type |= MotionActivityType.Cycling;
+            //            break;
+
+            //        case DetectedActivity.OnFoot:
+            //        case DetectedActivity.Walking:
+            //            type |= MotionActivityType.Walking;
+            //            break;
+
+            //        case DetectedActivity.Running:
+            //            type |= MotionActivityType.Running;
+            //            break;
+
+            //        case DetectedActivity.Still:
+            //            type |= MotionActivityType.Stationary;
+            //            break;
+            //    }
+            //}
+            //var confidence = ToConfidence(result.MostProbableActivity.Confidence);
+            
+            var confidence = ToConfidence(result.MostProbableActivity.Confidence);
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            await this.database
+                .ExecuteNonQuery(
+                    $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
+                )
+                .ConfigureAwait(false);
+        };
+
+        await this.client
+            .RequestActivityUpdatesAsync(
+                Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                this.GetPendingIntent()
+            )
+            .ConfigureAwait(false);
+    }
 
 
     static MotionActivityConfidence ToConfidence(int value)

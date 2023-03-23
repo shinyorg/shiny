@@ -36,12 +36,12 @@ namespace Shiny
         });
 
 
-        public virtual Task<IList<T>> RawQuery<T>(string sql, Func<ICursor, T> builder) => Task.Run<IList<T>>(() =>
+        public virtual Task<IList<T>> RawQuery<T>(string sql, Func<ICursor, T> builder, params string[] args) => Task.Run<IList<T>>(() =>
         {
             lock (this.syncLock)
             {
                 var list = new List<T>();
-                using (var cursor = this.WritableDatabase.RawQuery(sql, null))
+                using (var cursor = this.WritableDatabase.RawQuery(sql, args))
                 {
                     while (cursor.MoveToNext())
                     {
