@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Android.Content;
-using Android.Locations;
 using Microsoft.Extensions.Logging;
 using P = Android.Manifest.Permission;
 
