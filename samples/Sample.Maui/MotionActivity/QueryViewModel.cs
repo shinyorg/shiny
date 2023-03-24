@@ -14,6 +14,7 @@ public class QueryViewModel : ViewModel
 
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
+            Console.WriteLine("Loading");
             var result = await this.activityManager.RequestAccess();
 
             if (result != AccessState.Available)
@@ -30,7 +31,7 @@ public class QueryViewModel : ViewModel
                 .Select(x => new CommandItem
                 {
                     Text = Stringify(x),
-                    Detail = $"{x.Timestamp.LocalDateTime}"
+                    Detail = x.Timestamp.LocalDateTime.ToString("dddd, MMM dd - hh:mm:ss tt")
                 })
                 .ToList();
 
@@ -41,8 +42,6 @@ public class QueryViewModel : ViewModel
 
     public override async Task InitializeAsync(INavigationParameters parameters)
     {
-        this.Load.Execute(null);
-
         this.activityManager?
             .WhenActivityChanged()
             .Where(_ => this.IsRealTime)
@@ -52,6 +51,18 @@ public class QueryViewModel : ViewModel
             )
             .DisposedBy(this.DestroyWith);
 
+        this.WhenAnyValue(x => x.IsRealTime)
+            .Skip(1)
+            .Subscribe(value =>
+            {
+                if (value)
+                    this.Date = DateTime.Now;
+
+                this.Load.Execute(null);
+            })
+            .DisposedBy(this.DestroyWith);
+
+
         this.WhenAnyProperty(x => x.Date)
             .Skip(1)
             .DistinctUntilChanged()
@@ -60,17 +71,23 @@ public class QueryViewModel : ViewModel
     }
 
 
+    public override void OnAppearing()
+    {
+        base.OnAppearing();
+        this.Load.Execute(null);
+    }
+
     public ICommand Load { get; }
     [Reactive] public DateTime Date { get; set; } = DateTime.Now;
     [Reactive] public int EventCount { get; private set; }
     [Reactive] public IList<CommandItem> Events { get; private set; }
-    [Reactive] public bool IsRealTime { get; set; }
+    [Reactive] public bool IsRealTime { get; set; } = true;
 
 
     static string Stringify(MotionActivityEvent e)
     {
         if (e.IsUnknown)
-            return "Unkonwn";
+            return "Unknown";
 
         var s = "";
         for (var i = 0; i < e.DetectedActivities.Count; i++)
