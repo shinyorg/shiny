@@ -105,7 +105,6 @@ public class MotionActivityManagerImpl : IMotionActivityManager
                 });
                 return () => this.activityManager.StopActivityUpdates();
             })
-            .DistinctUntilChanged(x => (x.Types, x.Confidence))
             .Publish()
             .RefCount();
 
@@ -113,30 +112,34 @@ public class MotionActivityManagerImpl : IMotionActivityManager
     }
 
 
-    static MotionActivityEvent ToEvent(CMMotionActivity target)
+    protected static MotionActivityEvent ToEvent(CMMotionActivity target)
     {
-        var flags = MotionActivityType.Unknown;
+        var conf = (MotionActivityConfidence)Enum.Parse(typeof(MotionActivityConfidence), target.Confidence.ToString(), true);
+        var list = new List<DetectedMotionActivity>();
+
         if (!target.Unknown)
         {
-            flags &= MotionActivityType.Unknown;
             if (target.Automotive)
-                flags |= MotionActivityType.Automotive;
+                list.Add(new(MotionActivityType.Automotive, conf));
 
             if (target.Cycling)
-                flags |= MotionActivityType.Cycling;
+                list.Add(new(MotionActivityType.Cycling, conf));
 
             if (target.Running)
-                flags |= MotionActivityType.Running;
-
-            if (target.Stationary)
-                flags |= MotionActivityType.Stationary;
+                list.Add(new(MotionActivityType.Running, conf));
 
             if (target.Walking)
-                flags |= MotionActivityType.Walking;
+                list.Add(new(MotionActivityType.Automotive, conf));
+
+            if (target.Stationary)
+                list.Add(new(MotionActivityType.Stationary, conf));
         }
 
-        var conf = (MotionActivityConfidence)Enum.Parse(typeof(MotionActivityConfidence), target.Confidence.ToString(), true);
-        var activity = new MotionActivityEvent(flags, conf, (DateTime)target.StartDate);
+        var activity = new MotionActivityEvent(
+            list,
+            list.FirstOrDefault(),
+            (DateTime)target.StartDate
+        );
         return activity;
     }
 }

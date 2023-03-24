@@ -1,29 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Shiny.Locations;
 
 
-public class MotionActivityEvent
+public enum MotionActivityType
 {
-    public MotionActivityEvent(MotionActivityType types, MotionActivityConfidence confidence, DateTimeOffset timestamp)
-    {
-        this.Types = types;
-        this.Confidence = confidence;
-        this.Timestamp = timestamp;
-    }
+    Stationary = 1,
+    Walking = 2,
+    Running = 3,
+    Automotive = 4,
+    Cycling = 5
+}
 
-    /// <summary>
-    /// The motion activity type.
-    /// </summary>
-    public MotionActivityType Types { get; }
 
-    /// <summary>
-    /// The confidence of the accuracy.
-    /// </summary>
-    public MotionActivityConfidence Confidence { get; }
+public enum MotionActivityConfidence
+{
+    Low,
+    Medium,
+    High
+}
 
-    /// <summary>
-    /// The time the motion happened.
-    /// </summary>
-    public DateTimeOffset Timestamp { get; }
+
+public record DetectedMotionActivity(
+    MotionActivityType ActivityType,
+    MotionActivityConfidence Confidence
+);
+
+
+public record MotionActivityEvent(
+    IList<DetectedMotionActivity> DetectedActivities,
+    DetectedMotionActivity? MostProbableActivity,
+    DateTimeOffset Timestamp
+)
+{
+    public bool IsUnknown => this.DetectedActivities.Count == 0;
 }

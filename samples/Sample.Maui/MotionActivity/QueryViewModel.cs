@@ -1,6 +1,4 @@
-﻿using System.Reactive.Disposables;
-using Shiny;
-using Shiny.Locations;
+﻿using Shiny.Locations;
 
 namespace Sample.MotionActivity;
 
@@ -8,7 +6,7 @@ namespace Sample.MotionActivity;
 public class QueryViewModel : ViewModel
 {
     readonly IMotionActivityManager activityManager;
-
+    IDisposable? sub;
 
     public QueryViewModel(BaseServices services, IMotionActivityManager activityManager) : base(services)
     {
@@ -23,12 +21,15 @@ public class QueryViewModel : ViewModel
                 await this.Alert("Motion Activity is not available - " + result);
                 return;
             }
-            var activities = await this.activityManager.QueryByDate(this.Date);
+
+            var date = this.IsRealTime ? DateTimeOffset.UtcNow : this.Date;
+            var activities = await this.activityManager.QueryByDate(date);
+
             this.Events = activities
                 .OrderByDescending(x => x.Timestamp)
                 .Select(x => new CommandItem
                 {
-                    Text = $"({x.Confidence}) {x.Types}",
+                    Text = Stringify(x),
                     Detail = $"{x.Timestamp.LocalDateTime}"
                 })
                 .ToList();
@@ -44,12 +45,9 @@ public class QueryViewModel : ViewModel
 
         this.activityManager?
             .WhenActivityChanged()
+            .Where(_ => this.IsRealTime)
             .SubOnMainThread(
-                async x =>
-                {
-                    this.CurrentActivity = $"({x.Confidence}) {x.Types}";
-                    await this.SetChecks();
-                },
+                _ => this.Load.Execute(null),
                 async ex => await this.Dialogs.DisplayAlertAsync("ERROR", ex.ToString(), "OK")
             )
             .DisposedBy(this.DestroyWith);
@@ -59,41 +57,29 @@ public class QueryViewModel : ViewModel
             .DistinctUntilChanged()
             .Subscribe(_ => this.Load.Execute(null))
             .DisposedBy(this.DestroyWith);
-
-        await this.SetChecks();
     }
 
 
     public ICommand Load { get; }
     [Reactive] public DateTime Date { get; set; } = DateTime.Now;
     [Reactive] public int EventCount { get; private set; }
-    [Reactive] public string CurrentActivity { get; private set; } = "None";
     [Reactive] public IList<CommandItem> Events { get; private set; }
+    [Reactive] public bool IsRealTime { get; set; }
 
-    [Reactive] public bool IsAutomotive { get; private set; }
-    [Reactive] public bool IsCycling { get; private set; }
-    [Reactive] public bool IsRunning { get; private set; }
-    [Reactive] public bool IsWalking { get; private set; }
-    [Reactive] public bool IsStationary { get; private set; }
 
-    async Task SetChecks()
+    static string Stringify(MotionActivityEvent e)
     {
-        await Task.WhenAll(
-            this.DoCheck(MotionActivityType.Automotive, x => this.IsAutomotive = x),
-            this.DoCheck(MotionActivityType.Cycling, x => this.IsCycling = x),
-            this.DoCheck(MotionActivityType.Running, x => this.IsRunning = x),
-            this.DoCheck(MotionActivityType.Walking, x => this.IsWalking = x),
-            this.DoCheck(MotionActivityType.Stationary, x => this.IsStationary = x)
-        );
-    }
+        if (e.IsUnknown)
+            return "Unkonwn";
 
-    async Task DoCheck(MotionActivityType type, Action<bool> setter)
-    {
-        var result = await this.activityManager.IsCurrentActivity(
-            type,
-            TimeSpan.FromSeconds(30),
-            MotionActivityConfidence.Low
-        );
-        setter(result);
+        var s = "";
+        for (var i = 0; i < e.DetectedActivities.Count; i++)
+        {
+            if (i > 0) s += ", ";
+
+            var act = e.DetectedActivities[i];
+            s += $"{act.ActivityType} ({act.Confidence})";
+        }
+        return s;
     }
 }

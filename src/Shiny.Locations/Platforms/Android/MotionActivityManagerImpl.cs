@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Database;
 using Android.Gms.Location;
 using Microsoft.Extensions.Logging;
-using static Android.Manifest;
+using static Android.Manifest; 
 
 namespace Shiny.Locations;
 
@@ -16,6 +18,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
 {
     public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromMinutes(1);
     public static TimeSpan OldEventPurgeTime { get; set; } = TimeSpan.FromDays(60);
+    public static bool UseMostProbableResult { get; set; }
 
     public const string IntentAction = ReceiverName + ".INTENT_ACTION";
     public const string ReceiverName = "com.shiny.locations." + nameof(MotionActivityBroadcastReceiver);
@@ -58,7 +61,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
             Intent.ActionBootCompleted
         );
 
-
+        await this.PurgeOldEvents(OldEventPurgeTime);
         if (this.IsStarted)
         {
             try
@@ -68,17 +71,6 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Error restarting motion activity logging");
-            }
-
-            try
-            {
-                var last = DateTimeOffset.UtcNow.Subtract(OldEventPurgeTime);
-                var sql = "DELETE FROM motion_activity WHERE Timestamp < " + last.ToUnixTimeSeconds();
-                await this.database.ExecuteNonQuery(sql);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to purge old motion activity events");
             }
         }
     }
@@ -118,8 +110,11 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
         var et = (end ?? DateTimeOffset.UtcNow).ToUnixTimeSeconds().ToString();
         var sql = $$"""
             SELECT 
-                Confidence, 
-                Event, 
+                AutomotiveConfidence,
+                CyclingConfidence,
+                RunningConfidence,
+                WalkingConfidence,
+                StationaryConfidence,
                 Timestamp 
             FROM 
                 motion_activity 
@@ -134,22 +129,34 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
                 sql,
                 cursor =>
                 {
-                    var confidence = cursor.GetInt(0);
-                    var events = cursor.GetInt(1);
-                    var epochSeconds = cursor.GetLong(2);
+                    var list = new List<DetectedMotionActivity>();
+                    PopulateIf(list, cursor, 0, MotionActivityType.Automotive);
+                    PopulateIf(list, cursor, 1, MotionActivityType.Cycling);
+                    PopulateIf(list, cursor, 2, MotionActivityType.Running);
+                    PopulateIf(list, cursor, 3, MotionActivityType.Walking);
+                    PopulateIf(list, cursor, 4, MotionActivityType.Stationary);
+                    
+                    var epochSeconds = cursor.GetLong(5);
                     var dt = DateTimeOffset.FromUnixTimeSeconds(epochSeconds);
-
-                    return new MotionActivityEvent(
-                        (MotionActivityType)events,
-                        (MotionActivityConfidence)confidence,
-                        dt
-                    );
+                    var probable = list.OrderBy(x => x.Confidence).FirstOrDefault();
+                    return new MotionActivityEvent(list, probable, dt);
                 },
                 st,
                 et
             )
             .ConfigureAwait(false);
     }
+
+
+    static void PopulateIf(List<DetectedMotionActivity> list, ICursor cursor, int columnIndex, MotionActivityType type)
+    {
+        if (cursor.IsNull(columnIndex))
+            return;
+
+        var conf = ToConfidence(cursor.GetInt(columnIndex));
+        list.Add(new(type, conf));
+    }
+
 
     public IObservable<MotionActivityEvent> WhenActivityChanged()
         => this.eventSubj;
@@ -159,103 +166,55 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
         => this.pendingIntent ??= this.platform.GetBroadcastPendingIntent<MotionActivityBroadcastReceiver>(IntentAction, PendingIntentFlags.UpdateCurrent);
 
 
-    //protected virtual async Task StartActivityMonitor()
-    //{
-
-    //    MotionActivityBroadcastReceiver.ProcessTransition = async result =>
-    //    {
-    //        foreach (var e in result.TransitionEvents)
-    //        {
-    //            //e.ActivityType
-    //        }
-    //        //e.TransitionType == ActivityTransition.ActivityTransitionEnter // don't care
-    //        //e.ActivityType = DetectedActivity.InVehicle
-    //        //        await this.database
-    //        //            .ExecuteNonQuery(
-    //        //                $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
-    //        //            )
-    //        //            .ConfigureAwait(false);
-    //    };
-
-    //    //e.ElapsedRealTimeNanos
-
-    //    // we only care about enter events since we're tracking all types
-    //    var list = new List<ActivityTransition>
-    //    {
-    //        GetTransition(DetectedActivity.InVehicle),
-    //        GetTransition(DetectedActivity.OnBicycle),
-    //        GetTransition(DetectedActivity.OnFoot),
-    //        GetTransition(DetectedActivity.Running),
-    //        GetTransition(DetectedActivity.Still),
-    //        GetTransition(DetectedActivity.Tilting),
-    //        GetTransition(DetectedActivity.Unknown),
-    //        GetTransition(DetectedActivity.Walking)
-    //    };
-
-    //    // TODO: android task
-    //    this.client.RequestActivityTransitionUpdates(
-    //        new ActivityTransitionRequest(list),
-    //        this.GetPendingIntent()
-    //    );
-    //}
-
-
-    //protected static ActivityTransition GetTransition(int activityType)
-    //    => new ActivityTransition.Builder()
-    //        .SetActivityType(activityType)
-    //        .SetActivityTransition(ActivityTransition.ActivityTransitionEnter)
-    //        .Build();
+    public Task PurgeOldEvents(TimeSpan timeSpan)
+    {
+        var last = DateTimeOffset.UtcNow.Subtract(timeSpan);
+        var sql = "DELETE FROM motion_activity WHERE Timestamp < " + last.ToUnixTimeSeconds();
+        return this.database.ExecuteNonQuery(sql);
+    }
 
 
     protected virtual async Task StartActivityMonitor()
     {
         MotionActivityBroadcastReceiver.ProcessRecognition = async result =>
         {
-            var type = result.MostProbableActivity.Type switch
+            var auto = "NULL";
+            var cycle = "NULL";
+            var run = "NULL";
+            var walk = "NULL";
+            var still = "NULL";
+
+            foreach (var activity in result.ProbableActivities)
             {
-                DetectedActivity.InVehicle => MotionActivityType.Automotive,
-                DetectedActivity.OnBicycle => MotionActivityType.Cycling,
-                DetectedActivity.OnFoot => MotionActivityType.Walking,
-                DetectedActivity.Running => MotionActivityType.Running,
-                DetectedActivity.Still => MotionActivityType.Stationary,
-                _ => MotionActivityType.Unknown
-            };
+                switch (activity.Type)
+                {
+                    case DetectedActivity.InVehicle:
+                        auto = activity.Confidence.ToString();
+                        break;
 
-            //foreach (var activity in result.ProbableActivities)
-            //{
-            //    switch (activity.Type)
-            //    {
-            //        case DetectedActivity.InVehicle:
-            //            type |= MotionActivityType.Automotive;
-            //            break;
+                    case DetectedActivity.OnBicycle:
+                        cycle = activity.Confidence.ToString();
+                        break;
 
-            //        case DetectedActivity.OnBicycle:
-            //            type |= MotionActivityType.Cycling;
-            //            break;
+                    case DetectedActivity.OnFoot:
+                    case DetectedActivity.Walking:
+                        walk = activity.Confidence.ToString();
+                        break;
 
-            //        case DetectedActivity.OnFoot:
-            //        case DetectedActivity.Walking:
-            //            type |= MotionActivityType.Walking;
-            //            break;
+                    case DetectedActivity.Running:
+                        run = activity.Confidence.ToString();
+                        break;
 
-            //        case DetectedActivity.Running:
-            //            type |= MotionActivityType.Running;
-            //            break;
+                    case DetectedActivity.Still:
+                        still = activity.Confidence.ToString();
+                        break;
+                }
+            }
 
-            //        case DetectedActivity.Still:
-            //            type |= MotionActivityType.Stationary;
-            //            break;
-            //    }
-            //}
-            //var confidence = ToConfidence(result.MostProbableActivity.Confidence);
-            
-            var confidence = ToConfidence(result.MostProbableActivity.Confidence);
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             await this.database
-                .ExecuteNonQuery(
-                    $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
-                )
+                .ExecuteNonQuery($"INSERT INTO motion_activity(AutomotiveConfidence, CyclingConfidence, RunningConfidence, WalkingConfidence, StationaryConfidence, Timestamp) VALUES ({auto}, {cycle}, {run}, {walk}, {still}, {timestamp})")
                 .ConfigureAwait(false);
         };
 

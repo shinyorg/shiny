@@ -7,65 +7,36 @@
              x:Class="Sample.MotionActivity.QueryPage"
              Title="Motion Activity (Query)">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Refresh"
+                     Command="{Binding Load}" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Frame BorderColor="LemonChiffon"
-                   BackgroundColor="LemonChiffon">
-                <Label Text="{Binding CurrentActivity, StringFormat='Current Activity: {0}'}"
-                       TextColor="Black" />
-            </Frame>
-
             <Frame BorderColor="Black"
-                    Grid.Row="1">
+                   BackgroundColor="LemonChiffon"
+                   Grid.Row="0">
                 <VerticalStackLayout>
                     <DatePicker Date="{Binding Date}"
                                 HorizontalOptions="CenterAndExpand"
-                                FontSize="Large" />
-
-                    <Label Text="{Binding CurrentActivity, StringFormat='Currently: {0}'}"
-                            FontSize="Medium"
-                            HorizontalOptions="Center" />
-
-                    <Label Text="{Binding EventCount, StringFormat='{0} Event(s)'}"
-                            FontSize="Medium"
-                            HorizontalOptions="Center"
-                            HorizontalTextAlignment="Center"  />
+                                FontSize="Large"
+                                IsEnabled="{Binding IsRealTime, Converter={StaticResource Not}}" />
 
                     <HorizontalStackLayout>
-                        <Label Text="Is Automotive" />
-                        <CheckBox IsEnabled="False" IsChecked="{Binding IsAutomotive}" />
-                    </HorizontalStackLayout>
-
-                    <HorizontalStackLayout>
-                        <Label Text="Is Cycling" />
-                        <CheckBox IsEnabled="False" IsChecked="{Binding IsCycling}" />
-                    </HorizontalStackLayout>
-
-                    <HorizontalStackLayout>
-                        <Label Text="Is Running" />
-                        <CheckBox IsEnabled="False" IsChecked="{Binding IsRunning}" />
-                    </HorizontalStackLayout>
-
-                    <HorizontalStackLayout>
-                        <Label Text="Is Walking" />
-                        <CheckBox IsEnabled="False" IsChecked="{Binding IsWalking}" />
-                    </HorizontalStackLayout>
-
-                    <HorizontalStackLayout>
-                        <Label Text="Is Stationary" />
-                        <CheckBox IsEnabled="False" IsChecked="{Binding IsStationary}" />
+                        <Label Text="Real Time" />
+                        <Switch IsToggled="{Binding IsRealTime}" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>
 
             <CollectionView ItemsSource="{Binding Events}"
-                            Grid.Row="2">
+                            Grid.Row="1">
 
                 <CollectionView.EmptyView>
                     <Label Text="No Events Found"
