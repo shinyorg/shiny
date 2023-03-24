@@ -80,7 +80,7 @@ public class QueryViewModel : ViewModel
     public ICommand Load { get; }
     [Reactive] public DateTime Date { get; set; } = DateTime.Now;
     [Reactive] public int EventCount { get; private set; }
-    [Reactive] public IList<CommandItem> Events { get; private set; }
+    [Reactive] public IList<CommandItem> Events { get; set; }
     [Reactive] public bool IsRealTime { get; set; } = true;
 
 

@@ -5,7 +5,7 @@
              xmlns:sample1="clr-namespace:Sample"          
              x:DataType="sample:QueryViewModel"
              x:Class="Sample.MotionActivity.QueryPage"
-             Title="Motion Activity (Query)">
+             Title="Motion Activity">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Refresh"
@@ -32,6 +32,9 @@
                         <Label Text="Real Time" />
                         <Switch IsToggled="{Binding IsRealTime}" />
                     </HorizontalStackLayout>
+
+                    <Label Text="{Binding EventCount, StringFormat='Events In Current Set: {0}'}"
+                           HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
             </Frame>
 
