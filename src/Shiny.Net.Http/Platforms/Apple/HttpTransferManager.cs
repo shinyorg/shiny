@@ -10,8 +10,6 @@ using Shiny.Hosting;
 namespace Shiny.Net.Http;
 
 
-// TODO: request access for POST_NOTIFICATIONS & FOREGROUND_SERVICE
-
 public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                                    IHttpTransferManager,
                                    IShinyStartupTask,

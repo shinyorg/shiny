@@ -85,8 +85,8 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                 if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
                     permissionSet.Add(P.ForegroundService);
 
-                if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
-                    permissionSet.Add(AndroidPermissions.PostNotifications);
+                //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+                //    permissionSet.Add(AndroidPermissions.PostNotifications);
                 break;
         }
 
@@ -108,8 +108,9 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                     status = AccessState.Restricted;
             }
 
-            if (permissionSet.Contains(AndroidPermissions.PostNotifications) && !result.IsGranted(AndroidPermissions.PostNotifications))
-                status = AccessState.Denied; // without post notifications, foreground service will fail
+            // foreground does not fail - the notification will not show but the service will show up in the task manager as per: https://developer.android.com/develop/ui/views/notifications/notification-permission
+            //if (permissionSet.Contains(AndroidPermissions.PostNotifications) && !result.IsGranted(AndroidPermissions.PostNotifications))
+            //    status = AccessState.Denied; // without post notifications, foreground service will fail
         }
 
         //if (this.Platform.GetSystemService<LocationManager>(Context.LocationService)!.IsLocationEnabled)

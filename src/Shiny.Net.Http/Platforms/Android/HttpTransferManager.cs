@@ -66,18 +66,12 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
 
     public async Task<IHttpTransfer> Queue(HttpTransferRequest request)
     {
-        await this.platform
-            .RequestFilteredPermissions(new AndroidPermission(
-#if NET7_0_OR_GREATER
-                Android.Manifest.Permission.PostNotifications,
-#else
-                "android.permission.POST_NOTIFICATIONS",
-#endif
-                33,
-                null
-            ))
-            .ToTask()
-            .ConfigureAwait(false);
+        //await this.platform
+        //    .RequestFilteredPermissions(new (
+        //        Android.Manifest.Permission.ForegroundService
+        //    ))
+        //    .ToTask()
+        //    .ConfigureAwait(false);
 
         var identifier = Guid.NewGuid().ToString();
         var ht = this.Create(request, identifier);
