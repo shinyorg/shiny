@@ -135,6 +135,7 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
     {
         this.builder ??= new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
             .SetSmallIcon(this.Platform.GetNotificationIconResource())
+            .SetForegroundServiceBehavior((int)NotificationForegroundService.Immediate)
             .SetOngoing(true);
 
         this.builder
