@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
+
 using Android.Gms.Location;
+using Android.Gms.Tasks;
 using Android.Locations;
 using LocationRequest = Android.Gms.Location.LocationRequest;
+using Task = System.Threading.Tasks.Task;
 
 namespace Shiny.Locations;
 
@@ -18,6 +22,16 @@ static class PlatformExtensions
         location.Speed,
         location.SpeedAccuracyMetersPerSecond
     );
+
+
+    public static Task ToTask(this Android.Gms.Tasks.Task androidTask)
+    {
+        var src = new AndroidTaskListener();
+        androidTask.AddOnCanceledListener(src);
+        androidTask.AddOnFailureListener(src);
+        androidTask.AddOnSuccessListener(src);
+        return src.Task;
+    }
 
 
     public static LocationRequest ToNative(this GpsRequest request)
@@ -65,4 +79,15 @@ static class PlatformExtensions
 
         return nativeRequest;
     }
+}
+
+
+public class AndroidTaskListener : Java.Lang.Object, IOnSuccessListener, IOnFailureListener, IOnCanceledListener
+{
+    readonly TaskCompletionSource<object> compSource = new();
+
+    public Task Task => this.compSource.Task;
+    public void OnCanceled() => this.compSource.SetCanceled();
+    public void OnFailure(Java.Lang.Exception e) => this.compSource.SetException(e);
+    public void OnSuccess(Java.Lang.Object result) => this.compSource.SetResult(null!);
 }
