@@ -169,6 +169,9 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
         }
 
         var bg = request.BackgroundMode != GpsBackgroundMode.None;
+        this.locationManager.AllowsBackgroundLocationUpdates = bg;
+        this.locationManager.PausesLocationUpdatesAutomatically = false;
+
         if (request is AppleGpsRequest appleRequest)
         {
             this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
