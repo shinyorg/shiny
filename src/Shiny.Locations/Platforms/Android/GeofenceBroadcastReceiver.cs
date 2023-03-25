@@ -7,7 +7,7 @@ namespace Shiny.Locations;
 
 
 [BroadcastReceiver(
-    Name = GeofenceManagerImpl.ReceiverName,
+    Name = GeofenceManager.ReceiverName,
     Enabled = true,
     Exported = true
 )]

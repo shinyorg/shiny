@@ -5,8 +5,8 @@ namespace Shiny.Locations;
 
 internal class GeofenceManagerDelegate : ShinyLocationDelegate
 {
-    readonly GeofenceManagerImpl manager;
-    public GeofenceManagerDelegate(GeofenceManagerImpl geofenceImpl) => this.manager = geofenceImpl;
+    readonly GeofenceManager manager;
+    public GeofenceManagerDelegate(GeofenceManager geofenceImpl) => this.manager = geofenceImpl;
 
 
     public override void RegionEntered(CLLocationManager manager, CLRegion region)

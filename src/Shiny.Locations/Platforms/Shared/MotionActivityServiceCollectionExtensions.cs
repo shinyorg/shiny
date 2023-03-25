@@ -20,7 +20,7 @@ public static class MotionActivityServiceCollectionExtensions
 #if ANDROID
         services.AddSingleton<AndroidSqliteDatabase>();
 #endif
-        return services.AddShinyService<MotionActivityManagerImpl>();
+        return services.AddShinyService<MotionActivityManager>();
     }
 
 }

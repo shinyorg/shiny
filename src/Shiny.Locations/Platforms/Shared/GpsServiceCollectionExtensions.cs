@@ -31,9 +31,9 @@ public static class GpsServiceCollectionExtensions
             .IsGooglePlayServicesAvailable(Application.Context);
 
         if (resultCode == ConnectionResult.Success)
-            services.AddShinyService<GooglePlayServiceGpsManagerImpl>();
+            services.AddShinyService<GooglePlayServiceGpsManager>();
         else
-            services.AddShinyService<LocationServicesGpsManagerImpl>();
+            services.AddShinyService<LocationServicesGpsManager>();
 
 #elif APPLE
         services.AddShinyService<GpsManager>();

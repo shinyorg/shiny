@@ -9,12 +9,12 @@ using Android.Content;
 using Android.Database;
 using Android.Gms.Location;
 using Microsoft.Extensions.Logging;
-using static Android.Manifest; 
+using static Android.Manifest;
 
 namespace Shiny.Locations;
 
 
-public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
+public class MotionActivityManager : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
 {
     public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromMinutes(1);
     public static TimeSpan OldEventPurgeTime { get; set; } = TimeSpan.FromDays(60);
@@ -33,7 +33,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
     PendingIntent? pendingIntent;
 
 
-    public MotionActivityManagerImpl(
+    public MotionActivityManager(
         AndroidPlatform platform,
         AndroidSqliteDatabase database,
         ILogger<IMotionActivityManager> logger
@@ -56,11 +56,6 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
 
     public async void Start()
     {
-        this.platform.RegisterBroadcastReceiver<MotionActivityBroadcastReceiver>(
-            MotionActivityManagerImpl.IntentAction,
-            Intent.ActionBootCompleted
-        );
-
         await this.PurgeOldEvents(OldEventPurgeTime);
         if (this.IsStarted)
         {
@@ -76,29 +71,13 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
     }
 
 
-    public async Task<AccessState> RequestAccess()
+    public Task<AccessState> RequestAccess()
     {
-        var result = AccessState.Available;
+        var permissionKey = OperatingSystemShim.IsAndroidVersionAtLeast(29)
+            ? Permission.ActivityRecognition
+            : "com.google.android.gms.permission.ACTIVITY_RECOGNITION";
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
-        {
-            result = await this.platform
-                .RequestAccess(Permission.ActivityRecognition)
-                .ToTask()
-                .ConfigureAwait(false);
-
-            if (result == AccessState.Available && !this.IsStarted)
-            {
-                await this.StartActivityMonitor();
-                this.IsStarted = true;
-            }
-        }
-        else if (!this.IsStarted)
-        {
-            await this.StartActivityMonitor();
-            this.IsStarted = true;
-        }
-        return result;
+        return this.RequestAccessSpecific(permissionKey);
     }
 
 
@@ -109,18 +88,18 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
         var st = start.ToUnixTimeSeconds().ToString();
         var et = (end ?? DateTimeOffset.UtcNow).ToUnixTimeSeconds().ToString();
         var sql = $$"""
-            SELECT 
+            SELECT
                 AutomotiveConfidence,
                 CyclingConfidence,
                 RunningConfidence,
                 WalkingConfidence,
                 StationaryConfidence,
-                Timestamp 
-            FROM 
-                motion_activity 
+                Timestamp
+            FROM
+                motion_activity
             WHERE
                 Timestamp > ? AND Timestamp < ?
-            ORDER BY 
+            ORDER BY
                 Timestamp DESC
             """;
 
@@ -135,7 +114,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
                     PopulateIf(list, cursor, 2, MotionActivityType.Running);
                     PopulateIf(list, cursor, 3, MotionActivityType.Walking);
                     PopulateIf(list, cursor, 4, MotionActivityType.Stationary);
-                    
+
                     var epochSeconds = cursor.GetLong(5);
                     var dt = DateTimeOffset.FromUnixTimeSeconds(epochSeconds);
                     var probable = list.OrderBy(x => x.Confidence).FirstOrDefault();
@@ -145,6 +124,22 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
                 et
             )
             .ConfigureAwait(false);
+    }
+
+
+    protected async Task<AccessState> RequestAccessSpecific(string permissionKey)
+    {
+        var result = await this.platform
+            .RequestAccess(permissionKey)
+            .ToTask()
+            .ConfigureAwait(false);
+
+        if (result == AccessState.Available && !this.IsStarted)
+        {
+            await this.StartActivityMonitor();
+            this.IsStarted = true;
+        }
+        return result;
     }
 
 
@@ -176,6 +171,11 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
 
     protected virtual async Task StartActivityMonitor()
     {
+        this.platform.RegisterBroadcastReceiver<MotionActivityBroadcastReceiver>(
+            MotionActivityManager.IntentAction,
+            Intent.ActionBootCompleted
+        );
+
         MotionActivityBroadcastReceiver.ProcessRecognition = async result =>
         {
             var list = new List<DetectedMotionActivity>();
@@ -257,10 +257,10 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
 
     static MotionActivityConfidence ToConfidence(int value)
     {
-        if (value >= MotionActivityManagerImpl.HighConfidenceValue)
+        if (value >= MotionActivityManager.HighConfidenceValue)
             return MotionActivityConfidence.High;
 
-        if (value >= MotionActivityManagerImpl.MediumConfidenceValue)
+        if (value >= MotionActivityManager.MediumConfidenceValue)
             return MotionActivityConfidence.Medium;
 
         return MotionActivityConfidence.Low;

@@ -14,7 +14,7 @@ using UIKit;
 namespace Shiny.Locations;
 
 
-public class GeofenceManagerImpl : IGeofenceManager
+public class GeofenceManager : IGeofenceManager
 {
     readonly CLLocationManager locationManager;
     readonly IPlatform platform;
@@ -23,11 +23,11 @@ public class GeofenceManagerImpl : IGeofenceManager
     readonly IRepository<GeofenceRegion> repository;
 
 
-    public GeofenceManagerImpl(
+    public GeofenceManager(
         IPlatform platform,
         IServiceProvider services,
         IRepository<GeofenceRegion> repository,
-        ILogger<GeofenceManagerImpl> logger
+        ILogger<GeofenceManager> logger
     )
     {
         this.platform = platform;

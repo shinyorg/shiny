@@ -14,7 +14,7 @@ using System.Reactive.Threading.Tasks;
 namespace Shiny.Locations;
 
 
-public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
+public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 {
     public const string ReceiverName = "com.shiny.locations." + nameof(GeofenceBroadcastReceiver);
     public const string IntentAction = ReceiverName + ".INTENT_ACTION";
@@ -28,11 +28,11 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     PendingIntent? geofencePendingIntent;
 
 
-    public GeofenceManagerImpl(
+    public GeofenceManager(
         AndroidPlatform platform,
         IRepository<GeofenceRegion> repository,
         IServiceProvider services,
-        ILogger<GeofenceManagerImpl> logger
+        ILogger<GeofenceManager> logger
     )
     {
         this.platform = platform;
@@ -100,7 +100,7 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
         }
 
         return status;
-    }        
+    }
 
 
     public IList<GeofenceRegion> GetMonitorRegions()

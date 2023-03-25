@@ -33,10 +33,10 @@ public static class GeofenceServiceCollectionExtensions
             return services.AddGpsDirectGeofencing(delegateType);
 
         services.AddShinyService(delegateType);
-        services.AddShinyService<GeofenceManagerImpl>();
+        services.AddShinyService<GeofenceManager>();
 #elif APPLE
         services.AddShinyService(delegateType);
-        services.AddShinyService<GeofenceManagerImpl>();
+        services.AddShinyService<GeofenceManager>();
 #endif
         return services;
     }

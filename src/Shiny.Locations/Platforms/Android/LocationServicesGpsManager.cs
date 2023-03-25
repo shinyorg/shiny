@@ -9,10 +9,10 @@ using AContext = Android.Content.Context;
 namespace Shiny.Locations;
 
 
-public class LocationServicesGpsManagerImpl : AbstractGpsManager
+public class LocationServicesGpsManager : AbstractGpsManager
 {
     readonly LocationManager client;
-    public LocationServicesGpsManagerImpl(AndroidPlatform platform, ILogger<LocationServicesGpsManagerImpl> logger) : base(platform, logger)
+    public LocationServicesGpsManager(AndroidPlatform platform, ILogger<LocationServicesGpsManager> logger) : base(platform, logger)
         => this.client = platform.GetSystemService<LocationManager>(AContext.LocationService);
 
 

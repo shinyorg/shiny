@@ -9,7 +9,7 @@ using Foundation;
 namespace Shiny.Locations;
 
 
-public class MotionActivityManagerImpl : IMotionActivityManager
+public class MotionActivityManager : IMotionActivityManager
 {
     readonly CMMotionActivityManager activityManager = new();
 
