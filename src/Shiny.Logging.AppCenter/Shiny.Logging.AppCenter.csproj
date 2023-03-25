@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Shiny AppCenter Logging for Microsoft Extensions Logging</Description>
-        <TargetFrameworks>net7.0;net7.0-android;net7.0-maccatalyst</TargetFrameworks>
+        <TargetFrameworks>net7.0;net7.0-android;net7.0-ios</TargetFrameworks>
         <!--<TargetFrameworks>$(IosTargetFrameworks);$(AndroidTargetFrameworks)</TargetFrameworks>-->
     </PropertyGroup>
 
