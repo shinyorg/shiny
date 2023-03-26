@@ -19,7 +19,6 @@
 
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-        <XamarinIosFirebaseVersion>8.10.0.1</XamarinIosFirebaseVersion>
         <MicrosoftExtensionsVersion>7.0.0</MicrosoftExtensionsVersion>
     </PropertyGroup>
 

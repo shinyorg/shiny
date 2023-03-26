@@ -17,14 +17,6 @@
     <ItemGroup>
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="123.0.8" />
-        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.2.13" />
-        <PackageReference Update="Xamarin.Firebase.Analytics" Version="121.1.1" />
-        <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="$(XamarinIosFirebaseVersion)" />
-        <PackageReference Update="Xamarin.FireBase.iOS.Analytics" Version="$(XamarinIosFirebaseVersion)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -55,9 +47,6 @@
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <Compile Include="Platforms\Android\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-
-        <!--hack-->
-        <!--<PackageReference Include="Xamarin.Build.Download" Version="0.11.4" PrivateAssets="All" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
