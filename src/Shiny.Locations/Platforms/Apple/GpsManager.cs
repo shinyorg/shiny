@@ -172,10 +172,12 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
         this.locationManager.AllowsBackgroundLocationUpdates = bg;
         this.locationManager.PausesLocationUpdatesAutomatically = false;
 
+        var useSignificant = false;
         if (request is AppleGpsRequest appleRequest)
         {
             this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
             this.locationManager.ShowsBackgroundLocationIndicator = bg && appleRequest.ShowsBackgroundLocationIndicator;
+            useSignificant = appleRequest.UseSignificantLocationChanges;
 
             if (appleRequest.ActivityType != null)
                 this.locationManager.ActivityType = appleRequest.ActivityType.Value;
@@ -191,6 +193,9 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
         }
         //this.locationManager.ShouldDisplayHeadingCalibration = true;
         //this.locationManager.AllowDeferredLocationUpdatesUntil
-        this.locationManager.StartUpdatingLocation();
+        if (useSignificant)
+            this.locationManager.StartMonitoringSignificantLocationChanges();
+        else
+            this.locationManager.StartUpdatingLocation();
     }
 }

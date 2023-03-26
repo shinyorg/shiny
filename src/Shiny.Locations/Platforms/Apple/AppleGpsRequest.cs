@@ -8,6 +8,7 @@ public record AppleGpsRequest(
     GpsAccuracy Accuracy = GpsAccuracy.Normal,
     bool ShowsBackgroundLocationIndicator = true,
     bool PausesLocationUpdatesAutomatically = false,
+    bool UseSignificantLocationChanges = false,
     CLActivityType? ActivityType = null
 ) : GpsRequest(
     BackgroundMode,
