@@ -80,7 +80,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
         {
             var result = await this.platform
                 .RequestFilteredPermissions(
-                    new(P.ForegroundService, 29, null)
+                    new AndroidPermission(P.ForegroundService, 29, null)
                     //new(AndroidPermissions.PostNotifications, 33, null)
                 )
                 .ToTask();
