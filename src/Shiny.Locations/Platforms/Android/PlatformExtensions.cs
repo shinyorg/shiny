@@ -10,7 +10,7 @@ using Task = System.Threading.Tasks.Task;
 namespace Shiny.Locations;
 
 
-static class PlatformExtensions
+public static class PlatformExtensions
 {
     public static GpsReading FromNative(this Location location) => new GpsReading(
         new Position(location.Latitude, location.Longitude),
