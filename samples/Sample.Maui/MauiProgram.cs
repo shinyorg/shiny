@@ -63,7 +63,6 @@ public static class MauiProgram
         s.AddGps<Gps.MyGpsDelegate>();
         s.AddGeofencing<Geofencing.MyGeofenceDelegate>();
         //s.AddGpsDirectGeofencing<Geofencing.MyGeofenceDelegate>(); // if you don't know why this exists, don't use it!
-        s.AddMotionActivity();
 
         // for platform event testing - not needed for general consumption
         s.AddShinyService<Platform.PlatformStateTests>();
@@ -128,7 +127,6 @@ public static class MauiProgram
         // locations
         s.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>("Geofencing");
         s.RegisterForNavigation<Geofencing.CreatePage, Geofencing.CreateViewModel>("GeofencingCreate");
-        s.RegisterForNavigation<MotionActivity.QueryPage, MotionActivity.QueryViewModel>("MotionActivityQuery");
         s.RegisterForNavigation<Gps.GpsPage, Gps.GpsViewModel>("GPS");
 
         // notifications

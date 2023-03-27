@@ -33,7 +33,6 @@
                     <TableSection Title="Shiny.Locations">
                         <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Geofencing" />
                         <TextCell Text="GPS" Command="{Binding Navigate}" CommandParameter="GPS" />
-                        <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="MotionActivityQuery" />
                     </TableSection>
 
                     <TableSection Title="Shiny.Beacons">
