@@ -129,10 +129,17 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 
     public Task StopListener()
     {
-        this.locationManager.AllowsBackgroundLocationUpdates = false;
-        this.locationManager.StopUpdatingLocation();
-        this.CurrentSettings = null;
+        if (this.CurrentSettings == null)
+            return Task.CompletedTask;
 
+        this.locationManager.AllowsBackgroundLocationUpdates = false;
+
+        if (this.CurrentSettings.UseSignificantLocationChanges)
+            this.locationManager.StopMonitoringSignificantLocationChanges();
+        else
+            this.locationManager.StopUpdatingLocation();
+
+        this.CurrentSettings = null;
         return Task.CompletedTask;
     }
 
