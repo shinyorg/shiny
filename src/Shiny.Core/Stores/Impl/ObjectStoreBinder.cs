@@ -113,7 +113,7 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
     /// </summary>
     protected virtual IEnumerable<PropertyInfo> GetTypeProperties(Type type) => type
         .GetTypeInfo()
-        .DeclaredProperties
+        .GetProperties()
         .Where(x =>
             (x.GetGetMethod() != null) &&
             (x.GetSetMethod() != null)
