@@ -13,12 +13,12 @@ namespace Shiny.Locations;
 public record AndroidGpsRequest(
     GpsBackgroundMode BackgroundMode = GpsBackgroundMode.None,
     GpsAccuracy Accuracy = GpsAccuracy.Normal,
-    double DistanceFilter = 0,
+    double DistanceFilterMeters = 0,
     int IntervalMillis = 0,
     int FastestIntervalMillis = 10000, // 10 seconds
     bool WaitForAccurateLocation = false
 ) : GpsRequest(
     BackgroundMode,
     Accuracy,
-    DistanceFilter
+    DistanceFilterMeters
 );

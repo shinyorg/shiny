@@ -43,13 +43,16 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 
     public async void Start()
     {
-        if (this.CurrentListener != null)
+        if (this.CurrentSettings != null)
         {
             try
             {
                 // only auto-start if auth status was changed to FULL authorized, not restricted
                 if (this.locationManager.AuthorizationStatus == CLAuthorizationStatus.Authorized)
-                    await this.StartListenerInternal(this.CurrentListener);
+                {
+                    if (this.CurrentSettings != null)
+                        await this.StartListenerInternal(this.CurrentSettings);
+                }
                 else
                     this.logger.LogInformation("User has removed location permissions");
             }

@@ -29,11 +29,11 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
 
     public virtual async void Start()
     {
-        if (this.CurrentListener != null)
+        if (this.CurrentSettings != null)
         {
             try
             {
-                await this.StartListener(this.CurrentListener).ConfigureAwait(false);
+                await this.StartListener(this.CurrentSettings).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
