@@ -158,7 +158,7 @@ namespace Shiny.SpeechRecognition
                 intent.PutExtra(RecognizerIntent.ExtraLanguage, javaLocale);
             }
             intent.PutExtra(RecognizerIntent.ExtraLanguageModel, RecognizerIntent.LanguageModelFreeForm);
-            intent.PutExtra(RecognizerIntent.ExtraCallingPackage, this.platform.Package.PackageName);
+            intent.PutExtra(RecognizerIntent.ExtraCallingPackage, this.platform.AppContext.PackageName);
             //intent.PutExtra(RecognizerIntent.ExtraMaxResults, 1);
             //intent.PutExtra(RecognizerIntent.ExtraSpeechInputCompleteSilenceLengthMillis, 1500);
             //intent.PutExtra(RecognizerIntent.ExtraSpeechInputPossiblyCompleteSilenceLengthMillis, 1500);

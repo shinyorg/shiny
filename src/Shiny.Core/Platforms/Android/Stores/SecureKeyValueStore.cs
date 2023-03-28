@@ -21,7 +21,7 @@ public class SecureKeyValueStore : IKeyValueStore
         this.keyStore = new AndroidKeyStore(
             platform.AppContext,
             this.settingsStore,
-            $"{platform.AppIdentifier}.secure",
+            $"{platform.AppContext.PackageName}.secure",
             false
         );
     }

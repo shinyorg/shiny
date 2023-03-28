@@ -65,9 +65,6 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     }
 
 
-    public string AppIdentifier => this.AppContext.PackageName;
-
-
     public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
     {
         if (this.CurrentActivity != null)
@@ -80,18 +77,11 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     });
 
 
-    public PackageInfo Package => this
-        .AppContext
-        .PackageManager
-        .GetPackageInfo(this.AppContext.PackageName, 0);
-
-
     public const string ActionServiceStart = "ACTION_START_FOREGROUND_SERVICE";
     public const string ActionServiceStop = "ACTION_STOP_FOREGROUND_SERVICE";
 
     public void StartService(Type serviceType)
     {
-        // TODO: need POST_NOTIFICATIONS permission on Android
         var intent = new Intent(this.AppContext, serviceType);
         if (OperatingSystemShim.IsAndroidVersionAtLeast(26) && this.IsShinyForegroundService(serviceType))
         {
@@ -120,8 +110,9 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
         }
     }
 
+
     protected bool IsShinyForegroundService(Type serviceType)
-        => serviceType?.BaseType.Name.Contains("ShinyAndroidForegroundService") ?? false;
+        => serviceType?.BaseType?.Name.Contains("ShinyAndroidForegroundService") ?? false;
 
 
     public AccessState GetCurrentAccessState(string androidPermission)
@@ -129,19 +120,6 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
         var result = ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
         return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
     }
-
-
-    public IObservable<(Result result, Intent data)> RequestActivityResult(Action<int, Activity> request) => Observable.Create<(Result result, Intent data)>(ob =>
-    {
-        var current = Interlocked.Increment(ref this.requestCode);
-        var sub = this.activityResultSubject
-            .Where(x => x.RequestCode == current)
-            .Subscribe(x => ob.Respond((x.Result, x.Intent)));
-
-        request(current, this.CurrentActivity!);
-
-        return sub;
-    });
 
 
     public IObservable<AccessState> RequestAccess(string androidPermissions)

@@ -135,7 +135,7 @@ public class AndroidNotificationManager
             launchIntent = this.platform!
                 .AppContext!
                 .PackageManager!
-                .GetLaunchIntentForPackage(this.platform!.Package!.PackageName!)!
+                .GetLaunchIntentForPackage(this.platform!.AppContext.PackageName!)!
                 .SetFlags(this.options.LaunchActivityFlags);
         }
         else
