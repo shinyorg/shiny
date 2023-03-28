@@ -155,6 +155,7 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
         this.locationManager.DesiredAccuracy = request.Accuracy switch
         {
             //CLLocation.AccurracyBestForNavigation;
+            //CLLocation.AccuracyReduced
             GpsAccuracy.Highest => CLLocation.AccuracyBest,
             GpsAccuracy.High => CLLocation.AccuracyNearestTenMeters,
             GpsAccuracy.Normal => CLLocation.AccuracyHundredMeters,
@@ -174,13 +175,8 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
             useSignificant = appleRequest.UseSignificantLocationChanges;
 
             if (appleRequest.ActivityType != null)
-            {
-                
-                // TODO: shouldn't use distancefilter with this
-                //this.locationManager.DistanceFilter = CLLocation.AccurracyBestForNavigation;
-
                 this.locationManager.ActivityType = appleRequest.ActivityType.Value;
-            }
+            
             this.CurrentSettings = appleRequest;
         }
         else
@@ -190,8 +186,6 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
                 Accuracy: request.Accuracy
             );
         }
-        //this.locationManager.ShouldDisplayHeadingCalibration = true;
-        //this.locationManager.AllowDeferredLocationUpdatesUntil
         if (useSignificant)
             this.locationManager.StartMonitoringSignificantLocationChanges();
         else
