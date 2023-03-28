@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Android.Gms.Location;
 using Android.Gms.Tasks;
 using Android.Locations;
@@ -36,47 +35,28 @@ public static class PlatformExtensions
 
     public static LocationRequest ToNative(this GpsRequest request)
     {
-        var nativeRequest = LocationRequest.Create();
-
-        switch (request.Accuracy)
+        var nativeRequest = LocationRequest
+            .Create()
+            .SetSmallestDisplacement((float)request.DistanceFilterMeters)
+            .SetPriority(request.Accuracy switch
+            {
+                GpsAccuracy.Lowest => Priority.PriorityPassive,
+                GpsAccuracy.Low => Priority.PriorityLowPower,
+                GpsAccuracy.Normal => Priority.PriorityBalancedPowerAccuracy,
+                GpsAccuracy.High => Priority.PriorityHighAccuracy,
+                GpsAccuracy.Highest => Priority.PriorityHighAccuracy
+            });
+        
+        if (request is AndroidGpsRequest android)
         {
-            case GpsAccuracy.Lowest:
-                nativeRequest
-                    .SetPriority(Priority.PriorityLowPower)
-                    .SetInterval(1000 * 120) // 2 mins
-                    .SetSmallestDisplacement(3000);
-                break;
+            nativeRequest = nativeRequest.SetWaitForAccurateLocation(android.WaitForAccurateLocation);
 
-            case GpsAccuracy.Low:
-                nativeRequest
-                    .SetPriority(Priority.PriorityLowPower)
-                    .SetInterval(1000 * 60) // 1 min
-                    .SetSmallestDisplacement(1000);
-                break;
+            if (android.IntervalMillis > 0)
+                nativeRequest = nativeRequest.SetInterval(android.IntervalMillis);
 
-            case GpsAccuracy.Normal:
-                nativeRequest
-                    .SetPriority(Priority.PriorityBalancedPowerAccuracy)
-                    .SetInterval(1000 * 30) // 30 seconds
-                    .SetSmallestDisplacement(100);
-                break;
-
-            case GpsAccuracy.High:
-                nativeRequest
-                    .SetPriority(Priority.PriorityHighAccuracy)
-                    .SetInterval(1000 * 10) // 10 seconds
-                    .SetSmallestDisplacement(10);
-                break;
-
-            case GpsAccuracy.Highest:
-                nativeRequest
-                    .SetPriority(Priority.PriorityHighAccuracy)
-                    .SetInterval(1000) // every second
-                    .SetSmallestDisplacement(1);
-
-                break;
+            if (android.FastestIntervalMillis > 0)
+                nativeRequest.SetFastestInterval(android.FastestIntervalMillis);
         }
-
         return nativeRequest;
     }
 }

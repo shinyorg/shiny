@@ -148,32 +148,16 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
     {
         (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
 
-        switch (request.Accuracy)
+        this.locationManager.DistanceFilter = request.DistanceFilterMeters;
+        this.locationManager.DesiredAccuracy = request.Accuracy switch
         {
-            case GpsAccuracy.Highest:
-                this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
-                break;
-
-            case GpsAccuracy.High:
-                this.locationManager.DistanceFilter = 10;
-                this.locationManager.DesiredAccuracy = CLLocation.AccuracyNearestTenMeters;
-                break;
-
-            case GpsAccuracy.Normal:
-                this.locationManager.DistanceFilter = 100;
-                this.locationManager.DesiredAccuracy = CLLocation.AccuracyHundredMeters;
-                break;
-
-            case GpsAccuracy.Low:
-                this.locationManager.DistanceFilter = 1000;
-                this.locationManager.DesiredAccuracy = CLLocation.AccuracyKilometer;
-                break;
-
-            case GpsAccuracy.Lowest:
-                this.locationManager.DistanceFilter = 3000;
-                this.locationManager.DesiredAccuracy = CLLocation.AccuracyThreeKilometers;
-                break;
-        }
+            //CLLocation.AccurracyBestForNavigation;
+            GpsAccuracy.Highest => CLLocation.AccuracyBest,
+            GpsAccuracy.High => CLLocation.AccuracyNearestTenMeters,
+            GpsAccuracy.Normal => CLLocation.AccuracyHundredMeters,
+            GpsAccuracy.Low => CLLocation.AccuracyKilometer,
+            GpsAccuracy.Lowest => CLLocation.AccuracyThreeKilometers
+        };
 
         var bg = request.BackgroundMode != GpsBackgroundMode.None;
         this.locationManager.AllowsBackgroundLocationUpdates = bg;
@@ -187,8 +171,13 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
             useSignificant = appleRequest.UseSignificantLocationChanges;
 
             if (appleRequest.ActivityType != null)
-                this.locationManager.ActivityType = appleRequest.ActivityType.Value;
+            {
+                
+                // TODO: shouldn't use distancefilter with this
+                //this.locationManager.DistanceFilter = CLLocation.AccurracyBestForNavigation;
 
+                this.locationManager.ActivityType = appleRequest.ActivityType.Value;
+            }
             this.CurrentSettings = appleRequest;
         }
         else

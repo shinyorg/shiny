@@ -46,25 +46,27 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     protected ShinyLocationCallback Callback { get; }
     protected AndroidPlatform Platform { get; }
 
-
-    GpsRequest? request;
-    public GpsRequest? CurrentListener
+    AndroidGpsRequest? currentSettings;
+    public AndroidGpsRequest? CurrentSettings
     {
-        get => this.request;
+        get => this.currentSettings;
         set
         {
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
             if (bg != GpsBackgroundMode.None)
             {
-                this.Set(ref this.request, value);
+                this.Set(ref this.currentSettings, value);
             }
             else
             {
-                this.Set(ref this.request, null); // don't track across app restarts
-                this.request = value;
+                this.Set(ref this.currentSettings, null); // don't track across app restarts
+                this.currentSettings = value;
             }
         }
     }
+
+
+    public GpsRequest? CurrentListener => this.currentSettings;
 
 
     public async Task<AccessState> RequestAccess(GpsRequest request)
@@ -125,16 +127,19 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public virtual async Task StartListener(GpsRequest request)
     {
         if (this.CurrentListener != null)
-            return;
+            throw new InvalidOperationException("There is already a GPS listener running");
 
         request ??= new GpsRequest();
+        if (request is not AndroidGpsRequest android)
+            android = new AndroidGpsRequest(request.BackgroundMode, request.Accuracy, request.DistanceFilterMeters);
+
         (await this.RequestAccess(request)).Assert(allowRestricted: true);
 
         if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
             this.Platform.StartService(typeof(ShinyGpsService));
 
         await this.RequestLocationUpdates(request);
-        this.CurrentListener = request;
+        this.CurrentSettings = android;
     }
 
 
@@ -147,7 +152,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         if (this.CurrentListener.BackgroundMode == GpsBackgroundMode.Realtime && ShinyGpsService.IsStarted)
             this.Platform.StopService(typeof(ShinyGpsService));
 
-        this.CurrentListener = null;
+        this.CurrentSettings = null;
     }
 
 

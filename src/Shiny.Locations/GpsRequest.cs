@@ -41,24 +41,32 @@ public enum GpsAccuracy
 }
 
 
-public record GpsRequest(
+public record GpsRequest(    
+
     /// <summary>
     /// Sets the background mode - null means "don't run in background"
     /// </summary>
     GpsBackgroundMode BackgroundMode = GpsBackgroundMode.None,
 
     /// <summary>
-    /// The desired Priority/Accuracy of the GPS lock
+    /// The desired accuracy of the GPS lock
     /// </summary>
-    GpsAccuracy Accuracy = GpsAccuracy.Normal
+    GpsAccuracy Accuracy = GpsAccuracy.Normal,
+
+    /// <summary>
+    /// Distance filter in meters
+    /// </summary>
+    double DistanceFilterMeters = 0
 )
 {
-    public static GpsRequest Realtime(bool background) => new(
+    public static GpsRequest Realtime(bool background, double distanceFilterMeters = 0) => new(
         background
             ? GpsBackgroundMode.Realtime
             : GpsBackgroundMode.None,
 
-        GpsAccuracy.Highest
+        GpsAccuracy.Highest,
+
+        distanceFilterMeters
     );
 
     public static GpsRequest Foreground => new(GpsBackgroundMode.None, GpsAccuracy.Normal);
