@@ -14,7 +14,7 @@ things like dependency injection & logging in a structured way to your code!
 * Periodic Background Jobs
 * BLE Client & Hosting
 * Beacons Ranging & Monitoring
-* Locations - GPS, Geofencing, & Activity Monitoring (driving, walking, etc)
+* Locations - GPS & Geofencing
 * Push Notification - Native, Azure Notifications Hubs, Firebase, and more
 * Local Notifications - best of breed local notifications supporting almost all features across all of the supported platforms
 
@@ -38,6 +38,10 @@ These templates will help get you up & running quickly.  Simply select what feat
 
 > dotnet new --install Shiny.Templates
 
+## Integrating With Existing Apps
+
+If you cannot use our awesome templates - try our ugly, but effective boilerplate builder at:
+[https://shinylib.net/appbuilder](https://shinylib.net/appbuilder)
 
 ## Support Shiny!
 
