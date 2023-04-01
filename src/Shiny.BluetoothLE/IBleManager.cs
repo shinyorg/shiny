@@ -6,6 +6,9 @@ namespace Shiny.BluetoothLE;
 
 public interface IBleManager
 {
+    //IObservable<IPeripheral> WhenPeripheralStatusChanged();
+    
+
     /// <summary>
     /// Requests necessary permissions to ensure bluetooth LE can be used
     /// </summary>
@@ -42,3 +45,18 @@ public interface IBleManager
     /// <returns></returns>
     IObservable<ScanResult> Scan(ScanConfig? config = null);
 }
+
+
+public record ScanConfig(
+    /// <summary>
+    /// Filters scan to peripherals that advertise specified service UUIDs
+    /// iOS - you must set this to initiate a background scan
+    /// </summary>
+    params string[] ServiceUuids
+);
+
+public record ScanResult(
+    IPeripheral Peripheral,
+    int Rssi,
+    IAdvertisementData AdvertisementData
+);

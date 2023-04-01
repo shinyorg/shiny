@@ -49,8 +49,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, AndroidCustomizationOptions? options = null) where TDelegate : INotificationDelegate
-        => services.AddNotifications(typeof(TDelegate), options);
+    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services) where TDelegate : INotificationDelegate
+        => services.AddNotifications(typeof(TDelegate));
 
 
     /// <summary>
@@ -60,11 +60,9 @@ public static class ServiceCollectionExtensions
     /// <param name="delegateType"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, AndroidCustomizationOptions? options = null)
+    public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null)
     {
-        services.AddSingleton(options ?? new());
         services.AddGeofencing<NotificationGeofenceDelegate>();
-        //services.AddSingleton<INotificationCustomizer, DefaultAndroidNotificationCustomizer>();
         services.TryAddSingleton<AndroidNotificationProcessor>();
         services.TryAddSingleton<AndroidNotificationManager>();
 

@@ -1,295 +1,142 @@
 using System;
-using System.Linq;
-using System.Text;
 using System.Collections.Generic;
-using System.Reactive.Disposables;
+using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.Bluetooth;
-using Shiny.BluetoothLE.Internals;
+using Java.Lang.Annotation;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE;
 
 
-public class Peripheral : AbstractPeripheral,
-                          ICanDoTransactions,
-                          ICanPairPeripherals,
-                          ICanRequestMtu,
-                          ICanL2Cap
-
+public partial class Peripheral : BluetoothGattCallback, IPeripheral
 {
-    readonly Subject<ConnectionState> connSubject = new();
-    internal PeripheralContext Context { get; }
-
+    readonly AndroidPlatform platform;
+    readonly BleManager manager;
+    readonly ILogger logger;
 
     public Peripheral(
-        ManagerContext centralContext,
-        BluetoothDevice native
-    ) : base(
-        native.Name,
-        ToDeviceId(native.Address).ToString()
+        BleManager manager,
+        AndroidPlatform platform,
+        BluetoothDevice native,
+        ILogger<IPeripheral> logger
     )
     {
-        this.Context = new PeripheralContext(centralContext, native);
+        this.manager = manager;
+        this.platform = platform;
+        this.Native = native;
+        this.logger = logger;
     }
 
 
-    public BluetoothDevice Native => this.Context.NativeDevice;
-    public override ConnectionState Status => this.Context.Status;
+    public BluetoothDevice Native { get; }
+    public BluetoothGatt? Gatt { get; private set; }
+
+    public string? Name => this.Native.Name;
+
+    string? uuid;
+    public string Uuid => this.uuid ??= GetUuid(this.Native);
 
 
-    public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
+    public ConnectionState Status
     {
-        if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
-            throw new InvalidOperationException("L2Cap requires Android API Level 23+");
-
-        var socket = secure
-            ? this.Native.CreateL2capChannel(psm)
-            : this.Native.CreateInsecureL2capChannel(psm);
-
-        ob.Respond(new L2CapChannel(
-            psm,
-            data => Observable.FromAsync(ct => socket.InputStream!.WriteAsync(data, 0, data.Length, ct)),
-            socket.ListenForData(),
-            () => socket.Dispose()
-        ));
-
-        return Disposable.Empty;
-    });
-
-
-    public override void Connect(ConnectionConfig? config)
-    {
-        this.connSubject.OnNext(ConnectionState.Connecting);
-        this.Context.Connect(config);
-    }
-
-
-    public override void CancelConnection()
-    {
-        this.Context.Close();
-        this.connSubject.OnNext(ConnectionState.Disconnected);
-    }
-
-
-    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
-
-
-    // android does not have a find "1" service - it must discover all services.... seems shit
-    public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false)
-    {
-        var uuid = Utils.ToUuidString(serviceUuid);
-
-        return this
-            .GetServices()
-            .Select(x => x.FirstOrDefault(y => y
-                .Uuid
-                .Equals(uuid, StringComparison.InvariantCultureIgnoreCase)
-            ))
-            .Take(1)
-            .Assert(serviceUuid, throwIfNotFound);
-    }
-
-
-    public override IObservable<string> WhenNameUpdated() => this.Context
-        .ManagerContext
-        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
-        .Select(_ => this.Name);
-
-
-    public override IObservable<ConnectionState> WhenStatusChanged() => Observable.Create<ConnectionState>(ob =>
-    {
-        var comp = new CompositeDisposable();
-        ob.OnNext(this.Context.Status);
-
-        this.Context
-            .Callbacks
-            .ConnectionStateChanged
-            .Select(x => x.NewState.ToStatus())
-            .Subscribe(ob.OnNext)
-            .DisposedBy(comp);
-
-        this.connSubject
-            .Subscribe(ob.OnNext)
-            .DisposedBy(comp);
-
-        return comp;
-    });
-
-
-    public override IObservable<IList<IGattService>> GetServices()
-        => this.Context.Invoke(Observable.Create<IList<IGattService>>(ob =>
+        get
         {
-            this.AssertConnection();
-            var sub = this.Context
-                .Callbacks
-                .ServicesDiscovered
-                .Select(x => x.Gatt!.Services)
-                .Where(x => x != null)
-                .Select(x => x!
-                    .Select(native => new GattService(this, this.Context, native))
-                    .Cast<IGattService>()
-                    .ToList()
-                )
-                .Subscribe(
-                    ob.Respond,
-                    ob.OnError
-                );
+            if (this.Gatt == null)
+                return ConnectionState.Disconnected;
 
-            this.Context.RefreshServices();
-            this.Context.Gatt!.DiscoverServices();
-            return sub;
-        }));
-
-
-    public override IObservable<int> ReadRssi()
-    {
-        this.AssertConnection();
-
-        return this.Context.Invoke(Observable.Create<int>(ob =>
-        {
-            var sub = this.Context
-                .Callbacks
-                .ReadRemoteRssi
-                .Take(1)
-                .Select(x =>
-                {
-                    if (!x.IsSuccessful)
-                        throw new BleException("Failed to get RSSI - " + x.Status);
-
-                    return x.Rssi;
-                })
-                .Subscribe(
-                    x => ob.Respond(x),
-                    ob.OnError
-                );
-
-            this.Context.Gatt!.ReadRemoteRssi();
-
-            return sub;
-        }));
-    }
-
-
-    public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
-        new GattReliableWriteTransaction(this.Context);
-
-
-    public IObservable<bool> PairingRequest(string? pin = null) => Observable.Create<bool>(ob =>
-    {
-        var disp = new CompositeDisposable();
-
-        if (this.PairingStatus == PairingState.Paired)
-        {
-            ob.Respond(true);
+            return this.manager
+                .Native
+                .GetConnectionState(this.Native, ProfileType.Gatt)
+                .ToStatus();
         }
+    }
+
+
+    // TODO: after disconnecting GATT, refresh services must be called
+    public void CancelConnection()
+    {
+        try
+        {
+            this.Gatt?.Close();
+            this.Gatt = null;
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "BLE Peripheral did not cleanly disconnect");
+        }
+        this.connSubj.OnNext(ConnectionState.Disconnected);
+    }
+
+
+    public void Connect(ConnectionConfig? config)
+    {
+        AndroidConnectionConfig cfg = null!;
+        if (config == null)
+            cfg = new();
+        else if (config is AndroidConnectionConfig cfg1)
+            cfg = cfg1;
         else
+            cfg = new AndroidConnectionConfig(cfg.AutoConnect);
+
+        this.Gatt = this.Native.ConnectGatt(
+            this.platform.AppContext,
+            config?.AutoConnect ?? true,
+            this,
+            BluetoothTransports.Le
+        );
+        if (this.Gatt == null)
+            throw new BleException("GATT connection could not be established");
+
+        this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
+        this.connSubj.OnNext(ConnectionState.Connecting);
+    }
+
+
+    public IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
+    {
+        //        this.AssertConnection();
+
+        var sub = this.rssiSubj.Subscribe(x =>
         {
-            this.Context
-                .ManagerContext
-                .ListenForMe(this)
-                .Subscribe(intent =>
-                {
+            if (x.Status == GattStatus.Success)
+                ob.OnNext(x.Rssi);
+            else
+                throw new BleException("Failed to get RSSI - " + x.Status);
+        });
+        this.Gatt!.ReadRemoteRssi();
 
-                    switch (intent.Action)
-                    {
-                        case BluetoothDevice.ActionBondStateChanged:
-                            var prev = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraPreviousBondState, (int)Bond.None);
-                            var current = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraBondState, (int)Bond.None);
-
-                            if (prev == Bond.Bonding || current == Bond.Bonded)
-                            {
-                                // it is done now
-                                var bond = current == Bond.Bonded;
-                                ob.Respond(bond);
-                            }
-
-                            break;
-
-                        case BluetoothDevice.ActionPairingRequest:
-                            if (!pin.IsEmpty())
-                            {
-                                var bytes = Encoding.UTF8.GetBytes(pin);
-                                if (!this.Native.SetPin(bytes))
-                                {
-                                    ob.OnError(new ArgumentException("Failed to set PIN"));
-                                }
-                            }
-                            break;
-                    }
-                })
-                .DisposedBy(disp);
-
-            if (!this.Context.NativeDevice.CreateBond())
-                ob.Respond(false);
-        }
-        return disp;
-    });
-
-
-    public PairingState PairingStatus => this.Context.NativeDevice.BondState switch
-    {
-        Bond.Bonded => PairingState.Paired,
-        _ => PairingState.NotPaired
-    };
-
-
-    int currentMtu = 20;
-    public IObservable<int> RequestMtu(int size) => this.Context.Invoke(Observable.Create<int>(ob =>
-    {
-        this.AssertConnection();
-        var sub = this.WhenMtuChanged().Skip(1).Take(1).Subscribe(ob.Respond);
-        this.Context.Gatt!.RequestMtu(size);
         return sub;
-    }));
+    });
+   
+
+    readonly Subject<ConnectionState> connSubj = new();
+    public IObservable<ConnectionState> WhenStatusChanged() => this.connSubj;
 
 
-    public IObservable<int> WhenMtuChanged() => this.Context
-        .Callbacks
-        .MtuChanged
-        .Where(x => x.IsSuccessful)
-        .Select(x =>
-        {
-            this.currentMtu = x.Mtu;
-            return x.Mtu;
-        })
-        .StartWith(this.currentMtu);
-
-
-    public override int MtuSize => this.currentMtu;
-    public override int GetHashCode() => this.Context.NativeDevice.GetHashCode();
-
-
-    public override bool Equals(object? obj)
+    readonly Subject<(GattStatus Status, int Rssi)> rssiSubj = new();
+    public override void OnReadRemoteRssi(BluetoothGatt? gatt, int rssi, GattStatus status)
     {
-        var other = obj as Peripheral;
-        if (other == null)
-            return false;
-
-        if (!Object.ReferenceEquals(this, other))
-            return false;
-
-        return true;
+        if (status == GattStatus.Success)
+            this.rssiSubj.OnNext((status, rssi));
+        else
+            this.rssiSubj.OnNext((status, rssi));
     }
 
 
-    public override string ToString() => $"Peripheral: {this.Uuid}";
-
-
-#region Internals
-
-    void AssertConnection()
+    public override void OnConnectionStateChange(BluetoothGatt? gatt, GattStatus status, ProfileState newState)
     {
-        if (this.Status != ConnectionState.Connected)
-            throw new ArgumentException("Peripheral is not connected");
+        // on disconnect I should kill services
+        this.connSubj.OnNext(newState.ToStatus());
     }
 
 
-    // thanks monkey robotics
-    protected static Guid ToDeviceId(string address)
+    static string GetUuid(BluetoothDevice device)
     {
         var deviceGuid = new byte[16];
-        var mac = address.Replace(":", "");
+        var mac = device.Address!.Replace(":", "");
         var macBytes = Enumerable
             .Range(0, mac.Length)
             .Where(x => x % 2 == 0)
@@ -297,8 +144,51 @@ public class Peripheral : AbstractPeripheral,
             .ToArray();
 
         macBytes.CopyTo(deviceGuid, 10);
-        return new Guid(deviceGuid);
-    }        
-
-#endregion
+        return new Guid(deviceGuid).ToString();
+    }
 }
+
+
+//    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
+
+//    public override IObservable<string> WhenNameUpdated() => this.Context
+//        .ManagerContext
+//        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
+//        .Select(_ => this.Name);
+
+
+//readonly SemaphoreSlim semaphore = new(1, 1);
+
+//public IObservable<T> Invoke<T>(IObservable<T> observable)
+//{
+//    if (!this.ManagerContext.Configuration.UseInternalSyncQueue)
+//        return observable;
+
+//    return Observable.FromAsync(async ct =>
+//    {
+//        await this.semaphore
+//            .WaitAsync(ct)
+//            .ConfigureAwait(false);
+
+//        try
+//        {
+//            return await observable
+//                .ToTask(ct)
+//                .ConfigureAwait(false);
+//        }
+//        finally
+//        {
+//            this.semaphore.Release();
+//        }
+//    });
+//}
+
+
+//readonly Handler handler = new(Looper.MainLooper!);
+//public void InvokeOnMainThread(Action action)
+//{
+//    if (this.ManagerContext.Configuration.InvokeCallsOnMainThread)
+//        this.handler.Post(action);
+//    else
+//        action();
+//}

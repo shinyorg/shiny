@@ -8,7 +8,7 @@ public class ManagedScanResult : NotifyPropertyChanged, IAdvertisementData
 
 
     public IPeripheral Peripheral { get; }
-    public bool IsConnected => this.Peripheral.IsConnected();
+    public bool IsConnected => this.Peripheral.Status == ConnectionState.Connected;
     public string Uuid => this.Peripheral.Uuid;
 
 

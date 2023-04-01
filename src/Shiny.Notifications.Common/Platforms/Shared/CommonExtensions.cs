@@ -9,12 +9,12 @@ namespace Shiny.Notifications;
 
 public static class CommonExtensions
 {
-    public static void SetSoundFromEmbeddedResource(this Channel channel, Assembly assembly, string resourceName)
-        => channel.CustomSoundPath = Host
-            .Current
-            .Services
-            .GetRequiredService<IPlatform>()
-            .ResourceToFilePath(assembly, resourceName);
+    //public static void SetSoundFromEmbeddedResource(this Channel channel, Assembly assembly, string resourceName)
+    //    => channel.CustomSoundPath = Host
+    //        .Current
+    //        .Services
+    //        .GetRequiredService<IPlatform>()
+    //        .ResourceToFilePath(assembly, resourceName);
 
 
     internal static void AssertChannelRemove(this IChannelManager channelManager, string channelIdentifier)

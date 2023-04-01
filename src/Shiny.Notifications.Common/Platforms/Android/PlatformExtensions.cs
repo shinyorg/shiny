@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Android.Graphics;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
@@ -54,7 +52,7 @@ public static class PlatformExtensions
     }
 
 
-    public static void TrySetImage(this IPlatform platform, string localAttachmentFilePath, NotificationCompat.Builder builder)
+    public static void TrySetImage(this NotificationCompat.Builder builder, string localAttachmentFilePath)
     {
         using var stream = File.OpenRead(localAttachmentFilePath);
         

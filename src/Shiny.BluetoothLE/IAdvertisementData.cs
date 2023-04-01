@@ -1,6 +1,14 @@
-﻿using System;
+﻿namespace Shiny.BluetoothLE;
 
-namespace Shiny.BluetoothLE;
+public record AdvertisementServiceData(
+    string Uuid,
+    byte[] Data
+);
+
+public record ManufacturerData(
+    ushort CompanyId,
+    byte[] Data
+);
 
 
 public interface IAdvertisementData

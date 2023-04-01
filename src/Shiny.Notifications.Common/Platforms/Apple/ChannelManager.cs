@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Foundation;
 using UserNotifications;
 using Microsoft.Extensions.Logging;
@@ -84,11 +82,20 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
                 actions.Add(nativeAction);
             }
 
+            var unoptions = UNNotificationCategoryOptions.None;
+            var intents = new[] { String.Empty };
+
+            if (channel is AppleChannel apple)
+            {
+                unoptions = apple.CategoryOptions;
+                if (apple.IntentIdentifiers != null)
+                    intents = apple.IntentIdentifiers;
+            }
             var native = UNNotificationCategory.FromIdentifier(
                 channel.Identifier,
                 actions.ToArray(),
-                new string[] { "" },
-                UNNotificationCategoryOptions.None
+                intents,
+                unoptions
             );
             categories.Add(native);
         }
@@ -103,8 +110,9 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
             action.Identifier,
             action.Title,
             UNNotificationActionOptions.None,
-            action.Title,
-            String.Empty
+            action.Title, // button title
+            String.Empty  // placeholder
+            // icon fromsystem or fromimage by name
         ),
 
         ChannelActionType.Destructive => UNNotificationAction.FromIdentifier(

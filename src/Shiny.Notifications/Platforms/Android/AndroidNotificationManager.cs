@@ -18,21 +18,18 @@ public class AndroidNotificationManager
     readonly AndroidPlatform platform;
     readonly IChannelManager channelManager;
     readonly ISerializer serializer;
-    readonly AndroidCustomizationOptions options;
 
 
     public AndroidNotificationManager(
         AndroidPlatform platform,
         IChannelManager channelManager,
-        ISerializer serializer,
-        AndroidCustomizationOptions options
+        ISerializer serializer
     )
     {
         this.platform = platform;
         this.NativeManager = NotificationManagerCompat.From(this.platform.AppContext);
         this.channelManager = channelManager;
         this.serializer = serializer;
-        this.options = options;
     }
 
 
@@ -90,10 +87,6 @@ public class AndroidNotificationManager
             var color = this.platform.GetColorResourceId(this.options.ColorResourceName!);
             builder.SetColor(color);
         }
-        var customize = (notification as AndroidNotification)?.Customize;
-        if (customize != null)
-            await customize.Invoke(channel, builder).ConfigureAwait(false);
-
         return builder;
     }
 

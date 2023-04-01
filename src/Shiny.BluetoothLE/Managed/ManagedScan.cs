@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -27,7 +26,7 @@ public class ManagedScan : IDisposable, IManagedScan
 
     public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.list
         .ToList()
-        .Where(x => x.Peripheral.IsConnected())
+        .Where(x => x.Peripheral.Status == ConnectionState.Connected)
         .Select(x => x.Peripheral);
 
 

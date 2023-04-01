@@ -1,79 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
+
+namespace Shiny.BluetoothLE;
 
 
-namespace Shiny.BluetoothLE
+public record BleServiceInfo(string Uuid);
+public record BleCharacteristicInfo(
+    string ServiceUuid,
+    string Uuid,
+    CharacteristicProperties Properties
+);
+public record BleDescriptorInfo(
+    string ServiceUuid,
+    string CharacteristicUuid,
+    string Uuid
+);
+public record BleCharacteristicResult(
+    string ServiceUuid,
+    string Uuid,
+    byte[]? Data
+);
+
+public interface IPeripheral
 {
-    public interface IPeripheral
-    {
-        /// <summary>
-        /// The peripheral name - note that this is not readable in the background on most platforms
-        /// </summary>
-        string Name { get; }
+    string Uuid { get; }
+    string? Name { get; }
+    int Mtu { get; }
+    ConnectionState Status { get; } // TODO: add failed state?
 
-        /// <summary>
-        /// The peripheral UUID - note that this will not be the same per platform
-        /// </summary>
-        string Uuid { get; }
+    void Connect(ConnectionConfig? config);
+    void CancelConnection();
+    IObservable<ConnectionState> WhenStatusChanged();
+    IObservable<int> ReadRssi();
 
-        /// <summary>
-        /// The current connection status
-        /// </summary>
-        /// <value>The status.</value>
-        ConnectionState Status { get; }
+    IObservable<BleServiceInfo> GetService(string serviceUuid);
+    IObservable<IReadOnlyList<BleServiceInfo>> GetServices();
 
-        /// <summary>
-        /// Connect to a peripheral
-        /// </summary>
-        /// <param name="config">Connection configuration</param>
-        void Connect(ConnectionConfig? config = null);
+    IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid);
+    IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid);
 
-        /// <summary>
-        /// Disconnect from the peripheral and cancel persistent connection
-        /// </summary>
-        void CancelConnection();
+    bool IsNotifying(string serviceUuid, string characteristicUuid);
+    IObservable<BleCharacteristicInfo> WhenNotificationHooked();
+    IObservable<BleCharacteristicResult> WhenNotification(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true);
 
-        /// <summary>
-        /// This fires when a peripheral connection fails
-        /// </summary>
-        /// <returns></returns>
-        IObservable<BleException> WhenConnectionFailed();
+    IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid);
+    IObservable<Unit> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
 
-        /// <summary>
-        /// Monitor connection status
-        /// </summary>
-        /// <returns></returns>
-        IObservable<ConnectionState> WhenStatusChanged();
-
-        /// <summary>
-        /// BLE service discovery - This method does not complete.  It will clear all discovered services on subsequent connections
-        /// and does not require a connection to hook to it.
-        /// </summary>
-        IObservable<IList<IGattService>> GetServices();
-
-        /// <summary>
-        /// Searches for a known service
-        /// </summary>
-        /// <param name="serviceUuid"></param>
-        /// <param name="throwIfNotFound"></param>
-        /// <returns></returns>
-        IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false);
-
-        /// <summary>
-        /// Monitor peripheral name changes
-        /// </summary>
-        /// <returns></returns>
-        IObservable<string> WhenNameUpdated();
-
-        /// <summary>
-        /// Reads the RSSI of the connected peripheral
-        /// </summary>
-        /// <returns></returns>
-        IObservable<int> ReadRssi();
-
-        /// <summary>
-        /// This is the current MTU size (must be connected to get a true value)
-        /// </summary>
-        int MtuSize { get; }
-    }
+    IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid);
+    IObservable<byte[]> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid);
+    IObservable<Unit> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data);
 }

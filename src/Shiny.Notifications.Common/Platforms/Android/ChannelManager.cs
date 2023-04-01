@@ -93,6 +93,32 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
                 native.SetSound(null, null);
                 break;
         }
+        if (channel is AndroidChannel android)
+        {
+            if (android.Description != null)
+                native.Description = android.Description;
+
+            if (android.AllowBubbles != null && OperatingSystemShim.IsAndroidVersionAtLeast(26))
+                native.SetAllowBubbles(android.AllowBubbles.Value);
+
+            if (android.ShowBadge != null)
+                native.SetShowBadge(android.ShowBadge.Value);
+
+            if (android.EnableLights != null)
+                native.EnableLights(android.EnableLights.Value);
+
+            if (android.EnableVibration != null)
+                native.EnableVibration(android.EnableVibration.Value);
+
+            if (android.LockscreenVisibility != null)
+                native.LockscreenVisibility = android.LockscreenVisibility.Value;
+
+            if (android.Blockable != null && OperatingSystemShim.IsAndroidVersionAtLeast(33))
+                native.Blockable = android.Blockable.Value;
+
+            if (android.BypassDnd != null)
+                native.SetBypassDnd(android.BypassDnd.Value);
+        }
         this.nativeManager.CreateNotificationChannel(native);
         this.repository.Set(channel);
     }

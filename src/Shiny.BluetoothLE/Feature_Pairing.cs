@@ -6,6 +6,13 @@ using System.Reactive.Linq;
 namespace Shiny.BluetoothLE;
 
 
+public enum PairingState
+{
+    Unavailiable,
+    NotPaired,
+    Paired
+}
+
 public interface ICanViewPairedPeripherals : IBleManager
 {
     /// <summary>

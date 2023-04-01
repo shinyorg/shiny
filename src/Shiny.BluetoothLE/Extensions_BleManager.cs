@@ -64,10 +64,12 @@ public static class BleManagerExtensions
     /// <param name="scanPauseTime"></param>
     /// <param name="config"></param>
     /// <returns></returns>
-    public static IObservable<ScanResult> ScanInterval(this IBleManager bleManager,
-                                                        TimeSpan scanTime,
-                                                        TimeSpan scanPauseTime,
-                                                        ScanConfig? config = null) => Observable.Create<ScanResult>(ob =>
+    public static IObservable<ScanResult> ScanInterval(
+        this IBleManager bleManager,
+        TimeSpan scanTime,
+        TimeSpan scanPauseTime,
+        ScanConfig? config = null
+    ) => Observable.Create<ScanResult>(ob =>
     {
         var scanObs = bleManager.Scan(config).Do(ob.OnNext, ob.OnError);
         IObservable<long>? scanPauseObs = null;
