@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
 using Shiny.Locations;
-using Shiny.Stores;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Beacons;
 

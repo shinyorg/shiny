@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
     {
         if (!services.HasService<IJobManager>())
         {
-            services.AddRepository<JobInfoStoreConverter, JobInfo>();
+            services.AddRepository<JobInfoRepositoryConverter, JobInfo>();
 
             services.AddShinyService<JobsStartup>();
             services.AddShinyService<JobLifecycleTask>();

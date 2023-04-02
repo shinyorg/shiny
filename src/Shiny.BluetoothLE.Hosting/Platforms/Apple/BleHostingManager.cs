@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using CoreBluetooth;
+using CoreLocation;
 using Foundation;
 
 namespace Shiny.BluetoothLE.Hosting;

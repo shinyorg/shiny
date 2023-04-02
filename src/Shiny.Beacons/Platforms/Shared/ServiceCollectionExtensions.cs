@@ -41,7 +41,7 @@ public static class ServiceCollectionExtensions
         services.AddBluetoothLE();
 #endif
         services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
-        services.AddRepository<BeaconRegionStoreConverter, BeaconRegion>();
+        services.AddRepository<BeaconRegionRepositoryConverter, BeaconRegion>();
         services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
 
         return services;

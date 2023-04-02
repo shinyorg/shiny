@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shiny.Stores;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Jobs;
 
 
-public class JobInfo : IStoreEntity
+public class JobInfo : IRepositoryEntity
 {
     public JobInfo(Type jobType, string? identifier = null, bool runOnForeground = false)
     {
         if (jobType == null)
             throw new ArgumentException("Job Type not set");
 
-        this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
-        this.TypeName = jobType.AssemblyQualifiedName;
+        this.Identifier = identifier ?? jobType.AssemblyQualifiedName!;
+        this.TypeName = jobType.AssemblyQualifiedName!;
         this.PeriodicTime = TimeSpan.FromMinutes(15);
         this.RunOnForeground = runOnForeground;
     }
@@ -50,7 +50,7 @@ public class JobInfo : IStoreEntity
     public bool IsValid() => this.TypeName.IsEmpty() || Type.GetType(this.TypeName) != null;
 
     public void SetParameter(string key, object value)
-        => this.Parameters.Add(key, value.ToString());
+        => this.Parameters.Add(key, value!.ToString()!);
 
     public T GetParameter<T>(string key, T defaultValue = default)
     {

@@ -23,7 +23,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
     {
-        services.AddRepository<GeofenceRegionStoreConverter, GeofenceRegion>();
+        services.AddRepository<GeofenceRegionRepositoryConverter, GeofenceRegion>();
 #if ANDROID
         var resultCode = GoogleApiAvailability
             .Instance

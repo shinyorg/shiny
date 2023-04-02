@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
+using Shiny.Support.Repositories;
 using UIKit;
 
 namespace Shiny.Locations;

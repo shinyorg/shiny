@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Shiny.Support.Repositories;
 using BackgroundTasks;
 using UIKit;
-using Microsoft.Extensions.Logging;
-using Shiny.Stores;
 
 namespace Shiny.Jobs;
 

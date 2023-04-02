@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shiny.Stores;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Notifications;
 
 
-public class Notification : IStoreEntity
+public class Notification : IRepositoryEntity
 {
     /// <summary>
     /// You do not have to set this - it will be automatically set from the library if you do not supply one

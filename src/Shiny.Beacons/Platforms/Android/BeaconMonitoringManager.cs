@@ -1,11 +1,11 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
-using Shiny.Stores;
-using System.Linq;
 using Shiny.Locations;
+using Shiny.Support.Repositories;
 using P = Android.Manifest.Permission;
 
 namespace Shiny.Beacons;

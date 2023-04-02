@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shiny.Stores;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Notifications;
 
 
-public class Channel : IStoreEntity
+public class Channel : IRepositoryEntity
 {
     public static Channel Default { get; } = new Channel
     {

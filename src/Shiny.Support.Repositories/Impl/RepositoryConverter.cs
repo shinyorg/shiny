@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using Shiny.Stores;
 
-namespace Shiny.Stores;
+namespace Shiny.Support.Repositories.Impl;
 
 
-public abstract class StoreConverter<T> : IStoreConverter<T> where T : IStoreEntity
+public abstract class RepositoryConverter<T> : IRepositoryConverter<T> where T : IRepositoryEntity
 {
     public abstract T FromStore(IDictionary<string, object> values, ISerializer serializer);
 

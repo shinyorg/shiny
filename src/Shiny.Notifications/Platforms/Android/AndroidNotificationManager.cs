@@ -33,15 +33,15 @@ public class AndroidNotificationManager
     }
 
 
-    public virtual async Task Send(Notification notification)
+    public virtual void Send(AndroidNotification notification)
     {
         var channel = this.channelManager.Get(notification.Channel!);
-        var builder = await this.CreateNativeBuilder(notification, channel!).ConfigureAwait(false);
+        var builder = this.CreateNativeBuilder(notification, channel!);
         this.NativeManager.Notify(notification.Id, builder.Build());
     }
 
 
-    public virtual async Task<NotificationCompat.Builder> CreateNativeBuilder(Notification notification, Channel channel)
+    public virtual NotificationCompat.Builder CreateNativeBuilder(AndroidNotification notification, Channel channel)
     {
         var builder = new NotificationCompat.Builder(this.platform.AppContext, channel.Identifier);
         this.ApplyChannel(builder, notification, channel);
@@ -49,15 +49,15 @@ public class AndroidNotificationManager
         builder
             .SetContentTitle(notification.Title)
             .SetContentIntent(this.GetLaunchPendingIntent(notification))
-            .SetSmallIcon(this.platform.GetSmallIconResource(this.options.SmallIconResourceName))
-            .SetAutoCancel(this.options.AutoCancel)
-            .SetOngoing(this.options.OnGoing);
+            .SetSmallIcon(this.platform.GetSmallIconResource(notification.SmallIconResourceName))
+            .SetAutoCancel(notification.AutoCancel)
+            .SetOngoing(notification.OnGoing);
 
         if (!notification.Thread.IsEmpty())
             builder.SetGroup(notification.Thread);
 
-        if (!notification.LocalAttachmentPath.IsEmpty())
-            this.platform.TrySetImage(notification.LocalAttachmentPath, builder);
+        //if (!notification.LocalAttachmentPath.IsEmpty())
+        //    this.platform.TrySetImage(notification.LocalAttachmentPath, builder);
 
         //if (notification.BadgeCount != null)
         //{
@@ -67,24 +67,24 @@ public class AndroidNotificationManager
         //        .SetNumber(notification.BadgeCount.Value);
         //}
 
-        if (!this.options.Ticker.IsEmpty())
-            builder.SetTicker(this.options.Ticker);
+        if (!notification.Ticker.IsEmpty())
+            builder.SetTicker(notification.Ticker);
 
-        if (this.options.UseBigTextStyle)
+        if (notification.UseBigTextStyle)
             builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
         else
             builder.SetContentText(notification.Message);
 
-        if (!this.options.LargeIconResourceName.IsEmpty())
+        if (!notification.LargeIconResourceName.IsEmpty())
         {
-            var iconId = this.platform.GetResourceIdByName(this.options.LargeIconResourceName!);
+            var iconId = this.platform.GetResourceIdByName(notification.LargeIconResourceName!);
             if (iconId > 0)
                 builder.SetLargeIcon(BitmapFactory.DecodeResource(this.platform.AppContext.Resources, iconId));
         }
 
-        if (!this.options.ColorResourceName.IsEmpty())
+        if (!notification.ColorResourceName.IsEmpty())
         {
-            var color = this.platform.GetColorResourceId(this.options.ColorResourceName!);
+            var color = this.platform.GetColorResourceId(notification.ColorResourceName!);
             builder.SetColor(color);
         }
         return builder;
@@ -119,30 +119,30 @@ public class AndroidNotificationManager
     public AlarmManager Alarms => this.alarms ??= this.platform.GetSystemService<AlarmManager>(Context.AlarmService);
 
 
-    public virtual PendingIntent GetLaunchPendingIntent(Notification notification)
+    public virtual PendingIntent GetLaunchPendingIntent(AndroidNotification notification)
     {
         Intent launchIntent;
 
-        if (this.options.LaunchActivityType == null)
+        if (notification.LaunchActivityType == null)
         {
             launchIntent = this.platform!
                 .AppContext!
                 .PackageManager!
                 .GetLaunchIntentForPackage(this.platform!.AppContext.PackageName!)!
-                .SetFlags(this.options.LaunchActivityFlags);
+                .SetFlags(notification.LaunchActivityFlags);
         }
         else
         {
             launchIntent = new Intent(
                 this.platform.AppContext,
-                this.options.LaunchActivityType
+                notification.LaunchActivityType
             );
         }
 
         this.PopulateIntent(launchIntent, notification);
 
         PendingIntent pendingIntent;
-        if ((this.options.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
+        if ((notification.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
         {
             pendingIntent = TaskStackBuilder
                 .Create(this.platform.AppContext)

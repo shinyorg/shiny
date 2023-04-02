@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using AndroidX.Work;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
+using Shiny.Support.Repositories;
 using P = Android.Manifest.Permission;
 
 namespace Shiny.Jobs;

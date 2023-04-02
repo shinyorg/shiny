@@ -1,19 +1,21 @@
-﻿using System;
+﻿#if PLATFORM
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Subjects;
+using Shiny.Stores;
 
-namespace Shiny.Stores.Impl;
+namespace Shiny.Support.Repositories.Impl;
 
 
-public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
-    where TStoreConverter : class, IStoreConverter<TEntity>, new()
-    where TEntity : IStoreEntity
+public class JsonFileRepository<TRepositoryConverter, TEntity> : IRepository<TEntity>
+    where TRepositoryConverter : class, IRepositoryConverter<TEntity>, new()
+    where TEntity : IRepositoryEntity
 {
     readonly Subject<(RepositoryAction Action, TEntity? Entity)> repoSubj = new();
-    readonly TStoreConverter converter = new();
+    readonly TRepositoryConverter converter = new();
     readonly ISerializer serializer;
     readonly DirectoryInfo rootDir;
 
@@ -134,8 +136,8 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
             x => x.Property,
             x => x.Value
         );
-        if (!serialize.ContainsKey(nameof(IStoreEntity.Identifier)))
-            serialize.Add(nameof(IStoreEntity.Identifier), entity.Identifier);
+        if (!serialize.ContainsKey(nameof(IRepositoryEntity.Identifier)))
+            serialize.Add(nameof(IRepositoryEntity.Identifier), entity.Identifier);
 
         var value = this.serializer.Serialize(serialize);
         File.WriteAllText(path, value);
@@ -174,3 +176,4 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
         return dict;
     }
 }
+#endif

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using Shiny.Stores;
+using Shiny.Support.Repositories.Impl;
 
 namespace Shiny.Notifications.Infrastructure;
 
 
-public class ChannelStoreConverter : StoreConverter<Channel>
+public class ChannelRepositoryConverter : RepositoryConverter<Channel>
 {
     public override Channel FromStore(IDictionary<string, object> values, ISerializer serializer)
     {

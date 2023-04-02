@@ -7,6 +7,7 @@ using Android.Content;
 using Microsoft.Extensions.Logging;
 using Shiny.Locations;
 using Shiny.Stores;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Notifications;
 

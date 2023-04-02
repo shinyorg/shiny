@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shiny.Stores;
+using Shiny.Support.Repositories.Impl;
 
 namespace Shiny.Beacons.Infrastructure;
 
 
-public class BeaconRegionStoreConverter : StoreConverter<BeaconRegion>
+public class BeaconRegionRepositoryConverter : RepositoryConverter<BeaconRegion>
 {
     public override BeaconRegion FromStore(IDictionary<string, object> values, ISerializer serializer)
     {

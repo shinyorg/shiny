@@ -16,8 +16,6 @@
 
     <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
         <PackageReference Include="System.Text.Json" />
-        <!--TODO-->
-        <!--<PackageReference Include="Xamarin.Essentials" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">

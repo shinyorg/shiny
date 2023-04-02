@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
+using Shiny.Support.Repositories;
+using Shiny.Support.Repositories.Impl;
 
 namespace Shiny.Net.Http;
 
@@ -16,7 +18,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
     readonly AndroidPlatform platform;
     readonly IServiceProvider services;
     readonly IConnectivity connectivity;
-    readonly IRepository<BlobStore<HttpTransferRequest>> repository;
+    readonly IRepository<BlobRepositoryEntity<HttpTransferRequest>> repository;
 
 
     public HttpTransferManager(
@@ -24,7 +26,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
         AndroidPlatform platform,
         IServiceProvider services,
         IConnectivity connectivity,
-        IRepository<BlobStore<HttpTransferRequest>> repository
+        IRepository<BlobRepositoryEntity<HttpTransferRequest>> repository
     )
     {
         this.logger = logger;
@@ -76,7 +78,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
         var identifier = Guid.NewGuid().ToString();
         var ht = this.Create(request, identifier);
 
-        this.repository.Set(new BlobStore<HttpTransferRequest>
+        this.repository.Set(new
         (
             identifier,
             request

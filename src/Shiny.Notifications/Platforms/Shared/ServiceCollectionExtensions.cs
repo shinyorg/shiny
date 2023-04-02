@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, IosConfiguration? configuration = null)
     {
         services.AddSingleton(configuration ?? new());
-        services.AddRepository<NotificationStoreConverter, Notification>();
+        services.AddRepository<NotificationRepositoryConverter, Notification>();
         services.AddChannelManager();
         services.AddShinyService<NotificationManager>();
 
@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<AndroidNotificationProcessor>();
         services.TryAddSingleton<AndroidNotificationManager>();
 
-        services.AddRepository<NotificationStoreConverter, Notification>();
+        services.AddRepository<NotificationRepositoryConverter, Notification>();
         services.AddChannelManager();
         services.AddShinyService<NotificationManager>();
 

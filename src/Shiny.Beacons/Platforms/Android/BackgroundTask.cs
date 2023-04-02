@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Collections.Generic;
-using Shiny.BluetoothLE;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
+using Shiny.BluetoothLE;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Beacons;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Shiny.Stores;
+namespace Shiny.Support.Repositories;
 
 
 public enum RepositoryAction
@@ -15,7 +15,7 @@ public enum RepositoryAction
 }
 
 
-public interface IRepository<TEntity> where TEntity : IStoreEntity
+public interface IRepository<TEntity> where TEntity : IRepositoryEntity
 {
     /// <summary>
     /// Returns true if a given key/type value is found in storage
@@ -61,7 +61,6 @@ public interface IRepository<TEntity> where TEntity : IStoreEntity
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     void Clear();
-
 
     /// <summary>
     /// An observable for watching events within the repository

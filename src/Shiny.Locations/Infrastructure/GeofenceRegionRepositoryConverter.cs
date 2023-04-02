@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shiny.Stores;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Locations.Infrastructure;
 
 
-public class GeofenceRegionStoreConverter : IStoreConverter<GeofenceRegion>
+public class GeofenceRegionRepositoryConverter : IRepositoryConverter<GeofenceRegion>
 {
     const string LatitudeKey = "CenterLatitude";
     const string LongitudeKey = "CenterLongitude";
@@ -26,6 +27,7 @@ public class GeofenceRegionStoreConverter : IStoreConverter<GeofenceRegion>
 
         return region;
     }
+
 
     public IEnumerable<(string Property, object Value)> ToStore(GeofenceRegion entity, ISerializer serializer)
     {

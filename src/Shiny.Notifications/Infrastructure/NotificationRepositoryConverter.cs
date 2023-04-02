@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shiny.Stores;
+using Shiny.Support.Repositories.Impl;
 
 namespace Shiny.Notifications.Infrastructure;
 
 
-public class NotificationStoreConverter : StoreConverter<Notification>
+public class NotificationRepositoryConverter : RepositoryConverter<Notification>
 {
     public override Notification FromStore(IDictionary<string, object> values, ISerializer serializer)
     {

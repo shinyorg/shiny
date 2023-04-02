@@ -31,7 +31,7 @@ public static class CommonExtensions
     {
         if (!services.HasService<IChannelManager>())
         {
-            services.AddRepository<ChannelStoreConverter, Channel>();
+            services.AddRepository<ChannelRepositoryConverter, Channel>();
             services.AddShinyService<ChannelManager>();
         }
         return services;

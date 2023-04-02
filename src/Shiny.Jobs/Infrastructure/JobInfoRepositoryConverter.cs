@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shiny.Stores;
+using Shiny.Support.Repositories.Impl;
 
 namespace Shiny.Jobs.Infrastructure;
 
 
-public class JobInfoStoreConverter : StoreConverter<JobInfo>
+public class JobInfoRepositoryConverter : RepositoryConverter<JobInfo>
 {
     public override JobInfo FromStore(IDictionary<string, object> values, ISerializer serializer)
     {

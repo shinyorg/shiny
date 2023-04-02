@@ -1,5 +1,5 @@
 using System;
-using Shiny.Stores;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Beacons;
 
@@ -17,7 +17,7 @@ public record BeaconRegion(
     Guid Uuid,
     ushort? Major = null,
     ushort? Minor = null
-) : IStoreEntity
+) : IRepositoryEntity
 {
     public bool NotifyOnEntry { get; set; } = true;
     public bool NotifyOnExit { get; set; } = true;
