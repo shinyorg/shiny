@@ -17,8 +17,7 @@ public class MyBleDelegate : BleDelegate
             $"New Status: {state}"
         );
 
-
-    public override Task OnConnected(IPeripheral peripheral)
+    public override Task OnPeripheralStateChanged(IPeripheral peripheral)
         => this.conn.Log(
             "BLE",
             "Peripheral Connected",
