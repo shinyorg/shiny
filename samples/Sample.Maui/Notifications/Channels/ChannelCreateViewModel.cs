@@ -60,10 +60,11 @@ public class ChannelCreateViewModel : ViewModel
 
         if (this.UseCustomSound)
         {
-            if (this.UseEmbeddedSound)
-                channel.SetSoundFromEmbeddedResource(this.GetType().Assembly, "Sample.Resource.notification.mp3");
-            else
-                channel.CustomSoundPath = "notification.mp3";
+            // TODO
+            //if (this.UseEmbeddedSound)
+            //    channel.SetSoundFromEmbeddedResource(this.GetType().Assembly, "Sample.Resource.notification.mp3");
+            //else
+            //    channel.CustomSoundPath = "notification.mp3";
 
             channel.Sound = ChannelSound.Custom;
         }

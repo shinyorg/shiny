@@ -107,22 +107,16 @@ public static class MauiProgram
 
         // ble client
         s.RegisterForNavigation<BleClient.ScanPage, BleClient.ScanViewModel>("BleScan");
-        s.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralViewModel>("BlePeripheral");
-        s.RegisterForNavigation<BleClient.ServicePage, BleClient.ServiceViewModel>("BlePeripheralService");
-        s.RegisterForNavigation<BleClient.CharacteristicPage, BleClient.CharacteristicViewModel>("BlePeripheralCharacteristic");
-        s.RegisterForNavigation<BleClient.L2CapPage, BleHosting.L2CapViewModel>("BleL2Cap");
+        //s.RegisterForNavigation<BleClient.PeripheralPage, BleClient.PeripheralViewModel>("BlePeripheral");
+        //s.RegisterForNavigation<BleClient.ServicePage, BleClient.ServiceViewModel>("BlePeripheralService");
+        //s.RegisterForNavigation<BleClient.CharacteristicPage, BleClient.CharacteristicViewModel>("BlePeripheralCharacteristic");
+        //s.RegisterForNavigation<BleClient.L2CapPage, BleHosting.L2CapViewModel>("BleL2Cap");
         s.RegisterForNavigation<BleManaged.ManagedScanPage, BleManaged.ManagedScanViewModel>("BleManagedScan");
-        s.RegisterForNavigation<BleManaged.ManagedPeripheralPage, BleManaged.ManagedPeripheralViewModel>("BleManagedPeripheral");
 
         // ble hosting
         s.RegisterForNavigation<BleHosting.MainPage, BleHosting.MainViewModel>("BleHosting");
         s.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
         s.RegisterForNavigation<BleHosting.ManagedPage, BleHosting.ManagedViewModel>("BleHostingManaged");
-        s.RegisterForNavigation<BleHosting.L2CapPage, BleHosting.L2CapViewModel>("BleHostingL2Cap");
-
-        // ble perf testing
-        s.RegisterForNavigation<BlePerf.ClientPage, BlePerf.ClientViewModel>("BlePerfClient");
-        s.RegisterForNavigation<BlePerf.ServerPage, BlePerf.ServerViewModel>("BlePerfServer");
 
         // locations
         s.RegisterForNavigation<Geofencing.ListPage, Geofencing.ListViewModel>("Geofencing");

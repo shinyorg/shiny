@@ -62,4 +62,11 @@
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />        
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
     </ItemGroup>
+
+	<ItemGroup>
+		<None Remove="TODO/**" />
+		<Compile Remove="TODO/**" />
+		<MauiXaml Remove="TODO/**" />
+		<Content Include="TODO/**" />
+    </ItemGroup>
 </Project>
