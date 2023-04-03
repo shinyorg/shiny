@@ -7,7 +7,7 @@ namespace Shiny.BluetoothLE;
 
 
 [BroadcastReceiver(
-    Name = ".ShinyBleAdapterStateBroadcastReceiver",
+    Name = "org.shiny.bluetoothle.ShinyBleAdapterStateBroadcastReceiver",
     Enabled = true,
     Exported = true
 )]
