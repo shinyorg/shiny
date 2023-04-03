@@ -1,5 +1,4 @@
 ﻿#if PLATFORM
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Support.Repositories;
@@ -10,11 +9,9 @@ namespace Shiny;
 
 public static class ServiceRegistrationExtensions
 {
-    public static IServiceCollection AddRepository<TRepositoryConverter, TEntity>(this IServiceCollection services)
-        where TRepositoryConverter : class, IRepositoryConverter<TEntity>, new()
-        where TEntity : IRepositoryEntity
+    public static IServiceCollection AddDefaultRepository(this IServiceCollection services)
     {
-        services.AddSingleton<IRepository<TEntity>, JsonFileRepository<TRepositoryConverter, TEntity>>();
+        services.TryAddSingleton<IRepository, FileSystemRepository>();
         return services;
     }
 }

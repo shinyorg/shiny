@@ -3,7 +3,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Beacons;
-using Shiny.Beacons.Infrastructure;
 
 namespace Shiny;
 
@@ -40,8 +39,8 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<BackgroundTask>();
         services.AddBluetoothLE();
 #endif
+        services.AddDefaultRepository();
         services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
-        services.AddRepository<BeaconRegionRepositoryConverter, BeaconRegion>();
         services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
 
         return services;

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using UserNotifications;
-
-namespace Shiny.Notifications;
+﻿namespace Shiny.Notifications;
 
 
 public class AppleNotification : Notification
 {
-    public Func<Channel, UNNotificationRequest, Task>? Customize { get; }
+    public string? FilterCriteria { get; set; }
+    public double RelevanceScore { get; set; }
+    public string? TargetContentIdentifier { get; set; }
+    public string? Subtitle { get; set; }
 }

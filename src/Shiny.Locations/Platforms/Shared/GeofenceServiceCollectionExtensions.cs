@@ -1,10 +1,7 @@
 ﻿#if PLATFORM
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
-using Shiny.Locations.Infrastructure;
-using Shiny.Stores;
 #if ANDROID
 using Android.App;
 using Android.Gms.Common;
@@ -23,20 +20,25 @@ public static class GeofenceServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
     {
-        services.AddRepository<GeofenceRegionRepositoryConverter, GeofenceRegion>();
+        services.AddShinyService(delegateType);
+        services.AddDefaultRepository();
+
 #if ANDROID
-        var resultCode = GoogleApiAvailability
-            .Instance
-            .IsGooglePlayServicesAvailable(Application.Context);
+        if (!services.HasService<IGeofenceManager>())
+        {
+            var resultCode = GoogleApiAvailability
+                .Instance
+                .IsGooglePlayServicesAvailable(Application.Context);
 
-        if (resultCode == ConnectionResult.ServiceMissing)
-            return services.AddGpsDirectGeofencing(delegateType);
+            if (resultCode == ConnectionResult.ServiceMissing)
+                return services.AddGpsDirectGeofencing(delegateType);
 
-        services.AddShinyService(delegateType);
-        services.AddShinyService<GeofenceManager>();
+            
+            services.AddShinyService<GeofenceManager>();
+        }
 #elif APPLE
-        services.AddShinyService(delegateType);
-        services.AddShinyService<GeofenceManager>();
+        if (!services.HasService<IGeofenceManager>())
+            services.AddShinyService<GeofenceManager>();
 #endif
         return services;
     }

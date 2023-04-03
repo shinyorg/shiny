@@ -18,7 +18,7 @@ public class JobManager : AbstractJobManager
     public JobManager(
         AndroidPlatform platform,
         IServiceProvider container,
-        IRepository<JobInfo> repository,
+        IRepository repository,
         ILogger<IJobManager> logger
     )
     : base(

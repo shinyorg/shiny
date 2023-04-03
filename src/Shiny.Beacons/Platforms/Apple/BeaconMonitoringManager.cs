@@ -13,7 +13,7 @@ namespace Shiny.Beacons;
 
 public partial class BeaconMonitoringManager : IBeaconMonitoringManager
 {
-    readonly IRepository<BeaconRegion> repository;
+    readonly IRepository repository;
     readonly CLLocationManager manager;
     readonly BeaconLocationManagerDelegate gdelegate;
 
@@ -21,7 +21,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     public BeaconMonitoringManager(
         IServiceProvider services,
         ILogger<BeaconLocationManagerDelegate> logger,
-        IRepository<BeaconRegion> repository
+        IRepository repository
     )
     {
         this.repository = repository;
@@ -46,11 +46,11 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
 
     public void StopMonitoring(string identifier)
     {
-        var region = this.repository.Get(identifier);
+        var region = this.repository.Get<BeaconRegion>(identifier);
 
         if (region != null)
         {
-            this.repository.Remove(region.Identifier);
+            this.repository.Remove<BeaconRegion>(region.Identifier);
             this.manager.StopMonitoring(region.ToNative());
         }
     }
@@ -58,7 +58,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
 
     public void StopAllMonitoring()
     {
-        this.repository.Clear();
+        this.repository.Clear<BeaconRegion>();
 
         var allRegions = this
            .manager
@@ -70,5 +70,5 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     }
 
     public IList<BeaconRegion> GetMonitoredRegions()
-        => this.repository.GetList();
+        => this.repository.GetList<BeaconRegion>();
 }

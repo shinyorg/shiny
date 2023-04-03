@@ -8,9 +8,8 @@ using System.Reactive.Threading.Tasks;
 using Android.App;
 using Android.Gms.Location;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
-using Shiny.Support.Repositories;
 using P = Android.Manifest.Permission;
+using Shiny.Support.Repositories;
 
 namespace Shiny.Locations;
 
@@ -22,7 +21,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     readonly AndroidPlatform platform;
     readonly IServiceProvider services;
-    readonly IRepository<GeofenceRegion> repository;
+    readonly IRepository repository;
     readonly ILogger logger;
 
     readonly GeofencingClient client;
@@ -31,7 +30,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     public GeofenceManager(
         AndroidPlatform platform,
-        IRepository<GeofenceRegion> repository,
+        IRepository repository,
         IServiceProvider services,
         ILogger<GeofenceManager> logger
     )
@@ -60,7 +59,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                     foreach (var triggeringGeofence in e.TriggeringGeofences)
                     {
                         var state = (GeofenceState)e.GeofenceTransition;
-                        var region = this.repository.Get(triggeringGeofence.RequestId);
+                        var region = this.repository.Get<GeofenceRegion>(triggeringGeofence.RequestId);
 
                         if (region == null)
                         {
@@ -78,7 +77,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                     }
                 }
             };
-            var regions = this.repository.GetList();
+            var regions = this.repository.GetList<GeofenceRegion>();
             foreach (var region in regions)
                 await this.Create(region);
         }
@@ -105,7 +104,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
 
     public IList<GeofenceRegion> GetMonitorRegions()
-        => this.repository.GetList();
+        => this.repository.GetList<GeofenceRegion>();
 
 
     public async Task StartMonitoring(GeofenceRegion region)
@@ -118,19 +117,19 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     public Task StopMonitoring(string identifier)
     {
-        this.repository.Remove(identifier);
+        this.repository.Remove<GeofenceRegion>(identifier);
         return this.client.RemoveGeofencesAsync(new List<string> { identifier });
     }
 
 
     public async Task StopAllMonitoring()
     {
-        var regions = this.repository.GetList();
+        var regions = this.repository.GetList<GeofenceRegion>();
         var regionIds = regions.Select(x => x.Identifier).ToArray();
         if (regionIds.Any())
             await this.client.RemoveGeofencesAsync(regionIds).ConfigureAwait(false);
 
-        this.repository.Clear();
+        this.repository.Clear<GeofenceRegion>();
     }
 
 

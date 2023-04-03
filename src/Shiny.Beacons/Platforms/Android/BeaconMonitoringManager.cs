@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
-using Shiny.Locations;
 using Shiny.Support.Repositories;
 using P = Android.Manifest.Permission;
 
@@ -13,14 +12,14 @@ namespace Shiny.Beacons;
 
 public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyStartupTask
 {
-    readonly IRepository<BeaconRegion> repository;
+    readonly IRepository repository;
     readonly IBleManager bleManager;
     readonly AndroidPlatform platform;
 
 
     public BeaconMonitoringManager(
         IBleManager bleManager,
-        IRepository<BeaconRegion> repository,
+        IRepository repository,
         AndroidPlatform platform
     )
     {
@@ -49,12 +48,12 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public void StopMonitoring(string identifier)
     {
-        var region = this.repository.Get(identifier);
+        var region = this.repository.Get<BeaconRegion>(identifier);
 
         if (region != null)
         {
-            this.repository.Remove(identifier);
-            var regions = this.repository.GetList();
+            this.repository.Remove<BeaconRegion>(identifier);
+            var regions = this.repository.GetList<BeaconRegion>();
 
             if (regions.Count == 0)
                 this.StopService();
@@ -64,7 +63,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public void StopAllMonitoring()
     {
-        this.repository.Clear();
+        this.repository.Clear<BeaconRegion>();
         this.StopService();
     }
 
@@ -93,7 +92,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
 
     public IList<BeaconRegion> GetMonitoredRegions()
-        => this.repository.GetList();
+        => this.repository.GetList<BeaconRegion>();
 
 
     void StartService()

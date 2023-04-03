@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Hosting;
-using Shiny.Notifications.Infrastructure;
 
 namespace Shiny.Notifications;
 
@@ -16,6 +13,11 @@ public static class CommonExtensions
     //        .GetRequiredService<IPlatform>()
     //        .ResourceToFilePath(assembly, resourceName);
 
+#if ANDROID
+    public static void Add(this IChannelManager manager, AndroidChannel channel) => manager.Add(channel);
+#elif APPLE
+    public static void Add(this IChannelManager manager, AppleChannel channel) => manager.Add(channel);
+#endif
 
     internal static void AssertChannelRemove(this IChannelManager channelManager, string channelIdentifier)
     {
@@ -29,11 +31,27 @@ public static class CommonExtensions
 
     public static IServiceCollection AddChannelManager(this IServiceCollection services)
     {
+        services.AddDefaultRepository();
         if (!services.HasService<IChannelManager>())
-        {
-            services.AddRepository<ChannelRepositoryConverter, Channel>();
             services.AddShinyService<ChannelManager>();
-        }
+        
         return services;
+    }
+
+
+    internal static TNativeChannel TryToNative<TNativeChannel>(this Channel channel) where TNativeChannel : Channel, new()
+    {
+        if (channel is TNativeChannel native)
+            return native;
+
+        return new TNativeChannel
+        {
+            Identifier = channel.Identifier,
+            Importance = channel.Importance,
+            Description = channel.Description,
+            Sound = channel.Sound,
+            CustomSoundPath = channel.CustomSoundPath,
+            Actions = channel.Actions
+        };
     }
 }

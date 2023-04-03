@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Notifications;
-using Shiny.Notifications.Infrastructure;
 
 namespace Shiny;
 
@@ -30,7 +29,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, IosConfiguration? configuration = null)
     {
         services.AddSingleton(configuration ?? new());
-        services.AddRepository<NotificationRepositoryConverter, Notification>();
         services.AddChannelManager();
         services.AddShinyService<NotificationManager>();
 
@@ -66,7 +64,7 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<AndroidNotificationProcessor>();
         services.TryAddSingleton<AndroidNotificationManager>();
 
-        services.AddRepository<NotificationRepositoryConverter, Notification>();
+        services.AddDefaultRepository();
         services.AddChannelManager();
         services.AddShinyService<NotificationManager>();
 

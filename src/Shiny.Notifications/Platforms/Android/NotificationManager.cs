@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Android;
 using Android.Content;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
@@ -20,7 +20,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
     readonly AndroidPlatform platform;
     readonly IChannelManager channelManager;
     readonly AndroidNotificationManager manager;
-    readonly IRepository<Notification> repository;
+    readonly IRepository repository;
     readonly IGeofenceManager geofenceManager;
     readonly IKeyValueStore settings;
     readonly ILogger logger;
@@ -30,7 +30,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         IServiceProvider services,
         AndroidPlatform platform,
         AndroidNotificationManager manager,
-        IRepository<Notification> repository,
+        IRepository repository,
         IChannelManager channelManager,
         IGeofenceManager geofenceManager,
         IKeyValueStoreFactory keystore,
@@ -57,11 +57,11 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
 
     public async Task Cancel(int id)
     {
-        var notification = this.repository.Get(id.ToString());
+        var notification = this.repository.Get<AndroidNotification>(id.ToString());
         if (notification != null)
         {
             await this.CancelInternal(notification).ConfigureAwait(false);
-            this.repository.Remove(id.ToString());
+            this.repository.Remove<AndroidNotification>(id.ToString());
         }
     }
 
@@ -74,22 +74,22 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         }
         if (scope == CancelScope.All || scope == CancelScope.Pending)
         {
-            var notifications = this.repository.GetList();
+            var notifications = this.repository.GetList<AndroidNotification>();
             foreach (var notification in notifications)
             {
                 await this.CancelInternal(notification).ConfigureAwait(false);
             }
-            this.repository.Clear();
+            this.repository.Clear<AndroidNotification>();
         }
     }
 
 
     public Task<Notification?> GetNotification(int notificationId)
-        => Task.FromResult(this.repository.Get(notificationId.ToString()));
+        => Task.FromResult((Notification?)this.repository.Get<AndroidNotification>(notificationId.ToString()));
 
 
     public Task<IList<Notification>> GetPendingNotifications()
-        => Task.FromResult(this.repository.GetList());
+        => Task.FromResult((IList<Notification>)this.repository.GetList<AndroidNotification>().OfType<Notification>().ToList());
 
 
     public async Task<AccessState> RequestAccess(AccessRequestFlags access)
@@ -135,6 +135,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
     public async Task Send(Notification notification)
     {
         notification.AssertValid();
+        var android = notification.TryToNative<AndroidNotification>();
 
         // TODO: should I cancel an existing id if the user is setting it?
         if (notification.Id == 0)
@@ -145,9 +146,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         if (channel == null)
             throw new InvalidProgramException("No channel found for " + channelId);
 
-        var builder = await this.manager
-            .CreateNativeBuilder(notification, channel!)
-            .ConfigureAwait(false);
+        var builder = this.manager.CreateNativeBuilder(android, channel!);
 
         if (notification.Geofence != null)
         {

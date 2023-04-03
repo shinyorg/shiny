@@ -15,22 +15,22 @@ public enum RepositoryAction
 }
 
 
-public interface IRepository<TEntity> where TEntity : IRepositoryEntity
+public interface IRepository
 {
     /// <summary>
-    /// Returns true if a given key/type value is found in storage
+    /// Returns true if a given identifier/type value is found in storage
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    bool Exists(string key);
+    bool Exists<TEntity>(string identifier) where TEntity : IRepositoryEntity;
 
     /// <summary>
     /// Returns a specific entity by its key value
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    TEntity? Get(string key);
+    TEntity? Get<TEntity>(string identifier) where TEntity : IRepositoryEntity;
 
     /// <summary>
     /// Gets all entities from storage of a given type
@@ -38,33 +38,33 @@ public interface IRepository<TEntity> where TEntity : IRepositoryEntity
     /// <typeparam name="T"></typeparam>
     /// <param name="expression"></param>
     /// <returns></returns>
-    IList<TEntity> GetList(Expression<Func<TEntity, bool>>? expression = null);
+    IList<TEntity> GetList<TEntity>(Expression<Func<TEntity, bool>>? expression = null) where TEntity : IRepositoryEntity;
 
     /// <summary>
     /// Returns true if updating otherwise false if new
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    bool Set(TEntity entity);
+    bool Set<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
 
     /// <summary>
     /// Removes an entity from storage - if the entity exists, returns true, otherwise false
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    bool Remove(string key);
+    bool Remove<TEntity>(string identifier) where TEntity : IRepositoryEntity;
 
     /// <summary>
     /// Clears all entities of a given type
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    void Clear();
+    void Clear<TEntity>() where TEntity : IRepositoryEntity;
 
     /// <summary>
     /// An observable for watching events within the repository
     /// </summary>
     /// <returns></returns>
-    IObservable<(RepositoryAction Action, TEntity? Entity)> WhenActionOccurs();
+    IObservable<(RepositoryAction Action, object? Entity)> WhenActionOccurs();
 }

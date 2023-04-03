@@ -6,10 +6,9 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
-using CoreLocation;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
 using Shiny.Support.Repositories;
+using CoreLocation;
 using UIKit;
 
 namespace Shiny.Locations;
@@ -21,13 +20,13 @@ public class GeofenceManager : IGeofenceManager
     readonly IPlatform platform;
     readonly IServiceProvider services;
     readonly ILogger logger;
-    readonly IRepository<GeofenceRegion> repository;
+    readonly IRepository repository;
 
 
     public GeofenceManager(
         IPlatform platform,
         IServiceProvider services,
-        IRepository<GeofenceRegion> repository,
+        IRepository repository,
         ILogger<GeofenceManager> logger
     )
     {
@@ -54,7 +53,7 @@ public class GeofenceManager : IGeofenceManager
     {
         if (region is CLCircularRegion native)
         {
-            var geofence = this.repository.Get(native.Identifier);
+            var geofence = this.repository.Get<GeofenceRegion>(native.Identifier);
 
             if (geofence != null)
             {
@@ -82,7 +81,7 @@ public class GeofenceManager : IGeofenceManager
 
 
     public IList<GeofenceRegion> GetMonitorRegions()
-        => this.repository.GetList();
+        => this.repository.GetList<GeofenceRegion>();
 
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
@@ -136,11 +135,11 @@ public class GeofenceManager : IGeofenceManager
 
     public Task StopMonitoring(string identifier)
     {
-        var region = this.repository.Get(identifier);
+        var region = this.repository.Get<GeofenceRegion>(identifier);
 
         if (region != null)
         {
-            this.repository.Remove(region.Identifier);
+            this.repository.Remove<GeofenceRegion>(region.Identifier);
             this.locationManager.StopMonitoring(region.ToNative());
         }
         return Task.CompletedTask;
@@ -149,7 +148,7 @@ public class GeofenceManager : IGeofenceManager
 
     public Task StopAllMonitoring()
     {
-        this.repository.Clear();
+        this.repository.Clear<GeofenceRegion>();
 
         var natives = this
             .locationManager

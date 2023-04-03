@@ -20,7 +20,7 @@ public class AndroidNotificationProcessor
 
     readonly AndroidNotificationManager notificationManager;
     readonly IGeofenceManager geofenceManager;
-    readonly IRepository<Notification> repository;
+    readonly IRepository repository;
     readonly ISerializer serializer;
     readonly ILogger logger;
     readonly IEnumerable<INotificationDelegate> delegates;
@@ -29,7 +29,7 @@ public class AndroidNotificationProcessor
     public AndroidNotificationProcessor(
         AndroidNotificationManager notificationManager,
         IGeofenceManager geofenceManager,
-        IRepository<Notification> repository,
+        IRepository repository,
         ISerializer serializer,
         ILogger<AndroidNotificationProcessor> logger,
         IEnumerable<INotificationDelegate> delegates
@@ -75,17 +75,17 @@ public class AndroidNotificationProcessor
     }
 
 
-    public async Task ProcessPending()
+    public void ProcessPending()
     {
         // fire any missed/pending alarms?
-        var missed = this.repository.GetList(
+        var missed = this.repository.GetList<AndroidNotification>(
             x => x.ScheduleDate != null &&
             x.ScheduleDate < DateTime.UtcNow
         );
 
         foreach (var notification in missed)
         {
-            await this.notificationManager.Send(notification).ConfigureAwait(false);
+            this.notificationManager.Send(notification);
             this.DeleteOrReschedule(notification);
         }
     }
@@ -98,15 +98,15 @@ public class AndroidNotificationProcessor
             return;
 
         var notificationId = region.Identifier.Replace(GeofenceKey, String.Empty);
-        var notification = this.repository.Get(notificationId);
+        var notification = this.repository.Get<AndroidNotification>(notificationId);
 
         if (notification?.Geofence != null)
         {
-            await this.notificationManager.Send(notification).ConfigureAwait(false);
+            this.notificationManager.Send(notification);
 
             if (!notification.Geofence.Repeat)
             {
-                this.repository.Remove(notificationId);
+                this.repository.Remove<AndroidNotification>(notificationId);
                 await this.geofenceManager
                     .StopMonitoring(region.Identifier)
                     .ConfigureAwait(false);
@@ -115,16 +115,16 @@ public class AndroidNotificationProcessor
     }
 
 
-    public async Task ProcessAlarm(Intent intent)
+    public void ProcessAlarm(Intent intent)
     {
         // get notification for alarm
         var id = intent.GetIntExtra(IntentNotificationKey, 0);
         if (id > 0)
         {
-            var notification = this.repository.Get(id.ToString());
+            var notification = this.repository.Get<AndroidNotification>(id.ToString());
             if (notification != null)
             {
-                await this.notificationManager.Send(notification).ConfigureAwait(false);
+                this.notificationManager.Send(notification);
                 this.DeleteOrReschedule(notification);
             }
         }
@@ -135,7 +135,7 @@ public class AndroidNotificationProcessor
     {
         if (notification.RepeatInterval == null)
         {
-            this.repository.Remove(notification.Id.ToString());
+            this.repository.Remove<AndroidNotification>(notification.Id.ToString());
         }
         else
         {

@@ -123,7 +123,8 @@ public static class Extensions
     /// <returns></returns>
     public static bool IsPositionInside(this GeofenceRegion region, Position position)
     {
-        var distance = region.Center.GetDistanceTo(position);
+        var center = new Position(region.Center.Latitude, region.Center.Longitude);
+        var distance = center.GetDistanceTo(position);
         var inside = distance.TotalMeters <= region.Radius.TotalMeters;
         return inside;
     }

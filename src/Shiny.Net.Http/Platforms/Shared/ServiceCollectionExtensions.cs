@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shiny.Net.Http;
-using Shiny.Stores.Impl;
-using Shiny.Support.Repositories.Impl;
 
 namespace Shiny;
 
@@ -16,7 +14,7 @@ public static class ServiceCollectionExtensions
 
 #if ANDROID
         services.AddJob(typeof(TransferJob), requiredNetwork: Jobs.InternetAccess.Any, runInForeground: true);
-        services.AddRepository<BlobRepositoryConverter<HttpTransferRequest>, BlobRepositoryEntity<HttpTransferRequest>>();
+        services.AddDefaultRepository();
 #endif
         return services;
     }

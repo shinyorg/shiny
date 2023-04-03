@@ -16,28 +16,33 @@ public record BeaconRegion(
     string Identifier,
     Guid Uuid,
     ushort? Major = null,
-    ushort? Minor = null
+    ushort? Minor = null,
+    bool NotifyOnEntry = true,
+    bool NotifyOnExit = true
 ) : IRepositoryEntity
 {
-    public bool NotifyOnEntry { get; set; } = true;
-    public bool NotifyOnExit { get; set; } = true;
+    // forces validation to run after primary ctor
+    readonly bool valid = Check.Assert(Identifier, Major, Minor);
 
-
-    public void Validate()
+    internal static class Check
     {
-        if (this.Major != null && this.Major < 1)
-            throw new ArgumentException("Invalid Major Value");
-
-        if (this.Minor != null)
+        internal static bool Assert(string identifier, double? major, double? minor)
         {
-            if (this.Major == null)
-                throw new InvalidOperationException("You must provide a major value if you are setting minor");
+            if (identifier.IsEmpty())
+                throw new ArgumentException("Identifier is not set");
 
-            if (this.Minor < 1)
-                throw new InvalidOperationException("Invalid Minor Value");
+            if (major != null && major < 1)
+                throw new ArgumentException("Invalid Major Value");
+
+            if (minor != null)
+            {
+                if (major == null)
+                    throw new InvalidOperationException("You must provide a major value if you are setting minor");
+
+                if (minor < 1)
+                    throw new InvalidOperationException("Invalid Minor Value");
+            }
+            return true;
         }
     }
-
-
-    public override string ToString() => $"[Identifier: {this.Identifier} - UUID: {this.Uuid} - Major: {this.Major ?? 0} - Minor: {this.Minor ?? 0}]";
 }

@@ -16,14 +16,14 @@ public class BackgroundTask : IDisposable
     IDisposable? repoSub;
     IDisposable? scanSub;
 
-    readonly IRepository<BeaconRegion> repository;
+    readonly IRepository repository;
     readonly IBleManager bleManager;
     readonly ILogger logger;
     readonly IEnumerable<IBeaconMonitorDelegate> delegates;
 
 
     public BackgroundTask(
-        IRepository<BeaconRegion> repository,
+        IRepository repository,
         IBleManager centralManager,
         IEnumerable<IBeaconMonitorDelegate> delegates,
         ILogger<IBeaconMonitorDelegate> logger
@@ -42,9 +42,11 @@ public class BackgroundTask : IDisposable
 
         this.repoSub = this.repository
             .WhenActionOccurs()
-            .Subscribe(action =>
+            .Where(x => x.Entity is BeaconRegion)
+            .Subscribe(x =>
             {
-                switch (action.Action)
+                var e = (BeaconRegion)x.Entity;
+                switch (x.Action)
                 {
                     case RepositoryAction.Add:
                         if (this.states.Count == 0)
@@ -55,7 +57,7 @@ public class BackgroundTask : IDisposable
                         {
                             lock (this.states)
                             {
-                                this.states.Add(action.Entity!.Identifier, new BeaconRegionStatus(action.Entity));
+                                this.states.Add(e.Identifier, new BeaconRegionStatus(e));
                             }
                         }
                         break;
@@ -67,7 +69,7 @@ public class BackgroundTask : IDisposable
                     case RepositoryAction.Remove:
                         lock (this.states)
                         {
-                            this.states.Remove(action.Entity!.Identifier);
+                            this.states.Remove(e.Identifier);
                             if (this.states.Count == 0)
                                 this.StopScan();
                         }
@@ -90,7 +92,7 @@ public class BackgroundTask : IDisposable
             return;
 
         this.logger.LogInformation("Beacon Monitoring Scan Starting");
-        var regions = this.repository.GetList();
+        var regions = this.repository.GetList<BeaconRegion>();
         if (!regions.Any())
             return;
 

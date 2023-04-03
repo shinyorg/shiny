@@ -19,7 +19,7 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStar
 
     public JobManager(
         IServiceProvider container,
-        IRepository<JobInfo> repository,
+        IRepository repository,
         ILogger<IJobManager> logger
     ) : base(
         container,

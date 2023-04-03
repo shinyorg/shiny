@@ -1,6 +1,5 @@
 ﻿using System;
 using Android.App;
-using Android.Content;
 using Shiny.Notifications;
 
 namespace Shiny;

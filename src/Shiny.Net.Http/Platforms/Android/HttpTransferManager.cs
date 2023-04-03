@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
-using Shiny.Stores.Impl;
 using Shiny.Support.Repositories;
-using Shiny.Support.Repositories.Impl;
 
 namespace Shiny.Net.Http;
 
@@ -18,7 +14,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
     readonly AndroidPlatform platform;
     readonly IServiceProvider services;
     readonly IConnectivity connectivity;
-    readonly IRepository<BlobRepositoryEntity<HttpTransferRequest>> repository;
+    readonly IRepository repository;
 
 
     public HttpTransferManager(
@@ -26,7 +22,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
         AndroidPlatform platform,
         IServiceProvider services,
         IConnectivity connectivity,
-        IRepository<BlobRepositoryEntity<HttpTransferRequest>> repository
+        IRepository repository
     )
     {
         this.logger = logger;
@@ -44,16 +40,16 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
         {
             // TODO: danger - moving back to an async GetList will stop this.  We need to force the collection to load BEFORE the job runs which is a problem
             // the job may not see the collection is loaded.  Switching to GetList method also removes need to be thread safe on the collection
-            var requestBlobs = this.repository.GetList();
-            foreach (var blob in requestBlobs)
-            {
-                // TODO: anything that was inprogress, should auto resume - must save that state though,
-                // so we know manual 'manual pause' from 'paused by network'?  'Paused by network' could just move back to pending/inprogress
+            //var requestBlobs = this.repository.GetList<HttpTransferRequest>();
+            //foreach (var blob in requestBlobs)
+            //{
+            //    // TODO: anything that was inprogress, should auto resume - must save that state though,
+            //    // so we know manual 'manual pause' from 'paused by network'?  'Paused by network' could just move back to pending/inprogress
 
-                // job will deal with auto restart
-                var ht = this.Create(blob.Object, blob.Identifier);
-                this.transfers.Add(ht);
-            }
+            //    // job will deal with auto restart
+            //    var ht = this.Create(blob.Object, blob.Identifier);
+            //    this.transfers.Add(ht);
+            //}
         }
         catch (Exception ex)
         {
@@ -78,11 +74,11 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
         var identifier = Guid.NewGuid().ToString();
         var ht = this.Create(request, identifier);
 
-        this.repository.Set(new
-        (
-            identifier,
-            request
-        ));
+        //this.repository.Set(new
+        //(
+        //    identifier,
+        //    request
+        //));
         this.transfers.Add(ht);
 
         return ht;
@@ -95,7 +91,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
             transfer.Cancel();
 
         this.transfers.Clear();
-        this.repository.Clear();
+        //this.repository.Clear();
         return Task.CompletedTask;
     }
 
@@ -109,7 +105,7 @@ class HttpTransferManager : IHttpTransferManager, IShinyStartupTask, IShinyCompo
             ht.Cancel();
             this.transfers.Remove(ht);
         }
-        this.repository.Remove(identifier);
+        //this.repository.Remove(identifier);
         return Task.CompletedTask;
     }
 

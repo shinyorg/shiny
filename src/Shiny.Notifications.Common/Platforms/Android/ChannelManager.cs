@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Media;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Notifications;
@@ -15,14 +13,14 @@ namespace Shiny.Notifications;
 
 public class ChannelManager : IChannelManager, IShinyComponentStartup
 {
-    readonly IRepository<Channel> repository;
+    readonly IRepository repository;
     readonly AndroidPlatform platform;
     readonly ILogger logger;
     readonly NotificationManager nativeManager;
 
 
     public ChannelManager(
-        IRepository<Channel> repository,
+        IRepository repository,
         ILogger<ChannelManager> logger,
         AndroidPlatform platform
     )
@@ -52,6 +50,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     public void Add(Channel channel)
     {
         channel.AssertValid();
+        var android = channel.TryToNative<AndroidChannel>();
 
         var native = new NotificationChannel(
             channel.Identifier,
@@ -94,34 +93,32 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
                 native.SetSound(null, null);
                 break;
         }
-        if (channel is AndroidChannel android)
-        {
-            if (android.Description != null)
-                native.Description = android.Description;
+        if (android.Description != null)
+            native.Description = android.Description;
 
-            if (android.AllowBubbles != null && OperatingSystemShim.IsAndroidVersionAtLeast(26))
-                native.SetAllowBubbles(android.AllowBubbles.Value);
+        if (android.AllowBubbles != null && OperatingSystemShim.IsAndroidVersionAtLeast(26))
+            native.SetAllowBubbles(android.AllowBubbles.Value!);
 
-            if (android.ShowBadge != null)
-                native.SetShowBadge(android.ShowBadge.Value);
+        if (android.ShowBadge != null)
+            native.SetShowBadge(android.ShowBadge.Value);
 
-            if (android.EnableLights != null)
-                native.EnableLights(android.EnableLights.Value);
+        if (android.EnableLights != null)
+            native.EnableLights(android.EnableLights.Value);
 
-            if (android.EnableVibration != null)
-                native.EnableVibration(android.EnableVibration.Value);
+        if (android.EnableVibration != null)
+            native.EnableVibration(android.EnableVibration.Value);
 
-            if (android.LockscreenVisibility != null)
-                native.LockscreenVisibility = android.LockscreenVisibility.Value;
+        if (android.LockscreenVisibility != null)
+            native.LockscreenVisibility = android.LockscreenVisibility.Value;
 
-            if (android.Blockable != null && OperatingSystemShim.IsAndroidVersionAtLeast(33))
-                native.Blockable = android.Blockable.Value;
+        if (android.Blockable != null && OperatingSystemShim.IsAndroidVersionAtLeast(33))
+            native.Blockable = android.Blockable.Value;
 
-            if (android.BypassDnd != null)
-                native.SetBypassDnd(android.BypassDnd.Value);
-        }
+        if (android.BypassDnd != null)
+            native.SetBypassDnd(android.BypassDnd.Value);
+
         this.nativeManager.CreateNotificationChannel(native);
-        this.repository.Set(channel);
+        this.repository.Set(android);
     }
 
 
@@ -131,19 +128,19 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
         foreach (var channel in channels)
             this.nativeManager.DeleteNotificationChannel(channel.Identifier);
 
-        this.repository.Clear();
+        this.repository.Clear<AndroidChannel>();
         this.Add(Channel.Default);
     }
 
 
-    public Channel? Get(string channelId) => this.repository.Get(channelId);
-    public IList<Channel> GetAll() => this.repository.GetList();
+    public Channel? Get(string channelId) => this.repository.Get<AndroidChannel>(channelId);
+    public IList<Channel> GetAll() => this.repository.GetList<AndroidChannel>().OfType<Channel>().ToList();
     public void Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);
 
         this.nativeManager.DeleteNotificationChannel(channelId);
-        this.repository.Remove(channelId);
+        this.repository.Remove<AndroidChannel>(channelId);
     }
 
 

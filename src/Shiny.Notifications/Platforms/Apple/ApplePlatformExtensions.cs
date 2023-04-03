@@ -7,20 +7,31 @@ namespace Shiny.Notifications;
 
 public static class ApplePlatformExtensions
 {
-    public static Notification FromNative(this UNNotificationRequest native)
+    public static AppleNotification FromNative(this UNNotificationRequest native)
     {
         var id = 0;
         Int32.TryParse(native.Identifier, out id);
 
-        var shiny = new Notification
+        var shiny = new AppleNotification
         {
             Id = id,
             Title = native.Content?.Title,
             Message = native.Content?.Body,
             Payload = native.Content?.UserInfo?.FromNsDictionary(),
             BadgeCount = native.Content?.Badge?.Int32Value,
-            Channel = native.Content?.CategoryIdentifier
+            Channel = native.Content?.CategoryIdentifier,            
+            TargetContentIdentifier = native.Content?.TargetContentIdentifier,
+            Subtitle = native.Content?.Subtitle
         };
+
+
+        if (OperatingSystemShim.IsAppleVersionAtleast(14))
+        {
+            if (native.Content?.RelevanceScore > 0)
+                shiny.RelevanceScore = native.Content!.RelevanceScore!;
+
+            shiny.FilterCriteria = native.Content?.FilterCriteria!;
+        }
 
         if (native.Trigger is UNCalendarNotificationTrigger calendar)
         {

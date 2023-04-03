@@ -6,7 +6,6 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Locations;
@@ -15,7 +14,7 @@ namespace Shiny.Locations;
 public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 {
     readonly ILogger logger;
-    readonly IRepository<GeofenceRegion> repository;
+    readonly IRepository repository;
     readonly IGpsManager gpsManager;
 
 
@@ -28,7 +27,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     public GpsGeofenceManagerImpl(
         ILogger<GpsGeofenceManagerImpl> logger,
-        IRepository<GeofenceRegion> repository, 
+        IRepository repository, 
         IGpsManager gpsManager
     )
     {
@@ -42,7 +41,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     {
         try 
         { 
-            var restore = this.repository.GetList();
+            var restore = this.repository.GetList<GeofenceRegion>();
             if (restore.Any())
                 await this.TryStartGps();
         }
@@ -58,7 +57,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
 
     public IList<GeofenceRegion> GetMonitorRegions()
-        => this.repository.GetList();
+        => this.repository.GetList<GeofenceRegion>();
 
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
@@ -88,15 +87,15 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     public async Task StopAllMonitoring()
     {
-        this.repository.Clear();
+        this.repository.Clear<GeofenceRegion>();
         await this.gpsManager.StopListener().ConfigureAwait(false);
     }
 
 
     public async Task StopMonitoring(string identifier)
     {
-        this.repository.Remove(identifier);
-        var geofences = this.repository.GetList();
+        this.repository.Remove<GeofenceRegion>(identifier);
+        var geofences = this.repository.GetList<GeofenceRegion>();
 
         if (geofences.Count == 0)
             await this.gpsManager!.StopListener();

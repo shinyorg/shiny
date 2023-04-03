@@ -15,13 +15,13 @@ public abstract class AbstractJobManager : IJobManager
 {
     readonly Subject<JobRunResult> jobFinished = new();
     readonly Subject<JobInfo> jobStarted = new();
-    readonly IRepository<JobInfo> repository;
+    readonly IRepository repository;
     readonly IServiceProvider container;
 
 
     protected AbstractJobManager(
         IServiceProvider container,
-        IRepository<JobInfo> repository,
+        IRepository repository,
         ILogger<IJobManager> logger
     )
     {
@@ -58,7 +58,7 @@ public abstract class AbstractJobManager : IJobManager
         JobInfo? actual = null;
         try
         {
-            var job = this.repository.Get(jobName);
+            var job = this.repository.Get<JobInfo>(jobName);
 
             if (job == null)
                 throw new ArgumentException("No job found named " + jobName);
@@ -76,27 +76,27 @@ public abstract class AbstractJobManager : IJobManager
 
 
     public IList<JobInfo> GetJobs()
-        => this.repository.GetList();
+        => this.repository.GetList<JobInfo>();
 
 
     public JobInfo? GetJob(string jobIdentifier)
-        => this.repository.Get(jobIdentifier);
+        => this.repository.Get<JobInfo>(jobIdentifier);
 
 
     public void Cancel(string jobIdentifier)
     {
-        var job = this.repository.Get(jobIdentifier);
+        var job = this.repository.Get<JobInfo>(jobIdentifier);
         if (job != null)
         {
             this.CancelNative(job);
-            this.repository.Remove(jobIdentifier);
+            this.repository.Remove<JobInfo>(jobIdentifier);
         }
     }
 
 
     public virtual void CancelAll()
     {
-        var jobs = this.repository.GetList();
+        var jobs = this.repository.GetList<JobInfo>();
         foreach (var job in jobs)
         {
             if (!job.IsSystemJob)
@@ -110,7 +110,7 @@ public abstract class AbstractJobManager : IJobManager
     void CancelJob(JobInfo job)
     {
         this.CancelNative(job);
-        this.repository.Remove(job.Identifier);
+        this.repository.Remove<JobInfo>(job.Identifier);
     }
 
 
@@ -137,7 +137,7 @@ public abstract class AbstractJobManager : IJobManager
             try
             {
                 this.IsRunning = true;
-                var jobs = this.repository.GetList();
+                var jobs = this.repository.GetList<JobInfo>();
                 var tasks = new List<Task<JobRunResult>>();
 
                 if (runSequentially)

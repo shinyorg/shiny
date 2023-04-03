@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 
 namespace Shiny.Notifications;
@@ -9,9 +8,6 @@ namespace Shiny.Notifications;
     Name = ReceiverName,
     Enabled = true,
     Exported = false
-)]
-[IntentFilter(
-    new[] { Intent.ActionBootCompleted }
 )]
 public class ShinyNotificationBroadcastReceiver : ShinyBroadcastReceiver
 {
@@ -25,11 +21,11 @@ public class ShinyNotificationBroadcastReceiver : ShinyBroadcastReceiver
         switch (intent?.Action)
         {
             case Intent.ActionBootCompleted:
-                await this.Resolve<AndroidNotificationProcessor>().ProcessPending();
+                this.Resolve<AndroidNotificationProcessor>().ProcessPending();
                 break;
 
             case AlarmIntentAction:
-                await this.Resolve<AndroidNotificationProcessor>().ProcessAlarm(intent);
+                this.Resolve<AndroidNotificationProcessor>().ProcessAlarm(intent);
                 break;
 
             case EntryIntentAction:

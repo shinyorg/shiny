@@ -1,21 +1,21 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using Shiny.Support.Repositories;
 using Foundation;
 using UserNotifications;
-using Microsoft.Extensions.Logging;
-using Shiny.Stores;
-using Shiny.Support.Repositories;
 
 namespace Shiny.Notifications;
 
 
 public class ChannelManager : IChannelManager, IShinyComponentStartup
 {
-    readonly IRepository<Channel> repository;
+    readonly IRepository repository;
     readonly ILogger<ChannelManager> logger;
 
 
-    public ChannelManager(IRepository<Channel> repository, ILogger<ChannelManager> logger)
+    public ChannelManager(IRepository repository, ILogger<ChannelManager> logger)
     {
         this.repository = repository;
         this.logger = logger;
@@ -42,36 +42,37 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     public void Add(Channel channel)
     {
         channel.AssertValid();
-        this.repository.Set(channel);
+        var apple = channel.TryToNative<AppleChannel>();
+        this.repository.Set(apple);
         this.RebuildNativeCategories();
     }
 
 
     public void Clear()
     {
-        this.repository.Clear();
+        this.repository.Clear<AppleChannel>();
 
         // there must always be a default
         this.Add(Channel.Default);
     }
 
 
-    public Channel? Get(string channelId) => this.repository.Get(channelId);
-    public IList<Channel> GetAll() => this.repository.GetList();
+    public Channel? Get(string channelId) => this.repository.Get<AppleChannel>(channelId);
+    public IList<Channel> GetAll() => this.repository.GetList<AppleChannel>().OfType<Channel>().ToList();
 
 
     public void Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);
 
-        this.repository.Remove(channelId);
+        this.repository.Remove<AppleChannel>(channelId);
         this.RebuildNativeCategories();
     }
 
 
     protected void RebuildNativeCategories()
     {
-        var list = this.GetAll();
+        var list = this.repository.GetList<AppleChannel>();
         var categories = new List<UNNotificationCategory>();
 
         foreach (var channel in list)
@@ -83,20 +84,11 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
                 actions.Add(nativeAction);
             }
 
-            var unoptions = UNNotificationCategoryOptions.None;
-            var intents = new[] { String.Empty };
-
-            if (channel is AppleChannel apple)
-            {
-                unoptions = apple.CategoryOptions;
-                if (apple.IntentIdentifiers != null)
-                    intents = apple.IntentIdentifiers;
-            }
             var native = UNNotificationCategory.FromIdentifier(
                 channel.Identifier,
                 actions.ToArray(),
-                intents,
-                unoptions
+                channel.IntentIdentifiers ?? new[] { String.Empty },
+                channel.CategoryOptions
             );
             categories.Add(native);
         }
