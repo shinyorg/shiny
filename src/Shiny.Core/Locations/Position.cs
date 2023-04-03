@@ -3,23 +3,26 @@
 namespace Shiny.Locations;
 
 
-public class Position : IEquatable<Position>
+public record Position(double Latitude, double Longitude)
 {
-    public Position(double latitude, double longitude)
+    // forces validation to run after primary ctor
+    readonly bool valid = Check.Assert(Latitude, Longitude);
+
+    internal static class Check
     {
-        if (latitude < -90 || latitude > 90)
-            throw new ArgumentException($"Invalid latitude value - {latitude}");
+        internal static bool Assert(double latitude, double longitude)
+        {
+            if (latitude < -90 || latitude > 90)
+                throw new ArgumentException($"Invalid latitude value - {latitude}");
 
-        if (longitude < -180 || longitude > 180)
-            throw new ArgumentException($"Invalid longitude value - {longitude}");
+            if (longitude < -180 || longitude > 180)
+                throw new ArgumentException($"Invalid longitude value - {longitude}");
 
-        this.Latitude = latitude;
-        this.Longitude = longitude;
+            return true;
+        }
     }
 
 
-    public double Latitude { get; }
-    public double Longitude { get; }
     public Distance GetDistanceTo(Position other) => Distance.Between(this, other);
 
 
@@ -45,12 +48,4 @@ public class Position : IEquatable<Position>
 
     public static double ToBearing(double radians)
         => (ToDegrees(radians) + 360) % 360;
-
-
-    public override string ToString() => $"Latitude: {this.Latitude} - Longitude: {this.Longitude}";
-    public bool Equals(Position? other) => other != null && (this.Latitude, this.Longitude).Equals((other.Latitude, other.Longitude));
-    public static bool operator ==(Position? left, Position? right) => Equals(left, right);
-    public static bool operator !=(Position? left, Position? right) => !Equals(left, right);
-    public override bool Equals(object? obj) => obj is Position pos && this.Equals(pos);
-    public override int GetHashCode() => (this.Latitude, this.Longitude).GetHashCode();
 }
