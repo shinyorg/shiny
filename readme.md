@@ -1,10 +1,17 @@
-﻿# Shiny v3 ALPHA for Microsoft Application UI (MAUI), Xamarin, & WebAssembly
+﻿# Shiny v3 ALPHA
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
 
 ## THIS IS THE ALPHA/UNSTABLE BRANCH - FOR STABLE XAMARIN [GO HERE](https://github.com/shinyorg/shiny/tree/v2.7.0)
 
 Shiny is a cross platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
+
+## Supports
+* Xamarin iOS
+* Xamarin Android
+* .NET 7 for Android
+* .NET 7 for iOS
+* .NET 7 for MacCatalyst
 
 ## Features
 * Handles all of the cruft like Permissions, main thread traversal, persistent storage and app restarts
