@@ -141,15 +141,22 @@ public class FileSystemRepository : IRepository
                     x => (TEntity)x.Value
                 );
                 action(entityDictionary);
+
+                // write back
+                this.memory[en] = entityDictionary.ToDictionary(
+                    x => x.Key,
+                    x => (object)x.Value
+                );
             }
             else
             {
                 var entityDictionary = this.Load<TEntity>();
+                action(entityDictionary);
+
                 this.memory.Add(en, entityDictionary.ToDictionary(
                     x => x.Key,
                     x => (object)x.Value
                 ));
-                action(entityDictionary);
             }
         }
     }
