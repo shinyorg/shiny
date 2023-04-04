@@ -12,7 +12,6 @@
             <TableView Intent="Menu">
                 <TableRoot>
                     <TableSection>
-                        <TextCell Text="Logs" Command="{Binding Navigate}" CommandParameter="LogsPage" />
                         <TextCell Text="Shiny.Jobs" Command="{Binding Navigate}" CommandParameter="Jobs" />
                         <TextCell Text="Shiny.Net.Http" Command="{Binding Navigate}" CommandParameter="HttpTransfers" />
 
@@ -53,12 +52,10 @@
                         <TextCell Text="Channels" Command="{Binding Navigate}" CommandParameter="NotificationsChannelList" />
                     </TableSection>
 
-                    <!--This is meant for development testing, not for general consumption
-                    <TableSection Title="Testing">
-                        <TextCell Text="Perf Testing Server" Command="{Binding Navigate}" CommandParameter="BlePerfServer" />
-                        <TextCell Text="Perf Testing Client" Command="{Binding Navigate}" CommandParameter="BlePerfClient" />
+                    <TableSection Title="For Lib Dev">
+                        <TextCell Text="Logs" Command="{Binding Navigate}" CommandParameter="LogsPage" />
+                        <TextCell Text="App Data" Command="{Binding Navigate}" CommandParameter="AppDataPage" />
                     </TableSection>
-                    -->
                     <!--
                     NOT READY
                     <TextCell Text="L2Cap Client" Command="{Binding Navigate}" CommandParameter="BleL2Cap" />

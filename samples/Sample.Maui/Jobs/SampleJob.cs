@@ -14,6 +14,7 @@ public class SampleJob : IJob
     public SampleJob(INotificationManager notificationManager)
         => this.notificationManager = notificationManager;
 
+    // TODO: test new object binding
 
     public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
@@ -21,8 +22,7 @@ public class SampleJob : IJob
             "Jobs",
             $"Job Started - {jobInfo.Identifier}"
         );
-        var seconds = jobInfo.GetParameter<int>("SecondsToRun", 10);
-        await Task.Delay(TimeSpan.FromSeconds(seconds), cancelToken);
+        //await Task.Delay(TimeSpan.FromSeconds(seconds), cancelToken);
 
         await this.notificationManager.Send(
             "Jobs",

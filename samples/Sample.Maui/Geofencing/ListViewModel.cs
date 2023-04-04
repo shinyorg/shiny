@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.Locations;
+﻿using Shiny.Locations;
 
 namespace Sample.Geofencing;
 
@@ -53,5 +52,6 @@ public class ListViewModel : ViewModel
     public ICommand Load { get; }
     public ICommand DropAllFences { get; }
     public IList<GeofenceRegionViewModel> Geofences { get; private set; }
+
     public override void OnNavigatedTo(INavigationParameters parameters) => this.Load.Execute(null);
 }

@@ -33,7 +33,6 @@
                               Command="{Binding ChangeRequiredInternetAccess}" />
                     <SwitchCell Text="Battery Not Low" On="{Binding BatteryNotLow}" />
                     <SwitchCell Text="Peripheral Charging" On="{Binding DeviceCharging}" />
-                    <SwitchCell Text="Repeat" On="{Binding Repeat}" />
                 </TableSection>
             </TableView>
 

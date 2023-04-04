@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.Jobs;
+﻿using Shiny.Jobs;
 using Shiny.Notifications;
 
 namespace Sample.Jobs;
@@ -28,23 +27,17 @@ public class CreateViewModel : ViewModel
                     await this.Dialogs.DisplayAlertAsync("ERROR", "Enter a job name", "OK");
                     return;
                 }
-                if (this.SecondsToRun < 10)
-                {
-                    await this.Dialogs.DisplayAlertAsync("ERROR", "Must be great than 10 seconds", "OK");
-                    return;
-                }
 
                 await this.notifications.RequestAccess();
 
-                var job = new JobInfo(typeof(SampleJob), this.JobName.Trim())
-                {
-                    Repeat = this.Repeat,
-                    BatteryNotLow = this.BatteryNotLow,
-                    DeviceCharging = this.DeviceCharging,
-                    RunOnForeground = this.RunOnForeground,
-                    RequiredInternetAccess = (InternetAccess)Enum.Parse(typeof(InternetAccess), this.RequiredInternetAccess)
-                };
-                job.SetParameter("SecondsToRun", this.SecondsToRun);
+                var job = new JobInfo(
+                    this.JobName.Trim(),
+                    typeof(SampleJob), 
+                    BatteryNotLow: this.BatteryNotLow,
+                    DeviceCharging: this.DeviceCharging,
+                    RunOnForeground: this.RunOnForeground,
+                    RequiredInternetAccess: (InternetAccess)Enum.Parse(typeof(InternetAccess), this.RequiredInternetAccess)
+                );
                 this.jobManager.Register(job);
                 await this.Navigation.GoBack();
             }
@@ -74,7 +67,6 @@ public class CreateViewModel : ViewModel
     [Reactive] public string RequiredInternetAccess { get; set; } = InternetAccess.None.ToString();
     [Reactive] public bool BatteryNotLow { get; set; }
     [Reactive] public bool DeviceCharging { get; set; }
-    [Reactive] public bool Repeat { get; set; } = true;
     [Reactive] public bool RunOnForeground { get; set; } = true;
 
 

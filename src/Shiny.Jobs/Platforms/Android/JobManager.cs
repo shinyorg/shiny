@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using AndroidX.Work;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 using Shiny.Support.Repositories;
 using P = Android.Manifest.Permission;
 
@@ -19,11 +20,13 @@ public class JobManager : AbstractJobManager
         AndroidPlatform platform,
         IServiceProvider container,
         IRepository repository,
+        IObjectStoreBinder storeBinder,
         ILogger<IJobManager> logger
     )
     : base(
         container,
         repository,
+        storeBinder,
         logger
     )
     {
@@ -83,32 +86,16 @@ public class JobManager : AbstractJobManager
         var data = new Data.Builder();
         data.PutString(ShinyJobWorker.ShinyJobIdentifier, jobInfo.Identifier);
 
-        if (jobInfo.Repeat)
-        {
-            var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15))
-                .SetConstraints(constraints)
-                .SetInputData(data.Build())
-                .Build();
+        var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15))
+            .SetConstraints(constraints)
+            .SetInputData(data.Build())
+            .Build();
 
-            this.Instance.EnqueueUniquePeriodicWork(
-                jobInfo.Identifier,
-                ExistingPeriodicWorkPolicy.Replace,
-                request
-            );
-        }
-        else
-        {
-            var worker = new OneTimeWorkRequest.Builder(typeof(ShinyJobWorker))
-                .SetInputData(data.Build())
-                .SetConstraints(constraints)
-                .Build();
-
-            this.Instance.EnqueueUniqueWork(
-                jobInfo.Identifier,
-                ExistingWorkPolicy.Append,
-                worker
-            );
-        }
+        this.Instance.EnqueueUniquePeriodicWork(
+            jobInfo.Identifier,
+            ExistingPeriodicWorkPolicy.Replace,
+            request
+        );
     }
 
 

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
 using BackgroundTasks;
 using UIKit;
+using Shiny.Stores;
 
 namespace Shiny.Jobs;
 
@@ -20,10 +21,12 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStar
     public JobManager(
         IServiceProvider container,
         IRepository repository,
+        IObjectStoreBinder storeBinder,
         ILogger<IJobManager> logger
     ) : base(
         container,
         repository,
+        storeBinder,
         logger
     )
     {

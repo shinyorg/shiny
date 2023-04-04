@@ -10,19 +10,6 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-   //public static IServiceCollection AddJobs(this IServiceCollection services)
-   // {
-   //     services.AddBattery();
-   //     services.AddConnectivity();
-   //     services.AddRepository<JobInfoStoreConverter, JobInfo>();
-   //     //services.AddShinyService<JobsStartup>();
-   //     //services.AddShinyService<JobLifecycleTask>();
-   //     services.AddShinyService<JobManager>();
-
-   //     return services;
-   // }
-
-
     /// <summary>
     /// Register a job on the job manager
     /// </summary>
@@ -47,19 +34,15 @@ public static class ServiceCollectionExtensions
         string? identifier = null,
         InternetAccess requiredNetwork = InternetAccess.None,
         bool runInForeground = false,
-        params (string Key, object Value)[] parameters
+        params (string Key, string Value)[] parameters
     )
-        => services.AddJob(new JobInfo(jobType, identifier)
-        {
-            RequiredInternetAccess = requiredNetwork,
-            RunOnForeground = runInForeground,
-            Repeat = true,
-            Parameters = parameters?.ToDictionary(
-                x => x.Key,
-                x => x.Value?.ToString()
-            )
-        });
-
+        => services.AddJob(new JobInfo(
+            identifier ?? jobType.FullName,
+            jobType,
+            runInForeground,
+            Parameters: parameters?.ToDictionary(x => x.Key, x => x.Value),
+            RequiredInternetAccess: requiredNetwork
+        ));
 
     public static IServiceCollection AddJobs(this IServiceCollection services)
     {

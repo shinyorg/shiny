@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Jobs;
@@ -16,17 +17,20 @@ public abstract class AbstractJobManager : IJobManager
     readonly Subject<JobRunResult> jobFinished = new();
     readonly Subject<JobInfo> jobStarted = new();
     readonly IRepository repository;
+    readonly IObjectStoreBinder storeBinder;
     readonly IServiceProvider container;
 
 
     protected AbstractJobManager(
         IServiceProvider container,
         IRepository repository,
+        IObjectStoreBinder storeBinder,
         ILogger<IJobManager> logger
     )
     {
         this.container = container;
         this.repository = repository;
+        this.storeBinder = storeBinder;
         this.Log = logger;
     }
 
@@ -122,7 +126,7 @@ public abstract class AbstractJobManager : IJobManager
 
     public void Register(JobInfo jobInfo)
     {
-        this.ResolveJob(jobInfo);
+        //this.ResolveJob(jobInfo);
         this.RegisterNative(jobInfo);
         this.repository.Set(jobInfo);
     }
@@ -180,22 +184,19 @@ public abstract class AbstractJobManager : IJobManager
     {
         this.jobStarted.OnNext(job);
         var result = default(JobRunResult);
-        var cancel = false;
 
+        // TODO: bind job object by name+type
         try
         {
             this.LogJob(JobState.Start, job);
-            var jobDelegate = this.ResolveJob(job);
+
+            // TODO: bind it
+            var jobDelegate = (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, job.JobType);
 
             await jobDelegate
                 .Run(job, cancelToken)
                 .ConfigureAwait(false);
 
-            if (!job.Repeat)
-            {
-                this.Cancel(job.Identifier);
-                cancel = true;
-            }
             this.LogJob(JobState.Finish, job);
             result = new JobRunResult(job, null);
         }
@@ -204,26 +205,10 @@ public abstract class AbstractJobManager : IJobManager
             this.LogJob(JobState.Error, job, ex);
             result = new JobRunResult(job, ex);
         }
-        finally
-        {
-            if (!cancel)
-            {
-                job.LastRun = DateTimeOffset.UtcNow;
-                this.repository.Set(job);
-            }
-        }
+        // TODO: unbind job
+
         this.jobFinished.OnNext(result);
         return result;
-    }
-
-
-    protected virtual IJob ResolveJob(JobInfo jobInfo)
-    {
-        var type = Type.GetType(jobInfo.TypeName);
-        if (type == null)
-            throw new ArgumentException($"Job '{jobInfo.Identifier}' - Job type '{jobInfo.TypeName}' not found - did you delete / move this class from your library?");
-
-        return (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, type);
     }
 
 

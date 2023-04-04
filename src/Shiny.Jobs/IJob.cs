@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.Jobs;
 
+
 public interface IJob
 {
     /// <summary>

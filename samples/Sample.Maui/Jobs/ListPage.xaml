@@ -29,7 +29,6 @@
                         <DataTemplate x:DataType="shiny:JobInfo">
                             <StackLayout>
                                 <Label Text="{Binding Identifier}" FontSize="Large" />
-                                <Label Text="{Binding LastRun}" FontSize="Small" />
                                 <BoxView Style="{StaticResource HR}"/>
                             </StackLayout>
                         </DataTemplate>
