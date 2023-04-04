@@ -10,15 +10,24 @@ public abstract class ViewModel : ReactiveObject,
                                   IPageLifecycleAware,
                                   IDisposable
 {
-    protected ViewModel(BaseServices services) => this.Services = services;
+    protected ViewModel(BaseServices services)
+    {
+        this.Services = services;
+        this.Navigate = ReactiveCommand.CreateFromTask<string>(uri =>
+            this.Navigation.Navigate(uri)
+        );
+    }
 
 
     [Reactive] public string Title { get; protected set; } = null!;
     [Reactive] public bool IsBusy { get; protected set; }
+    
     protected IPlatform Platform => this.Services.Platform;
     protected IPageDialogService Dialogs => this.Services.Dialogs;
     protected INavigationService Navigation => this.Services.Navigator;
     protected BaseServices Services { get; }
+
+    public ICommand Navigate { get; }
 
     public virtual void OnAppearing() { }
     public virtual void OnDisappearing() { }

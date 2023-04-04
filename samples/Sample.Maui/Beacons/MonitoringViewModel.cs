@@ -25,7 +25,7 @@ public class MonitoringViewModel : ViewModel
                 return;
             }
 
-            this.Regions = this.beaconManager
+            var regions = this.beaconManager
                 .GetMonitoredRegions()
                 .Select(x => new CommandItem
                 {
@@ -38,6 +38,8 @@ public class MonitoringViewModel : ViewModel
                     })
                 })
                 .ToList();
+
+            this.Regions = regions;
         });
 
         this.StopAllMonitoring = ReactiveCommand.CreateFromTask(

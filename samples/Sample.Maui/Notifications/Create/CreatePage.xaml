@@ -39,22 +39,24 @@
                     <Label Text="Payload" />
                     <Entry Text="{Binding Payload}" />
 
-                    <!--<ContentView IsVisible="{Binding IsAndroid}">
-                        <StackLayout>
-                            <Label Text="Android big Text" />
-                            <CheckBox IsChecked="{Binding UseAndroidBigTextStyle}" />
-                        </StackLayout>
-                    </ContentView>-->
-
                     <Frame BorderColor="Black"
                            BackgroundColor="LemonChiffon"
                            IsVisible="{Binding IsTriggerVisible}">
                         <Label Text="{Binding TriggerDetails}" TextColor="Black" />
                     </Frame>
 
-                    <Button Text="Geofence Trigger" Command="{Binding SetGeofence}" />
-                    <Button Text="Repeat Interval Trigger" Command="{Binding SetInterval}" />
-                    <Button Text="Schedule Trigger" Command="{Binding SetScheduleDate}" />
+                    <Button Text="Geofence Trigger"
+                            Command="{Binding Navigate}"
+                            CommandParameter="NotificationsLocation" />
+
+                    <Button Text="Repeat Interval Trigger"
+                            Command="{Binding Navigate}"
+                            CommandParameter="NotificationsInterval" />
+
+                    <Button Text="Schedule Trigger"
+                            Command="{Binding Navigate}"
+                            CommandParameter="NotificationsSchedule" />
+
                     <Button Text="No Trigger" Command="{Binding SetNoTrigger}" />
                 </StackLayout>
             </ScrollView>

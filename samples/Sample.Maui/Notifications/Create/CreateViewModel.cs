@@ -1,5 +1,4 @@
 using Shiny.Notifications;
-using Shiny;
 using Notification = Shiny.Notifications.Notification;
 
 namespace Sample.Notifications.Create;
@@ -12,13 +11,21 @@ public class CreateViewModel : ViewModel
 
     public CreateViewModel(BaseServices services, INotificationManager notificationManager) : base(services)
     {
-        State.CurrentNotification = new Notification();
-
+        // NOTE: using compiler conditions, we can open up full customization of the native notification
+#if ANDROID
+        State.CurrentNotification = new AndroidNotification
+        {
+            Ticker = "Ticker value",
+            UseBigTextStyle = true
+        };
+#elif IOS || MACCATALYST
+        State.CurrentNotification = new AppleNotification
+        {
+            Subtitle = "Nice subtitle",
+            RelevanceScore = 1.0
+        };
+#endif
         this.notificationManager = notificationManager;
-
-        this.SetGeofence = this.Navigation.Command(nameof(LocationPage));
-        this.SetInterval = this.Navigation.Command(nameof(IntervalPage));
-        this.SetScheduleDate = this.Navigation.Command(nameof(SchedulePage));
         this.SetNoTrigger = new Command(() =>
         {
             State.CurrentNotification.ScheduleDate = null;
@@ -54,10 +61,9 @@ public class CreateViewModel : ViewModel
             if (!this.Payload.IsEmpty())
             {
                 n.Payload = new Dictionary<string, string> {
-                    { nameof(this.Payload), this.Payload }
+                    { nameof(this.Payload), this.Payload! }
                 };
             }
-            //n.Android.UseBigTextStyle = this.UseAndroidBigTextStyle;
 
             var result = await notificationManager.RequestRequiredAccess(n);
             if (result != AccessState.Available)
@@ -67,7 +73,7 @@ public class CreateViewModel : ViewModel
             else
             {
                 await notificationManager.Send(n);
-                await this.Dialogs.DisplayAlertAsync("", "Notification Sent", "OK");
+                await this.Dialogs.DisplayAlertAsync("Done", "Notification Sent", "OK");
                 await this.Navigation.GoBack();
             }
         });
@@ -81,22 +87,15 @@ public class CreateViewModel : ViewModel
             return;
 
         var filePath = Path.GetTempFileName();
-        using (var stream = await this.httpClient.GetStreamAsync(this.ImageUri))
-        {
-            using (var fs = File.Create(filePath))
-            {
-                await stream.CopyToAsync(fs);
-            }
-            
-        }
+        using var stream = await this.httpClient.GetStreamAsync(this.ImageUri);        
+        using var fs = File.Create(filePath);
+        await stream.CopyToAsync(fs);            
+        
         notification.LocalAttachmentPath = filePath;
     }
 
 
     public ICommand SetNoTrigger { get; }
-    public ICommand SetScheduleDate { get; }
-    public ICommand SetInterval { get; }
-    public ICommand SetGeofence { get; }
     public ICommand Send { get; }
 
     [Reactive] public string Identifier { get; set; }

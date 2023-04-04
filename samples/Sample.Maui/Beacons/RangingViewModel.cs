@@ -47,6 +47,7 @@ public class RangingViewModel : ViewModel
 
             this.StartScan();
         }
+        this.RaisePropertyChanged(nameof(this.Beacons));
     }
 
 
