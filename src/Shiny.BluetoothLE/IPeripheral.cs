@@ -35,10 +35,10 @@ public interface IPeripheral
     IObservable<int> ReadRssi();
 
     IObservable<BleServiceInfo> GetService(string serviceUuid);
-    IObservable<IReadOnlyList<BleServiceInfo>> GetServices();
+    IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices = false);
 
     IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid);
-    IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid);
+    IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid, bool refresh = false);
 
     bool IsNotifying(string serviceUuid, string characteristicUuid);
     IObservable<BleCharacteristicInfo> WhenNotificationHooked();

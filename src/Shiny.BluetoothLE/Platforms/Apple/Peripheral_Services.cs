@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
 
@@ -11,58 +11,70 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral
 {
-    public IObservable<BleServiceInfo> GetService(string serviceUuid) => Observable.Create<BleServiceInfo>(ob =>
+    protected IObservable<CBService> GetNativeService(string serviceUuid) => Observable.Create<CBService>(ob =>
     {
+        this.AssertConnnection();
+
+        IDisposable? disp = null;
         var nativeUuid = CBUUID.FromString(serviceUuid);
         var service = this.TryGetService(nativeUuid);
-        if (service != null)
+
+        if (service == null)
         {
-            ob.Respond(FromNative(service));
-            return Disposable.Empty;
+            disp = this.serviceDiscoverySubj.Subscribe(x =>
+            {
+                if (x != null)
+                {
+                    ob.OnError(new InvalidOperationException(x.LocalizedDescription));
+                }
+                else
+                {
+                    // the service should be scope now
+                    service = this.TryGetService(nativeUuid);
+                    if (service == null)
+                        ob.OnError(new InvalidOperationException("No service found for " + serviceUuid));
+                    else
+                        ob.Respond(service);
+                }
+            });
+            this.Native.DiscoverServices(new[] { nativeUuid });
         }
-        var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
-        {
-            if (this.Native.Services == null)
-                return;
-
-            var service = this.TryGetService(nativeUuid);
-            if (service == null)
-                ob.OnError(new ArgumentException("This service does not exist"));
-            else
-                ob.Respond(FromNative(service));
-        });
-
-        this.Native.DiscoveredService += handler;
-        this.Native.DiscoverServices(new[] { nativeUuid });
-
-        return Disposable.Create(() => this.Native.DiscoveredService -= handler);
+        return () => disp?.Dispose();
     });
 
 
-    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => Observable.Create<IReadOnlyList<BleServiceInfo>>(ob =>
+    public IObservable<BleServiceInfo> GetService(string serviceUuid) => this
+        .GetNativeService(serviceUuid)
+        .Select(FromNative);
+
+
+
+    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => Observable.Create<IReadOnlyList<BleServiceInfo>>(ob =>
     {
-        var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
+        this.AssertConnnection();
+        IDisposable? disp = null;
+
+        // TODO: what if haven't done full discovery?
+        if (this.Native.Services == null || refreshServices)
         {
-            if (args.Error != null)
+            disp = this.serviceDiscoverySubj.Subscribe(x =>
             {
-                ob.OnError(new BleException(args.Error.LocalizedDescription));
-                return;
-            }
-
-            if (this.Native.Services != null)
-            {
-                var list = this.Native
-                    .Services
-                    .Select(native => new BleServiceInfo(native.UUID.ToString()))
-                    .ToList();
-
-                ob.Respond(list);
-            }
-        });
-        this.Native.DiscoveredService += handler;
-        this.Native.DiscoverServices();
-
-        return () => this.Native.DiscoveredService -= handler;
+                if (x != null)
+                {
+                    ob.OnError(new InvalidOperationException(x.LocalizedDescription));
+                }
+                else if (this.Native.Services != null)
+                {
+                    ob.Respond(this.Native.Services.Select(FromNative).ToList());
+                }
+            });
+            this.Native.DiscoverServices();
+        }
+        else
+        {
+            ob.Respond(this.Native.Services.Select(FromNative).ToList());
+        }
+        return () => disp?.Dispose();
     });
 
 
@@ -76,4 +88,9 @@ public partial class Peripheral
         var service = this.Native.Services?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
         return service;
     }
+
+
+    readonly Subject<NSError?> serviceDiscoverySubj = new();
+    public override void DiscoveredService(CBPeripheral peripheral, NSError? error)
+        => this.serviceDiscoverySubj.OnNext(error);
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using Android.Bluetooth;
 
 namespace Shiny.BluetoothLE;
@@ -13,7 +15,23 @@ public partial class Peripheral
     public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
     public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => throw new NotImplementedException();
     public bool IsNotifying(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
-    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
+
+
+    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(ch => Observable.Create<BleCharacteristicResult>(ob => 
+        {
+            if (!ch.Properties.HasFlag(GattProperty.Read))
+                throw new InvalidOperationException($"Characteristic '{characteristicUuid}' does not support read");
+
+            // TODO: hook and listen
+            if (!this.Gatt!.ReadCharacteristic(ch))
+                throw new BleException("Failed to read characteristic: " + characteristicUuid);
+
+            return () => { };
+        }))
+        .Switch();
+
     public IObservable<BleCharacteristicResult> WhenNotification(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true) => throw new NotImplementedException();
     public IObservable<BleCharacteristicInfo> WhenNotificationHooked() => throw new NotImplementedException();
     public IObservable<Unit> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => throw new NotImplementedException();
@@ -22,35 +40,29 @@ public partial class Peripheral
     public override void OnCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, GattStatus status) { }
     public override void OnCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, GattStatus status) { }
     public override void OnCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) { }
+
+
+    protected IObservable<BluetoothGattCharacteristic> GetNativeCharacteristic(string serviceUuid, string characteristicUuid) => this
+        .GetNativeService(serviceUuid)
+        .Select(service =>
+        {
+            var uuid = Utils.ToUuidType(characteristicUuid);
+            var ch = service.Characteristics!.FirstOrDefault(x => x.Uuid.Equals(uuid));
+            if (ch == null)
+                throw new InvalidOperationException($"No characteristic '{characteristicUuid}' exists under service '{serviceUuid}'");
+
+            return ch;
+        });
+
+    protected void AssertWrite(BluetoothGattCharacteristic ch, bool withResponse)
+    {
+        if (withResponse && !ch.Properties.HasFlag(GattProperty.Write))
+            throw new InvalidOperationException($"Characteristic '{ch.Uuid}' does not support write with response");
+
+        if (!withResponse && !ch.Properties.HasFlag(GattProperty.WriteNoResponse))
+            throw new InvalidOperationException($"Characteristic '{ch.Uuid}' does not support write without response");
+    }
 }
-
-//public override IObservable<IList<IGattCharacteristic>> GetCharacteristics() => Observable.Return(
-//            this.native
-//                .Characteristics
-//                .Select(native => new GattCharacteristic(this, this.context, native))
-//                .Cast<IGattCharacteristic>()
-//                .ToList()
-//        );
-
-
-//public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false)
-//    => Observable.Create<IGattCharacteristic?>(ob =>
-//    {
-//        var uuid = Utils.ToUuidType(characteristicUuid);
-//        var cs = this.native.GetCharacteristic(uuid);
-
-//        if (cs == null)
-//        {
-//            ob.Respond(null);
-//        }
-//        else
-//        {
-//            var characteristic = new GattCharacteristic(this, this.context, cs);
-//            ob.Respond(characteristic);
-//        }
-//        return Disposable.Empty;
-//    })
-//    .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
 
 //public override IObservable<GattCharacteristicResult> Write(byte[] value, bool withResponse = true) => this.context.Invoke(Observable.Create<GattCharacteristicResult>((Func<IObserver<GattCharacteristicResult>, IDisposable>)(ob =>
 //{
@@ -95,45 +107,6 @@ public partial class Peripheral
 //            //else if (!this.context.Gatt.WriteCharacteristic(this.native))
 //            if (!this.context.Gatt?.WriteCharacteristic(this.native) ?? false)
 //                ob.OnError(new BleException("Failed to write to characteristic"));
-//        }
-//        catch (Exception ex)
-//        {
-//            ob.OnError(ex);
-//        }
-//    });
-
-//    return sub;
-//})));
-
-
-//public override IObservable<GattCharacteristicResult> Read() => this.context.Invoke(Observable.Create<GattCharacteristicResult>((Func<IObserver<GattCharacteristicResult>, IDisposable>)(ob =>
-//{
-//    this.AssertRead();
-
-//    var sub = this.context
-//        .Callbacks
-//        .CharacteristicRead
-//        .Where(this.NativeEquals)
-//        .Subscribe(args =>
-//        {
-//            if (!args.IsSuccessful)
-//            {
-//                ob.OnError(new BleException($"Failed to read characteristic - {args.Status}"));
-//            }
-//            else
-//            {
-//                var value = args.Characteristic.GetValue();
-//                var result = new GattCharacteristicResult(this, value, GattCharacteristicResultType.Read);
-//                ob.Respond(result);
-//            }
-//        });
-
-//    this.context.InvokeOnMainThread(() =>
-//    {
-//        try
-//        {
-//            if (!this.context.Gatt?.ReadCharacteristic(this.native) ?? false)
-//                throw new BleException("Failed to read characteristic");
 //        }
 //        catch (Exception ex)
 //        {
@@ -216,37 +189,6 @@ public partial class Peripheral
 //    return true;
 //}
 
-
-//public override int GetHashCode() => this.native.GetHashCode();
-//public override string ToString() => $"Characteristic: {this.Uuid}";
-
-//#region Internals
-
-//bool NativeEquals(GattCharacteristicEventArgs args)
-//{
-//    if (this.context?.Gatt == null)
-//        return false;
-
-//    if (args?.Characteristic?.Service == null)
-//        return false;
-
-//    if (args.Gatt == null)
-//        return false;
-
-//    if (this.native.Equals(args.Characteristic))
-//        return true;
-
-//    if (!this.native.Uuid.Equals(args.Characteristic.Uuid))
-//        return false;
-
-//    if (!this.native.Service.Uuid.Equals(args.Characteristic.Service.Uuid))
-//        return false;
-
-//    if (!this.context.Gatt.Equals(args.Gatt))
-//        return false;
-
-//    return true;
-//}
 
 
 //byte[] GetNotifyDescriptorBytes(bool useIndicationsIfAvailable)

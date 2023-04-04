@@ -20,56 +20,181 @@ public partial class Peripheral
 {
     public IObservable<BleCharacteristicResult> WhenNotification(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true) => throw new NotImplementedException();
     public IObservable<BleCharacteristicInfo> WhenNotificationHooked() => throw new NotImplementedException();
-    public IObservable<Unit> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => throw new NotImplementedException();
-
-    public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
-    public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => throw new NotImplementedException();
-
-
     public bool IsNotifying(string serviceUuid, string characteristicUuid)
     {
         return false;
     }
 
 
-    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => Observable.Create<BleCharacteristicResult>(ob =>
-    {
-        //AssertConnected
-        //this.AssertRead();
-        var suid = CBUUID.FromString(serviceUuid);
-        var cuid = CBUUID.FromString(characteristicUuid);
+    public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(x => new BleCharacteristicInfo(serviceUuid, characteristicUuid, (CharacteristicProperties)x.Properties));
 
-        var sub = this.charUpdateSubj
-            .Where(x => x.Char.UUID.Equals(cuid) && x.Char.Service!.UUID.Equals(suid))
-            .Do(x =>
+
+    public IObservable<Unit> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(ch =>
+        {
+            this.AssertWrite(ch, withResponse);
+            return withResponse
+                ? this.WriteWithResponse(ch, data)
+                : this.WriteWithoutResponse(ch, data);
+        })
+        .Switch();
+
+
+    public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => this
+        .GetNativeService(serviceUuid)
+        .Select(service => Observable.Create<IReadOnlyList<BleCharacteristicInfo>>(ob =>
+        {
+            var sub = this.charDiscoverySubj
+                .Where(x => x.Service.Equals(service))
+                .Subscribe(x =>
+                {
+                    if (x.Error != null)
+                    {
+                        ob.OnError(new InvalidOperationException(x.Error.LocalizedDescription));
+                    }
+                    else if (service.Characteristics != null)
+                    {
+                        var list = service.Characteristics.Select(this.FromNative).ToList();
+                        ob.Respond(list);
+                    }
+                });
+
+            this.Native.DiscoverCharacteristics(service);
+
+            return () => sub.Dispose();
+        }))
+        .Switch();
+
+
+    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(ch => Observable.Create<BleCharacteristicResult>(ob =>
+        {
+            if (!ch.Properties.HasFlag(CBCharacteristicProperties.Read))
+                throw new InvalidOperationException($"Characteristic '{characteristicUuid}' does not support read");
+
+            var sub = this.charUpdateSubj
+                .Where(x => x.Char.Equals(ch))
+                .Do(x =>
+                {
+                    if (x.Error != null)
+                        throw new InvalidCastException(x.Error.LocalizedDescription);
+                })
+                .Select(x => new BleCharacteristicResult(
+                    serviceUuid,
+                    characteristicUuid,
+                    x.Char.Value?.ToArray()
+                ))
+                .Subscribe(
+                    x => ob.Respond(x), // 1 and done
+                    ob.OnError
+                );
+
+            // could queue writes to ensure operation order - iOS does this pretty well
+            this.Native.ReadValue(ch);
+
+            return () => sub.Dispose();
+        }))
+        .Switch();
+
+
+    protected BleCharacteristicInfo FromNative(CBCharacteristic ch) => new BleCharacteristicInfo(
+        ch.Service!.UUID.ToString(),
+        ch.UUID.ToString(),
+        (CharacteristicProperties)ch.Properties
+    );
+    
+
+    protected IObservable<CBCharacteristic> GetNativeCharacteristic(string serviceUuid, string characteristicUuid) => this
+        .GetNativeService(serviceUuid)
+        .Select(service => Observable.Create<CBCharacteristic>(ob =>
+        {
+            IDisposable? sub = null;
+            var uuid = CBUUID.FromString(characteristicUuid);
+            var ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
+
+            if (ch == null)
             {
-                if (x.Error != null)
-                    throw new InvalidCastException(x.Error.LocalizedDescription);
-            })
-            .Select(x => new BleCharacteristicResult(
-                serviceUuid,
-                characteristicUuid,
-                x.Char.Value?.ToArray()
-            ))
-            .Subscribe(
-                ob.OnNext,
-                ob.OnError
-            );
+                sub = this.charDiscoverySubj
+                    .Where(x => x.Service.Equals(service))
+                    .Subscribe(x =>
+                    {
+                        if (x.Error != null)
+                        {
+                            ob.OnError(new InvalidOperationException(x.Error.LocalizedDescription));
+                        }
+                        else if (service.Characteristics != null)
+                        {
+                            ch = service.Characteristics.FirstOrDefault(x => x.UUID.Equals(uuid));
+                            if (ch == null)
+                                ob.OnError(new InvalidOperationException($"No characteristic found in service '{serviceUuid}' with UUID: {characteristicUuid}"));
+                            else
+                                ob.Respond(ch);
+                        }
+                    });
 
-        var service = this.Native.Services?.FirstOrDefault(x => x.UUID.Equals(suid));
-        var ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(cuid));
-        this.Native.ReadValue(ch);
-        
-        return () => { };
+                this.Native.DiscoverCharacteristics(new[] { uuid }, service);
+            }
+
+            return () => sub?.Dispose();
+        }))
+        .Switch();
+
+
+    protected IObservable<Unit> WriteWithResponse(CBCharacteristic nativeCh, byte[] value) => Observable.Create<Unit>(ob =>
+    {
+        var data = NSData.FromArray(value);
+
+        // TODO: if queuing ops, should wait to hook this
+        var sub = this.charWroteSubj
+            .Where(x => x.Char.Equals(nativeCh))
+            .Subscribe(x =>
+            {
+                if (x.Error == null)
+                    ob.Respond(Unit.Default);
+                else
+                    ob.OnError(new InvalidOperationException(x.Error.LocalizedDescription));
+            });
+
+        // TODO: should wait in queue
+        this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithResponse);
+
+        return () => sub.Dispose();
     });
 
 
-    readonly Subject<CBCharacteristic[]> charDiscoverySubj = new();
-    public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
+    protected IObservable<Unit> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => Observable.FromAsync(async ct =>
     {
-        if (service.Characteristics != null)
-            this.charDiscoverySubj.OnNext(service.Characteristics);
+        if (!this.Native.CanSendWriteWithoutResponse)
+        {      
+            // TODO: wait for opportunity to send
+        }
+        var data = NSData.FromArray(value);
+        this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithoutResponse);
+
+        // TODO: if cancelled, remove from queue
+    });
+
+
+    protected void AssertWrite(CBCharacteristic ch, bool withResponse)
+    {
+        if (withResponse && !ch.Properties.HasFlag(CBCharacteristicProperties.Write))
+            throw new InvalidOperationException($"Characteristic '{ch.UUID}' does not support write with response");
+
+        if (!withResponse && !ch.Properties.HasFlag(CBCharacteristicProperties.WriteWithoutResponse))
+            throw new InvalidOperationException($"Characteristic '{ch.UUID}' does not support write without response");
     }
+
+
+    // TODO: this should be a process queue
+    public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral) { }
+
+    readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
+    public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
+        => this.charDiscoverySubj.OnNext((service, error));
 
 
     readonly Subject<(CBCharacteristic Char, NSError? Error)> charUpdateSubj = new();
@@ -89,15 +214,6 @@ public partial class Peripheral
     //            return Observable.Return(this);
     //        }
 
-
-    //        public override IObservable<GattCharacteristicResult> Write(byte[] value, bool withResponse)
-    //        {
-    //            this.AssertWrite(withResponse);
-    //            return withResponse
-    //                ? this.WriteWithResponse(value)
-    //                : this.WriteWithoutResponse(value);
-    //        }
-
     //        public override IObservable<GattCharacteristicResult> WhenNotificationReceived() => Observable.Create<GattCharacteristicResult>((Func<IObserver<GattCharacteristicResult>, Action>)(ob =>
     //        {
     //            var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
@@ -114,66 +230,5 @@ public partial class Peripheral
 
     //            return () => this.Peripheral.UpdatedCharacterteristicValue -= handler;
     //        }));
-
-
-    //        #region Internals
-
-    //        IObservable<GattCharacteristicResult> WriteWithResponse(byte[] value) => Observable.Create<GattCharacteristicResult>((Func<IObserver<GattCharacteristicResult>, Action>)(ob =>
-    //        {
-    //            var data = NSData.FromArray(value);
-    //            var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
-    //            {
-    //                if (!this.Equals(args.Characteristic))
-    //                    return;
-
-    //                if (args.Error == null)
-    //                    ob.Respond(new GattCharacteristicResult(this, null, GattCharacteristicResultType.Write));
-    //                else
-    //                    ob.OnError(new BleException(args.Error.Description));
-    //            });
-    //            this.Peripheral.WroteCharacteristicValue += handler;
-    //            this.Peripheral.WriteValue(data, this.NativeCharacteristic, CBCharacteristicWriteType.WithResponse);
-
-    //            return () => this.Peripheral.WroteCharacteristicValue -= handler;
-    //        }));
-
-
-
-
-
-    //        IObservable<GattCharacteristicResult> WriteWithoutResponse(byte[] value)
-    //        {
-    //            if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
-    //                return this.NewInternalWrite(value);
-
-    //            return Observable.Return(this.DoWriteNoResponse(value));
-    //        }
-
-
-    //        IObservable<GattCharacteristicResult> NewInternalWrite(byte[] value) => Observable.Create<GattCharacteristicResult>(ob =>
-    //        {
-    //            EventHandler? handler = null;
-    //            if (this.Peripheral.CanSendWriteWithoutResponse)
-    //            {
-    //                ob.Respond(this.DoWriteNoResponse(value));
-    //            }
-    //            else
-    //            {
-    //                handler = new EventHandler((sender, args) => ob.Respond(this.DoWriteNoResponse(value)));
-    //                this.Peripheral.IsReadyToSendWriteWithoutResponse += handler;
-    //            }
-    //            return () =>
-    //            {
-    //                if (handler != null)
-    //                    this.Peripheral.IsReadyToSendWriteWithoutResponse -= handler;
-    //            };
-    //        });
-
-
-    //        GattCharacteristicResult DoWriteNoResponse(byte[] value)
-    //        {
-    //            var data = NSData.FromArray(value);
-    //            this.Peripheral.WriteValue(data, this.NativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
-    //            return new GattCharacteristicResult(this, value, GattCharacteristicResultType.WriteWithoutResponse);
-    //        }
+    
 }

@@ -116,7 +116,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     }
 
 
-    static readonly PeripheralScanningOptions PeripheralScanningOptions = new PeripheralScanningOptions { AllowDuplicatesKey = true };
+    static readonly PeripheralScanningOptions peripheralScanningOptions = new PeripheralScanningOptions { AllowDuplicatesKey = true };
 
     public IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(ob =>
     {
@@ -136,13 +136,13 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                 {
                     this.Manager.ScanForPeripherals(
                         null!,
-                        PeripheralScanningOptions
+                        peripheralScanningOptions
                     );
                 }
                 else
                 {
                     var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
-                    this.Manager.ScanForPeripherals(uuids, PeripheralScanningOptions);
+                    this.Manager.ScanForPeripherals(uuids, peripheralScanningOptions);
                 }
                 return this.ScanResultReceived;
             })

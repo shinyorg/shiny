@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -69,6 +67,13 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
                 .Subscribe(_ => this.DoConnect());
         }
         this.DoConnect();
+    }
+
+
+    protected void AssertConnnection()
+    {
+        if (this.Status != ConnectionState.Connected)
+            throw new InvalidOperationException("GATT is not connected");
     }
 
 

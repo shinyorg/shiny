@@ -1,78 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral
 {
-    public IObservable<BleServiceInfo> GetService(string serviceUuid) => throw new NotImplementedException();
-    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => throw new NotImplementedException();
+    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => Observable.FromAsync<IReadOnlyList<BleServiceInfo>>(async ct =>
+    {
+        this.AssertConnection();
 
-    public override void OnServicesDiscovered(BluetoothGatt gatt, GattStatus status) { }
+        if (this.Gatt!.Services == null || refreshServices)
+            this.RefreshServices();
 
-    //public void RefreshServices()
-    //{
-    //    if (this.Gatt == null || !this.ManagerContext.Configuration.FlushServicesBetweenConnections)
-    //        return;
+        var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
+        this.Gatt.DiscoverServices();
 
-    //    // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
-    //    try
-    //    {
-    //        //Log.Warn(BleLogCategory.Device, "Try to clear Android cache");
-    //        var method = this.Gatt.Class.GetMethod("refresh");
-    //        if (method != null)
-    //        {
-    //            var result = (bool)method.Invoke(this.Gatt);
-    //            this.Logger.LogWarning("Clear Internal Cache Refresh Result: " + result);
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        this.Logger.LogWarning(ex, "Failed to clear internal device cache");
-    //    }
-    //}
+        await task.ConfigureAwait(false);
+        var services = this.Gatt
+            .Services!
+            .Select(x => new BleServiceInfo(
+                x.Uuid!.ToString()
+            ))
+            .ToList();
+
+        return services;
+    });
 
 
+    protected IObservable<BluetoothGattService> GetNativeService(string serviceUuid) => Observable.Create<BluetoothGattService>(ob =>
+    {
+        this.AssertConnection();
 
-    //    // android does not have a find "1" service - it must discover all services.... seems shit
-    //    public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false)
-    //    {
-    //        var uuid = Utils.ToUuidString(serviceUuid);
+        var service = this.Gatt!.GetService(Utils.ToUuidType(serviceUuid));
+        if (service == null)
+            throw new InvalidOperationException("No service found with uuid: " + serviceUuid);
 
-    //        return this
-    //            .GetServices()
-    //            .Select(x => x.FirstOrDefault(y => y
-    //                .Uuid
-    //                .Equals(uuid, StringComparison.InvariantCultureIgnoreCase)
-    //            ))
-    //            .Take(1)
-    //            .Assert(serviceUuid, throwIfNotFound);
-    //    }
+        ob.Respond(service);
+        return Disposable.Empty;
+    });
 
 
-    //    public override IObservable<IList<IGattService>> GetServices()
-    //        => this.Context.Invoke(Observable.Create<IList<IGattService>>(ob =>
-    //        {
-    //            this.AssertConnection();
-    //            var sub = this.Context
-    //                .Callbacks
-    //                .ServicesDiscovered
-    //                .Select(x => x.Gatt!.Services)
-    //                .Where(x => x != null)
-    //                .Select(x => x!
-    //                    .Select(native => new GattService(this, this.Context, native))
-    //                    .Cast<IGattService>()
-    //                    .ToList()
-    //                )
-    //                .Subscribe(
-    //                    ob.Respond,
-    //                    ob.OnError
-    //                );
+    protected void RefreshServices()
+    {
+        // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
+        try
+        {
+            var method = this.Gatt!.Class.GetMethod("refresh");
+            if (method == null)
+            {
+                this.logger.LogWarning("No internal refresh method found");
+            }
+            else
+            {
+                var result = (bool)method.Invoke(this.Gatt);
+                this.logger.LogWarning("Clear Internal Cache Refresh Result: " + result);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Failed to clear internal device cache");
+        }
+    }
 
-    //            this.Context.RefreshServices();
-    //            this.Context.Gatt!.DiscoverServices();
-    //            return sub;
-    //        }));
+
+    readonly Subject<Unit> serviceDiscoverySubj = new();
+    public override void OnServicesDiscovered(BluetoothGatt gatt, GattStatus status)
+        => this.serviceDiscoverySubj.OnNext(Unit.Default);
 }

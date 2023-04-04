@@ -97,7 +97,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     public IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
     {
-        //        this.AssertConnection();
+        this.AssertConnection();
 
         var sub = this.rssiSubj.Subscribe(x =>
         {
@@ -145,6 +145,13 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
         macBytes.CopyTo(deviceGuid, 10);
         return new Guid(deviceGuid).ToString();
+    }
+
+
+    protected void AssertConnection()
+    {
+        if (this.Status != ConnectionState.Connected)
+            throw new InvalidOperationException("GATT is not connected");
     }
 }
 
