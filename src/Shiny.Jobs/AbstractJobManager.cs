@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -126,7 +127,9 @@ public abstract class AbstractJobManager : IJobManager
 
     public void Register(JobInfo jobInfo)
     {
-        //this.ResolveJob(jobInfo);
+        if (jobInfo.JobType == null)
+            throw new ArgumentException("JobType is null");
+
         this.RegisterNative(jobInfo);
         this.repository.Set(jobInfo);
     }
@@ -184,14 +187,15 @@ public abstract class AbstractJobManager : IJobManager
     {
         this.jobStarted.OnNext(job);
         var result = default(JobRunResult);
+        IJob? jobDelegate = null;
 
-        // TODO: bind job object by name+type
         try
         {
             this.LogJob(JobState.Start, job);
 
-            // TODO: bind it
-            var jobDelegate = (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, job.JobType);
+            jobDelegate = (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, job.JobType);
+            if (jobDelegate is INotifyPropertyChanged npc)
+                this.storeBinder.Bind(npc);
 
             await jobDelegate
                 .Run(job, cancelToken)
@@ -205,7 +209,11 @@ public abstract class AbstractJobManager : IJobManager
             this.LogJob(JobState.Error, job, ex);
             result = new JobRunResult(job, ex);
         }
-        // TODO: unbind job
+        finally
+        {
+            if (jobDelegate is INotifyPropertyChanged npc)
+                this.storeBinder.UnBind(npc);
+        }
 
         this.jobFinished.OnNext(result);
         return result;

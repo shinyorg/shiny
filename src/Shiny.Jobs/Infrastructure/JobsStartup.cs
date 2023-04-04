@@ -33,12 +33,12 @@ public class JobsStartup : IShinyStartupTask
             var jobs = this.jobManager.GetJobs();
             foreach (var job in jobs)
             {
-                // TODO
-                //if (Type.GetType(job.TypeName) == null)
-                //{
-                //    this.logger.LogWarning($"Job '{job.Identifier}' with type '{job.TypeName}' cannot be found and has been removed");
-                //    this.jobManager.Cancel(job.Identifier);
-                //}
+                // the repository returned an empty type, user may have moved it, send log and cancel job
+                if (job.JobType == null)
+                {
+                    this.logger.LogWarning($"Job type '{job.Identifier}' cannot be found and has been removed");
+                    this.jobManager.Cancel(job.Identifier);
+                }
             }
         }
         catch (Exception ex)

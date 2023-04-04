@@ -28,7 +28,16 @@ public class CreateViewModel : ViewModel
                     return;
                 }
 
-                await this.notifications.RequestAccess();
+                var access = await jobManager.RequestAccess();
+                if (access != AccessState.Available)
+                {
+                    await this.Dialogs.DisplayAlertAsync("Error", "Job permissions failed: " + access, "OK");
+                    return;
+                }
+
+                access = await this.notifications.RequestAccess();
+                if (access != AccessState.Available)
+                    await this.Dialogs.DisplayAlertAsync("Warning", "Invalid permissions for notifications, the job will not display them", "OK");
 
                 var job = new JobInfo(
                     this.JobName.Trim(),
@@ -36,43 +45,30 @@ public class CreateViewModel : ViewModel
                     BatteryNotLow: this.BatteryNotLow,
                     DeviceCharging: this.DeviceCharging,
                     RunOnForeground: this.RunOnForeground,
-                    RequiredInternetAccess: (InternetAccess)Enum.Parse(typeof(InternetAccess), this.RequiredInternetAccess)
+                    RequiredInternetAccess: this.IsInternetRequired ? InternetAccess.Any : InternetAccess.None
                 );
                 this.jobManager.Register(job);
                 await this.Navigation.GoBack();
             }
         );
-
-
-        this.ChangeRequiredInternetAccess = new Command(async () =>
-        {
-            // TODO
-            //this.RequiredInternetAccess = await this.Choose(
-            //    "Internet Access",
-            //    InternetAccess.None.ToString(),
-            //    InternetAccess.Any.ToString(),
-            //    InternetAccess.Unmetered.ToString()
-            //);
-        });
     }
 
 
     public ICommand CreateJob { get; }
     public ICommand RunAsTask { get; }
-    public ICommand ChangeRequiredInternetAccess { get; }
 
     [Reactive] public string AccessStatus { get; private set; }
     [Reactive] public string JobName { get; set; } = "TestJob";
     [Reactive] public int SecondsToRun { get; set; } = 10;
-    [Reactive] public string RequiredInternetAccess { get; set; } = InternetAccess.None.ToString();
+    [Reactive] public bool IsInternetRequired { get; set; }
     [Reactive] public bool BatteryNotLow { get; set; }
     [Reactive] public bool DeviceCharging { get; set; }
     [Reactive] public bool RunOnForeground { get; set; } = true;
 
 
-    //public override async void OnAppearing()
-    //{
-    //    base.OnAppearing();
-    //    this.AccessStatus = (await this.jobManager.RequestAccess()).ToString();
-    //}
+    public override async void OnAppearing()
+    {
+        base.OnAppearing();
+        this.AccessStatus = (await this.jobManager.RequestAccess()).ToString();
+    }
 }

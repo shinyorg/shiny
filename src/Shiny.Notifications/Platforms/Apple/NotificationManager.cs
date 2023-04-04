@@ -93,8 +93,8 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             .GetPendingNotificationRequestsAsync()
             .ConfigureAwait(false);
 
-        var notifications = (IList<Notification>)requests.Select(x => x.FromNative()).ToList();
-        return notifications;
+        var notifications = requests.Select(x => x.FromNative() as Notification).ToList();
+        return (IList<Notification>)notifications;
     });
 
 

@@ -11,8 +11,16 @@ public static class InternalExtensions
         return new TNotification
         {
             Id = notification.Id,
-
-            // TODO
+            BadgeCount = notification.BadgeCount,
+            Channel = notification.Channel,
+            ScheduleDate = notification.ScheduleDate,
+            Thread = notification.Thread,
+            RepeatInterval = notification.RepeatInterval,
+            Title = notification.Title,
+            LocalAttachmentPath = notification.LocalAttachmentPath,
+            Message = notification.Message,
+            Geofence = notification.Geofence,
+            Payload = notification.Payload,
         };
     }
 }

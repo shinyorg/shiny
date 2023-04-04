@@ -52,8 +52,8 @@ public class ListViewModel : ViewModel
     public ICommand CancelAllJobs { get; }
     public ICommand RunAllJobs { get; }
     public ICommand Create { get; }
-    public IList<JobInfo> Jobs { get; private set; }
 
+    [Reactive] public IList<JobInfo> Jobs { get; private set; }
     [Reactive] public string RunningText { get; private set; }
     [Reactive] public JobInfo? SelectedJob { get; set; }
 

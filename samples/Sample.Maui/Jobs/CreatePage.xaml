@@ -28,11 +28,9 @@
 
                 <TableSection Title="Criteria">
                     <SwitchCell Text="Run On Foreground" On="{Binding RunOnForeground}" />
-                    <TextCell Text="Required Internet Access"
-                              Detail="{Binding RequiredInternetAccess}"
-                              Command="{Binding ChangeRequiredInternetAccess}" />
+                    <SwitchCell Text="Internet Required" On="{Binding IsInternetRequired}" />
                     <SwitchCell Text="Battery Not Low" On="{Binding BatteryNotLow}" />
-                    <SwitchCell Text="Peripheral Charging" On="{Binding DeviceCharging}" />
+                    <SwitchCell Text="Device Must Be Charging" On="{Binding DeviceCharging}" />
                 </TableSection>
             </TableView>
 

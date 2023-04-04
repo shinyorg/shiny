@@ -7,9 +7,20 @@
              x:Class="Sample.AppDataPage"
              Title="App Data">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Purge Settings"
+                     Command="{Binding Purge}"/>
+    </ContentPage.ToolbarItems>
+
     <CollectionView ItemsSource="{Binding Files}"
                     SelectedItem="{Binding SelectedFile}"
                     SelectionMode="Single">
+
+        <CollectionView.EmptyView>
+            <Label Text="No Files Found"
+                   Style="{StaticResource NoDataLabel}"/>
+        </CollectionView.EmptyView>
+
         <CollectionView.ItemTemplate>
             <DataTemplate x:DataType="io:FileInfo">
                 <VerticalStackLayout>
