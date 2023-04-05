@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
+using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -13,17 +14,20 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
 {
     readonly BleManager manager;
     readonly ILogger logger;
+    readonly IOperationQueue operations;
     IDisposable? autoReconnectSub;
 
 
     public Peripheral(
         BleManager manager,
         CBPeripheral native,
+        IOperationQueue operations,
         ILogger<IPeripheral> logger
     )
     {
         this.manager = manager;
         this.Native = native;
+        this.operations = operations;
         this.logger = logger;
 
         this.Uuid = native.Identifier.ToString();

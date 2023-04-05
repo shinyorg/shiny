@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.Bluetooth;
 using Microsoft.Extensions.Logging;
+using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -12,18 +13,21 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 {
     readonly AndroidPlatform platform;
     readonly BleManager manager;
+    readonly IOperationQueue operations;
     readonly ILogger logger;
 
     public Peripheral(
         BleManager manager,
         AndroidPlatform platform,
         BluetoothDevice native,
+        IOperationQueue operations,
         ILogger<IPeripheral> logger
     )
     {
         this.manager = manager;
         this.platform = platform;
         this.Native = native;
+        this.operations = operations;
         this.logger = logger;
     }
 

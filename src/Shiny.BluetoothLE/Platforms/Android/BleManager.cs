@@ -12,6 +12,7 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Microsoft.Extensions.Logging;
+using Shiny.BluetoothLE.Intrastructure;
 using SR = Android.Bluetooth.LE.ScanResult;
 
 namespace Shiny.BluetoothLE;
@@ -24,6 +25,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     readonly AndroidPlatform platform;    
     readonly AndroidBleConfiguration config;
     readonly IServiceProvider services;
+    readonly IOperationQueue operations;
     readonly ILogger<IBleManager> logger;
     readonly ILogger<IPeripheral> peripheralLogger;
 
@@ -31,6 +33,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         AndroidPlatform platform,
         AndroidBleConfiguration config,
         IServiceProvider services,
+        IOperationQueue operations,
         ILogger<IBleManager> logger,
         ILogger<IPeripheral> peripheralLogger
     )
@@ -38,6 +41,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         this.platform = platform;
         this.config = config;
         this.services = services;
+        this.operations = operations;
         this.logger = logger;
         this.peripheralLogger = peripheralLogger;
 
@@ -195,7 +199,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
     Peripheral GetPeripheral(BluetoothDevice device) => this.peripherals.GetOrAdd(
         device.Address!,
-        x => new Peripheral(this, this.platform, device, this.peripheralLogger)
+        x => new Peripheral(this, this.platform, device, this.operations, this.peripheralLogger)
     );
 
 

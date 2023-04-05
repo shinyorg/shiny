@@ -116,7 +116,7 @@ public static class CharacteristicExtensions
     public static IObservable<DeviceInfo> ReadDeviceInformation(this IPeripheral peripheral)
         => peripheral
             .GetCharacteristics(StandardUuids.DeviceInformationServiceUuid)
-            .SelectMany(x => x.Select(y => peripheral.ReadCharacteristic(y.ServiceUuid, y.Uuid)))
+            .SelectMany(x => x.Select(y => peripheral.ReadCharacteristic(y.Service.Uuid, y.Uuid)))
             .Concat()
             .ToList()
             .Select(data =>

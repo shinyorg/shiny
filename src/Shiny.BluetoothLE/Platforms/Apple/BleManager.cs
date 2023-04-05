@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 using CoreBluetooth;
 using Foundation;
+using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -14,21 +15,24 @@ namespace Shiny.BluetoothLE;
 public class BleManager : CBCentralManagerDelegate, IBleManager
 {
     readonly IServiceProvider services;
+    readonly IOperationQueue operations;
     readonly ILogger logger;
     readonly ILogger<IPeripheral> peripheralLogger;
     readonly AppleBleConfiguration config;
 
     public BleManager(
+        AppleBleConfiguration config,
         IServiceProvider services,
+        IOperationQueue operations,
         ILogger<IBleManager> logger,
-        ILogger<IPeripheral> peripheralLogger,
-        AppleBleConfiguration config
+        ILogger<IPeripheral> peripheralLogger
     )
     {
+        this.config = config;
+        this.operations = operations;
         this.services = services;
         this.logger = logger;
         this.peripheralLogger = peripheralLogger;
-        this.config = config;
     }
 
     public bool IsScanning { get; private set; }
@@ -234,6 +238,6 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
     Peripheral GetPeripheral(CBPeripheral peripheral) => this.peripherals.GetOrAdd(
         peripheral.Identifier.ToString(),
-        x => new Peripheral(this, peripheral, this.peripheralLogger)
+        x => new Peripheral(this, peripheral, this.operations, this.peripheralLogger)
     );
 }

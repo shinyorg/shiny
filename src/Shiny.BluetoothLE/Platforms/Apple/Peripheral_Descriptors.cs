@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
 
@@ -83,41 +84,22 @@ public partial class Peripheral
         return () => this.Native.WroteDescriptorValue -= handler;
     });
 
+
+    readonly Subject<(CBDescriptor? Descriptor, NSError? Error)> descReadSubject = new();
     public override void UpdatedValue(CBPeripheral peripheral, CBDescriptor descriptor, NSError? error)
-    {
-    }
+        => this.descReadSubject.OnNext((descriptor, error));
 
-    //bool Equals(CBDescriptor descriptor)
-    //{
-    //    if (!this.native.UUID.Equals(descriptor.UUID))
-    //        return false;
+    readonly Subject<(CBDescriptor? Descriptor, NSError? Error)> descWriteSubject = new();
+    public override void WroteDescriptorValue(CBPeripheral peripheral, CBDescriptor descriptor, NSError? error)
+        => this.descWriteSubject.OnNext((descriptor, error));
 
-    //    if (!this.NativeCharacteristic.UUID.Equals(descriptor.Characteristic.UUID))
-    //        return false;
-
-    //    if (!this.NativeService.UUID.Equals(descriptor.Characteristic.Service.UUID))
-    //        return false;
-
-    //    if (!this.Peripheral.Identifier.Equals(descriptor.Characteristic.Service.Peripheral.Identifier))
-    //        return false;
-
-    //    return true;
-    //}
-
-
-    //public override bool Equals(object obj)
-    //{
-    //    var other = obj as GattDescriptor;
-    //    if (other == null)
-    //        return false;
-
-    //    if (!Object.ReferenceEquals(this, other))
-    //        return false;
-
-    //    return true;
-    //}
-
-
-    //public override int GetHashCode() => this.native.GetHashCode();
-    //public override string ToString() => this.Uuid.ToString();
+    
+    protected IObservable<CBDescriptor> GetNativeDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(ch => Observable.Create<CBDescriptor>(ob =>
+        {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+            return () => { };
+        }))
+        .Switch();
 }

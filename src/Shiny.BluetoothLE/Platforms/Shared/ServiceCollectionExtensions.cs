@@ -3,6 +3,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.BluetoothLE;
+using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny;
 
@@ -19,10 +20,13 @@ public static class ServiceCollectionExtensions
 #if APPLE
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null, AppleBleConfiguration? config = null)
     {
+        services.TryAddSingleton<IOperationQueue, FallthroughOperationQueue>();
         services.TryAddSingleton(config ?? new AppleBleConfiguration());
+
 #elif ANDROID
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null, AndroidBleConfiguration? config = null)
     {
+        services.TryAddSingleton<IOperationQueue, SemaphoreOperationQueue>();
         services.TryAddSingleton(config ?? new AndroidBleConfiguration());
 #endif
         if (!services.HasImplementation<BleManager>())
