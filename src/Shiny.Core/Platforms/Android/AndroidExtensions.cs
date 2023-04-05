@@ -29,6 +29,34 @@ public static class AndroidExtensions
     }
 
 
+    /// <summary>
+    /// Gets a parcel out from an intent while checking for OS version
+    /// </summary>
+    /// <typeparam name="T">MUST be java type</typeparam>
+    /// <param name="intent"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static T? GetParcel<T>(this Intent intent, string name) where T : Java.Lang.Object
+    {
+        Java.Lang.Object? result;
+
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        {
+            var javaCls = Java.Lang.Class.FromType(typeof(T));
+            if (javaCls == null)
+                throw new InvalidOperationException("Invalid java type");
+
+            result = intent.GetParcelableExtra(name, javaCls);
+
+        }
+        else
+        {
+            result = intent.GetParcelableExtra(name);
+        }
+        return (T)result;
+    }
+
+
     public static PendingIntent GetBroadcastPendingIntent<T>(this AndroidPlatform platform, string intentAction, PendingIntentFlags flags, int requestCode = 0, Action<Intent>? modifyIntent = null)
     {
         var intent = platform.CreateIntent<T>(intentAction);

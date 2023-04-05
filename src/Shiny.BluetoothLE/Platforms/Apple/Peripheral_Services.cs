@@ -45,8 +45,7 @@ public partial class Peripheral
 
     public IObservable<BleServiceInfo> GetService(string serviceUuid) => this
         .GetNativeService(serviceUuid)
-        .Select(FromNative);
-
+        .Select(this.FromNative);
 
 
     public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => Observable.Create<IReadOnlyList<BleServiceInfo>>(ob =>
@@ -65,20 +64,20 @@ public partial class Peripheral
                 }
                 else if (this.Native.Services != null)
                 {
-                    ob.Respond(this.Native.Services.Select(FromNative).ToList());
+                    ob.Respond(this.Native.Services.Select(this.FromNative).ToList());
                 }
             });
             this.Native.DiscoverServices();
         }
         else
         {
-            ob.Respond(this.Native.Services.Select(FromNative).ToList());
+            ob.Respond(this.Native.Services.Select(this.FromNative).ToList());
         }
         return () => disp?.Dispose();
     });
 
 
-    static BleServiceInfo FromNative(CBService native) => new BleServiceInfo(
+    protected BleServiceInfo FromNative(CBService native) => new BleServiceInfo(
         native.UUID.ToString()
     );
 

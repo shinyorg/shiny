@@ -14,12 +14,17 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral
 {
+    public IObservable<BleServiceInfo> GetService(string serviceUuid) => this.GetNativeService(serviceUuid).Select(this.FromNative);
+
     public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => Observable.FromAsync<IReadOnlyList<BleServiceInfo>>(async ct =>
     {
         this.AssertConnection();
 
-        if (this.Gatt!.Services == null || refreshServices)
+        if (refreshServices)
             this.RefreshServices();
+
+        if (this.Gatt!.Services != null && !refreshServices)
+            return this.Gatt.Services.Select(this.FromNative).ToList();
 
         var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
         this.Gatt.DiscoverServices();
@@ -34,6 +39,11 @@ public partial class Peripheral
 
         return services;
     });
+
+
+    readonly Subject<Unit> serviceDiscoverySubj = new();
+    public override void OnServicesDiscovered(BluetoothGatt? gatt, GattStatus status)
+        => this.serviceDiscoverySubj.OnNext(Unit.Default);
 
 
     protected IObservable<BluetoothGattService> GetNativeService(string serviceUuid) => Observable.Create<BluetoothGattService>(ob =>
@@ -72,7 +82,5 @@ public partial class Peripheral
     }
 
 
-    readonly Subject<Unit> serviceDiscoverySubj = new();
-    public override void OnServicesDiscovered(BluetoothGatt gatt, GattStatus status)
-        => this.serviceDiscoverySubj.OnNext(Unit.Default);
+    protected BleServiceInfo FromNative(BluetoothGattService service) => new BleServiceInfo(service.Uuid.ToString());
 }

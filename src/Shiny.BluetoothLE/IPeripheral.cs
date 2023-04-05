@@ -7,17 +7,16 @@ namespace Shiny.BluetoothLE;
 
 public record BleServiceInfo(string Uuid);
 public record BleCharacteristicInfo(
-    string ServiceUuid,
+    BleServiceInfo Service,
     string Uuid,
     CharacteristicProperties Properties
 );
 public record BleDescriptorInfo(
-    string ServiceUuid,
-    string CharacteristicUuid,
+    BleCharacteristicInfo Characteristic,
     string Uuid
 );
 public record BleCharacteristicResult(
-    string ServiceUuid,
+    BleCharacteristicInfo Characteristic,
     string Uuid,
     byte[]? Data
 );
@@ -38,7 +37,7 @@ public interface IPeripheral
     IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices = false);
 
     IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid);
-    IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid, bool refresh = false);
+    IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid);
 
     bool IsNotifying(string serviceUuid, string characteristicUuid);
     IObservable<BleCharacteristicInfo> WhenNotificationHooked();

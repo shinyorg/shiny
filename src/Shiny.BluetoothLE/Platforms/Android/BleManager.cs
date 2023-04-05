@@ -21,20 +21,23 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 {
     public const string BroadcastReceiverName = "org.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
 
-    readonly AndroidPlatform platform;
+    readonly AndroidPlatform platform;    
     readonly AndroidBleConfiguration config;
+    readonly IServiceProvider services;
     readonly ILogger<IBleManager> logger;
     readonly ILogger<IPeripheral> peripheralLogger;
 
     public BleManager(
         AndroidPlatform platform,
         AndroidBleConfiguration config,
+        IServiceProvider services,
         ILogger<IBleManager> logger,
         ILogger<IPeripheral> peripheralLogger
     )
     {
         this.platform = platform;
         this.config = config;
+        this.services = services;
         this.logger = logger;
         this.peripheralLogger = peripheralLogger;
 
@@ -42,17 +45,39 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
 
-    public bool IsScanning => this.scanSubj != null;
+    public bool IsScanning => this.Native.Adapter!.IsDiscovering;
     public BluetoothManager Native { get; }
-    //    public IServiceProvider Services { get; }
-    //    public AccessState Status => this.Manager.GetAccessState();
 
 
     public void Start()
     {
         ShinyBleBroadcastReceiver.Process = async intent =>
         {
-            //this.DeviceEvent(intent)
+            if (intent?.Action == Intent.ActionBootCompleted || intent?.Action == null)
+                return;
+            Java.Lang.Class.FromType(typeof(BluetoothDevice));
+
+            var device = intent.GetParcel<BluetoothDevice>(BluetoothDevice.ExtraDevice);
+            if (device != null)
+            {
+                var peripheral = this.GetPeripheral(device);
+
+                switch (intent?.Action)
+                {
+                    case BluetoothDevice.ActionNameChanged: break; // TODO
+                    case BluetoothDevice.ActionBondStateChanged: break; // TODO
+                    case BluetoothDevice.ActionPairingRequest: break; // TODO
+                    case BluetoothDevice.ActionAclConnected:
+                        // bg connected
+                        await this.services
+                            .RunDelegates<IBleDelegate>(
+                                x => x.OnPeripheralStateChanged(peripheral),
+                                this.logger
+                            )
+                            .ConfigureAwait(false);
+                        break;
+                }
+            }
         };
 
         this.platform.RegisterBroadcastReceiver<ShinyBleBroadcastReceiver>(
@@ -64,22 +89,23 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         );
         ShinyBleAdapterStateBroadcastReceiver.Process = async intent =>
         {
-            //            var newState = (State)intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
-            //            stateSubj.OnNext(newState);
+            if (intent?.Action != BluetoothAdapter.ActionStateChanged)
+                return;
 
-            //        ShinyBleAdapterStateBroadcastReceiver
-            //            .WhenStateChanged()
-            //            .Where(x =>
-            //                x != State.TurningOn &&
-            //                x != State.TurningOff
-            //            )
-            //            .Select(x => x.FromNative())
-            //            .SubscribeAsync(status =>
-            //                this.Services.RunDelegates<IBleDelegate>(
-            //                    del => del.OnAdapterStateChanged(status),
-            //                    this.logger
-            //                )
-            //            );
+            var newState = (State)intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
+            if (newState == State.Connected || newState == State.Disconnected)
+            {
+                var status = newState == State.Connected
+                    ? AccessState.Available
+                    : AccessState.Disabled;
+
+                await this.services
+                    .RunDelegates<IBleDelegate>(
+                        del => del.OnAdapterStateChanged(status),
+                        this.logger
+                    )
+                    .ConfigureAwait(false);
+            }
         };
 
         this.platform.RegisterBroadcastReceiver<ShinyBleAdapterStateBroadcastReceiver>(
@@ -106,68 +132,63 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     });
 
 
-    Subject<ScanResult>? scanSubj;
-    public IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(ob =>
-    {
-        if (this.scanSubj != null)
-            throw new InvalidOperationException("There is already an active scan");
-
-        this.scanSubj = new();
-        this.Clear();
-
-        var disp = this.scanSubj.Subscribe(
-            ob.OnNext,
-            ob.OnError
-        );
-        this.StartScan(config);
-
-
-        return () =>
+    readonly Subject<(SR? Native, ScanFailure? Failure)> scanSubj = new();
+    public IObservable<ScanResult> Scan(ScanConfig? config = null) => this.RequestAccess()
+        .Do(x => x.Assert())
+        .Select(x => Observable.Create<ScanResult>(ob =>
         {
-            this.StopScan();
-            disp?.Dispose();
-        };
+            if (this.IsScanning)
+                throw new InvalidOperationException("There is already an active scan");
+        
+            this.Clear();
 
-        //        return this
-        //            .RequestAccess()
-        //            .Do(access =>
-        //            {
-        //                Assert(access);
-        //                this.IsScanning = true;
-        //            })
-    });
+            var disp = this.scanSubj.Subscribe(x =>
+            {
+                if (x.Failure == null)
+                {
+                    if (x.Native != null)
+                    {
+                        ob.OnNext(this.FromNative(x.Native));
+                    }
+                }
+                else
+                {
+                    ob.OnError(new InvalidOperationException("Scan Error: " + x.Failure));
+                }
+            });
+            this.StartScan(config);
+
+            return () =>
+            {
+                this.StopScan();
+                disp?.Dispose();
+            };
+        }))
+        .Switch();
 
 
     public void StopScan()
-    {
-        this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
-        this.scanSubj?.Dispose();
-        this.scanSubj = null;
-    }
+        => this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
 
+    public IEnumerable<IPeripheral> GetConnectedPeripherals()
+        => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
 
-    public IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null) => throw new NotImplementedException();
-    public IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid) => throw new NotImplementedException();
-
+    public IPeripheral? GetKnownPeripheral(string peripheralUuid)
+        => this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
 
     public override void OnScanResult([GeneratedEnum] ScanCallbackType callbackType, SR? result)
-    {
-        if (result != null)
-            this.Trigger(result);
-    }
-   
+        => this.scanSubj.OnNext((result, null));
 
     public override void OnScanFailed([GeneratedEnum] ScanFailure errorCode)
-        => this.scanSubj?.OnError(new InvalidOperationException("Scan Error: " + errorCode));
+        => this.scanSubj.OnNext((null, errorCode));        
 
-    
     public override void OnBatchScanResults(IList<SR>? results)
     {
         if (results == null)
             return;
 
         foreach (var result in results)
-            this.Trigger(result);
+            this.scanSubj.OnNext((result, null));
     }
 
 
@@ -178,8 +199,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     );
 
 
-    void Trigger(SR native) => this.scanSubj?.OnNext(this.FromNative(native));
-    ScanResult FromNative(SR native)
+    protected ScanResult FromNative(SR native)
     {
         var peripheral = this.GetPeripheral(native.Device!);
         var ad = new AdvertisementData(native);
@@ -189,7 +209,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
     void StartScan(ScanConfig? config)
     {
-        AndroidScanConfig cfg = null!;
+        AndroidScanConfig cfg;
         if (config == null)
             cfg = new();
         else if (config is AndroidScanConfig cfg1)
@@ -208,8 +228,8 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
                 var fullUuid = Utils.ToUuidType(uuid);
                 var parcel = new ParcelUuid(fullUuid);
                 scanFilters.Add(new ScanFilter.Builder()
-                    .SetServiceUuid(parcel)
-                    .Build()
+                    .SetServiceUuid(parcel)!
+                    .Build()!
                 );
             }
         }
@@ -227,17 +247,15 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
     void Clear()
     {
-        //var connectedDevices = this.GetConnectedDevices().ToList();
+        var connectedDevices = this.peripherals.Values.Select(x => x).ToList(); 
         this.peripherals.Clear();
-        //foreach (var dev in connectedDevices)
-        //    this.devices.TryAdd(dev.Native.Address!, dev);
+        foreach (var dev in connectedDevices)
+            this.peripherals.TryAdd(dev.Native.Address!, dev);
     }
 
 
     static string[] GetPlatformPermissions()
     {
-        var list = new List<string>();
-
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             return new[]
@@ -255,48 +273,20 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
 
-    static void Assert(AccessState access)
-    {
-        if (access == AccessState.NotSetup)
-        {
-            var permissions = GetPlatformPermissions();
-            var msgList = String.Join(", ", permissions);
-            throw new InvalidOperationException("Your AndroidManifest.xml is missing 1 or more of the following permissions for this version of Android: " + msgList);
-        }
-        else if (access != AccessState.Available)
-        {
-            throw new InvalidOperationException($"Invalid Status: {access}");
-        }
-    }
+    //static void Assert(AccessState access)
+    //{
+    //    if (access == AccessState.NotSetup)
+    //    {
+    //        var permissions = GetPlatformPermissions();
+    //        var msgList = String.Join(", ", permissions);
+    //        throw new InvalidOperationException("Your AndroidManifest.xml is missing 1 or more of the following permissions for this version of Android: " + msgList);
+    //    }
+    //    else if (access != AccessState.Available)
+    //    {
+    //        throw new InvalidOperationException($"Invalid Status: {access}");
+    //    }
+    //}
 }
-
-//    readonly Subject<(Intent Intent, Peripheral Peripheral)> peripheralSubject = new();
-//    public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid)
-//    {
-//        var address = Guid
-//            .Parse(peripheralUuid)
-//            .ToByteArray()
-//            .Skip(10)
-//            .Take(6)
-//            .ToArray();
-
-//        var native = this.context.Manager.Adapter!.GetRemoteDevice(address);
-//        if (native == null)
-//            return Observable.Return<IPeripheral?>(null);
-
-//        var peripheral = this.context.GetDevice(native);
-//        return Observable.Return(peripheral);
-//    }
-
-
-//    public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null)
-//        => Observable.Return(this.context
-//            .Manager
-//            .GetConnectedDevices(ProfileType.Gatt)
-//            .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le) // just in case
-//            .Select(this.context.GetDevice)
-//        );
-
 
 //    public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => Observable.Return(this.context
 //        .Manager
@@ -305,40 +295,6 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 //        .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
 //        .Select(this.context.GetDevice)
 //    );
-
-//    public IObservable<AccessState> StatusChanged() => ShinyBleAdapterStateBroadcastReceiver
-//        .WhenStateChanged()
-//        .Select(x => x.FromNative())
-//        .StartWith(this.Status);
-
-
-//    public IObservable<(Intent Intent, Peripheral Peripheral)> PeripheralEvents
-//        => this.peripheralSubject;
-
-
-//    async void DeviceEvent(Intent intent)
-//    {
-//        try
-//        {
-//            var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice)!;
-//            var peripheral = this.GetDevice(device);
-
-//            if (intent.Action?.Equals(BluetoothDevice.ActionAclConnected) ?? false)
-//            {
-//                await this.Services
-//                    .RunDelegates<IBleDelegate>(
-//                        x => x.OnConnected(peripheral),
-//                        this.logger
-//                    )
-//                    .ConfigureAwait(false);
-//            }
-//            this.peripheralSubject.OnNext((intent, peripheral));
-//        }
-//        catch (Exception ex)
-//        {
-//            this.logger.LogError(ex, "DeviceEvent error");
-//        }
-//    }
 
 
 //    public IObservable<Intent> ListenForMe(Peripheral me) => this

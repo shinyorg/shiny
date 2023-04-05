@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 using CoreBluetooth;
 using Foundation;
-using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE;
 
@@ -65,19 +65,12 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     }
 
 
-
-
     public IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
     {
         IDisposable? disp = null;
         if (this.Manager.State.IsUnknown())
         {
-            // TODO
-            //disp = this.StateUpdated.Subscribe(_ =>
-            //{
-            //    var current = this.Manager.State.FromNative();
-            //    ob.Respond(current);
-            //});
+            disp = this.stateUpdatedSubj.Subscribe(x => ob.Respond(x));
         }
         else
         {
@@ -87,33 +80,25 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     });
 
 
-    public IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid)
+    public IPeripheral? GetKnownPeripheral(string peripheralUuid)
     {
-        var uuid = new NSUuid(peripheralUuid);
-        var peripheral = this.Manager
-            .RetrievePeripheralsWithIdentifiers(uuid)
-            .FirstOrDefault();
+        //var uuid = new NSUuid(peripheralUuid);
+        //var peripheral = this.Manager
+        //    .RetrievePeripheralsWithIdentifiers(uuid)
+        //    .FirstOrDefault();
 
-        if (peripheral == null)
-            return Observable.Return<IPeripheral?>(null);
+        //if (peripheral == null)
+        //    return Observable.Return<IPeripheral?>(null);
 
-        var device = this.GetPeripheral(peripheral);
-        return Observable.Return(device);
+        //var device = this.GetPeripheral(peripheral);
+        //return Observable.Return(device);
+        return this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
     }
 
 
-    public IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null)
-    {
-        //if (serviceUuid == null)
-        //    return Observable.Return(this.Manager.GetConnectedDevices().ToList());
-
-        return Observable.Return(this
-            .Manager
-            .RetrieveConnectedPeripherals(CBUUID.FromString(serviceUuid))
-            .Select(x => this.GetPeripheral(x))
-            .ToList()
-        );
-    }
+    public IEnumerable<IPeripheral> GetConnectedPeripherals()
+        => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
+    
 
 
     static readonly PeripheralScanningOptions peripheralScanningOptions = new PeripheralScanningOptions { AllowDuplicatesKey = true };
@@ -123,6 +108,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
         if (this.IsScanning)
             throw new ArgumentException("There is already an existing scan");
 
+        this.Clear();
         config ??= new ScanConfig();
         var sub = this.RequestAccess()
             .Do(access =>

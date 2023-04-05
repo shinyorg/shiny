@@ -28,7 +28,7 @@ public partial class Peripheral
 
     public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
-        .Select(x => new BleCharacteristicInfo(serviceUuid, characteristicUuid, (CharacteristicProperties)x.Properties));
+        .Select(this.FromNative);
 
 
     public IObservable<Unit> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
@@ -84,7 +84,7 @@ public partial class Peripheral
                         throw new InvalidCastException(x.Error.LocalizedDescription);
                 })
                 .Select(x => new BleCharacteristicResult(
-                    serviceUuid,
+                    this.FromNative(x.Char),
                     characteristicUuid,
                     x.Char.Value?.ToArray()
                 ))
@@ -101,12 +101,31 @@ public partial class Peripheral
         .Switch();
 
 
+
+    // TODO: this should be a process queue
+    public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral) { }
+
+    readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
+    public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
+        => this.charDiscoverySubj.OnNext((service, error));
+
+
+    readonly Subject<(CBCharacteristic Char, NSError? Error)> charUpdateSubj = new();
+    public override void UpdatedCharacterteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
+        => this.charUpdateSubj.OnNext((characteristic, error));
+
+
+    readonly Subject<(CBCharacteristic Char, NSError? Error)> charWroteSubj = new();
+    public override void WroteCharacteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
+        => this.charWroteSubj.OnNext((characteristic, error));
+
+
     protected BleCharacteristicInfo FromNative(CBCharacteristic ch) => new BleCharacteristicInfo(
-        ch.Service!.UUID.ToString(),
-        ch.UUID.ToString(),
-        (CharacteristicProperties)ch.Properties
-    );
-    
+            this.FromNative(ch.Service!),
+            ch.UUID.ToString(),
+            (CharacteristicProperties)ch.Properties
+        );
+
 
     protected IObservable<CBCharacteristic> GetNativeCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeService(serviceUuid)
@@ -169,7 +188,7 @@ public partial class Peripheral
     protected IObservable<Unit> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => Observable.FromAsync(async ct =>
     {
         if (!this.Native.CanSendWriteWithoutResponse)
-        {      
+        {
             // TODO: wait for opportunity to send
         }
         var data = NSData.FromArray(value);
@@ -188,23 +207,6 @@ public partial class Peripheral
             throw new InvalidOperationException($"Characteristic '{ch.UUID}' does not support write without response");
     }
 
-
-    // TODO: this should be a process queue
-    public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral) { }
-
-    readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
-    public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
-        => this.charDiscoverySubj.OnNext((service, error));
-
-
-    readonly Subject<(CBCharacteristic Char, NSError? Error)> charUpdateSubj = new();
-    public override void UpdatedCharacterteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
-        => this.charUpdateSubj.OnNext((characteristic, error));
-
-
-    readonly Subject<(CBCharacteristic Char, NSError? Error)> charWroteSubj = new();
-    public override void WroteCharacteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
-        => this.charWroteSubj.OnNext((characteristic, error));
 
     //        public override IObservable<IGattCharacteristic> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
     //        {
@@ -230,5 +232,5 @@ public partial class Peripheral
 
     //            return () => this.Peripheral.UpdatedCharacterteristicValue -= handler;
     //        }));
-    
+
 }
