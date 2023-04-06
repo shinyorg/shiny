@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.BluetoothLE;
@@ -24,10 +23,9 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton(config ?? new AppleBleConfiguration());
 
 #elif ANDROID
-    public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null, AndroidBleConfiguration? config = null)
+    public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null)
     {
         services.TryAddSingleton<IOperationQueue, SemaphoreOperationQueue>();
-        services.TryAddSingleton(config ?? new AndroidBleConfiguration());
 #endif
         if (!services.HasImplementation<BleManager>())
             services.AddShinyService<BleManager>();
@@ -50,8 +48,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBluetoothLE<TCentralDelegate>(this IServiceCollection services, AppleBleConfiguration? config = null) where TCentralDelegate : class, IBleDelegate
         => services.AddBluetoothLE(typeof(TCentralDelegate), config);
 
-#elif ANDROID
-    public static IServiceCollection AddBluetoothLE<TCentralDelegate>(this IServiceCollection services, AndroidBleConfiguration? config = null) where TCentralDelegate : class, IBleDelegate
-        => services.AddBluetoothLE(typeof(TCentralDelegate), config);
+#else
+    public static IServiceCollection AddBluetoothLE<TCentralDelegate>(this IServiceCollection services) where TCentralDelegate : class, IBleDelegate
+        => services.AddBluetoothLE(typeof(TCentralDelegate));
 #endif
 }

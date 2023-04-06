@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,10 +39,16 @@ public class SemaphoreOperationQueue : IOperationQueue
 }
 
 
-//public static class OperationQueueExtensions
-//{
-//    public static IObservable<T> Execute<T>(this IOperationQueue queue, Func<Task> task)
-//    {
+public static class OperationQueueExtensions
+{
+    public static IObservable<T> QueueToObservable<T>(this IOperationQueue queue, Func<CancellationToken, Task<T>> func) => Observable.FromAsync(async ct =>
+    {
+        T result = default!;
+        await queue.Queue(async () => 
+        {
+            result = await func.Invoke(ct).ConfigureAwait(false);
+        }).ConfigureAwait(false);
 
-//    }
-//}
+        return result;
+    });
+}

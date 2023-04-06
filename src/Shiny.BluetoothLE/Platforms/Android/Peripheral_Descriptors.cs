@@ -1,24 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
+using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral
 {
-    public IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
+    public IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(ch => ch.Descriptors!.Select(this.FromNative).ToList());
 
-    public IObservable<byte[]> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => throw new NotImplementedException();
-    public IObservable<Unit> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => throw new NotImplementedException();
+    public IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => this
+        .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
+        .Select(desc => this.operations.QueueToObservable(async ct =>
+        {
+            var task = this.descWriteSubj
+                .Where(x => x.Descriptor.Equals(x))
+                .Take(1)
+                .ToTask(ct);
 
-    public override void OnDescriptorRead(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status) { }
-    public override void OnDescriptorWrite(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status) { }
+            if (!this.Gatt!.ReadDescriptor(desc))
+                throw new InvalidOperationException("Could not read descriptor: " + descriptorUuid);
+
+            await task.ConfigureAwait(false);
+            return this.ToResult(desc);
+        }))
+        .Switch();
+
+    public IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
+        .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
+        .Select(desc => this.operations.QueueToObservable(async ct =>
+        {
+            var task = this.descReadSubj
+                .Where(x => x.Descriptor.Equals(x))
+                .Take(1)
+                .ToTask(ct);
+
+            if (!this.Gatt!.ReadDescriptor(desc))
+                throw new InvalidOperationException("Could not read descriptor: " + descriptorUuid);
+
+            await task.ConfigureAwait(false);
+            return this.ToResult(desc);
+        }))
+        .Switch();
+
+
+    readonly Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status)> descReadSubj = new();
+    public override void OnDescriptorRead(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
+        => this.descReadSubj.OnNext((descriptor!, status));
+
+    readonly Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status)> descWriteSubj = new();
+    public override void OnDescriptorWrite(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
+        => this.descWriteSubj.OnNext((descriptor!, status));
+
+    protected IObservable<BluetoothGattDescriptor> GetNativeDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(ch =>
+        {
+            var uuid = Utils.ToUuidType(descriptorUuid);
+            var desc = ch.GetDescriptor(uuid);
+            if (desc == null)
+                throw new InvalidOperationException($"There is not descriptor '{descriptorUuid}' under service/characteristic: {serviceUuid}/{characteristicUuid}");
+
+            return desc;
+        });
+
+    protected BleDescriptorResult ToResult(BluetoothGattDescriptor desc, byte[]? data = null) => new BleDescriptorResult(
+        this.FromNative(desc),
+        data ?? desc.GetValue()
+    );
+
+    protected BleDescriptorInfo FromNative(BluetoothGattDescriptor desc) => new BleDescriptorInfo(
+        this.FromNative(desc.Characteristic!),
+        desc.Uuid!.ToString()
+        //desc.Permissions
+    );
 }
-
-//public override IObservable<GattDescriptorResult> Write(byte[] data) =>
-//        this.context.Invoke(this.WriteInternal(data));
 
 
 //protected internal IObservable<GattDescriptorResult> WriteInternal(byte[] data) => Observable.Create<GattDescriptorResult>(ob =>

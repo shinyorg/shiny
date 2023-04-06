@@ -35,53 +35,55 @@ public partial class Peripheral
     });
 
 
-    public IObservable<byte[]> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => Observable.Create<byte[]>(ob =>
+    public IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => Observable.Create<BleDescriptorResult>(ob =>
     {
-        var handler = new EventHandler<CBDescriptorEventArgs>((sender, args) =>
-        {
-            //if (!this.Equals(args.Descriptor))
-            //    return;
+        //var handler = new EventHandler<CBDescriptorEventArgs>((sender, args) =>
+        //{
+        //    //if (!this.Equals(args.Descriptor))
+        //    //    return;
 
-            if (args.Error != null)
-            {
-                //ob.OnError(new BleException(args.Error.Description));
-            }
-            else
-            {
-                var value = args.Descriptor.ToByteArray();
-                //ob.Respond<GattDescriptorResult>(new GattDescriptorResult(this, value));
-            }
-        });
-        this.Native.UpdatedValue += handler;
-        //this.Native.ReadValue(this.native);
+        //    if (args.Error != null)
+        //    {
+        //        //ob.OnError(new BleException(args.Error.Description));
+        //    }
+        //    else
+        //    {
+        //        var value = args.Descriptor.ToByteArray();
+        //        //ob.Respond<GattDescriptorResult>(new GattDescriptorResult(this, value));
+        //    }
+        //});
+        //this.Native.UpdatedValue += handler;
+        ////this.Native.ReadValue(this.native);
 
-        return () => this.Native.UpdatedValue -= handler;
+        //return () => this.Native.UpdatedValue -= handler;
+        return () => { };
     });
 
 
-    public IObservable<Unit> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => Observable.Create<Unit>(ob =>
+    public IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => Observable.Create<BleDescriptorResult>(ob =>
     {
-        var handler = new EventHandler<CBDescriptorEventArgs>((sender, args) =>
-        {
-            //if (!this.Equals(args.Descriptor))
-            //    return;
+        //var handler = new EventHandler<CBDescriptorEventArgs>((sender, args) =>
+        //{
+        //    //if (!this.Equals(args.Descriptor))
+        //    //    return;
 
-            if (args.Error != null)
-            {
-                ob.OnError(new BleException(args.Error.Description));
-            }
-            else
-            {
-                var bytes = args.Descriptor.ToByteArray();
-                //ob.Respond(new GattDescriptorResult(this, bytes));
-            }
-        });
+        //    if (args.Error != null)
+        //    {
+        //        ob.OnError(new BleException(args.Error.Description));
+        //    }
+        //    else
+        //    {
+        //        var bytes = args.Descriptor.ToByteArray();
+        //        //ob.Respond(new GattDescriptorResult(this, bytes));
+        //    }
+        //});
 
-        var nsdata = NSData.FromArray(data);
-        this.Native.WroteDescriptorValue += handler;
-        //this.Native.WriteValue(nsdata, this.native);
+        //var nsdata = NSData.FromArray(data);
+        //this.Native.WroteDescriptorValue += handler;
+        ////this.Native.WriteValue(nsdata, this.native);
 
-        return () => this.Native.WroteDescriptorValue -= handler;
+        //return () => this.Native.WroteDescriptorValue -= handler;
+        return () => { };
     });
 
 

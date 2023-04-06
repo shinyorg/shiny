@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CoreBluetooth;
@@ -11,10 +10,10 @@ using UIKit;
 namespace Shiny.BluetoothLE;
 
 
-public record NotificationSubscription(
-    string ServiceUuid,
-    string CharacteristicUuid
-);
+//public record NotificationSubscription(
+//    string ServiceUuid,
+//    string CharacteristicUuid
+//);
 
 public partial class Peripheral
 {
@@ -31,7 +30,7 @@ public partial class Peripheral
         .Select(this.FromNative);
 
 
-    public IObservable<Unit> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
+    public IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch =>
         {
@@ -85,7 +84,6 @@ public partial class Peripheral
                 })
                 .Select(x => new BleCharacteristicResult(
                     this.FromNative(x.Char),
-                    characteristicUuid,
                     x.Char.Value?.ToArray()
                 ))
                 .Subscribe(
@@ -163,7 +161,7 @@ public partial class Peripheral
         .Switch();
 
 
-    protected IObservable<Unit> WriteWithResponse(CBCharacteristic nativeCh, byte[] value) => Observable.Create<Unit>(ob =>
+    protected IObservable<BleCharacteristicResult> WriteWithResponse(CBCharacteristic nativeCh, byte[] value) => Observable.Create<BleCharacteristicResult>(ob =>
     {
         var data = NSData.FromArray(value);
 
@@ -173,7 +171,7 @@ public partial class Peripheral
             .Subscribe(x =>
             {
                 if (x.Error == null)
-                    ob.Respond(Unit.Default);
+                    ob.Respond(new BleCharacteristicResult(this.FromNative(nativeCh), nativeCh.Value?.ToArray()));
                 else
                     ob.OnError(new InvalidOperationException(x.Error.LocalizedDescription));
             });
@@ -185,15 +183,17 @@ public partial class Peripheral
     });
 
 
-    protected IObservable<Unit> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => Observable.FromAsync(async ct =>
+    protected IObservable<BleCharacteristicResult> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => Observable.FromAsync<BleCharacteristicResult>(async ct =>
     {
         if (!this.Native.CanSendWriteWithoutResponse)
         {
             // TODO: wait for opportunity to send
+            //ob.Respond(new BleCharacteristicResult(this.FromNative(nativeCh), nativeCh.Value?.ToArray()));
         }
         var data = NSData.FromArray(value);
         this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithoutResponse);
 
+        return default;
         // TODO: if cancelled, remove from queue
     });
 

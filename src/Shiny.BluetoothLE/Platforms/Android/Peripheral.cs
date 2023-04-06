@@ -39,6 +39,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     string? uuid;
     public string Uuid => this.uuid ??= GetUuid(this.Native);
+    public int Mtu { get; private set; } = 20;
 
 
     public ConnectionState Status
@@ -56,11 +57,11 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     }
 
 
-    // TODO: after disconnecting GATT, refresh services must be called
     public void CancelConnection()
     {
         try
         {
+
             this.Gatt?.Close();
             this.Gatt = null;
         }
@@ -92,6 +93,9 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             throw new BleException("GATT connection could not be established");
 
         this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
+        if (cfg.RequestedMtu != null)
+            this.Gatt.RequestMtu(cfg.RequestedMtu.Value);
+
         this.connSubj.OnNext(ConnectionState.Connecting);
     }
 
@@ -105,7 +109,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             if (x.Status == GattStatus.Success)
                 ob.OnNext(x.Rssi);
             else
-                throw new BleException("Failed to get RSSI - " + x.Status);
+                ob.OnError(new BleException("Failed to get RSSI - " + x.Status));
         });
         this.Gatt!.ReadRemoteRssi();
 
@@ -119,17 +123,16 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     readonly Subject<(GattStatus Status, int Rssi)> rssiSubj = new();
     public override void OnReadRemoteRssi(BluetoothGatt? gatt, int rssi, GattStatus status)
-    {
-        if (status == GattStatus.Success)
-            this.rssiSubj.OnNext((status, rssi));
-        else
-            this.rssiSubj.OnNext((status, rssi));
-    }
+        => this.rssiSubj.OnNext((status, rssi));
+
+    public override void OnMtuChanged(BluetoothGatt? gatt, int mtu, GattStatus status)
+        => this.Mtu = mtu;
 
 
     public override void OnConnectionStateChange(BluetoothGatt? gatt, GattStatus status, ProfileState newState)
     {
         // on disconnect I should kill services
+        //gatt.Services.Clear();
         this.connSubj.OnNext(newState.ToStatus());
     }
 
@@ -163,40 +166,3 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 //        .ManagerContext
 //        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
 //        .Select(_ => this.Name);
-
-
-//readonly SemaphoreSlim semaphore = new(1, 1);
-
-//public IObservable<T> Invoke<T>(IObservable<T> observable)
-//{
-//    if (!this.ManagerContext.Configuration.UseInternalSyncQueue)
-//        return observable;
-
-//    return Observable.FromAsync(async ct =>
-//    {
-//        await this.semaphore
-//            .WaitAsync(ct)
-//            .ConfigureAwait(false);
-
-//        try
-//        {
-//            return await observable
-//                .ToTask(ct)
-//                .ConfigureAwait(false);
-//        }
-//        finally
-//        {
-//            this.semaphore.Release();
-//        }
-//    });
-//}
-
-
-//readonly Handler handler = new(Looper.MainLooper!);
-//public void InvokeOnMainThread(Action action)
-//{
-//    if (this.ManagerContext.Configuration.InvokeCallsOnMainThread)
-//        this.handler.Post(action);
-//    else
-//        action();
-//}

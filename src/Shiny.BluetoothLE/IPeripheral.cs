@@ -17,7 +17,10 @@ public record BleDescriptorInfo(
 );
 public record BleCharacteristicResult(
     BleCharacteristicInfo Characteristic,
-    string Uuid,
+    byte[]? Data
+);
+public record BleDescriptorResult(
+    BleDescriptorInfo Descriptor,
     byte[]? Data
 );
 
@@ -44,9 +47,9 @@ public interface IPeripheral
     IObservable<BleCharacteristicResult> WhenNotification(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true);
 
     IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid);
-    IObservable<Unit> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
+    IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
 
     IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid);
-    IObservable<byte[]> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid);
-    IObservable<Unit> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data);
+    IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid);
+    IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data);
 }

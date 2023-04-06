@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text;
 using Android.Bluetooth;
 
 namespace Shiny.BluetoothLE;
@@ -10,7 +10,7 @@ public partial class Peripheral : ICanPairPeripherals
 {
     public IObservable<bool> PairingRequest(string? pin = null) => Observable.Create<bool>(ob =>
     {
-        var disp = new CompositeDisposable();
+        IDisposable? sub = null;
 
         if (this.PairingStatus == PairingState.Paired)
         {
@@ -18,45 +18,42 @@ public partial class Peripheral : ICanPairPeripherals
         }
         else
         {
-            //this.Context
-            //    .ManagerContext
-            //    .ListenForMe(this)
-            //    .Subscribe(intent =>
-            //    {
+            sub = this.manager
+                .PeripheralIntents
+                .Where(x => x.Peripheral.Equals(this))
+                .Select(x => x.Intent)
+                .Subscribe(intent =>
+                {
+                    switch (intent.Action)
+                    {
+                        case BluetoothDevice.ActionBondStateChanged:
+                            var prev = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraPreviousBondState, (int)Bond.None);
+                            var current = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraBondState, (int)Bond.None);
 
-            //        switch (intent.Action)
-            //        {
-            //            case BluetoothDevice.ActionBondStateChanged:
-            //                var prev = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraPreviousBondState, (int)Bond.None);
-            //                var current = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraBondState, (int)Bond.None);
+                            if (prev == Bond.Bonding || current == Bond.Bonded)
+                            {
+                                // it is done now
+                                var bond = current == Bond.Bonded;
+                                ob.Respond(bond);
+                            }
 
-            //                if (prev == Bond.Bonding || current == Bond.Bonded)
-            //                {
-            //                    // it is done now
-            //                    var bond = current == Bond.Bonded;
-            //                    ob.Respond(bond);
-            //                }
+                            break;
 
-            //                break;
-
-            //            case BluetoothDevice.ActionPairingRequest:
-            //                if (!pin.IsEmpty())
-            //                {
-            //                    var bytes = Encoding.UTF8.GetBytes(pin);
-            //                    if (!this.Native.SetPin(bytes))
-            //                    {
-            //                        ob.OnError(new ArgumentException("Failed to set PIN"));
-            //                    }
-            //                }
-            //                break;
-            //        }
-            //    })
-            //    .DisposedBy(disp);
+                        case BluetoothDevice.ActionPairingRequest:
+                            if (!pin.IsEmpty())
+                            {
+                                var bytes = Encoding.UTF8.GetBytes(pin!);
+                                if (!this.Native.SetPin(bytes))
+                                    ob.OnError(new ArgumentException("Failed to set PIN"));
+                            }
+                            break;
+                    }
+                });
 
             if (!this.Native.CreateBond())
-                ob.Respond(false);
+                throw new InvalidOperationException("Could not create bond");
         }
-        return disp;
+        return () => sub?.Dispose();
     });
 
 

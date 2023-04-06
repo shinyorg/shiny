@@ -23,7 +23,6 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     public const string BroadcastReceiverName = "org.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
 
     readonly AndroidPlatform platform;    
-    readonly AndroidBleConfiguration config;
     readonly IServiceProvider services;
     readonly IOperationQueue operations;
     readonly ILogger<IBleManager> logger;
@@ -31,7 +30,6 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
     public BleManager(
         AndroidPlatform platform,
-        AndroidBleConfiguration config,
         IServiceProvider services,
         IOperationQueue operations,
         ILogger<IBleManager> logger,
@@ -39,7 +37,6 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     )
     {
         this.platform = platform;
-        this.config = config;
         this.services = services;
         this.operations = operations;
         this.logger = logger;
@@ -53,33 +50,35 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     public BluetoothManager Native { get; }
 
 
+    public IObservable<(Peripheral Peripheral, Intent Intent)> PeripheralIntents => this.peripheralEventSubj;
+    readonly Subject<(Peripheral Peripheral, Intent Intent)> peripheralEventSubj = new();
+
+
     public void Start()
     {
         ShinyBleBroadcastReceiver.Process = async intent =>
         {
             if (intent?.Action == Intent.ActionBootCompleted || intent?.Action == null)
                 return;
-            Java.Lang.Class.FromType(typeof(BluetoothDevice));
 
             var device = intent.GetParcel<BluetoothDevice>(BluetoothDevice.ExtraDevice);
             if (device != null)
             {
                 var peripheral = this.GetPeripheral(device);
 
-                switch (intent?.Action)
+                if (intent.Action == BluetoothDevice.ActionAclConnected)
                 {
-                    case BluetoothDevice.ActionNameChanged: break; // TODO
-                    case BluetoothDevice.ActionBondStateChanged: break; // TODO
-                    case BluetoothDevice.ActionPairingRequest: break; // TODO
-                    case BluetoothDevice.ActionAclConnected:
-                        // bg connected
-                        await this.services
-                            .RunDelegates<IBleDelegate>(
-                                x => x.OnPeripheralStateChanged(peripheral),
-                                this.logger
-                            )
-                            .ConfigureAwait(false);
-                        break;
+                    // bg connected
+                    await this.services
+                        .RunDelegates<IBleDelegate>(
+                            x => x.OnPeripheralStateChanged(peripheral),
+                            this.logger
+                        )
+                        .ConfigureAwait(false);
+                }
+                else
+                {
+                    this.peripheralEventSubj.OnNext((peripheral, intent));
                 }
             }
         };

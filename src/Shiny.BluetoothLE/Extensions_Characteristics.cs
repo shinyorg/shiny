@@ -124,7 +124,10 @@ public static class CharacteristicExtensions
                 var dev = new DeviceInfo();
                 foreach (var item in data)
                 {
-                    switch (item.Uuid.ToLower())
+                    if (item.Data == null)
+                        continue;
+
+                    switch (item.Characteristic.Uuid.ToLower())
                     {
                         case "2a23":
                         case "00002a23-0000-1000-8000-00805f9b34fb":
