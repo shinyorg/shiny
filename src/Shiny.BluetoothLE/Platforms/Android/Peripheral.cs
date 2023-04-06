@@ -156,11 +156,3 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             throw new InvalidOperationException("GATT is not connected");
     }
 }
-
-
-//    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
-
-//    public override IObservable<string> WhenNameUpdated() => this.Context
-//        .ManagerContext
-//        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
-//        .Select(_ => this.Name);

@@ -4,7 +4,7 @@ using Shiny.Hosting;
 namespace Shiny;
 
 
-internal class ShinyInitializationService : IMauiInitializeService
+public class ShinyMauiInitializationService : IMauiInitializeService
 {
     public void Initialize(IServiceProvider services)
     {

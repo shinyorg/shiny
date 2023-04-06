@@ -9,7 +9,7 @@ namespace Shiny.BluetoothLE.Intrastructure;
 
 public interface IOperationQueue
 {
-    Task Queue(Func<Task> task); 
+    Task Queue(Func<Task> task);
 }
 
 

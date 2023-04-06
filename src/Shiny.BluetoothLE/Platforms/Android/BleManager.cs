@@ -78,6 +78,12 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
                 }
                 else
                 {
+                    //    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
+
+                    //    public override IObservable<string> WhenNameUpdated() => this.Context
+                    //        .ManagerContext
+                    //        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
+                    //        .Select(_ => this.Name);
                     this.peripheralEventSubj.OnNext((peripheral, intent));
                 }
             }

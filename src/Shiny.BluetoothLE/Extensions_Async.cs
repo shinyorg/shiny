@@ -31,9 +31,9 @@ public static class AsyncExtensions
         => peripheral
             .GetCharacteristics(serviceUuid)
             .ToTask(cancelToken);
+    
 
-
-    public static Task WriteCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true, CancellationToken cancelToken = default, int timeoutMs = 3000)
+    public static Task<BleCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => peripheral
             .WriteCharacteristic(serviceUuid, characteristicUuid, data, withResponse)
             .Timeout(TimeSpan.FromMilliseconds(timeoutMs))
@@ -44,5 +44,19 @@ public static class AsyncExtensions
         => peripheral
             .ReadCharacteristic(serviceUuid, characteristicUuid)
             .Timeout(TimeSpan.FromMilliseconds(timeoutMs))
+            .ToTask(cancelToken);
+
+
+    public static Task<BleDescriptorResult> ReadDescriptorAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, string descriptorUuid, CancellationToken cancelToken = default, int timeoutMs = 3000)
+        => peripheral
+            .ReadDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
+            .Timeout(TimeSpan.FromMicroseconds(timeoutMs))
+            .ToTask(cancelToken);
+
+
+    public static Task<BleDescriptorResult> WriteDescriptorAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data, CancellationToken cancelToken = default, int timeoutMs = 3000)
+        => peripheral
+            .WriteDescriptor(serviceUuid, characteristicUuid, descriptorUuid, data)
+            .Timeout(TimeSpan.FromMicroseconds(timeoutMs))
             .ToTask(cancelToken);
 }

@@ -16,17 +16,24 @@ public partial class Peripheral
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch => ch.Descriptors!.Select(this.FromNative).ToList());
 
+    public IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
+        .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
+        .Select(this.FromNative);
+
     public IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => this
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.descWriteSubj
-                .Where(x => x.Descriptor.Equals(x))
+            var task = this.descSubj
+                .Where(x => x.Descriptor.Equals(x) && !x.IsWrite)
                 .Take(1)
                 .ToTask(ct);
 
-            if (!this.Gatt!.ReadDescriptor(desc))
-                throw new InvalidOperationException("Could not read descriptor: " + descriptorUuid);
+            if (!desc.SetValue(data))
+                throw new BleException("Unable to set GattDescriptor: " + descriptorUuid);
+
+            if (!this.Gatt!.WriteDescriptor(desc))
+                throw new InvalidOperationException("Could not writte descriptor: " + descriptorUuid);
 
             await task.ConfigureAwait(false);
             return this.ToResult(desc);
@@ -37,11 +44,11 @@ public partial class Peripheral
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.descReadSubj
-                .Where(x => x.Descriptor.Equals(x))
+            var task = this.descSubj
+                .Where(x => x.Descriptor.Equals(x) && x.IsWrite)
                 .Take(1)
                 .ToTask(ct);
-
+            
             if (!this.Gatt!.ReadDescriptor(desc))
                 throw new InvalidOperationException("Could not read descriptor: " + descriptorUuid);
 
@@ -51,13 +58,12 @@ public partial class Peripheral
         .Switch();
 
 
-    readonly Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status)> descReadSubj = new();
+    readonly Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status, bool IsWrite)> descSubj = new();
     public override void OnDescriptorRead(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
-        => this.descReadSubj.OnNext((descriptor!, status));
+        => this.descSubj.OnNext((descriptor!, status, false));
 
-    readonly Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status)> descWriteSubj = new();
     public override void OnDescriptorWrite(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
-        => this.descWriteSubj.OnNext((descriptor!, status));
+        => this.descSubj.OnNext((descriptor!, status, true));
 
     protected IObservable<BluetoothGattDescriptor> GetNativeDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
@@ -71,9 +77,9 @@ public partial class Peripheral
             return desc;
         });
 
-    protected BleDescriptorResult ToResult(BluetoothGattDescriptor desc, byte[]? data = null) => new BleDescriptorResult(
+    protected BleDescriptorResult ToResult(BluetoothGattDescriptor desc) => new BleDescriptorResult(
         this.FromNative(desc),
-        data ?? desc.GetValue()
+        desc.GetValue()
     );
 
     protected BleDescriptorInfo FromNative(BluetoothGattDescriptor desc) => new BleDescriptorInfo(
@@ -82,68 +88,3 @@ public partial class Peripheral
         //desc.Permissions
     );
 }
-
-
-//protected internal IObservable<GattDescriptorResult> WriteInternal(byte[] data) => Observable.Create<GattDescriptorResult>(ob =>
-//{
-//    var sub = this.context
-//        .Callbacks
-//        .DescriptorWrite
-//        .Where(this.NativeEquals)
-//        .Subscribe(args =>
-//        {
-//            if (args.IsSuccessful)
-//                ob.Respond(new GattDescriptorResult(this, data));
-//            else
-//                ob.OnError(new BleException($"Failed to write descriptor value - {args.Status}"));
-//        });
-
-//    this.context.InvokeOnMainThread(() =>
-//    {
-//        try
-//        {
-//            if (!this.native.SetValue(data))
-//                ob.OnError(new BleException("Failed to set descriptor value"));
-
-//            else if (!this.context.Gatt?.WriteDescriptor(this.native) ?? false)
-//                ob.OnError(new BleException("Failed to write to descriptor"));
-//        }
-//        catch (Exception ex)
-//        {
-//            ob.OnError(ex);
-//        }
-//    });
-
-//    return sub;
-//});
-
-
-//public override IObservable<GattDescriptorResult> Read() => this.context.Invoke(Observable.Create<GattDescriptorResult>(ob =>
-//{
-//    var sub = this.context
-//        .Callbacks
-//        .DescriptorRead
-//        .Where(this.NativeEquals)
-//        .Subscribe(args =>
-//        {
-//            if (args.IsSuccessful)
-//                ob.Respond(new GattDescriptorResult(this, args.Descriptor.GetValue()));
-//            else
-//                ob.OnError(new BleException($"Failed to read descriptor value - {args.Status}"));
-//        });
-
-//    this.context.InvokeOnMainThread(() =>
-//    {
-//        try
-//        {
-//            if (!this.context.Gatt?.ReadDescriptor(this.native) ?? false)
-//                ob.OnError(new BleException("Failed to read descriptor"));
-//        }
-//        catch (Exception ex)
-//        {
-//            ob.OnError(ex);
-//        }
-//    });
-
-//    return sub;
-//}));
