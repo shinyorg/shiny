@@ -40,24 +40,18 @@ public class Host : IHost
     public virtual void Run()
     {
         var tasks = this.Services.GetServices<IShinyStartupTask>();
-        var logger = this.Logging.CreateLogger<Host>();
+        //var logger = this.Logging.CreateLogger<Host>();
+        var logger = this.Services.GetRequiredService<ILogger<Host>>();
 
         foreach (var task in tasks)
         {
             var tn = task.GetType().FullName;
-            try
-            {
-
-                task.Start();
-                logger.LogDebug($"Startup task '{tn}' ran successfully");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Startup task '{tn}' failed");
-            }
+            logger.LogDebug($"Startup task '{tn}' ran successfully");
+            task.Start();
         }
         Host.Current = this;
     }
+
 
     public void Dispose()
     {

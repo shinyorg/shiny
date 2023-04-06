@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Hosting;
 using Shiny.Stores;
 
 namespace Shiny;
@@ -89,23 +88,35 @@ public static class ServiceProviderExtensions
 
         if (interfaces.Any(x => x == typeof(INotifyPropertyChanged)) || interfaces.Any(x => x == typeof(IShinyComponentStartup)))
         {
-            services.AddSingleton(implementationType, sp =>
+            services.AddSingleton(implementationType, services =>
             {
-                var instance = ActivatorUtilities.CreateInstance(sp, implementationType);
+                var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("ShinyStartup");
+                var instance = ActivatorUtilities.CreateInstance(services, implementationType);
+                var fn = implementationType.FullName;
+
                 if (instance is INotifyPropertyChanged npc)
-                    sp.GetRequiredService<IObjectStoreBinder>().Bind(npc);
+                {
+                    logger.LogInformation("Startup Binding for " + fn);
+
+                    services
+                        .GetRequiredService<IObjectStoreBinder>()
+                        .Bind(npc);
+                }
 
                 if (instance is IShinyComponentStartup startup)
+                {
+                    logger.LogInformation("Component Start: " + fn);
                     startup.ComponentStart();
-
+                }
                 return instance;
             });
             interfaces.Remove(typeof(INotifyPropertyChanged));
             interfaces.Remove(typeof(IShinyComponentStartup));
         }
         foreach (var iface in interfaces)
+        { 
             services.AddSingleton(iface, sp => sp.GetRequiredService(implementationType));
-
+        }
         return services;
     }
 
