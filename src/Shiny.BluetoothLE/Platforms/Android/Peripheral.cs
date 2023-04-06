@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
@@ -61,7 +62,6 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     {
         try
         {
-
             this.Gatt?.Close();
             this.Gatt = null;
         }
@@ -100,20 +100,18 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     }
 
 
-    public IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
+    public IObservable<int> ReadRssi() => this.operations.QueueToObservable(async ct =>
     {
         this.AssertConnection();
 
-        var sub = this.rssiSubj.Subscribe(x =>
-        {
-            if (x.Status == GattStatus.Success)
-                ob.OnNext(x.Rssi);
-            else
-                ob.OnError(new BleException("Failed to get RSSI - " + x.Status));
-        });
+        var task = this.rssiSubj.Take(1).ToTask();
         this.Gatt!.ReadRemoteRssi();
 
-        return sub;
+        var result = await task.ConfigureAwait(false);
+        if (result.Status != GattStatus.Success)
+            throw new InvalidOperationException("Failed to retrieve RSSI: " + result.Status);
+
+        return result.Rssi;
     });
    
 

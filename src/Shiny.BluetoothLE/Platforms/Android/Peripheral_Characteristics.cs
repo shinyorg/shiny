@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
+using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -31,17 +33,24 @@ public partial class Peripheral
 
     public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
-        .Select(ch => Observable.Create<BleCharacteristicResult>(ob => 
+        .Select(ch => this.operations.QueueToObservable(async ct => 
         {
             if (!ch.Properties.HasFlag(GattProperty.Read))
                 throw new InvalidOperationException($"Characteristic '{characteristicUuid}' does not support read");
 
-            // TODO: hook and listen
+            var task = this.charEventSubj
+                .Where(x => x.Char.Equals(ch))
+                .Take(1)
+                .ToTask();
 
             if (!this.Gatt!.ReadCharacteristic(ch))
                 throw new BleException("Failed to read characteristic: " + characteristicUuid);
 
-            return () => { };
+            var result = await task.ConfigureAwait(false);
+            if (result.Status != GattStatus.Success)
+                throw new BleException("Failed to read characteristic: " + result.Status);
+
+            return this.ToResult(ch);
         }))
         .Switch();
 
@@ -50,8 +59,14 @@ public partial class Peripheral
     public IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => throw new NotImplementedException();
 
 
-    public override void OnCharacteristicRead(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status) { }
-    public override void OnCharacteristicWrite(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status) { }
+    readonly Subject<(BluetoothGattCharacteristic Char, GattStatus Status, bool forWrite)> charEventSubj = new();
+
+    public override void OnCharacteristicRead(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
+        => this.charEventSubj.OnNext((characteristic!, status, false));
+
+    public override void OnCharacteristicWrite(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
+        => this.charEventSubj.OnNext((characteristic!, status, true));
+
     public override void OnCharacteristicChanged(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic) { }
 
 
@@ -67,6 +82,11 @@ public partial class Peripheral
             return ch;
         });
 
+
+    protected BleCharacteristicResult ToResult(BluetoothGattCharacteristic ch) => new BleCharacteristicResult(
+        this.FromNative(ch),
+        ch.GetValue()
+    );
 
     protected BleCharacteristicInfo FromNative(BluetoothGattCharacteristic ch) => new BleCharacteristicInfo(
         this.FromNative(ch.Service),
@@ -187,15 +207,6 @@ public partial class Peripheral
 //            );
 //        });
 //}
-
-
-//public override IObservable<IList<IGattDescriptor>> GetDescriptors() => Observable.Return(
-//    this.native
-//        .Descriptors
-//        .Select(x => new GattDescriptor(this, this.context, x))
-//        .Cast<IGattDescriptor>()
-//        .ToList()
-//);
 
 
 //byte[] GetNotifyDescriptorBytes(bool useIndicationsIfAvailable)
