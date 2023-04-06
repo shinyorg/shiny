@@ -39,7 +39,7 @@ public static class AndroidExtensions
     public static T? GetParcel<T>(this Intent intent, string name) where T : Java.Lang.Object
     {
         Java.Lang.Object? result;
-
+#if ANDROID33_0_OR_GREATER
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             var javaCls = Java.Lang.Class.FromType(typeof(T));
@@ -47,12 +47,11 @@ public static class AndroidExtensions
                 throw new InvalidOperationException("Invalid java type");
 
             result = intent.GetParcelableExtra(name, javaCls);
+            return (T)result;
+        }
+#endif
 
-        }
-        else
-        {
-            result = intent.GetParcelableExtra(name);
-        }
+        result = intent.GetParcelableExtra(name);
         return (T)result;
     }
 

@@ -125,7 +125,11 @@ public partial class Peripheral
 
 
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
+#if XAMARIN_IOS
+    public override void DiscoveredCharacteristic(CBPeripheral peripheral, CBService service, NSError? error)
+#else
     public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
+#endif
         => this.charDiscoverySubj.OnNext((service, error));
 
 
