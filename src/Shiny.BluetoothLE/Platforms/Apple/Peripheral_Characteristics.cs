@@ -102,7 +102,7 @@ public partial class Peripheral
 
     public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
-        .Select(ch => this.operations.QueueToObservable(async ct => 
+        .Select(ch => this.operations.QueueToObservable(async ct =>
         {
             if (!ch.Properties.HasFlag(CBCharacteristicProperties.Read))
                 throw new InvalidOperationException($"Characteristic '{characteristicUuid}' does not support read");
@@ -125,7 +125,7 @@ public partial class Peripheral
 
 
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
-#if XAMARIN_IOS
+#if XAMARINIOS
     public override void DiscoveredCharacteristic(CBPeripheral peripheral, CBService service, NSError? error)
 #else
     public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
@@ -194,7 +194,7 @@ public partial class Peripheral
         .Switch();
 
 
-    protected IObservable<BleCharacteristicResult> WriteWithResponse(CBCharacteristic nativeCh, byte[] value) => this.operations.QueueToObservable(async ct => 
+    protected IObservable<BleCharacteristicResult> WriteWithResponse(CBCharacteristic nativeCh, byte[] value) => this.operations.QueueToObservable(async ct =>
     {
         var data = NSData.FromArray(value);
         var task = this.charWroteSubj.Where(x => x.Char.Equals(nativeCh)).Take(1).ToTask(ct);
@@ -212,7 +212,7 @@ public partial class Peripheral
     {
         if (!this.Native.CanSendWriteWithoutResponse)
             await this.readyWwrSubj.Take(1).ToTask(ct);
-        
+
         var data = NSData.FromArray(value);
         this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithoutResponse);
 
