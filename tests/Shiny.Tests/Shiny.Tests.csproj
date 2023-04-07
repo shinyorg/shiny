@@ -27,14 +27,6 @@
     </PropertyGroup>
     -->
 
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
-	</PropertyGroup>
-		
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
-		<CodesignEntitlements>Platforms\MacCatalyst\Entitlements.plist</CodesignEntitlements>
-	</PropertyGroup>
-
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
 
@@ -65,16 +57,10 @@
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
         <!--<ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />-->
-        <!--<ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" />-->
         <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <!--<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />-->
-        <!--<ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />-->
-        <!--<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />-->
-        <!--<ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />-->
-        <!--<ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />-->
     </ItemGroup>
-    
+
     <ItemGroup>
         <Compile Remove="Push\AbstractPushTests.cs" />
         <Compile Remove="Push\TestGoogleCredential.cs" />
@@ -82,6 +68,5 @@
         <Compile Remove="Push\AppleNativeTests.cs" />
         <Compile Remove="Push\AzureNotificationHubTests.cs" />
         <None Remove="BuildTasks\" />
-        <Folder Include="BuildTasks\" />
     </ItemGroup>
 </Project>

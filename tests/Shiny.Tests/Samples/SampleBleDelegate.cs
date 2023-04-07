@@ -3,7 +3,6 @@ using Shiny.BluetoothLE;
 
 namespace Sample;
 
-
 public class SampleBleDelegate : IBleDelegate
 {
     public SampleBleDelegate()
@@ -15,8 +14,7 @@ public class SampleBleDelegate : IBleDelegate
         return Task.CompletedTask;
     }
 
-
-    public Task OnConnected(IPeripheral peripheral)
+    public Task OnPeripheralStateChanged(IPeripheral peripheral)
     {
         return Task.CompletedTask;
     }
