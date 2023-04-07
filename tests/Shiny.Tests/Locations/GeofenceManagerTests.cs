@@ -37,7 +37,7 @@ public class GeofenceManagerTests : AbstractShinyTests
             new Position(1, 1),
             Distance.FromMeters(300)
         ));
-        var gf = await manager.GetMonitorRegions();
+        var gf = manager.GetMonitorRegions();
         gf.Count.Should().Be(1);
 
         gf.First().Identifier.Should().Be(nameof(BasicRegistrationTest));
