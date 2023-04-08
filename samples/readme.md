@@ -1,7 +1,12 @@
 # Shiny Samples
 
+These samples make use great open source frameworks like [Prism](https://prismlibrary.com) & ReactiveUI (https://reactiveui.net) as well
+as principles like dependency injection and reactive extensions... much like Shiny itself.  If you find these complex or you simply don't complain...
+remember - this is not a product!  You don't get refunds for free
+
 ## Sample (Sample.Maui)
-A kitchen sink using all of the support libraries that don't require special external entitlements from Apple (like Push or NFC)
+A kitchen sink using all of the support libraries that don't require special external entitlements from Apple (like Push).
+This sample also uses Shiny.Framework (https://github.com/shinyorg/framework) which has helpers around ReactiveUI & Prism.
 
 ## MAUI Push (Sample.Push.Maui)
 
