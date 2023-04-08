@@ -3,9 +3,10 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:bleclient="clr-namespace:Sample.BleClient"
+    xmlns:bluetoothle="clr-namespace:Shiny.BluetoothLE;assembly=Shiny.BluetoothLE"
     x:DataType="bleclient:ServiceViewModel"
     x:Class="Sample.BleClient.ServicePage"
-    Title="Service">
+    Title="{Binding Title}">
 
     <ContentPage.Content>
         <Grid>
@@ -22,9 +23,11 @@
                             SelectionMode="Single"
                             Grid.Row="1">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="bleclient:CharacteristicViewModel">
+                    <DataTemplate x:DataType="bluetoothle:BleCharacteristicInfo">
                         <StackLayout>
-                            <Label Text="{Binding UUID}" />
+                            <Label Text="{Binding Uuid, StringFormat='Characteristic: {0}'}"
+                                   FontSize="Large" />
+                            <BoxView Style="{StaticResource HR}" />
                         </StackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

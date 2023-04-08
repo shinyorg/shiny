@@ -13,30 +13,49 @@ public class CharacteristicViewModel : ViewModel
 
     public CharacteristicViewModel(BaseServices services) : base(services)
     {
-        this.Read = ReactiveCommand.CreateFromTask(async () =>
-        {
-            //var result = await this.characteristic!.ReadAsync();
-            //this.SetRead(result.Data!);
-        });
-
-
-        this.ToggleNotify = ReactiveCommand.Create(() =>
-        {
-            if (this.dispose == null)
+        this.Read = ReactiveCommand.CreateFromTask(
+            async () =>
             {
-                this.dispose = this.peripheral
-                    .NotifyCharacteristic(this.characteristic)
-                    .SubOnMainThread(x => this.SetRead(x.Data!));
-            }
-            else
+                var result = await this.peripheral!.ReadCharacteristicAsync(this.characteristic);
+                this.Set(result);
+            },
+            this.WhenAny(x => x.CanRead, x => x.GetValue())
+        );
+
+        this.Write = ReactiveCommand.CreateFromTask(
+            async () =>
             {
-                this.Stop();
-            }
-        });
+                var value = await this.Dialogs.DisplayPromptAsync("Data", "Enter some data that we will encode to ship to device", "OK", "Cancel");
+                if (!value.IsEmpty())
+                {
+                    var data = Encoding.UTF8.GetBytes(value);
+                    var result = await this.peripheral.WriteCharacteristicAsync(this.characteristic, data);
+                    this.Set(result);
+                }
+            },
+            this.WhenAny(x => x.CanWrite, x => x.GetValue())
+        );
+
+        this.ToggleNotify = ReactiveCommand.Create(
+            () =>
+            {
+                if (this.dispose == null)
+                {
+                    this.dispose = this.peripheral
+                        .NotifyCharacteristic(this.characteristic)
+                        .SubOnMainThread(x => this.Set(x));
+                }
+                else
+                {
+                    this.Stop();
+                }
+            },
+            this.WhenAny(x => x.CanNotify, x => x.GetValue())
+        );
     }
 
 
-    public override Task InitializeAsync(INavigationParameters parameters)
+    public override void OnNavigatedTo(INavigationParameters parameters) 
     {
         this.characteristic = parameters.GetValue<BleCharacteristicInfo>("Characteristic");
         this.ServiceUUID = this.characteristic.Service.Uuid;
@@ -45,9 +64,10 @@ public class CharacteristicViewModel : ViewModel
         this.CanNotify = this.characteristic.CanNotify();
         this.CanRead = this.characteristic.CanRead();
         this.CanWrite = this.characteristic.CanWrite();
-        return base.InitializeAsync(parameters);
     }
 
+
+    public override void OnDisappearing() => this.Stop();
 
 
     void Stop()
@@ -58,9 +78,10 @@ public class CharacteristicViewModel : ViewModel
     }
 
 
-    void SetRead(byte[] data)
+    void Set(BleCharacteristicResult result)
     {
-        this.ReadValue = Encoding.UTF8.GetString(data);
+        this.LastEvent = result.Event.ToString();
+        this.LastValue = result.Data == null ? "NO DATA" : Encoding.UTF8.GetString(result.Data);
         this.LastValueTime = DateTime.Now.ToString();
     }
 
@@ -75,7 +96,7 @@ public class CharacteristicViewModel : ViewModel
     [Reactive] public string ServiceUUID { get; private set; }
     [Reactive] public string UUID { get; private set; }
     [Reactive] public bool IsNotifying { get; private set; }
-    [Reactive] public string ReadValue { get; private set; }
-    [Reactive] public string WriteValue { get; private set; }
+    [Reactive] public string LastEvent { get; private set; } = "None";
+    [Reactive] public string LastValue { get; private set; }
     [Reactive] public string LastValueTime { get; private set; }
 }

@@ -9,12 +9,18 @@
     <ContentPage.Content>
         <StackLayout>
             <Label Text="{Binding ServiceUUID, StringFormat='Service UUID: {0}'}" />
-            <Label Text="{Binding UUID, StringFormat='Service UUID: {0}'}" />
-            <Label Text="{Binding ReadValue, StringFormat='Read Value: {0}'}" />
+            <Label Text="{Binding UUID, StringFormat='Characteristic UUID: {0}'}" />
+            <Label Text="{Binding LastEvent, StringFormat='Last Event: {0}'}" />
+            <Label Text="{Binding LastValue, StringFormat='Last Value: {0}'}" />
             <Label Text="{Binding LastValueTime, StringFormat='Last Value Time: {0}'}" />
+
             <Button Text="Read"
                     Command="{Binding Read}"
                     IsEnabled="{Binding CanRead}" />
+
+            <Button Text="Write"
+                    Command="{Binding Write}"
+                    IsEnabled="{Binding CanWrite}" />
 
             <Button Text="Start Notifications"
                     Command="{Binding ToggleNotify}"
@@ -32,14 +38,6 @@
                     </DataTrigger>
                 </Button.Triggers>
             </Button>
-
-            <Label Text="Write Value" />
-            <Entry Text="{Binding WriteValue}"
-                   IsEnabled="{Binding CanWrite}" />
-
-            <Button Text="Write"
-                    Command="{Binding Write}"
-                    IsEnabled="{Binding CanWrite}" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

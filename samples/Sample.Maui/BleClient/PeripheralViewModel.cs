@@ -5,24 +5,20 @@ namespace Sample.BleClient;
 
 public class PeripheralViewModel : ViewModel
 {
+    IPeripheral peripheral = null!;
+
     public PeripheralViewModel(BaseServices services) : base(services)
     {
-
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
-            await this.peripheral
+            var services = await this.peripheral
                 .WithConnectIf()
                 .Select(x => x.GetServices())
                 .Switch()
                 .ToTask();
 
-            //this.Services = (await this.peripheral.GetServicesAsync())
-            //    .Select(x => new ServiceViewModel(x))
-            //    .ToList();
-
-            this.RaisePropertyChanged(nameof(this.Services));
+            this.Services = services.ToList();
         });
-
 
         this.GetDeviceInfo = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -46,34 +42,28 @@ public class PeripheralViewModel : ViewModel
             );
         });
 
-        //this.WhenAnyProperty(x => x.SelectedService)
-        //    .Where(x => x != null)
-        //    .SubOnMainThread(async x =>
-        //    {
-        //        this.SelectedService = null;
-        //        await this.Navigation.PushAsync(new ServicePage
-        //        {
-        //            BindingContext = x
-        //        });
-        //    });
+        this.WhenAnyValueSelected(
+            x => x.SelectedService,
+            x => this.Navigation.Navigate(
+                "BlePeripheralService",
+                ("Peripheral", this.peripheral),
+                ("Service", x!)
+            )
+        );
     }
-
-
-    IPeripheral peripheral = null!;
 
     public ICommand Load { get; }
     public ICommand GetDeviceInfo { get; }
 
-    [Reactive] public List<ServiceViewModel> Services { get; private set; }
-    [Reactive] public ServiceViewModel? SelectedService { get; set; }
+    [Reactive] public IList<BleServiceInfo> Services { get; private set; } = null!;
+    [Reactive] public BleServiceInfo? SelectedService { get; set; }
 
 
-    public override Task InitializeAsync(INavigationParameters parameters)
+    public override void OnNavigatedTo(INavigationParameters parameters)
     {
         this.peripheral = parameters.GetValue<IPeripheral>("Peripheral")!;
         this.Title = this.peripheral.Name ?? "No Name";
 
         this.Load.Execute(null);
-        return base.InitializeAsync(parameters);
     }
 }
