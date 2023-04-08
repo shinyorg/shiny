@@ -111,8 +111,10 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
         if (android.LockscreenVisibility != null)
             native.LockscreenVisibility = android.LockscreenVisibility.Value;
 
+#if !MONOANDROID
         if (android.Blockable != null && OperatingSystemShim.IsAndroidVersionAtLeast(33))
             native.Blockable = android.Blockable.Value;
+#endif
 
         if (android.BypassDnd != null)
             native.SetBypassDnd(android.BypassDnd.Value);

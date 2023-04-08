@@ -6,16 +6,17 @@ namespace Sample.BleClient;
 
 public class CharacteristicViewModel : ViewModel
 {
-    IGattCharacteristic characteristic = null!;
+    IPeripheral peripheral = null!;
+    BleCharacteristicInfo characteristic = null!;
     IDisposable? dispose;
 
 
-    public CharacteristicViewModel(BaseServices services, IGattCharacteristic characteristic) : base(services)
+    public CharacteristicViewModel(BaseServices services) : base(services)
     {
         this.Read = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await this.characteristic!.ReadAsync();
-            this.SetRead(result.Data!);
+            //var result = await this.characteristic!.ReadAsync();
+            //this.SetRead(result.Data!);
         });
 
 
@@ -23,8 +24,8 @@ public class CharacteristicViewModel : ViewModel
         {
             if (this.dispose == null)
             {
-                this.dispose = this.characteristic
-                    .Notify()
+                this.dispose = this.peripheral
+                    .NotifyCharacteristic(this.characteristic)
                     .SubOnMainThread(x => this.SetRead(x.Data!));
             }
             else
@@ -37,7 +38,7 @@ public class CharacteristicViewModel : ViewModel
 
     public override Task InitializeAsync(INavigationParameters parameters)
     {
-        this.characteristic = parameters.GetValue<IGattCharacteristic>("Characteristic");
+        this.characteristic = parameters.GetValue<BleCharacteristicInfo>("Characteristic");
         this.ServiceUUID = this.characteristic.Service.Uuid;
         this.UUID = this.characteristic.Uuid;
 

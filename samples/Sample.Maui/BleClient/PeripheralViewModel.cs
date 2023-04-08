@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.BluetoothLE;
+﻿using Shiny.BluetoothLE;
 
 namespace Sample.BleClient;
 
@@ -8,21 +7,22 @@ public class PeripheralViewModel : ViewModel
 {
     public PeripheralViewModel(BaseServices services) : base(services)
     {
-        
+
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
-            //this.peripheral
-            //    .WithConnectIf()
-            //    .Select(x => x.GetServices())
-            //    .Switch()
-            //    .ToTask();
-            //this.Services = (await peripheral.GetServicesAsync())
+            await this.peripheral
+                .WithConnectIf()
+                .Select(x => x.GetServices())
+                .Switch()
+                .ToTask();
+
+            //this.Services = (await this.peripheral.GetServicesAsync())
             //    .Select(x => new ServiceViewModel(x))
             //    .ToList();
 
             this.RaisePropertyChanged(nameof(this.Services));
         });
-        
+
 
         this.GetDeviceInfo = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -60,18 +60,19 @@ public class PeripheralViewModel : ViewModel
 
 
     IPeripheral peripheral = null!;
-    
-    public ICommand Load { get; }
-    public ICommand GetDeviceInfo { get; }    
-    public List<ServiceViewModel> Services { get; private set; }
 
-    [Reactive] public ServiceViewModel SelectedService { get; set; }
+    public ICommand Load { get; }
+    public ICommand GetDeviceInfo { get; }
+
+    [Reactive] public List<ServiceViewModel> Services { get; private set; }
+    [Reactive] public ServiceViewModel? SelectedService { get; set; }
 
 
     public override Task InitializeAsync(INavigationParameters parameters)
     {
-        this.peripheral = parameters.GetValue<IPeripheral>("Peripheral");
-        //this.Title = peripheral.Name;
+        this.peripheral = parameters.GetValue<IPeripheral>("Peripheral")!;
+        this.Title = this.peripheral.Name ?? "No Name";
+
         this.Load.Execute(null);
         return base.InitializeAsync(parameters);
     }

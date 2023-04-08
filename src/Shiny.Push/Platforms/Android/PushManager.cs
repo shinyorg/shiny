@@ -120,7 +120,7 @@ public class PushManager : NotifyPropertyChanged,
 
     public void Handle(Activity activity, Intent intent)
     {
-        var clickAction = intent?.Action?.Equals(ShinyIntents.NotificationClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false;
+        var clickAction = intent?.Action?.Equals(ShinyPushIntents.NotificationClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false;
         if (!clickAction)
             return;
 

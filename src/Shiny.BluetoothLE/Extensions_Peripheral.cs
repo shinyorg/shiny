@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -83,4 +84,22 @@ public static class PeripheralExtensions
             .WhenStatusChanged()
             .Where(x => x == ConnectionState.Disconnected)
             .Select(_ => peripheral);
+
+    public static IObservable<BleCharacteristicResult> NotifyCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, bool useIndicationsIfAvailable = true, bool autoReconnect = true)
+        => peripheral.NotifyCharacteristic(info.Service.Uuid, info.Uuid, useIndicationsIfAvailable, autoReconnect);
+
+    public static IObservable<BleCharacteristicResult> ReadCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info)
+        => peripheral.ReadCharacteristic(info.Service.Uuid, info.Uuid);
+
+    public static IObservable<BleCharacteristicResult> WriteCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, byte[] data, bool withoutResponse = false)
+        => peripheral.WriteCharacteristic(info.Service.Uuid, info.Uuid, data, withoutResponse);
+
+    public static IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(this IPeripheral peripheral, BleCharacteristicInfo info)
+        => peripheral.GetDescriptors(info.Service.Uuid, info.Uuid);
+
+    public static IObservable<BleDescriptorResult> WriteDescriptor(this IPeripheral peripheral, BleDescriptorInfo info, byte[] data)
+        => peripheral.WriteDescriptor(info.Characteristic.Service.Uuid, info.Characteristic.Uuid, info.Uuid, data);
+
+    public static IObservable<BleDescriptorResult> ReadDescriptor(this IPeripheral peripheral, BleDescriptorInfo info)
+        => peripheral.ReadDescriptor(info.Characteristic.Service.Uuid, info.Characteristic.Uuid, info.Uuid);
 }
