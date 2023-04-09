@@ -21,6 +21,10 @@ public partial class Peripheral
 
         if (service == null)
         {
+            ob.Respond(service);
+        }
+        else
+        { 
             disp = this.serviceDiscoverySubj.Subscribe(x =>
             {
                 if (x != null)

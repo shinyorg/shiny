@@ -53,17 +53,18 @@ public partial class Peripheral
     IObservable<BleCharacteristicResult>? notifyObs;
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true, bool autoReconnect = true)
     {
-        // TODO: assert notification
-        // TODO: finish reconnect
-
         this.notifyObs ??= this.GetNativeCharacteristic(serviceUuid, characteristicUuid)
             .Select(ch => this.operations.QueueToObservable(async ct =>
             {
+                // TODO: finish auto reconnect
+                this.FromNative(ch).AssertNotify();
+
                 this.logger.LogInformation("Hook Notification Characteristic: " + characteristicUuid);
 
                 if (!this.Gatt.SetCharacteristicNotification(ch, true))
                     throw new BleException("Failed to set characteristic notification value");
 
+                // TODO: writedescriptor will incur inside of another lock, thus causing a deadlock - we need a safe write
                 var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
                 await this.WriteDescriptorAsync(serviceUuid, characteristicUuid, NotifyDescriptorUuid, notifyBytes);
                 this.logger.LogInformation($"Hooked Notification Characteristic '{characteristicUuid}' successfully");
@@ -126,7 +127,6 @@ public partial class Peripheral
 
             if (!this.Gatt!.WriteCharacteristic(ch))
                 throw new BleException("Failed to write to characteristic: " + characteristicUuid);
-
             
             var result = await task.ConfigureAwait(false);
             if (result.Status != GattStatus.Success)

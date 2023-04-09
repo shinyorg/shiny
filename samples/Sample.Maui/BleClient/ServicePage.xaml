@@ -13,6 +13,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Label Text="{Binding Title, StringFormat='Service UUID: {0}'}"
@@ -32,6 +33,9 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               HorizontalOptions="CenterAndExpand" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>

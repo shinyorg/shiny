@@ -13,7 +13,6 @@ public static class AsyncExtensions
     public static Task<AccessState> RequestAccessAsync(this IBleManager manager)
         => manager.RequestAccess().ToTask();
 
-
     public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
             .WithConnectIf(config)

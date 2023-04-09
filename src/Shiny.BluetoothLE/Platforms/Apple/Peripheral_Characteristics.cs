@@ -22,16 +22,23 @@ public partial class Peripheral
         this.notifyObservable ??= this.GetNativeCharacteristic(serviceUuid, characteristicUuid)
             .Select(ch =>
             {
+                this.FromNative(ch).AssertNotify();
+
                 this.logger.LogInformation("Hooking Notification Characteristic: " + characteristicUuid);
                 IDisposable? autoReconnectSub = null;
 
                 if (autoReconnect)
                 {
-                    // TODO: re-get native char as it will have changed
-                    //autoReconnectSub = this.WhenConnected()
+                    this.autoReconnectSub = this.WhenConnected()
+                        .Select(x => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                        .Switch()
+                        .Subscribe(chNew =>
+                        {
+                            ch = chNew;
+                            this.Native.SetNotifyValue(true, ch);
+                        });
                 }
 
-                // TODO: assert notification
                 this.Native.SetNotifyValue(true, ch);
                 return this.charUpdateSubj
                     .Where(x => x.Char.Equals(ch))
@@ -166,7 +173,11 @@ public partial class Peripheral
             var uuid = CBUUID.FromString(characteristicUuid);
             var ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
 
-            if (ch == null)
+            if (ch != null)
+            {
+                ob.Respond(ch);
+            }
+            else
             {
                 sub = this.charDiscoverySubj
                     .Where(x => x.Service.Equals(service))

@@ -12,7 +12,10 @@ public class ServiceViewModel : ViewModel
     {
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
+            this.IsBusy = true;
+            await this.peripheral.ConnectAsync();
             this.Characteristics = (await this.peripheral!.GetCharacteristicsAsync(this.service.Uuid)).ToList();
+            this.IsBusy = false;
         });
 
         this.WhenAnyValueSelected(
@@ -37,8 +40,7 @@ public class ServiceViewModel : ViewModel
         this.service = parameters.GetValue<BleServiceInfo>("Service");
         this.peripheral = parameters.GetValue<IPeripheral>("Peripheral");
         this.Title = $"{this.peripheral.Name} - {this.service.Uuid}";
+
+        this.Load.Execute(null);
     }
-
-
-    public override void OnAppearing() => this.Load.Execute(null);
 }

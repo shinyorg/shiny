@@ -2,7 +2,6 @@
 //using System.Reactive;
 //using System.Reactive.Linq;
 //using Android.Bluetooth;
-//using Shiny.BluetoothLE.Internals;
 
 //namespace Shiny.BluetoothLE;
 
@@ -10,26 +9,26 @@
 //public partial class Peripheral : ICanDoTransactions
 //{
 //    public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
-//        new GattReliableWriteTransaction(this.Context);
+//        new GattReliableWriteTransaction(this);
 
 
 
-//public override void OnReliableWriteCompleted(BluetoothGatt gatt, GattStatus status) { }
+//    public override void OnReliableWriteCompleted(BluetoothGatt gatt, GattStatus status) { }
 //}
 
 //public class GattReliableWriteTransaction
 //{
-//    readonly PeripheralContext context;
+//    readonly Peripheral peripheral;
 
 
-//    public GattReliableWriteTransaction(PeripheralContext context)
+//    public GattReliableWriteTransaction(Peripheral peripheral)
 //    {
-//        this.context = context;
-//        this.context.Gatt.BeginReliableWrite();
+//        // TODO: 
+//        peripheral.Gatt.BeginReliableWrite();
 //    }
 
 
-//    public override IObservable<GattCharacteristicResult> Write(IGattCharacteristic characteristic, byte[] value)
+//    public override IObservable<BleCharacteristicResult> Write(IGattCharacteristic characteristic, byte[] value)
 //    {
 //        // just write to the standard characteristic write
 //        this.AssertAction();
