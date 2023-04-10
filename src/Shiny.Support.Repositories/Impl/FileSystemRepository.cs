@@ -7,8 +7,7 @@ namespace Shiny.Support.Repositories.Impl;
 
 
 public class FileSystemRepository : IRepository
-{
-    readonly Subject<(RepositoryAction Action, object? Entity)> repoSubj = new();
+{    
     readonly ISerializer serializer;
     readonly DirectoryInfo rootDir;
 
@@ -51,6 +50,34 @@ public class FileSystemRepository : IRepository
     }
 
 
+    public void Insert<TEntity>(TEntity entity) where TEntity : IRepositoryEntity
+    {
+        this.InTransaction<TEntity>(list =>
+        {
+            if (list.ContainsKey(entity.Identifier))
+                throw new ArgumentException($"{typeof(TEntity).FullName} already has a record with identifier '{entity.Identifier}'");
+
+            this.Write(entity);
+            list[entity.Identifier] = entity;
+            this.repoSubj.OnNext((RepositoryAction.Add, typeof(TEntity), entity));
+        });
+    }
+
+
+    public void Update<TEntity>(TEntity entity) where TEntity : IRepositoryEntity
+    {
+        this.InTransaction<TEntity>(list =>
+        {
+            if (!list.ContainsKey(entity.Identifier))
+                throw new ArgumentException($"{typeof(TEntity).FullName} already has a record with identifier '{entity.Identifier}'");
+
+            this.Write(entity);
+            list[entity.Identifier] = entity;
+            this.repoSubj.OnNext((RepositoryAction.Update, typeof(TEntity), entity));
+        });
+    }
+
+
     public bool Set<TEntity>(TEntity entity) where TEntity : IRepositoryEntity
     {
         var update = true;
@@ -60,7 +87,7 @@ public class FileSystemRepository : IRepository
             list[entity.Identifier] = entity;
 
             var action = update ? RepositoryAction.Update : RepositoryAction.Add;
-            this.repoSubj.OnNext((action, entity));
+            this.repoSubj.OnNext((action, typeof(TEntity), entity));
         });
         return update;
     }
@@ -80,7 +107,7 @@ public class FileSystemRepository : IRepository
                 File.Delete(path);
                 removed = true;
 
-                this.repoSubj.OnNext((RepositoryAction.Remove, (object)entity));
+                this.repoSubj.OnNext((RepositoryAction.Remove, typeof(TEntity), (object)entity));
             }
         });
         return removed;
@@ -97,11 +124,12 @@ public class FileSystemRepository : IRepository
         foreach (var file in files)
             file.Delete();
 
-        this.repoSubj.OnNext((RepositoryAction.Clear, default));
+        this.repoSubj.OnNext((RepositoryAction.Clear, typeof(TEntity), default));
     });
 
 
-    public IObservable<(RepositoryAction Action, object? Entity)> WhenActionOccurs() => this.repoSubj;
+    readonly Subject<(RepositoryAction Action, Type EntityType, object? Entity)> repoSubj = new();
+    public IObservable<(RepositoryAction Action, Type EntityType, object? Entity)> WhenActionOccurs() => this.repoSubj;
 
 
     FileInfo[] GetFiles<TEntity>() => this.rootDir.GetFiles($"{typeof(TEntity).Name}_*.shiny");

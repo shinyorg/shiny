@@ -63,8 +63,22 @@ public interface IRepository
     void Clear<TEntity>() where TEntity : IRepositoryEntity;
 
     /// <summary>
+    /// Will save entity by its identifier, if the identifier already exists, an error is thrown
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="entity"></param>
+    void Insert<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
+
+    /// <summary>
+    /// Will save entity by its identifier, if the identifier does not exist, an error is thrown
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="entity"></param>
+    void Update<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
+
+    /// <summary>
     /// An observable for watching events within the repository
     /// </summary>
     /// <returns></returns>
-    IObservable<(RepositoryAction Action, object? Entity)> WhenActionOccurs();
+    IObservable<(RepositoryAction Action, Type EntityType, object? Entity)> WhenActionOccurs();
 }
