@@ -42,6 +42,7 @@
 
     <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
         <Compile Include="$(MSBuildThisFileDirectory)IsExternalInit.cs" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
