@@ -31,6 +31,13 @@ static class PlatformExtensions
             HttpMethod = request.HttpMethod ?? HttpMethod.Get.Method,
             AllowsExpensiveNetworkAccess = request.UseMeteredConnection
         };
+        if (request is AppleHttpTransferRequest appleRequest)
+        {
+            native.AllowsCellularAccess = appleRequest.AllowsCellularAccess;
+            native.AllowsConstrainedNetworkAccess = appleRequest.AllowsConstrainedNetworkAccess;
+            if (OperatingSystemShim.IsAppleVersionAtleast(14, 5) && appleRequest.AssumesHttp3Capable != null)
+                native.AssumesHttp3Capable = appleRequest.AssumesHttp3Capable.Value;
+        }
 
         if (!request.IsUpload && !request.PostData.IsEmpty())        
             native.Body = NSData.FromString(request.PostData!);

@@ -30,7 +30,11 @@ public abstract class ViewModel : ReactiveObject,
     public ICommand Navigate { get; }
 
     public virtual void OnAppearing() { }
-    public virtual void OnDisappearing() { }
+    public virtual void OnDisappearing()
+    {
+        this.deactivateWith?.Dispose();
+        this.deactivateWith = null;
+    }
 
 
     ILogger? logger;
@@ -53,15 +57,18 @@ public abstract class ViewModel : ReactiveObject,
         }
     }
 
+    CompositeDisposable? deactivateWith;
+    public CompositeDisposable DeactivateWith
+    {
+        get => this.deactivateWith ??= new();
+    }
+
     CompositeDisposable? destroyWith;
     public CompositeDisposable DestroyWith
     {
-        get
-        {
-            this.destroyWith ??= new();
-            return this.destroyWith;
-        }
+        get => this.destroyWith ??= new();
     }
+
     public virtual Task InitializeAsync(INavigationParameters parameters) => Task.CompletedTask;
     public virtual Task<bool> CanNavigateAsync(INavigationParameters parameters) => Task.FromResult(true);
     public virtual void OnNavigatedFrom(INavigationParameters parameters) { }

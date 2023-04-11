@@ -30,7 +30,7 @@ public partial class Peripheral
     public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch => this.operations.QueueToObservable(async ct => 
-        {
+        {            
             if (!ch.Properties.HasFlag(GattProperty.Read))
                 throw new InvalidOperationException($"Characteristic '{characteristicUuid}' does not support read");
 
@@ -141,6 +141,7 @@ public partial class Peripheral
         .Switch();
 
 
+    // TODO: return gattstatus codes?
     readonly Subject<(BluetoothGattCharacteristic Char, GattStatus Status, bool IsWrite)> charEventSubj = new();
     public override void OnCharacteristicRead(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
         => this.charEventSubj.OnNext((characteristic!, status, false));

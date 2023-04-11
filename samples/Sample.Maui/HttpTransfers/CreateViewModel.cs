@@ -70,6 +70,7 @@ public class CreateViewModel : ViewModel
             //}
             var request = new HttpTransferRequest //(this.Url, this.FilePath, this.IsUpload)
             (
+                Guid.NewGuid().ToString(),
                 this.Url,
                 this.IsUpload,
                 this.FilePath!,

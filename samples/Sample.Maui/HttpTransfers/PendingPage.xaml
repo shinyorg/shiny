@@ -77,7 +77,7 @@
                                          Grid.ColumnSpan="4"
                                          Grid.Row="3" />
 
-                            <Button Text="Resume"
+                            <!--<Button Text="Resume"
                                     Command="{Binding Resume}"
                                     HorizontalOptions="FillAndExpand"
                                     Grid.Row="4"
@@ -87,7 +87,7 @@
                                     Command="{Binding Pause}"
                                     HorizontalOptions="FillAndExpand"
                                     Grid.Row="4"
-                                    Grid.Column="1" />
+                                    Grid.Column="1" />-->
 
                             <Button Text="Cancel"
                                     Command="{Binding Cancel}"

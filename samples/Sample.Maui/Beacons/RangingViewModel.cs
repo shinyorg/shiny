@@ -52,6 +52,7 @@ public class RangingViewModel : ViewModel
 
 
     public override void OnNavigatedFrom(INavigationParameters parameters) => this.StopScan();
+    public override void OnDisappearing() => this.StopScan();
 
 
     public ICommand ScanToggle { get; }
@@ -69,6 +70,7 @@ public class RangingViewModel : ViewModel
     void StartScan()
     {
         this.Beacons.Clear();
+
 
         this.scanner = this.beaconManager
             .WhenBeaconRanged(this.region)

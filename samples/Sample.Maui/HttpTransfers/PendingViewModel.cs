@@ -6,27 +6,23 @@ namespace Sample.HttpTransfers;
 
 public class PendingViewModel : ViewModel
 {
+    readonly IHttpTransferManager httpTransfers;
+
+
     public PendingViewModel(BaseServices services, IHttpTransferManager httpTransfers) : base(services)
     {
+        this.httpTransfers = httpTransfers;
+
         this.Create = this.Navigation.Command("HttpTransfersCreate");
         this.Load = this.LoadingCommand(async () =>
-        {            
-            this.Transfers = httpTransfers
-                .Transfers
+        {
+            var transfers = await httpTransfers.GetTransfers();
+            this.Transfers = (await httpTransfers.GetTransfers())
                 .Select(transfer => new HttpTransferViewModel(
                     transfer,
-                    this.DestroyWith,
-                    this.ConfirmCommand(
-                        "Are you sure you want to resume this transfer?",
-                        () => httpTransfers.Resume(transfer.Identifier)
-                    ),
-                    this.ConfirmCommand(
-                        "Are you sure you wish to pause this transfer?",
-                        () => httpTransfers.Pause(transfer.Identifier)
-                    ),
                     this.ConfirmCommand(
                         "Are you sure you want to cancel this transfer?",
-                        () => httpTransfers.Cancel(transfer.Identifier)
+                        async () => await httpTransfers.Cancel(transfer.Identifier)
                     )
                 ))
                 .ToList();
@@ -40,67 +36,56 @@ public class PendingViewModel : ViewModel
     }
 
 
+    public override void OnAppearing()
+    {
+        this.Load.Execute(null);
+        this.httpTransfers
+            .WhenUpdateReceived()
+            .Select(x => (x, this.Transfers.FirstOrDefault(x => x.Identifier.Equals(x.Identifier))))
+            .Where(x => x.Item2 != null)
+            .SubOnMainThread(x =>
+            {
+                var transfer = x.Item1;
+                var vm = x.Item2!;
+
+                vm.TransferSpeed = Math.Round((decimal)transfer.Progress.BytesPerSecond / 1024, 2) + "Kb/s";
+                vm.Status = transfer.Status.ToString();
+
+                if (transfer.IsDeterministic)
+                {
+                    vm.EstimateTimeRemaining = Math.Round(transfer.Progress.EstimatedTimeRemaining.TotalMinutes, 1) + " min(s)";
+                    vm.PercentComplete = transfer.Progress.PercentComplete;
+                }
+            })
+            .DisposedBy(this.DeactivateWith);
+    }
+
     public ICommand Create { get; }
     public ICommand Load { get; }
     public ICommand CancelAll { get; }
 
-
-    IList<HttpTransferViewModel> transfers = null!;
-    public IList<HttpTransferViewModel> Transfers
-    {
-        get => this.transfers;
-        private set
-        {
-            this.transfers = value;
-            this.RaisePropertyChanged();
-        }
-    }
-
-    public override void OnAppearing() => this.Load.Execute(null);
+    [Reactive] public IList<HttpTransferViewModel> Transfers { get; private set; }
 }
-
 
 
 public class HttpTransferViewModel : ReactiveObject
 {
-    readonly IHttpTransfer transfer;
-
-
-    public HttpTransferViewModel(
-        IHttpTransfer transfer,
-        CompositeDisposable disposer,
-        ICommand resume,
-        ICommand pause,
-        ICommand cancel
-    )
+    public HttpTransferViewModel(HttpTransfer transfer, ICommand cancel)
     {
-        this.transfer = transfer;
-        this.Resume = resume;
-        this.Pause = pause;
+        this.Identifier = transfer.Identifier;
+        this.Uri = transfer.Request.Uri;
+        this.IsUpload = transfer.Request.IsUpload;
         this.Cancel = cancel;
-
-        this.transfer
-            .ListenToMetrics()
-            .SubOnMainThread(x =>
-            {
-                this.TransferSpeed = Math.Round((decimal)x.BytesPerSecond / 1024, 2) + "Kb/s";
-                this.EstimateTimeRemaining = Math.Round(x.EstimatedTimeRemaining.TotalMinutes, 1) + " min(s)";
-                this.PercentComplete = x.PercentComplete;
-                this.Status = x.Status.ToString();
-            })
-            .DisposedBy(disposer);
     }
 
-    public ICommand Resume { get; }
-    public ICommand Pause { get; }
+
+    public string Identifier { get; }
+    public string Uri { get; }
+    public bool IsUpload { get; }
     public ICommand Cancel { get; }
 
-    public string Identifier => this.transfer.Identifier;
-    public bool IsUpload => this.transfer.Request.IsUpload;
-    public string Uri => this.transfer.Request.Uri;
-
-    [Reactive] public double PercentComplete { get; private set; }
-    [Reactive] public string Status { get; private set; } = null!;
-    [Reactive] public string TransferSpeed { get; private set; } = null!;
-    [Reactive] public string EstimateTimeRemaining { get; private set; } = null!;
+    [Reactive] public double PercentComplete { get; set; }
+    [Reactive] public string Status { get; set; } = null!;
+    [Reactive] public string TransferSpeed { get; set; } = null!;
+    [Reactive] public string EstimateTimeRemaining { get; set; } = null!;
 }

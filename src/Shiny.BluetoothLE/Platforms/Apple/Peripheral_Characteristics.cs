@@ -126,11 +126,13 @@ public partial class Peripheral
         .Switch();
 
 
+    //public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error) => base.UpdatedNotificationState(peripheral, characteristic, error);
     readonly Subject<Unit> readyWwrSubj = new();
     public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral)
         => this.readyWwrSubj.OnNext(Unit.Default);
 
 
+    
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
 #if XAMARINIOS
     public override void DiscoveredCharacteristic(CBPeripheral peripheral, CBService service, NSError? error)
@@ -212,6 +214,7 @@ public partial class Peripheral
         this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithResponse);
 
         var result = await task.ConfigureAwait(false);
+        //result.Error.Code == CBError.PeripheralDisconnected
         if (result.Error != null)
             throw new BleException(result.Error.LocalizedDescription);
 

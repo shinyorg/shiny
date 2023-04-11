@@ -17,19 +17,19 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
     }
 
 
-    public Task OnError(IHttpTransfer transfer, Exception ex)
-        => this.CreateHttpTransferEvent(transfer, ex);
+    public Task OnError(HttpTransferRequest request, Exception ex)
+        => this.CreateHttpTransferEvent(request, ex);
 
 
-    public Task OnCompleted(IHttpTransfer transfer)
-        => this.CreateHttpTransferEvent(transfer);
+    public Task OnCompleted(HttpTransferRequest request)
+        => this.CreateHttpTransferEvent(request);
 
 
-    async Task CreateHttpTransferEvent(IHttpTransfer transfer, Exception? exception = null)
+    async Task CreateHttpTransferEvent(HttpTransferRequest request, Exception? exception = null)
     {
-        var state = transfer.Status == HttpTransferState.Completed ? $"Completed" : "Failed";
-        var direction = transfer.Request.IsUpload ? "Upload" : "Download";
-        var msg = $"{direction} of {Path.GetFileName(transfer.Request.LocalFilePath)} {state}";
+        var state = exception == null ? $"Completed" : "Failed";
+        var direction = request.IsUpload ? "Upload" : "Download";
+        var msg = $"{direction} of {Path.GetFileName(request.LocalFilePath)} {state}";
 
         await this.conn.Log("HTTP Transfer", msg, exception?.ToString());
         await this.notificationManager.Send("HTTP Transfer", msg);
@@ -37,11 +37,18 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
 }
 
 #if ANDROID
-public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
+public partial class MyHttpTransferDelegate : IAndroidHttpTransferDelegate
 {
-    public void Configure(AndroidX.Core.App.NotificationCompat.Builder builder)
+    public void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransferRequest request)
     {
-        builder.SetContentText("Overriding HTTP Tranfer text from Sample");
+        if (request.IsUpload)
+        {
+            builder.SetContentText($"Uploading {Path.GetFileName(request.LocalFilePath)}");
+        }
+        else
+        {
+            builder.SetContentText($"Downloading file from {request.Uri}");
+        }
     }
 }
 #endif
