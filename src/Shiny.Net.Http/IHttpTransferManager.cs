@@ -7,10 +7,10 @@ namespace Shiny.Net.Http;
 
 public interface IHttpTransferManager
 {
-    ValueTask<IList<HttpTransfer>> GetTransfers();
-    ValueTask<HttpTransfer> Queue(HttpTransferRequest request);
-    ValueTask Cancel(string identifier);
-    ValueTask CancelAll();
+    Task<IList<HttpTransfer>> GetTransfers();
+    Task<HttpTransfer> Queue(HttpTransferRequest request);
+    Task Cancel(string identifier);
+    Task CancelAll();
 
     IObservable<HttpTransferResult> WhenUpdateReceived();
 }
