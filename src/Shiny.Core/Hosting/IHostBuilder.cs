@@ -7,7 +7,7 @@ namespace Shiny.Hosting;
 
 public interface IHostBuilder
 {
-    Func<IServiceCollection, IServiceProvider> ConfigureContainer { get; set; }
+    Func<IServiceCollection, IServiceProvider>? ConfigureContainer { get; set; }
     IServiceCollection Services { get; }
     //ConfigurationManager? Configuration { get; }
     ILoggingBuilder Logging { get; }
