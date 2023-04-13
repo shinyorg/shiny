@@ -1,4 +1,5 @@
 ﻿using Shiny.Net.Http;
+using Shiny.Notifications;
 
 namespace Sample.HttpTransfers;
 
@@ -12,13 +13,37 @@ public class CreateViewModel : ViewModel
     public CreateViewModel(
         BaseServices services,
         IFilePicker filePicker,
+        INotificationManager notifications,
         IHttpTransferManager manager
     ) : base(services)
     {
+        this.WhenAnyValue(x => x.IsUpload)
+            .Subscribe(upload =>
+            {
+                if (upload)
+                {
+                    this.Title = "New Upload";
+                    this.HttpVerb = "POST";
+                    var path = this.GetRandomFilePath();
+                    if (File.Exists(path))
+                        this.FilePath = path;
+                }
+                else
+                {
+                    this.Title = "New Download";
+                    this.HttpVerb = "GET";
+                    if (this.Url.IsEmpty())
+                        this.Url = "http://ipv4.download.thinkbroadband.com/1GB.zip";
+
+                    this.FilePath = Path.Combine(this.Platform.AppData.FullName, Guid.NewGuid().ToString() + ".download");
+                }
+            });
+
         this.TestDownload = ReactiveCommand.Create(() =>
         {
             this.IsUpload = false;
-            this.Url = "https://speed.hetzner.de/10GB.bin";
+            //this.Url = "https://speed.hetzner.de/10GB.bin";
+            this.Url = "http://ipv4.download.thinkbroadband.com/1GB.zip";
         });
 
         this.SelectUpload = ReactiveCommand.CreateFromTask(
@@ -56,19 +81,11 @@ public class CreateViewModel : ViewModel
                 return;
             }
 
-            //var verb = this.HttpVerb?.ToLower() switch
-            //{
-            //    "post" => HttpMethod.Post,
-            //    "get" => HttpMethod.Get,
-            //    "put" => HttpMethod.Put,
-            //    _ => null
-            //};
-            //if (verb == null)
-            //{
-            //    await this.Alert("Invalid HTTP Verb - " + this.HttpVerb);
-            //    return;
-            //}
-            var request = new HttpTransferRequest //(this.Url, this.FilePath, this.IsUpload)
+            var access = await notifications.RequestAccess();
+            if (access != AccessState.Available)
+                await this.Dialogs.DisplayAlertAsync("Warning", "You will not get notifications for transfers due to insufficient permissions", "OK");
+
+            var request = new HttpTransferRequest
             (
                 Guid.NewGuid().ToString(),
                 this.Url,
@@ -107,24 +124,6 @@ public class CreateViewModel : ViewModel
     public override void OnNavigatedTo(INavigationParameters parameters)
     {
         base.OnNavigatedTo(parameters);
-
-        this.sub = this.WhenAnyProperty(x => x.IsUpload).Subscribe(upload =>
-        {
-            if (upload)
-            {
-                this.Title = "New Upload";
-                this.HttpVerb = "POST";
-                var path = this.GetRandomFilePath();
-                if (File.Exists(path))
-                    this.FilePath = path;
-            }
-            else
-            {
-                this.Title = "New Download";
-                this.HttpVerb = "GET";
-                this.FilePath = Path.Combine(this.Platform.AppData.FullName, Guid.NewGuid().ToString() + ".download");
-            }
-        });
     }
 
 

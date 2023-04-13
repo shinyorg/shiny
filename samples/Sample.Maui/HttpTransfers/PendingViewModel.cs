@@ -22,7 +22,11 @@ public class PendingViewModel : ViewModel
                     transfer,
                     this.ConfirmCommand(
                         "Are you sure you want to cancel this transfer?",
-                        async () => await httpTransfers.Cancel(transfer.Identifier)
+                        async () =>
+                        {
+                            await httpTransfers.Cancel(transfer.Identifier);
+                            this.Load.Execute(null);
+                        }
                     )
                 ))
                 .ToList();
@@ -79,7 +83,7 @@ public class HttpTransferViewModel : ReactiveObject
     }
 
 
-    public string Identifier { get; }
+    public string Identifier { get;  }
     public string Uri { get; }
     public bool IsUpload { get; }
     public ICommand Cancel { get; }

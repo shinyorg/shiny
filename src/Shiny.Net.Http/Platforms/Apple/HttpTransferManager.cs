@@ -93,6 +93,9 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             task = this.Session.CreateDownloadTask(nativeRequest);
         }
         task.TaskDescription = request.Identifier;
+        task.Resume();
+        //task.Response
+        //task.Progress
 
         var transfer = new HttpTransfer(request, 0, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
         this.repository.Insert(transfer);
@@ -147,12 +150,20 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
                 var ts = last.Timestamp.Subtract(first.Timestamp);
                 var totalXfer = last.Value.BytesTransferred - first.Value.BytesTransferred;
+                var bytesPerSecond = 0L;
+                var timeRemaining = TimeSpan.Zero;
+                var percent = -1.0;
 
-                var bytesPerSecond = Convert.ToInt64(Math.Round(totalXfer / ts.TotalSeconds));
-                var bytesRemaining = last.Value.BytesToTransfer!.Value - last.Value.BytesTransferred;
-                var timeRemaining = TimeSpan.FromSeconds(bytesRemaining / bytesPerSecond);
-                var percent = Math.Round((double)last.Value.BytesTransferred / last.Value.BytesToTransfer!.Value, 2);
+                if (totalXfer > 0)
+                    bytesPerSecond = Convert.ToInt64(Math.Round(totalXfer / ts.TotalSeconds));
 
+                if (bytesPerSecond > 0 && last.Value.BytesToTransfer != null)
+                {
+                    var bytesRemaining = last.Value.BytesToTransfer!.Value - last.Value.BytesTransferred;
+                    timeRemaining = TimeSpan.FromSeconds(bytesRemaining / bytesPerSecond);
+                    percent = Math.Round((double)last.Value.BytesTransferred / last.Value.BytesToTransfer!.Value, 2);
+                }
+                
                 ob.OnNext(new HttpTransferResult(
                     last.Value.Request,
                     last.Value.Status,
@@ -277,41 +288,39 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         if (ht == null)
             return;
 
-        if (error != null)
+        switch (task.State)
         {
-            var ex = new InvalidOperationException(error.LocalizedDescription);
-            this.logger.LogError(ex, "Error with HTTP transfer: " + ht.Identifier);
-            await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, ex), this.logger);
-        }
-        else
-        {
-            switch (task.State)
-            {
-                case NSUrlSessionTaskState.Running:
-                    ht = ht with { Status = HttpTransferState.InProgress };
-                    this.repository.Set(ht);
-                    break;
+            //case NSUrlSessionTaskState.Running:
+            //    ht = ht with { Status = HttpTransferState.InProgress };
+            //    this.repository.Set(ht);
+            //    break;
 
-                case NSUrlSessionTaskState.Suspended:
-                    ht = ht with { Status = HttpTransferState.Paused };
-                    this.repository.Set(ht);
-                    break;
+            //case NSUrlSessionTaskState.Suspended:
+            //    ht = ht with { Status = HttpTransferState.Paused };
+            //    this.repository.Set(ht);
+            //    break;
 
-                case NSUrlSessionTaskState.Canceling:
-                    this.logger.LogWarning($"Transfer {ht.Identifier} was cancelled");
-                    this.repository.Remove<HttpTransfer>(ht.Identifier);
+            case NSUrlSessionTaskState.Canceling:
+                this.logger.LogWarning($"Transfer {ht.Identifier} was cancelled");
+                this.repository.Remove<HttpTransfer>(ht.Identifier);
 
-                    ht = ht with { Status = HttpTransferState.Completed };
-                    break;
+                ht = ht with { Status = HttpTransferState.Canceled };
+                break;
 
-                case NSUrlSessionTaskState.Completed:
-                    this.logger.LogInformation($"Transfer {ht.Identifier} completed successfully");
-                    await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), this.logger);
-                    this.repository.Remove<HttpTransfer>(ht.Identifier);
+            case NSUrlSessionTaskState.Completed:
+                // TODO: error?
+                this.logger.LogInformation($"Transfer {ht.Identifier} completed successfully");
+                await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), this.logger);
+                this.repository.Remove<HttpTransfer>(ht.Identifier);
 
-                    ht = ht with { Status = HttpTransferState.Completed };
-                    break;
-            }
+                ht = ht with { Status = HttpTransferState.Completed };
+                break;
+
+            default:
+                var ex = new InvalidOperationException(error.LocalizedDescription);
+                this.logger.LogError(ex, "Error with HTTP transfer: " + ht.Identifier);
+                await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, ex), this.logger);
+                break;
         }
         this.transferSubj.OnNext(ht);
         this.TryDeleteUploadTempFile(ht);        
@@ -356,7 +365,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
-
     public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
     {
         this.logger.LogDebug("DidFinishDownloading");
@@ -371,6 +379,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 x => x.OnCompleted(transfer.Request),
                 this.logger
             );
+            this.transferSubj.OnNext(transfer with
+            {
+                Status = HttpTransferState.Completed
+            });
         }
     }
 

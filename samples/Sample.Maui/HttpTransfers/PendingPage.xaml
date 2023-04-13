@@ -4,7 +4,7 @@
              xmlns:httptransfers="clr-namespace:Sample.HttpTransfers"
              x:DataType="httptransfers:PendingViewModel"
              x:Class="Sample.HttpTransfers.PendingPage"
-             Title="Pending">
+             Title="HTTP Transfers">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Create" Command="{Binding Create}" />
