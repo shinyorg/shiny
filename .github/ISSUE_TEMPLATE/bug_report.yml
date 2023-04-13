@@ -90,9 +90,9 @@ body:
       label: Code of Conduct
       description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
       options:
-        - label: My reproducible sample is NOT FROM THE SHINY SAMPLES REPOSITORY! 
+        - label: I have supplied a reproducible sample is NOT FROM THE SHINY SAMPLES! 
           required: true
-        - label: I am a Sponsor or I am using the latest stable version from nuget (v2.7.1 currently)
+        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v2.7.1 stable - ALPHAS are not taking issues)
           required: true
         - label: I understand that if I am checking these boxes and I am not actually following what they are saying, I will be removed from this repository!
           required: true
