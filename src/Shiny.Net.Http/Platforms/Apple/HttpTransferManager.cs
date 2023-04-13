@@ -67,14 +67,14 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public NSUrlSession Session { get; } // TODO: when session completes/invalidates - we may need to be able to create new one
 
 
-    public ValueTask<IList<HttpTransfer>> GetTransfers()
+    public Task<IList<HttpTransfer>> GetTransfers()
     {
         var transfers = this.repository.GetList<HttpTransfer>();
-        return ValueTask.FromResult(transfers);
+        return Task.FromResult(transfers);
     }
 
 
-    public async ValueTask<HttpTransfer> Queue(HttpTransferRequest request)
+    public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         request.AssertValid();
         if (this.repository.Exists<HttpTransfer>(request.Identifier))
@@ -104,7 +104,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
-    public async ValueTask Cancel(string identifier)
+    public async Task Cancel(string identifier)
     {
         var task = (await this.Session.GetAllTasksAsync())
             .FirstOrDefault(x => x
@@ -119,7 +119,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
-    public async ValueTask CancelAll()
+    public async Task CancelAll()
     {
         this.repository.Clear<HttpTransfer>();
         var tasks = await this.Session.GetAllTasksAsync();
@@ -323,7 +323,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 break;
         }
         this.transferSubj.OnNext(ht);
-        this.TryDeleteUploadTempFile(ht);        
+        this.TryDeleteUploadTempFile(ht);
     }
 
 

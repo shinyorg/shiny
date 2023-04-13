@@ -24,14 +24,14 @@ public class HttpTransferManager : IHttpTransferManager
     }
 
 
-    public ValueTask<IList<HttpTransfer>> GetTransfers()
+    public Task<IList<HttpTransfer>> GetTransfers()
     {
         var transfers = this.repository.GetList<HttpTransfer>();
-        return ValueTask.FromResult(transfers);
+        return Task.FromResult(transfers);
     }
 
 
-    public async ValueTask<HttpTransfer> Queue(HttpTransferRequest request)
+    public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         (await this.jobManager.RequestAccess()).Assert();
         request.AssertValid();
@@ -53,19 +53,19 @@ public class HttpTransferManager : IHttpTransferManager
     }
 
 
-    public ValueTask Cancel(string identifier)
+    public Task Cancel(string identifier)
     {
         // this will trigger over to the job if it is running
-        this.repository.Remove<HttpTransfer>(identifier); 
-        return ValueTask.CompletedTask;
+        this.repository.Remove<HttpTransfer>(identifier);
+        return Task.CompletedTask;
     }
 
 
-    public ValueTask CancelAll()
+    public Task CancelAll()
     {
         // this will trigger over to the job if it is running
         this.repository.Clear<HttpTransfer>();
-        return ValueTask.CompletedTask;
+        return Task.CompletedTask;
     }
 
 
