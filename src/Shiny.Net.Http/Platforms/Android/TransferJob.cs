@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -52,8 +53,13 @@ public class TransferJob : IJob
     public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
         var requests = this.repository.GetList<HttpTransfer>();
+        if (requests.Count == 0)
+            return;
+
         var queue = new Queue<HttpTransfer>(requests);
         var cancelSrc = new CancellationTokenSource();
+        var disposer = new CompositeDisposable();
+        HttpTransfer? activeTransfer = null;
 
         this.repository
             .WhenActionOccurs()
@@ -63,60 +69,128 @@ public class TransferJob : IJob
             )
             .Subscribe(x =>
             {
-                switch (x.Action)
+                if (x.Action == RepositoryAction.Clear)
                 {
-                    case RepositoryAction.Add:
-                        queue.Enqueue((HttpTransfer)x.Entity!);
-                        break;
-
-                    case RepositoryAction.Remove:
-                        // TODO: if current request
-                        cancelSrc?.Cancel();
-                        break;
-
-                    case RepositoryAction.Clear:
-                        queue.Clear();
-                        cancelSrc?.Cancel();
-                        break;
+                    this.logger.LogDebug("All HTTP Transfers have been cleared");
+                    queue.Clear();
+                    cancelSrc?.Cancel();
                 }
-            });
+                else
+                {
+                    var transfer = (HttpTransfer)x.Entity!;
+                    switch (x.Action)
+                    {
+                        case RepositoryAction.Add:
+                            this.logger.LogDebug("New transfer queued");
+                            queue.Enqueue((HttpTransfer)x.Entity!);
+                            break;
 
-        // TODO: if no-meter internet job is running, we also need to cancel
-        // TODO: if internet is disconnected, job should be killed externally via the incoming cancel token
-        // TODO: we don't error out of transfer, we simply pause it if the error is related to internet disconnect/timeout
-        var request = queue.Dequeue();
-        while (request != null)
+                        case RepositoryAction.Remove:
+                            // TODO: pull item out of queue
+                            if (transfer.Identifier == activeTransfer?.Identifier)
+                            {
+                                this.logger.LogDebug("Current transfer has been removed");
+                                cancelSrc?.Cancel();
+                            }
+                            break;
+                    }
+                }
+            })
+            .DisposedBy(disposer);
+
+        this.connectivity
+            .WhenChanged()
+            .Where(_ => activeTransfer != null)
+            .Subscribe(x =>
+            {
+                if (!x.IsInternetAvailable())
+                {
+                    this.logger.LogDebug("No network detected for transfers - pausing");
+                    this.repository.Set(activeTransfer! with
+                    {
+                        Status = HttpTransferState.PausedByNoNetwork
+                    });
+                }
+                else if (x.Access == NetworkAccess.ConstrainedInternet && !activeTransfer!.Request.UseMeteredConnection)
+                {
+                    this.logger.LogDebug("Costed network detected for active transfer - pausing");
+                    this.repository.Set(activeTransfer! with
+                    {
+                        Status = HttpTransferState.PausedByCostedNetwork
+                    });
+                    cancelSrc?.Cancel();
+                }
+            })
+            .DisposedBy(disposer);
+
+        activeTransfer = queue.Dequeue();
+        while (activeTransfer != null && !cancelToken.IsCancellationRequested)
         {
-            //    if (transfer.Request.UseMeteredConnection || !this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet))
-            cancelSrc = new();
-            using var _ = cancelToken.Register(() => cancelSrc?.Cancel());
+            try
+            {
+                if (activeTransfer.Request.UseMeteredConnection || !this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet))
+                {
+                    this.logger.LogDebug("Staring transfer: " + activeTransfer.Identifier);
+                    cancelSrc = new();
+                    using var _ = cancelToken.Register(() => cancelSrc?.Cancel());
 
-            await this.DoRequest(request, cancelSrc.Token).ConfigureAwait(false);
-            request = queue.Dequeue();
-        } 
+                    await this.DoRequest(activeTransfer, cancelSrc.Token).ConfigureAwait(false);
+                    this.logger.LogDebug("Finished transfer: " + activeTransfer.Identifier);
+
+                    this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
+                }
+                else
+                {
+                    this.logger.LogDebug($"Transfer '{activeTransfer.Identifier}' cannot start on current network configuration. Waiting for next pass");
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                this.logger.LogDebug("Job is being told to suspended");
+            }
+            catch (Exception ex)
+            {
+                this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
+                this.logger.LogError(ex, "There was an isssue processing request");
+            }
+            activeTransfer = queue.Count == 0 ? null : queue.Dequeue();
+        }
+        disposer.Dispose();
     }
 
 
     async Task DoRequest(HttpTransfer transfer, CancellationToken cancelToken)
     {
         var request = transfer.Request;
-        var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray();
+        var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray() ?? Array.Empty<(string Key, string Value)>();
 
-        //var method = new HttpMethod(request.HttpMethod ?? )
+        HttpMethod? httpMethod = null;
+        if (request.HttpMethod != null)
+            httpMethod = new HttpMethod(request.HttpMethod);
+
         var obs = request.IsUpload
-            ? this.httpClient.Upload(request.Uri, request.LocalFilePath, null, headers)
-            : this.httpClient.Download(request.Uri, request.LocalFilePath, 8192, null, headers);
+            ? this.httpClient.Upload(request.Uri, request.LocalFilePath, httpMethod, headers)
+            : this.httpClient.Download(request.Uri, request.LocalFilePath, 8192, httpMethod, headers);
 
         var builder = this.StartNotification(request);
         this.notifications.Notify(NOTIFICATION_ID, builder.Build());
 
-        // TODO: trigger manager observable
-        obs
-            .Finally(() => this.notifications.Cancel(NOTIFICATION_ID))
-            .Subscribe(
-                x =>
+        var tcs = new TaskCompletionSource<object>();
+        using var _ = cancelToken.Register(() => tcs.TrySetCanceled());
+
+        var sub = obs.Subscribe(
+            x =>
+            {
+                if (!cancelToken.IsCancellationRequested)
                 {
-                    // TODO: need to be able to update HttpTransfer
+                    this.repository.Set(transfer with
+                    {
+                        Status = HttpTransferState.InProgress,
+                        BytesToTransfer = x.IsDeterministic ? x.BytesToTransfer : null,
+                        BytesTransferred = x.BytesTransferred
+                    });
+
+                    // allow customization here though android delegate?
                     builder.SetProgress(100, Convert.ToInt32(x.PercentComplete * 100), false);
                     this.notifications.Notify(NOTIFICATION_ID, builder.Build());
 
@@ -125,24 +199,49 @@ public class TransferJob : IJob
                         HttpTransferState.InProgress,
                         x
                     ));
-                },
-                ex =>
+                }
+            },
+            ex =>
+            {
+                if (ex is not TaskCanceledException)
                 {
-                    // TODO: need to be able to update HttpTransfer
                     this.delegates.RunDelegates(x => x.OnError(request, ex), this.logger);
+
                     progressSubj.OnNext(new HttpTransferResult(
                         request,
                         HttpTransferState.Error,
-                        null
+                        new TransferProgress(0, 0, 0, TimeSpan.Zero, 0)
                     ));
-                },
-                () =>
-                {
-                    // TODO: need to be able to update HttpTransfer
-                    // TODO: if not errored
-                    this.delegates.RunDelegates(x => x.OnCompleted(request), this.logger);
                 }
-            );
+                tcs.TrySetResult(ex);
+            },
+            () =>
+            {
+                this.delegates.RunDelegates(x => x.OnCompleted(request), this.logger);
+                progressSubj.OnNext(new HttpTransferResult(
+                    request,
+                    HttpTransferState.Completed,
+                    new TransferProgress(
+                        0,
+                        transfer.BytesToTransfer,
+                        transfer.BytesTransferred,
+                        TimeSpan.Zero,
+                        1.0
+                    )
+                ));
+                tcs.TrySetResult(null!);
+            }
+        );
+
+        try
+        {
+            await tcs.Task.ConfigureAwait(false);
+        }
+        finally
+        {
+            this.notifications.Cancel(NOTIFICATION_ID);
+            sub.Dispose();
+        }
     }
 
     
