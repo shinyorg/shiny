@@ -28,6 +28,7 @@ public static class MauiProgram
     {
         var s = builder.Services;
 #if DEBUG
+        builder.Logging.SetMinimumLevel(LogLevel.Trace);
         builder.Logging.AddDebug();
 #endif
         //builder.Logging.AddAppCenter("")
@@ -115,7 +116,7 @@ public static class MauiProgram
 
         // ble hosting
         s.RegisterForNavigation<BleHosting.MainPage, BleHosting.MainViewModel>("BleHosting");
-        s.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
+        //s.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
         s.RegisterForNavigation<BleHosting.ManagedPage, BleHosting.ManagedViewModel>("BleHostingManaged");
 
         // locations

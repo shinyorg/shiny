@@ -7,11 +7,6 @@
              x:Class="Sample.AppDataPage"
              Title="App Data">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Purge Settings"
-                     Command="{Binding Purge}"/>
-    </ContentPage.ToolbarItems>
-
     <CollectionView ItemsSource="{Binding Files}"
                     SelectedItem="{Binding SelectedFile}"
                     SelectionMode="Single">

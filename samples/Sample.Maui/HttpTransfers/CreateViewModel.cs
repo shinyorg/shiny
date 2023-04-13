@@ -121,11 +121,6 @@ public class CreateViewModel : ViewModel
     }
 
 
-    public override void OnNavigatedTo(INavigationParameters parameters)
-    {
-        base.OnNavigatedTo(parameters);
-    }
-
 
     public ICommand TestDownload { get; }
     public ICommand Save { get; }

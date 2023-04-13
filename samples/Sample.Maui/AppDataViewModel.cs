@@ -9,61 +9,69 @@ public class AppDataViewModel : ViewModel
             this.Files = new DirectoryInfo(this.Platform.AppData.FullName).GetFiles().ToList()
         );
 
-        this.Purge = ReactiveCommand.Create(async () =>
-        {
-            var confirm = await this.Dialogs.DisplayAlertAsync(
-                "Confirm",
-                "Are you sure you wish to delete appdata? You will need to restart your app after performing this operation",
-                "Yes",
-                "No"
-            );
-            if (!confirm)
-                return;
-
-            var files = new DirectoryInfo(this.Platform.AppData.FullName).GetFiles();
-            foreach (var file in files)
-            {
-                try
-                {
-                    File.Delete(file.FullName);
-                }
-                catch { } // catch and release
-            }
-            this.Load.Execute(null);
-        });
-
         this.WhenAnyValueSelected(
             x => x.SelectedFile,
             async x =>
             {
-                if (x.Length == 0)
+                var canOpen = (x.Length > 0 && x.Length < 1000000);
+                if (canOpen)
                 {
-                    await this.Dialogs.DisplayAlertAsync("Error", "File has no content", "OK");
-                    return;
+                    await this.Dialogs.DisplayActionSheetAsync(
+                        "Actions",
+                        ActionSheetButton.CreateButton(
+                            "Open",
+                            () => this.Navigation.Navigate(
+                                nameof(FileViewPage),
+                                ("FilePath", x.FullName)
+                            )
+                        ),
+                        ActionSheetButton.CreateDestroyButton(
+                            "Delete",
+                            () => this.DeleteAction(x)
+                        )
+                    );
                 }
-                if (x.Length > 1000000)
+                else
                 {
-                    await this.Dialogs.DisplayAlertAsync("Error", "File is too big to open", "OK");
-                    return;
+                    await this.DeleteAction(x);
                 }
-                await this.Navigation.Navigate(
-                    nameof(FileViewPage),
-                    ("FilePath", x.FullName)
-                );
             }
         );
     }
 
 
     public ICommand Load { get; }
-    public ICommand Purge { get; }
 
     [Reactive] public List<FileInfo> Files { get; set; }
     [Reactive] public FileInfo? SelectedFile { get; set; }
+
 
     public override void OnAppearing()
     {
         base.OnAppearing();
         this.Load.Execute(null);
+    }
+
+
+    async Task DeleteAction(FileInfo file)
+    {
+        var confirm = await this.Dialogs.DisplayAlertAsync(
+            "Confirm",
+            $"Are you sure you wish to delete '{file.Name}'? You will need to restart your app after performing this operation",
+            "Yes",
+            "No"
+        );
+        if (confirm)
+        {
+            try
+            {
+                file.Delete();
+                this.Load.Execute(null);
+            }
+            catch
+            {
+                await this.Dialogs.DisplayAlertAsync("ERROR", "Unable to delete file", "OK");
+            }
+        }
     }
 }
