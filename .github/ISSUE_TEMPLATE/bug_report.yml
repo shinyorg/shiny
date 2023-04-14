@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for filing an issue.  Please only file issues against the LATEST STABLE version of Shiny from Nuget.  If you are a sponsor, you can discuss issues with preview releases in the SponsorConnect Discord channel
+        Thank you for filing an issue.  Please only file issues against the LATEST STABLE or LATEST BETA version of Shiny from Nuget (ALPHAs are not accepted for issues).  If you are a sponsor, you can discuss issues with preview releases in the SponsorConnect Discord channel
         If you have questions, please post them in GitHub discussions
   - type: dropdown
     id: component
@@ -51,9 +51,9 @@ body:
       options:
       #- label: Blazor
       - label: MAUI
-      - label: Xamarin Native
-      - label: Xamarin Forms
-      - label: Other (Sponsors only)
+      - label: Native
+      - label: Classic Xamarin
+      - label: Other
   - type: textarea
     validations:
       required: true
@@ -83,7 +83,7 @@ body:
     id: codesample
     attributes:
       label: Code Sample
-      description: Please copy/paste or attach a reproducible sample (this should include your Shiny startup, any code where you start an operation, and/or the delegate you are using)
+      description: Please include a github repo with your reproducible sample
   - type: checkboxes
     id: terms
     attributes:

@@ -1,4 +1,4 @@
-﻿# Shiny v3 ALPHA
+﻿# Shiny v3 ALPHA for .NET Mobile
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
 
 ## THIS IS THE ALPHA/UNSTABLE BRANCH - FOR STABLE XAMARIN [GO HERE](https://github.com/shinyorg/shiny/tree/v2.7.0)
@@ -63,7 +63,8 @@ Depending on your Sponsorship Tier, you may also get access to some great benefi
 
 How about some [Shiny Gear](https://www.redbubble.com/shop/ap/45038461)
 
-## Premium Support
+## Premium Paid Support
+
 Looking for consulting for your .NET applications and Shiny, you can now book a time with Allan Ritchie on here: [1-1 Consulting Session](https://superpeer.com/allanritchie/-/1-on-1-development-help)
 
 
@@ -71,3 +72,6 @@ Looking for consulting for your .NET applications and Shiny, you can now book a 
 * [Allan Ritchie](https://github.com/aritchie) - Project Lead
 * [Dan Siegel](https://github.com/dansiegel) - Contributor
 * [Emily Stanek](https://github.com/emilystanek) - Logo Designer
+
+
+![Alt](https://repobeats.axiom.co/api/embed/83185f7533b7bee4a7e92e6943b686d11af40157.svg "Repobeats analytics image")
