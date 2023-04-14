@@ -56,7 +56,6 @@ public class TransferJob : IJob
         if (requests.Count == 0)
             return;
 
-        var queue = new Queue<HttpTransfer>(requests);
         var cancelSrc = new CancellationTokenSource();
         var disposer = new CompositeDisposable();
         HttpTransfer? activeTransfer = null;
@@ -65,34 +64,25 @@ public class TransferJob : IJob
             .WhenActionOccurs()
             .Where(x =>
                 x.EntityType == typeof(HttpTransfer) &&
-                x.Action != RepositoryAction.Update
+                (
+                    x.Action == RepositoryAction.Remove ||
+                    x.Action == RepositoryAction.Clear
+                )
             )
             .Subscribe(x =>
             {
                 if (x.Action == RepositoryAction.Clear)
                 {
                     this.logger.LogDebug("All HTTP Transfers have been cleared");
-                    queue.Clear();
                     cancelSrc?.Cancel();
                 }
                 else
                 {
                     var transfer = (HttpTransfer)x.Entity!;
-                    switch (x.Action)
+                    if (transfer.Identifier == activeTransfer?.Identifier)
                     {
-                        case RepositoryAction.Add:
-                            this.logger.LogDebug("New transfer queued");
-                            queue.Enqueue((HttpTransfer)x.Entity!);
-                            break;
-
-                        case RepositoryAction.Remove:
-                            // TODO: pull item out of queue
-                            if (transfer.Identifier == activeTransfer?.Identifier)
-                            {
-                                this.logger.LogDebug("Current transfer has been removed");
-                                cancelSrc?.Cancel();
-                            }
-                            break;
+                        this.logger.LogDebug("Current transfer has been removed");
+                        cancelSrc?.Cancel();
                     }
                 }
             })
@@ -110,6 +100,7 @@ public class TransferJob : IJob
                     {
                         Status = HttpTransferState.PausedByNoNetwork
                     });
+                    // don't cancel here, the job or the transfer itself will do it
                 }
                 else if (x.Access == NetworkAccess.ConstrainedInternet && !activeTransfer!.Request.UseMeteredConnection)
                 {
@@ -123,7 +114,11 @@ public class TransferJob : IJob
             })
             .DisposedBy(disposer);
 
-        activeTransfer = queue.Dequeue();
+        activeTransfer = this.repository
+            .GetList<HttpTransfer>()
+            .OrderBy(x => x.CreatedAt)
+            .FirstOrDefault();
+
         while (activeTransfer != null && !cancelToken.IsCancellationRequested)
         {
             try
@@ -153,7 +148,10 @@ public class TransferJob : IJob
                 this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
                 this.logger.LogError(ex, "There was an isssue processing request");
             }
-            activeTransfer = queue.Count == 0 ? null : queue.Dequeue();
+            activeTransfer = this.repository
+                .GetList<HttpTransfer>()
+                .OrderBy(x => x.CreatedAt)
+                .FirstOrDefault();
         }
         disposer.Dispose();
     }
@@ -210,7 +208,7 @@ public class TransferJob : IJob
                     progressSubj.OnNext(new HttpTransferResult(
                         request,
                         HttpTransferState.Error,
-                        new TransferProgress(0, 0, 0, TimeSpan.Zero, 0)
+                        new TransferProgress(0, 0, 0)
                     ));
                 }
                 tcs.TrySetResult(ex);
@@ -224,9 +222,7 @@ public class TransferJob : IJob
                     new TransferProgress(
                         0,
                         transfer.BytesToTransfer,
-                        transfer.BytesTransferred,
-                        TimeSpan.Zero,
-                        1.0
+                        transfer.BytesTransferred
                     )
                 ));
                 tcs.TrySetResult(null!);
@@ -282,9 +278,10 @@ public class TransferJob : IJob
         var channel = new NotificationChannel(
             NotificationChannelId,
             NotificationChannelId,
-            NotificationImportance.Default
+            NotificationImportance.Low // to disable sound
         );
         channel.SetShowBadge(false);
+        channel.SetSound(null, null);
         this.notifications.CreateNotificationChannel(channel);
     }
 }

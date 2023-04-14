@@ -42,12 +42,54 @@ public record HttpTransferResult(
 public record TransferProgress(    
     long BytesPerSecond,
     long? BytesToTransfer,
-    long BytesTransferred,
-    TimeSpan EstimatedTimeRemaining,
-    double PercentComplete
+    long BytesTransferred
 )
 {
     public bool IsDeterministic => this.BytesToTransfer != null;
+
+
+    double? percentComplete;
+    public double PercentComplete
+    {
+        get
+        {
+            if (this.percentComplete == null)
+            {
+                if (this.BytesToTransfer == null)
+                {
+                    this.percentComplete = -1;
+                }
+                else
+                {
+                    var bytesRemaining = this.BytesToTransfer.Value - this.BytesTransferred;
+                    this.percentComplete = Math.Round((double)this.BytesTransferred / this.BytesToTransfer!.Value, 2);
+                }
+            }
+            return this.percentComplete.Value;
+        }
+    }
+
+
+    TimeSpan? estimate;
+    public TimeSpan EstimatedTimeRemaining
+    {
+        get
+        {
+            if (this.estimate == null)
+            {
+                if (this.BytesToTransfer == null || this.BytesPerSecond == 0)
+                {
+                    this.estimate = TimeSpan.Zero;
+                }
+                else
+                {
+                    var bytesRemaining = this.BytesToTransfer.Value - this.BytesTransferred;
+                    this.estimate = TimeSpan.FromSeconds(bytesRemaining / this.BytesPerSecond);
+                }
+            }
+            return this.estimate!.Value;
+        }
+    }
 };
 
 

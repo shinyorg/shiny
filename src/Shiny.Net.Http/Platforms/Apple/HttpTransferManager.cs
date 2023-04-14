@@ -151,18 +151,9 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 var ts = last.Timestamp.Subtract(first.Timestamp);
                 var totalXfer = last.Value.BytesTransferred - first.Value.BytesTransferred;
                 var bytesPerSecond = 0L;
-                var timeRemaining = TimeSpan.Zero;
-                var percent = -1.0;
 
                 if (totalXfer > 0)
                     bytesPerSecond = Convert.ToInt64(Math.Round(totalXfer / ts.TotalSeconds));
-
-                if (bytesPerSecond > 0 && last.Value.BytesToTransfer != null)
-                {
-                    var bytesRemaining = last.Value.BytesToTransfer!.Value - last.Value.BytesTransferred;
-                    timeRemaining = TimeSpan.FromSeconds(bytesRemaining / bytesPerSecond);
-                    percent = Math.Round((double)last.Value.BytesTransferred / last.Value.BytesToTransfer!.Value, 2);
-                }
                 
                 ob.OnNext(new HttpTransferResult(
                     last.Value.Request,
@@ -170,9 +161,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                     new TransferProgress(
                         bytesPerSecond,
                         last.Value.BytesToTransfer,
-                        last.Value.BytesTransferred,
-                        timeRemaining,
-                        percent
+                        last.Value.BytesTransferred
                     )
                 ));
             }

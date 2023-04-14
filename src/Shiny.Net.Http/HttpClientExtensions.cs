@@ -37,16 +37,11 @@ public static class HttpClientExtensions
                 if (stop.Elapsed.TotalSeconds > 2)
                 {
                     var bytesPerSecond = Convert.ToInt64(totalSince / stop.Elapsed.TotalSeconds);
-                    var bytesRemaining = file.Length - totalBytesXfer;
-                    var timeRemaining = TimeSpan.FromSeconds(bytesRemaining / bytesPerSecond);
-                    var percent = Math.Round((double)totalBytesXfer / file.Length, 2);
 
                     ob.OnNext(new TransferProgress(                        
                         bytesPerSecond,
                         file.Length,
-                        totalBytesXfer,
-                        timeRemaining,
-                        percent
+                        totalBytesXfer
                     ));
 
                     totalSince = 0;
@@ -114,31 +109,12 @@ public static class HttpClientExtensions
             if (stop.Elapsed.TotalSeconds > 2)
             {
                 var bytesPerSecond = Convert.ToInt32(totalSince / stop.Elapsed.TotalSeconds);
+                ob.OnNext(new TransferProgress(
+                    bytesPerSecond,
+                    contentLength ?? 0,
+                    totalBytesXfer
+                ));
 
-                if (contentLength == null)
-                {
-                    ob.OnNext(new TransferProgress(
-                        bytesPerSecond,
-                        0,
-                        totalBytesXfer,
-                        TimeSpan.Zero,
-                        0
-                    ));
-                }
-                else
-                {
-                    var bytesRemaining = contentLength.Value - totalBytesXfer;
-                    var timeRemaining = TimeSpan.FromSeconds(bytesRemaining / bytesPerSecond);
-                    var percent = Math.Round((double)totalBytesXfer / contentLength.Value, 2);
-
-                    ob.OnNext(new TransferProgress(
-                        bytesPerSecond,
-                        contentLength.Value,
-                        totalBytesXfer,
-                        timeRemaining,
-                        percent
-                    ));
-                }
                 totalSince = 0;
                 stop.Restart();
             }
@@ -149,39 +125,4 @@ public static class HttpClientExtensions
         ob.OnError,
         ob.OnCompleted
     ));
-
-
-    //public IObservable<HttpTransferMetrics> ListenToMetrics() =>
-    //    this.WhenAnyProperty()
-    //        .Select(x => (x.Object.BytesTransferred, x.Object.BytesToTransfer))
-    //        .Buffer(TimeSpan.FromSeconds(2))
-    //        .Select(results =>
-    //        {
-    //            var timeRemaining = TimeSpan.Zero;
-    //            var bytesPerSecond = 0L;
-
-    //            if (results.Count > 0)
-    //            {
-    //                // total bytes to transfer - all bytes transferred = delta
-    //                // add all deltas over the past 2 seconds for total bytes xfer
-    //                var totalBytes = results.Sum(x => x.BytesToTransfer - x.BytesTransferred);
-    //                if (totalBytes > 0)
-    //                {
-    //                    bytesPerSecond = Convert.ToInt64((double)totalBytes / 2); // in two seconds
-
-    //                    var remainingBytes = this.BytesToTransfer - this.BytesTransferred;
-    //                    var secondsRemaining = remainingBytes / bytesPerSecond;
-    //                    timeRemaining = TimeSpan.FromSeconds(secondsRemaining);
-    //                }
-    //            }
-    //            return new HttpTransferMetrics(
-    //                timeRemaining,
-    //                bytesPerSecond,
-    //                this.BytesToTransfer,
-    //                this.BytesTransferred,
-    //                this.PercentComplete,
-    //                this.Status
-    //            );
-    //        });
 }
-
