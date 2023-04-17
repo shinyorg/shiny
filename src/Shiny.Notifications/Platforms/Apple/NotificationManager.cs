@@ -348,7 +348,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         var t = notification?.Request?.Trigger;
         if (t == null || t is not UNPushNotificationTrigger)
         {
-            completionHandler.Invoke(UNNotificationPresentationOptions.Banner);
+            completionHandler.Invoke(this.configuration.PresentationOptions);
         }
     }
 
