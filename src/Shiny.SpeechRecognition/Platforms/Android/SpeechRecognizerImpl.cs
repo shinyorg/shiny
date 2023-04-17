@@ -111,7 +111,7 @@ public class SpeechRecognizerImpl : Java.Lang.Object, ISpeechRecognizer, IRecogn
 
                 // TODO: sometimes this will lock into NoMatch exception
                 speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.platform.AppContext)!;
-                if (SpeechRecognizer.IsRecognitionAvailable)
+                //if (SpeechRecognizer.IsRecognitionAvailable)
                 speechRecognizer.SetRecognitionListener(this);
                 speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
             }
