@@ -30,10 +30,11 @@ public class ConversationViewModel : ViewModel
 
     async Task DoConversation()
     {
-        this.Items.Clear();
-
-        using (var cancelSrc = new CancellationTokenSource())
+        try
         {
+            this.Items.Clear();
+
+            using var cancelSrc = new CancellationTokenSource();
             await this.Computer("Please tell me your name");
             var name = await this.speech.ListenUntilPause().ToTask(cancelSrc.Token);
             this.Add(name);
@@ -50,6 +51,10 @@ public class ConversationViewModel : ViewModel
             this.Add(next);
 
             await this.Computer("Interesting");
+        }
+        catch (Exception ex)
+        {
+            await this.Alert(ex.ToString());
         }
     }
 

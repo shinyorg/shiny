@@ -1,75 +1,68 @@
 ﻿using System;
 using System.Globalization;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using AVFoundation;
-
 using Foundation;
-
 using Speech;
 using UIKit;
 
+namespace Shiny.SpeechRecognition;
 
-namespace Shiny.SpeechRecognition
+
+public class SpeechRecognizerImpl : ISpeechRecognizer
 {
-    public class SpeechRecognizerImpl : AbstractSpeechRecognizer
+    public async Task<AccessState> RequestAccess()
     {
-        public override async Task<AccessState> RequestAccess()
-        {
-            var status = AccessState.Available;
+        var status = AccessState.Available;
 
-            if (!UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-            {
-                status = AccessState.NotSupported;
-            }
+        if (!UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
+        {
+            status = AccessState.NotSupported;
+        }
+        else
+        {
+            var nativeStatus = SFSpeechRecognizer.AuthorizationStatus;
+            if (nativeStatus != SFSpeechRecognizerAuthorizationStatus.NotDetermined)
+                status = FromNative(nativeStatus);
+
             else
             {
-                var nativeStatus = SFSpeechRecognizer.AuthorizationStatus;
-                if (nativeStatus != SFSpeechRecognizerAuthorizationStatus.NotDetermined)
-                    status = FromNative(nativeStatus);
-
-                else
-                {
-                    var tcs = new TaskCompletionSource<AccessState>();
-                    SFSpeechRecognizer.RequestAuthorization(x => tcs.SetResult(FromNative(x)));
-                    status = await tcs.Task.ConfigureAwait(false);
-                }
-            }
-            return status;
-        }
-
-
-        static AccessState FromNative(SFSpeechRecognizerAuthorizationStatus status)
-        {
-            switch (status)
-            {
-                case SFSpeechRecognizerAuthorizationStatus.Authorized:
-                    return AccessState.Available;
-
-                case SFSpeechRecognizerAuthorizationStatus.Denied:
-                    return AccessState.Denied;
-
-                case SFSpeechRecognizerAuthorizationStatus.Restricted:
-                    return AccessState.Restricted;
-
-                default:
-                    return AccessState.Unknown;
+                var tcs = new TaskCompletionSource<AccessState>();
+                SFSpeechRecognizer.RequestAuthorization(x => tcs.SetResult(FromNative(x)));
+                status = await tcs.Task.ConfigureAwait(false);
             }
         }
+        return status;
+    }
 
 
-        public override IObservable<string> ListenUntilPause(CultureInfo? culture = null) => this.Listen(true, culture);
-        public override IObservable<string> ContinuousDictation(CultureInfo? culture = null) => this.Listen(false, culture);
+    static AccessState FromNative(SFSpeechRecognizerAuthorizationStatus status) => status switch
+    {
+        SFSpeechRecognizerAuthorizationStatus.Authorized => AccessState.Available,
+        SFSpeechRecognizerAuthorizationStatus.Denied => AccessState.Denied,
+        SFSpeechRecognizerAuthorizationStatus.Restricted => AccessState.Restricted,
+        _ => AccessState.Unknown
+    };
 
 
-        protected virtual IObservable<string> Listen(bool completeOnEndOfSpeech, CultureInfo? culture) => Observable.Create<string>(ob =>
+    readonly Subject<bool> listenSubj = new();
+    public IObservable<bool> WhenListeningStatusChanged() => this.listenSubj;
+    public IObservable<string> ListenUntilPause(CultureInfo? culture = null) => this.Listen(true, culture);
+    public IObservable<string> ContinuousDictation(CultureInfo? culture = null) => this.Listen(false, culture);
+
+
+    protected virtual IObservable<string> Listen(bool completeOnEndOfSpeech, CultureInfo? culture) => Observable
+        .FromAsync(async () => (await this.RequestAccess()).Assert())
+        .Select(_ => Observable.Create<string>(ob =>
         {
             var speechRecognizer = culture == null
                 ? new SFSpeechRecognizer()
                 : new SFSpeechRecognizer(NSLocale.FromLocaleIdentifier(culture.Name));
 
             if (!speechRecognizer.Available)
-                throw new ArgumentException("Speech recognizer is not available");
+                throw new InvalidOperationException("Speech recognizer is not available");
 
             var speechRequest = new SFSpeechAudioBufferRecognitionRequest();
             var audioEngine = new AVAudioEngine();
@@ -90,7 +83,7 @@ namespace Shiny.SpeechRecognition
             if (error != null)
                 throw new ArgumentException("Error starting audio engine - " + error.LocalizedDescription);
 
-            this.ListenSubject.OnNext(true);
+            this.listenSubj.OnNext(true);
 
             var currentIndex = 0;
             var cancel = false;
@@ -134,8 +127,8 @@ namespace Shiny.SpeechRecognition
                 speechRequest.EndAudio();
                 speechRequest.Dispose();
                 speechRecognizer.Dispose();
-                this.ListenSubject.OnNext(false);
+                this.listenSubj.OnNext(false);
             };
-        });
-    }
+        }))
+        .Switch();
 }

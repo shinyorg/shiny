@@ -10,7 +10,7 @@ public static class Extensions
     /// </summary>
     /// <param name="keywords"></param>
     /// <returns></returns>
-    public static IObservable<string> ListenForFirstKeyword(this ISpeechRecognizer speechRecognizer, params string[] keywords)
+    public static IObservable<string?> ListenForFirstKeyword(this ISpeechRecognizer speechRecognizer, params string[] keywords)
         => speechRecognizer
             .ContinuousDictation()
             .Select(x =>

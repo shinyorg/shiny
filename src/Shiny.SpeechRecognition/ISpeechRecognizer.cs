@@ -28,7 +28,6 @@ public interface ISpeechRecognizer
     IObservable<string> ContinuousDictation(CultureInfo? culture = null);
 
 
-    // TODO: replace with a flag
     /// <summary>
     /// When listening status changes
     /// </summary>
