@@ -1,10 +1,15 @@
 ﻿namespace Sample;
 
 
-public class MainViewModel : ReactiveObject
+public class MainViewModel : ReactiveObject, IPageLifecycleAware
 {
-    public MainViewModel(INavigationService navigator)
+    readonly IDeviceDisplay display;
+
+
+    public MainViewModel(INavigationService navigator, IDeviceDisplay display)
     {
+        this.display = display;
+
         this.Navigate = ReactiveCommand.CreateFromTask<string>(async uri =>
         {
             await navigator.Navigate("NavigationPage/" + uri);
@@ -15,4 +20,7 @@ public class MainViewModel : ReactiveObject
 
     [Reactive] public bool IsMenuVisible { get; private set; }
     public ICommand Navigate { get; }
+
+    public void OnAppearing() => this.display.KeepScreenOn = true;
+    public void OnDisappearing() { }
 }

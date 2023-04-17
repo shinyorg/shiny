@@ -83,6 +83,7 @@ public static class MauiProgram
         s.AddScoped<BaseServices>();
         s.AddSingleton(TextToSpeech.Default);
         s.AddSingleton(FilePicker.Default);
+        s.AddSingleton(DeviceDisplay.Current);
 
         return builder;
     }
