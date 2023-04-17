@@ -51,6 +51,10 @@ namespace Shiny.Push.FirebaseMessaging
             {
                 try
                 {
+                    var permission = await ((NativeAdapter)this.adapter).RequestPermission();
+                    if (!permission)
+                        throw new InvalidOperationException("User has removed notification permissions");
+
                     this.TryStartFirebase();
                     var fcmToken = await this.GetFcmToken().ConfigureAwait(false);
                     this.container.SetCurrentToken(fcmToken, true);
@@ -102,6 +106,11 @@ namespace Shiny.Push.FirebaseMessaging
 
         public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
+            // HACK: cleaner in v3
+            var permission = await ((NativeAdapter)this.adapter).RequestPermission();
+            if (!permission)
+                return new PushAccessState(AccessState.Denied, null);
+
             this.TryStartFirebase();
             var fcmToken = await this.GetFcmToken().ConfigureAwait(false);
             this.container.SetCurrentToken(fcmToken, false);
