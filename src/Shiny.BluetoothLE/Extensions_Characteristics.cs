@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -11,6 +12,27 @@ namespace Shiny.BluetoothLE;
 
 public static class CharacteristicExtensions
 {
+    /// <summary>
+    /// Requests all services and characteristics from a peripheral.  Should only be used for niche cases or debugging.
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <returns></returns>
+    public static IObservable<IReadOnlyList<BleCharacteristicInfo>> GetAllCharacteristics(this IPeripheral peripheral)
+        => peripheral
+            .GetServices()
+            .SelectMany(x => x.Select(y => peripheral.GetCharacteristics(y.Uuid)))
+            .Switch()
+            .ToArray()
+            .Select(results =>
+            {
+                var list = new List<BleCharacteristicInfo>();
+                foreach (var result in results)
+                    list.AddRange(result);
+
+                return list;
+            });
+
+
     /// <summary>
     /// Used for writing blobs
     /// </summary>
@@ -112,6 +134,7 @@ public static class CharacteristicExtensions
         if (!characteristic.CanNotify())
             throw new InvalidOperationException($"This characteristic '{characteristic.Uuid}' does not support notifications");
     }
+
 
     public static IObservable<DeviceInfo> ReadDeviceInformation(this IPeripheral peripheral)
         => peripheral

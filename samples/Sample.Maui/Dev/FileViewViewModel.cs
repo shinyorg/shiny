@@ -1,4 +1,4 @@
-﻿namespace Sample;
+﻿namespace Sample.Dev;
 
 
 public class FileViewViewModel : ViewModel

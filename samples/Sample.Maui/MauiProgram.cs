@@ -1,4 +1,6 @@
-﻿using Prism.DryIoc;
+﻿using CommunityToolkit.Maui.Markup;
+using Prism.DryIoc;
+using Sample.Dev;
 
 namespace Sample;
 
@@ -9,6 +11,7 @@ public static class MauiProgram
         .CreateBuilder()
         .UseMauiApp<App>()
         .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
+        .UseMauiCommunityToolkitMarkup()
         .ConfigureFonts(fonts =>
         {
             fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -66,7 +69,7 @@ public static class MauiProgram
         //s.AddGpsDirectGeofencing<Geofencing.MyGeofenceDelegate>(); // if you don't know why this exists, don't use it!
 
         // for platform event testing - not needed for general consumption
-        s.AddShinyService<Platform.PlatformStateTests>();
+        s.AddShinyService<PlatformStateTests>();
         s.AddShinyService<Jobs.JobLoggerTask>();
 
         return builder;
@@ -92,6 +95,8 @@ public static class MauiProgram
     static MauiAppBuilder RegisterRoutes(this MauiAppBuilder builder)
     {
         var s = builder.Services;
+
+        s.RegisterForNavigation<MainPage, MainViewModel>();
 
         // HTTP Transfers
         s.RegisterForNavigation<HttpTransfers.CreatePage, HttpTransfers.CreateViewModel>("HttpTransfersCreate");
@@ -143,7 +148,8 @@ public static class MauiProgram
         s.RegisterForNavigation<Stores.BasicPage, Stores.BasicViewModel>("SettingsBasic");
         s.RegisterForNavigation<Stores.BindPage, Stores.BindViewModel>("SettingsBind");
 
-        s.RegisterForNavigation<MainPage, MainViewModel>();
+        // dev
+        s.RegisterForNavigation<BleHostUnitTestsPage, BleHostUnitTestsViewModel>("BleHostUnitTests");
         s.RegisterForNavigation<LogsPage, LogsViewModel>();
         s.RegisterForNavigation<AppDataPage, AppDataViewModel>();
         s.RegisterForNavigation<FileViewPage, FileViewViewModel>();

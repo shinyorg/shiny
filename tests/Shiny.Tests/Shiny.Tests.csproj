@@ -21,12 +21,9 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
-    <!--
-    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+      <CreatePackage>false</CreatePackage>
     </PropertyGroup>
-    -->
-
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
 
@@ -40,7 +37,7 @@
 
     <ItemGroup>
         <PackageReference Include="Acr.UserDialogs" Version="8.0.1" />
-        <PackageReference Include="FluentAssertions" Version="6.8.0" />
+        <PackageReference Include="FluentAssertions" Version="6.10.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0" />
     </ItemGroup>
@@ -56,7 +53,7 @@
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
-        <!--<ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />-->
+        <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
     </ItemGroup>
@@ -67,6 +64,5 @@
         <Compile Remove="Push\FirebaseTests.cs" />
         <Compile Remove="Push\AppleNativeTests.cs" />
         <Compile Remove="Push\AzureNotificationHubTests.cs" />
-        <None Remove="BuildTasks\" />
     </ItemGroup>
 </Project>

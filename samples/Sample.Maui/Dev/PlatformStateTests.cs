@@ -1,6 +1,6 @@
 ﻿using Shiny.Hosting;
 
-namespace Sample.Platform;
+namespace Sample.Dev;
 
 
 #if ANDROID

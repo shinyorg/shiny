@@ -26,9 +26,16 @@ public static class AsyncExtensions
             .ToTask(cancelToken);
 
 
-    public static Task<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristicsAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken cancelToken = default)
+    public static Task<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristicsAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
-            .GetCharacteristics(serviceUuid)
+            .GetAllCharacteristics()
+            .Timeout(timeout ?? TimeSpan.FromSeconds(10))
+            .ToTask(cancelToken);
+
+    public static Task<IReadOnlyList<BleCharacteristicInfo>> GetAllCharacteristicsAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, TimeSpan? timeout = null)
+        => peripheral
+            .GetAllCharacteristics()
+            .Timeout(timeout ?? TimeSpan.FromSeconds(10))
             .ToTask(cancelToken);
 
     public static Task<IReadOnlyList<BleDescriptorInfo>> GetDescriptorsAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
@@ -67,6 +74,12 @@ public static class AsyncExtensions
         => peripheral
             .ReadDeviceInformation()
             .Timeout(TimeSpan.FromMilliseconds(timeoutMs))
+            .ToTask(cancelToken);
+
+    public static Task<int> ReadRssiAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, int timeoutMs = 3000)
+        => peripheral
+            .ReadRssi()
+            .Timeout(TimeSpan.FromMicroseconds(timeoutMs))
             .ToTask(cancelToken);
 
     public static Task<BleCharacteristicResult> ReadCharacteristicAsync(this IPeripheral peripheral, BleCharacteristicInfo info, CancellationToken cancelToken = default, int timeoutMs = 3000)

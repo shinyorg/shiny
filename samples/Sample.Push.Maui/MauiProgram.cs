@@ -30,22 +30,7 @@ public static class MauiProgram
         builder.Services.AddTransient<TagsPage>();
         builder.Services.AddTransient<TagsViewModel>();
 
-#if FIREBASE
-#if USE_PUSH_CONFIG
-        // ios or android
-        var cfg = builder.Configuration.GetSection("Firebase");
-        builder.Services.AddPushFirebaseMessaging<MyPushDelegate>(new(
-            false,
-            cfg["AppId"],
-            cfg["SenderId"],
-            cfg["ProjectId"],
-            cfg["ApiKey"]
-        ));
-#else
-        builder.Services.AddFirebaseMessaging<MyPushDelegate>();
-#endif
-
-#elif NATIVE
+#if NATIVE
 #if USE_PUSH_CONFIG && ANDROID
         var cfg = builder.Configuration.GetSection("Firebase");
         builder.Services.AddPush<MyPushDelegate>(new (

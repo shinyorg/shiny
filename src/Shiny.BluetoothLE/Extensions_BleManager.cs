@@ -29,6 +29,18 @@ public static class BleManagerExtensions
 
 
     /// <summary>
+    /// This will scan until the first peripheral with a specified service UUID is found
+    /// </summary>
+    /// <param name="bleManager"></param>
+    /// <param name="serviceUuid"></param>
+    /// <returns></returns>
+    public static IObservable<IPeripheral> ScanUntilFirstPeripheralFound(this IBleManager bleManager, string serviceUuid) => bleManager
+        .Scan(new(serviceUuid))
+        .Take(1)
+        .Select(x => x.Peripheral);
+
+
+    /// <summary>
     /// Scans only for distinct peripherals instead of repeating each peripheral scan response - this will only give you peripherals, not RSSI or ad packets
     /// </summary>
     /// <param name="bleManager"></param>

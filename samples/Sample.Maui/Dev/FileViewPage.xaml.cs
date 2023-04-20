@@ -1,9 +1,9 @@
-﻿namespace Sample;
+﻿namespace Sample.Dev;
 
 public partial class FileViewPage : ContentPage
 {
     public FileViewPage()
     {
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }

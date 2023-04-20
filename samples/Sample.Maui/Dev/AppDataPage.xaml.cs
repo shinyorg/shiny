@@ -1,9 +1,9 @@
-﻿namespace Sample;
+﻿namespace Sample.Dev;
 
 public partial class AppDataPage : ContentPage
 {
     public AppDataPage()
     {
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }

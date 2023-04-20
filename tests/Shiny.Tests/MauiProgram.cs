@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Maui.Devices;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
 using Xunit.Runners.Maui;
@@ -17,6 +18,7 @@ public static class MauiProgram
             .AddJsonPlatformBundle(optional: false)
             .Build();
 
+        DeviceDisplay.KeepScreenOn = true;
         return MauiApp
             .CreateBuilder()
             .ConfigureTests(new TestOptions

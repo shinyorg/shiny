@@ -55,6 +55,7 @@
                     <TableSection Title="For Lib Dev">
                         <TextCell Text="Logs" Command="{Binding Navigate}" CommandParameter="LogsPage" />
                         <TextCell Text="App Data" Command="{Binding Navigate}" CommandParameter="AppDataPage" />
+                        <TextCell Text="BLE Host for Unit Tests" Command="{Binding Navigate}" CommandParameter="BleHostUnitTests" />
                     </TableSection>
                     <!--
                     NOT READY

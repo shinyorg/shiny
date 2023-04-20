@@ -1,11 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<PushProvider>native</PushProvider><!--native, firebase, or azure-->
-
-		<!--if native android or firebase - firebase will look for the embedded configuration-->
-		<FirebaseUseEmbeddedConfiguration>false</FirebaseUseEmbeddedConfiguration>
-		<TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>
+		<PushProvider>azure</PushProvider>
+		<TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
@@ -25,14 +22,10 @@
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
 		<SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
-		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		<RuntimeIdentifier Condition="'$(Configuration)' == 'Debug'">iossimulator-x64</RuntimeIdentifier>
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
 		<SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-		<CodesignEntitlements>Platforms\MacCatalyst\Entitlements.plist</CodesignEntitlements>
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
@@ -59,16 +52,17 @@
 
 	<PropertyGroup>		
 		<DefineConstants Condition="'$(PushProvider)' == 'azure'">$(DefineConstants);AZURE</DefineConstants>
-		<DefineConstants Condition="'$(PushProvider)' == 'firebase'">$(DefineConstants);FIREBASE</DefineConstants>
 		<DefineConstants Condition="'$(PushProvider)' == 'native'">$(DefineConstants);NATIVE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
+	  <CreatePackage>false</CreatePackage>
+	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
-		<ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" Condition="'$(PushProvider)' == 'firebase'" />
-		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" Condition="'$(PushProvider)' == 'azure'" />
+		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
     </ItemGroup>
 </Project>
