@@ -59,10 +59,6 @@ public class Notification : IRepositoryEntity
     /// </summary>
     public IntervalTrigger? RepeatInterval { get; set; }
 
-    /// <summary>
-    /// Set an image/video/audio for iOS attachment or Android bigpicture style - file must be on disk
-    /// </summary>
-    public string? LocalAttachmentPath { get; set; }
 
     public string Identifier => this.Id.ToString();
 }

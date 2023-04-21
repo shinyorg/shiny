@@ -154,12 +154,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             Title = notification.Title!,
             Body = notification.Message!
         };
-        if (!notification.LocalAttachmentPath.IsEmpty())
-        {
-            var imageUri = NSUrl.FromString(notification.LocalAttachmentPath!);
-            var attachment = UNNotificationAttachment.FromIdentifier("image", imageUri, new UNNotificationAttachmentOptions(), out var _);
-            content.Attachments = new [] { attachment };
-        }
+
         if (!notification.Thread.IsEmpty())
             content.ThreadIdentifier = notification.Thread!;
 
@@ -180,6 +175,9 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 content.FilterCriteria = apple.FilterCriteria;
                 content.RelevanceScore = apple.RelevanceScore;
             }
+
+            if (apple.Attachments != null)
+                content.Attachments = apple.Attachments;
         }
         this.ApplyChannel(notification, channel, content);
         return content;
