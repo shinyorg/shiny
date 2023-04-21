@@ -79,7 +79,7 @@ public static class AsyncExtensions
     public static Task<int> ReadRssiAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => peripheral
             .ReadRssi()
-            .Timeout(TimeSpan.FromMicroseconds(timeoutMs))
+            .Timeout(TimeSpan.FromMilliseconds(timeoutMs))
             .ToTask(cancelToken);
 
     public static Task<BleCharacteristicResult> ReadCharacteristicAsync(this IPeripheral peripheral, BleCharacteristicInfo info, CancellationToken cancelToken = default, int timeoutMs = 3000)
