@@ -11,12 +11,7 @@
         <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
-    </ItemGroup>
-
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
     </ItemGroup>
 
