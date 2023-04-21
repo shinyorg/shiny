@@ -18,8 +18,8 @@ public class ShinyStartupService : IStartupService
 
     public Task StartupComplete()
     {
-        var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-        var host = new Host(services, loggerFactory);
+        var loggerFactory = this.services.GetRequiredService<ILoggerFactory>();
+        var host = new Host(this.services, loggerFactory);
         host.Run();
 
         return Task.CompletedTask;

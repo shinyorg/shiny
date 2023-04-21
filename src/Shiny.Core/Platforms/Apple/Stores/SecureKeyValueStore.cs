@@ -81,7 +81,7 @@ public class SecureKeyValueStore : IKeyValueStore
             Account = key,
             Service = this.Service,
             Label = key,
-            Accessible = DefaultAccessible,
+            Accessible = this.DefaultAccessible,
             ValueData = NSData.FromString(content, NSStringEncoding.UTF8),
         };
         var result = SecKeyChain.Add(record);

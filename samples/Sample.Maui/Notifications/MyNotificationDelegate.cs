@@ -43,7 +43,7 @@ public class MyNotificationDelegate : INotificationDelegate
                     if (!response.Text.IsEmpty())
                         name = response.Text!.Trim();
 
-                    await notifications.Send(
+                    await this.notifications.Send(
                         "Shiny Chat",
                         $"Hi {name}, do you like me?",
                         "ChatAnswer"

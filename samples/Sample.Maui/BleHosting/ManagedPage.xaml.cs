@@ -4,6 +4,6 @@ public partial class ManagedPage : ContentPage
 {
     public ManagedPage()
     {
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }
