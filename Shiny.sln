@@ -30,7 +30,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3A15354E-BAD2-4195-BE6B-49ED2B4E56E6}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
-		build\Build.slnf = build\Build.slnf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{75481E6D-0D2C-4AFA-81AE-73A7756EA9C0}"
@@ -96,9 +95,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Hosting.Uno", "src\Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Support.Repositories", "src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj", "{47A57CFE-A1A8-407A-86FA-FA003D562C58}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Sample.Blazor", "samples\Sample.Blazor\Sample.Blazor.csproj", "{D76E2446-98AC-4081-950A-5FEE4C721658}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Blazor", "samples\Sample.Blazor\Sample.Blazor.csproj", "{D76E2446-98AC-4081-950A-5FEE4C721658}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{B145321D-8E33-4A33-B5CF-37A162C0E261}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{B145321D-8E33-4A33-B5CF-37A162C0E261}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
