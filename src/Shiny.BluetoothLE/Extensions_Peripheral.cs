@@ -37,7 +37,7 @@ public static class PeripheralExtensions
         if (peripheral.Status == ConnectionState.Connected)
         {
             ob.Respond(peripheral);
-            return Disposable.Empty;
+            return Disposable.Empty; // we didn't start the connection, so we aren't closing it
         }
 
         var sub1 = peripheral
