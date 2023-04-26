@@ -162,6 +162,9 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task StartAdvertising(AdvertisementOptions? options = null)
     {
+        if (this.IsAdvertising)
+            throw new InvalidOperationException("Advertisement is already running");
+        
         options ??= new();
 
         var settings = new AdvertiseSettings.Builder()!
@@ -191,6 +194,9 @@ public partial class BleHostingManager : IBleHostingManager
 
     public void StopAdvertising()
     {
+        if (!this.IsAdvertising)
+            return;
+        
         var adapter = this.context.Platform.GetBluetoothAdapter()!;
         adapter.BluetoothLeAdvertiser!.StopAdvertising(this.adCallbacks);
         this.adCallbacks = null;
