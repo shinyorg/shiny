@@ -26,9 +26,9 @@ public partial class StoreTests
     public void EnumTest(IKeyValueStore store)
     {
         this.currentStore = store;
-        this.currentStore.Set(nameof(EnumTest), MyTestEnum.Hi);
+        this.currentStore.Set(nameof(this.EnumTest), MyTestEnum.Hi);
         this.currentStore
-            .Get(typeof(MyTestEnum), nameof(EnumTest))
+            .Get(typeof(MyTestEnum), nameof(this.EnumTest))
             .Should()
             .Be(MyTestEnum.Hi);
     }
@@ -53,9 +53,9 @@ public partial class StoreTests
         this.currentStore = store;
 
         var guid = new Guid();
-        this.currentStore.Set(nameof(GuidTest), guid);
+        this.currentStore.Set(nameof(this.GuidTest), guid);
         this.currentStore
-            .Get(typeof(Guid), nameof(GuidTest))
+            .Get(typeof(Guid), nameof(this.GuidTest))
             .Should()
             .Be(guid);
     }

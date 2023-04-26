@@ -33,14 +33,14 @@ public class GeofenceManagerTests : AbstractShinyTests
         var manager = this.GetService<IGeofenceManager>();
 
         await manager.StartMonitoring(new GeofenceRegion(
-            nameof(BasicRegistrationTest),
+            nameof(this.BasicRegistrationTest),
             new Position(1, 1),
             Distance.FromMeters(300)
         ));
         var gf = manager.GetMonitorRegions();
         gf.Count.Should().Be(1);
 
-        gf.First().Identifier.Should().Be(nameof(BasicRegistrationTest));
+        gf.First().Identifier.Should().Be(nameof(this.BasicRegistrationTest));
 
         await manager.StopAllMonitoring();
     }

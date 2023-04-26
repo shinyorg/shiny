@@ -21,15 +21,15 @@ public class NotificationTests : AbstractShinyTests
     [Fact(DisplayName = "Notifications - Standard")]
     public async Task StandardTest()
     {
-        this.CreateFullChannel(nameof(StandardTest));
-        await this.Notifications.Send("Test", "Test 1", nameof(StandardTest));
+        this.CreateFullChannel(nameof(this.StandardTest));
+        await this.Notifications.Send("Test", "Test 1", nameof(this.StandardTest));
     }
 
 
     [Fact(DisplayName = "Notifications - Channel Store")]
     public void ChannelStoreProperTest()
     {
-        var created = this.CreateFullChannel(nameof(ChannelStoreProperTest));
+        var created = this.CreateFullChannel(nameof(this.ChannelStoreProperTest));
 
         var channel = this.Notifications.GetChannels().Single();
 

@@ -30,7 +30,7 @@
 	<array>
 		<string>bluetooth-central</string>
 		<string>bluetooth-peripheral</string>
-	</array>	
+	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -40,6 +40,10 @@
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>BLE Peripheral Hello</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>BLE Background Hello</string>	
+	<string>BLE Background Hello</string>
+    <key>CFBundleIdentifier</key>
+    <string>org.shiny.tests</string>
+    <key>MinimumOSVersion</key>
+    <string>15.0</string>    
 </dict>
 </plist>

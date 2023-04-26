@@ -17,8 +17,7 @@ public static class MauiProgram
         Configuration = new ConfigurationBuilder()
             .AddJsonPlatformBundle(optional: false)
             .Build();
-
-        DeviceDisplay.KeepScreenOn = true;
+        
         return MauiApp
             .CreateBuilder()
             .ConfigureTests(new TestOptions
@@ -33,8 +32,12 @@ public static class MauiProgram
             .ConfigureLifecycleEvents(lc =>
             {
 #if ANDROID
-                lc.AddAndroid(x => x.OnApplicationCreating(app => Acr.UserDialogs.UserDialogs.Init(app)));
+                lc.AddAndroid(x => x
+                    .OnApplicationCreating(app => Acr.UserDialogs.UserDialogs.Init(app))
+                    .OnCreate((_, _) => DeviceDisplay.KeepScreenOn = true)
+                );
 #else
+                DeviceDisplay.KeepScreenOn = true;
                 Acr.UserDialogs.UserDialogs.Init();
 #endif
             })

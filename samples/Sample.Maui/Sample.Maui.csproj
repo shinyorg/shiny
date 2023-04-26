@@ -48,6 +48,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="..\..\tests\Shiny.Tests\BluetoothLE\BleConfiguration.cs">
+            <Link>Dev\BleConfiguration.cs</Link>
+        </Compile>
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
@@ -68,14 +71,5 @@
 		<Compile Remove="TODO/**" />
 		<MauiXaml Remove="TODO/**" />
 		<Content Include="TODO/**" />
-		<None Remove="Dev\" />
     </ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Dev\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Include="..\..\tests\Shiny.Tests\BluetoothLE\BleConfiguration.cs">
-	    <Link>Dev\BleConfiguration.cs</Link>
-	  </Compile>
-	</ItemGroup>
 </Project>
