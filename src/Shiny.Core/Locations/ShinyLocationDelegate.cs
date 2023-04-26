@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if APPLE
+using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CoreLocation;
@@ -20,6 +21,7 @@ public abstract class ShinyLocationDelegate : CLLocationManagerDelegate
     public override void AuthorizationChanged(CLLocationManager manager, CLAuthorizationStatus status)
         => this.statusSubject.OnNext(status);
 }
+#endif
 /*
 Accuracy authorization in iOS14
 iOS14 introduces a new dimension to location permissions. On the one hand, When In Use and Always define the circumstances in which the app can use location; on the other, Accuracy Authorization defines the frequency and precision of location data.

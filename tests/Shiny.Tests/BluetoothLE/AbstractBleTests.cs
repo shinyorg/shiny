@@ -8,11 +8,7 @@ namespace Shiny.Tests.BluetoothLE;
 
 public abstract class AbstractBleTests : AbstractShinyTests
 {
-    protected AbstractBleTests(ITestOutputHelper output) : base(output)
-    {
-        this.Config = MauiProgram.Configuration.GetSection("BlueoothLE").Get<BleConfiguration>();
-    }
-
+    protected AbstractBleTests(ITestOutputHelper output) : base(output) { }
 
     public override void Dispose()
     {
@@ -34,7 +30,6 @@ public abstract class AbstractBleTests : AbstractShinyTests
     protected IBleManager Manager => this.GetService<IBleManager>();
     protected IBleHostingManager HostingManager => this.GetService<IBleHostingManager>();
     protected Shiny.BluetoothLE.IPeripheral? Peripheral { get; set; }
-    protected BleConfiguration Config { get; }
 
 
     protected virtual async Task FindFirstPeripheral(string serviceUuid, bool connect)

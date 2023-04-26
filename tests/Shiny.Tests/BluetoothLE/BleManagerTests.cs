@@ -9,7 +9,7 @@ public class BleManagerTests : AbstractBleTests
     public BleManagerTests(ITestOutputHelper output) : base(output) { }
 
 
-    [Fact(DisplayName = "BLE Permissions")]
+    [Fact(DisplayName = "BLE Client - Permissions")]
     public async Task Permissions()
     {
         var status = await this.GetService<IBleManager>().RequestAccess();
@@ -17,7 +17,7 @@ public class BleManagerTests : AbstractBleTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "BLE Client - Scan Filter")]
     public async Task Scan_Filter()
     {
         var result = await this.Manager

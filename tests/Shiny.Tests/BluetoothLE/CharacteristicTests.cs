@@ -12,18 +12,19 @@ public class CharacteristicTests : AbstractBleTests
     async Task Setup()
     {
         this.Peripheral = await this.Manager
-            .ScanUntilPeripheralFound(this.Config.PeripheralName)
-            .Timeout(this.Config.DeviceScanTimeout)
+            .ScanUntilFirstPeripheralFound(BleConfiguration.ServiceUuid)
+            // .ScanUntilPeripheralFound("BleConfiguration.PeripheralName")
+            .Timeout(BleConfiguration.DeviceScanTimeout)
             .ToTask();
 
         await this.Peripheral
             .WithConnectIf()
-            .Timeout(this.Config.ConnectTimeout) // android can take some time :P
+            .Timeout(BleConfiguration.ConnectTimeout) // android can take some time :P
             .ToTask();
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "BLE Client - Characteristic - Write Without Response")]
     public async Task WriteWithoutResponse()
     {
         await this.Setup();
@@ -40,11 +41,13 @@ public class CharacteristicTests : AbstractBleTests
 
 
 
-    [Fact]
+    [Fact(DisplayName = "BLE Client - Get All Characteristics")]
     public async Task GetAllCharacteristics()
     {
         await this.Setup();
-        await this.Peripheral!.GetAllCharacteristicsAsync();
+        var results = await this.Peripheral!.GetAllCharacteristicsAsync();
+
+        results.Count.Should().Be(3);
     }
     //[Fact]
     //public async Task BlobWriteTest()

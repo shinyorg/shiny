@@ -24,6 +24,13 @@
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
       <CreatePackage>false</CreatePackage>
     </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<!--<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>-->
+	</PropertyGroup>
+
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
 
@@ -37,7 +44,7 @@
 
     <ItemGroup>
         <PackageReference Include="Acr.UserDialogs" Version="8.0.1" />
-        <PackageReference Include="FluentAssertions" Version="6.10.0" />
+        <PackageReference Include="FluentAssertions" Version="6.11.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0" />
     </ItemGroup>

@@ -13,7 +13,7 @@ public class PeripheralTests : AbstractBleTests
     {
         this.Peripheral = await this.Manager
             .ScanUntilFirstPeripheralFound(BleConfiguration.ServiceUuid)
-            .Timeout(this.Config.DeviceScanTimeout)
+            .Timeout(BleConfiguration.DeviceScanTimeout)
             .ToTask();
 
         if (connect)
@@ -23,7 +23,7 @@ public class PeripheralTests : AbstractBleTests
 
     Task Connect() => this.Peripheral!
         .WithConnectIf()
-        .Timeout(this.Config.ConnectTimeout)
+        .Timeout(BleConfiguration.ConnectTimeout)
         .ToTask();
 
 
