@@ -152,14 +152,14 @@ public partial class Peripheral
         => this.charWroteSubj.OnNext((characteristic, error));
 
 
-    protected BleCharacteristicResult ToResult(CBCharacteristic ch, BleCharacteristicEvent @event) => new BleCharacteristicResult(
+    protected BleCharacteristicResult ToResult(CBCharacteristic ch, BleCharacteristicEvent @event) => new(
         this.FromNative(ch),
         @event,
         ch.Value?.ToArray()
     );
 
 
-    protected BleCharacteristicInfo FromNative(CBCharacteristic ch) => new BleCharacteristicInfo(
+    protected BleCharacteristicInfo FromNative(CBCharacteristic ch) => new(
         this.FromNative(ch.Service!),
         ch.UUID.ToString(),
         ch.IsNotifying,
@@ -225,8 +225,12 @@ public partial class Peripheral
     protected IObservable<BleCharacteristicResult> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => this.operations.QueueToObservable(async ct =>
     {
         if (!this.Native.CanSendWriteWithoutResponse)
+        {
+            this.logger.LogDebug("Waiting for 'CanSendWriteWithoutResponse'");
             await this.readyWwrSubj.Take(1).ToTask(ct);
-
+            this.logger.LogDebug("'CanSendWriteWithoutResponse' is ready");
+        }
+        this.logger.LogDebug("Writing characteristic without response");
         var data = NSData.FromArray(value);
         this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithoutResponse);
 

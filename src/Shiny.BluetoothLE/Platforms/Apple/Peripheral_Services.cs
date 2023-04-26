@@ -19,12 +19,12 @@ public partial class Peripheral
         var nativeUuid = CBUUID.FromString(serviceUuid);
         var service = this.TryGetService(nativeUuid);
 
-        if (service == null)
+        if (service != null)
         {
             ob.Respond(service);
         }
         else
-        { 
+        {
             disp = this.serviceDiscoverySubj.Subscribe(x =>
             {
                 if (x != null)
