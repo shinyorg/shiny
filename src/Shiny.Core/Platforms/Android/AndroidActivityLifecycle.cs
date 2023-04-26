@@ -25,7 +25,7 @@ public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityL
     public Activity? Activity
     {
         get => this.current.TryGetTarget(out var a) ? a : null;
-        set => this.current.SetTarget(value);
+        private set => this.current.SetTarget(value);
     }
 
 

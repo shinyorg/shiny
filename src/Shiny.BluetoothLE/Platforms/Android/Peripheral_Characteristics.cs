@@ -37,7 +37,7 @@ public partial class Peripheral
             var task = this.charEventSubj
                 .Where(x => x.Char.Equals(ch) && !x.IsWrite)
                 .Take(1)
-                .ToTask();
+                .ToTask(ct);
 
             if (!this.Gatt!.ReadCharacteristic(ch))
                 throw new BleException("Failed to read characteristic: " + characteristicUuid);

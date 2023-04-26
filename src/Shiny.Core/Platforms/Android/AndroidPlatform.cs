@@ -19,7 +19,7 @@ namespace Shiny;
 public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPermissionsResult, IAndroidLifecycle.IOnActivityResult
 {
     int requestCode;
-    readonly AndroidActivityLifecycle activityLifecycle;
+    static AndroidActivityLifecycle activityLifecycle; // this should never change once installed on the platform
     readonly Subject<PermissionRequestResult> permissionSubject = new();
     readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
 
@@ -27,7 +27,7 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     public AndroidPlatform()
     {
         var app = (Application)Application.Context;
-        this.activityLifecycle = new(app);
+        activityLifecycle ??= new(app);
 
         this.AppContext = app;
         this.AppData = new DirectoryInfo(this.AppContext.FilesDir.AbsolutePath);
@@ -51,8 +51,8 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     public DirectoryInfo Public { get; }
 
 
-    public Activity? CurrentActivity => this.activityLifecycle.Activity;
-    public IObservable<ActivityChanged> WhenActivityChanged() => this.activityLifecycle.ActivitySubject;
+    public Activity? CurrentActivity => activityLifecycle.Activity;
+    public IObservable<ActivityChanged> WhenActivityChanged() => activityLifecycle.ActivitySubject;
 
 
     readonly Handler handler = new Handler(Looper.MainLooper);
@@ -70,8 +70,8 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
         if (this.CurrentActivity != null)
             ob.Respond(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
 
-        return this
-            .activityLifecycle
+        // TODO: this should timeout - if an activity isn't coming in - something is stuck somewhere
+        return activityLifecycle
             .ActivitySubject
             .Subscribe(x => ob.Respond(x));
     });
@@ -153,12 +153,14 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
             comp.Add(this
                 .WhenActivityStatusChanged()
                 .Take(1)
-                .Subscribe(x =>
-                    ActivityCompat.RequestPermissions(
+                .Timeout(TimeSpan.FromSeconds(5))
+                .Subscribe(
+                    x => ActivityCompat.RequestPermissions(
                         x.Activity,
                         androidPermissions,
                         current
-                    )
+                    ),
+                    ex => ob.OnError(new TimeoutException("A current activity was not detected to be able to request permissions", ex))
                 )
             );
         }
