@@ -19,16 +19,16 @@ public partial class Peripheral
     public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => Observable.FromAsync<IReadOnlyList<BleServiceInfo>>(async ct =>
     {
         this.AssertConnection();
-
         if (refreshServices)
             this.RefreshServices();
 
-        if (this.Gatt!.Services != null && !refreshServices)
-            return this.Gatt.Services.Select(this.FromNative).ToList();
+        if ((this.Gatt!.Services?.Count ?? 0) > 0 && !refreshServices)
+            return this.Gatt.Services!.Select(this.FromNative).ToList();
 
         var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
-        this.Gatt.DiscoverServices();
-
+        if (!this.Gatt.DiscoverServices())
+            throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
+        
         await task.ConfigureAwait(false);
         var services = this.Gatt
             .Services!
