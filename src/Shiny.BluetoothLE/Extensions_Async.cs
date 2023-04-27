@@ -25,6 +25,10 @@ public static class AsyncExtensions
             .GetServices()
             .ToTask(cancelToken);
 
+    public static Task<BleServiceInfo> GetServiceAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken cancelToken = default)
+        => peripheral
+            .GetService(serviceUuid)
+            .ToTask(cancelToken);    
 
     public static Task<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristicsAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
@@ -32,6 +36,11 @@ public static class AsyncExtensions
             .Timeout(timeout ?? TimeSpan.FromSeconds(10))
             .ToTask(cancelToken);
 
+    public static Task<BleCharacteristicInfo> GetCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
+        => peripheral
+            .GetCharacteristic(serviceUuid, characteristicUuid)
+            .ToTask(cancelToken);
+    
     public static Task<IReadOnlyList<BleCharacteristicInfo>> GetAllCharacteristicsAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
             .GetAllCharacteristics()
