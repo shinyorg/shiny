@@ -36,10 +36,11 @@ public static class CharacteristicExtensions
     /// <summary>
     /// Used for writing blobs
     /// </summary>
-    /// <param name="ch">The characteristic to write on</param>
+    /// <param name="serviceUuid">The service of the characteristic</param>
+    /// <param name="characteristicUuid">The characteristic to write to</param>
     /// <param name="stream">The stream to send</param>
     /// <param name="packetSendTimeout">How long to wait before timing out a packet send - defaults to 5 seconds</param>
-    public static IObservable<BleWriteSegment> WriteBlob(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
+    public static IObservable<BleWriteSegment> WriteCharacteristicBlob(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, Stream stream, TimeSpan? packetSendTimeout = null) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
     {
         var mtu = peripheral.Mtu;
         var buffer = new byte[mtu];
@@ -79,16 +80,8 @@ public static class CharacteristicExtensions
 
         return Disposable.Empty;
     });
-
-
-    public static IObservable<byte[]> ReadCharacteristicInterval(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, TimeSpan timeSpan)
-        => Observable
-            .Interval(timeSpan)
-            .Select(_ => peripheral.ReadCharacteristic(serviceUuid, characteristicUuid))
-            .Switch()
-            .Select(x => x.Data);
-
-
+    
+    
     public static bool CanRead(this BleCharacteristicInfo ch) => ch.Properties.HasFlag(CharacteristicProperties.Read);
     public static bool CanWriteWithResponse(this BleCharacteristicInfo ch) => ch.Properties.HasFlag(CharacteristicProperties.Write);
     public static bool CanWriteWithoutResponse(this BleCharacteristicInfo ch) => ch.Properties.HasFlag(CharacteristicProperties.WriteWithoutResponse);
@@ -193,13 +186,13 @@ public static class CharacteristicExtensions
 
 
     public static IObservable<int> ReadBatteryInformation(this IPeripheral peripheral)
-        => StandardIntObserable(peripheral, StandardUuids.BatteryService);
+        => StandardIntObservable(peripheral, StandardUuids.BatteryService);
 
     public static IObservable<int> HeartRateSensor(this IPeripheral peripheral)
-        => StandardIntObserable(peripheral, StandardUuids.HeartRateMeasurementSensor);
+        => StandardIntObservable(peripheral, StandardUuids.HeartRateMeasurementSensor);
 
 
-    static IObservable<int> StandardIntObserable(IPeripheral peripheral, (string ServiceUuid, string CharacteristicUuid) uuid) => peripheral
+    static IObservable<int> StandardIntObservable(IPeripheral peripheral, (string ServiceUuid, string CharacteristicUuid) uuid) => peripheral
         .ReadCharacteristic(uuid.ServiceUuid, uuid.CharacteristicUuid)
         .Select(x => (int)x.Data[0]);
 }

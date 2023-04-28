@@ -23,39 +23,63 @@ public class CharacteristicTests : AbstractBleTests
             .ToTask();
     }
 
-
-    [Fact(DisplayName = "BLE Client - Characteristic - Write Without Response")]
-    public async Task WriteWithoutResponse()
+    
+    [Theory(DisplayName = "BLE Client - Characteristic - Writes")]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task WriteWithoutResponse(bool withResponse)
     {
         await this.Setup();
 
         var value = new byte[] { 0x01, 0x02 };
-        var result = await this.Peripheral.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, value);
+        var result = await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, value, withResponse);
         result.Event.Should().Be(BleCharacteristicEvent.WriteWithoutResponse);
         // result.Data.Should().Be(value);
 
-        result = await this.Peripheral.ReadCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
+        result = await this.Peripheral!.ReadCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
         result.Event.Should().Be(BleCharacteristicEvent.Read);
         // result.Data.Should().Be(value);
     }
 
-
-
+    
     [Fact(DisplayName = "BLE Client - Get All Characteristics")]
     public async Task GetAllCharacteristics()
     {
         await this.Setup();
         var results = await this.Peripheral!.GetAllCharacteristicsAsync();
 
-        results.Count.Should().Be(3);
+        AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
+        AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
+        AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid);
+        
+        AssertChar(results, BleConfiguration.SecondaryServiceUuid, BleConfiguration.SecondaryCharacteristicUuid1);
+        AssertChar(results, BleConfiguration.SecondaryServiceUuid, BleConfiguration.SecondaryCharacteristicUuid2);
     }
-    //[Fact]
-    //public async Task BlobWriteTest()
-    //{
-    //    await this.Setup();
 
-    //    this.characteristics[0].BlobWrite()
-    //}
+
+    static void AssertChar(IReadOnlyList<BleCharacteristicInfo> results, string serviceUuid, string characteristicUuid)
+        => results
+            .FirstOrDefault(x =>
+                x.Service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase) &&
+                x.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase)
+            )
+            .Should()
+            .NotBeNull($"Did not find service: {serviceUuid} / characteristic: {characteristicUuid}");
+    
+    // [Fact]
+    // public async Task BlobWriteTest()
+    // {
+    //     await this.Setup();
+    //
+    //     // TODO: need stream
+    //     this.Peripheral!.WriteCharacteristicBlob(
+    //         BleConfiguration.ServiceUuid,
+    //         BleConfiguration.WriteCharacteristicUuid,
+    //         
+    //         null,
+    //         TimeSpan.FromSeconds(5)
+    //     );
+    // }
 
     //[Fact]
     //public async Task Concurrent_Notifications()
@@ -93,32 +117,39 @@ public class CharacteristicTests : AbstractBleTests
     //}
 
 
-    //[Fact]
-    //public async Task Concurrent_Writes()
-    //{
-    //    await this.Setup();
-    //    var bytes = new byte[] { 0x01 };
-    //    var list = new List<Task<GattCharacteristicResult>>();
+    [Fact]
+    public async Task Concurrent_Writes()
+    {
+        await this.Setup();
+        var bytes = new byte[] { 0x01 };
+        var list = new List<Task<BleCharacteristicResult>>();
 
-    //    foreach (var ch in this.characteristics)
-    //        list.Add(ch.Write(bytes).Timeout(this.Config.OperationTimeout).ToTask());
+        var ch = await this.Peripheral!.GetCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
+        ch.Should().NotBeNull("Write characteristic was not found");
+        
+        for (var i = 0; i < 10; i++)
+            list.Add(this.Peripheral!.WriteCharacteristicAsync(ch, bytes, true, CancellationToken.None, 5000));
 
-    //    await Task.WhenAll(list);
-    //}
-
-
-    //[Fact]
-    //public async Task Concurrent_Reads()
-    //{
-    //    await this.Setup();
-    //    var list = new List<Task<GattCharacteristicResult>>();
-    //    foreach (var ch in this.characteristics)
-    //        list.Add(ch.Read().Timeout(this.Config.OperationTimeout).ToTask());
-
-    //    await Task.WhenAll(list);
-    //}
+        await Task.WhenAll(list);
+    }
 
 
+    [Fact]
+    public async Task Concurrent_Reads()
+    {
+        await this.Setup();
+        
+        var ch = await this.Peripheral!.GetCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
+        ch.Should().NotBeNull("Write characteristic was not found");
+        
+        var list = new List<Task<BleCharacteristicResult>>();
+        for (var i = 0; i < 10; i++)
+            list.Add(this.Peripheral!.ReadCharacteristicAsync(ch, CancellationToken.None, 5000));
+
+        await Task.WhenAll(list);
+    }
+
+// Device Info
     //[Fact(Skip = "TODO")]
     //public async Task Reconnect_ReadAndWrite()
     //{
