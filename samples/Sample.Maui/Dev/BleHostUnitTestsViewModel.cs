@@ -47,7 +47,7 @@ public class BleHostUnitTestsViewModel : ViewModel
                             await this.Log($"{request.Peripheral.Uuid} Wrote to Characteristic", request.Data);
 
                             await notifier.Notify(request.Data);
-                        }));
+                        }, WriteOptions.Write | WriteOptions.WriteWithoutResponse));
                     }
                 );
                 await hostingManager.AddService(

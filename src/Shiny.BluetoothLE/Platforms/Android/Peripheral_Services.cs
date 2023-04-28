@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
+using Java.IO;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE;
@@ -16,47 +17,45 @@ public partial class Peripheral
 {
     public IObservable<BleServiceInfo> GetService(string serviceUuid) => this.GetNativeService(serviceUuid).Select(this.FromNative);
 
-    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => Observable.FromAsync<IReadOnlyList<BleServiceInfo>>(async ct =>
-    {
-        this.AssertConnection();
-        if (refreshServices)
-            this.RefreshServices();
-
-        if ((this.Gatt!.Services?.Count ?? 0) > 0 && !refreshServices)
-            return this.Gatt.Services!.Select(this.FromNative).ToList();
-
-        var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
-        if (!this.Gatt.DiscoverServices())
-            throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
-        
-        await task.ConfigureAwait(false);
-        var services = this.Gatt
-            .Services!
-            .Select(x => new BleServiceInfo(
-                x.Uuid!.ToString()
-            ))
-            .ToList();
-
-        return services;
-    });
-
+    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => this
+        .GetNativeServices(refreshServices)
+        .Select(x => x.Select(this.FromNative).ToList());
+    
 
     readonly Subject<Unit> serviceDiscoverySubj = new();
     public override void OnServicesDiscovered(BluetoothGatt? gatt, GattStatus status)
         => this.serviceDiscoverySubj.OnNext(Unit.Default);
 
 
-    protected IObservable<BluetoothGattService> GetNativeService(string serviceUuid) => Observable.Create<BluetoothGattService>(ob =>
-    {
-        this.AssertConnection();
+    protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices(bool refreshServices) =>
+        Observable.FromAsync<IReadOnlyList<BluetoothGattService>>(async ct =>
+        {
+            this.AssertConnection();
+            if (refreshServices)
+                this.RefreshServices();
 
-        var service = this.Gatt!.GetService(Utils.ToUuidType(serviceUuid));
-        if (service == null)
-            throw new InvalidOperationException("No service found with uuid: " + serviceUuid);
+            if ((this.Gatt!.Services?.Count ?? 0) > 0 && !refreshServices)
+                return this.Gatt.Services!.ToList();
 
-        ob.Respond(service);
-        return Disposable.Empty;
-    });
+            var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
+            if (!this.Gatt.DiscoverServices())
+                throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
+
+            await task.ConfigureAwait(false);
+            return this.Gatt.Services!.ToList();
+        });
+
+
+    protected IObservable<BluetoothGattService> GetNativeService(string serviceUuid) => this
+        .GetNativeServices(false)
+        .Select(x =>
+        {
+            var native = this.Gatt!.GetService(Utils.ToUuidType(serviceUuid));
+            if (native == null)
+                throw new InvalidOperationException("No service found with uuid: " + serviceUuid);
+
+            return native;
+        });
 
 
     protected void RefreshServices()
@@ -82,5 +81,5 @@ public partial class Peripheral
     }
 
 
-    protected BleServiceInfo FromNative(BluetoothGattService service) => new BleServiceInfo(service.Uuid.ToString());
+    protected BleServiceInfo FromNative(BluetoothGattService service) => new(service.Uuid.ToString());
 }
