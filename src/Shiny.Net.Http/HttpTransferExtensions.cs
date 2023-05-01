@@ -1,9 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reactive.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.Hosting;
 
 namespace Shiny.Net.Http;
 
