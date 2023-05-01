@@ -16,7 +16,8 @@ public static class ServiceCollectionExtensions
         services.AddShinyService<HttpTransferManager>();
         services.AddShinyService(typeof(TDelegate));
         services.AddDefaultRepository();
-
+        services.AddSingleton<HttpTransferMonitor>();
+        
 #if ANDROID
         services.AddJob(typeof(TransferJob), requiredNetwork: Jobs.InternetAccess.Any, runInForeground: true);
 #else
