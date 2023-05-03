@@ -43,7 +43,7 @@ public interface IBleManager
     /// WARNING: only one scan can be active at a time.  Use IsScanning to check for active scanning
     /// </summary>
     /// <returns></returns>
-    IObservable<ScanResult> Scan(ScanConfig? config = null);
+    IObservable<ScanResult> Scan(ScanConfig? scanConfig = null);
 }
 
 

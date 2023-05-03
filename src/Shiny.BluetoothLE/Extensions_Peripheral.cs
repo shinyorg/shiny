@@ -85,8 +85,8 @@ public static class PeripheralExtensions
             .Where(x => x == ConnectionState.Disconnected)
             .Select(_ => peripheral);
 
-    public static IObservable<BleCharacteristicResult> NotifyCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, bool useIndicationsIfAvailable = true, bool autoReconnect = true)
-        => peripheral.NotifyCharacteristic(info.Service.Uuid, info.Uuid, useIndicationsIfAvailable, autoReconnect);
+    public static IObservable<BleCharacteristicResult> NotifyCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, bool useIndicationsIfAvailable = true)
+        => peripheral.NotifyCharacteristic(info.Service.Uuid, info.Uuid, useIndicationsIfAvailable);
 
     public static IObservable<BleCharacteristicResult> ReadCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info)
         => peripheral.ReadCharacteristic(info.Service.Uuid, info.Uuid);

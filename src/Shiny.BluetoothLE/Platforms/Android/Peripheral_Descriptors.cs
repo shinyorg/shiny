@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -24,18 +26,7 @@ public partial class Peripheral
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.descSubj
-                .Where(x => x.Descriptor.Equals(x) && !x.IsWrite)
-                .Take(1)
-                .ToTask(ct);
-
-            if (!desc.SetValue(data))
-                throw new BleException("Unable to set GattDescriptor: " + descriptorUuid);
-
-            if (!this.Gatt!.WriteDescriptor(desc))
-                throw new InvalidOperationException("Could not writte descriptor: " + descriptorUuid);
-
-            await task.ConfigureAwait(false);
+            await this.WriteDescriptor(desc, data, ct).ConfigureAwait(false);
             return this.ToResult(desc);
         }))
         .Switch();
@@ -56,7 +47,7 @@ public partial class Peripheral
             return this.ToResult(desc);
         }))
         .Switch();
-
+    
 
     readonly Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status, bool IsWrite)> descSubj = new();
     public override void OnDescriptorRead(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
@@ -65,6 +56,32 @@ public partial class Peripheral
     public override void OnDescriptorWrite(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
         => this.descSubj.OnNext((descriptor!, status, true));
 
+    
+    protected async Task WriteDescriptor(BluetoothGattDescriptor descriptor, byte[] data, CancellationToken ct)
+    {
+        var task = this.descSubj
+            .Where(x => x.Descriptor.Equals(x) && !x.IsWrite)
+            .Take(1)
+            .ToTask(ct);
+
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        {
+            this.Gatt!.WriteDescriptor(descriptor, data);
+        }
+        else
+        {
+            if (!descriptor.SetValue(data))
+                throw new BleException("Unable to set GattDescriptor: " + descriptor.Uuid);
+
+            if (!this.Gatt!.WriteDescriptor(descriptor))
+                throw new InvalidOperationException("Could not writte descriptor: " + descriptor.Uuid);
+        }
+        var result = await task.ConfigureAwait(false);
+        if (result.Status != GattStatus.Success)
+            throw new BleException($"Failed to write descriptor: {descriptor.Uuid} - {result.Status}");
+    }
+    
+    
     protected IObservable<BluetoothGattDescriptor> GetNativeDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch =>
@@ -77,11 +94,13 @@ public partial class Peripheral
             return desc;
         });
 
+    
     protected BleDescriptorResult ToResult(BluetoothGattDescriptor desc) => new BleDescriptorResult(
         this.FromNative(desc),
         desc.GetValue()
     );
 
+    
     protected BleDescriptorInfo FromNative(BluetoothGattDescriptor desc) => new BleDescriptorInfo(
         this.FromNative(desc.Characteristic!),
         desc.Uuid!.ToString()

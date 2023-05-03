@@ -17,20 +17,20 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     readonly IServiceProvider services;
     readonly IOperationQueue operations;
     readonly ILogger logger;
-    readonly ILogger<IPeripheral> peripheralLogger;
+    readonly ILogger<Peripheral> peripheralLogger;
     readonly AppleBleConfiguration config;
 
     public BleManager(
         AppleBleConfiguration config,
         IServiceProvider services,
         IOperationQueue operations,
-        ILogger<IBleManager> logger,
-        ILogger<IPeripheral> peripheralLogger
+        ILogger<BleManager> logger,
+        ILogger<Peripheral> peripheralLogger
     )
     {
         this.config = config;
         this.operations = operations;
-        this.services = services;
+        this.services = services; 
         this.logger = logger;
         this.peripheralLogger = peripheralLogger;
     }
@@ -112,13 +112,13 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
     static readonly PeripheralScanningOptions peripheralScanningOptions = new PeripheralScanningOptions { AllowDuplicatesKey = true };
 
-    public IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(ob =>
+    public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => Observable.Create<ScanResult>(ob =>
     {
         if (this.IsScanning)
             throw new ArgumentException("There is already an existing scan");
 
         this.Clear();
-        config ??= new ScanConfig();
+        scanConfig ??= new ScanConfig();
         var sub = this.RequestAccess()
             .Do(access =>
             {
@@ -127,7 +127,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
             })
             .SelectMany(_ =>
             {
-                if (config.ServiceUuids == null || config.ServiceUuids.Length == 0)
+                if (scanConfig.ServiceUuids == null || scanConfig.ServiceUuids.Length == 0)
                 {
                     this.Manager.ScanForPeripherals(
                         null!,
@@ -136,15 +136,15 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                 }
                 else
                 {
-                    var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
+                    var uuids = scanConfig.ServiceUuids.Select(CBUUID.FromString).ToArray();
                     this.Manager.ScanForPeripherals(uuids, peripheralScanningOptions);
                 }
                 return this.ScanResultReceived;
             })
             .Subscribe(
-                x => ob.OnNext(x),
-                ex => ob.OnError(ex),
-                () => ob.OnCompleted()
+                ob.OnNext,
+                ob.OnError, 
+                ob.OnCompleted
             );
 
         return () =>

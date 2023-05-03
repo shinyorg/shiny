@@ -30,10 +30,8 @@ public partial class Peripheral
     public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch => this.operations.QueueToObservable(async ct => 
-        {            
-            if (!ch.Properties.HasFlag(GattProperty.Read))
-                throw new InvalidOperationException($"Characteristic '{characteristicUuid}' does not support read");
-
+        {
+            this.FromNative(ch).AssertRead();
             var task = this.charEventSubj
                 .Where(x => x.Char.Equals(ch) && !x.IsWrite)
                 .Take(1)
@@ -50,23 +48,30 @@ public partial class Peripheral
         }))
         .Switch();
 
+    
     IObservable<BleCharacteristicResult>? notifyObs;
-    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true, bool autoReconnect = true)
+    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
-        this.notifyObs ??= this.GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        this.AssertConnection();
+        
+        this.notifyObs ??= this.WhenConnected()
+            .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+            .Switch()
             .Select(ch => this.operations.QueueToObservable(async ct =>
             {
-                // TODO: finish auto reconnect
                 this.FromNative(ch).AssertNotify();
 
                 this.logger.LogInformation("Hook Notification Characteristic: " + characteristicUuid);
 
-                if (!this.Gatt.SetCharacteristicNotification(ch, true))
+                if (!this.Gatt!.SetCharacteristicNotification(ch, true))
                     throw new BleException("Failed to set characteristic notification value");
-
-                // TODO: writedescriptor will incur inside of another lock, thus causing a deadlock - we need a safe write
+                
                 var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
-                await this.WriteDescriptorAsync(serviceUuid, characteristicUuid, NotifyDescriptorUuid, notifyBytes);
+                var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
+                if (nativeDescriptor == null)
+                    throw new BleException("Characteristic notification descriptor not found");
+
+                await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
                 this.logger.LogInformation($"Hooked Notification Characteristic '{characteristicUuid}' successfully");
 
                 this.AddNotify(serviceUuid, characteristicUuid);
@@ -86,14 +91,14 @@ public partial class Peripheral
                             serviceUuid,
                             characteristicUuid,
                             NotifyDescriptorUuid,
-                            BluetoothGattDescriptor.DisableNotificationValue.ToArray()
+                            BluetoothGattDescriptor.DisableNotificationValue!.ToArray()
                         )
                         .Subscribe(
                             _ => { },
                             ex => this.logger.LogWarning(ex, "Could not cleanly disable notifications on characteristic: " + characteristicUuid)
                         );
 
-                        if (!this.Gatt.SetCharacteristicNotification(ch, false))
+                        if (!this.Gatt!.SetCharacteristicNotification(ch, false))
                             this.logger.LogWarning("Could not cleanly disable notifications on characteristic: " + characteristicUuid);
                     }
                     catch (Exception ex)
@@ -114,7 +119,7 @@ public partial class Peripheral
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch => this.operations.QueueToObservable(async ct =>
         {
-            // TODO: assert write
+            this.FromNative(ch).AssertWrite(withResponse);
             var task = this.charEventSubj.Where(x => x.Char.Equals(ch) && x.IsWrite).Take(1).ToTask(ct);
 
             ch.WriteType = withResponse ? GattWriteType.Default : GattWriteType.NoResponse;
@@ -122,15 +127,22 @@ public partial class Peripheral
             if (ch.Properties.HasFlag(GattProperty.SignedWrite) && this.Native.BondState == Bond.Bonded)
                 ch.WriteType |= GattWriteType.Signed;
 
-            if (!ch.SetValue(data))
-                throw new BleException("Could not set value of characteristic: " + characteristicUuid);
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+            {
+                this.Gatt!.WriteCharacteristic(ch, data, (int)ch.WriteType);
+            }
+            else
+            {
+                if (!ch.SetValue(data))
+                    throw new BleException("Could not set value of characteristic: " + characteristicUuid);
 
-            if (!this.Gatt!.WriteCharacteristic(ch))
-                throw new BleException("Failed to write to characteristic: " + characteristicUuid);
-            
+                if (!this.Gatt!.WriteCharacteristic(ch))
+                    throw new BleException("Failed to write to characteristic: " + characteristicUuid);
+            }
+
             var result = await task.ConfigureAwait(false);
             if (result.Status != GattStatus.Success)
-                throw new BleException("Failed to write to characteristic: " + characteristicUuid);
+                throw new BleException($"Failed to write to characteristic: {characteristicUuid} - {result.Status}");
 
             var eventType = withResponse
                 ? BleCharacteristicEvent.Write
@@ -195,15 +207,5 @@ public partial class Peripheral
             return BluetoothGattDescriptor.EnableIndicationValue.ToArray();
 
         return BluetoothGattDescriptor.EnableNotificationValue.ToArray();
-    }
-
-
-    protected void AssertWrite(BluetoothGattCharacteristic ch, bool withResponse)
-    {
-        if (withResponse && !ch.Properties.HasFlag(GattProperty.Write))
-            throw new InvalidOperationException($"Characteristic '{ch.Uuid}' does not support write with response");
-
-        if (!withResponse && !ch.Properties.HasFlag(GattProperty.WriteNoResponse))
-            throw new InvalidOperationException($"Characteristic '{ch.Uuid}' does not support write without response");
     }
 }

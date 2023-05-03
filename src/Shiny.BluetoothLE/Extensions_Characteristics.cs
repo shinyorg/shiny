@@ -34,7 +34,7 @@ public static class CharacteristicExtensions
 
 
     /// <summary>
-    /// Used for writing blobs
+    /// Used for writing streams to a characteristic
     /// </summary>
     /// <param name="serviceUuid">The service of the characteristic</param>
     /// <param name="characteristicUuid">The characteristic to write to</param>
@@ -82,29 +82,73 @@ public static class CharacteristicExtensions
     });
     
     
+    /// <summary>
+    /// Checks if a characteristic can read
+    /// </summary>
+    /// <param name="ch"></param>
+    /// <returns></returns>     
     public static bool CanRead(this BleCharacteristicInfo ch) => ch.Properties.HasFlag(CharacteristicProperties.Read);
+    
+    
+    /// <summary>
+    /// Checks if a characteristic can write with response
+    /// </summary>
+    /// <param name="ch"></param>
+    /// <returns></returns> 
     public static bool CanWriteWithResponse(this BleCharacteristicInfo ch) => ch.Properties.HasFlag(CharacteristicProperties.Write);
+    
+    
+    /// <summary>
+    /// Checks if a characteristic can write without response
+    /// </summary>
+    /// <param name="ch"></param>
+    /// <returns></returns> 
     public static bool CanWriteWithoutResponse(this BleCharacteristicInfo ch) => ch.Properties.HasFlag(CharacteristicProperties.WriteWithoutResponse);
+    
+    
+    /// <summary>
+    /// Checks if a characteristic has some form of write capabilities
+    /// </summary>
+    /// <param name="ch"></param>
+    /// <returns></returns> 
     public static bool CanWrite(this BleCharacteristicInfo ch) =>
         ch.Properties.HasFlag(CharacteristicProperties.WriteWithoutResponse) ||
         ch.Properties.HasFlag(CharacteristicProperties.Write) ||
         ch.Properties.HasFlag(CharacteristicProperties.AuthenticatedSignedWrites);
 
 
+    /// <summary>
+    /// Checks if a characteristic has notification or indication capabilities
+    /// </summary>
+    /// <param name="ch"></param>
+    /// <returns></returns>
     public static bool CanNotifyOrIndicate(this BleCharacteristicInfo ch) => ch.CanNotify() || ch.CanIndicate();
 
 
+    /// <summary>
+    /// Checks if a characteristic has notification capabilities
+    /// </summary>
+    /// <param name="ch"></param>
+    /// <returns></returns>
     public static bool CanNotify(this BleCharacteristicInfo ch) =>
         ch.Properties.HasFlag(CharacteristicProperties.Notify) ||
         ch.Properties.HasFlag(CharacteristicProperties.NotifyEncryptionRequired) ||
         ch.CanIndicate();
 
 
+    /// <summary>
+    /// Checks if a characteristic has indication capabilities
+    /// </summary>
+    /// <param name="ch"></param>
+    /// <returns></returns>
     public static bool CanIndicate(this BleCharacteristicInfo ch) =>
         ch.Properties.HasFlag(CharacteristicProperties.Indicate) ||
         ch.Properties.HasFlag(CharacteristicProperties.IndicateEncryptionRequired);
 
 
+    /// <summary>
+    /// Asserts that a characteristic has some form of write capabilities
+    /// </summary>
     public static void AssertWrite(this BleCharacteristicInfo characteristic, bool withResponse)
     {
         if (!characteristic.CanWrite())
@@ -115,6 +159,9 @@ public static class CharacteristicExtensions
     }
 
 
+    /// <summary>
+    /// Asserts that a characteristic has read capabilities
+    /// </summary>
     public static void AssertRead(this BleCharacteristicInfo characteristic)
     {
         if (!characteristic.CanRead())
@@ -122,6 +169,11 @@ public static class CharacteristicExtensions
     }
 
 
+    /// <summary>
+    /// Asserts that a characteristic has notification capabilities
+    /// </summary>
+    /// <param name="characteristic"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public static void AssertNotify(this BleCharacteristicInfo characteristic)
     {
         if (!characteristic.CanNotify())
@@ -129,6 +181,11 @@ public static class CharacteristicExtensions
     }
 
 
+    /// <summary>
+    /// Attempts to read device information a peripheral (if available)
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <returns></returns>
     public static IObservable<DeviceInfo> ReadDeviceInformation(this IPeripheral peripheral)
         => peripheral
             .GetCharacteristics(StandardUuids.DeviceInformationServiceUuid)
@@ -185,9 +242,19 @@ public static class CharacteristicExtensions
             });
 
 
+    /// <summary>
+    /// Reads battery information from a peripheral (if available)
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <returns></returns>
     public static IObservable<int> ReadBatteryInformation(this IPeripheral peripheral)
         => StandardIntObservable(peripheral, StandardUuids.BatteryService);
 
+    /// <summary>
+    /// Easy observable to connect to a standard BLE heart rate sensor (not guaranteed for all heart rate sensors)
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <returns></returns>
     public static IObservable<int> HeartRateSensor(this IPeripheral peripheral)
         => StandardIntObservable(peripheral, StandardUuids.HeartRateMeasurementSensor);
 

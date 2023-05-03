@@ -1,4 +1,5 @@
-﻿using Acr.UserDialogs;
+﻿using System.Reactive.Disposables;
+using Acr.UserDialogs;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 
@@ -22,6 +23,7 @@ public abstract class AbstractShinyTests : IDisposable
     }
 
 
+    protected virtual CompositeDisposable Disposable { get; } = new();
     protected virtual void Log(string message) => this.output.WriteLine(message);
     protected T GetService<T>() => this.Host!.Services!.GetRequiredService<T>()!;
     protected IHost Host { get; }
@@ -49,5 +51,9 @@ public abstract class AbstractShinyTests : IDisposable
     }
 
 
-    public virtual void Dispose() => this.Host?.Dispose();
+    public virtual void Dispose()
+    {
+        this.Disposable.Dispose();
+        this.Host?.Dispose();   
+    }
 }

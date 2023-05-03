@@ -27,6 +27,45 @@ public class PeripheralTests : AbstractBleTests
         .ToTask();
 
 
+    [Fact(DisplayName = "BLE Peripheral - Status Tests")]
+    public async Task WhenStatusChangedTests()
+    {
+        var connected = false;
+        var disconnected = false;
+        
+        await this.Setup(true);
+        var sub = this.Peripheral!
+            .WhenStatusChanged()
+            .Skip(1)
+            .Subscribe(state =>
+            {
+                // TODO: could test startsWith by making it count connects
+                this.Log("State Changed: " + state);
+                switch (state)
+                {
+                    case ConnectionState.Connected:
+                        connected = true;
+                        break;
+                    
+                    case ConnectionState.Disconnected:
+                        disconnected = true;
+                        break;
+                }
+            })
+            .DisposedBy(this.Disposable);
+        
+        // TODO: send write for disconnect, wait 15 seconds for readvertise & connect?
+
+        this.Log("Turn off BLE server - waiting 5 seconds");
+        await Task.Delay(5000);
+        disconnected.Should().Be(true, "Disconnected should be true");
+        
+        this.Log("Turn on BLE server - waiting 5 seconds");
+        await Task.Delay(5000);
+        connected.Should().Be(true, "Connected should be true");
+    }
+    
+    
     [Fact]
     public async Task RssiTests()
     {

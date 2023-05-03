@@ -41,17 +41,45 @@ public interface IPeripheral
     int Mtu { get; }
     ConnectionState Status { get; } // TODO: add failed state?
 
+    /// <summary>
+    /// Sets up an asynchronous connection request
+    /// </summary>
+    /// <param name="config">The connection configuration</param>
     void Connect(ConnectionConfig? config);
     void CancelConnection();
     IObservable<ConnectionState> WhenStatusChanged();
+    
+    /// <summary>
+    /// Reads the peripheral RSSI
+    /// </summary>
+    /// <returns>A completed observable with the RSSI</returns>
     IObservable<int> ReadRssi();
 
+    /// <summary>
+    /// Get a known service
+    /// </summary>
+    /// <param name="serviceUuid">The UUID of the service</param>
+    /// <returns>Returns a completed observable with a service or an exception if the service is not found</returns>
     IObservable<BleServiceInfo> GetService(string serviceUuid);
+    
+    /// <summary>
+    /// Runs a discovery process for all services for use with a GATT connection
+    /// </summary>
+    /// <param name="refreshServices"></param>
+    /// <returns></returns>
     IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices = false);
 
     IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid);
     IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid);
-    IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true, bool autoReconnect = true);
+    
+    /// <summary>
+    /// Connects to a characteristic if not already subscribed, it will also attempt to auto-reconnect if you keep the observable hooked 
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="useIndicationsIfAvailable"></param>
+    /// <returns></returns>
+    IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true);
     IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid);
     IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
 

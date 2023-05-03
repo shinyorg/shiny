@@ -17,29 +17,20 @@ namespace Shiny.BluetoothLE;
 public partial class Peripheral
 {
     IObservable<BleCharacteristicResult>? notifyObservable;
-    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true, bool autoReconnect = true)
+    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true)
     {
-        this.notifyObservable ??= this.GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        this.AssertConnnection();
+        
+        this.notifyObservable ??= this.WhenConnected()
+            .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+            .Switch()
             .Select(ch =>
             {
                 this.FromNative(ch).AssertNotify();
 
                 this.logger.LogInformation("Hooking Notification Characteristic: " + characteristicUuid);
-                IDisposable? autoReconnectSub = null;
-
-                if (autoReconnect)
-                {
-                    this.autoReconnectSub = this.WhenConnected()
-                        .Select(x => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
-                        .Switch()
-                        .Subscribe(chNew =>
-                        {
-                            ch = chNew;
-                            this.Native.SetNotifyValue(true, ch);
-                        });
-                }
-
                 this.Native.SetNotifyValue(true, ch);
+                
                 return this.charUpdateSubj
                     .Where(x => x.Char.Equals(ch))
                     .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
@@ -47,7 +38,6 @@ public partial class Peripheral
                     {
                         try
                         {
-                            autoReconnectSub?.Dispose();
                             this.Native.SetNotifyValue(false, ch);
                         }
                         catch (Exception ex)

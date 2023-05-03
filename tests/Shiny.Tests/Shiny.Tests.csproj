@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
+<!--        <TargetFrameworks>net7.0-ios</TargetFrameworks>-->
         <OutputType>Exe</OutputType>
         <RootNamespace>Shiny.Tests</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -30,7 +31,7 @@
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		<!--<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>-->
+<!--		<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>-->
 	</PropertyGroup>
 
     <ItemGroup>
@@ -67,6 +68,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        
         <Compile Remove="Push\AbstractPushTests.cs" />
         <Compile Remove="Push\TestGoogleCredential.cs" />
         <Compile Remove="Push\FirebaseTests.cs" />
