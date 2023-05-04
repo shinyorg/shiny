@@ -116,7 +116,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
    
 
     readonly Subject<ConnectionState> connSubj = new();
-    public IObservable<ConnectionState> WhenStatusChanged() => this.connSubj;
+    public IObservable<ConnectionState> WhenStatusChanged() => this.connSubj.StartWith(this.Status);
 
 
     readonly Subject<(GattStatus Status, int Rssi)> rssiSubj = new();

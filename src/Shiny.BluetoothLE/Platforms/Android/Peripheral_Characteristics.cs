@@ -203,7 +203,7 @@ public partial class Peripheral
 
     protected byte[] GetNotifyDescriptorBytes(BluetoothGattCharacteristic ch, bool useIndicationsIfAvailable)
     {
-        if (useIndicationsIfAvailable || (!ch.Properties.HasFlag(GattProperty.Notify) && ch.Properties.HasFlag(GattProperty.Indicate)))
+        if (useIndicationsIfAvailable && ch.Properties.HasFlag(GattProperty.Indicate))
             return BluetoothGattDescriptor.EnableIndicationValue.ToArray();
 
         return BluetoothGattDescriptor.EnableNotificationValue.ToArray();

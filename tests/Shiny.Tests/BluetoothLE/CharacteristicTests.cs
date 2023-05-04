@@ -27,21 +27,44 @@ public class CharacteristicTests : AbstractBleTests
     [Theory(DisplayName = "BLE Client - Characteristic - Writes")]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task WriteWithoutResponse(bool withResponse)
+    public async Task WriteTests(bool withResponse)
     {
         await this.Setup();
-
         var value = new byte[] { 0x01, 0x02 };
-        var result = await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, value, withResponse);
-        result.Event.Should().Be(BleCharacteristicEvent.WriteWithoutResponse);
-        // result.Data.Should().Be(value);
 
-        result = await this.Peripheral!.ReadCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
-        result.Event.Should().Be(BleCharacteristicEvent.Read);
+        var responseType = withResponse ? BleCharacteristicEvent.Write : BleCharacteristicEvent.WriteWithoutResponse;
+        var result = await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, value, withResponse);
+        result.Event.Should().Be(responseType);
         // result.Data.Should().Be(value);
     }
 
-    
+
+    [Fact(DisplayName = "BLE Client - Read")]
+    public async Task ReadTests()
+    {
+        var result = await this.Peripheral!.ReadCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
+        result.Event.Should().Be(BleCharacteristicEvent.Read);
+    }
+
+
+
+    [Fact(DisplayName = "BLE Client - Notification")]
+    public async Task NotifyTest()
+    {
+        await this.Setup();
+        var task = this.Peripheral!
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid)
+            .Take(1)
+            .Timeout(TimeSpan.FromSeconds(10))
+            .ToTask();
+
+        await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x01 });
+
+        var result = await task;
+        result.Event.Should().Be(BleCharacteristicEvent.Notification);
+    }
+
+
     [Fact(DisplayName = "BLE Client - Get All Characteristics")]
     public async Task GetAllCharacteristics()
     {
