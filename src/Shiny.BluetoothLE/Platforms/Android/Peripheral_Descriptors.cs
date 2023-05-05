@@ -59,6 +59,13 @@ public partial class Peripheral
             .Take(1)
             .ToTask(ct);
 
+#if XAMARIN
+        if (!descriptor.SetValue(data))
+            throw new BleException("Unable to set GattDescriptor: " + descriptor.Uuid);
+
+        if (!this.Gatt!.WriteDescriptor(descriptor))
+            throw new InvalidOperationException("Could not writte descriptor: " + descriptor.Uuid);
+#else
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             this.Gatt!.WriteDescriptor(descriptor, data);
@@ -71,6 +78,7 @@ public partial class Peripheral
             if (!this.Gatt!.WriteDescriptor(descriptor))
                 throw new InvalidOperationException("Could not writte descriptor: " + descriptor.Uuid);
         }
+#endif
         var result = await task.ConfigureAwait(false);
         if (result.Status != GattStatus.Success)
             throw new BleException($"Failed to write descriptor: {descriptor.Uuid} - {result.Status}");
