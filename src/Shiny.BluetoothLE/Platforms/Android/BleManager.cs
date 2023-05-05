@@ -46,7 +46,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
 
-    public bool IsScanning => this.Native.Adapter!.IsDiscovering;
+    public bool IsScanning { get; private set; }
     public BluetoothManager Native { get; }
 
 
@@ -169,6 +169,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
             return () =>
             {
+                this.IsScanning = false;
                 this.StopScan();
                 disp?.Dispose();
             };
@@ -251,6 +252,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             builder.Build(),
             this
         );
+        this.IsScanning = true;
     }
 
 
