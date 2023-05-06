@@ -40,7 +40,6 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     string? uuid;
     public string Uuid => this.uuid ??= GetUuid(this.Native);
-    public int Mtu { get; private set; } = 20;
 
 
     public ConnectionState Status
@@ -93,8 +92,6 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             throw new BleException("GATT connection could not be established");
 
         this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
-        if (cfg.RequestedMtu != null)
-            this.Gatt.RequestMtu(cfg.RequestedMtu.Value);
 
         this.connSubj.OnNext(ConnectionState.Connecting);
     }
@@ -123,14 +120,13 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     public override void OnReadRemoteRssi(BluetoothGatt? gatt, int rssi, GattStatus status)
         => this.rssiSubj.OnNext((status, rssi));
 
-    public override void OnMtuChanged(BluetoothGatt? gatt, int mtu, GattStatus status)
-        => this.Mtu = mtu;
-
 
     public override void OnConnectionStateChange(BluetoothGatt? gatt, GattStatus status, ProfileState newState)
     {
         // on disconnect I should kill services
-        //gatt.Services.Clear();
+        if (newState == ProfileState.Disconnected)
+            gatt?.Services?.Clear();
+
         this.connSubj.OnNext(newState.ToStatus());
     }
 
