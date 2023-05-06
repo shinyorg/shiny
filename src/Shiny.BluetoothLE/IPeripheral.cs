@@ -46,7 +46,16 @@ public interface IPeripheral
     /// </summary>
     /// <param name="config">The connection configuration</param>
     void Connect(ConnectionConfig? config);
+
+    /// <summary>
+    /// Cancel any current requested connection with this peripheral - YOU MUST make this call to remove connections
+    /// </summary>
     void CancelConnection();
+
+    /// <summary>
+    /// Monitor connection status
+    /// </summary>
+    /// <returns></returns>
     IObservable<ConnectionState> WhenStatusChanged();
     
     /// <summary>
@@ -69,7 +78,19 @@ public interface IPeripheral
     /// <returns></returns>
     IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices = false);
 
+    /// <summary>
+    /// Get a characteristic - if not found, a BleException is thrown
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <returns></returns>
     IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid);
+
+    /// <summary>
+    /// Discover characteristics for a specific service UUID
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <returns></returns>
     IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid);
     
     /// <summary>
