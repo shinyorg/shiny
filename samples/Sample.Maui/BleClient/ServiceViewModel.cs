@@ -35,12 +35,13 @@ public class ServiceViewModel : ViewModel
     [Reactive] public BleCharacteristicInfo? SelectedCharacteristic { get; set; }
 
 
-    public override void OnNavigatedTo(INavigationParameters parameters)
+    public override void OnAppearing() => this.Load.Execute(null);
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
         this.service = parameters.GetValue<BleServiceInfo>("Service");
         this.peripheral = parameters.GetValue<IPeripheral>("Peripheral");
         this.Title = $"{this.peripheral.Name} - {this.service.Uuid}";
 
-        this.Load.Execute(null);
+        return Task.CompletedTask;
     }
 }

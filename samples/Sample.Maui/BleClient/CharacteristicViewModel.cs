@@ -55,8 +55,9 @@ public class CharacteristicViewModel : ViewModel
     }
 
 
-    public override void OnNavigatedTo(INavigationParameters parameters) 
+    public override Task InitializeAsync(INavigationParameters parameters)
     {
+        this.peripheral = parameters.GetValue<IPeripheral>("Peripheral");
         this.characteristic = parameters.GetValue<BleCharacteristicInfo>("Characteristic");
         this.ServiceUUID = this.characteristic.Service.Uuid;
         this.UUID = this.characteristic.Uuid;
@@ -64,6 +65,7 @@ public class CharacteristicViewModel : ViewModel
         this.CanNotify = this.characteristic.CanNotify();
         this.CanRead = this.characteristic.CanRead();
         this.CanWrite = this.characteristic.CanWrite();
+        return Task.CompletedTask;
     }
 
 
