@@ -101,11 +101,58 @@ public interface IPeripheral
     /// <param name="useIndicationsIfAvailable"></param>
     /// <returns></returns>
     IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true);
+
+    /// <summary>
+    /// Reads a characteristic
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <returns></returns>
     IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid);
+
+    /// <summary>
+    /// Write to characterisitic with or without response (as long as operation is supported)
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="data"></param>
+    /// <param name="withResponse"></param>
+    /// <returns></returns>
     IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
 
+    /// <summary>
+    /// Gets a descriptor, exception if not found
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="descriptorUuid"></param>
+    /// <returns></returns>
     IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid);
+
+    /// <summary>
+    /// Gets all descriptors for a characterisitic
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <returns></returns>
     IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid);
+
+    /// <summary>
+    /// Reads a descriptor
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="descriptorUuid"></param>
+    /// <returns></returns>
     IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid);
+
+    /// <summary>
+    /// Writes a descriptor
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="descriptorUuid"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
     IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data);
 }
