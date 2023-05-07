@@ -41,7 +41,6 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     string? uuid;
     public string Uuid => this.uuid ??= GetUuid(this.Native);
 
-
     public ConnectionState Status
     {
         get

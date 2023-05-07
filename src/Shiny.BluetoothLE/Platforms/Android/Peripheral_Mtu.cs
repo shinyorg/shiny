@@ -11,7 +11,6 @@ public partial class Peripheral : ICanRequestMtu
     public int Mtu { get; private set; } = 20;
 
 
-
     readonly Subject<(int Mtu, GattStatus Status)> mtuSubj = new();
     public override void OnMtuChanged(BluetoothGatt? gatt, int mtu, GattStatus status)
     { 
