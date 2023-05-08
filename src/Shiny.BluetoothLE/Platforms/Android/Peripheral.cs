@@ -79,7 +79,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         else if (config is AndroidConnectionConfig cfg1)
             cfg = cfg1;
         else
-            cfg = new AndroidConnectionConfig(cfg.AutoConnect);
+            cfg = new AndroidConnectionConfig(config.AutoConnect);
 
         this.Gatt = this.Native.ConnectGatt(
             this.platform.AppContext,
