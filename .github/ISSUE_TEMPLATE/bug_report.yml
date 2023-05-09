@@ -46,14 +46,13 @@ body:
   - type: checkboxes
     id: platforms
     attributes:
-      label: What platform(s) are effected?
+      label: Hosting Model
       description: You really should only select one of these
       options:
       #- label: Blazor
       - label: MAUI
-      - label: Native
-      - label: Classic Xamarin
-      - label: Other
+      - label: Native/Classic Xamarin
+      - label: Uno
   - type: textarea
     validations:
       required: true
