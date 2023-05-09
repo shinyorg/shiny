@@ -1,14 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Shiny.Hosting;
-#if MONOANDROID || XAMARINIOS
+#if PLATFORM
 using Shiny.Infrastructure;
-using Shiny.Net;
-using Shiny.Power;
 #endif
 
 namespace Shiny;
@@ -34,10 +30,8 @@ public class HostBuilder : IHostBuilder
 
     public IHost Build()
     {
-#if MONOANDROID || XAMARINIOS
+#if PLATFORM
         this.Services.AddShinyCoreServices();
-        this.Services.TryAddSingleton<IBattery, BatteryImpl>();
-        this.Services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
 #endif
         this.Services.AddSingleton<IConfiguration>(this.Configuration);
 

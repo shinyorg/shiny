@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Hosting;
+using Shiny.Net;
+using Shiny.Power;
 using Shiny.Stores;
 using Shiny.Stores.Impl;
 
@@ -17,6 +19,7 @@ public static class ShinyInfrastructureExtensions
         services.AddShinyService<AndroidLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        
         services.AddCommon();
 #elif APPLE
         services.AddShinyService<IosPlatform>();
@@ -34,6 +37,8 @@ public static class ShinyInfrastructureExtensions
         services.TryAddSingleton<ISerializer, DefaultSerializer>();
         services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
         services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+        services.TryAddSingleton<IBattery, BatteryImpl>();
+        services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
         return services;
     }
 }
