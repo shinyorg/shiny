@@ -134,21 +134,6 @@ public static class AndroidExtensions
     }
 
 
-    public static IObservable<Intent> WhenIntentReceived(this AndroidPlatform platform, string intentAction)
-        => Observable.Create<Intent>(ob =>
-        {
-            var filter = new IntentFilter();
-            filter.AddAction(intentAction);
-            var receiver = new ObservableBroadcastReceiver
-            {
-                OnEvent = ob.OnNext
-            };
-            platform.AppContext.RegisterReceiver(receiver, filter);
-            return () => platform.AppContext.UnregisterReceiver(receiver);
-        });
-
-
-
     public static T GetIntentValue<T>(this AndroidPlatform platform, string intentAction, Func<Intent, T> transform)
     {
         using var filter = new IntentFilter(intentAction);
