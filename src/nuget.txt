@@ -29,3 +29,4 @@ Support & FAQ
 3) Reporting Bugs: If you believe you have encountered a bug, please be sure to search the open and closed issues as you may find the issue has already been fixed as and is awaiting release. If you find that you have a new issue, please create a new project that focuses on ONLY the necessary steps to reproduce the issue you are facing. Issues that are opened which do not have a sample app reproducing the issue will be closed. In addition to this being required by the Shiny team, this is just good etiquette for any Open Source project. Additionally we ask that you do not comment on PR's, commits and issues from long ago, if there is a legitimate issue, open a new issue referencing what you need to reference
 
 
+
