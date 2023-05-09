@@ -53,6 +53,7 @@ body:
       - label: MAUI
       - label: Native/Classic Xamarin
       - label: Uno
+      - label: Manual
   - type: textarea
     validations:
       required: true
