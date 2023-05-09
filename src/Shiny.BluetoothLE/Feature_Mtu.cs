@@ -21,6 +21,14 @@ public interface ICanRequestMtu : IPeripheral
 public static class FeatureMtu
 {
     /// <summary>
+    /// Checks if MTU requests are available
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <returns></returns>
+    public static bool CanRequestMtu(this IPeripheral peripheral) => peripheral is ICanRequestMtu;
+    
+    
+    /// <summary>
     /// Requests MTU value if available to platform, otherwise returns the current negotiated MTU
     /// </summary>
     /// <param name="peripheral"></param>
