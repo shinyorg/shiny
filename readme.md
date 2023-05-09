@@ -48,7 +48,7 @@ These templates will help get you up & running quickly.  Simply select what feat
 ## Integrating With Existing Apps
 
 If you cannot use our awesome templates - try our ugly, but effective boilerplate builder at:
-[https://shinylib.net/appbuilder](https://shinylib.net/appbuilder)
+[https://shinylib.net/client/appbuilder/](https://shinylib.net/client/appbuilder/)
 
 ## Support Shiny!
 
