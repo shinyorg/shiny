@@ -80,19 +80,8 @@ public static class ObservableExtensions
     /// <returns></returns>
     public static IObservable<U> SelectAsync<T, U>(this IObservable<T> observable, Func<Task<U>> task)
         => observable.Select(x => Observable.FromAsync(() => task())).Switch();
-
-
-    // TODO: combineLatest?
-    /// <summary>
-    /// Passes the last and current values from the stream
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="ob"></param>
-    /// <returns></returns>
-    public static IObservable<Tuple<T, T>> WithPrevious<T>(this IObservable<T> ob)
-        => ob.Scan(Tuple.Create(default(T), default(T)), (acc, current) => Tuple.Create(acc.Item2, current));
-
-
+    
+    
     /// <summary>
     /// Quick helper method to execute an async select
     /// </summary>

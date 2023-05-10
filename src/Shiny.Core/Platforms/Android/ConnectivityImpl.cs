@@ -11,30 +11,83 @@ public class ConnectivityImpl : IConnectivity
     public ConnectivityImpl(AndroidPlatform platform) => this.platform = platform;
 
 
-    public IObservable<IConnectivity> WhenChanged() => Observable.Create<IConnectivity>(ob =>
-    {
-        var request = new NetworkRequest.Builder().Build();
-        var callback = new ShinyNetworkCallback(() => ob.OnNext(this));
-        this.Native.RegisterNetworkCallback(request, callback);     
+    public IObservable<IConnectivity> WhenChanged() => Observable
+        .Create<IConnectivity>(ob =>
+        {
+            var request = new NetworkRequest.Builder().Build();
+            var callback = new ShinyNetworkCallback(() => ob.OnNext(this));
+            this.Native.RegisterNetworkCallback(request, callback);     
 
-        // ConnectivityManager.IsNetworkTypeValid(ConnectivityType.Bluetooth)
-        return () => this.Native.UnregisterNetworkCallback(callback);
-    });
+            return () => this.Native.UnregisterNetworkCallback(callback);
+        })
+        .Publish()
+        .RefCount();
 
     public ConnectionTypes ConnectionTypes
     {
         get
         {
-            return ConnectionTypes.None;
+            var n = this.Native;
+            if (n.ActiveNetwork == null)
+                return ConnectionTypes.None;
+            
+            var caps = n.GetNetworkCapabilities(n.ActiveNetwork!);
+            if (caps == null)
+                return ConnectionTypes.None;
+            
+            ConnectionTypes types = 0;
+            if (caps.HasTransport(TransportType.Wifi))
+                types |= ConnectionTypes.Wifi;
+
+            if (caps.HasTransport(TransportType.Cellular))
+                types |= ConnectionTypes.Cellular;
+            
+            if (caps.HasTransport(TransportType.Ethernet))
+                types |= ConnectionTypes.Wired;
+
+            if (caps.HasTransport(TransportType.Bluetooth))
+                types |= ConnectionTypes.Bluetooth;
+            
+            return types;
         }
     }
 
 
+    /*
+     *
+            val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork // network is currently in a high power state for performing data transmission. 
+            Log.d("Network", "active network $network")
+            network ?: return false // return false if network is null
+            val actNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false // return false if Network Capabilities is null
+            return when {
+                actNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> { // check if wifi is connected
+                    Log.d("Network", "wifi connected")
+                    true
+                }
+                actNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> { // check if mobile dats is connected
+                    Log.d("Network", "cellular network connected")
+                    true
+                }
+                else -> {
+                    Log.d("Network", "internet not connected")
+                    false
+                }
+            }
+        }
+     */
     public NetworkAccess Access
     {
         get
         {
-            return NetworkAccess.None;
+            var info = this.Native.ActiveNetworkInfo;
+            if (info == null || !info.IsAvailable || !info.IsConnected)
+                return NetworkAccess.None;
+
+            var access = info.IsRoaming ? NetworkAccess.ConstrainedInternet : NetworkAccess.Internet;
+            return access;
         }
     }
 

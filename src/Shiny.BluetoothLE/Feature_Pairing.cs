@@ -25,7 +25,16 @@ public interface ICanViewPairedPeripherals : IBleManager
 
 public interface ICanPairPeripherals : IPeripheral
 {
+    /// <summary>
+    /// Send a pairing request
+    /// </summary>
+    /// <param name="pin"></param>
+    /// <returns></returns>
     IObservable<bool> PairingRequest(string? pin = null);
+    
+    /// <summary>
+    /// The current peripheral pairing status
+    /// </summary>
     PairingState PairingStatus { get; }
 }
 
