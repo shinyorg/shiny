@@ -153,6 +153,7 @@ public static class MauiProgram
         s.RegisterForNavigation<LogsPage, LogsViewModel>();
         s.RegisterForNavigation<AppDataPage, AppDataViewModel>();
         s.RegisterForNavigation<FileViewPage, FileViewViewModel>();
+        s.RegisterForNavigation<SupportServicePage, SupportServiceViewModel>();
 
         return builder;
     }

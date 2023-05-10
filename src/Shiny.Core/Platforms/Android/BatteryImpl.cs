@@ -13,10 +13,11 @@ public class BatteryImpl : IBattery
 
     public IObservable<IBattery> WhenChanged() => Observable.Create<IBattery>(ob =>
     {
-        
-        return () => { };
+        var receiver = ActionBroadcastReceiver.Register(this.platform, Intent.ActionBatteryChanged, _ => ob.OnNext(this));
+        return () => ActionBroadcastReceiver.UnRegister(this.platform, receiver);
     });
 
+    
     public BatteryState Status
     {
         get
@@ -33,6 +34,7 @@ public class BatteryImpl : IBattery
         }
     }
 
+    
     public double Level
     {
         get
@@ -46,23 +48,7 @@ public class BatteryImpl : IBattery
             if (values.Scale <= 0)
                 return 1.0;
 
-            return (double)values.Level / (double)values.Level;
+            return (double)values.Level / (double)values.Scale;
         }
     }
 }
-
-//    [BroadcastReceiver(Enabled = true, Exported = false, Label = "Essentials Battery Broadcast Receiver")]
-//    class BatteryBroadcastReceiver : BroadcastReceiver
-//    {
-//        Action onChanged;
-
-//        public BatteryBroadcastReceiver()
-//        {
-//        }
-
-//        public BatteryBroadcastReceiver(Action onChanged) =>
-//            this.onChanged = onChanged;
-
-//        public override void OnReceive(Context context, Intent intent) =>
-//            onChanged?.Invoke();
-//    }

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample.Dev"
+             x:DataType="sample:SupportServiceViewModel"
+             x:Class="Sample.Dev.SupportServicePage"
+             Title="{Binding Title}">
+
+    <VerticalStackLayout>
+        <Label Text="{Binding BatteryLevel, StringFormat='Battery Level: {0} %'}" />
+        <Label Text="{Binding BatteryStatus, StringFormat='Battery Status: {0}'}" />
+        
+        <Label Text="{Binding NetworkAccess, StringFormat='Network Access: {0}'}" />
+        <Label Text="{Binding ConnectionTypes, StringFormat='Connection Types: {0}'}" />
+    </VerticalStackLayout>
+</ContentPage>
