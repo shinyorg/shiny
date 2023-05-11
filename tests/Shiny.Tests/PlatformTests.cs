@@ -10,20 +10,6 @@ public class PlatformTests : AbstractShinyTests
 {
     public PlatformTests(ITestOutputHelper output) : base(output) {}
 
-    //[Fact(DisplayName = "Platform - App Build")]
-    //public void AppBuild()
-    //    => Assert.Equal("1", this.GetService<IPlatform>().AppBuild);
-
-
-    //[Fact(DisplayName = "Platform - AppID")]
-    //public void AppIdentifier()
-    //    => Assert.Equal("com.shiny.devicetests", this.GetService<IPlatform>().AppIdentifier);
-
-
-    //[Fact(DisplayName = "Platform - App Version")]
-    //public void AppVersion()
-    //    => Assert.Equal("1", this.GetService<IPlatform>().AppVersion);
-
 
     [Fact(DisplayName = "Platform - InvokeOnMainThread Async /w Result")]
     public async Task InvokeOnMainThreadAsyncWithResult()
@@ -39,11 +25,12 @@ public class PlatformTests : AbstractShinyTests
     public async Task InvokeOnMainThreadAsync()
     {
         var platform = this.GetService<IPlatform>();
-        var value = Guid.NewGuid();
+        var value = "";
         await platform.InvokeOnMainThreadAsync(() =>
         {
-            Console.WriteLine("HI");
+            value = "HI";
         });
+        value.Should().Be("HI");
     }
 
 
@@ -64,21 +51,4 @@ public class PlatformTests : AbstractShinyTests
             // swallow, good here
         }
     }
-
-    //// TODO: based on device
-    //[Fact]
-    //public void MachineName()
-    //    => Assert.Equal("", this.GetService<IPlatform>().MachineName);
-
-    //[Fact]
-    //public void Manufacturer()
-    //    => Assert.Equal("1", this.GetService<IPlatform>().Manufacturer);
-
-    //[Fact]
-    //public void Model()
-    //    => Assert.Equal("1", this.GetService<IPlatform>().Model);
-
-    //[Fact]
-    //public void OperatingSystem()
-    //    => Assert.Equal("1", this.GetService<IPlatform>().OperatingSystem);
 }
