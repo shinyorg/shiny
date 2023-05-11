@@ -7,7 +7,6 @@ namespace Sample.BleManaged;
 public class ManagedScanViewModel : ViewModel
 {
     readonly IManagedScan scanner;
-    const string ServiceUuid = "FFF0";
 
 
     public ManagedScanViewModel(
@@ -36,11 +35,10 @@ public class ManagedScanViewModel : ViewModel
                     new AndroidScanConfig(
                         Android.Bluetooth.LE.ScanMode.Opportunistic,
                         true,
-                        ServiceUuid
+                        null
                     ),
 #else
                     new ScanConfig(
-                        ServiceUuids: ServiceUuid
                     ),
 #endif
                     x =>
