@@ -192,7 +192,7 @@ public partial class Peripheral
                         }
                         else
                         {
-                            var ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
+                            ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
                             if (ch != null)
                             {
                                 ob.Respond(ch);
