@@ -121,8 +121,20 @@ public static class ServiceProviderExtensions
     }
 
 
-    public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, ILogger logger)
-        => services.GetServices<T>().RunDelegates(execute, logger);
+    public static async Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, ILogger logger)
+    {
+        try
+        {
+            await services
+                .GetServices<T>()
+                .RunDelegates(execute, logger)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "Could not resolve delegates");
+        }
+    }
 
 
     public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, ILogger logger)
