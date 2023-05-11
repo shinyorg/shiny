@@ -6,24 +6,26 @@ namespace Shiny;
 [BroadcastReceiver(Enabled = true, Exported = false, Label = "Shiny Broadcast Receiver")]
 public class ActionBroadcastReceiver : BroadcastReceiver
 {
-    readonly Action<Intent> action;
-    public ActionBroadcastReceiver(Action<Intent> action) => this.action = action;
+    public Action<Intent>? OnAction { get; set; }
 
     public override void OnReceive(Context? context, Intent? intent)
     {
-        if (intent != null)
-            this.action.Invoke(intent);   
+        if (intent != null && this.OnAction != null)
+            this.OnAction.Invoke(intent);   
     }
 
 
     public static ActionBroadcastReceiver Register(AndroidPlatform platform, string intentAction, Action<Intent> action)
     {
-         var filter = new IntentFilter();
-         filter.AddAction(intentAction);
-         var receiver = new ActionBroadcastReceiver(action);
-         platform.AppContext.RegisterReceiver(receiver, filter);
+        var filter = new IntentFilter();
+        filter.AddAction(intentAction);
+        var receiver = new ActionBroadcastReceiver
+        {
+            OnAction = action
+        };
+        platform.AppContext.RegisterReceiver(receiver, filter);
 
-         return receiver;
+        return receiver;
     }
 
 
