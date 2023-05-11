@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -19,42 +20,57 @@ public partial class Peripheral
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true, bool emitSubscribedEvent = false)
     {
         this.AssertConnnection();
-        
-        this.notifyObservable ??= this.WhenConnected()
+
+        this.notifyObservable ??= Observable.Create<BleCharacteristicResult>(ob => this
+            .WhenConnected()
             .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
             .Switch()
-            .Select(ch =>
+            .Select(ch => Observable.FromAsync(async ct =>
             {
                 this.FromNative(ch).AssertNotify();
-
                 this.logger.LogInformation("Hooking Notification Characteristic: " + characteristicUuid);
-                this.Native.SetNotifyValue(true, ch);
+                var task = Task.CompletedTask;
 
                 if (emitSubscribedEvent)
                 {
-                    //this.notifySubj
-                    //    .Take(1)
-                    //    .Subscribe(_ => );
+                    task = this.notifySubj
+                        .Take(1)
+                        .Where(x => x.Char.Equals(ch))
+                        .ToTask(ct);
                 }
-                
-                return this.charUpdateSubj
-                    .Where(x => x.Char.Equals(ch))
-                    .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
-                    .Finally(() =>
-                    {
-                        try
-                        {
-                            this.Native.SetNotifyValue(false, ch);
-                        }
-                        catch (Exception ex)
-                        {
-                            this.logger.LogWarning("Unable to cleanly dispose of characteristic notifications", ex);
-                        }
-                    });
-            })
+                this.Native.SetNotifyValue(true, ch);
+                await task.ConfigureAwait(false);
+
+                if (emitSubscribedEvent)
+                    ob.OnNext(this.ToResult(ch, BleCharacteristicEvent.NotificationSubscribed));
+
+                return ch;
+            }))
             .Switch()
-            .Publish()
-            .RefCount();
+            .Select(ch => this.charUpdateSubj
+                .Where(x => x.Char.Equals(ch))
+                .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
+                .Finally(() =>
+                {
+                    try
+                    {
+                        this.Native.SetNotifyValue(false, ch);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogWarning("Unable to cleanly dispose of characteristic notifications", ex);
+                    }
+                })
+            )
+            .Switch()
+            .Subscribe(
+                ob.OnNext,
+                ob.OnError
+            )
+        )
+        .Switch()
+        .Publish()
+        .RefCount();
 
         return this.notifyObservable;
     }
