@@ -7,7 +7,6 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
-using UIKit;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
 
@@ -208,7 +207,7 @@ public partial class Peripheral
         if (result.Error != null)
             throw new BleException(result.Error.LocalizedDescription);
 
-        return this.ToResult(nativeCh, BleCharacteristicEvent.WriteWithoutResponse);
+        return this.ToResult(nativeCh, BleCharacteristicEvent.Write);
     });
 
 
