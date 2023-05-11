@@ -25,10 +25,10 @@ public partial class Peripheral : ICanRequestMtu
 
         var disposable = this.mtuSubj.Subscribe(x =>
         {
-            if (x.Status != GattStatus.Success)
-                ob.OnError(new InvalidOperationException("MTU Requested Failed - " + x.Status));
+            if (x.Status == GattStatus.Success)
+                ob.Respond(x.Mtu);
             else
-                ob.OnNext(x.Mtu);
+                ob.OnError(new InvalidOperationException("MTU Requested Failed - " + x.Status));
         });
 
         this.Gatt!.RequestMtu(requestValue);
