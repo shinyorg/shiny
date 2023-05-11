@@ -68,7 +68,6 @@ public partial class Peripheral
                 ob.OnError
             )
         )
-        .Switch()
         .Publish()
         .RefCount();
 
