@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 
 namespace Shiny.BluetoothLE;
 
@@ -10,10 +12,19 @@ namespace Shiny.BluetoothLE;
 public static class PeripheralExtensions
 {
     /// <summary>
+    /// Quick access method for checking if device is connected instead of looking at Status enum
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <returns></returns>
+    public static bool IsConnected(this IPeripheral peripheral)
+        => peripheral.Status == ConnectionState.Connected;
+    
+    
+    /// <summary>
     /// Starts connection process if not already connecteds
     /// </summary>
     /// <param name="peripheral"></param>
-    /// <param name="connectionConfig"></param>
+    /// <param name="config"></param>
     /// <returns>True if connection attempt was sent, otherwise false</returns>
     public static bool ConnectIf(this IPeripheral peripheral, ConnectionConfig? config = null)
     {
@@ -84,6 +95,7 @@ public static class PeripheralExtensions
             .WhenStatusChanged()
             .Where(x => x == ConnectionState.Disconnected)
             .Select(_ => peripheral);
+
 
     public static IObservable<BleCharacteristicResult> NotifyCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, bool useIndicationsIfAvailable = true)
         => peripheral.NotifyCharacteristic(info.Service.Uuid, info.Uuid, useIndicationsIfAvailable);
