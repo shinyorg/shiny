@@ -3,13 +3,13 @@
 namespace Shiny.Tests.BluetoothLE;
 
 
-[Trait("Category", "BluetoothLE")]
+[Trait("Category", "BLE Manager")]
 public class BleManagerTests : AbstractBleTests
 {
     public BleManagerTests(ITestOutputHelper output) : base(output) { }
 
 
-    [Fact(DisplayName = "BLE Client - Permissions")]
+    [Fact(DisplayName = "BLE Manager - Permissions")]
     public async Task Permissions()
     {
         var status = await this.GetService<IBleManager>().RequestAccess();
@@ -17,7 +17,7 @@ public class BleManagerTests : AbstractBleTests
     }
 
 
-    [Fact(DisplayName = "BLE Client - Scan Filter")]
+    [Fact(DisplayName = "BLE Manager - Platform Scan Options")]
     public async Task Scan_Filter()
     {
         var result = await this.Manager
@@ -36,25 +36,26 @@ public class BleManagerTests : AbstractBleTests
             .Timeout(TimeSpan.FromSeconds(20))
             .ToTask();
 
-        Assert.NotNull(result);
+        result.Should().NotBeNull("Did not find a peripheral broadcasting unit test service UUID");
     }
 
 
-    //[Fact]
-    //public async Task Peripherals_GetConnected()
-    //{
-    //    var peripherals = await this.Manager.GetConnectedPeripherals();
+    [Fact(DisplayName = "BLE Manager - Get Connected Peripherals")]
+    public async Task Peripherals_GetConnected()
+    {
+        await this.Setup();
+        var peripherals = this.Manager.GetConnectedPeripherals();
 
-    //    foreach (var peripheral in peripherals)
-    //    {
-    //        this.Log($"Connected Bluetooth Devices: Identifier={peripheral.Name} UUID={peripheral.Uuid} Connected={peripheral.IsConnected()}");
-    //        peripheral.Status.Should().Be(ConnectionState.Connected);
-    //    }
-    //}
+        foreach (var peripheral in peripherals)
+        {
+            this.Log($"Connected Bluetooth Devices: Identifier={peripheral.Name} UUID={peripheral.Uuid} Connected={peripheral.IsConnected()}");
+            peripheral.Status.Should().Be(ConnectionState.Connected);
+        }
+    }
 
 #if ANDROID
 
-    [Fact]
+    [Fact(DisplayName = "BLE Manager - Android - Paired Peripherals")]
     public async Task Android_Peripherals_GetPaired()
     {
         this.Manager.CanViewPairedPeripherals().Should().BeTrue();
@@ -66,28 +67,5 @@ public class BleManagerTests : AbstractBleTests
             peripheral.PairingStatus.Should().Be(PairingState.Paired);
         }
     }
-
-
-    //[Fact]
-    //public async Task Android_Peripherals_GetKnown()
-    //{
-    //    var peripherals = await this.Manager
-    //        .TryGetPairedPeripherals()
-    //        .ToTask()
-    //        .ConfigureAwait(false);
-
-    //    // get the first paired peripheral
-    //    var known = peripherals.FirstOrDefault();
-    //    if (known != null)
-    //    {
-    //        //Now try to get it from the known peripherals
-    //        var found = await this.Manager.GetKnownPeripheral(known.Uuid);
-    //        known.Uuid.Should().Be(found.Uuid);
-    //    }
-    //    else
-    //    {
-    //        this.Log("No well known peripheral found to test with. Please pair a peripheral");
-    //    }
-    //}
 #endif
 }

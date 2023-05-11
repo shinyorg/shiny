@@ -2,18 +2,13 @@
 
 public static class BleConfiguration
 {
-    public static TimeSpan DeviceScanTimeout { get; set; } = TimeSpan.FromSeconds(10);
-    public static TimeSpan ConnectTimeout { get; set; } = TimeSpan.FromSeconds(30);
-    public static TimeSpan OperationTimeout { get; set; } = TimeSpan.FromSeconds(10);
-    //public string PeripheralName { get; set; }
-
     public const string ServiceUuid = "8c927255-fdec-4605-957b-57b6450779c0";    
     public const string ReadCharacteristicUuid = "8c927255-fdec-4605-957b-57b6450779c1";    
     public const string WriteCharacteristicUuid = "8c927255-fdec-4605-957b-57b6450779c2";
     public const string NotifyCharacteristicUuid = "8c927255-fdec-4605-957b-57b6450779c3";
 
 
-    public const string SecondaryServiceUuid = "9c927255-fdec-4605-957b-57b6450779c0";
-    public const string SecondaryCharacteristicUuid1 = "9c927255-fdec-4605-957b-57b6450779c1";
-    public const string SecondaryCharacteristicUuid2 = "9c927255-fdec-4605-957b-57b6450779c2";
+    public const string SecondaryServiceUuid = "0810fade-9ad8-4ad5-9f33-46ca74d9f790";
+    public const string SecondaryCharacteristicUuid1 = "0810fade-9ad8-4ad5-9f33-46ca74d9f791";
+    public const string SecondaryCharacteristicUuid2 = "0810fade-9ad8-4ad5-9f33-46ca74d9f792";
 }

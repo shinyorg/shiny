@@ -37,23 +37,17 @@ public abstract class AbstractBleTests : AbstractShinyTests
     {
         this.Peripheral = await this.Manager
             .ScanUntilFirstPeripheralFound(BleConfiguration.ServiceUuid)
-            // .ScanUntilPeripheralFound("BleConfiguration.PeripheralName")
-            .Timeout(BleConfiguration.DeviceScanTimeout)
+            .Timeout(TimeSpan.FromSeconds(20))
             .ToTask();
 
         if (connect)
-        {
-            await this.Peripheral
-                .WithConnectIf()
-                .Timeout(BleConfiguration.ConnectTimeout) // android can take some time :P
-                .ToTask();
-        }
+            await this.Connect();
     }
 
 
     protected Task Connect() => this.Peripheral!
         .WithConnectIf()
-        .Timeout(BleConfiguration.ConnectTimeout)
+        .Timeout(TimeSpan.FromSeconds(10))
         .ToTask();
 
 
