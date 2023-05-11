@@ -1,4 +1,5 @@
-﻿using Shiny.BluetoothLE;
+﻿using System.Threading.Tasks;
+using Shiny.BluetoothLE;
 
 namespace Shiny.Tests.BluetoothLE;
 
@@ -7,21 +8,6 @@ namespace Shiny.Tests.BluetoothLE;
 public class CharacteristicTests : AbstractBleTests
 {
     public CharacteristicTests(ITestOutputHelper output) : base(output) { }
-
-
-    async Task Setup()
-    {
-        this.Peripheral = await this.Manager
-            .ScanUntilFirstPeripheralFound(BleConfiguration.ServiceUuid)
-            // .ScanUntilPeripheralFound("BleConfiguration.PeripheralName")
-            .Timeout(BleConfiguration.DeviceScanTimeout)
-            .ToTask();
-
-        await this.Peripheral
-            .WithConnectIf()
-            .Timeout(BleConfiguration.ConnectTimeout) // android can take some time :P
-            .ToTask();
-    }
 
     
     [Theory(DisplayName = "BLE Client - Characteristic - Writes")]
@@ -39,13 +25,42 @@ public class CharacteristicTests : AbstractBleTests
     }
 
 
+    [Fact(DisplayName = "BLE Client - Find Multiple Characteristics")]
+    public async Task FindMultipleCharacteristicTest()
+    {
+        await this.Setup();
+
+        var c1 = await this.Peripheral!.GetCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
+        var c2 = await this.Peripheral!.GetCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid);
+
+        c1.Should().NotBeNull("Read Characteristic should have been found");
+        c2.Should().NotBeNull("Read Characteristic should have been found");
+    }
+
+
     [Fact(DisplayName = "BLE Client - Read")]
     public async Task ReadTests()
     {
+        await this.Setup();
         var result = await this.Peripheral!.ReadCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
         result.Event.Should().Be(BleCharacteristicEvent.Read);
     }
 
+
+    [Fact(DisplayName = "BLE Client - Reconnect Read")]
+    public async Task ReconnectReadTests()
+    {
+        await this.Setup();
+        var result = await this.Peripheral!.ReadCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
+        result.Event.Should().Be(BleCharacteristicEvent.Read);
+        this.Log("Initial Read Complete - Moving to Reconnection");
+
+        this.Peripheral.CancelConnection();
+        await Task.Delay(2000);
+        await this.Connect();
+        result = await this.Peripheral!.ReadCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
+        result.Event.Should().Be(BleCharacteristicEvent.Read);
+    }
 
 
     [Fact(DisplayName = "BLE Client - Notification")]
@@ -55,13 +70,47 @@ public class CharacteristicTests : AbstractBleTests
         var task = this.Peripheral!
             .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid)
             .Take(1)
-            .Timeout(TimeSpan.FromSeconds(10))
+            .Timeout(TimeSpan.FromSeconds(30))
             .ToTask();
 
-        await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x01 });
+        await this.Peripheral!.WriteCharacteristicAsync(
+            BleConfiguration.ServiceUuid,
+            BleConfiguration.WriteCharacteristicUuid,
+            new byte[] { 0x01 },
+            true,
+            CancellationToken.None,
+            30000
+        );
 
         var result = await task;
         result.Event.Should().Be(BleCharacteristicEvent.Notification);
+    }
+
+
+    [Fact(DisplayName = "BLE Client - Reconnect Notification")]
+    public async Task ReconnectNotifyTest()
+    {
+        var count = 0;
+        await this.Setup();
+        using var sub = this.Peripheral!
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid)
+            .Subscribe(x => count++);
+
+        // trigger first notification
+        await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x02 }, true);
+        await Task.Delay(2000);
+        count.Should().Be(1);
+        this.Log("Initial Test Complete - Moving to reconnection");
+
+        // disconnecting will not remove notification, so we should expect a resubscription
+        this.Peripheral!.CancelConnection();
+        await this.Connect();
+        await Task.Delay(2000);
+
+        this.Log("Reconnected");
+        await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x03 }, true);
+        await Task.Delay(2000); // give a breather for resub
+        count.Should().Be(2);
     }
 
 

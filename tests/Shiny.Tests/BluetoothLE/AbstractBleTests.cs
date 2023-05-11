@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
 using Shiny.Hosting;
@@ -30,6 +31,30 @@ public abstract class AbstractBleTests : AbstractShinyTests
     protected IBleManager Manager => this.GetService<IBleManager>();
     protected IBleHostingManager HostingManager => this.GetService<IBleHostingManager>();
     protected Shiny.BluetoothLE.IPeripheral? Peripheral { get; set; }
+
+
+    protected virtual async Task Setup(bool connect = true)
+    {
+        this.Peripheral = await this.Manager
+            .ScanUntilFirstPeripheralFound(BleConfiguration.ServiceUuid)
+            // .ScanUntilPeripheralFound("BleConfiguration.PeripheralName")
+            .Timeout(BleConfiguration.DeviceScanTimeout)
+            .ToTask();
+
+        if (connect)
+        {
+            await this.Peripheral
+                .WithConnectIf()
+                .Timeout(BleConfiguration.ConnectTimeout) // android can take some time :P
+                .ToTask();
+        }
+    }
+
+
+    protected Task Connect() => this.Peripheral!
+        .WithConnectIf()
+        .Timeout(BleConfiguration.ConnectTimeout)
+        .ToTask();
 
 
     protected virtual async Task FindFirstPeripheral(string serviceUuid, bool connect)

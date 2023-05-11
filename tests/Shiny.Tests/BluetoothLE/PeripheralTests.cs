@@ -9,25 +9,7 @@ public class PeripheralTests : AbstractBleTests
     public PeripheralTests(ITestOutputHelper output) : base(output) { }
 
 
-    async Task Setup(bool connect)
-    {
-        this.Peripheral = await this.Manager
-            .ScanUntilFirstPeripheralFound(BleConfiguration.ServiceUuid)
-            .Timeout(BleConfiguration.DeviceScanTimeout)
-            .ToTask();
-
-        if (connect)
-            await this.Connect();
-    }
-
-
-    Task Connect() => this.Peripheral!
-        .WithConnectIf()
-        .Timeout(BleConfiguration.ConnectTimeout)
-        .ToTask();
-
-
-    [Fact(DisplayName = "BLE Peripheral - Status Tests")]
+    [Fact(DisplayName = "BLE Client - Peripheral Status")]
     public async Task WhenStatusChangedTests()
     {
         var connected = false;
@@ -56,17 +38,19 @@ public class PeripheralTests : AbstractBleTests
         
         // TODO: send write for disconnect, wait 15 seconds for readvertise & connect?
 
-        this.Log("Turn off BLE server - waiting 5 seconds");
+        this.Log("Disconnecting");
+        this.Peripheral!.CancelConnection(); // auto reconnect will be cancelled here, but event will still fire
         await Task.Delay(5000);
-        disconnected.Should().Be(true, "Disconnected should be true");
         
-        this.Log("Turn on BLE server - waiting 5 seconds");
-        await Task.Delay(5000);
+        this.Log("Reconnecting");
+        await this.Connect();
+
         connected.Should().Be(true, "Connected should be true");
+        disconnected.Should().Be(true, "Disconnected should be true");
     }
     
     
-    [Fact]
+    [Fact(DisplayName = "BLE Client - RSSI")]
     public async Task RssiTests()
     {
         await this.Setup(false);
@@ -86,6 +70,13 @@ public class PeripheralTests : AbstractBleTests
     }
 
 
+    [Fact(DisplayName = "BLE Client - MTU Request")]
+    public async Task MtuRequestTest()
+    {
+        await this.Setup();
+        var mtu = await this.Peripheral!.TryRequestMtuAsync(512);
+        this.Log("MTU: " + mtu);
+    }
     //[Fact]
     //public async Task Service_Rediscover()
     //{
