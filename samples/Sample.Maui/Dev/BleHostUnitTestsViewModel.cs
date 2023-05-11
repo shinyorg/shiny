@@ -46,7 +46,11 @@ public class BleHostUnitTestsViewModel : ViewModel
                             currentData = request.Data;
                             await this.Log($"{request.Peripheral.Uuid} Wrote to Characteristic", request.Data);
 
-                            await notifier.Notify(request.Data);
+                            if (notifier.SubscribedCentrals.Count > 0)
+                            {
+                                await notifier.Notify(request.Data);
+                                await this.Log("Notification Broadcasted to subscribers");
+                            }
                         }, WriteOptions.Write | WriteOptions.WriteWithoutResponse));
                     }
                 );
@@ -70,9 +74,12 @@ public class BleHostUnitTestsViewModel : ViewModel
                 );
                 await hostingManager.StartAdvertising(new(ServiceUuids: new[]
                 {
-                    BleConfiguration.ServiceUuid
+                    BleConfiguration.ServiceUuid,
+                    BleConfiguration.SecondaryServiceUuid
                 }));
                 await this.Log("BLE Host Online");
+                await this.Log("Broadcasting Service: " + BleConfiguration.ServiceUuid);
+                await this.Log("Broadcasting Service: " + BleConfiguration.SecondaryServiceUuid);
                 this.IsHostOnline = true;
             },
             this.WhenAny(
