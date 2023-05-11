@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE;
 public partial class Peripheral
 {
     IObservable<BleCharacteristicResult>? notifyObservable;
-    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true)
+    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true, bool emitSubscribedEvent = false)
     {
         this.AssertConnnection();
         
@@ -29,6 +29,13 @@ public partial class Peripheral
 
                 this.logger.LogInformation("Hooking Notification Characteristic: " + characteristicUuid);
                 this.Native.SetNotifyValue(true, ch);
+
+                if (emitSubscribedEvent)
+                {
+                    //this.notifySubj
+                    //    .Take(1)
+                    //    .Subscribe(_ => );
+                }
                 
                 return this.charUpdateSubj
                     .Where(x => x.Char.Equals(ch))
@@ -84,6 +91,7 @@ public partial class Peripheral
                     }
                     else if (service.Characteristics != null)
                     {
+                        // TODO: if existing chars from single discoveries - we likely want second passthrough
                         var list = service.Characteristics.Select(this.FromNative).ToList();
                         ob.Respond(list);
                     }
@@ -115,13 +123,14 @@ public partial class Peripheral
         .Switch();
 
 
-    //public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error) => base.UpdatedNotificationState(peripheral, characteristic, error);
+    readonly Subject<(CBCharacteristic Char, NSError? Error)> notifySubj = new();
+    public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
+        => this.notifySubj.OnNext((characteristic, error));
+
     readonly Subject<Unit> readyWwrSubj = new();
     public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral)
         => this.readyWwrSubj.OnNext(Unit.Default);
 
-
-    
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
 #if XAMARINIOS
     public override void DiscoveredCharacteristic(CBPeripheral peripheral, CBService service, NSError? error)
@@ -170,21 +179,28 @@ public partial class Peripheral
             }
             else
             {
+                var count = 0;
+
                 sub = this.charDiscoverySubj
                     .Where(x => x.Service.Equals(service))
                     .Subscribe(x =>
                     {
+                        count++;
                         if (x.Error != null)
                         {
                             ob.OnError(new InvalidOperationException(x.Error.LocalizedDescription));
                         }
-                        else if (service.Characteristics != null)
+                        else
                         {
-                            ch = service.Characteristics.FirstOrDefault(x => x.UUID.Equals(uuid));
-                            if (ch == null)
-                                ob.OnError(new InvalidOperationException($"No characteristic found in service '{serviceUuid}' with UUID: {characteristicUuid}"));
-                            else
+                            var ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
+                            if (ch != null)
+                            {
                                 ob.Respond(ch);
+                            }
+                            else if (count >= 2)
+                            { 
+                                ob.OnError(new InvalidOperationException($"No characteristic found in service '{serviceUuid}' with UUID: {characteristicUuid}"));
+                            }
                         }
                     });
 

@@ -50,7 +50,7 @@ public partial class Peripheral
 
     
     IObservable<BleCharacteristicResult>? notifyObs;
-    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
+    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true, bool emitSubscribedEvent = false)
     {
         this.AssertConnection();
         
@@ -75,9 +75,12 @@ public partial class Peripheral
                 this.logger.LogInformation($"Hooked Notification Characteristic '{characteristicUuid}' successfully");
 
                 this.AddNotify(serviceUuid, characteristicUuid);
+
                 return ch;
             }))
             .Switch()
+
+            // TODO: emit sub event here
             .Select(ch => this.notifySubj
                 .Where(x => x.Equals(ch))
                 .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))

@@ -52,31 +52,23 @@ public partial class Peripheral
         .Select(this.FromNative);
 
 
-    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => Observable.Create<IReadOnlyList<BleServiceInfo>>(ob =>
+    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => Observable.Create<IReadOnlyList<BleServiceInfo>>(ob =>
     {
         this.AssertConnnection();
-        IDisposable? disp = null;
 
-        // TODO: what if haven't done full discovery?
-        if (this.Native.Services == null || refreshServices)
+        var disp = this.serviceDiscoverySubj.Subscribe(x =>
         {
-            disp = this.serviceDiscoverySubj.Subscribe(x =>
+            if (x != null)
             {
-                if (x != null)
-                {
-                    ob.OnError(new InvalidOperationException(x.LocalizedDescription));
-                }
-                else if (this.Native.Services != null)
-                {
-                    ob.Respond(this.Native.Services.Select(this.FromNative).ToList());
-                }
-            });
-            this.Native.DiscoverServices();
-        }
-        else
-        {
-            ob.Respond(this.Native.Services.Select(this.FromNative).ToList());
-        }
+                ob.OnError(new InvalidOperationException(x.LocalizedDescription));
+            }
+            else if (this.Native.Services != null)
+            {
+                ob.Respond(this.Native.Services.Select(this.FromNative).ToList());
+            }
+        });
+        this.Native.DiscoverServices();
+
         return () => disp?.Dispose();
     });
 

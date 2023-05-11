@@ -180,7 +180,6 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     }
 
 
-    readonly Subject<(bool Connected, CBPeripheral Peripheral)> connectedSubj = new();
     public override void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
         => this.RunStateChange(peripheral, true);
 
@@ -233,10 +232,9 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
         // TODO: conn failures
         var status = connected ? ConnectionState.Connected : ConnectionState.Disconnected;
-        p.ConnectionSubject.OnNext(status);
+        p.ReceiveStateChange(status);
 
         this.services.RunDelegates<IBleDelegate>(x => x.OnPeripheralStateChanged(p), this.logger);
-        this.connectedSubj.OnNext((connected, peripheral));
     }
 
 

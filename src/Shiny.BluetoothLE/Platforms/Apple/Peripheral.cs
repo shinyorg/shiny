@@ -105,6 +105,7 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         return sub;
     });
 
+
     readonly Subject<(int Rssi, InvalidOperationException? Exception)> rssiSubj = new();
     public override void RssiRead(CBPeripheral peripheral, NSNumber rssi, NSError? error)
     {
@@ -120,7 +121,7 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     public IObservable<ConnectionState> WhenStatusChanged() => Observable.Create<ConnectionState>(ob =>
     {
         ob.OnNext(this.Status);
-        var sub = this.ConnectionSubject.Subscribe(ob.OnNext);
+        var sub = this.connSubj.Subscribe(ob.OnNext);
 
         //    //this.context
         //    //    .FailedConnection
@@ -131,7 +132,13 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     });
 
 
-    internal Subject<ConnectionState> ConnectionSubject { get; } = new();
+    
+    readonly Subject<ConnectionState> connSubj = new();
+    internal void ReceiveStateChange(ConnectionState connStatus)
+    {
+        this.connSubj.OnNext(connStatus);
+        //bool hasDiscoveredAll = false;
+    }
 
     //public override IObservable<BleException> WhenConnectionFailed() => this.context
     //    .FailedConnection

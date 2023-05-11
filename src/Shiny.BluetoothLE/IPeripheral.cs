@@ -26,7 +26,8 @@ public enum BleCharacteristicEvent
     Read,
     Write,
     WriteWithoutResponse,
-    Notification
+    Notification,
+    NotificationSubscribed
 }
 
 public record BleDescriptorResult(
@@ -65,18 +66,17 @@ public interface IPeripheral
     IObservable<int> ReadRssi();
 
     /// <summary>
-    /// Get a known service
+    /// Get a known service - this will pull from cached services, if not found, will initiate a discovery
     /// </summary>
     /// <param name="serviceUuid">The UUID of the service</param>
     /// <returns>Returns a completed observable with a service or an exception if the service is not found</returns>
     IObservable<BleServiceInfo> GetService(string serviceUuid);
     
     /// <summary>
-    /// Runs a discovery process for all services for use with a GATT connection
+    /// Runs a discovery process for all services - will force a fresh cache rebuild of all services
     /// </summary>
-    /// <param name="refreshServices"></param>
     /// <returns></returns>
-    IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices = false);
+    IObservable<IReadOnlyList<BleServiceInfo>> GetServices();
 
     /// <summary>
     /// Get a characteristic - if not found, a BleException is thrown
@@ -94,13 +94,17 @@ public interface IPeripheral
     IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid);
     
     /// <summary>
-    /// Connects to a characteristic if not already subscribed, it will also attempt to auto-reconnect if you keep the observable hooked 
+    /// Connects to a characteristic if not already subscribed, it will also attempt to auto-reconnect if you keep the observable hooked
     /// </summary>
-    /// <param name="serviceUuid"></param>
-    /// <param name="characteristicUuid"></param>
-    /// <param name="useIndicationsIfAvailable"></param>
+    /// <param name="serviceUuid">The service UUID</param>
+    /// <param name="characteristicUuid">The characteristic UUID</param>
+    /// <param name="useIndicationsIfAvailable">Uses indications (acks) if available, otherwise uses standard notify</param>
+    /// <param name="emitSubscribedEvent">
+    /// If true, the notificaton BleCharacteristicEvent will be emitted with empty data and notification subscribed - useful for knowing when hook is made
+    /// WARNING: If subscriber has multiple hooks, this event will only be emitted to the first subscriber
+    /// </param>
     /// <returns></returns>
-    IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true);
+    IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true, bool emitSubscribedEvent = false);
 
     /// <summary>
     /// Reads a characteristic

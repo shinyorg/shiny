@@ -17,9 +17,15 @@ public partial class Peripheral
 {
     public IObservable<BleServiceInfo> GetService(string serviceUuid) => this.GetNativeService(serviceUuid).Select(this.FromNative);
 
-    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices(bool refreshServices) => this
-        .GetNativeServices(refreshServices)
-        .Select(x => x.Select(this.FromNative).ToList());
+    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices()
+    {
+        // we want a fresh discovery everytime the user calls this
+        // internal functions call GetNativeServices which doesn't force a refresh
+        this.RequiresServiceDiscovery = true;
+        return this
+            .GetNativeServices()
+            .Select(x => x.Select(this.FromNative).ToList());
+    }
     
 
     readonly Subject<Unit> serviceDiscoverySubj = new();
@@ -27,27 +33,27 @@ public partial class Peripheral
         => this.serviceDiscoverySubj.OnNext(Unit.Default);
 
 
-    protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices(bool refreshServices) =>
+    protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices() =>
         Observable.FromAsync<IReadOnlyList<BluetoothGattService>>(async ct =>
         {
             this.AssertConnection();
-            if (refreshServices)
-                this.RefreshServices();
+            if (!this.RequiresServiceDiscovery)
+                return this.Gatt!.Services!.ToList();
 
-            if ((this.Gatt!.Services?.Count ?? 0) > 0 && !refreshServices)
-                return this.Gatt.Services!.ToList();
-
+            // this.RefreshServices(); // force refresh of services on GATT
             var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
-            if (!this.Gatt.DiscoverServices())
+            if (!this.Gatt!.DiscoverServices())
                 throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
 
             await task.ConfigureAwait(false);
+            this.RequiresServiceDiscovery = false;
+
             return this.Gatt.Services!.ToList();
         });
 
 
     protected IObservable<BluetoothGattService> GetNativeService(string serviceUuid) => this
-        .GetNativeServices(false)
+        .GetNativeServices()
         .Select(x =>
         {
             var native = this.Gatt!.GetService(Utils.ToUuidType(serviceUuid));
@@ -58,8 +64,11 @@ public partial class Peripheral
         });
 
 
-    protected void RefreshServices()
+    public bool RequiresServiceDiscovery { get; private set; } = true;
+
+    public void RefreshServices()
     {
+        this.AssertConnection();
         // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
         try
         {
