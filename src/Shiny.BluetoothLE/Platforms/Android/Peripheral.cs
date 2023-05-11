@@ -45,21 +45,27 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     {
         get
         {
-            if (this.Gatt == null)
-                return ConnectionState.Disconnected;
-
-            return this.manager
-                .Native
-                .GetConnectionState(this.Native, ProfileType.Gatt)
-                .ToStatus();
+            var status = ConnectionState.Disconnected;
+            if (this.Gatt != null)
+            {
+                status = this.manager
+                    .Native
+                    .GetConnectionState(this.Native, ProfileType.Gatt)
+                    .ToStatus();
+            }
+            return status;
         }
     }
 
 
     public void CancelConnection()
     {
+        if (this.Gatt == null)
+            return;
+        
         try
         {
+            this.RequiresServiceDiscovery = true;
             this.Gatt?.Close();
             this.Gatt = null;
         }
@@ -100,7 +106,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     {
         this.AssertConnection();
 
-        var task = this.rssiSubj.Take(1).ToTask();
+        var task = this.rssiSubj.Take(1).ToTask(ct);
         this.Gatt!.ReadRemoteRssi();
 
         var result = await task.ConfigureAwait(false);
@@ -122,9 +128,11 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     public override void OnConnectionStateChange(BluetoothGatt? gatt, GattStatus status, ProfileState newState)
     {
-        // on disconnect I should kill services
+        if (this.logger.IsEnabled(LogLevel.Debug))
+            this.logger.LogDebug($"Connection State Change: {newState}");
+        
         if (newState == ProfileState.Disconnected)
-            gatt?.Services?.Clear();
+            this.RequiresServiceDiscovery = true;
 
         this.connSubj.OnNext(newState.ToStatus());
     }
