@@ -36,13 +36,16 @@
 
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
-
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
         <MauiImage Include="Resources\Images\*" />
         <MauiFont Include="Resources\Fonts\*" />
+        
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
         <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
+        <MauiAsset Include="appsettings.maccatalyst.json" LogicalName="appsettings.maccatalyst.json"/>
+        <MauiAsset Include="appsettings.ios.json" LogicalName="appsettings.ios.json"/>
+        <MauiAsset Include="appsettings.android.json" LogicalName="appsettings.android.json"/>
     </ItemGroup>
 
     <ItemGroup>
