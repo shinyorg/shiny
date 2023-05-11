@@ -54,7 +54,8 @@ public partial class Peripheral
     {
         this.AssertConnection();
         
-        this.notifyObs ??= this.WhenConnected()
+        this.notifyObs ??= Observable.Create<BleCharacteristicResult>(ob => this
+            .WhenConnected()
             .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
             .Switch()
             .Select(ch => this.operations.QueueToObservable(async ct =>
@@ -65,7 +66,7 @@ public partial class Peripheral
 
                 if (!this.Gatt!.SetCharacteristicNotification(ch, true))
                     throw new BleException("Failed to set characteristic notification value");
-                
+
                 var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
                 var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
                 if (nativeDescriptor == null)
@@ -75,46 +76,57 @@ public partial class Peripheral
                 this.logger.LogInformation($"Hooked Notification Characteristic '{characteristicUuid}' successfully");
 
                 this.AddNotify(serviceUuid, characteristicUuid);
+                if (emitSubscribedEvent)
+                    ob.OnNext(this.ToResult(ch, BleCharacteristicEvent.NotificationSubscribed));
 
                 return ch;
             }))
             .Switch()
-
-            // TODO: emit sub event here
             .Select(ch => this.notifySubj
                 .Where(x => x.Equals(ch))
-                .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
-                .Finally(() =>
-                {
-                    try
-                    {
-                        this.RemoveNotify(serviceUuid, characteristicUuid);
-
-                        this.WriteDescriptor(
-                            serviceUuid,
-                            characteristicUuid,
-                            NotifyDescriptorUuid,
-                            BluetoothGattDescriptor.DisableNotificationValue!.ToArray()
-                        )
-                        .Subscribe(
-                            _ => { },
-                            ex => this.logger.LogWarning(ex, "Could not cleanly disable notifications on characteristic: " + characteristicUuid)
-                        );
-
-                        if (!this.Gatt!.SetCharacteristicNotification(ch, false))
-                            this.logger.LogWarning("Could not cleanly disable notifications on characteristic: " + characteristicUuid);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.logger.LogWarning(ex, "Error disabling notifications on characteristic: " + characteristicUuid);
-                    }
-                })
+                .Finally(() => this.TryNotificationCleanup(ch, serviceUuid, characteristicUuid))
             )
             .Switch()
-            .Publish()
-            .RefCount();
+            .Subscribe(
+                x => ob.OnNext(this.ToResult(x, BleCharacteristicEvent.Notification)),
+                ob.OnError
+            )
+        )
+        .Publish()
+        .RefCount();
 
         return this.notifyObs!;
+    }
+
+
+    protected void TryNotificationCleanup(BluetoothGattCharacteristic ch, string serviceUuid, string characteristicUuid)
+    {
+        try
+        {
+            this.RemoveNotify(serviceUuid, characteristicUuid);
+
+            if (this.Status == ConnectionState.Connected)
+            {
+                // TODO: is this actually needed?
+                this.WriteDescriptor(
+                    serviceUuid,
+                    characteristicUuid,
+                    NotifyDescriptorUuid,
+                    BluetoothGattDescriptor.DisableNotificationValue!.ToArray()
+                )
+                .Subscribe(
+                    _ => { },
+                    ex => this.logger.LogWarning(ex, "Could not cleanly disable notifications on characteristic: " + characteristicUuid)
+                );
+
+                if (!this.Gatt!.SetCharacteristicNotification(ch, false))
+                    this.logger.LogWarning("Could not cleanly disable notifications on characteristic: " + characteristicUuid);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Error disabling notifications on characteristic: " + characteristicUuid);
+        }
     }
 
 

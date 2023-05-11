@@ -90,26 +90,52 @@ public class CharacteristicTests : AbstractBleTests
     [Fact(DisplayName = "BLE Characteristic - Reconnect Notification")]
     public async Task ReconnectNotifyTest()
     {
-        var count = 0;
+        var notifyReady = new TaskCompletionSource();
+        var notifyFired = new TaskCompletionSource();
         await this.Setup();
+
         using var sub = this.Peripheral!
-            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid)
-            .Subscribe(x => count++);
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid, true, true)
+            .Subscribe(x =>
+            {
+                switch (x.Event)
+                {
+                    case BleCharacteristicEvent.NotificationSubscribed:
+                        notifyReady.SetResult();
+                        break;
+                    
+                    case BleCharacteristicEvent.Notification:
+                        notifyFired.SetResult();
+                        break;
+                }
+            });
 
         // trigger first notification
+        this.Log("Waiting for notify to be ready");
+        await notifyReady.Task;
+        
+        this.Log("Sending Write");
         await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x02 }, true);
-        await Task.Delay(2000);
-        count.Should().Be(1);
+        
+        this.Log("Waiting for notification to be fired");
+        await notifyFired.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        
         this.Log("Initial Test Complete - Moving to reconnection");
+        this.Peripheral!.CancelConnection(); // disconnecting will not remove notification, so we should expect a resubscription
 
-        // disconnecting will not remove notification, so we should expect a resubscription
-        this.Peripheral!.CancelConnection();
+        // reset completion sources
+        notifyReady = new();
+        notifyFired = new();
         await this.Connect();
-
-        this.Log("Reconnected");
+        
+        this.Log("RECONNECT - Waiting for notify to be ready");
+        await notifyReady.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        
+        this.Log("RECONNECT - Sending Write");
         await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x03 }, true);
-        await Task.Delay(2000); // give a breather for resub
-        count.Should().Be(2);
+        
+        this.Log("RECONNECT - Waiting for notification to be fired");
+        await notifyFired.Task.WaitAsync(TimeSpan.FromSeconds(3));
     }
 
 
