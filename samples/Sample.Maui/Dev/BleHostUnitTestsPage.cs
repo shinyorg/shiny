@@ -8,6 +8,11 @@ public class BleHostUnitTestsPage : ContentPage
 {
     public BleHostUnitTestsPage()
     {
+        this.ToolbarItems.Add(new ToolbarItem()
+            .Text("Clear")
+            .BindCommand(static (BleHostUnitTestsViewModel vm) => vm.Clear)
+        );
+        
         this.Content = new Grid
         {
             RowDefinitions = Rows.Define(
@@ -47,8 +52,6 @@ public class BleHostUnitTestsPage : ContentPage
             }
         };
     }
-
-    enum Row { Top, Body }
 }
 
 
@@ -60,13 +63,13 @@ public class BleHostItem : Grid
         this.Padding = 5;
 
         this.RowDefinitions = Rows.Define(
-            (Row.Title, GridLength.Auto),
-            (Row.Details, GridLength.Auto),
-            (Row.Seperator, GridLength.Auto)
+            GridLength.Auto,
+            GridLength.Auto,
+            GridLength.Auto
         );
         this.ColumnDefinitions = Columns.Define(
-            (Column.Text, new(1, GridUnitType.Star)),
-            (Column.Timestamp, new(1, GridUnitType.Star))
+            new(1, GridUnitType.Star),
+            new(1, GridUnitType.Star)
         );
 
         this.Children.Add(
@@ -102,10 +105,6 @@ public class BleHostItem : Grid
             new Hr().Row(2).ColumnSpan(2)
         );
     }
-
-
-    enum Row { Title, Details, Seperator }
-    enum Column { Text, Timestamp }
 }
 
 public class EmptyView : Label

@@ -27,60 +27,59 @@ public class BleHostUnitTestsViewModel : ViewModel
                     {
                         byte[]? currentData = null;
 
-                        var notifier = sb.AddCharacteristic(BleConfiguration.NotifyCharacteristicUuid, x => x.SetNotification(async sub =>
+                        var notifier = sb.AddCharacteristic(BleConfiguration.NotifyCharacteristicUuid, x => x.SetNotification(sub =>
                         {
                             var smsg = sub.IsSubscribing ? "Subscribed" : "UnSubscribed";
-                            await this.Log($"{sub.Peripheral.Uuid} {smsg} to Characteristic");
+                            this.Log($"{sub.Peripheral.Uuid} {smsg} to Characteristic");
+
+                            return Task.CompletedTask;
                         }));
 
-                        sb.AddCharacteristic(BleConfiguration.ReadCharacteristicUuid, x => x.SetRead(async request =>
+                        sb.AddCharacteristic(BleConfiguration.ReadCharacteristicUuid, x => x.SetRead(request =>
                         {
                             var data = currentData ?? new byte[] { 0x0 };
-                            await this.Log($"{request.Peripheral.Uuid} Read Characteristic", data);
+                            this.Log($"{request.Peripheral.Uuid} Read Characteristic", data);
 
-                            return GattResult.Success(data);
+                            return Task.FromResult(GattResult.Success(data));
                         }));
 
                         sb.AddCharacteristic(BleConfiguration.WriteCharacteristicUuid, cb => cb.SetWrite(async request =>
                         {
                             currentData = request.Data;
-                            await this.Log($"{request.Peripheral.Uuid} Wrote to Characteristic", request.Data);
+                            this.Log($"{request.Peripheral.Uuid} Wrote to Characteristic", request.Data);
 
                             if (notifier.SubscribedCentrals.Count > 0)
                             {
                                 await notifier.Notify(request.Data);
-                                await this.Log("Notification Broadcasted to subscribers");
+                                this.Log("Notification Broadcasted to subscribers");
                             }
                         }, WriteOptions.Write | WriteOptions.WriteWithoutResponse));
                     }
                 );
-                await hostingManager.AddService(
-                    BleConfiguration.SecondaryServiceUuid,
-                    false,
-                    sb =>
-                    {
-                        sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid1, x => x.SetRead(async request =>
-                        {
-                            await this.Log("Secondary Read - CH1");
-                            return GattResult.Success(new byte[] { 0x01 });
-                        }));
-
-                        sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid2, x => x.SetRead(async request =>
-                        {
-                            await this.Log("Secondary Read - CH2");
-                            return GattResult.Success(new byte[] { 0x01 });
-                        }));
-                    }
-                );
+                // await hostingManager.AddService(
+                //     BleConfiguration.SecondaryServiceUuid,
+                //     false,
+                //     sb =>
+                //     {
+                //         sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid1, x => x.SetRead(async request =>
+                //         {
+                //             await this.Log("Secondary Read - CH1");
+                //             return GattResult.Success(new byte[] { 0x01 });
+                //         }));
+                //
+                //         sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid2, x => x.SetRead(async request =>
+                //         {
+                //             await this.Log("Secondary Read - CH2");
+                //             return GattResult.Success(new byte[] { 0x01 });
+                //         }));
+                //     }
+                // );
                 await hostingManager.StartAdvertising(new(ServiceUuids: new[]
                 {
-                    BleConfiguration.ServiceUuid,
-                    BleConfiguration.SecondaryServiceUuid
+                    BleConfiguration.ServiceUuid
                 }));
-                await this.Log("BLE Host Online");
-                await this.Log("Broadcasting Service: " + BleConfiguration.ServiceUuid);
-                await this.Log("Broadcasting Service: " + BleConfiguration.SecondaryServiceUuid);
                 this.IsHostOnline = true;
+                this.WriteState();
             },
             this.WhenAny(
                 x => x.IsHostOnline,
@@ -88,15 +87,15 @@ public class BleHostUnitTestsViewModel : ViewModel
             )
         );
 
-        this.StopServer = ReactiveCommand.CreateFromTask(
-            async () =>
+        this.StopServer = ReactiveCommand.Create(
+            () =>
             {
                 if (!this.IsHostOnline)
                     return;
 
                 hostingManager.ClearServices();
                 hostingManager.StopAdvertising();
-                await this.Log("Stopped BLE Host");
+                this.WriteState();
                 this.IsHostOnline = false;
             },
             this.WhenAny(
@@ -104,6 +103,12 @@ public class BleHostUnitTestsViewModel : ViewModel
                 x => x.GetValue()
             )
         );
+
+        this.Clear = ReactiveCommand.Create(() =>
+        {
+            this.Logs.Clear();
+            this.WriteState();
+        });
     }
 
 
@@ -111,6 +116,7 @@ public class BleHostUnitTestsViewModel : ViewModel
     [Reactive] public bool IsHostOnline { get; private set; }
     public ICommand StartServer { get; }
     public ICommand StopServer { get; }
+    public ICommand Clear { get; }
 
 
     public override void OnAppearing()
@@ -121,7 +127,7 @@ public class BleHostUnitTestsViewModel : ViewModel
         => this.StopServer.Execute(null);
 
 
-    Task Log(string @event, byte[]? data = null) => MainThread.InvokeOnMainThreadAsync(() =>
+    void Log(string @event, byte[]? data = null) => MainThread.BeginInvokeOnMainThread(() =>
     {
         var dataString = String.Empty;
         if (data != null)
@@ -133,4 +139,18 @@ public class BleHostUnitTestsViewModel : ViewModel
             dataString
         ));
     });
+
+    
+    void WriteState()
+    {
+        if (this.IsHostOnline)
+        {
+            this.Log("BLE Host Online");
+            this.Log("Broadcasting Service: " + BleConfiguration.ServiceUuid);            
+        }
+        else
+        {
+            this.Log("Stopped BLE Host");
+        }
+    }
 }

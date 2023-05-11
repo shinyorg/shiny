@@ -20,10 +20,10 @@ public class ServiceViewModel : ViewModel
 
         this.WhenAnyValueSelected(
             x => x.SelectedCharacteristic,
-            async x => await this.Navigation.Navigate(
+            x => this.Navigation.Navigate(
                 "BlePeripheralCharacteristic",
                 ("Peripheral", this.peripheral),
-                ("Characteristic", x)
+                ("Characteristic", x!)
             )
         );
     }
