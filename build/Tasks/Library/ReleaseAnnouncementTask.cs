@@ -23,8 +23,9 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
     public override Task RunAsync(BuildContext context)
     {
-        var link = GetLink(context);
-        var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - {link}";
+        //var link = GetLink(context);
+        //var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - {link}";
+        var message = $"Shiny {context.ReleaseVersion} released! Check out the latest info @ https://shinylib.net";
 
         return Task.WhenAll(
             this.Twitter(context, message),
@@ -34,17 +35,17 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
     }
 
 
-    static string GetLink(BuildContext context)
-    {
-        if (!context.IsReleaseBranch)
-            return $"{DocLink}vnext.html";
+    //static string GetLink(BuildContext context)
+    //{
+    //    if (!context.IsReleaseBranch)
+    //        return $"{DocLink}vnext.html";
 
-        var ver = context.ReleaseVersion.Replace(".", String.Empty);
-        if (!ver.StartsWith("v"))
-            ver = "v" + ver;
+    //    var ver = context.ReleaseVersion.Replace(".", String.Empty);
+    //    if (!ver.StartsWith("v"))
+    //        ver = "v" + ver;
 
-        return $"{DocLink}{ver}.html";
-    }
+    //    return $"{DocLink}{ver}.html";
+    //}
 
 
     async Task Twitter(BuildContext context, string message)
