@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using Foundation;
-using Microsoft.Extensions.Options;
-using ObjCRuntime;
 using Shiny.Hosting;
 using UIKit;
 
@@ -19,7 +16,7 @@ public abstract class ShinyAppDelegate : UIApplicationDelegate
         var host = this.CreateShinyHost();
         host.Run();
 
-        host.Lifecycle.FinishedLaunching(launchOptions);
+        Host.Lifecycle.FinishedLaunching(launchOptions);
         return base.FinishedLaunching(application, launchOptions);
     }
 
