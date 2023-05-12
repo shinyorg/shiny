@@ -23,7 +23,17 @@ public class Host : IHost
         private set => currentHost = value ?? throw new ArgumentException(nameof(value));
     }
 
+
     public static bool IsInitialized => currentHost != null;
+    public static IServiceProvider ServiceProvider => Current.Services;
+    public static ILoggerFactory LoggingFactory => Current.Logging;
+    public static T? GetService<T>() => ServiceProvider.GetService<T>();
+
+#if APPLE
+    public static IosLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<IosLifecycleExecutor>();
+#elif ANDROID
+    public static AndroidLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<AndroidLifecycleExecutor>();
+#endif
 
 
     public Host(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)

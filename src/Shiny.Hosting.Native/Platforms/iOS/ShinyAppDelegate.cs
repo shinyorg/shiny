@@ -19,22 +19,22 @@ public abstract class ShinyAppDelegate : UIApplicationDelegate
         var host = this.CreateShinyHost();
         host.Run();
 
-        host.Lifecycle().FinishedLaunching(launchOptions);
+        host.Lifecycle.FinishedLaunching(launchOptions);
         return base.FinishedLaunching(application, launchOptions);
     }
 
     public override void WillEnterForeground(UIApplication application)
-        => Host.Current.Lifecycle().OnAppForegrounding();
+        => Host.Lifecycle.OnAppForegrounding();
 
     public override void DidEnterBackground(UIApplication application)
-        => Host.Current.Lifecycle().OnAppBackgrounding();
+        => Host.Lifecycle.OnAppBackgrounding();
 
     public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
-        => Host.Current.Lifecycle().OnRegisteredForRemoteNotifications(deviceToken);
+        => Host.Lifecycle.OnRegisteredForRemoteNotifications(deviceToken);
 
     public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
-        => Host.Current.Lifecycle().OnFailedToRegisterForRemoteNotifications(error);
+        => Host.Lifecycle.OnFailedToRegisterForRemoteNotifications(error);
 
     public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-        => Host.Current.Lifecycle().OnDidReceiveRemoveNotification(userInfo, completionHandler);
+        => Host.Lifecycle.OnDidReceiveRemoveNotification(userInfo, completionHandler);
 }

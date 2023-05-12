@@ -5,17 +5,12 @@ using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using ObjCRuntime;
-using Microsoft.Extensions.DependencyInjection;
-using Shiny.Hosting;
 
 namespace Shiny;
 
 
 public static class AppleExtensions
 {
-    public static IosLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<IosLifecycleExecutor>();
-
-
     static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
 

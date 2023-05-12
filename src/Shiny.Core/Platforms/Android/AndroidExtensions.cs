@@ -4,17 +4,12 @@ using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Microsoft.Extensions.DependencyInjection;
-using Shiny.Hosting;
 
 namespace Shiny;
 
 
 public static class AndroidExtensions
 {
-    public static AndroidLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<AndroidLifecycleExecutor>();
-
-
     public static int GetNotificationIconResource(this AndroidPlatform platform)
     {
         var id = platform.GetResourceIdByName("notification");

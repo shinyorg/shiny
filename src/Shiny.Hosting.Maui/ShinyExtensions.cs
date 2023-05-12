@@ -17,17 +17,17 @@ public static class ShinyExtensions
 #if ANDROID
             events.AddAndroid(android => android
                 // Shiny will supply app foreground/background events
-                .OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) => Host.Current.Lifecycle().OnRequestPermissionsResult(activity, requestCode, permissions, grantResults))
-                .OnActivityResult((activity, requestCode, result, intent) => Host.Current.Lifecycle().OnActivityResult(activity, requestCode, result, intent))
-                .OnNewIntent((activity, intent) => Host.Current.Lifecycle().OnNewIntent(activity, intent))
+                .OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) => Host.Lifecycle.OnRequestPermissionsResult(activity, requestCode, permissions, grantResults))
+                .OnActivityResult((activity, requestCode, result, intent) => Host.Lifecycle.OnActivityResult(activity, requestCode, result, intent))
+                .OnNewIntent((activity, intent) => Host.Lifecycle.OnNewIntent(activity, intent))
             );
 #elif IOS || MACCATALYST
             // Shiny will supply push events & handle background url for http transfers
             events.AddiOS(ios => ios
-                .FinishedLaunching((_, options) => Host.Current.Lifecycle().FinishedLaunching(options))
-                .ContinueUserActivity((_, activity, handler) => Host.Current.Lifecycle().OnContinueUserActivity(activity, handler))
-                .WillEnterForeground(_ => Host.Current.Lifecycle().OnAppForegrounding())
-                .DidEnterBackground(_ => Host.Current.Lifecycle().OnAppBackgrounding())
+                .FinishedLaunching((_, options) => Host.Lifecycle.FinishedLaunching(options))
+                .ContinueUserActivity((_, activity, handler) => Host.Lifecycle.OnContinueUserActivity(activity, handler))
+                .WillEnterForeground(_ => Host.Lifecycle.OnAppForegrounding())
+                .DidEnterBackground(_ => Host.Lifecycle.OnAppBackgrounding())
             );
 #endif
         });

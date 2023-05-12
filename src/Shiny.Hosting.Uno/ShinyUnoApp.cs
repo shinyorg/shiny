@@ -17,19 +17,19 @@ public abstract class ShinyUnoApp : Application
 
 #if APPLE
     public override void WillEnterForeground(UIApplication application)
-        => Host.Current.Lifecycle().OnAppForegrounding();
+        => Host.Lifecycle.OnAppForegrounding();
 
     public override void DidEnterBackground(UIApplication application)
-        => Host.Current.Lifecycle().OnAppBackgrounding();
+        => Host.Lifecycle.OnAppBackgrounding();
 
     public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
-        => Host.Current.Lifecycle().OnContinueUserActivity(userActivity, completionHandler);
+        => Host.Lifecycle.OnContinueUserActivity(userActivity, completionHandler);
 
     public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
-        => Host.Current.Lifecycle().FinishedLaunching(launchOptions);
+        => Host.Lifecycle.FinishedLaunching(launchOptions);
 
     public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
-        => Host.Current.Lifecycle().OnHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
+        => Host.Lifecycle.OnHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
 
     //[Export("application:didFailToRegisterForRemoteNotificationsWithError:")]
     //public void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
@@ -45,8 +45,8 @@ public abstract class ShinyUnoApp : Application
 
     // TODO: I need lifecycle against mainactivity
      // Shiny will supply app foreground/background events
-                //.OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) => Host.Current.Lifecycle().OnRequestPermissionsResult(activity, requestCode, permissions, grantResults))
-                //.OnActivityResult((activity, requestCode, result, intent) => Host.Current.Lifecycle().OnActivityResult(activity, requestCode, result, intent))
-                //.OnNewIntent((activity, intent) => Host.Current.Lifecycle().OnNewIntent(activity, intent))
+                //.OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) => Host.Lifecycle.OnRequestPermissionsResult(activity, requestCode, permissions, grantResults))
+                //.OnActivityResult((activity, requestCode, result, intent) => Host.Lifecycle.OnActivityResult(activity, requestCode, result, intent))
+                //.OnNewIntent((activity, intent) => Host.Lifecycle.OnNewIntent(activity, intent))
 #endif
 }
