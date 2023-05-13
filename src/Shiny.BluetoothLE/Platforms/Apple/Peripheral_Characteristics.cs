@@ -5,7 +5,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -58,6 +57,7 @@ public partial class Peripheral
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(this.FromNative);
 
+    
     public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
     {
         this.AssertConnnection();
@@ -145,11 +145,19 @@ public partial class Peripheral
 
     readonly Subject<(CBCharacteristic Char, NSError? Error)> notifySubj = new();
     public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
-        => this.notifySubj.OnNext((characteristic, error));
+    {
+        if (this.logger.IsEnabled(LogLevel.Debug))
+            this.logger.LogDebug($"UpdatedNotificationState: {characteristic.Service.UUID}/{characteristic.UUID} - ENABLED: {characteristic.IsNotifying}");
+        this.notifySubj.OnNext((characteristic, error));
+    }
 
     readonly Subject<Unit> readyWwrSubj = new();
+
     public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral)
-        => this.readyWwrSubj.OnNext(Unit.Default);
+    {
+        this.logger.LogDebug("IsReadyToSendWriteWithoutResponse Fired");
+        this.readyWwrSubj.OnNext(Unit.Default);
+    }
 
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
 #if XAMARINIOS
