@@ -29,6 +29,7 @@ public static class CharacteristicExtensions
             x.Service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase) &&
             x.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase)
         )
+        .Take(1)
         .ToTask(cancellationToken);
         
     
