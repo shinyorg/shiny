@@ -49,7 +49,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Acr.UserDialogs" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0" />
@@ -71,7 +71,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        
         <Compile Remove="Push\AbstractPushTests.cs" />
         <Compile Remove="Push\TestGoogleCredential.cs" />
         <Compile Remove="Push\FirebaseTests.cs" />

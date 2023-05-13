@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
@@ -17,9 +18,10 @@ public static class MauiProgram
         Configuration = new ConfigurationBuilder()
             .AddJsonPlatformBundle(optional: false)
             .Build();
-        
-        return MauiApp
-            .CreateBuilder()
+
+        var builder = MauiApp.CreateBuilder();
+
+        builder
             .ConfigureTests(new TestOptions
             {
                 Assemblies =
@@ -33,14 +35,15 @@ public static class MauiProgram
             {
 #if ANDROID
                 lc.AddAndroid(x => x
-                    .OnApplicationCreating(app => Acr.UserDialogs.UserDialogs.Init(app))
                     .OnCreate((_, _) => DeviceDisplay.KeepScreenOn = true)
                 );
 #else
                 DeviceDisplay.KeepScreenOn = true;
-                Acr.UserDialogs.UserDialogs.Init();
 #endif
-            })
-            .Build();
+            });
+
+        builder.Logging.AddDebug();
+
+        return builder.Build();
     }
 }

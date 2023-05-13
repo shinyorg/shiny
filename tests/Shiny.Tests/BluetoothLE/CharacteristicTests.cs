@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Shiny.BluetoothLE;
 
 namespace Shiny.Tests.BluetoothLE;
@@ -87,11 +88,39 @@ public class CharacteristicTests : AbstractBleTests
     }
 
 
-    [Fact(DisplayName = "BLE Characteristic - Reconnect Notification")]
-    public async Task ReconnectNotifyTest()
+    [Fact(DisplayName = "BLE Characteristic - Wait for Subscription Before")]
+    public async Task WaitForSubscriptionBefore()
     {
-        var notifyFired = new TaskCompletionSource();
         await this.Setup();
+
+        var task = this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid);
+        using var sub = this.Peripheral!
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid, true)
+            .Subscribe(x => this.Log("Notification Fired"));
+        
+        await task.WaitAsync(TimeSpan.FromSeconds(20));
+    }
+    
+    
+    [Fact(DisplayName = "BLE Characteristic - Wait for Subscription After")]
+    public async Task WaitForSubscriptionAfter()
+    {
+        await this.Setup();
+
+        using var sub = this.Peripheral!
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid, true)
+            .Subscribe(x => this.Log("Notification Fired"));
+
+        await Task.Delay(8000); // let's wait for the hook internally
+        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid).WaitAsync(TimeSpan.FromSeconds(3));
+    }
+    
+
+    [Fact(DisplayName = "BLE Characteristic - Reconnect Notification")]
+    public async Task ReconnectNotify()
+    {
+        await this.Setup();
+        var notifyFired = new TaskCompletionSource();
 
         using var sub = this.Peripheral!
             .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid, true)
@@ -115,7 +144,7 @@ public class CharacteristicTests : AbstractBleTests
         await this.Connect();
         
         this.Log("RECONNECT - Waiting for notify to be ready");
-        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
+        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid).WaitAsync(TimeSpan.FromSeconds(10));
 
         this.Log("RECONNECT - Sending Write");
         await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x03 }, true);
