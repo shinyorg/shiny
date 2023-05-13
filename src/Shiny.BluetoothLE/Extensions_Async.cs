@@ -36,10 +36,12 @@ public static class AsyncExtensions
             .Timeout(timeout ?? TimeSpan.FromSeconds(10))
             .ToTask(cancelToken);
 
+    
     public static Task<BleCharacteristicInfo> GetCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
         => peripheral
             .GetCharacteristic(serviceUuid, characteristicUuid)
             .ToTask(cancelToken);
+    
     
     public static Task<IReadOnlyList<BleCharacteristicInfo>> GetAllCharacteristicsAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
@@ -47,11 +49,13 @@ public static class AsyncExtensions
             .Timeout(timeout ?? TimeSpan.FromSeconds(10))
             .ToTask(cancelToken);
 
+    
     public static Task<IReadOnlyList<BleDescriptorInfo>> GetDescriptorsAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
         => peripheral
             .GetDescriptors(serviceUuid, characteristicUuid)
             .ToTask(cancelToken);
 
+    
     public static Task<BleCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => peripheral
             .WriteCharacteristic(serviceUuid, characteristicUuid, data, withResponse)
