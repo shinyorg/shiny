@@ -26,8 +26,7 @@ public enum BleCharacteristicEvent
     Read,
     Write,
     WriteWithoutResponse,
-    Notification,
-    NotificationSubscribed
+    Notification
 }
 
 public record BleDescriptorResult(
@@ -99,19 +98,21 @@ public interface IPeripheral
     /// <param name="serviceUuid">The service UUID</param>
     /// <param name="characteristicUuid">The characteristic UUID</param>
     /// <param name="useIndicationsIfAvailable">Uses indications (acks) if available, otherwise uses standard notify</param>
-    /// <param name="emitSubscribedEvent">
-    /// If true, the notificaton BleCharacteristicEvent will be emitted with empty data and notification subscribed - useful for knowing when hook is made
-    /// WARNING: If subscriber has multiple hooks, this event will only be emitted to the first subscriber
-    /// </param>
     /// <returns></returns>
-    IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true, bool emitSubscribedEvent = false);
+    IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true);
+
+    /// <summary>
+    /// Watches for characteristic subscriptions
+    /// </summary>
+    /// <returns>A streaming observable - will start with all currently subscribed characteristics across all services</returns>
+    IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged();
 
     /// <summary>
     /// Reads a characteristic
     /// </summary>
     /// <param name="serviceUuid"></param>
     /// <param name="characteristicUuid"></param>
-    /// <returns></returns>
+    /// <returns>A completable observable with the characteristic value</returns>
     IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid);
 
     /// <summary>
@@ -121,7 +122,7 @@ public interface IPeripheral
     /// <param name="characteristicUuid"></param>
     /// <param name="data"></param>
     /// <param name="withResponse"></param>
-    /// <returns></returns>
+    /// <returns>A completable observable</returns>
     IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
 
     /// <summary>
@@ -130,7 +131,7 @@ public interface IPeripheral
     /// <param name="serviceUuid"></param>
     /// <param name="characteristicUuid"></param>
     /// <param name="descriptorUuid"></param>
-    /// <returns></returns>
+    /// <returns>A completable observable</returns>
     IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid);
 
     /// <summary>
@@ -138,7 +139,7 @@ public interface IPeripheral
     /// </summary>
     /// <param name="serviceUuid"></param>
     /// <param name="characteristicUuid"></param>
-    /// <returns></returns>
+    /// <returns>A completable observable</returns>
     IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid);
 
     /// <summary>
@@ -147,7 +148,7 @@ public interface IPeripheral
     /// <param name="serviceUuid"></param>
     /// <param name="characteristicUuid"></param>
     /// <param name="descriptorUuid"></param>
-    /// <returns></returns>
+    /// <returns>A completable observable with the characteristic value</returns>
     IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid);
 
     /// <summary>
@@ -157,6 +158,6 @@ public interface IPeripheral
     /// <param name="characteristicUuid"></param>
     /// <param name="descriptorUuid"></param>
     /// <param name="data"></param>
-    /// <returns></returns>
+    /// <returns>A completable observable</returns>
     IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data);
 }

@@ -6,12 +6,32 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE;
 
 
 public static class CharacteristicExtensions
 {
+    /// <summary>
+    /// Waits for a characteristic subscription - if already hooked, it will return immediately
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static Task WaitForCharacteristicSubscription(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancellationToken = default) => peripheral
+        .WhenCharacteristicSubscriptionChanged()
+        .Where(x =>
+            x.IsNotifying &&
+            x.Service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase) &&
+            x.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase)
+        )
+        .ToTask(cancellationToken);
+        
+    
     /// <summary>
     /// Requests all services and characteristics from a peripheral.  Should only be used for niche cases or debugging.
     /// </summary>

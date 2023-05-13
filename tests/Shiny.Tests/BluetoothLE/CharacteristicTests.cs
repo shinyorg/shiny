@@ -90,29 +90,16 @@ public class CharacteristicTests : AbstractBleTests
     [Fact(DisplayName = "BLE Characteristic - Reconnect Notification")]
     public async Task ReconnectNotifyTest()
     {
-        var notifyReady = new TaskCompletionSource();
         var notifyFired = new TaskCompletionSource();
         await this.Setup();
 
         using var sub = this.Peripheral!
-            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid, true, true)
-            .Subscribe(x =>
-            {
-                switch (x.Event)
-                {
-                    case BleCharacteristicEvent.NotificationSubscribed:
-                        notifyReady.SetResult();
-                        break;
-                    
-                    case BleCharacteristicEvent.Notification:
-                        notifyFired.SetResult();
-                        break;
-                }
-            });
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid, true)
+            .Subscribe(x => notifyFired?.SetResult());
 
         // trigger first notification
         this.Log("Waiting for notify to be ready");
-        await notifyReady.Task;
+        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
         
         this.Log("Sending Write");
         await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x02 }, true);
@@ -124,13 +111,12 @@ public class CharacteristicTests : AbstractBleTests
         this.Peripheral!.CancelConnection(); // disconnecting will not remove notification, so we should expect a resubscription
 
         // reset completion sources
-        notifyReady = new();
         notifyFired = new();
         await this.Connect();
         
         this.Log("RECONNECT - Waiting for notify to be ready");
-        await notifyReady.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        
+        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
+
         this.Log("RECONNECT - Sending Write");
         await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x03 }, true);
         

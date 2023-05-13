@@ -17,59 +17,38 @@ namespace Shiny.BluetoothLE;
 public partial class Peripheral
 {
     IObservable<BleCharacteristicResult>? notifyObservable;
-    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true, bool emitSubscribedEvent = false)
+    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true)
     {
         this.AssertConnnection();
 
-        this.notifyObservable ??= Observable.Create<BleCharacteristicResult>(ob => this
+        this.notifyObservable ??= this
             .WhenConnected()
             .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
             .Switch()
-            .Select(ch => Observable.FromAsync(async ct =>
+            .Select(ch =>
             {
                 this.FromNative(ch).AssertNotify();
                 this.logger.LogInformation("Hooking Notification Characteristic: " + characteristicUuid);
-                var task = Task.CompletedTask;
-
-                if (emitSubscribedEvent)
-                {
-                    task = this.notifySubj
-                        .Take(1)
-                        .Where(x => x.Char.Equals(ch))
-                        .ToTask(ct);
-                }
                 this.Native.SetNotifyValue(true, ch);
-                await task.ConfigureAwait(false);
 
-                if (emitSubscribedEvent)
-                    ob.OnNext(this.ToResult(ch, BleCharacteristicEvent.NotificationSubscribed));
-
-                return ch;
-            }))
-            .Switch()
-            .Select(ch => this.charUpdateSubj
-                .Where(x => x.Char.Equals(ch))
-                .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
-                .Finally(() =>
-                {
-                    try
+                return this.charUpdateSubj
+                    .Where(x => x.Char.Equals(ch))
+                    .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
+                    .Finally(() =>
                     {
-                        this.Native.SetNotifyValue(false, ch);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.logger.LogWarning("Unable to cleanly dispose of characteristic notifications", ex);
-                    }
-                })
-            )
+                        try
+                        {
+                            this.Native.SetNotifyValue(false, ch);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger.LogWarning("Unable to cleanly dispose of characteristic notifications", ex);
+                        }
+                    });
+            })
             .Switch()
-            .Subscribe(
-                ob.OnNext,
-                ob.OnError
-            )
-        )
-        .Publish()
-        .RefCount();
+            .Publish()
+            .RefCount();
 
         return this.notifyObservable;
     }
@@ -78,6 +57,32 @@ public partial class Peripheral
     public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(this.FromNative);
+
+    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
+    {
+        this.AssertConnnection();
+        
+        if (this.Native.Services != null)
+        {
+            foreach (var service in this.Native.Services)
+            {
+                if (service.Characteristics != null)
+                {
+                    foreach (var ch in service.Characteristics)
+                    {
+                        if (ch.IsNotifying)
+                            ob.OnNext(this.FromNative(ch));
+                    }
+                }
+            }
+        }
+
+        return this.notifySubj.Subscribe(x =>
+        {
+            var info = this.FromNative(x.Char);
+            ob.OnNext(info);
+        });
+    });
 
 
     public IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this

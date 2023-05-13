@@ -74,23 +74,6 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     }
 
 
-    protected void AssertConnnection()
-    {
-        if (this.Status != ConnectionState.Connected)
-            throw new InvalidOperationException("GATT is not connected");
-    }
-
-
-    protected void DoConnect() => this.manager
-        .Manager
-        .ConnectPeripheral(this.Native, new PeripheralConnectionOptions
-        {
-            NotifyOnDisconnection = true,
-            NotifyOnConnection = true,
-            NotifyOnNotification = true
-        });
-
-
     public IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
     {
         var sub = this.rssiSubj.Subscribe(x =>
@@ -114,8 +97,6 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         else
             this.rssiSubj.OnNext((0, new InvalidOperationException(error.LocalizedDescription)));
     }
-    //public override void RssiUpdated(CBPeripheral peripheral, NSError? error) {}
-
 
 
     public IObservable<ConnectionState> WhenStatusChanged() => Observable.Create<ConnectionState>(ob =>
@@ -135,10 +116,7 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     
     readonly Subject<ConnectionState> connSubj = new();
     internal void ReceiveStateChange(ConnectionState connStatus)
-    {
-        this.connSubj.OnNext(connStatus);
-        //bool hasDiscoveredAll = false;
-    }
+        => this.connSubj.OnNext(connStatus);
 
     //public override IObservable<BleException> WhenConnectionFailed() => this.context
     //    .FailedConnection
@@ -147,4 +125,20 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     //public override void UpdatedName(CBPeripheral peripheral)
     //{
     //}
+    
+    protected void AssertConnnection()
+    {
+        if (this.Status != ConnectionState.Connected)
+            throw new InvalidOperationException("GATT is not connected");
+    }
+
+
+    protected void DoConnect() => this.manager
+        .Manager
+        .ConnectPeripheral(this.Native, new PeripheralConnectionOptions
+        {
+            NotifyOnDisconnection = true,
+            NotifyOnConnection = true,
+            NotifyOnNotification = true
+        });
 }

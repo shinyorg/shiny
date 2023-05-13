@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 
 namespace Shiny.BluetoothLE;
 
@@ -72,7 +69,7 @@ public static class PeripheralExtensions
         });
     });
 
-
+    
     /// <summary>
     /// Quick helper around WhenStatusChanged().Where(x => x == ConnectionStatus.Connected)
     /// </summary>
@@ -84,7 +81,7 @@ public static class PeripheralExtensions
             .Where(x => x == ConnectionState.Connected)
             .Select(_ => peripheral);
 
-
+    
     /// <summary>
     /// Quick helper around WhenStatusChanged().Where(x => x == ConnectionStatus.Disconnected)
     /// </summary>
@@ -96,7 +93,7 @@ public static class PeripheralExtensions
             .Where(x => x == ConnectionState.Disconnected)
             .Select(_ => peripheral);
 
-
+    
     /// <summary>
     /// Hooks a notification subscription - NOTE: this is a refcount observable. A characteristic will stay hooked
     /// as long as their are subscribers
@@ -104,14 +101,11 @@ public static class PeripheralExtensions
     /// <param name="peripheral"></param>
     /// <param name="info"></param>
     /// <param name="useIndicationsIfAvailable"></param>
-    /// <param name="emitSubscribedEvent">
-    /// If true, the notificaton BleCharacteristicEvent will be emitted with empty data and notification subscribed - useful for knowing when hook is made
-    /// WARNING: If subscriber has multiple hooks, this event will only be emitted to the first subscriber
-    /// </param>
     /// <returns>A streaming observable</returns>
-    public static IObservable<BleCharacteristicResult> NotifyCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, bool useIndicationsIfAvailable = true, bool emitSubscribedEvent = false)
-        => peripheral.NotifyCharacteristic(info.Service.Uuid, info.Uuid, useIndicationsIfAvailable, emitSubscribedEvent);
+    public static IObservable<BleCharacteristicResult> NotifyCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, bool useIndicationsIfAvailable = true)
+        => peripheral.NotifyCharacteristic(info.Service.Uuid, info.Uuid, useIndicationsIfAvailable);
 
+    
     /// <summary>
     /// Read a characteristic value
     /// </summary>
@@ -120,7 +114,8 @@ public static class PeripheralExtensions
     /// <returns>A completing observable</returns>
     public static IObservable<BleCharacteristicResult> ReadCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info)
         => peripheral.ReadCharacteristic(info.Service.Uuid, info.Uuid);
-
+    
+    
     /// <summary>
     /// Writes a value to a characteristic
     /// </summary>
@@ -132,6 +127,7 @@ public static class PeripheralExtensions
     public static IObservable<BleCharacteristicResult> WriteCharacteristic(this IPeripheral peripheral, BleCharacteristicInfo info, byte[] data, bool withResponse = true)
         => peripheral.WriteCharacteristic(info.Service.Uuid, info.Uuid, data, withResponse);
 
+    
     /// <summary>
     /// Get all descriptors
     /// </summary>
@@ -141,6 +137,7 @@ public static class PeripheralExtensions
     public static IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(this IPeripheral peripheral, BleCharacteristicInfo info)
         => peripheral.GetDescriptors(info.Service.Uuid, info.Uuid);
 
+    
     /// <summary>
     /// Write a value to a descriptor
     /// </summary>
@@ -151,6 +148,7 @@ public static class PeripheralExtensions
     public static IObservable<BleDescriptorResult> WriteDescriptor(this IPeripheral peripheral, BleDescriptorInfo info, byte[] data)
         => peripheral.WriteDescriptor(info.Characteristic.Service.Uuid, info.Characteristic.Uuid, info.Uuid, data);
 
+    
     /// <summary>
     /// Read a descriptor value
     /// </summary>

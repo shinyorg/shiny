@@ -19,6 +19,7 @@ public partial class Peripheral
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(this.FromNative);
 
+    
     public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => this
         .GetNativeService(serviceUuid)
         .Select(service => service
@@ -27,6 +28,7 @@ public partial class Peripheral
             .ToList()
         );
 
+    
     public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch => this.operations.QueueToObservable(async ct => 
@@ -49,12 +51,39 @@ public partial class Peripheral
         .Switch();
 
     
+    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
+    {
+        this.AssertConnection();
+
+        if (this.Gatt!.Services != null)
+        {
+            // TODO: safety lock the notication queue
+            foreach (var service in this.Gatt!.Services)
+            {
+                if (service.Characteristics != null)
+                {
+                    foreach (var ch in service.Characteristics)
+                    {
+                        if (this.IsNotifying(ch.Service!.Uuid!.ToString(), ch.Uuid!.ToString()))
+                        {
+                            var info = this.FromNative(ch);
+                            ob.OnNext(info);
+                        }
+                    }
+                }
+            }
+        }
+
+        return this.charSubSubj.Subscribe(ob.OnNext);
+    });
+    
+    readonly Subject<BleCharacteristicInfo> charSubSubj = new();
     IObservable<BleCharacteristicResult>? notifyObs;
-    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true, bool emitSubscribedEvent = false)
+    public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
         this.AssertConnection();
         
-        this.notifyObs ??= Observable.Create<BleCharacteristicResult>(ob => this
+        this.notifyObs ??= this
             .WhenConnected()
             .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
             .Switch()
@@ -76,24 +105,19 @@ public partial class Peripheral
                 this.logger.LogInformation($"Hooked Notification Characteristic '{characteristicUuid}' successfully");
 
                 this.AddNotify(serviceUuid, characteristicUuid);
-                if (emitSubscribedEvent)
-                    ob.OnNext(this.ToResult(ch, BleCharacteristicEvent.NotificationSubscribed));
-
+                this.charSubSubj.OnNext(this.FromNative(ch));
+                
                 return ch;
             }))
             .Switch()
             .Select(ch => this.notifySubj
                 .Where(x => x.Equals(ch))
+                .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
                 .Finally(() => this.TryNotificationCleanup(ch, serviceUuid, characteristicUuid))
             )
             .Switch()
-            .Subscribe(
-                x => ob.OnNext(this.ToResult(x, BleCharacteristicEvent.Notification)),
-                ob.OnError
-            )
-        )
-        .Publish()
-        .RefCount();
+            .Publish()
+            .RefCount();
 
         return this.notifyObs!;
     }
@@ -121,6 +145,8 @@ public partial class Peripheral
 
                 if (!this.Gatt!.SetCharacteristicNotification(ch, false))
                     this.logger.LogWarning("Could not cleanly disable notifications on characteristic: " + characteristicUuid);
+                
+                this.charSubSubj.OnNext(this.FromNative(ch));
             }
         }
         catch (Exception ex)
@@ -175,7 +201,6 @@ public partial class Peripheral
         .Switch();
 
 
-    // TODO: return gattstatus codes?
     readonly Subject<(BluetoothGattCharacteristic Char, GattStatus Status, bool IsWrite)> charEventSubj = new();
     public override void OnCharacteristicRead(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
         => this.charEventSubj.OnNext((characteristic!, status, false));
@@ -200,19 +225,22 @@ public partial class Peripheral
             return ch;
         });
 
+    
     protected BleCharacteristicResult ToResult(BluetoothGattCharacteristic ch, BleCharacteristicEvent @event) => new BleCharacteristicResult(
         this.FromNative(ch),
         @event,
         ch.GetValue()
     );
 
+    
     protected BleCharacteristicInfo FromNative(BluetoothGattCharacteristic ch) => new BleCharacteristicInfo(
         this.FromNative(ch.Service),
         ch.Uuid.ToString(),
         this.IsNotifying(ch.Service.Uuid.ToString(), ch.Uuid.ToString()),
         (CharacteristicProperties)(int)ch.Properties
     );
-
+    
+    
     readonly List<string> notifications = new();
     protected bool IsNotifying(string serviceUuid, string characteristicUuid)
         => this.notifications.Contains($"{serviceUuid}-{characteristicUuid}".ToLower());
