@@ -1,5 +1,4 @@
 ﻿using System.Reactive.Disposables;
-using Acr.UserDialogs;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 
@@ -28,27 +27,6 @@ public abstract class AbstractShinyTests : IDisposable
     protected T GetService<T>() => this.Host!.Services!.GetRequiredService<T>()!;
     protected IHost Host { get; }
     protected virtual void Configure(IHostBuilder hostBuilder) { }
-    protected virtual Task Alert(string message) => UserDialogs.Instance.AlertAsync(message);
-
-    protected virtual async Task<int> IntInput(string message, int? maxLength = null)
-    {
-        var result = await UserDialogs.Instance.PromptAsync(new PromptConfig
-        {
-            Message = message,
-            MaxLength = maxLength,
-            InputType = InputType.Number
-        });
-        if (!result.Ok)
-            return 0;
-
-        return Int32.Parse(result.Value);
-    }
-    
-    protected virtual async Task AlertWait(string message, Func<Task> wait)
-    {
-        using (UserDialogs.Instance.Alert(message))
-            await wait.Invoke();
-    }
 
 
     public virtual void Dispose()
