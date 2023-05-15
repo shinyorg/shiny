@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using CoreBluetooth;
 using Foundation;
 
+namespace Shiny.BluetoothLE;
 
-namespace Shiny.BluetoothLE
-{
+
     public class AdvertisementData : IAdvertisementData
     {
         readonly NSDictionary adData;
@@ -91,4 +91,3 @@ namespace Shiny.BluetoothLE
             return this.adData.ObjectForKey(key);
         }
     }
-}

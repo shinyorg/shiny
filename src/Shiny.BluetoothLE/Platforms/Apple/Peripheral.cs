@@ -43,6 +43,7 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         .Native
         .GetMaximumWriteValueLength(CBCharacteristicWriteType.WithoutResponse);
 
+    
     public ConnectionState Status => this.Native.State switch
     {
         CBPeripheralState.Connected => ConnectionState.Connected,

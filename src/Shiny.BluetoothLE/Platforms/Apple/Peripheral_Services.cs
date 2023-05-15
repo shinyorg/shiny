@@ -73,7 +73,7 @@ public partial class Peripheral
     });
 
 
-    protected BleServiceInfo FromNative(CBService native) => new BleServiceInfo(
+    protected BleServiceInfo FromNative(CBService native) => new(
         native.UUID.ToString()
     );
 
@@ -87,5 +87,8 @@ public partial class Peripheral
 
     readonly Subject<NSError?> serviceDiscoverySubj = new();
     public override void DiscoveredService(CBPeripheral peripheral, NSError? error)
-        => this.serviceDiscoverySubj.OnNext(error);
+    {
+        Log.ServiceDiscoveryEvent(this.logger, peripheral.Identifier, peripheral.Services?.Length ?? 0);
+        this.serviceDiscoverySubj.OnNext(error);
+    }
 }

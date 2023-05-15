@@ -69,12 +69,12 @@ public partial class Peripheral
 
 
     //var bytes = args.Descriptor.ToByteArray(); from old code
-    protected BleDescriptorResult ToResult(CBDescriptor native) => new BleDescriptorResult(
+    protected BleDescriptorResult ToResult(CBDescriptor native) => new(
         this.FromNative(native),
         (native.Value as NSData)?.ToArray()
     );
 
-    protected BleDescriptorInfo FromNative(CBDescriptor native) => new BleDescriptorInfo(
+    protected BleDescriptorInfo FromNative(CBDescriptor native) => new(
         this.FromNative(native.Characteristic!),
         native.UUID.ToString()
     );

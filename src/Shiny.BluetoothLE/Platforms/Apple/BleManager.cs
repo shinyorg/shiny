@@ -46,11 +46,8 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
             if (this.manager == null)
             {
                 if (!AppleExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
-                    this.logger.LogCritical("NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
-
-                if (!AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
-                    this.logger.LogCritical("NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
-
+                    Log.MissingIosPermission(this.logger, "NSBluetoothPeripheralUsageDescription");
+                
                 var background = this.services.GetService(typeof(IBleDelegate)) != null;
                 if (!background)
                 {
@@ -59,6 +56,9 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                 }
                 else
                 {
+                    if (!AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
+                        Log.MissingIosPermission(this.logger, "NSBluetoothAlwaysUsageDescription");
+                    
                     var opts = new CBCentralInitOptions
                     {
                         ShowPowerAlert = this.config.ShowPowerAlert,
