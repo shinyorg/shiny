@@ -168,11 +168,11 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         }));
 
 
-    public bool Handle(string sessionIdentifier, Action completionHandler)
+    public bool Handle(string sessionIdentifier, Action incomingCompletionHandler)
     {
         if (SessionName.Equals(sessionIdentifier))
         {
-            this.completionHandler = completionHandler;
+            this.completionHandler = incomingCompletionHandler;
             return true;
         }
         return false;
@@ -265,14 +265,14 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
     {
-        this.logger.LogDebug($"DidFinishEventsForBackgroundSession");
+        this.logger.LogDebug("DidFinishEventsForBackgroundSession");
         this.completionHandler?.Invoke();
     }
 
 
     public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError? error)
     {
-        this.logger.LogDebug($"DidCompleteWithError");
+        this.logger.LogDebug("DidCompleteWithError");
         var ht = this.repository.Get<HttpTransfer>(task.TaskDescription);
         if (ht == null)
             return;
@@ -318,7 +318,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
     {
-        this.logger.LogDebug($"DidSendBodyData");
+        this.logger.LogDebug("DidSendBodyData");
         var ht = this.repository.Get<HttpTransfer>(task.TaskDescription);
 
         if (ht != null)

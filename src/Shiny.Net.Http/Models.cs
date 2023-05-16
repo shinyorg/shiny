@@ -61,7 +61,6 @@ public record TransferProgress(
                 }
                 else
                 {
-                    var bytesRemaining = this.BytesToTransfer.Value - this.BytesTransferred;
                     this.percentComplete = Math.Round((double)this.BytesTransferred / this.BytesToTransfer!.Value, 2);
                 }
             }

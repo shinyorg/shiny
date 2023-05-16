@@ -77,11 +77,14 @@ public class HttpTransferMonitor : IDisposable
             {
                 if (x.Action == RepositoryAction.Clear)
                 {
+                    this.logger.LogInformation("Incoming HTTP Transfer Repository Clear");
                     this.transfers.Clear();
                 }
                 else
                 {
                     var e = (HttpTransfer)x.Entity!;
+                    this.logger.RepositoryChange(x.Action, e.Identifier, e.Request.Uri);
+
                     switch (x.Action)
                     {
                         case RepositoryAction.Add:
@@ -106,6 +109,8 @@ public class HttpTransferMonitor : IDisposable
             {
                 // sync lock the collection?
                 var item = this.transfers.FirstOrDefault(y => y.Identifier.Equals(x.Request.Identifier));
+                if (item != null)
+                    this.logger.TransferUpdate(item.Identifier, item.Status);
 
                 if (x.Status == HttpTransferState.Completed && removeFinished)
                 {
