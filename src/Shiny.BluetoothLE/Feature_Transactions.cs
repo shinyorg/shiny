@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 
 namespace Shiny.BluetoothLE;
 

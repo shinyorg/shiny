@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
-using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
@@ -54,10 +53,9 @@ public partial class Peripheral
     public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
     {
         this.AssertConnection();
-
-        if (this.Gatt!.Services != null)
+        
+        if (!this.RequiresServiceDiscovery && this.Gatt!.Services != null)
         {
-            // TODO: safety lock the notication queue
             foreach (var service in this.Gatt!.Services)
             {
                 if (service.Characteristics != null)
@@ -77,6 +75,7 @@ public partial class Peripheral
         return this.charSubSubj.Subscribe(ob.OnNext);
     });
     
+    
     readonly Subject<BleCharacteristicInfo> charSubSubj = new();
     IObservable<BleCharacteristicResult>? notifyObs;
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
@@ -91,7 +90,7 @@ public partial class Peripheral
             {
                 this.FromNative(ch).AssertNotify();
 
-                this.logger.LogInformation("Hook Notification Characteristic: " + characteristicUuid);
+                this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribing");
 
                 if (!this.Gatt!.SetCharacteristicNotification(ch, true))
                     throw new BleException("Failed to set characteristic notification value");
@@ -102,8 +101,8 @@ public partial class Peripheral
                     throw new BleException("Characteristic notification descriptor not found");
 
                 await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
-                this.logger.LogInformation($"Hooked Notification Characteristic '{characteristicUuid}' successfully");
-
+                this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
+                
                 this.AddNotify(serviceUuid, characteristicUuid);
                 this.charSubSubj.OnNext(this.FromNative(ch));
                 
@@ -140,18 +139,18 @@ public partial class Peripheral
                 )
                 .Subscribe(
                     _ => { },
-                    ex => this.logger.LogWarning(ex, "Could not cleanly disable notifications on characteristic: " + characteristicUuid)
+                    ex => this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid)
                 );
 
                 if (!this.Gatt!.SetCharacteristicNotification(ch, false))
-                    this.logger.LogWarning("Could not cleanly disable notifications on characteristic: " + characteristicUuid);
+                    this.logger.DisableNotificationError(null!, serviceUuid, characteristicUuid);
                 
                 this.charSubSubj.OnNext(this.FromNative(ch));
             }
         }
         catch (Exception ex)
         {
-            this.logger.LogWarning(ex, "Error disabling notifications on characteristic: " + characteristicUuid);
+            this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid);
         }
     }
 
@@ -242,20 +241,37 @@ public partial class Peripheral
     
     
     readonly List<string> notifications = new();
+
     protected bool IsNotifying(string serviceUuid, string characteristicUuid)
-        => this.notifications.Contains($"{serviceUuid}-{characteristicUuid}".ToLower());
+    {
+        lock (this.notifications)
+            return this.notifications.Contains(NotifyKey(serviceUuid, characteristicUuid));
+    }
+
 
     protected void AddNotify(string serviceUuid, string characteristicUuid)
-        => this.notifications.Add($"{serviceUuid}-{characteristicUuid}".ToLower());
+    {
+        lock (this.notifications)
+            this.notifications.Add(NotifyKey(serviceUuid, characteristicUuid));
+    }
+
 
     protected void RemoveNotify(string serviceUuid, string characteristicUuid)
-        => this.notifications.Remove($"{serviceUuid}-{characteristicUuid}".ToLower());
+    {
+        lock (this.notifications)
+            this.notifications.Remove(NotifyKey(serviceUuid, characteristicUuid));
+    }
 
+
+    static string NotifyKey(string serviceUuid, string characteristicUuid)
+        => $"{serviceUuid}-{characteristicUuid}".ToLower();
+
+ 
     protected byte[] GetNotifyDescriptorBytes(BluetoothGattCharacteristic ch, bool useIndicationsIfAvailable)
     {
         if (useIndicationsIfAvailable && ch.Properties.HasFlag(GattProperty.Indicate))
-            return BluetoothGattDescriptor.EnableIndicationValue.ToArray();
+            return BluetoothGattDescriptor.EnableIndicationValue!.ToArray();
 
-        return BluetoothGattDescriptor.EnableNotificationValue.ToArray();
+        return BluetoothGattDescriptor.EnableNotificationValue!.ToArray();
     }
 }
