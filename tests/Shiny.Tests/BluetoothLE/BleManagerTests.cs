@@ -56,10 +56,10 @@ public class BleManagerTests : AbstractBleTests
 #if ANDROID
 
     [Fact(DisplayName = "BLE Manager - Android - Paired Peripherals")]
-    public async Task Android_Peripherals_GetPaired()
+    public void Android_Peripherals_GetPaired()
     {
         this.Manager.CanViewPairedPeripherals().Should().BeTrue();
-        var peripherals = await this.Manager.TryGetPairedPeripherals();
+        var peripherals = this.Manager.TryGetPairedPeripherals();
 
         foreach (ICanPairPeripherals peripheral in peripherals)
         {

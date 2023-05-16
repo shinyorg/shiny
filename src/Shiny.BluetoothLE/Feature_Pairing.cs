@@ -8,7 +8,6 @@ namespace Shiny.BluetoothLE;
 
 public enum PairingState
 {
-    Unavailiable,
     NotPaired,
     Paired
 }
@@ -19,7 +18,7 @@ public interface ICanViewPairedPeripherals : IBleManager
     /// Get the list of paired peripherals
     /// </summary>
     /// <returns></returns>
-    IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals();
+    IReadOnlyList<IPeripheral> GetPairedPeripherals();
 }
 
 
@@ -45,11 +44,11 @@ public static class FeaturePairing
     public static bool IsPairingRequestsAvailable(this IPeripheral peripheral) => peripheral is ICanPairPeripherals;
 
 
-    public static IObservable<IEnumerable<IPeripheral>> TryGetPairedPeripherals(this IBleManager centralManager)
+    public static IReadOnlyList<IPeripheral> TryGetPairedPeripherals(this IBleManager centralManager)
     {
         var paired = centralManager as ICanViewPairedPeripherals;
         if (paired == null)
-            return Observable.Empty<IEnumerable<IPeripheral>>();
+            return Array.Empty<IPeripheral>().ToList();
 
         return paired.GetPairedPeripherals();
     }

@@ -18,7 +18,7 @@ using SR = Android.Bluetooth.LE.ScanResult;
 namespace Shiny.BluetoothLE;
 
 
-public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
+public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 {
     public const string BroadcastReceiverName = "org.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
 
@@ -143,7 +143,7 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
     readonly Subject<(SR? Native, ScanFailure? Failure)> scanSubj = new();
     public IObservable<ScanResult> Scan(ScanConfig? config = null) => this.RequestAccess()
-        .Do(x => x.Assert())
+        .Do(x => Assert(x))
         .Select(x => Observable.Create<ScanResult>(ob =>
         {
             if (this.IsScanning)
@@ -284,43 +284,19 @@ public class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
 
-    //static void Assert(AccessState access)
-    //{
-    //    if (access == AccessState.NotSetup)
-    //    {
-    //        var permissions = GetPlatformPermissions();
-    //        var msgList = String.Join(", ", permissions);
-    //        throw new InvalidOperationException("Your AndroidManifest.xml is missing 1 or more of the following permissions for this version of Android: " + msgList);
-    //    }
-    //    else if (access != AccessState.Available)
-    //    {
-    //        throw new InvalidOperationException($"Invalid Status: {access}");
-    //    }
-    //}
+    static void Assert(AccessState access)
+    {
+        if (access == AccessState.NotSetup)
+        {
+            var permissions = GetPlatformPermissions();
+            var msgList = String.Join(", ", permissions);
+            throw new InvalidOperationException("Your AndroidManifest.xml is missing 1 or more of the following permissions for this version of Android: " + msgList);
+        }
+        
+        if (access != AccessState.Available)
+            throw new PermissionException("BluetoothLE", access);
+    }
 }
-
-//    public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => Observable.Return(this.context
-//        .Manager
-//        .Adapter!
-//        .BondedDevices
-//        .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
-//        .Select(this.context.GetDevice)
-//    );
-
-
-//    public IObservable<Intent> ListenForMe(Peripheral me) => this
-//        .peripheralSubject
-//        .Where(x => x.Peripheral.Native.Address!.Equals(me.Native.Address))
-//        .Select(x => x.Intent);
-
-
-//    public IObservable<Intent> ListenForMe(string eventName, Peripheral me) => this
-//        .ListenForMe(me)
-//        .Where(intent => intent.Action?.Equals(
-//            eventName,
-//            StringComparison.InvariantCultureIgnoreCase
-//        ) ?? false);
-
 
 //    public IEnumerable<Peripheral> GetConnectedDevices()
 //    {
