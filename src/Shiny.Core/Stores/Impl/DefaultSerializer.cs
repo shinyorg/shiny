@@ -6,7 +6,7 @@ namespace Shiny.Stores.Impl;
 
 public class DefaultSerializer : ISerializer
 {
-    readonly JsonSerializerOptions serializeOptions = new JsonSerializerOptions
+    readonly JsonSerializerOptions serializeOptions = new()
     {
         Converters =
         {

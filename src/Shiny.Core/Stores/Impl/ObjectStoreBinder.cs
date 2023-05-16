@@ -52,7 +52,7 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
             // Skip if there are no properties to bind
             if (props.Count == 0)
             {
-                this.logger?.LogInformation($"Skip model bind (no public props): {npc.GetType().FullName} to store: {store.Alias}");
+                this.logger?.BindInfo("Skipped (no get/set properties)", npc.GetType()!.FullName!, store.Alias);
                 return;
             }
 
@@ -68,19 +68,19 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
                     }
                     catch (Exception ex)
                     {
-                        this.logger?.LogError($"Failed to bind {prop.Name} on {type.FullName}", ex);
+                        this.logger?.PropertyBindError(ex, type.FullName!, prop.Name);
                     }
                 }
             }
             npc.PropertyChanged += this.OnPropertyChanged;
             this.boundObjects.Add(npc);
 
-            this.logger?.LogInformation($"Successfully bound model: {npc.GetType().FullName} to store: {store.Alias}");
+            this.logger?.BindInfo("Success", npc.GetType().FullName!, store.Alias);
             this.bindings.Add(npc, store);
         }
         catch (Exception ex)
         {
-            this.logger?.LogError(ex, $"Failed to bind model: {npc?.GetType().FullName ?? "Unknown"} to store: {store.Alias}");
+            this.logger?.BindError(ex, npc?.GetType().FullName ?? "Unknown", store.Alias);
         }
     }
 

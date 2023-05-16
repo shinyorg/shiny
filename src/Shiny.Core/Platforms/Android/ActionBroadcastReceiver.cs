@@ -3,10 +3,14 @@ using Android.Content;
 
 namespace Shiny;
 
-[BroadcastReceiver(Enabled = true, Exported = false, Label = "Shiny Broadcast Receiver")]
+[BroadcastReceiver(
+    Enabled = true, 
+    Exported = false, 
+    Label = "Shiny Broadcast Receiver"
+)]
 public class ActionBroadcastReceiver : BroadcastReceiver
 {
-    public Action<Intent>? OnAction { get; set; }
+    public Action<Intent>? OnAction { get; init; }
 
     public override void OnReceive(Context? context, Intent? intent)
     {
@@ -31,6 +35,6 @@ public class ActionBroadcastReceiver : BroadcastReceiver
 
     public static void UnRegister(AndroidPlatform platform, ActionBroadcastReceiver receiver)
     {
-        platform.AppContext.UnregisterReceiver(receiver);
+        platform!.AppContext.UnregisterReceiver(receiver);
     }
 }

@@ -21,7 +21,7 @@ public class MemoryKeyValueStore : IKeyValueStore
     protected void Do(Action<Dictionary<string, object>> worker) => this.Do<object>(values =>
     {
         worker(values);
-        return null;
+        return null!;
     });
     protected T Do<T>(Func<Dictionary<string, object>, T> worker)
     {

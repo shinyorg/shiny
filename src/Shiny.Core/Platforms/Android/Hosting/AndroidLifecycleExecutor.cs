@@ -95,7 +95,7 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
             }
             catch (Exception ex)
             {
-                this.logger.LogError("Failed to execute lifecycle call", ex);
+                this.logger.LogError(ex, "Failed to execute lifecycle call");
             }
         }
     }

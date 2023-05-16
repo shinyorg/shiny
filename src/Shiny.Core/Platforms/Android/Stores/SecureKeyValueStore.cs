@@ -1,6 +1,6 @@
 ﻿using System;
 using Javax.Crypto;
-using Shiny.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Stores;
 
@@ -13,7 +13,11 @@ public class SecureKeyValueStore : IKeyValueStore
     readonly ISerializer serializer;
 
 
-    public SecureKeyValueStore(AndroidPlatform platform, ISerializer serializer)
+    public SecureKeyValueStore(
+        ILogger<SecureKeyValueStore> logger,
+        AndroidPlatform platform, 
+        ISerializer serializer
+    )
     {
         this.settingsStore = new SettingsKeyValueStore(platform, serializer);
         this.serializer = serializer;
@@ -21,6 +25,7 @@ public class SecureKeyValueStore : IKeyValueStore
         this.keyStore = new AndroidKeyStore(
             platform.AppContext,
             this.settingsStore,
+            logger,
             $"{platform.AppContext.PackageName}.secure",
             false
         );

@@ -1,5 +1,6 @@
 ﻿// modified from Xamarin Essentials source
 using System;
+using System.Security.Cryptography;
 using System.Text;
 using Android.Content;
 using Android.Runtime;
@@ -8,6 +9,7 @@ using Android.Security.Keystore;
 using Java.Security;
 using Javax.Crypto;
 using Javax.Crypto.Spec;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Stores;
 
@@ -21,6 +23,7 @@ public class AndroidKeyStore
     const string prefsMasterKey = "SecureStorageKey";
     const int initializationVectorLen = 12; // Android supports an IV of 12 for AES/GCM
 
+    readonly ILogger logger;
     readonly IKeyValueStore clearStore;
     readonly Context appContext;
     readonly string alias;
@@ -28,9 +31,11 @@ public class AndroidKeyStore
     readonly KeyStore keyStore;
 
 
+    // TODO: inject logger
     internal AndroidKeyStore(
         Context appContext,
         IKeyValueStore clearStore,
+        ILogger logger,
         string keystoreAlias,
         bool alwaysUseAsymmetricKeyStorage
     )
@@ -38,6 +43,7 @@ public class AndroidKeyStore
         this.appContext  = appContext;
         this.alwaysUseAsymmetricKey = alwaysUseAsymmetricKeyStorage;
         this.alias = keystoreAlias;
+        this.logger = logger;
 
         this.clearStore = clearStore;
         this.keyStore = KeyStore.GetInstance(androidKeyStore)!;
@@ -78,15 +84,15 @@ public class AndroidKeyStore
             }
             catch (InvalidKeyException ikEx)
             {
-                System.Diagnostics.Debug.WriteLine($"Unable to unwrap key: Invalid Key. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ikEx.Message}");
+                this.logger.LogDebug($"Unable to unwrap key: Invalid Key. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ikEx.Message}");
             }
             catch (IllegalBlockSizeException ibsEx)
             {
-                System.Diagnostics.Debug.WriteLine($"Unable to unwrap key: Illegal Block Size. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ibsEx.Message}");
+                this.logger.LogDebug($"Unable to unwrap key: Illegal Block Size. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ibsEx.Message}");
             }
             catch (BadPaddingException paddingEx)
             {
-                System.Diagnostics.Debug.WriteLine($"Unable to unwrap key: Bad Padding. This may be caused by system backup or upgrades. All secure storage items will now be removed. {paddingEx.Message}");
+                this.logger.LogDebug(e($"Unable to unwrap key: Bad Padding. This may be caused by system backup or upgrades. All secure storage items will now be removed. {paddingEx.Message}");
             }
             this.clearStore.Clear(); // TODO: only want this to clear secure though
         }
