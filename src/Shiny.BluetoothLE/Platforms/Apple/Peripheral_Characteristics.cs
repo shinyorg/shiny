@@ -27,7 +27,7 @@ public partial class Peripheral
             .Select(ch =>
             {
                 this.FromNative(ch).AssertNotify();
-                this.logger.LogInformation("Hooking Notification Characteristic: " + characteristicUuid);
+                this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
                 this.Native.SetNotifyValue(true, ch);
 
                 return this.charUpdateSubj
@@ -41,7 +41,7 @@ public partial class Peripheral
                         }
                         catch (Exception ex)
                         {
-                            this.logger.LogWarning("Unable to cleanly dispose of characteristic notifications", ex);
+                            this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid);
                         }
                     });
             })
@@ -146,7 +146,7 @@ public partial class Peripheral
     readonly Subject<(CBCharacteristic Char, NSError? Error)> notifySubj = new();
     public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
     {
-        Log.CharacteristicNotifyState(this.logger, characteristic.Service!.UUID, characteristic.UUID, characteristic.IsNotifying);
+        this.logger.CharacteristicNotifyState(characteristic.Service!.UUID, characteristic.UUID, characteristic.IsNotifying);
         this.notifySubj.OnNext((characteristic, error));
     }
 

@@ -46,7 +46,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
             if (this.manager == null)
             {
                 if (!AppleExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
-                    Log.MissingIosPermission(this.logger, "NSBluetoothPeripheralUsageDescription");
+                    this.logger.MissingIosPermission("NSBluetoothPeripheralUsageDescription");
                 
                 var background = this.services.GetService(typeof(IBleDelegate)) != null;
                 if (!background)
@@ -57,7 +57,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                 else
                 {
                     if (!AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
-                        Log.MissingIosPermission(this.logger, "NSBluetoothAlwaysUsageDescription");
+                        this.logger.MissingIosPermission("NSBluetoothAlwaysUsageDescription");
                     
                     var opts = new CBCentralInitOptions
                     {
@@ -115,7 +115,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => Observable.Create<ScanResult>(ob =>
     {
         if (this.IsScanning)
-            throw new ArgumentException("There is already an existing scan");
+            throw new InvalidOperationException("There is already an existing scan");
 
         this.Clear();
         scanConfig ??= new ScanConfig();
