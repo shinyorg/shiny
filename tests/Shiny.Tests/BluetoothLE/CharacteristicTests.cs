@@ -128,7 +128,7 @@ public class CharacteristicTests : AbstractBleTests
 
         // trigger first notification
         this.Log("Waiting for notify to be ready");
-        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
+        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid);
         
         this.Log("Sending Write");
         await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x02 }, true);
@@ -144,7 +144,7 @@ public class CharacteristicTests : AbstractBleTests
         await this.Connect();
         
         this.Log("RECONNECT - Waiting for notify to be ready");
-        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid).WaitAsync(TimeSpan.FromSeconds(10));
+        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid).WaitAsync(TimeSpan.FromSeconds(10));
 
         this.Log("RECONNECT - Sending Write");
         await this.Peripheral!.WriteCharacteristicAsync(BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid, new byte[] { 0x03 }, true);
