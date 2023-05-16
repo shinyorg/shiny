@@ -20,7 +20,7 @@ public class ManagedScan : IDisposable
         => this.beaconManager = beaconManager;
 
 
-    public ObservableCollection<ManagedBeacon> Beacons { get; } = new ObservableCollection<ManagedBeacon>();
+    public ObservableCollection<ManagedBeacon> Beacons { get; } = new();
     public BeaconRegion? ScanningRegion { get; private set; }
     public bool IsScanning => this.ScanningRegion != null;
 

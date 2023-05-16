@@ -17,7 +17,7 @@ public class BeaconRangingManager : IBeaconRangingManager
     {
         this.centralManager = centralManager;
         this.scanner = this.centralManager
-            .ScanForBeacons(true) // TODO
+            .ScanForBeacons(false)
             .Publish()
             .RefCount();
     }

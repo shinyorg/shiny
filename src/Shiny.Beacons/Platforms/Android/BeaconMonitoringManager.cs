@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE;
 using Shiny.Support.Repositories;
 using P = Android.Manifest.Permission;
@@ -15,25 +16,35 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     readonly IRepository repository;
     readonly IBleManager bleManager;
     readonly AndroidPlatform platform;
+    readonly ILogger logger;
 
 
     public BeaconMonitoringManager(
         IBleManager bleManager,
         IRepository repository,
-        AndroidPlatform platform
+        AndroidPlatform platform,
+        ILogger<BeaconMonitoringManager> logger
     )
     {
         this.bleManager = bleManager;
         this.repository = repository;
         this.platform = platform;
+        this.logger = logger;
     }
 
 
     public void Start()
     {
-        var regions = this.GetMonitoredRegions();
-        if (regions.Any())
-            this.StartService();
+        try
+        {
+            var regions = this.GetMonitoredRegions();
+            if (regions.Any())
+                this.StartService();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Failed to start beacon monitoring");
+        }
     }
 
 

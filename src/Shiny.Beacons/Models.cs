@@ -1,7 +1,28 @@
-using System;
+﻿using System;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Beacons;
+
+public enum Proximity
+{
+    Unknown = 0,
+    Immediate = 1,
+    Near = 2,
+    Far = 3
+}
+
+
+public record Beacon(
+    Guid Uuid,
+    ushort Major,
+    ushort Minor,
+    Proximity Proximity,
+    int Rssi,
+    double Accuracy
+)
+{
+    public override string ToString() => $"[Beacon: Uuid={this.Uuid}, Major={this.Major}, Minor={this.Minor}]";
+}
 
 
 public enum BeaconRegionState

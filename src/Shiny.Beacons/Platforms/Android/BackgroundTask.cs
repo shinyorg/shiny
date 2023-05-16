@@ -132,7 +132,6 @@ public class BackgroundTask : IDisposable
             return;
 
         this.scanSub?.Dispose();
-        this.states.Clear();
         this.scanSub = null;
         lock (this.states)
             this.states.Clear();

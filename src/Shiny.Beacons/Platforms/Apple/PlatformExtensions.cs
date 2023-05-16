@@ -9,7 +9,7 @@ public static class PlatformExtensions
 {
     static NSUuid ToNsUuid(BeaconRegion region)
     {
-        if (region.Uuid == null)
+        if (region.Uuid == Guid.Empty)
             throw new ArgumentException("You must pass a UUID for the Beacon Region");
 
         var uuid = region.Uuid.ToNSUuid();
@@ -62,11 +62,11 @@ public static class PlatformExtensions
     };
 
     
-    public static CLProximity ToNative(this Proximity proximity) => proximity switch
-    {
-        Proximity.Far => CLProximity.Far,
-        Proximity.Immediate => CLProximity.Immediate,
-        Proximity.Near => CLProximity.Near,
-        _ => CLProximity.Unknown
-    };
+    // public static CLProximity ToNative(this Proximity proximity) => proximity switch
+    // {
+    //     Proximity.Far => CLProximity.Far,
+    //     Proximity.Immediate => CLProximity.Immediate,
+    //     Proximity.Near => CLProximity.Near,
+    //     _ => CLProximity.Unknown
+    // };
 }

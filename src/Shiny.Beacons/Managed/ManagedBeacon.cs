@@ -1,7 +1,7 @@
 ﻿using System;
 
-
 namespace Shiny.Beacons.Managed;
+
 
 public class ManagedBeacon : NotifyPropertyChanged
 {
