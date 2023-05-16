@@ -13,7 +13,7 @@ public class SecureStorageTests
     {
         var serializer = new DefaultSerializer();
 #if ANDROID
-        this.secureStore = new SecureKeyValueStore(new AndroidPlatform(), serializer);
+        this.secureStore = new SecureKeyValueStore(null, new AndroidPlatform(), serializer);
 #else
         this.secureStore = new SecureKeyValueStore(new IosPlatform(), serializer);
 #endif

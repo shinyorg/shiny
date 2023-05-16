@@ -84,13 +84,13 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
             {
                 if (func(handler))
                 {
-                    this.logger.LogDebug($"{handler!.GetType().FullName} handling lifecycle event for {typeof(T).FullName}");
+                    this.logger.LifecycleInfo(handler!.GetType().FullName!, typeof(T).FullName!);
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Failed to execute lifecycle call - '{handler!.GetType().FullName}' for lifecycle event '{typeof(T).FullName}'", ex);
+                this.logger.LifecycleError(ex, handler!.GetType().FullName!, typeof(T).FullName!);
             }
         }
         return false;
@@ -103,12 +103,12 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
         {
             try
             {
+                this.logger.LifecycleInfo(handler!.GetType().FullName!, typeof(T).FullName!);
                 action(handler);
-                this.logger.LogDebug($"{handler!.GetType().FullName} handling lifecycle event for {typeof(T).FullName}");
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Failed to execute lifecycle call - '{handler!.GetType().FullName}' for lifecycle event '{typeof(T).FullName}'", ex);
+                this.logger.LifecycleError(ex, handler!.GetType().FullName!, typeof(T).FullName!);
             }
         }
     }

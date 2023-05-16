@@ -10,6 +10,7 @@ using Java.Security;
 using Javax.Crypto;
 using Javax.Crypto.Spec;
 using Microsoft.Extensions.Logging;
+using CipherMode = Javax.Crypto.CipherMode;
 
 namespace Shiny.Stores;
 
@@ -84,15 +85,15 @@ public class AndroidKeyStore
             }
             catch (InvalidKeyException ikEx)
             {
-                this.logger.LogDebug($"Unable to unwrap key: Invalid Key. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ikEx.Message}");
+                this.logger?.LogDebug($"Unable to unwrap key: Invalid Key. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ikEx.Message}");
             }
             catch (IllegalBlockSizeException ibsEx)
             {
-                this.logger.LogDebug($"Unable to unwrap key: Illegal Block Size. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ibsEx.Message}");
+                this.logger?.LogDebug($"Unable to unwrap key: Illegal Block Size. This may be caused by system backup or upgrades. All secure storage items will now be removed. {ibsEx.Message}");
             }
             catch (BadPaddingException paddingEx)
             {
-                this.logger.LogDebug(e($"Unable to unwrap key: Bad Padding. This may be caused by system backup or upgrades. All secure storage items will now be removed. {paddingEx.Message}");
+                this.logger?.LogDebug($"Unable to unwrap key: Bad Padding. This may be caused by system backup or upgrades. All secure storage items will now be removed. {paddingEx.Message}");
             }
             this.clearStore.Clear(); // TODO: only want this to clear secure though
         }

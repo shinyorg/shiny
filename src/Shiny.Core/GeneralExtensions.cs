@@ -52,7 +52,7 @@ public static class GeneralExtensions
         if (sender == null)
             throw new ArgumentException("Sender is null");
 
-        var member = (expression as LambdaExpression)?.Body as MemberExpression;
+        var member = expression.Body as MemberExpression;
         if (member == null)
             throw new ArgumentException("Invalid lamba expression - body is not a member expression");
 
@@ -81,7 +81,7 @@ public static class GeneralExtensions
         if (method == null)
             throw new InvalidOperationException($"No method named '{methodName}' was found on type '{type.FullName}'");
 
-        var baseType = method.GetBaseDefinition().DeclaringType;
+        // var baseType = method.GetBaseDefinition().DeclaringType;
         var result = !method.DeclaringType!.FullName.Equals(method.GetBaseDefinition().DeclaringType?.FullName);
 
         return result;

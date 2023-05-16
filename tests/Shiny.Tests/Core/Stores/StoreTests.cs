@@ -18,7 +18,7 @@ public partial class StoreTests : IDisposable
             var serializer = new DefaultSerializer();
 #if ANDROID
             var platform = new AndroidPlatform();
-            yield return new object[] { new SecureKeyValueStore(platform, serializer) };
+            yield return new object[] { new SecureKeyValueStore(null!, platform, serializer) };
             yield return new object[] { new SettingsKeyValueStore(platform, serializer) };
 #elif IOS || MACCATALYST
             var platform = new IosPlatform();

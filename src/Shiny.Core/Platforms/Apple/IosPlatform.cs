@@ -3,7 +3,6 @@ using System.Reactive.Linq;
 using System.IO;
 using System.Linq;
 using Foundation;
-using Microsoft.Extensions.Logging;
 
 namespace Shiny;
 

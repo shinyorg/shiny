@@ -23,8 +23,7 @@ public class ConnectivityImpl : IConnectivity
         {
             var action = (NWPath path) =>
             {
-                if (this.logger.IsEnabled(LogLevel.Debug))
-                    this.logger.LogDebug($"Network change detected - {this.ConnectionTypes} - {this.Access}");
+                this.logger.NetworkChange(this.ConnectionTypes, this.Access);
                 ob.OnNext(this);
             };
             this.netmon.SnapshotHandler += action;

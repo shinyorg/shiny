@@ -11,7 +11,7 @@ namespace Shiny;
 
 public static class AppleExtensions
 {
-    static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+    readonly static DateTime reference = new(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
 
     public static bool HasAppDelegateHook(string selector)
