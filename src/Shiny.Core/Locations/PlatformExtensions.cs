@@ -30,7 +30,7 @@ public static class LocationExtensions
         if (!CLLocationManager.LocationServicesEnabled)
             return AccessState.Disabled;
 
-        return CLLocationManager.Status.FromNative(background);
+        return locationManager.AuthorizationStatus.FromNative(background);
     }
 
 
