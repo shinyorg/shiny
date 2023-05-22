@@ -30,8 +30,10 @@ public class Host : IHost
     public static T? GetService<T>() => ServiceProvider.GetService<T>();
 
 #if APPLE
+    public static IosPlatform Platform => ServiceProvider.GetRequiredService<IosPlatform>();
     public static IosLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<IosLifecycleExecutor>();
 #elif ANDROID
+    public static AndroidPlatform Platform => ServiceProvider.GetRequiredService<AndroidPlatform>();
     public static AndroidLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<AndroidLifecycleExecutor>();
 #endif
 

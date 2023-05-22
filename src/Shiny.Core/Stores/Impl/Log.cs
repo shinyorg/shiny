@@ -21,7 +21,7 @@ internal static partial class Log
     public static partial void PropertyBindError(this ILogger logger, Exception exception, string typeFullName, string propertyName);
     
     [LoggerMessage(
-        EventId = 2,
+        EventId = 3,
         Level = LogLevel.Error,
         Message = "Binding Failure: {typeFullName} - {storeAlias}"
     )]
