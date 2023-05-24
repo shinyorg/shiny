@@ -2,7 +2,7 @@
     <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 
     <PropertyGroup>
-        <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>$(DefaultTargetFrameworks);$(WindowsTarget)</TargetFrameworks>
         <Description>Shiny Reactive BluetoothLE Plugin for client/central operations</Description>
     </PropertyGroup>
 

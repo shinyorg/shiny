@@ -26,6 +26,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null)
     {
         services.TryAddSingleton<IOperationQueue, SemaphoreOperationQueue>();
+#elif WINDOWS
+    public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null)
+    {
+        //services.TryAddSingleton<IOperationQueue, FallthroughOperationQueue>(); // needed for windows?
 #endif
         if (!services.HasImplementation<BleManager>())
             services.AddShinyService<BleManager>();
