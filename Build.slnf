@@ -8,6 +8,7 @@
       "src\\Shiny.Hosting.Native\\Shiny.Hosting.Native.csproj",
       "src\\Shiny.Hosting.Uno\\Shiny.Hosting.Uno.csproj",
       "src\\Shiny.Logging.AppCenter\\Shiny.Logging.AppCenter.csproj",
+      "src\\Shiny.Logging.Sqlite\\Shiny.Logging.Sqlite.csproj",
       "src\\Shiny.Extensions.Configuration\\Shiny.Extensions.Configuration.csproj",
       "src\\Shiny.Beacons\\Shiny.Beacons.csproj",
       "src\\Shiny.BluetoothLE.Common\\Shiny.BluetoothLE.Common.csproj",
