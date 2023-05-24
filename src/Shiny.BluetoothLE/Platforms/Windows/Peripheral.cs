@@ -13,6 +13,8 @@ public partial class Peripheral : IPeripheral
     {
         this.Native = device;
         this.DeviceInfo = deviceInfo;
+
+        this.Uuid = device.BluetoothDeviceId.ToString();
     }
 
 
@@ -20,7 +22,7 @@ public partial class Peripheral : IPeripheral
     public BluetoothLEDevice? Native { get; private set; }
     public DeviceInformation DeviceInfo { get; }
 
-    public string Uuid => throw new NotImplementedException();
+    public string Uuid { get; }
     public string? Name =>this.Native?.Name;
     public int Mtu => -1;
 
@@ -87,10 +89,6 @@ public partial class Peripheral : IPeripheral
 
 
         public override void Connect(ConnectionConfig? config) => this.context.Connect();
-        public override void CancelConnection() => this.context.Disconnect();
-        public override ConnectionState Status => this.context.Status;
-        public override IObservable<ConnectionState> WhenStatusChanged() => this.context.WhenStatusChanged();
-        public override IObservable<int> ReadRssi() => Observable.Empty<int>();
         public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false) => Observable
             .FromAsync(async ct =>
             {
@@ -107,18 +105,7 @@ public partial class Peripheral : IPeripheral
 
         public override IObservable<IList<IGattService>> GetServices() => Observable.FromAsync(async ct =>
         {
-            var result = await this.context
-                .NativeDevice
-                .GetGattServicesAsync(BluetoothCacheMode.Uncached)
-                .AsTask(ct)
-                .ConfigureAwait(false);
-
-            result.Status.Assert();
-            return result
-                .Services
-                .Select(x => new GattService(this.context, x))
-                .Cast<IGattService>()
-                .ToList();
+           
         });
 
 

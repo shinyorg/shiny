@@ -1,13 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Shiny.BluetoothLE;
 
 
-public partial class Peripheral : IPeripheral
+public partial class Peripheral
 {
-    public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
-    public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => throw new NotImplementedException();
+    public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => Observable.FromAsync<BleCharacteristicInfo>(async ct =>
+    {
+        var sid = Utils.ToUuidType(serviceUuid);
+        var cid = Utils.ToUuidType(characteristicUuid);
+
+        var service = await this.Native!
+            .GetGattServicesForUuidAsync(sid)
+            .AsTask(ct)
+            .ConfigureAwait(false);
+
+        service.Status.Assert();
+
+        //service.ProtocolError
+        var chars = await service.Services.First().GetCharacteristicsForUuidAsync(cid).AsTask(ct).ConfigureAwait(false);
+        chars.Status.Assert();
+        var ch = chars.Characteristics.First();
+
+        return ToChar(ch);
+    });
+
+
+    public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => Observable.FromAsync(async ct =>
+    {
+        var nativeUuid = Utils.ToUuidType(serviceUuid);
+
+        //var result = await this.Native!.GetGattService(nativeUuid);
+
+        //    .GetCharacteristicsAsync(BluetoothCacheMode.Uncached)
+        //    .AsTask(ct)
+        //    .ConfigureAwait(false);
+
+        //result.Status.Assert();
+        //return result
+        //    .Characteristics
+        //    .Select(x => ToChar(x))
+        //    .ToList();
+        return null;
+    });
+
+
+    protected static BleCharacteristicInfo ToChar(GattCharacteristic ch) => new BleCharacteristicInfo(
+        new BleServiceInfo(ch.Service.Uuid.ToString()), 
+        ch.Uuid.ToString(), 
+        false, //ch.ValueChanged != null, 
+        CharacteristicProperties.Broadcast
+    );
+
+
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true) => throw new NotImplementedException();
     public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
     public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => throw new NotImplementedException();
@@ -30,6 +79,32 @@ using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteris
 
 namespace Shiny.BluetoothLE
 {
+
+
+
+ public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false) =>
+            Observable.FromAsync(async () =>
+            {
+                var uuid = Utils.ToUuidType(characteristicUuid);
+                var result = await this.native.GetCharacteristicsForUuidAsync(
+                    uuid,
+                    BluetoothCacheMode.Cached
+                );
+                if (result.Status != GattCommunicationStatus.Success)
+                    throw new ArgumentException("GATT Communication failure - " + result.Status);
+
+                var ch = new GattCharacteristic(this.context, result.Characteristics.First(), this);
+                return ch;
+            })
+            .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
+
+
+        public override IObservable<IList<IGattCharacteristic>> GetCharacteristics() => Observable.FromAsync(async ct =>
+        {
+
+        });
+
+
     public class GattCharacteristic : AbstractGattCharacteristic
     {
         readonly PeripheralContext context;

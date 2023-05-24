@@ -146,6 +146,7 @@ public partial class Peripheral
     readonly Subject<(CBCharacteristic Char, NSError? Error)> notifySubj = new();
     public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
     {
+        //CBATTError.PrepareQueueFull
         this.logger.CharacteristicNotifyState(characteristic.Service!.UUID, characteristic.UUID, characteristic.IsNotifying);
         this.notifySubj.OnNext((characteristic, error));
     }

@@ -2,18 +2,64 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Enumeration;
+using Windows.Devices.Radios;
+using Windows.Foundation;
 
 namespace Shiny.BluetoothLE;
 
 
-public partial class BleManager : IBleManager
+public partial class BleManager : IBleManager, IShinyStartupTask
 {
-    readonly ConcurrentDictionary<ulong, IPeripheral> peripherals = new();
+    readonly IServiceProvider services;
+    readonly ILogger logger;
+
+
+    public BleManager(IServiceProvider services, ILogger<IBleManager> logger)
+    {
+        this.services = services;
+        this.logger = logger;
+    }
+
+
+    public void Start()
+    {
+        var delegates = this.services.GetServices<IBleDelegate>().ToList();
+        if (delegates.Count == 0)
+            return;
+
+        // TODO: monitor SelectedRadio
+        this.GetRadio()
+            .Where(x => x != null)
+            .Subscribe(
+                radio =>
+                {
+
+                    var handler = new TypedEventHandler<Radio, object>((sender, args) =>
+                    {
+                        var status = sender.GetAccessStatus();
+                        delegates.RunDelegates(x => x.OnAdapterStateChanged(status), this.logger);
+                    });
+                },
+                ex =>
+                {
+                    this.logger.LogError(ex, "Could not monitor radio");
+                }
+            );
+    }
+
+    
 
 
     public bool IsScanning { get; private set; }
+    public Radio? SelectedRadio { get; set; }
+
 
     public IEnumerable<IPeripheral> GetConnectedPeripherals() => throw new NotImplementedException();
     public IPeripheral? GetKnownPeripheral(string peripheralUuid) => throw new NotImplementedException();
@@ -33,11 +79,59 @@ public partial class BleManager : IBleManager
     //});
 
 
-    public IObservable<AccessState> RequestAccess() => throw new NotImplementedException();
+    public IObservable<AccessState> RequestAccess() => this.GetRadio().Select(x => x.GetAccessStatus());
+
+
     public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => throw new NotImplementedException();
     public void StopScan() => throw new NotImplementedException();
 
 
+
+    public IObservable<Radio?> GetRadio() => Observable.Create<Radio?>(ob =>
+    {
+        IDisposable? sub = null;
+
+        if (this.SelectedRadio != null)
+        {
+            ob.Respond(this.SelectedRadio!);
+        }
+        else
+        {
+            //BluetoothAdapter.GetDefaultAsync().AsTask(ct)
+            sub = this.GetRadios().Subscribe(x =>
+            {
+                this.SelectedRadio = x.FirstOrDefault();
+                ob.Respond(this.SelectedRadio);
+            });
+        }
+        return () => sub?.Dispose();
+    });
+
+
+    public IObservable<IReadOnlyList<Radio>> GetRadios() => Observable.FromAsync<IReadOnlyList<Radio>>(async ct =>
+    {
+        var list = new List<Radio>();
+        var peripherals = await DeviceInformation
+            .FindAllAsync(BluetoothAdapter.GetDeviceSelector())
+            .AsTask(ct)
+            .ConfigureAwait(false);
+
+        foreach (var dev in peripherals)
+        {
+            //Log.Info(BleLogCategory.Adapter, "found - {dev.Name} ({dev.Kind} - {dev.Id})");
+
+            var native = await BluetoothAdapter.FromIdAsync(dev.Id);
+            if (native.IsLowEnergySupported)
+            {
+                var radio = await native.GetRadioAsync();
+                list.Add(radio);
+            }
+        }
+        return list;
+    });
+
+
+    readonly ConcurrentDictionary<ulong, IPeripheral> peripherals = new();
 
     IPeripheral GetPeripheral(BluetoothLEDevice native)
     {
@@ -50,87 +144,10 @@ public partial class BleManager : IBleManager
         .Where(x => x.Value.Status != ConnectionState.Connected)
         .ToList()
         .ForEach(x => this.peripherals.TryRemove(x.Key, out _));
-
-    //        public IObservable<IAdapter> FindAdapters() => Observable.Create<IAdapter>(async ob =>
-    //        {
-    //            var peripherals = await DeviceInformation.FindAllAsync(BluetoothAdapter.GetDeviceSelector());
-    //            foreach (var dev in peripherals)
-    //            {
-    //                Log.Info(BleLogCategory.Adapter, "found - {dev.Name} ({dev.Kind} - {dev.Id})");
-
-    //                var native = await BluetoothAdapter.FromIdAsync(dev.Id);
-    //                if (native.IsLowEnergySupported)
-    //                {
-    //                    var radio = await native.GetRadioAsync();
-    //                    var adapter = new Adapter(native, radio);
-    //                    ob.OnNext(adapter);
-    //                }
-    //            }
-    //            ob.OnCompleted();
-    //            return Disposable.Empty;
-    //        });
-
-
-
-    //public override IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
-    //{
-    //    Radio? r = null;
-    //    var handler = new TypedEventHandler<Radio, object>((sender, args) =>
-    //        ob.OnNext(this.Status)
-    //    );
-    //    var sub = this
-    //        .GetRadio()
-    //        .Subscribe(
-    //            rdo =>
-    //            {
-    //                r = rdo;
-    //                ob.OnNext(this.Status);
-    //                r.StateChanged += handler;
-    //            },
-    //            ob.OnError
-    //        );
-
-    //    return () =>
-    //    {
-    //        sub.Dispose();
-    //        if (r != null)
-    //            r.StateChanged -= handler;
-    //    };
-    //})
-    //.StartWith(this.Status);
 }
 
 
-/*
-        public override IObservable<AccessState> RequestAccess() => this.GetRadio()
-            .Catch((ArgumentException ex) => Observable.Return<Radio>(null))
-            .Select(x => x == null ? AccessState.NotSupported : this.Status);
-
-
-        AccessState Status
-        {
-            get
-            {
-                if (this.radio == null)
-                    return AccessState.Unknown;
-
-                switch (this.radio.State)
-                {
-                    case RadioState.Disabled:
-                    case RadioState.Off:
-                        return AccessState.Disabled;
-
-                    case RadioState.Unknown:
-                        return AccessState.Unknown;
-
-                    default:
-                        return AccessState.Available;
-                }
-            }
-        }
-
-
-        
+/*       
 
 
         public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null) => this.GetDevices(

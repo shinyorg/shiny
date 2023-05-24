@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Shiny.BluetoothLE;
 
 
-public partial class Peripheral : IPeripheral
+public partial class Peripheral
 {
     public IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => throw new NotImplementedException();
     public IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
