@@ -30,7 +30,7 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<!--<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>-->
 <!--		<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>-->
 	</PropertyGroup>
 
@@ -49,7 +49,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+        <!--<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />-->
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0" />

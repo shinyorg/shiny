@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
@@ -42,7 +41,7 @@ public static class MauiProgram
 #endif
             });
 
-        builder.Logging.AddDebug();
+        //builder.Logging.AddDebug();
 
         return builder.Build();
     }

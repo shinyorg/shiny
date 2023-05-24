@@ -99,33 +99,6 @@ namespace Shiny.BluetoothLE
             .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
 
 
-        public override IObservable<IList<IGattCharacteristic>> GetCharacteristics() => Observable.FromAsync(async ct =>
-        {
-
-        });
-
-
-    public class GattCharacteristic : AbstractGattCharacteristic
-    {
-        readonly PeripheralContext context;
-
-
-        public GattCharacteristic(
-            PeripheralContext context,
-            Native native,
-            IGattService service
-        ) : base(
-            service,
-            native.Uuid.ToString(),
-            (CharacteristicProperties)native.CharacteristicProperties
-        )
-        {
-            this.context = context;
-            this.Native = native;
-        }
-
-
-        public Native Native { get; }
 
 
         public override IObservable<IList<IGattDescriptor>> GetDescriptors() => Observable.FromAsync<IList<IGattDescriptor>>(async ct =>
