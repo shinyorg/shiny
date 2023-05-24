@@ -1,4 +1,6 @@
 ﻿#if PLATFORM
+using System.Runtime.InteropServices;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Hosting;
@@ -24,6 +26,11 @@ public static class ShinyInfrastructureExtensions
 #elif APPLE
         services.AddShinyService<IosPlatform>();
         services.AddShinyService<IosLifecycleExecutor>();
+        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        services.AddCommon();
+#elif WINDOWS
+        services.AddShinyService<WindowsPlatform>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
         services.AddCommon();

@@ -1,6 +1,5 @@
 ﻿using System;
 using Foundation;
-using Shiny.Infrastructure;
 
 namespace Shiny.Stores;
 
