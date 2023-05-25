@@ -22,24 +22,23 @@ namespace Shiny.Logging.AppCenter
 
         public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
         public bool IsEnabled(LogLevel logLevel) => logLevel >= this.configLogLevel;
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!this.IsEnabled(logLevel))
                 return;
 
-            // TODO: I need scopes
             var message = formatter(state, exception);
             if (logLevel >= LogLevel.Error)
             {
                 exception ??= new Exception(message);
 
-                //Crashes.TrackError(
-                //    exception,
-                //    new Dictionary<string, string>
-                //    {
-                //        { "Message", message }
-                //    }
-                //);
+                Crashes.TrackError(
+                    exception,
+                    new Dictionary<string, string>
+                    {
+                        { "Message", message }
+                    }
+                );
             }
             else
             {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shiny.Logging.AppCenter;
+namespace Shiny.Logging.Sqlite;
 
 public class NullScope : IDisposable
 {

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Shiny.Logging.Sqlite;
 
 namespace Shiny;
@@ -11,10 +10,11 @@ public static class ServiceCollectionExtensions
     /// Add SQLite logging
     /// </summary>
     /// <param name="builder"></param>
-    /// <param name="logLevel"></param>
-    public static void AddSqlite(this ILoggingBuilder builder, LogLevel logLevel = LogLevel.Warning)
+    /// <param name="dbPath">The path used to store the sqlite database</param>
+    /// <param name="logLevel">The minimum log level to use</param>
+    public static void AddSqlite(this ILoggingBuilder builder, string dbPath = ".", LogLevel logLevel = LogLevel.Trace)
     {
-        //builder.Services.TryAddSingleton<ShinySqliteConnection>();
-        builder.AddProvider(new SqliteLoggerProvider(logLevel));
+        var conn = LoggingSqliteConnection.CreateInstance(dbPath);
+        builder.AddProvider(new SqliteLoggerProvider(logLevel, conn));
     }
 }

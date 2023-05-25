@@ -80,7 +80,9 @@ public static class MauiProgram
     {
         var s = builder.Services;
 
-        //builder.Logging.AddProvider(new SqliteLoggerProvider(LogLevel.Trace));
+        builder.Logging.AddAppCenter("TODO", LogLevel.Information);
+        builder.Logging.AddSqlite(Path.Combine(FileSystem.AppDataDirectory, "logging.db"), LogLevel.Debug);
+        
         s.AddSingleton<SampleSqliteConnection>();
         s.AddShinyService<CommandExceptionHandler>();
         s.AddScoped<BaseServices>();

@@ -6,8 +6,14 @@ namespace Shiny.Logging.Sqlite;
 public class SqliteLoggerProvider : ILoggerProvider
 {
     readonly LogLevel logLevel;
-    public SqliteLoggerProvider(LogLevel logLevel) => this.logLevel = logLevel;
+    readonly LoggingSqliteConnection conn;
 
-    public ILogger CreateLogger(string categoryName) => new SqliteLogger(this.logLevel);
+    public SqliteLoggerProvider(LogLevel logLevel, LoggingSqliteConnection conn)
+    {
+        this.logLevel = logLevel;
+        this.conn = conn;
+    }
+
+    public ILogger CreateLogger(string categoryName) => new SqliteLogger(this.logLevel, this.conn);
     public void Dispose() { }
 }
