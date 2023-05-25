@@ -43,7 +43,7 @@ public partial class Peripheral
 
             var result = await task.ConfigureAwait(false);
             if (result.Status != GattStatus.Success)
-                throw new BleException("Failed to read characteristic: " + result.Status);
+                throw ToException("Failed to read characteristic: " + characteristicUuid, result.Status);
 
             return this.ToResult(ch, BleCharacteristicEvent.Read);
         }))
@@ -189,7 +189,7 @@ public partial class Peripheral
 #endif
             var result = await task.ConfigureAwait(false);
             if (result.Status != GattStatus.Success)
-                throw new BleException($"Failed to write to characteristic: {characteristicUuid} - {result.Status}");
+                throw ToException($"Failed to write to characteristic: {characteristicUuid}", result.Status);
 
             var eventType = withResponse
                 ? BleCharacteristicEvent.Write

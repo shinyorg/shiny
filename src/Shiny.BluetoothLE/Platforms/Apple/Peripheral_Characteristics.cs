@@ -107,7 +107,7 @@ public partial class Peripheral
                 {
                     if (x.Error != null)
                     {
-                        ob.OnError(new InvalidOperationException(x.Error.LocalizedDescription));
+                        ob.OnError(ToException(x.Error));
                     }
                     else if (service.Characteristics != null)
                     {
@@ -136,7 +136,7 @@ public partial class Peripheral
 
             var result = await task.ConfigureAwait(false);
             if (result.Error != null)
-                throw new InvalidCastException(result.Error.LocalizedDescription);
+                throw ToException(result.Error);
 
             return this.ToResult(ch, BleCharacteristicEvent.Read);
         }))
@@ -146,18 +146,18 @@ public partial class Peripheral
     readonly Subject<(CBCharacteristic Char, NSError? Error)> notifySubj = new();
     public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
     {
-        //CBATTError.PrepareQueueFull
         this.logger.CharacteristicNotifyState(characteristic.Service!.UUID, characteristic.UUID, characteristic.IsNotifying);
         this.notifySubj.OnNext((characteristic, error));
     }
 
+    
     readonly Subject<Unit> readyWwrSubj = new();
-
     public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral)
     {
         this.logger.LogDebug("IsReadyToSendWriteWithoutResponse Fired");
         this.readyWwrSubj.OnNext(Unit.Default);
     }
+    
 
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
 #if XAMARINIOS
@@ -216,7 +216,7 @@ public partial class Peripheral
                         count++;
                         if (x.Error != null)
                         {
-                            ob.OnError(new InvalidOperationException(x.Error.LocalizedDescription));
+                            ob.OnError(ToException(x.Error));
                         }
                         else
                         {
@@ -247,9 +247,8 @@ public partial class Peripheral
         this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithResponse);
 
         var result = await task.ConfigureAwait(false);
-        //result.Error.Code == CBError.PeripheralDisconnected
         if (result.Error != null)
-            throw new BleException(result.Error.LocalizedDescription);
+            throw ToException(result.Error);
 
         return this.ToResult(nativeCh, BleCharacteristicEvent.Write);
     });
@@ -259,9 +258,9 @@ public partial class Peripheral
     {
         if (!this.Native.CanSendWriteWithoutResponse)
         {
-            Log.CanSendWriteWithoutResponse(this.logger, false);
+            this.logger.CanSendWriteWithoutResponse(false);
             await this.readyWwrSubj.Take(1).ToTask(ct);
-            Log.CanSendWriteWithoutResponse(this.logger, true);
+            this.logger.CanSendWriteWithoutResponse(true);
         }
         this.logger.LogDebug("Writing characteristic without response");
         var data = NSData.FromArray(value);

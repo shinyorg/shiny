@@ -32,6 +32,8 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         this.logger = logger;
     }
 
+    protected static BleOperationException ToException(string message, GattStatus status) =>
+        new (message, (int)status);
 
     public BluetoothDevice Native { get; }
     public BluetoothGatt? Gatt { get; private set; }

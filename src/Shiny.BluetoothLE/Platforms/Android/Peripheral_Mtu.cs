@@ -28,7 +28,7 @@ public partial class Peripheral : ICanRequestMtu
             if (x.Status == GattStatus.Success)
                 ob.Respond(x.Mtu);
             else
-                ob.OnError(new InvalidOperationException("MTU Requested Failed - " + x.Status));
+                ob.OnError(ToException("MTU Requested Failed", x.Status));
         });
 
         this.Gatt!.RequestMtu(requestValue);

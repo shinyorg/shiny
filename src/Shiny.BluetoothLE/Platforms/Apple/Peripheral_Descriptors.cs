@@ -30,7 +30,7 @@ public partial class Peripheral
             this.Native.ReadValue(desc);
             var result = await task.ConfigureAwait(false);
             if (result.Error != null)
-                throw new BleException("Could not read descriptor: " + descriptorUuid);
+                throw ToException(result.Error);
 
             return this.ToResult(desc);
         }))
@@ -48,7 +48,7 @@ public partial class Peripheral
             
             var result = await task.ConfigureAwait(false);
             if (result.Error != null)
-                throw new BleException("Could not write descriptor: " + descriptorUuid);
+                throw ToException(result.Error);
 
             return this.ToResult(desc);
         }))

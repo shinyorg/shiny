@@ -142,4 +142,8 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
             NotifyOnConnection = true,
             NotifyOnNotification = true
         });
+    
+    
+    protected static BleOperationException ToException(NSError error, string message = "") =>
+        new (message + error.LocalizedDescription, error.Code.ToInt32());
 }
