@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <Nullable>enable</Nullable>
+        <Description>Shiny SQLite Logging for Microsoft Extensions Logging</Description>
     </PropertyGroup>
 
     <ItemGroup>
