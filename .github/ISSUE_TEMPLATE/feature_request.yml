@@ -3,6 +3,10 @@ description: You have an idea for an enhancement within Shiny
 title: "[Feature Request]: "
 labels: [feature request, unverified]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Please note that we are not taking feature requests for Windows or Shiny v2.
   - type: textarea
     attributes:
       label: Summary

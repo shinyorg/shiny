@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thank you for filing an issue.  Please only file issues against the LATEST STABLE or LATEST BETA version of Shiny from Nuget (ALPHAs are not accepted for issues).  If you are a sponsor, you can discuss issues with preview releases in the SponsorConnect Discord channel
-        If you have questions, please post them in GitHub discussions
+        If you have questions, please post them in GitHub discussions. 
   - type: dropdown
     id: component
     attributes:
@@ -24,6 +24,7 @@ body:
         - BluetoothLE Client (Shiny.BluetoothLE)
         - BluetoothLE Hosting (Shiny.BluetoothLE.Hosting)
         - AppCenter Logging (Shiny.Logging.AppCenter)
+        - SQLite Logging (Shiny.Logging.Sqlite)
         - Beacons (Shiny.Beacons)
         - Speech Recognition (Shiny.SpeechRecognition)
         - Other
@@ -38,6 +39,7 @@ body:
       - label: iOS (13+ supported)
       - label: Mac Catalyst
       - label: Android (8+ supported)
+      - label: Windows (.NET 7 Target)
   - type: textarea
     validations:
       required: true

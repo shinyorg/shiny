@@ -1,7 +1,7 @@
-﻿# Shiny v3 BETA for .NET Mobile
+﻿# Shiny v3 BETA for .NET
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
 
-## THIS IS THE UNSTABLE BRANCH - FOR STABLE XAMARIN [GO HERE](https://github.com/shinyorg/shiny/tree/v2.7.0)
+## THIS IS THE BETA BRANCH - FOR STABLE [GO HERE](https://github.com/shinyorg/shiny/tree/v2.7.0)
 
 Shiny is a cross platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
@@ -12,6 +12,7 @@ things like dependency injection & logging in a structured way to your code!
 * .NET 7 for Android
 * .NET 7 for iOS
 * .NET 7 for MacCatalyst
+* .NET 7 for Windows (Core & BLE)
 
 ## Features
 * Handles all of the cruft like Permissions, main thread traversal, persistent storage and app restarts
