@@ -144,6 +144,11 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         });
     
     
+
     protected static BleOperationException ToException(NSError error, string message = "") =>
-        new (message + error.LocalizedDescription, error.Code.ToInt32());
+#if XAMARIN
+        new (message + error.LocalizedDescription, (int)error.Code);
+#else
+        new(message + error.LocalizedDescription, error.Code.ToInt32());
+#endif
 }
