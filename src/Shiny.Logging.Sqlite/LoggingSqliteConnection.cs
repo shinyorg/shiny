@@ -35,4 +35,5 @@ public class LoggingSqliteConnection : SQLiteAsyncConnection
     
     
     public static LoggingSqliteConnection? Instance { get; private set; }
+    public AsyncTableQuery<LogStore> Logs => this.Table<LogStore>();
 }
