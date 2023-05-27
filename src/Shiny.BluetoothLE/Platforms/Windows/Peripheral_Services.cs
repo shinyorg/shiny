@@ -17,7 +17,8 @@ public partial class Peripheral : IPeripheral
             .AsTask(ct)
             .ConfigureAwait(false);
 
-        result.Status.Assert();
+        // TODO
+        //result.Status.Assert();
         return result
             .Services
             .Select(x => new BleServiceInfo(x.Uuid.ToString()))

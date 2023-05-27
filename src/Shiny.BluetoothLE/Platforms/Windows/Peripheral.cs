@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 
@@ -14,7 +13,7 @@ public partial class Peripheral : IPeripheral
         this.Native = device;
         this.DeviceInfo = deviceInfo;
 
-        this.Uuid = device.BluetoothDeviceId.ToString();
+        this.Uuid = device.BluetoothDeviceId!.ToString();
     }
 
 
@@ -85,111 +84,6 @@ public partial class Peripheral : IPeripheral
 
 /*
 
-            this.Uuid = native.GetDeviceId().ToString();
-
-
-        public override void Connect(ConnectionConfig? config) => this.context.Connect();
-        public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false) => Observable
-            .FromAsync(async ct =>
-            {
-                var uuid = Utils.ToUuidType(serviceUuid);
-                var result = await this.context.NativeDevice.GetGattServicesForUuidAsync(uuid, BluetoothCacheMode.Cached);
-                if (result.Status != GattCommunicationStatus.Success)
-                    throw new ArgumentException("Could not find GATT service - " + result.Status);
-
-                var wrap = new GattService(this.context, result.Services.First());
-                return wrap;
-            })
-            .Assert(serviceUuid, throwIfNotFound);
-
-
-        public override IObservable<IList<IGattService>> GetServices() => Observable.FromAsync(async ct =>
-        {
-           
-        });
-
-
-        IObservable<string> nameOb;
-        public override IObservable<string> WhenNameUpdated()
-        {
-            this.nameOb = this.nameOb ?? Observable.Create<string>(ob =>
-            {
-                var handler = new TypedEventHandler<BluetoothLEDevice, object>(
-                    (sender, args) => ob.OnNext(this.Name)
-                );
-                var sub = this.WhenConnected().Subscribe(_ =>
-                    this.context.NativeDevice.NameChanged += handler
-                );
-                return () =>
-                {
-                    sub?.Dispose();
-                    if (this.context.NativeDevice != null)
-                        this.context.NativeDevice.NameChanged -= handler;
-                };
-            })
-            .StartWith(this.Name)
-            .Publish()
-            .RefCount();
-
-            return this.nameOb;
-        }
-
-
-        public IGattReliableWriteTransaction BeginReliableWriteTransaction() => new GattReliableWriteTransaction();
-
-
-    }
-}
-
-
-
-
-
-
-using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Threading.Tasks;
-using Windows.Devices.Bluetooth;
-
-
-namespace Shiny.BluetoothLE.Internals
-{
-    public class PeripheralContext
-    {
-        readonly object syncLock;
-        readonly ManagerContext managerContext;
-        readonly IList<GattCharacteristic> subscribers;
-        readonly Subject<ConnectionState> connSubject;
-        readonly ulong bluetoothAddress;
-
-
-        public PeripheralContext(ManagerContext managerContext,
-                                 IPeripheral peripheral,
-                                 BluetoothLEDevice native)
-        {
-            this.syncLock = new object();
-            this.connSubject = new Subject<ConnectionState>();
-            this.managerContext = managerContext;
-            this.subscribers = new List<GattCharacteristic>();
-            this.Peripheral = peripheral;
-            this.NativeDevice = native;
-            this.bluetoothAddress = native.BluetoothAddress;
-        }
-
-
-        public IPeripheral Peripheral { get; }
-        public BluetoothLEDevice? NativeDevice { get; private set; }
-        public IObservable<ConnectionState> WhenStatusChanged() => this.connSubject.StartWith(this.Status);
-
-
-        public async Task Connect()
-        {
-
-        }
-
-
         public async Task Disconnect()
         {
             if (this.NativeDevice == null)
@@ -234,10 +128,4 @@ namespace Shiny.BluetoothLE.Internals
                 }
             }
         }
-
-
-        void OnNativeConnectionStatusChanged(BluetoothLEDevice sender, object args) =>
-            this.connSubject.OnNext(this.Status);
-    }
-}
  */

@@ -43,14 +43,14 @@ public static class Utils
         => Guid.Parse(ToUuidString(value));
 
 
-    public static async Task Execute(this IAsyncOperation<GattCommunicationStatus> operation, CancellationToken ct)
-    {
-        var result = await operation.AsTask(ct).ConfigureAwait(false);
-        result.Assert();
-    }
+    //public static async Task Execute(this IAsyncOperation<GattCommunicationStatus> operation, CancellationToken ct)
+    //{
+    //    var result = await operation.AsTask(ct).ConfigureAwait(false);
+    //    result.Assert();
+    //}
 
 
-    public static void Assert(this GattCommunicationStatus status)
+    public static void Assert(this GattCommunicationStatus status, string operation, string serviceUuid, string? characteristicUuid = null, string? descriptorUuid = null)
     {
         if (status != GattCommunicationStatus.Success)
             throw new ArgumentException("Invalid Communcation Status - " + status);

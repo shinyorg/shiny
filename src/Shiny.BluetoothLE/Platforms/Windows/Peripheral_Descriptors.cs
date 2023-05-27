@@ -1,73 +1,92 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral
 {
-    public IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => throw new NotImplementedException();
-    public IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
-    public IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => throw new NotImplementedException();
-    public IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => throw new NotImplementedException();
-}
-/*
- using System;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Collections.Generic;
-using Shiny.BluetoothLE.Internals;
-using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattDeviceService;
+    public IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
+        .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
+        .Select(ToInfo);
 
 
-namespace Shiny.BluetoothLE
-{
-    public class GattService : AbstractGattService
-    {
-        readonly PeripheralContext context;
-        readonly Native native;
-
-
-        public GattService(PeripheralContext context, Native native) : base(context.Peripheral, native.Uuid.ToString(), false)
+    public IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        //.Select(_ => Observable.Empty<IReadOnlyList<BleDescriptorInfo>>())
+        .Select(ch => Observable.FromAsync<IReadOnlyList<BleDescriptorInfo>>(async ct =>
         {
-            this.context = context;
-            this.native = native;
-        }
+            var result = await ch.GetDescriptorsAsync(BluetoothCacheMode.Uncached).AsTask(ct);
+            //result.Status.Assert()
+
+            //result.Descriptors. //.Select(x => ToInfo(x)).ToList();
+
+            //result.Descriptors.Select(x => { }).ToList();
+            //    //return result.Descriptors.Select(x => ToInfo(x, ch)).ToList();
+            //    return null;
+            return new List<BleDescriptorInfo>(0);
+        }))
+        .Switch();
 
 
-        public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false) =>
-            Observable.FromAsync(async () =>
-            {
-                var uuid = Utils.ToUuidType(characteristicUuid);
-                var result = await this.native.GetCharacteristicsForUuidAsync(
-                    uuid,
-                    BluetoothCacheMode.Cached
-                );
-                if (result.Status != GattCommunicationStatus.Success)
-                    throw new ArgumentException("GATT Communication failure - " + result.Status);
-
-                var ch = new GattCharacteristic(this.context, result.Characteristics.First(), this);
-                return ch;
-            })
-            .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
-
-
-        public override IObservable<IList<IGattCharacteristic>> GetCharacteristics() => Observable.FromAsync(async ct =>
+    public IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
+        .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
+        .Select(desc => Observable.FromAsync(async ct =>
         {
-            var result = await this.native
-                .GetCharacteristicsAsync(BluetoothCacheMode.Uncached)
+            var result = await desc
+                .Descriptor
+                .ReadValueAsync(BluetoothCacheMode.Uncached)
                 .AsTask(ct)
                 .ConfigureAwait(false);
+            // TODO
 
-            result.Status.Assert();
-            return result
-                .Characteristics
-                .Select(x => new GattCharacteristic(this.context, x, this))
-                .Cast<IGattCharacteristic>()
-                .ToList();
-        });
-    }
+            return new BleDescriptorResult(
+                ToInfo(desc),
+                null
+            );
+        }))
+        .Switch();
+
+
+    public IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => this
+        .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
+        .Select(desc => Observable.FromAsync(async ct =>
+        {
+            var result = await desc
+                .Descriptor
+                .WriteValueAsync(null)
+                .AsTask(ct)
+                .ConfigureAwait(false);
+            // TODO
+
+            return new BleDescriptorResult(
+                ToInfo(desc),
+                data
+            );
+        }))
+        .Switch();
+
+
+    protected IObservable<(GattDescriptor Descriptor, GattCharacteristic Characteristic)> GetNativeDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => this
+        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
+        .Select(ch => Observable.FromAsync(async ct =>
+        {
+            var uuid = Utils.ToUuidType(descriptorUuid);
+            var result = await ch.GetDescriptorsForUuidAsync(uuid).AsTask(ct).ConfigureAwait(false);
+
+            var desc = result.Descriptors.First();
+
+            return (desc, ch);
+        }))
+        .Switch();
+
+
+    protected static BleDescriptorInfo ToInfo((GattDescriptor Descriptor, GattCharacteristic Characteristic) values) => new(
+        ToChar(values.Characteristic),
+        values.Descriptor.Uuid.ToString()
+    );
 }
- */
