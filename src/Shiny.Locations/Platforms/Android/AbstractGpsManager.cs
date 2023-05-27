@@ -72,6 +72,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
         var status = AccessState.Denied;
+        var realtime = request.BackgroundMode == GpsBackgroundMode.Realtime;
         var requestBg = false;
         var permissionSet = new List<string> { P.AccessCoarseLocation };
         if (request.Accuracy > GpsAccuracy.Low)
@@ -81,12 +82,12 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         {
             case GpsBackgroundMode.Standard:
                 // just always request BG
-                requestBg = OperatingSystemShim.IsAndroidVersionAtLeast(29);
+                requestBg = !realtime && OperatingSystemShim.IsAndroidVersionAtLeast(29);
                 break;
 
             case GpsBackgroundMode.Realtime:
                 // just always request BG
-                requestBg = OperatingSystemShim.IsAndroidVersionAtLeast(29);
+                requestBg = !realtime && OperatingSystemShim.IsAndroidVersionAtLeast(29);
 
                 if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
                     permissionSet.Add(P.ForegroundService);
