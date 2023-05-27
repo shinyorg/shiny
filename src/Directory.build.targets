@@ -11,7 +11,8 @@
 
     <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-        <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="All" />
+        <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.119" PrivateAssets="All" />
+        <!--<PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="All" />-->
     </ItemGroup>
 
     <ItemGroup>
