@@ -24,7 +24,7 @@
 
     <PropertyGroup>
         <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>
-        <!--<WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net7.0-windows10.0.19041.0</WindowsTarget>-->
+        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net7.0-windows10.0.19041.0</WindowsTarget>
         <!--<UseMSBuild>false</UseMSBuild>-->
 
         <StandardTargetFrameworks>net7.0</StandardTargetFrameworks>
