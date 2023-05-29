@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
@@ -44,7 +44,7 @@
         <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
-        <PackageReference Include="CommunityToolkit.Maui.Markup" Version="3.1.0" />
+        <PackageReference Include="CommunityToolkit.Maui.Markup" Version="3.2.0" />
     </ItemGroup>
 
     <ItemGroup>
