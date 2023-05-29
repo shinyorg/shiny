@@ -45,7 +45,7 @@ jobs:
           dotnet-version: '7.0.x'
 
     - name: Add .NET Workloads
-      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
+      run: dotnet workload install maui-ios maui-android maui-maccatalyst
 
     - name: Build
       run: dotnet run --project build/ShinyBuild.csproj

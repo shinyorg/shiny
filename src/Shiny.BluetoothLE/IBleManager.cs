@@ -22,6 +22,8 @@ public interface IBleManager
     /// <param name="peripheralUuid">Peripheral identifier.</param>
     IPeripheral? GetKnownPeripheral(string peripheralUuid);
 
+    // IObservable<Unit> WhenServicesChanged();
+    
     /// <summary>
     /// Get current scanning status
     /// </summary>
