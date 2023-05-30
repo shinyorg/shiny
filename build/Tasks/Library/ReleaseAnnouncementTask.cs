@@ -18,7 +18,7 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
     const string DocLink = "https://shinylib.net/release-notes/mobile/";
 
     public override bool ShouldRun(BuildContext context)
-        => false; //context.IsRunningInCI && context.IsNugetDeployBranch;
+        => context.IsRunningInCI && context.Branch.FriendlyName.Contains("v3");
 
 
     public override Task RunAsync(BuildContext context)
