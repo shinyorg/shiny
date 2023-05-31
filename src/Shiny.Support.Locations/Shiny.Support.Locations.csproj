@@ -2,8 +2,8 @@
     <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 
     <PropertyGroup>
-        <TargetFrameworks>$(DefaultTargetFrameworks);$(WindowsTarget)</TargetFrameworks>
-        <Description>Shiny Support Library for connectivity and battery</Description>
+        <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+        <Description>Shiny Support Library for Common Location</Description>
     </PropertyGroup>
 
     <ItemGroup>

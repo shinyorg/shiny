@@ -5,6 +5,7 @@
       "src\\Shiny.Core\\Shiny.Core.csproj",
       "src\\Shiny.Support.Repositories\\Shiny.Support.Repositories.csproj",
       "src\\Shiny.Support.DeviceMonitoring\\Shiny.Support.DeviceMonitoring.csproj",
+      "src\\Shiny.Support.Locations\\Shiny.Support.Locations.csproj",
       "src\\Shiny.Hosting.Maui\\Shiny.Hosting.Maui.csproj",
       "src\\Shiny.Hosting.Native\\Shiny.Hosting.Native.csproj",
       "src\\Shiny.Logging.AppCenter\\Shiny.Logging.AppCenter.csproj",
