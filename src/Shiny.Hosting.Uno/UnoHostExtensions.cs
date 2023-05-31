@@ -10,12 +10,12 @@ namespace Shiny.Hosting;
 
 public static class UnoHostExtensions
 {
-    public static IHostBuilder UseShiny(this IHostBuilder builder)
-    {
-        builder.Services.AddSingleton<IStartupService, ShinyStartupService>();
-        builder.Services.AddShinyCoreServices();
-
-        return builder;
-    }
+    // public static IHostBuilder UseShiny(this IHostBuilder builder)
+    // {
+    //     builder.Services.AddSingleton<IStartupService, ShinyStartupService>();
+    //     builder.Services.AddShinyCoreServices();
+    //
+    //     return builder;
+    // }
 }
 #endif

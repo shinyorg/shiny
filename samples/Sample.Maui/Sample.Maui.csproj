@@ -64,8 +64,11 @@
         <ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup Condition="$(TargetFramework.Contains('ios')) OR $(TargetFramework.Contains('android'))">
+        <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
     </ItemGroup>
 
 	<ItemGroup>

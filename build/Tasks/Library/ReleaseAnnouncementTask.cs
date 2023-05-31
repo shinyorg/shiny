@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Cake.Core.Diagnostics;
+﻿using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using Discord;
 using Discord.WebSocket;
@@ -15,10 +12,10 @@ namespace ShinyBuild.Tasks.Library;
 [IsDependentOn(typeof(NugetDeployTask))]
 public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 {
-    const string DocLink = "https://shinylib.net/release-notes/mobile/";
+    // const string DocLink = "https://shinylib.net/release-notes/mobile/";
 
     public override bool ShouldRun(BuildContext context)
-        => false; //context.IsRunningInCI && context.IsNugetDeployBranch;
+        => context.IsRunningInCI && context.Branch.FriendlyName.Contains("v3");
 
 
     public override Task RunAsync(BuildContext context)

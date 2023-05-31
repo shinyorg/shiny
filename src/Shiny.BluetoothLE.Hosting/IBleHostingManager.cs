@@ -14,7 +14,7 @@ public interface IBleHostingManager
     void StopAdvertising();
 
     //Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen);
-    //Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null);
+    Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null);
 
     Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder);
     void RemoveService(string serviceUuid);

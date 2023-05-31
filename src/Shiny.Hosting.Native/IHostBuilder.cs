@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +10,7 @@ public interface IHostBuilder
 {
     Func<IServiceCollection, IServiceProvider>? ConfigureContainer { get; set; }
     IServiceCollection Services { get; }
-    //ConfigurationManager? Configuration { get; }
+    ConfigurationManager? Configuration { get; }
     ILoggingBuilder Logging { get; }
 
     IHost Build();

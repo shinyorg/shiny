@@ -80,7 +80,7 @@ public static class MauiProgram
     {
         var s = builder.Services;
 
-        builder.Logging.AddAppCenter("TODO", LogLevel.Information);
+        // builder.Logging.AddAppCenter("TODO", LogLevel.Information);
         builder.Logging.AddSqlite(Path.Combine(FileSystem.AppDataDirectory, "logging.db"), LogLevel.Debug);
         
         s.AddSingleton<SampleSqliteConnection>();
@@ -124,7 +124,7 @@ public static class MauiProgram
 
         // ble hosting
         s.RegisterForNavigation<BleHosting.MainPage, BleHosting.MainViewModel>("BleHosting");
-        //s.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
+        s.RegisterForNavigation<BleHosting.BeaconAdvertisePage, BleHosting.BeaconAdvertiseViewModel>("BleHostingBeaconAdvertise");
         s.RegisterForNavigation<BleHosting.ManagedPage, BleHosting.ManagedViewModel>("BleHostingManaged");
 
         // locations
