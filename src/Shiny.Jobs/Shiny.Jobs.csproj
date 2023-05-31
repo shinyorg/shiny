@@ -3,11 +3,12 @@
 
     <PropertyGroup>
         <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
-        <Description>Shiny background jobs module</Description>
+        <Description>Shiny Background Jobs</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
         <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
     </ItemGroup>
 

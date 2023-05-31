@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Extensions.Logging;
-using Shiny.Net;
 
 namespace Shiny;
 
@@ -20,11 +19,4 @@ internal static partial class Log
         Message = "Failed to execute lifecycle call - '{handlerTypeName}' for lifecycle event '{eventTypeName}'"
     )]
     public static partial void LifecycleError(this ILogger logger, Exception exception, string handlerTypeName, string eventTypeName);
-
-    [LoggerMessage(
-        EventId = 3,
-        Level = LogLevel.Debug,
-        Message = "Network change detected - {connectionTypes} - {access}"
-    )]
-    public static partial void NetworkChange(this ILogger logger, ConnectionTypes connectionTypes, NetworkAccess access);
 }

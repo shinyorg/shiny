@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
 #endif
         where TDelegate : class, IHttpTransferDelegate
     {
+        services.AddConnectivity();
+
         services.AddShinyService<HttpTransferManager>();
         services.AddShinyService(typeof(TDelegate));
         services.AddDefaultRepository();

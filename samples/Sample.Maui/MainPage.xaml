@@ -27,6 +27,7 @@
                     <TableSection Title="Shiny.BluetoothLE.Hosting">
                         <TextCell Text="Standard Model" Command="{Binding Navigate}" CommandParameter="BleHosting" />
                         <TextCell Text="Managed Model" Command="{Binding Navigate}" CommandParameter="BleHostingManaged" />
+                        <TextCell Text="Beacon Advertising" Command="{Binding Navigate}" CommandParameter="BleHostingBeaconAdvertise" />
                     </TableSection>
 
                     <TableSection Title="Shiny.Locations">
@@ -61,7 +62,7 @@
                     <!--
                     NOT READY
                     <TextCell Text="L2Cap Client" Command="{Binding Navigate}" CommandParameter="BleL2Cap" />
-                    <TextCell Text="Beacon Advertising" Command="{Binding Navigate}" CommandParameter="BleHostingBeaconAdvertise" />
+                    
                     <TextCell Text="L2Cap Hosting" Command="{Binding Navigate}" CommandParameter="BleHostingL2Cap" />
                     -->
                 </TableRoot>

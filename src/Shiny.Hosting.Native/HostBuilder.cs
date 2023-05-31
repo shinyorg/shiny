@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
+using Shiny.Logging;
 #if PLATFORM
 using Shiny.Infrastructure;
 #endif

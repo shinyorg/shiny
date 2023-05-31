@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 
@@ -46,6 +47,9 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddJobs(this IServiceCollection services)
     {
+        services.AddConnectivity();
+        services.AddBattery();
+        
         if (!services.HasService<IJobManager>())
         {
             services.AddDefaultRepository();
