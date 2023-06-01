@@ -53,6 +53,13 @@ public class BleManagerTests : AbstractBleTests
         }
     }
 
+    [Fact(DisplayName = "BLE Manager - Request Access Async")]
+    public async Task RequestAccessAsyncTest()
+    {
+        var result = await this.Manager.RequestAccessAsync();
+        this.Log("Result: " + result);
+    }
+
 #if ANDROID
 
     [Fact(DisplayName = "BLE Manager - Android - Paired Peripherals")]

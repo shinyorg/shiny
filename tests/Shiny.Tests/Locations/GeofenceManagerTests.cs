@@ -8,7 +8,7 @@ namespace Shiny.Tests.Locations;
 public class GeofenceManagerTests : AbstractShinyTests
 {
     public GeofenceManagerTests(ITestOutputHelper output) : base(output) {}
-    protected override void Configure(IHostBuilder hostBuilder)
+    protected override void Configure(HostBuilder hostBuilder)
         => hostBuilder.Services.AddGeofencing<SampleGeofenceDelegate>();
     public override async void Dispose()
     {

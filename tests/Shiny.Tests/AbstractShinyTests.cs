@@ -13,7 +13,7 @@ public abstract class AbstractShinyTests : IDisposable
     protected AbstractShinyTests(ITestOutputHelper output)
     {
         this.output = output;
-        var builder = new HostBuilder();
+        var builder = HostBuilder.Create();
 
         builder.Logging.AddXUnit(output);
         this.Configure(builder);
@@ -26,7 +26,7 @@ public abstract class AbstractShinyTests : IDisposable
     protected virtual void Log(string message) => this.output.WriteLine(message);
     protected T GetService<T>() => this.Host!.Services!.GetRequiredService<T>()!;
     protected IHost Host { get; }
-    protected virtual void Configure(IHostBuilder hostBuilder) { }
+    protected virtual void Configure(HostBuilder hostBuilder) { }
 
 
     public virtual void Dispose()

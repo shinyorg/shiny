@@ -21,7 +21,7 @@ public abstract class AbstractBleTests : AbstractShinyTests
     }
 
 
-    protected override void Configure(IHostBuilder hostBuilder)
+    protected override void Configure(HostBuilder hostBuilder)
     {
         hostBuilder.Services.AddBluetoothLE();
         hostBuilder.Services.AddBluetoothLeHosting();

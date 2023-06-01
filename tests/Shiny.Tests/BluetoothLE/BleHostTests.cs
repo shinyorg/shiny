@@ -12,7 +12,7 @@ public class BleHostTests : AbstractBleTests
     public BleHostTests(ITestOutputHelper output) : base(output) { }
 
 
-    protected override void Configure(IHostBuilder hostBuilder)
+    protected override void Configure(HostBuilder hostBuilder)
     {
         base.Configure(hostBuilder);
         hostBuilder.Services.AddBluetoothLeHosting();

@@ -7,7 +7,7 @@ namespace Shiny.Tests.Locations;
 public class GpsManagerTests : AbstractShinyTests
 {
     public GpsManagerTests(ITestOutputHelper output) : base(output) { }
-    protected override void Configure(IHostBuilder hostBuilder) => hostBuilder.Services.AddGps();
+    protected override void Configure(HostBuilder hostBuilder) => hostBuilder.Services.AddGps();
 
 
     [Fact(DisplayName = "GPS - Last Location")]

@@ -9,7 +9,7 @@ public class NotificationTests : AbstractShinyTests
     public NotificationTests(ITestOutputHelper output) : base(output) { }
 
     INotificationManager Notifications => this.GetService<INotificationManager>();
-    protected override void Configure(IHostBuilder hostBuilder) => hostBuilder.Services.AddNotifications();
+    protected override void Configure(HostBuilder hostBuilder) => hostBuilder.Services.AddNotifications();
     public override void Dispose()
     {
         //this.Notifications.Clear().GetAwaiter().GetResult();
