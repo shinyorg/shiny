@@ -24,6 +24,7 @@ public class ErrorLoggingViewModel : ViewModel
                 })
                 .ToList();
         });
+        this.BindBusyCommand(this.Load);
 
         this.Test = ReactiveCommand.Create(() =>
         {
