@@ -51,7 +51,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                 var background = this.services.GetService(typeof(IBleDelegate)) != null;
                 if (!background)
                 {
-                    this.manager = new CBCentralManager(this, null);
+                    this.manager = new CBCentralManager(this, this.config.DispatchQueue);
                     this.manager.Delegate = this;
                 }
                 else
@@ -65,7 +65,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                         RestoreIdentifier = this.config.RestoreIdentifier ?? "shinyble"
                     };
 
-                    this.manager = new CBCentralManager(this, null, opts);
+                    this.manager = new CBCentralManager(this, this.config.DispatchQueue, opts);
                     this.manager.Delegate = this;
                 }
             }

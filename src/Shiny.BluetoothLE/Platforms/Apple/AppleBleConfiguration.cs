@@ -1,4 +1,6 @@
-﻿namespace Shiny.BluetoothLE;
+﻿using CoreFoundation;
+
+namespace Shiny.BluetoothLE;
 
 
 public record AppleBleConfiguration(
@@ -11,5 +13,10 @@ public record AppleBleConfiguration(
     /// <summary>
     /// CBCentralInitOptions restoration key for background restoration
     /// </summary>
-    string? RestoreIdentifier = null
+    string? RestoreIdentifier = null,
+
+    /// <summary>
+    /// Dispatch queue for CBCentralManager to use - leave null if you do not know what this does
+    /// </summary>
+    DispatchQueue? DispatchQueue = null
 );
