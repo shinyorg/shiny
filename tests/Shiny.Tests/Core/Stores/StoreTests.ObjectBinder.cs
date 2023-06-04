@@ -7,9 +7,8 @@ namespace Shiny.Tests.Core.Stores;
 
 public partial class StoreTests
 {
-
-    [Trait("Category", "ObjectBinder")]
-    [Theory]
+    
+    [Theory(DisplayName = "Store Binding - Basic")]
     [MemberData(nameof(Data))]
     public void Binding_Basic(IKeyValueStore store)
     {
@@ -22,9 +21,8 @@ public partial class StoreTests
         store.Get<string>(key).Should().Be(random);
     }
 
-
-    [Trait("Category", "ObjectBinder")]
-    [Theory]
+    
+    [Theory(DisplayName = "Store Binding - Persist")]
     [MemberData(nameof(Data))]
     public void Binding_Persist(IKeyValueStore store)
     {
@@ -36,9 +34,8 @@ public partial class StoreTests
         values.BoundObject.StringProperty.Should().Be(obj2.StringProperty);
     }
 
-
-    [Trait("Category", "ObjectBinder")]
-    [Theory]
+    
+    [Theory(DisplayName = "Store Binding - Nullifying Removes")]
     [MemberData(nameof(Data))]
     public void NullifyingRemoves(IKeyValueStore store)
     {
@@ -52,9 +49,8 @@ public partial class StoreTests
         store.Contains(key).Should().BeFalse();
     }
 
-
-    [Trait("Category", "ObjectBinder")]
-    [Theory]
+    
+    [Theory(DisplayName = "Store Binding - Default Value Removes")]
     [MemberData(nameof(Data))]
     public void DefaultValueRemoves(IKeyValueStore store)
     {
@@ -68,9 +64,8 @@ public partial class StoreTests
         store.Contains(key).Should().BeFalse();
     }
 
-
-    [Trait("Category", "ObjectBinder")]
-    [Theory]
+    
+    [Theory(DisplayName = "Store Binding - Protected Setter")]
     [MemberData(nameof(Data))]
     public void Binding_ProtectedSetter(IKeyValueStore store)
     {
@@ -82,8 +77,7 @@ public partial class StoreTests
     }
 
 
-    [Trait("Category", "ObjectBinder")]
-    [Theory]
+    [Theory(DisplayName = "Store Binding - Protected Getter")]
     [MemberData(nameof(Data))]
     public void Binding_ProtectedGetter(IKeyValueStore store)
     {
@@ -94,9 +88,8 @@ public partial class StoreTests
         store.Contains(key).Should().BeFalse();
     }
 
-
-    [Trait("Category", "ObjectBinder")]
-    [Fact]
+    
+    [Fact(DisplayName = "Store Binding - Attribute Binding")]
     public void AttributeBinding()
     {
         var allStores = Data.Select(x => x.First()).Cast<IKeyValueStore>().ToList();
@@ -117,6 +110,7 @@ public partial class StoreTests
     }
 
 
+    
     (IObjectStoreBinder Binder, T BoundObject) SetupBinder<T>(IKeyValueStore store) where T : class, INotifyPropertyChanged, new()
     {
         this.currentStore = store;

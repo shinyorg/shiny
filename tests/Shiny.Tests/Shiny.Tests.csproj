@@ -23,11 +23,15 @@
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net7.0-ios'">
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
         <CreatePackage>false</CreatePackage>
         <CodesignProvision>Automatic</CodesignProvision>
         <CodesignKey>iPhone Developer</CodesignKey>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
+      <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
