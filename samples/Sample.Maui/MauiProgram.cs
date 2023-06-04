@@ -21,21 +21,29 @@ public static class MauiProgram
             new DryIocContainerExtension(),
             prism => prism.OnAppStart("MainPage")
         )
+        .RegisterLogging()
         .RegisterServices()
         .RegisterShinyServices()
         .RegisterRoutes()
         .Build();
 
 
-    static MauiAppBuilder RegisterShinyServices(this MauiAppBuilder builder)
+    static MauiAppBuilder RegisterLogging(this MauiAppBuilder builder)
     {
-        var s = builder.Services;
 #if DEBUG
         builder.Logging.SetMinimumLevel(LogLevel.Trace);
         builder.Logging.AddDebug();
 #endif
+        builder.Logging.AddSqlite(Path.Combine(FileSystem.AppDataDirectory, "logging.db"), LogLevel.Debug);
         //builder.Logging.AddAppCenter("")
 
+        return builder;
+    }
+
+    
+    static MauiAppBuilder RegisterShinyServices(this MauiAppBuilder builder)
+    {
+        var s = builder.Services;
         s.AddJob(typeof(SampleJob));
 
         // shiny.jobs
@@ -79,9 +87,6 @@ public static class MauiProgram
     static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
     {
         var s = builder.Services;
-
-        // builder.Logging.AddAppCenter("TODO", LogLevel.Information);
-        builder.Logging.AddSqlite(Path.Combine(FileSystem.AppDataDirectory, "logging.db"), LogLevel.Debug);
         
         s.AddSingleton<SampleSqliteConnection>();
         s.AddShinyService<CommandExceptionHandler>();

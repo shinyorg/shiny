@@ -5,10 +5,11 @@ namespace Sample;
 
 public class ErrorLoggingViewModel : ViewModel
 {
-    public ErrorLoggingViewModel(BaseServices services, ILogger<ErrorLoggingViewModel> logger) : base(services)
+    public ErrorLoggingViewModel(BaseServices services) : base(services)
     {
         this.Load = ReactiveCommand.CreateFromTask(async () =>
         {
+            this.IsBusy = true;
             var results = await LoggingSqliteConnection.Instance!
                 .Table<LogStore>()
                 .Where(x => x.TimestampUtc >= DateTime.Now.Date)
@@ -23,13 +24,8 @@ public class ErrorLoggingViewModel : ViewModel
                     return x;
                 })
                 .ToList();
-        });
-        this.BindBusyCommand(this.Load);
-
-        this.Test = ReactiveCommand.Create(() =>
-        {
-            logger.LogError("Test Error");
-            this.Load.Execute(null);
+            
+            this.IsBusy = false;
         });
 
         this.Clear = ReactiveCommand.CreateFromTask(async () =>
@@ -45,7 +41,6 @@ public class ErrorLoggingViewModel : ViewModel
 
 
     public ICommand Load { get; }
-    public ICommand Test { get; }
     public ICommand Clear { get; }
     [Reactive] public IList<LogStore> Logs { get; private set; }
 
