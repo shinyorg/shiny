@@ -1,4 +1,5 @@
-﻿using CoreLocation;
+﻿using System;
+using CoreLocation;
 
 namespace Shiny.Locations;
 
@@ -13,7 +14,7 @@ static class PlatformExtensions
     public static GpsReading FromNative(this CLLocation location) => new GpsReading(
         location.Coordinate.FromNative(),
         location.HorizontalAccuracy,
-        location.Timestamp.ToDateTime(),
+        DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(location.Timestamp.SecondsSince1970)),
         location.Course,
         location.VerticalAccuracy,
         location.Altitude,

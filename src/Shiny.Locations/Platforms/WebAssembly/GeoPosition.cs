@@ -35,5 +35,5 @@ public class GeoPosition
     public Position Position => this.position ??= new Position(this.Latitude, this.Longitude);
 
     [JsonIgnore]
-    public DateTime Timestamp => DateTimeOffset.FromUnixTimeMilliseconds(this.Epoch).DateTime;
+    public DateTimeOffset Timestamp => DateTimeOffset.FromUnixTimeMilliseconds(this.Epoch);
 }
