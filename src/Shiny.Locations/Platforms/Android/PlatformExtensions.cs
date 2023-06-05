@@ -14,7 +14,7 @@ public static class PlatformExtensions
     public static GpsReading FromNative(this Location location) => new GpsReading(
         new Position(location.Latitude, location.Longitude),
         location.Accuracy,
-        DateTimeOffset.FromUnixTimeMilliseconds(location.Time).UtcDateTime,
+        DateTimeOffset.FromUnixTimeMilliseconds(location.Time).DateTime,
         location.Bearing,
         location.BearingAccuracyDegrees,
         location.Altitude,
