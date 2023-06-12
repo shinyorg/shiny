@@ -9,19 +9,19 @@
 
     <ItemGroup>
         <None Include="Shiny.Core.targets" Pack="True" PackagePath="buildTransitive" />
-        <PackageReference Include="System.Reactive" />
+        <PackageReference Include="System.Reactive" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
-        <PackageReference Include="System.Text.Json" />
+        <PackageReference Include="System.Text.Json" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <PackageReference Include="Xamarin.AndroidX.Core" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />
+        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.9.0.1" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.1.1" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1.1" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
