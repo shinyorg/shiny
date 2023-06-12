@@ -60,7 +60,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     public void OnFailedToRegisterForRemoteNotifications(NSError error)
         => this.Execute(this.remoteHandlers, x => x.OnFailedToRegister(error));
 
-    public void OnDidReceiveRemoveNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+    public void OnDidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         => this.Execute(this.remoteHandlers, x => x.OnDidReceive(userInfo, completionHandler));
 
     public bool OnContinueUserActivity(NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)

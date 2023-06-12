@@ -21,6 +21,6 @@ public class AppDelegate : MauiUIApplicationDelegate
 
     [Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
     public void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-        => Host.Lifecycle.OnDidReceiveRemoveNotification(userInfo, completionHandler);
+        => Host.Lifecycle.OnDidReceiveRemoteNotification(userInfo, completionHandler);
 }
 
