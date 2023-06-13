@@ -276,7 +276,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var ht = this.repository.Get<HttpTransfer>(task.TaskDescription);
         if (ht == null)
         {
-            this.logger.LogDebug("No transfer was found - " task.TaskDescription);
+            this.logger.LogDebug("No transfer was found - " + task.TaskDescription);
             return;
         }
 
