@@ -57,42 +57,48 @@ public partial class Peripheral
     public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => throw new NotImplementedException();
 
 
-    IObservable<BleCharacteristicResult>? notifyChar;
+    readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
-        this.notifyChar ??= this.WhenConnected()
-            .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
-            .Switch()
-            .Select(x => Observable.Create<BleCharacteristicResult>(ob => 
-            {
-                var handler = new TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs>((sender, args) =>
+        var key = $"{serviceUuid}-{characteristicUuid}";
+
+        if (this.notifiers.ContainsKey(key))
+        {
+            var obs = this.WhenConnected()
+                .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                .Switch()
+                .Select(x => Observable.Create<BleCharacteristicResult>(ob =>
                 {
-                    //args.CharacteristicValue.AsStream()
-                });
-                x.ValueChanged += handler;
-                var notifyValue = useIndicationsIfAvailable && x.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate)
-                    ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
-                    : GattClientCharacteristicConfigurationDescriptorValue.Notify;
-
-                x.WriteClientCharacteristicConfigurationDescriptorAsync(notifyValue)
-                    .AsTask()
-                    .ContinueWith(result =>
+                    var handler = new TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs>((sender, args) =>
                     {
-
+                        //args.CharacteristicValue.AsStream()
                     });
-                // TODO: fire that it is hooked
+                    x.ValueChanged += handler;
+                    var notifyValue = useIndicationsIfAvailable && x.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate)
+                        ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
+                        : GattClientCharacteristicConfigurationDescriptorValue.Notify;
 
-                return () => x.ValueChanged -= handler;
-            }))
-            .Switch()
-            .Finally(() => 
-            {
-                // TODO: unhook
-            })
-            .Publish()
-            .RefCount();
+                    x.WriteClientCharacteristicConfigurationDescriptorAsync(notifyValue)
+                        .AsTask()
+                        .ContinueWith(result =>
+                        {
 
-        return this.notifyChar;
+                        });
+                    // TODO: fire that it is hooked
+
+                    return () => x.ValueChanged -= handler;
+                }))
+                .Switch()
+                .Finally(() =>
+                {
+                    // TODO: unhook
+                })
+                .Publish()
+                .RefCount();
+
+            this.notifiers.Add(key, obs);
+        }
+        return this.notifiers[key];
     }
 
 
