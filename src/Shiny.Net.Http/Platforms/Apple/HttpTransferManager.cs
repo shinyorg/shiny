@@ -275,7 +275,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.logger.LogDebug("DidCompleteWithError");
         var ht = this.repository.Get<HttpTransfer>(task.TaskDescription);
         if (ht == null)
+        {
+            this.logger.LogDebug("No transfer was found - " task.TaskDescription);
             return;
+        }
 
         switch (task.State)
         {
@@ -357,7 +360,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
     {
         this.logger.LogDebug("DidFinishDownloading");
-        var transfer= this.repository.Get<HttpTransfer>(downloadTask.TaskDescription);
+        var transfer = this.repository.Get<HttpTransfer>(downloadTask.TaskDescription);
 
         if (transfer != null)
         {
