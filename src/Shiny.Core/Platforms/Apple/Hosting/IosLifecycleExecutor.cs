@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 
     public void Start()
     {
-        if (this.notificationHandlers.Any())
+        if (this.notificationHandlers != null && this.notificationHandlers.Any())
         {
             UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
                 (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
