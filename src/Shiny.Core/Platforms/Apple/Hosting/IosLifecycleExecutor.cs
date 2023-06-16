@@ -41,10 +41,13 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 
     public void Start()
     {
-        UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
-            (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
-            (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
-        );
+        if (this.notificationHandlers.Any())
+        {
+            UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
+                (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
+                (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
+            );
+        }
     }
 
 
