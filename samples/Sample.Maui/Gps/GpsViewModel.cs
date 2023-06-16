@@ -126,7 +126,7 @@ public class GpsViewModel : ViewModel
     [Reactive] public double Heading { get; private set; }
     [Reactive] public double HeadingAccuracy { get; private set; }
     [Reactive] public double Speed { get; private set; }
-    [Reactive] public DateTime Timestamp { get; private set; }
+    [Reactive] public DateTimeOffset Timestamp { get; private set; }
 
 
     void SetValues(GpsReading reading)

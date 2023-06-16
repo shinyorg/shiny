@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Shiny.BluetoothLE;
 
@@ -88,6 +89,37 @@ public class CharacteristicTests : AbstractBleTests
     }
 
 
+    [Fact(DisplayName = "BLE Characteristic - Multi-Notification")]
+    public async Task MultipleNotifyTest()
+    {
+        await this.Setup();
+        var task1 = this.Peripheral!
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid)
+            .Take(1)
+            .Timeout(TimeSpan.FromSeconds(30))
+            .ToTask();
+
+        var task2 = this.Peripheral!
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.Notify2CharacteristicUuid)
+            .Take(1)
+            .Timeout(TimeSpan.FromSeconds(30))
+            .ToTask();
+
+        await this.Peripheral!.WriteCharacteristicAsync(
+            BleConfiguration.ServiceUuid,
+            BleConfiguration.WriteCharacteristicUuid,
+            new byte[] { 0x01 },
+            true,
+            CancellationToken.None,
+            30000
+        );
+
+        await Task.WhenAll(task1, task2);
+        task1.Result.Event.Should().Be(BleCharacteristicEvent.Notification);
+        task2.Result.Event.Should().Be(BleCharacteristicEvent.Notification);
+    }
+
+
     [Fact(DisplayName = "BLE Characteristic - Wait for Subscription Before")]
     public async Task WaitForSubscriptionBefore()
     {
@@ -163,7 +195,8 @@ public class CharacteristicTests : AbstractBleTests
         AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.ReadCharacteristicUuid);
         AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
         AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid);
-        
+        AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.Notify2CharacteristicUuid);
+
         // TODO: BLE Host is not pumping this out
         // TODO: could detect device info service?  On all android though?
         // AssertChar(results, BleConfiguration.SecondaryServiceUuid, BleConfiguration.SecondaryCharacteristicUuid1);

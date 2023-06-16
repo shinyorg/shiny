@@ -15,41 +15,47 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral
 {
-    IObservable<BleCharacteristicResult>? notifyObservable;
+    readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true)
     {
         this.AssertConnnection();
+        var key = $"{serviceUuid}-{characteristicUuid}";
 
-        this.notifyObservable ??= this
-            .WhenConnected()
-            .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
-            .Switch()
-            .Select(ch =>
-            {
-                this.FromNative(ch).AssertNotify();
-                this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
-                this.Native.SetNotifyValue(true, ch);
+        if (!this.notifiers.ContainsKey(key))
+        {
+            var obs = this
+                .WhenConnected()
+                .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                .Switch()
+                .Select(ch =>
+                {
+                    this.FromNative(ch).AssertNotify();
+                    this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
+                    this.Native.SetNotifyValue(true, ch);
 
-                return this.charUpdateSubj
-                    .Where(x => x.Char.Equals(ch))
-                    .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
-                    .Finally(() =>
-                    {
-                        try
+                    return this.charUpdateSubj
+                        .Where(x => x.Char.Equals(ch))
+                        .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
+                        .Finally(() =>
                         {
-                            this.Native.SetNotifyValue(false, ch);
-                        }
-                        catch (Exception ex)
-                        {
-                            this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid);
-                        }
-                    });
-            })
-            .Switch()
-            .Publish()
-            .RefCount();
+                            try
+                            {
+                                this.Native.SetNotifyValue(false, ch);
+                            }
+                            catch (Exception ex)
+                            {
+                                this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid);
+                            }
+                        });
+                })
+                .Switch()
+                .Publish()
+                .RefCount();
 
-        return this.notifyObservable;
+            this.notifiers.Add(key, obs);
+        }
+
+        return this.notifiers[key];
     }
 
 

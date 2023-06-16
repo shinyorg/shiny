@@ -75,6 +75,14 @@ public static class GeneralExtensions
     }
 
 
+    /// <summary>
+    /// Finds if a method of a class is overridden
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="methodName"></param>
+    /// <param name="flags"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static bool IsMethodOverridden(this Type type, string methodName, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public)
     {
         var method = type.GetMethod(methodName, flags);

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SQLite;
 
@@ -36,4 +38,12 @@ public class LoggingSqliteConnection : SQLiteAsyncConnection
     
     public static LoggingSqliteConnection? Instance { get; private set; }
     public AsyncTableQuery<LogStore> Logs => this.Table<LogStore>();
+
+    public Task ClearLogs(Expression<Func<LogStore, bool>>? expression = null)
+    {
+        if (expression != null)
+            return this.Logs.DeleteAsync(expression);
+        
+        return this.DeleteAllAsync<LogStore>();
+    }
 }

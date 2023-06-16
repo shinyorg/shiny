@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -41,10 +42,13 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 
     public void Start()
     {
-        UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
-            (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
-            (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
-        );
+        if (this.notificationHandlers != null && this.notificationHandlers.Any())
+        {
+            UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
+                (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
+                (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
+            );
+        }
     }
 
 
@@ -60,7 +64,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     public void OnFailedToRegisterForRemoteNotifications(NSError error)
         => this.Execute(this.remoteHandlers, x => x.OnFailedToRegister(error));
 
-    public void OnDidReceiveRemoveNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+    public void OnDidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         => this.Execute(this.remoteHandlers, x => x.OnDidReceive(userInfo, completionHandler));
 
     public bool OnContinueUserActivity(NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)

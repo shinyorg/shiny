@@ -20,7 +20,7 @@ public class SecureStorageTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Secure Storage - Remove Where Not Exists")]
     public void RemoveWhereNotExists()
     {
         var key = Guid.NewGuid().ToString();
@@ -30,7 +30,7 @@ public class SecureStorageTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Secure Storage - Set Duplicate")]
     public void SetDuplicate()
     {
         var key = Guid.NewGuid().ToString();
@@ -40,7 +40,7 @@ public class SecureStorageTests
     }
 
 
-    [Fact]
+    [Fact(DisplayName = "Secure Storage - With Binding")]
     public void WithBinding()
     {
         var factory = new KeyValueStoreFactory(new[] { this.secureStore });

@@ -35,6 +35,16 @@ public class BleHostUnitTestsViewModel : ViewModel
                             return Task.CompletedTask;
                         }));
 
+
+                        var notifier2 = sb.AddCharacteristic(BleConfiguration.Notify2CharacteristicUuid, x => x.SetNotification(sub =>
+                        {
+                            var smsg = sub.IsSubscribing ? "Subscribed" : "UnSubscribed";
+                            this.Log($"{sub.Peripheral.Uuid} {smsg} to Characteristic Notifier 2");
+
+                            return Task.CompletedTask;
+                        }));
+
+
                         sb.AddCharacteristic(BleConfiguration.ReadCharacteristicUuid, x => x.SetRead(request =>
                         {
                             var data = currentData ?? new byte[] { 0x0 };
@@ -51,6 +61,11 @@ public class BleHostUnitTestsViewModel : ViewModel
                             if (notifier.SubscribedCentrals.Count > 0)
                             {
                                 await notifier.Notify(request.Data);
+                                this.Log("Notification Broadcasted to subscribers");
+                            }
+                            if (notifier2.SubscribedCentrals.Count > 0)
+                            {
+                                await notifier2.Notify(request.Data);
                                 this.Log("Notification Broadcasted to subscribers");
                             }
                         }, WriteOptions.Write | WriteOptions.WriteWithoutResponse));

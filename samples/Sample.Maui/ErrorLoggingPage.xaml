@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sqlite="clr-namespace:Shiny.Logging.Sqlite;assembly=Shiny.Logging.Sqlite"
+             x:Class="Sample.ErrorLoggingPage"
+             Title="SQLite Logger">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear" Command="{Binding Clear}" />
+        <ToolbarItem Text="Reload" Command="{Binding Load}" />
+    </ContentPage.ToolbarItems>
+    
+    <ContentPage.Content>
+        <CollectionView ItemsSource="{Binding Logs}">
+            <CollectionView.EmptyView>
+                <Label Text="No Logs"
+                       VerticalTextAlignment="Center"
+                       VerticalOptions="FillAndExpand"
+                       HorizontalTextAlignment="Center"
+                       HorizontalOptions="FillAndExpand" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="sqlite:LogStore">
+                    <Grid ColumnDefinitions="3*, 1*" RowDefinitions="Auto, Auto, Auto">
+                        <Label Text="{Binding LogLevel}"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               Grid.Column="0"
+                               Grid.Row="0" />
+
+                        <Label Text="{Binding TimestampUtc}"
+                               FontSize="Small"
+                               Grid.Column="1"
+                               Grid.Row="0" />
+
+                        <Label Text="{Binding Message}"
+                                   FontSize="Small"
+                              FontAttributes="Italic"
+                              LineBreakMode="WordWrap"
+                              Grid.ColumnSpan="2"
+                              Grid.Row="1" />
+
+                       <BoxView HeightRequest="1"
+                                HorizontalOptions="FillAndExpand" 
+                                BackgroundColor="LightGray"
+                                Grid.ColumnSpan="2"
+                                Grid.Row="2" />
+                   </Grid>
+               </DataTemplate>
+           </CollectionView.ItemTemplate>
+       </CollectionView>
+    </ContentPage.Content>
+</ContentPage>

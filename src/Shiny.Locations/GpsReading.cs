@@ -17,7 +17,7 @@ public record GpsReading(
     /// <summary>
     /// The time stamp.
     /// </summary>
-    DateTime Timestamp,
+    DateTimeOffset Timestamp,
 
     /// <summary>
     /// The heading of the reading.

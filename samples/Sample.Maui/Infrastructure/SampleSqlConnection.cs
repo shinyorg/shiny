@@ -12,7 +12,7 @@ public class SampleSqliteConnection : SQLiteAsyncConnection
     }
 
 
-    public Task Log(string category, string text, string? detail = null, DateTime? timestamp = null) => this.InsertAsync(new Log
+    public Task Log(string category, string text, string? detail = null, DateTimeOffset? timestamp = null) => this.InsertAsync(new Log
     {
         Category = category,
         Text = text,

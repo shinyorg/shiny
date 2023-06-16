@@ -33,5 +33,5 @@ public abstract class ShinyAppDelegate : UIApplicationDelegate
         => Host.Lifecycle.OnFailedToRegisterForRemoteNotifications(error);
 
     public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-        => Host.Lifecycle.OnDidReceiveRemoveNotification(userInfo, completionHandler);
+        => Host.Lifecycle.OnDidReceiveRemoteNotification(userInfo, completionHandler);
 }

@@ -77,48 +77,56 @@ public partial class Peripheral
     
     
     readonly Subject<BleCharacteristicInfo> charSubSubj = new();
-    IObservable<BleCharacteristicResult>? notifyObs;
+
+
+    readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
         this.AssertConnection();
-        
-        this.notifyObs ??= this
-            .WhenConnected()
-            .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
-            .Switch()
-            .Select(ch => this.operations.QueueToObservable(async ct =>
-            {
-                this.FromNative(ch).AssertNotify();
+        var key = $"{serviceUuid}-{characteristicUuid}";
 
-                this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribing");
+        if (!this.notifiers.ContainsKey(key))
+        {
+            var obs = this
+                .WhenConnected()
+                .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                .Switch()
+                .Select(ch => this.operations.QueueToObservable(async ct =>
+                {
+                    this.FromNative(ch).AssertNotify();
 
-                if (!this.Gatt!.SetCharacteristicNotification(ch, true))
-                    throw new BleException("Failed to set characteristic notification value");
+                    this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribing");
 
-                var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
-                var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
-                if (nativeDescriptor == null)
-                    throw new BleException("Characteristic notification descriptor not found");
+                    if (!this.Gatt!.SetCharacteristicNotification(ch, true))
+                        throw new BleException("Failed to set characteristic notification value");
 
-                await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
-                this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
-                
-                this.AddNotify(serviceUuid, characteristicUuid);
-                this.charSubSubj.OnNext(this.FromNative(ch));
-                
-                return ch;
-            }))
-            .Switch()
-            .Select(ch => this.notifySubj
-                .Where(x => x.Equals(ch))
-                .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
-                .Finally(() => this.TryNotificationCleanup(ch, serviceUuid, characteristicUuid))
-            )
-            .Switch()
-            .Publish()
-            .RefCount();
+                    var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
+                    var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
+                    if (nativeDescriptor == null)
+                        throw new BleException("Characteristic notification descriptor not found");
 
-        return this.notifyObs!;
+                    await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
+                    this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
+
+                    this.AddNotify(serviceUuid, characteristicUuid);
+                    this.charSubSubj.OnNext(this.FromNative(ch));
+
+                    return ch;
+                }))
+                .Switch()
+                .Select(ch => this.notifySubj
+                    .Where(x => x.Equals(ch))
+                    .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
+                    .Finally(() => this.TryNotificationCleanup(ch, serviceUuid, characteristicUuid))
+                )
+                .Switch()
+                .Publish()
+                .RefCount();
+
+            this.notifiers.Add(key, obs);
+        }
+
+        return this.notifiers[key];
     }
 
 

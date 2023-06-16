@@ -7,20 +7,11 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    </ItemGroup>
-
-    <ItemGroup Condition="$(TargetFramework.Contains('monoandroid'))">
-        <!--<Reference Include="Mono.Android.Export" />-->
-        <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('android'))">
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.1" />
-    </ItemGroup>
-
-    <ItemGroup Condition="$(TargetFramework.Contains('xamarin'))">
-        <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.2" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />

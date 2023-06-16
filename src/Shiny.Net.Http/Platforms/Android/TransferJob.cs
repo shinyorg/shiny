@@ -141,7 +141,7 @@ public class TransferJob : IJob
             }
             catch (TaskCanceledException)
             {
-                this.logger.LogDebug("Job is being told to suspended");
+                this.logger.LogDebug("Job is being told to suspend");
             }
             catch (Exception ex)
             {
