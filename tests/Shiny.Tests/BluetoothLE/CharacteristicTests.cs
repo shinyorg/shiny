@@ -114,7 +114,7 @@ public class CharacteristicTests : AbstractBleTests
             30000
         );
 
-        await Task.WaitAll(task1, task2);
+        await Task.WhenAll(task1, task2);
         task1.Result.Event.Should().Be(BleCharacteristicEvent.Notification);
         task2.Result.Event.Should().Be(BleCharacteristicEvent.Notification);
     }

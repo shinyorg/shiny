@@ -15,7 +15,7 @@
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.2" />
+        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.5.1.1" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
