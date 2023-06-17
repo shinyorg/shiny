@@ -44,10 +44,17 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     {
         if (this.notificationHandlers != null && this.notificationHandlers.Any())
         {
-            UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
-                (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
-                (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
-            );
+            if (UNUserNotificationCenter.Current.Delegate != null)
+            {
+                this.logger.LogWarning("UNUserNotificationCenter is already set.  Shiny will not be able to run its notification delegates");
+            }
+            else
+            {
+                UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
+                    (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
+                    (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
+                );
+            }
         }
     }
 
@@ -117,7 +124,12 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
         }
     }
 
-    public void Dispose() => UNUserNotificationCenter.Current.Delegate = null;
+
+    public void Dispose()
+    {
+        if (UNUserNotificationCenter.Current.Delegate is ShinyUNUserNotificationCenterDelegate)
+            UNUserNotificationCenter.Current.Delegate = null;
+    }
 
 
     //public static bool ShinyHandleEventsForBackgroundUrl(this IUIApplicationDelegate _, string sessionUrl, Action completionHandler)
