@@ -200,9 +200,8 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     }
 
 
-    //public Subject<PeripheralConnectionFailed> FailedConnection { get; } = new();
-    //public override void FailedToConnectPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError? error)
-    //    => this.FailedConnection.OnNext(new PeripheralConnectionFailed(peripheral, error));
+    public override void FailedToConnectPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError? error)
+        => this.GetPeripheral(peripheral).ConnectionFailed(error);
 
 
     readonly Subject<AccessState> stateUpdatedSubj = new();

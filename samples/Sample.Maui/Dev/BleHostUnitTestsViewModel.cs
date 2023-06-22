@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using DynamicData;
+﻿using System.Text;
 using Shiny.BluetoothLE.Hosting;
 using Shiny.Tests.BluetoothLE;
 
@@ -71,24 +69,24 @@ public class BleHostUnitTestsViewModel : ViewModel
                         }, WriteOptions.Write | WriteOptions.WriteWithoutResponse));
                     }
                 );
-                // await hostingManager.AddService(
-                //     BleConfiguration.SecondaryServiceUuid,
-                //     false,
-                //     sb =>
-                //     {
-                //         sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid1, x => x.SetRead(async request =>
-                //         {
-                //             await this.Log("Secondary Read - CH1");
-                //             return GattResult.Success(new byte[] { 0x01 });
-                //         }));
-                //
-                //         sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid2, x => x.SetRead(async request =>
-                //         {
-                //             await this.Log("Secondary Read - CH2");
-                //             return GattResult.Success(new byte[] { 0x01 });
-                //         }));
-                //     }
-                // );
+                //await hostingManager.AddService(
+                //    BleConfiguration.SecondaryServiceUuid,
+                //    false,
+                //    sb =>
+                //    {
+                //        sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid1, x => x.SetRead(async request =>
+                //        {
+                //            this.Log("Secondary Read - CH1");
+                //            return GattResult.Success(new byte[] { 0x01 });
+                //        }));
+
+                //        sb.AddCharacteristic(BleConfiguration.SecondaryCharacteristicUuid2, x => x.SetRead(async request =>
+                //        {
+                //            this.Log("Secondary Read - CH2");
+                //            return GattResult.Success(new byte[] { 0x01 });
+                //        }));
+                //    }
+                //);
                 await hostingManager.StartAdvertising(new(ServiceUuids: new[]
                 {
                     BleConfiguration.ServiceUuid

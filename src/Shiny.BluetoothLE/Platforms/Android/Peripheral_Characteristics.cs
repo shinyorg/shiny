@@ -32,6 +32,8 @@ public partial class Peripheral
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch => this.operations.QueueToObservable(async ct => 
         {
+            this.charEventSubj ??= new();
+
             this.FromNative(ch).AssertRead();
             var task = this.charEventSubj
                 .Where(x => x.Char.Equals(ch) && !x.IsWrite)
@@ -49,11 +51,13 @@ public partial class Peripheral
         }))
         .Switch();
 
-    
+
+    Subject<BleCharacteristicInfo>? charSubSubj;
     public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
     {
         this.AssertConnection();
-        
+        this.charSubSubj ??= new();
+
         if (!this.RequiresServiceDiscovery && this.Gatt!.Services != null)
         {
             foreach (var service in this.Gatt!.Services)
@@ -74,15 +78,15 @@ public partial class Peripheral
 
         return this.charSubSubj.Subscribe(ob.OnNext);
     });
-    
-    
-    readonly Subject<BleCharacteristicInfo> charSubSubj = new();
 
 
-    readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
+    Dictionary<string, IObservable<BleCharacteristicResult>>? notifiers;
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
         this.AssertConnection();
+
+        this.notifiers ??= new();
+        this.notifySubj ??= new();
         var key = $"{serviceUuid}-{characteristicUuid}";
 
         if (!this.notifiers.ContainsKey(key))
@@ -153,7 +157,7 @@ public partial class Peripheral
                 if (!this.Gatt!.SetCharacteristicNotification(ch, false))
                     this.logger.DisableNotificationError(null!, serviceUuid, characteristicUuid);
                 
-                this.charSubSubj.OnNext(this.FromNative(ch));
+                this.charSubSubj?.OnNext(this.FromNative(ch));
             }
         }
         catch (Exception ex)
@@ -208,16 +212,16 @@ public partial class Peripheral
         .Switch();
 
 
-    readonly Subject<(BluetoothGattCharacteristic Char, GattStatus Status, bool IsWrite)> charEventSubj = new();
+    Subject<(BluetoothGattCharacteristic Char, GattStatus Status, bool IsWrite)>? charEventSubj;
     public override void OnCharacteristicRead(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
-        => this.charEventSubj.OnNext((characteristic!, status, false));
+        => this.charEventSubj?.OnNext((characteristic!, status, false));
 
     public override void OnCharacteristicWrite(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
-        => this.charEventSubj.OnNext((characteristic!, status, true));
+        => this.charEventSubj?.OnNext((characteristic!, status, true));
 
-    readonly Subject<BluetoothGattCharacteristic> notifySubj = new();
+    Subject<BluetoothGattCharacteristic>? notifySubj = new();
     public override void OnCharacteristicChanged(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic)
-        => this.notifySubj.OnNext(characteristic!);
+        => this.notifySubj?.OnNext(characteristic!);
 
 
     protected IObservable<BluetoothGattCharacteristic> GetNativeCharacteristic(string serviceUuid, string characteristicUuid) => this
@@ -248,10 +252,11 @@ public partial class Peripheral
     );
     
     
-    readonly List<string> notifications = new();
+    List<string>? notifications;
 
     protected bool IsNotifying(string serviceUuid, string characteristicUuid)
     {
+        this.notifications ??= new();
         lock (this.notifications)
             return this.notifications.Contains(NotifyKey(serviceUuid, characteristicUuid));
     }
@@ -259,6 +264,7 @@ public partial class Peripheral
 
     protected void AddNotify(string serviceUuid, string characteristicUuid)
     {
+        this.notifications ??= new();
         lock (this.notifications)
             this.notifications.Add(NotifyKey(serviceUuid, characteristicUuid));
     }
@@ -266,6 +272,7 @@ public partial class Peripheral
 
     protected void RemoveNotify(string serviceUuid, string characteristicUuid)
     {
+        this.notifications ??= new();
         lock (this.notifications)
             this.notifications.Remove(NotifyKey(serviceUuid, characteristicUuid));
     }

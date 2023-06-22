@@ -38,6 +38,8 @@ public partial class Peripheral
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
+            this.descSubj ??= new();
+
             var task = this.descSubj
                 .Where(x => x.Descriptor.Equals(desc) && !x.IsWrite)
                 .Take(1)
@@ -54,6 +56,7 @@ public partial class Peripheral
     
     protected async Task WriteDescriptor(BluetoothGattDescriptor descriptor, byte[] data, CancellationToken ct)
     {
+        this.descSubj ??= new();
         var task = this.descSubj
             .Where(x => x.Descriptor.Equals(descriptor) && x.IsWrite)
             .Take(1)
@@ -98,13 +101,13 @@ public partial class Peripheral
         });
 
 
-    readonly Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status, bool IsWrite)> descSubj = new();
+    Subject<(BluetoothGattDescriptor Descriptor, GattStatus Status, bool IsWrite)>? descSubj = new();
     public override void OnDescriptorRead(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
-        => this.descSubj.OnNext((descriptor!, status, false));
+        => this.descSubj?.OnNext((descriptor!, status, false));
 
 
     public override void OnDescriptorWrite(BluetoothGatt? gatt, BluetoothGattDescriptor? descriptor, GattStatus status)
-        => this.descSubj.OnNext((descriptor!, status, true));
+        => this.descSubj?.OnNext((descriptor!, status, true));
 
 
     protected BleDescriptorResult ToResult(BluetoothGattDescriptor desc) => new BleDescriptorResult(

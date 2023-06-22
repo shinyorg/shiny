@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
-using Java.IO;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE;
@@ -28,15 +26,17 @@ public partial class Peripheral
     }
     
 
-    readonly Subject<Unit> serviceDiscoverySubj = new();
+    Subject<Unit>? serviceDiscoverySubj;
     public override void OnServicesDiscovered(BluetoothGatt? gatt, GattStatus status)
-        => this.serviceDiscoverySubj.OnNext(Unit.Default);
+        => this.serviceDiscoverySubj?.OnNext(Unit.Default);
 
 
     protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices() =>
         Observable.FromAsync<IReadOnlyList<BluetoothGattService>>(async ct =>
         {
             this.AssertConnection();
+
+            this.serviceDiscoverySubj ??= new();
             if (!this.RequiresServiceDiscovery)
                 return this.Gatt!.Services!.ToList();
 
@@ -88,6 +88,12 @@ public partial class Peripheral
             this.logger.LogWarning(ex, "Failed to clear internal device cache");
         }
     }
+
+
+    Subject<Unit>? servChangeSubj;
+    public IObservable<Unit> WhenServicesChanged() => this.servChangeSubj ??= new();
+    public override void OnServiceChanged(BluetoothGatt gatt)
+        => this.servChangeSubj?.OnNext(Unit.Default);
 
 
     protected BleServiceInfo FromNative(BluetoothGattService service) => new(service.Uuid.ToString());

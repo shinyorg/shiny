@@ -1,8 +1,5 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Shiny.BluetoothLE;
+﻿using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
-using Shiny.Hosting;
 
 namespace Shiny.Tests.BluetoothLE;
 

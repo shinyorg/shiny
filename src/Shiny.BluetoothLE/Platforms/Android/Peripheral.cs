@@ -17,6 +17,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     readonly IOperationQueue operations;
     readonly ILogger logger;
 
+
     public Peripheral(
         BleManager manager,
         AndroidPlatform platform,
@@ -81,33 +82,50 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     public void Connect(ConnectionConfig? config)
     {
-        AndroidConnectionConfig cfg = null!;
-        if (config == null)
-            cfg = new();
-        else if (config is AndroidConnectionConfig cfg1)
-            cfg = cfg1;
-        else
-            cfg = new AndroidConnectionConfig(config.AutoConnect);
+        try
+        {
+            AndroidConnectionConfig cfg = null!;
+            if (config == null)
+                cfg = new();
+            else if (config is AndroidConnectionConfig cfg1)
+                cfg = cfg1;
+            else
+                cfg = new AndroidConnectionConfig(config.AutoConnect);
 
-        this.Gatt = this.Native.ConnectGatt(
-            this.platform.AppContext,
-            config?.AutoConnect ?? true,
-            this,
-            BluetoothTransports.Le
-        );
-        if (this.Gatt == null)
-            throw new BleException("GATT connection could not be established");
+            this.Gatt = this.Native.ConnectGatt(
+                this.platform.AppContext,
+                config?.AutoConnect ?? true,
+                this,
+                BluetoothTransports.Le
+            );
+            if (this.Gatt == null)
+                throw new BleException("GATT connection could not be established");
 
-        this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
+            this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
 
-        this.connSubj.OnNext(ConnectionState.Connecting);
+            this.connSubj.OnNext(ConnectionState.Connecting);
+        }
+        catch (BleException ex)
+        {
+            this.connFailSubj?.OnNext(ex);
+            this.logger.LogWarning(ex, "Failed to connect");
+        }
+        catch (Exception ex)
+        {
+            this.connFailSubj?.OnNext(new("Failed to connect", ex));
+            this.logger.LogWarning(ex, "Failed to connect");
+        }
     }
 
+
+    Subject<BleException>? connFailSubj;
+    public IObservable<BleException> WhenConnectionFailed() => this.connFailSubj ??= new();
 
     public IObservable<int> ReadRssi() => this.operations.QueueToObservable(async ct =>
     {
         this.AssertConnection();
 
+        this.rssiSubj ??= new();
         var task = this.rssiSubj.Take(1).ToTask(ct);
         this.Gatt!.ReadRemoteRssi();
 
@@ -123,15 +141,14 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     public IObservable<ConnectionState> WhenStatusChanged() => this.connSubj.StartWith(this.Status);
 
 
-    readonly Subject<(GattStatus Status, int Rssi)> rssiSubj = new();
+    Subject<(GattStatus Status, int Rssi)>? rssiSubj;
     public override void OnReadRemoteRssi(BluetoothGatt? gatt, int rssi, GattStatus status)
-        => this.rssiSubj.OnNext((status, rssi));
+        => this.rssiSubj?.OnNext((status, rssi));
 
 
     public override void OnConnectionStateChange(BluetoothGatt? gatt, GattStatus status, ProfileState newState)
     {
-        if (this.logger.IsEnabled(LogLevel.Debug))
-            this.logger.LogDebug($"Connection State Change: {newState}");
+        this.logger.ConnectionStateChange(status, newState);
         
         if (newState == ProfileState.Disconnected)
             this.RequiresServiceDiscovery = true;

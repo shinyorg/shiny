@@ -1,49 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
+using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral
 {
-    protected IObservable<CBService> GetNativeService(string serviceUuid) => Observable.Create<CBService>(ob =>
+    protected IObservable<CBService> GetNativeService(string serviceUuid) => this.operations.QueueToObservable(async ct =>
     {
         this.AssertConnnection();
 
-        IDisposable? disp = null;
         var nativeUuid = CBUUID.FromString(serviceUuid);
         var service = this.TryGetService(nativeUuid);
 
         if (service != null)
-        {
-            ob.Respond(service);
-        }
-        else
-        {
-            disp = this.serviceDiscoverySubj.Subscribe(x =>
-            {
-                if (x != null)
-                {
-                    ob.OnError(new InvalidOperationException(x.LocalizedDescription));
-                }
-                else
-                {
-                    // the service should be scope now
-                    service = this.TryGetService(nativeUuid);
-                    if (service == null)
-                        ob.OnError(new InvalidOperationException("No service found for " + serviceUuid));
-                    else
-                        ob.Respond(service);
-                }
-            });
-            this.Native.DiscoverServices(new[] { nativeUuid });
-        }
-        return () => disp?.Dispose();
+            return service;
+
+        this.serviceDiscoverySubj ??= new();
+        var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
+
+        this.Native.DiscoverServices(new[] { nativeUuid });
+        var result = await task.ConfigureAwait(false);
+        if (result != null)
+            throw new InvalidOperationException(result.LocalizedDescription);
+
+        // the service should be scope now
+        service = this.TryGetService(nativeUuid);
+        if (service == null)
+            throw new InvalidOperationException("No service found for " + serviceUuid);
+
+        return service;
     });
 
 
@@ -56,6 +50,7 @@ public partial class Peripheral
     {
         this.AssertConnnection();
 
+        this.serviceDiscoverySubj ??= new();
         var disp = this.serviceDiscoverySubj.Subscribe(x =>
         {
             if (x != null)
@@ -85,10 +80,16 @@ public partial class Peripheral
     }
 
 
-    readonly Subject<NSError?> serviceDiscoverySubj = new();
+    Subject<NSError?>? serviceDiscoverySubj;
     public override void DiscoveredService(CBPeripheral peripheral, NSError? error)
     {
-        Log.ServiceDiscoveryEvent(this.logger, peripheral.Identifier, peripheral.Services?.Length ?? 0);
-        this.serviceDiscoverySubj.OnNext(error);
+        this.logger.ServiceDiscoveryEvent(peripheral.Identifier, peripheral.Services?.Length ?? 0);
+        this.serviceDiscoverySubj?.OnNext(error);
     }
+
+
+    Subject<Unit> servChangeSubj;
+    public IObservable<Unit> WhenServicesChanged() => this.servChangeSubj ??= new();
+    public override void ModifiedServices(CBPeripheral peripheral, CBService[] services)
+        => this.servChangeSubj?.OnNext(Unit.Default);
 }

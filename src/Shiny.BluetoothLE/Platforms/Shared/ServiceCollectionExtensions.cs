@@ -19,17 +19,11 @@ public static class ServiceCollectionExtensions
 #if APPLE
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null, AppleBleConfiguration? config = null)
     {
-        services.TryAddSingleton<IOperationQueue, FallthroughOperationQueue>();
         services.TryAddSingleton(config ?? new AppleBleConfiguration());
 
-#elif ANDROID
+#elif ANDROID || WINDOWS
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null)
-    {
-        services.TryAddSingleton<IOperationQueue, SemaphoreOperationQueue>();
-#elif WINDOWS
-    public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null)
-    {
-        //services.TryAddSingleton<IOperationQueue, FallthroughOperationQueue>(); // needed for windows?
+    {       
 #endif
         if (!services.HasImplementation<BleManager>())
             services.AddShinyService<BleManager>();
@@ -37,6 +31,7 @@ public static class ServiceCollectionExtensions
         if (delegateType != null)
             services.AddShinyService(delegateType);
 
+        services.TryAddSingleton<IOperationQueue, SemaphoreOperationQueue>();
         return services;
     }
 

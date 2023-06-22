@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Shiny.Stores.Impl;
 
+
 internal static partial class Log
 {
     [LoggerMessage(

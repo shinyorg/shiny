@@ -6,10 +6,6 @@ namespace Shiny.BluetoothLE;
 
 public interface IBleManager
 {
-    //IObservable<IPeripheral> WhenPeripheralStatusChanged();
-    //IObservable<AccessState> WhenStatusChanged()
-        // this really needs to be handled by a delegate because that's where the status changes, user should still call RequestAccess or trap when it fails starting a scan operation
-
     /// <summary>
     /// Requests necessary permissions to ensure bluetooth LE can be used
     /// </summary>
@@ -22,8 +18,6 @@ public interface IBleManager
     /// <param name="peripheralUuid">Peripheral identifier.</param>
     IPeripheral? GetKnownPeripheral(string peripheralUuid);
 
-    // IObservable<Unit> WhenServicesChanged();
-    
     /// <summary>
     /// Get current scanning status
     /// </summary>
@@ -63,3 +57,8 @@ public record ScanResult(
     int Rssi,
     IAdvertisementData AdvertisementData
 );
+
+
+//IObservable<IPeripheral> WhenPeripheralStatusChanged();
+//IObservable<AccessState> WhenStatusChanged()
+// this really needs to be handled by a delegate because that's where the status changes, user should still call RequestAccess or trap when it fails starting a scan operation

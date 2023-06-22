@@ -105,11 +105,6 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         ob.OnNext(this.Status);
         var sub = this.connSubj.Subscribe(ob.OnNext);
 
-        //    //this.context
-        //    //    .FailedConnection
-        //    //    .Where(x => x.Equals(this.peripheral))
-        //    //    .Subscribe(x => ob.OnNext(ConnectionStatus.Failed));
-
         return () => sub.Dispose();
     });
 
@@ -119,14 +114,18 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     internal void ReceiveStateChange(ConnectionState connStatus)
         => this.connSubj.OnNext(connStatus);
 
-    //public override IObservable<BleException> WhenConnectionFailed() => this.context
-    //    .FailedConnection
-    //    .Where(x => x.Peripheral.Equals(this.Native))
-    //    .Select(x => new BleException(x.Error.ToString()));
-    //public override void UpdatedName(CBPeripheral peripheral)
-    //{
-    //}
-    
+
+    readonly Subject<BleException> connFailedSubj = new();
+    public IObservable<BleException> WhenConnectionFailed() => this.connFailedSubj;
+
+
+    internal void ConnectionFailed(NSError? error)
+    {
+        var ex = new BleException(error?.LocalizedDescription ?? "Connection Failed");
+        this.connFailedSubj.OnNext(ex);
+    }
+
+
     protected void AssertConnnection()
     {
         if (this.Status != ConnectionState.Connected)
@@ -142,8 +141,7 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
             NotifyOnConnection = true,
             NotifyOnNotification = true
         });
-    
-    
+
 
     protected static BleOperationException ToException(NSError error, string message = "") =>
 #if XAMARIN

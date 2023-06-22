@@ -48,22 +48,23 @@ public static class PeripheralExtensions
             return Disposable.Empty; // we didn't start the connection, so we aren't closing it
         }
 
-        var sub1 = peripheral
+        var comp = new CompositeDisposable();
+        peripheral
             .WhenConnected()
             .Take(1)
-            .Subscribe(_ => ob.Respond(peripheral));
+            .Subscribe(_ => ob.Respond(peripheral))
+            .DisposedBy(comp);
 
-        // TODO: watch for new failed state?
-        //var sub2 = peripheral
-        //    .WhenConnectionFailed()
-        //    .Subscribe(ob.OnError);
+        peripheral
+            .WhenConnectionFailed()
+            .Subscribe(ob.OnError)
+            .DisposedBy(comp);
 
         peripheral.Connect(config);
 
         return Disposable.Create(() =>
         {
-            sub1.Dispose();
-            //sub2.Dispose();
+            comp.Dispose();
             if (peripheral.Status != ConnectionState.Connected)
                 peripheral.CancelConnection();
         });

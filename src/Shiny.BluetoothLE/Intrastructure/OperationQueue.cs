@@ -13,10 +13,10 @@ public interface IOperationQueue
 }
 
 
-public class FallthroughOperationQueue : IOperationQueue
-{
-    public Task Queue(Func<Task> task) => task.Invoke();
-}
+//public class FallthroughOperationQueue : IOperationQueue
+//{
+//    public Task Queue(Func<Task> task) => task.Invoke();
+//}
 
 
 public class SemaphoreOperationQueue : IOperationQueue

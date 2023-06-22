@@ -201,47 +201,52 @@ public partial class Peripheral
 
     protected IObservable<CBCharacteristic> GetNativeCharacteristic(string serviceUuid, string characteristicUuid) => this
         .GetNativeService(serviceUuid)
-        .Select(service => Observable.Create<CBCharacteristic>(ob =>
+        .Select(service => this.operations.QueueToObservable(async ct => 
         {
-            IDisposable? sub = null;
             var uuid = CBUUID.FromString(characteristicUuid);
             var ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
 
             if (ch != null)
-            {
-                ob.Respond(ch);
-            }
-            else
-            {
-                var count = 0;
+                return ch;
 
-                sub = this.charDiscoverySubj
-                    .Where(x => x.Service.Equals(service))
-                    .Subscribe(x =>
-                    {
-                        count++;
-                        if (x.Error != null)
-                        {
-                            ob.OnError(ToException(x.Error));
-                        }
-                        else
-                        {
-                            ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
-                            if (ch != null)
-                            {
-                                ob.Respond(ch);
-                            }
-                            else if (count >= 2)
-                            { 
-                                ob.OnError(new InvalidOperationException($"No characteristic found in service '{serviceUuid}' with UUID: {characteristicUuid}"));
-                            }
-                        }
-                    });
+            var task = this.charDiscoverySubj
+                .Where(x => x.Service.Equals(service))
+                .Take(1)
+                .ToTask(ct);
+            //var count = 0;
+            //sub = this.charDiscoverySubj
+            //    .Where(x => x.Service.Equals(service))
+            //    .Subscribe(x =>
+            //    {
+            //        count++;
+            //        if (x.Error != null)
+            //        {
+            //            ob.OnError(ToException(x.Error));
+            //        }
+            //        else
+            //        {
+            //            ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
+            //            if (ch != null)
+            //            {
+            //                ob.Respond(ch);
+            //            }
+            //            else if (count >= 2)
+            //            { 
+            //                ob.OnError(new InvalidOperationException($"No characteristic found in service '{serviceUuid}' with UUID: {characteristicUuid}"));
+            //            }
+            //        }
+            //    });
 
-                this.Native.DiscoverCharacteristics(new[] { uuid }, service);
-            }
+            this.Native.DiscoverCharacteristics(new[] { uuid }, service);
+            var result = await task.ConfigureAwait(false);
+            if (result.Error != null)
+                throw ToException(result.Error);
 
-            return () => sub?.Dispose();
+            ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
+            if (ch == null)
+                throw new InvalidOperationException($"No characteristic found in service '{serviceUuid}' with UUID: {characteristicUuid}");
+
+            return ch;
         }))
         .Switch();
 

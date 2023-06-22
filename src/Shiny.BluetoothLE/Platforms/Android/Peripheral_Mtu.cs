@@ -11,11 +11,11 @@ public partial class Peripheral : ICanRequestMtu
     public int Mtu { get; private set; } = 20;
 
 
-    readonly Subject<(int Mtu, GattStatus Status)> mtuSubj = new();
+    Subject<(int Mtu, GattStatus Status)>? mtuSubj;
     public override void OnMtuChanged(BluetoothGatt? gatt, int mtu, GattStatus status)
     { 
         this.Mtu = mtu;
-        this.mtuSubj.OnNext((mtu, status));
+        this.mtuSubj?.OnNext((mtu, status));
     }
 
 
@@ -23,6 +23,7 @@ public partial class Peripheral : ICanRequestMtu
     {
         this.AssertConnection();
 
+        this.mtuSubj ??= new();
         var disposable = this.mtuSubj.Subscribe(x =>
         {
             if (x.Status == GattStatus.Success)

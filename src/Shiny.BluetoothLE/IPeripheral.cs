@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 
 namespace Shiny.BluetoothLE;
 
@@ -57,7 +58,20 @@ public interface IPeripheral
     /// </summary>
     /// <returns></returns>
     IObservable<ConnectionState> WhenStatusChanged();
-    
+
+    /// <summary>
+    /// When a connection status
+    /// </summary>
+    /// <returns></returns>
+    IObservable<BleException> WhenConnectionFailed();
+
+    /// <summary>
+    /// Fires when services available on the peripheral change
+    /// You should call GetService(s) after this is fired if you want to get the state of the change
+    /// </summary>
+    /// <returns></returns>
+    IObservable<Unit> WhenServicesChanged();
+
     /// <summary>
     /// Reads the peripheral RSSI
     /// </summary>
