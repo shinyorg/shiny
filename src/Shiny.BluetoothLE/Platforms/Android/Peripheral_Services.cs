@@ -37,10 +37,10 @@ public partial class Peripheral
             this.AssertConnection();
 
             this.serviceDiscoverySubj ??= new();
-            if (!this.RequiresServiceDiscovery)
+            if (!this.RequiresServiceDiscovery && this.Gatt?.Services != null)
                 return this.Gatt!.Services!.ToList();
 
-            // this.RefreshServices(); // force refresh of services on GATT
+            this.RefreshServices(); // force refresh of services on GATT
             var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
             if (!this.Gatt!.DiscoverServices())
                 throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
