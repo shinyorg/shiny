@@ -109,7 +109,6 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     });
 
 
-    
     readonly Subject<ConnectionState> connSubj = new();
     internal void ReceiveStateChange(ConnectionState connStatus)
         => this.connSubj.OnNext(connStatus);

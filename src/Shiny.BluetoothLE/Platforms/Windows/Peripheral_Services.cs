@@ -9,6 +9,7 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral : IPeripheral
 {
+    public IObservable<Unit> WhenServicesChanged() => null;
     public IObservable<BleServiceInfo> GetService(string serviceUuid) => throw new NotImplementedException();
     public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => Observable.FromAsync(async ct =>
     {

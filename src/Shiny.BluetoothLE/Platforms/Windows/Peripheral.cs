@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
@@ -41,6 +42,9 @@ public partial class Peripheral : IPeripheral
         }
     }
 
+
+    public IObservable<BleException> WhenConnectionFailed() => null;
+    public IObservable<Unit>
 
     public void Connect(ConnectionConfig? config)
     {
