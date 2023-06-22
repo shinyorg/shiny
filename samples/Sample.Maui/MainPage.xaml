@@ -74,6 +74,10 @@
         <NavigationPage>
             <x:Arguments>
                 <ContentPage Title="Welcome">
+                    <ContentPage.ToolbarItems>
+                        <ToolbarItem Text="Settings" Command="{Binding OpenAppSettings}" />
+                    </ContentPage.ToolbarItems>
+
                     <Label Text="Welcome to the Shiny.NET Samples"
                            Style="{StaticResource NoDataLabel}" />
                 </ContentPage>

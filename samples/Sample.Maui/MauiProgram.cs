@@ -94,7 +94,7 @@ public static class MauiProgram
         s.AddSingleton(TextToSpeech.Default);
         s.AddSingleton(FilePicker.Default);
         s.AddSingleton(DeviceDisplay.Current);
-
+        s.AddSingleton(AppInfo.Current);
         return builder;
     }
 
