@@ -87,6 +87,8 @@ public partial class Peripheral
 
         this.notifiers ??= new();
         this.notifySubj ??= new();
+        this.charSubSubj ??= new();
+
         var key = $"{serviceUuid}-{characteristicUuid}";
 
         if (!this.notifiers.ContainsKey(key))
@@ -172,7 +174,12 @@ public partial class Peripheral
         .Select(ch => this.operations.QueueToObservable(async ct =>
         {
             this.FromNative(ch).AssertWrite(withResponse);
-            var task = this.charEventSubj.Where(x => x.Char.Equals(ch) && x.IsWrite).Take(1).ToTask(ct);
+
+            this.charEventSubj ??= new();
+            var task = this.charEventSubj
+                .Where(x => x.Char.Equals(ch) && x.IsWrite)
+                .Take(1)
+                .ToTask(ct);
 
             ch.WriteType = withResponse ? GattWriteType.Default : GattWriteType.NoResponse;
             

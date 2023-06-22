@@ -79,8 +79,13 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
         // dispose is (should) only used by unit tests
         // this is really only need for unit tests - it will passthrough under normal circumstances
         this.platform.InvokeOnMainThread(() =>
-            ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this)
-        );
+        {
+            try
+            {
+                ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this);
+            }
+            catch { }
+        });
         base.Dispose();
     }
 
