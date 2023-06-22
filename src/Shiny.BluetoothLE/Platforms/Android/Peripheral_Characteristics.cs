@@ -315,8 +315,5 @@ public partial class Peripheral
 
     Subject<BluetoothGattCharacteristic>? notifySubj = new();
     public override void OnCharacteristicChanged(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic)
-    {
-        this.logger.LogDebug("OnCharacteristicChanged CharID: " + characteristic.InstanceId);
-        this.notifySubj?.OnNext(characteristic!);
-    }
+        => this.notifySubj?.OnNext(characteristic!);
 }
