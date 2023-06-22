@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
+using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
@@ -93,39 +94,57 @@ public partial class Peripheral
 
         if (!this.notifiers.ContainsKey(key))
         {
-            var obs = this
-                .WhenConnected()
-                .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
-                .Switch()
-                .Select(ch => this.operations.QueueToObservable(async ct =>
+            var obs = Observable
+                .Create<BleCharacteristicResult>(ob =>
                 {
-                    this.FromNative(ch).AssertNotify();
+                    BluetoothGattCharacteristic? characteristic = null;
 
-                    this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribing");
+                    var sub = this.WhenConnected()
+                        .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                        .Switch()
+                        .Select(ch => this.operations.QueueToObservable(async ct =>
+                        {
+                            this.FromNative(ch).AssertNotify();
+                            this.logger.LogDebug("Char InstanceID: " + ch.InstanceId);
 
-                    if (!this.Gatt!.SetCharacteristicNotification(ch, true))
-                        throw new BleException("Failed to set characteristic notification value");
+                            this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribing");
 
-                    var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
-                    var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
-                    if (nativeDescriptor == null)
-                        throw new BleException("Characteristic notification descriptor not found");
+                            if (!this.Gatt!.SetCharacteristicNotification(ch, true))
+                                throw new BleException("Failed to set characteristic notification value");
 
-                    await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
-                    this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
+                            var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
+                            var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
+                            if (nativeDescriptor == null)
+                                throw new BleException("Characteristic notification descriptor not found");
 
-                    this.AddNotify(serviceUuid, characteristicUuid);
-                    this.charSubSubj.OnNext(this.FromNative(ch));
+                            await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
+                            this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
 
-                    return ch;
-                }))
-                .Switch()
-                .Select(ch => this.notifySubj
-                    .Where(x => x.Equals(ch))
-                    .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
-                    .Finally(() => this.TryNotificationCleanup(ch, serviceUuid, characteristicUuid))
-                )
-                .Switch()
+                            this.AddNotify(serviceUuid, characteristicUuid);
+                            this.charSubSubj.OnNext(this.FromNative(ch));
+
+                            characteristic = ch;
+                            return ch;
+                        }))
+                        .Switch()
+                        .Select(ch => this.notifySubj
+                            .Where(x => x.Equals(ch))
+                            .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
+                        )
+                        .Switch()
+                        .Subscribe(
+                            ob.OnNext,
+                            ob.OnError
+                        );
+
+                    return () =>
+                    {
+                        if (characteristic != null)
+                            this.TryNotificationCleanup(characteristic, serviceUuid, characteristicUuid);
+
+                        sub?.Dispose();
+                    };
+                })
                 .Publish()
                 .RefCount();
 
@@ -139,12 +158,11 @@ public partial class Peripheral
     protected void TryNotificationCleanup(BluetoothGattCharacteristic ch, string serviceUuid, string characteristicUuid)
     {
         try
-        {
+        {            
             this.RemoveNotify(serviceUuid, characteristicUuid);
 
             if (this.Status == ConnectionState.Connected)
             {
-                // TODO: is this actually needed?
                 this.WriteDescriptor(
                     serviceUuid,
                     characteristicUuid,
@@ -161,6 +179,7 @@ public partial class Peripheral
                 
                 this.charSubSubj?.OnNext(this.FromNative(ch));
             }
+            this.logger.LogDebug($"Cleaned up characteristic subscription: {serviceUuid} / {characteristicUuid}");
         }
         catch (Exception ex)
         {
@@ -218,17 +237,6 @@ public partial class Peripheral
         }))
         .Switch();
 
-
-    Subject<(BluetoothGattCharacteristic Char, GattStatus Status, bool IsWrite)>? charEventSubj;
-    public override void OnCharacteristicRead(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
-        => this.charEventSubj?.OnNext((characteristic!, status, false));
-
-    public override void OnCharacteristicWrite(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
-        => this.charEventSubj?.OnNext((characteristic!, status, true));
-
-    Subject<BluetoothGattCharacteristic>? notifySubj = new();
-    public override void OnCharacteristicChanged(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic)
-        => this.notifySubj?.OnNext(characteristic!);
 
 
     protected IObservable<BluetoothGattCharacteristic> GetNativeCharacteristic(string serviceUuid, string characteristicUuid) => this
@@ -295,5 +303,20 @@ public partial class Peripheral
             return BluetoothGattDescriptor.EnableIndicationValue!.ToArray();
 
         return BluetoothGattDescriptor.EnableNotificationValue!.ToArray();
+    }
+
+
+    Subject<(BluetoothGattCharacteristic Char, GattStatus Status, bool IsWrite)>? charEventSubj;
+    public override void OnCharacteristicRead(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
+        => this.charEventSubj?.OnNext((characteristic!, status, false));
+
+    public override void OnCharacteristicWrite(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic, GattStatus status)
+        => this.charEventSubj?.OnNext((characteristic!, status, true));
+
+    Subject<BluetoothGattCharacteristic>? notifySubj = new();
+    public override void OnCharacteristicChanged(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic)
+    {
+        this.logger.LogDebug("OnCharacteristicChanged CharID: " + characteristic.InstanceId);
+        this.notifySubj?.OnNext(characteristic!);
     }
 }
