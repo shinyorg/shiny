@@ -44,7 +44,6 @@ public partial class Peripheral : IPeripheral
 
 
     public IObservable<BleException> WhenConnectionFailed() => null;
-    public IObservable<Unit>
 
     public void Connect(ConnectionConfig? config)
     {
