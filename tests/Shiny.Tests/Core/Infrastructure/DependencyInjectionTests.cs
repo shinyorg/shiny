@@ -21,8 +21,13 @@ public class DependencyInjectionTests
         services.AddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
         services.AddSingleton<IKeyValueStore>(settings);
         addServices?.Invoke(services);
+        KeyValueStoreFactory.DefaultStoreName = "memory";
 
-        return services.BuildServiceProvider(true);
+        var sp = services.BuildServiceProvider(true);
+        foreach (var startup in sp.GetServices<IShinyStartupTask>())
+            startup.Start();
+
+        return sp;
     }
 
 
@@ -41,7 +46,7 @@ public class DependencyInjectionTests
 
         var services = Create(
             s => SetCountKey(s, setValue),
-            s => s.AddSingleton<IFullService, FullService>()
+            s => s.AddShinyService<FullService>()
         );
         services
             .GetRequiredService<IFullService>()
@@ -56,7 +61,7 @@ public class DependencyInjectionTests
     {
         var sp = Create(null, x =>
         {
-            x.AddSingleton<TestStartupTask>();
+            x.AddShinyService<TestStartupTask>();
         });
         TestStartupTask.Value.Should().Be(99);
         TestStartupTask.Value = 0;
