@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Locations;
@@ -8,15 +7,8 @@ namespace Shiny.Locations;
 
 public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
 {
-    readonly DeferredGpsConfiguration configuration;
     readonly ILogger logger;
-
-
-    public DeferredGpsDelegate(IServiceProvider services)
-    {
-        this.configuration = services.GetRequiredService<DeferredGpsConfiguration>();
-        this.logger = services.GetRequiredService<ILogger<DeferredGpsDelegate>>();
-    }
+    public DeferredGpsDelegate(ILogger logger) => this.logger = logger;
 
 
     public async Task OnReading(GpsReading reading)
@@ -30,20 +22,20 @@ public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
         }
         else
         {
-            if (this.configuration.MinDistance != null)
+            if (this.MinimumDistance != null)
             {
                 var dist = this.LastReading.Position.GetDistanceTo(reading.Position);
-                fireReading = dist >= this.configuration.MinDistance;
+                fireReading = dist >= this.MinimumDistance;
 
-                this.logger.DeferDistanceInfo(this.configuration.MinDistance!.TotalMeters, dist.TotalMeters, fireReading);
+                this.logger.DeferDistanceInfo(this.MinimumDistance!.TotalMeters, dist.TotalMeters, fireReading);
             }
 
-            if (!fireReading && this.configuration.MinTime != null)
+            if (!fireReading && this.MinimumTime != null)
             {
                 var timeDiff = reading.Timestamp.Subtract(this.LastReading.Timestamp);
-                fireReading = timeDiff >= this.configuration.MinTime;
+                fireReading = timeDiff >= this.MinimumTime;
 
-                this.logger.DeferTimeInfo(this.configuration.MinTime!.Value, timeDiff, fireReading);
+                this.logger.DeferTimeInfo(this.MinimumTime!.Value, timeDiff, fireReading);
             }
         }
 
@@ -69,11 +61,21 @@ public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
     }
 
 
+    Distance? minDistance;
+    public Distance? MinimumDistance
+    {
+        get => this.minDistance;
+        set => this.Set(ref this.minDistance, value);
+    }
+
+
+    TimeSpan? minTime;
+    public TimeSpan? MinimumTime
+    {
+        get => this.minTime;
+        set => this.Set(ref this.minTime, value);
+    }
+
+
     protected abstract Task OnDeferredReading(GpsReading reading);
 }
-
-// maybe make this mutable so it can be changed in app
-public record DeferredGpsConfiguration(
-    Distance? MinDistance,
-    TimeSpan? MinTime
-);
