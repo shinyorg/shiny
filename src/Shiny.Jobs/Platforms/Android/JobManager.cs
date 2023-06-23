@@ -93,18 +93,10 @@ public class JobManager : AbstractJobManager
 
         this.Instance.EnqueueUniquePeriodicWork(
             jobInfo.Identifier,
-            ExistingPeriodicWorkPolicy.Replace,
+            ExistingPeriodicWorkPolicy.Replace!,
             request
         );
     }
-
-
-    static NetworkType ToNative(InternetAccess access) => access switch
-    {
-        InternetAccess.Any => NetworkType.Connected,
-        InternetAccess.Unmetered => NetworkType.Unmetered,
-        _ => NetworkType.NotRequired
-    };
 
 
     protected override void CancelNative(JobInfo jobInfo)
@@ -119,4 +111,10 @@ public class JobManager : AbstractJobManager
 
 
     WorkManager Instance => WorkManager.GetInstance(this.platform.AppContext);
+    static NetworkType ToNative(InternetAccess access) => access switch
+    {
+        InternetAccess.Any => NetworkType.Connected!,
+        InternetAccess.Unmetered => NetworkType.Unmetered!,
+        _ => NetworkType.NotRequired!
+    };
 }

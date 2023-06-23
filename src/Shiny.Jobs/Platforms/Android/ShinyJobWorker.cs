@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using AndroidX.Concurrent.Futures;
@@ -9,8 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 
-
 namespace Shiny.Jobs;
+
 
 public class ShinyJobWorker : ListenableWorker, CallbackToFutureAdapter.IResolver
 {
