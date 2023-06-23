@@ -14,11 +14,11 @@ public abstract class Job : NotifyPropertyChanged, IJob
 
     public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
-        try
-        {
-            var fireJob = true;
-            this.JobInfo = jobInfo;
+        var fireJob = true;
+        this.JobInfo = jobInfo;
 
+        try
+        {        
             if (this.MinimumTime != null && this.LastRunTime != null)
             {
                 var timeDiff = this.LastRunTime.Value.Subtract(DateTimeOffset.UtcNow);
@@ -31,8 +31,8 @@ public abstract class Job : NotifyPropertyChanged, IJob
         }
         finally
         {
-            this.JobInfo = null;
-            this.LastRunTime = DateTimeOffset.UtcNow;
+            if (fireJob)
+                this.LastRunTime = DateTimeOffset.UtcNow;
         }
     }
 
@@ -40,6 +40,10 @@ public abstract class Job : NotifyPropertyChanged, IJob
     protected abstract Task Run(CancellationToken cancelToken);
     protected JobInfo? JobInfo { get; private set; }
 
+    /// <summary>
+    /// Last runtime of this job.  Null if never run before.
+    /// This value will persist between runs, it is not recommended that you set this yourself
+    /// </summary>
     DateTimeOffset? lastRunTime;
     public DateTimeOffset? LastRunTime
     {
@@ -48,6 +52,11 @@ public abstract class Job : NotifyPropertyChanged, IJob
     }
 
 
+    /// <summary>
+    /// Sets a minimum time between this job firing
+    /// CAREFUL: jobs tend to NOT run when the users phone is not in use
+    /// This value will persist between runs
+    /// </summary>
     TimeSpan? minTime;
     public TimeSpan? MinimumTime
     {
