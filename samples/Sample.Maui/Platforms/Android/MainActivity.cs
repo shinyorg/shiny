@@ -1,8 +1,6 @@
 ﻿using Android.App;
 using Android.Content.PM;
 
-using Shiny.Push;
-
 namespace Sample.Maui;
 
 [Activity(
@@ -16,13 +14,6 @@ namespace Sample.Maui;
         ConfigChanges.SmallestScreenSize |
         ConfigChanges.Density
 )]
-[IntentFilter(
-    new[] {
-        ShinyPushIntents.NotificationClickAction,
-        ShinyNotificationIntents.NotificationClickAction
-    }
-)]
 public class MainActivity : MauiAppCompatActivity
 {
 }
-
