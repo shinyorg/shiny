@@ -8,7 +8,7 @@ namespace Shiny.Locations;
 public abstract class GpsDelegate : NotifyPropertyChanged, IGpsDelegate
 {
     
-    public DeferredGpsDelegate(ILogger logger) => this.Logger = logger;
+    public GpsDelegate(ILogger logger) => this.Logger = logger;
 
 
     protected ILogger Logger { get; }
