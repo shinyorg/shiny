@@ -26,6 +26,7 @@ public static class AppCenterExtensions
         params Type[] additionalAppCenterPackages
     )
     {
+#if PLATFORM
         builder.AddProvider(new AppCenterLoggerProvider(minimumLogLevel));
         if (!String.IsNullOrWhiteSpace(appCenterSecret))
         {
@@ -35,5 +36,8 @@ public static class AppCenterExtensions
             
             AppCenter.Start(appCenterSecret, list.ToArray());
         }
+#else
+        throw new NotSupportedException("This is not a valid platform for Shiny.Logging.AppCenter");
+#endif
     }
 }

@@ -3,7 +3,7 @@
 
     <PropertyGroup>
         <Description>Shiny AppCenter Logging for Microsoft Extensions Logging</Description>
-        <TargetFrameworks>$(IosTargetFrameworks);$(AndroidTargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

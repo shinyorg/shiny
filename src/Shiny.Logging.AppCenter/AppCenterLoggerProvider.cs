@@ -1,16 +1,16 @@
-﻿using System;
+﻿#if PLATFORM
 using Microsoft.Extensions.Logging;
 
+namespace Shiny.Logging.AppCenter;
 
-namespace Shiny.Logging.AppCenter
+
+public class AppCenterLoggerProvider : ILoggerProvider
 {
-    public class AppCenterLoggerProvider : ILoggerProvider
-    {
-        readonly LogLevel logLevel;
-        public AppCenterLoggerProvider(LogLevel logLevel) => this.logLevel = logLevel;
+    readonly LogLevel logLevel;
+    public AppCenterLoggerProvider(LogLevel logLevel) => this.logLevel = logLevel;
 
 
-        public ILogger CreateLogger(string categoryName) => new AppCenterLogger(categoryName, this.logLevel);
-        public void Dispose() { }
-    }
+    public ILogger CreateLogger(string categoryName) => new AppCenterLogger(categoryName, this.logLevel);
+    public void Dispose() { }
 }
+#endif
