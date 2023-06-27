@@ -14,6 +14,9 @@ namespace Sample.Maui;
         ConfigChanges.SmallestScreenSize |
         ConfigChanges.Density
 )]
+[IntentFilter(new[] {
+    Shiny.ShinyNotificationIntents.NotificationClickAction
+})]
 public class MainActivity : MauiAppCompatActivity
 {
 }
