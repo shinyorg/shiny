@@ -5,10 +5,13 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Locations;
 
 
-public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
+public abstract class GpsDelegate : NotifyPropertyChanged, IGpsDelegate
 {
-    readonly ILogger logger;
-    public DeferredGpsDelegate(ILogger logger) => this.logger = logger;
+    
+    public DeferredGpsDelegate(ILogger logger) => this.Logger = logger;
+
+
+    protected ILogger Logger { get; }
 
 
     public async Task OnReading(GpsReading reading)
@@ -18,7 +21,7 @@ public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
         if (this.LastReading == null)
         {
             fireReading = true;
-            this.logger.LogDebug("No previous reading");
+            this.Logger.LogDebug("No previous reading");
         }
         else
         {
@@ -27,7 +30,7 @@ public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
                 var dist = this.LastReading.Position.GetDistanceTo(reading.Position);
                 fireReading = dist >= this.MinimumDistance;
 
-                this.logger.DeferDistanceInfo(this.MinimumDistance!.TotalMeters, dist.TotalMeters, fireReading);
+                this.Logger.DeferDistanceInfo(this.MinimumDistance!.TotalMeters, dist.TotalMeters, fireReading);
             }
 
             if (!fireReading && this.MinimumTime != null)
@@ -35,7 +38,7 @@ public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
                 var timeDiff = reading.Timestamp.Subtract(this.LastReading.Timestamp);
                 fireReading = timeDiff >= this.MinimumTime;
 
-                this.logger.DeferTimeInfo(this.MinimumTime!.Value, timeDiff, fireReading);
+                this.Logger.DeferTimeInfo(this.MinimumTime!.Value, timeDiff, fireReading);
             }
         }
 
@@ -43,7 +46,7 @@ public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
         {
             try
             {
-                await this.OnDeferredReading(reading).ConfigureAwait(false);
+                await this.OnGpsReading(reading).ConfigureAwait(false);
             }
             finally
             {
@@ -77,5 +80,5 @@ public abstract class DeferredGpsDelegate : NotifyPropertyChanged, IGpsDelegate
     }
 
 
-    protected abstract Task OnDeferredReading(GpsReading reading);
+    protected abstract Task OnGpsReading(GpsReading reading);
 }
