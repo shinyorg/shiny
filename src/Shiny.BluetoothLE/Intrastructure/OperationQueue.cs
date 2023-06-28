@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE.Intrastructure;
 
@@ -9,23 +11,31 @@ namespace Shiny.BluetoothLE.Intrastructure;
 
 public interface IOperationQueue
 {
-    Task Queue(Func<Task> task);
+    Task Queue(Func<Task> task, CancellationToken cancellToken, string? caller);
 }
-
-
-//public class FallthroughOperationQueue : IOperationQueue
-//{
-//    public Task Queue(Func<Task> task) => task.Invoke();
-//}
 
 
 public class SemaphoreOperationQueue : IOperationQueue
 {
+    readonly ILogger logger;
+
+
+    public SemaphoreOperationQueue(ILogger<SemaphoreOperationQueue> logger)
+    {
+        this.logger = logger;
+    }
+
+
     readonly SemaphoreSlim semaphore = new(1);
 
-    public async Task Queue(Func<Task> task)
+    public async Task Queue(Func<Task> task, CancellationToken cancellationToken, [CallerMemberName] string? caller = null)
     {
-        await this.semaphore.WaitAsync().ConfigureAwait(false);
+        if (this.logger.IsEnabled(LogLevel.Debug))        
+            this.logger.LogDebug($"[{caller}] awaiting at BLE operation lock");
+        
+        await this.semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        if (this.logger.IsEnabled(LogLevel.Debug))
+            this.logger.LogDebug($"[{caller}] past BLE operation lock");
 
         try
         {
@@ -34,6 +44,8 @@ public class SemaphoreOperationQueue : IOperationQueue
         finally
         {
             this.semaphore.Release();
+            if (this.logger.IsEnabled(LogLevel.Debug))
+                this.logger.LogDebug($"[{caller}] release BLE operation lock");
         }
     }
 }
@@ -41,13 +53,13 @@ public class SemaphoreOperationQueue : IOperationQueue
 
 public static class OperationQueueExtensions
 {
-    public static IObservable<T> QueueToObservable<T>(this IOperationQueue queue, Func<CancellationToken, Task<T>> func) => Observable.FromAsync(async ct =>
+    public static IObservable<T> QueueToObservable<T>(this IOperationQueue queue, Func<CancellationToken, Task<T>> func, [CallerMemberName] string? caller = null) => Observable.FromAsync(async ct =>
     {
         T result = default!;
         await queue.Queue(async () => 
         {
             result = await func.Invoke(ct).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+        }, ct, caller).ConfigureAwait(false);
 
         return result;
     });
