@@ -15,7 +15,10 @@ public abstract class AbstractShinyTests : IDisposable
         this.output = output;
         var builder = HostBuilder.Create();
 
+        builder.Logging.SetMinimumLevel(LogLevel.Trace);
         builder.Logging.AddXUnit(output);
+        builder.Logging.AddDebug();
+
         this.Configure(builder);
         this.Host = builder.Build();
         this.Host.Run(); // force Host.Current to be hooked

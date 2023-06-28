@@ -40,6 +40,7 @@ public partial class Peripheral
             if (!this.RequiresServiceDiscovery && this.Gatt?.Services != null)
                 return this.Gatt!.Services!.ToList();
 
+            // TODO: should lock here
             this.RefreshServices(); // force refresh of services on GATT
             var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
             if (!this.Gatt!.DiscoverServices())

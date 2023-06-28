@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Shiny.BluetoothLE;
+﻿using Shiny.BluetoothLE;
 
 namespace Shiny.Tests.BluetoothLE;
 
@@ -69,23 +66,24 @@ public class CharacteristicTests : AbstractBleTests
     public async Task NotifyTest()
     {
         await this.Setup();
-        var task = this.Peripheral!
-            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid)
-            .Take(1)
-            .Timeout(TimeSpan.FromSeconds(30))
-            .ToTask();
+        await this.DoNotificationAndOut();
+    }
 
-        await this.Peripheral!.WriteCharacteristicAsync(
-            BleConfiguration.ServiceUuid,
-            BleConfiguration.WriteCharacteristicUuid,
-            new byte[] { 0x01 },
-            true,
-            CancellationToken.None,
-            30000
-        );
 
-        var result = await task;
-        result.Event.Should().Be(BleCharacteristicEvent.Notification);
+    [Fact(DisplayName = "BLE Characteristic - Notification Disconnect and Rehook")]
+    public async Task NotifyWithDisconnectAndRehook()
+    {
+        await this.Setup();
+
+        this.Log("Doing initial notification hook");
+        await this.DoNotificationAndOut();
+
+        this.Peripheral!.CancelConnection();
+        this.Log("Disconnected");
+
+        await this.Connect();
+        this.Log("Reconnected - Doing secondary notification hook");
+        await this.DoNotificationAndOut();
     }
 
 
@@ -196,11 +194,34 @@ public class CharacteristicTests : AbstractBleTests
         AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.WriteCharacteristicUuid);
         AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid);
         AssertChar(results, BleConfiguration.ServiceUuid, BleConfiguration.Notify2CharacteristicUuid);
+    }
 
-        // TODO: BLE Host is not pumping this out
-        // TODO: could detect device info service?  On all android though?
-        // AssertChar(results, BleConfiguration.SecondaryServiceUuid, BleConfiguration.SecondaryCharacteristicUuid1);
-        // AssertChar(results, BleConfiguration.SecondaryServiceUuid, BleConfiguration.SecondaryCharacteristicUuid2);
+
+    async Task DoNotificationAndOut()
+    {
+        this.Log("Will hook notification");
+        var task = this.Peripheral!
+            .NotifyCharacteristic(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid)
+            .Take(1)
+            .Timeout(TimeSpan.FromSeconds(15))
+            .ToTask();
+
+        this.Log("Waiting for notify to be ready");
+        await this.Peripheral!.WaitForCharacteristicSubscription(BleConfiguration.ServiceUuid, BleConfiguration.NotifyCharacteristicUuid);
+
+        this.Log("Writing Request for notification");
+        await this.Peripheral!.WriteCharacteristicAsync(
+            BleConfiguration.ServiceUuid,
+            BleConfiguration.WriteCharacteristicUuid,
+            new byte[] { 0x01 },
+            true,
+            CancellationToken.None,
+            30000
+        );
+
+        this.Log("Waiting for notification");
+        var result = await task.ConfigureAwait(false);
+        result.Event.Should().Be(BleCharacteristicEvent.Notification);
     }
 
 

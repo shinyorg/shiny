@@ -56,13 +56,21 @@ public class BleHostUnitTestsViewModel : ViewModel
                             currentData = request.Data;
                             this.Log($"{request.Peripheral.Uuid} Wrote to Characteristic", request.Data);
 
-                            if (notifier.SubscribedCentrals.Count > 0)
+                            if (notifier.SubscribedCentrals.Count == 0)
+                            {
+                                this.Log("No subscribers on 1");
+                            }
+                            else
                             {
                                 await notifier.Notify(request.Data);
                                 this.Log("Notification Broadcasted to subscribers");
                             }
-                            if (notifier2.SubscribedCentrals.Count > 0)
+                            if (notifier2.SubscribedCentrals.Count == 0)
                             {
+                                this.Log("No subscribers on 2");
+                            }
+                            else
+                            { 
                                 await notifier2.Notify(request.Data);
                                 this.Log("Notification Broadcasted to subscribers");
                             }
