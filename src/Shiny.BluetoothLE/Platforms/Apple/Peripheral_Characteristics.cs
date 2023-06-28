@@ -25,7 +25,11 @@ public partial class Peripheral
         {
             var obs = this
                 .WhenConnected()
-                .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                .Select(_ =>
+                {
+                    this.logger.LogDebug($"Connection Detected - Attempting to hook: {serviceUuid} / {characteristicUuid}");
+                    return this.GetNativeCharacteristic(serviceUuid, characteristicUuid);
+                })
                 .Switch()
                 .Select(ch =>
                 {
@@ -213,29 +217,6 @@ public partial class Peripheral
                 .Where(x => x.Service.Equals(service))
                 .Take(1)
                 .ToTask(ct);
-            //var count = 0;
-            //sub = this.charDiscoverySubj
-            //    .Where(x => x.Service.Equals(service))
-            //    .Subscribe(x =>
-            //    {
-            //        count++;
-            //        if (x.Error != null)
-            //        {
-            //            ob.OnError(ToException(x.Error));
-            //        }
-            //        else
-            //        {
-            //            ch = service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(uuid));
-            //            if (ch != null)
-            //            {
-            //                ob.Respond(ch);
-            //            }
-            //            else if (count >= 2)
-            //            { 
-            //                ob.OnError(new InvalidOperationException($"No characteristic found in service '{serviceUuid}' with UUID: {characteristicUuid}"));
-            //            }
-            //        }
-            //    });
 
             this.Native.DiscoverCharacteristics(new[] { uuid }, service);
             var result = await task.ConfigureAwait(false);

@@ -80,7 +80,7 @@ public partial class Peripheral
             else
             {
                 var result = (bool)method.Invoke(this.Gatt);
-                this.logger.LogWarning("Clear Internal Cache Refresh Result: " + result);
+                this.logger.LogInformation("Clear Internal Cache Refresh Result: " + result);
             }
         }
         catch (Exception ex)

@@ -97,10 +97,15 @@ public partial class Peripheral
             var obs = Observable
                 .Create<BleCharacteristicResult>(ob =>
                 {
+                    this.logger.LogDebug($"Hooking Characteristic Notification: {serviceUuid} / {characteristicUuid}");
                     BluetoothGattCharacteristic? characteristic = null;
 
                     var sub = this.WhenConnected()
-                        .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                        .Select(_ =>
+                        {
+                            this.logger.LogDebug($"Connection Detected - Attempting to hook characteristic: {serviceUuid} / {characteristicUuid}");
+                            return this.GetNativeCharacteristic(serviceUuid, characteristicUuid);
+                        })
                         .Switch()
                         .Select(ch => this.operations.QueueToObservable(async ct =>
                         {
