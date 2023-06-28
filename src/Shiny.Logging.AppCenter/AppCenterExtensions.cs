@@ -34,8 +34,9 @@ public static class AppCenterExtensions
             var list = new List<Type>{ typeof(Crashes), typeof(Analytics) };
             if (additionalAppCenterPackages.Length > 0)
                 list.AddRange(additionalAppCenterPackages);
-            
-            AppCenter.Start(appCenterSecret, list.ToArray());
+
+            if (!AppCenter.Configured)
+                AppCenter.Start(appCenterSecret, list.ToArray());
         }
     }
 }
