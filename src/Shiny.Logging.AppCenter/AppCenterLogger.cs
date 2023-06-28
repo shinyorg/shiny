@@ -28,23 +28,15 @@ public class AppCenterLogger : ILogger
         if (!this.IsEnabled(logLevel))
             return;
 
-        var message = formatter(state, exception);
-        if (logLevel >= LogLevel.Error)
-        {
-            exception ??= new Exception(message);
-
-            Crashes.TrackError(
-                exception,
-                new Dictionary<string, string>
-                {
-                    { "Message", message }
-                }
-            );
-        }
-        else
-        {
-            Analytics.TrackEvent($"[{logLevel} - {this.categoryName}] {message}");
-        }
+        var message = formatter(state, exception);        
+        exception ??= new Exception(message);
+        Crashes.TrackError(
+            exception,
+            new Dictionary<string, string>
+            {
+                { "Message", message }
+            }
+        );
     }
 }
 #endif
