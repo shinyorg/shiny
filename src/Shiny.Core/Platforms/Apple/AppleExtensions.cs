@@ -14,11 +14,11 @@ public static class AppleExtensions
     readonly static DateTime reference = new(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
     
-    public static IObservable<NSNotification> ObserveNotification(this NSNotificationCenter notificationCenter, NSString notificationKey) => Observable.Create<NSNotification>(obs =>
-    {
-        var pointer = notificationCenter.AddObserver(notificationKey, obs.OnNext);
-        return () => notificationCenter.RemoveObserver(pointer);
-    });    
+    //public static IObservable<NSNotification> ObserveNotification(this NSNotificationCenter notificationCenter, NSString notificationKey) => Observable.Create<NSNotification>(obs =>
+    //{
+    //    var pointer = notificationCenter.AddObserver(notificationKey, obs.OnNext);
+    //    return () => notificationCenter.RemoveObserver(pointer);
+    //});    
 
     
     public static bool HasAppDelegateHook(string selector)

@@ -70,7 +70,6 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
         if (this.CurrentActivity != null)
             ob.Respond(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
 
-        // TODO: this should timeout - if an activity isn't coming in - something is stuck somewhere
         return activityLifecycle
             .ActivitySubject
             .Subscribe(x => ob.Respond(x));
