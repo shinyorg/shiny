@@ -1,6 +1,7 @@
 ﻿#if PLATFORM
 using System.Linq.Expressions;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 
 namespace Shiny.Support.Repositories.Impl;
@@ -10,12 +11,18 @@ public class FileSystemRepository : IRepository
 {    
     readonly ISerializer serializer;
     readonly DirectoryInfo rootDir;
+    readonly ILogger logger;
 
 
-    public FileSystemRepository(IPlatform platform, ISerializer serializer)
+    public FileSystemRepository(
+        IPlatform platform,
+        ISerializer serializer,
+        ILogger<FileSystemRepository> logger
+    )
     {
         this.serializer = serializer;
         this.rootDir = platform.AppData;
+        this.logger = logger;
     }
 
 
@@ -166,14 +173,16 @@ public class FileSystemRepository : IRepository
             {
                 var entityDictionary = this.memory[en].ToDictionary(
                     x => x.Key,
-                    x => (TEntity)x.Value
+                    x => (TEntity)x.Value,
+                    StringComparer.InvariantCultureIgnoreCase
                 );
                 action(entityDictionary);
 
                 // write back
                 this.memory[en] = entityDictionary.ToDictionary(
                     x => x.Key,
-                    x => (object)x.Value
+                    x => (object)x.Value,
+                    StringComparer.InvariantCultureIgnoreCase
                 );
             }
             else
@@ -183,7 +192,8 @@ public class FileSystemRepository : IRepository
 
                 this.memory.Add(en, entityDictionary.ToDictionary(
                     x => x.Key,
-                    x => (object)x.Value
+                    x => (object)x.Value,
+                    StringComparer.InvariantCultureIgnoreCase
                 ));
             }
         }

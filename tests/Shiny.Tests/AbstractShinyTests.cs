@@ -20,6 +20,7 @@ public abstract class AbstractShinyTests : IDisposable
         builder.Logging.AddDebug();
 
         this.Configure(builder);
+        
         this.Host = builder.Build();
         this.Host.Run(); // force Host.Current to be hooked
     }

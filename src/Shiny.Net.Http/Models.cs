@@ -32,7 +32,8 @@ public record HttpTransfer(
 public record HttpTransferResult(
     HttpTransferRequest Request,
     HttpTransferState Status,
-    TransferProgress Progress
+    TransferProgress Progress,
+    Exception? Exception
 )
 {
     public bool IsDeterministic => this.Progress.BytesToTransfer != null;

@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -195,7 +194,8 @@ public class TransferJob : IJob
                     progressSubj.OnNext(new HttpTransferResult(
                         request,
                         HttpTransferState.InProgress,
-                        x
+                        x,
+                        null
                     ));
                 }
             },
@@ -208,7 +208,8 @@ public class TransferJob : IJob
                     progressSubj.OnNext(new HttpTransferResult(
                         request,
                         HttpTransferState.Error,
-                        new TransferProgress(0, 0, 0)
+                        new TransferProgress(0, 0, 0),
+                        ex
                     ));
                 }
                 tcs.TrySetResult(ex);
@@ -223,7 +224,8 @@ public class TransferJob : IJob
                         0,
                         transfer.BytesToTransfer,
                         transfer.BytesTransferred
-                    )
+                    ),
+                    null
                 ));
                 tcs.TrySetResult(null!);
             }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reactive.Linq;
 
 namespace Shiny.Net.Http;
 
@@ -38,4 +39,28 @@ public static class HttpTransferExtensions
                 throw new ArgumentException($"{request.LocalFilePath} does not exist");
         }
     }
+
+
+    /// <summary>
+    /// Allows you to monitor a specific transfer - this will complete or error unlike the full WhenUpdateReceived stream
+    /// </summary>
+    /// <param name="manager"></param>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public static IObservable<HttpTransferResult> WatchTransfer(this IHttpTransferManager manager, string identifier)
+        => Observable.Create<HttpTransferResult>(ob =>
+            manager
+                .WhenUpdateReceived()
+                .Where(x => x.Request.Identifier.Equals(identifier, StringComparison.InvariantCultureIgnoreCase))
+                .Subscribe(x =>
+                {
+                    if (x.Exception != null)
+                        ob.OnError(x.Exception);
+                    else if (x.Status == HttpTransferState.Completed)
+                        ob.OnCompleted();
+                    else
+                        ob.OnNext(x);
+                })
+        );
+        
 }

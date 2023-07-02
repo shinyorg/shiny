@@ -24,6 +24,7 @@ public static class HttpClientExtensions
         var totalSince = 0L;
 
         var stop = new Stopwatch();
+
         using var progress = new ProgressStreamContent(
             stream,
             sent =>
@@ -31,11 +32,20 @@ public static class HttpClientExtensions
                 totalBytesXfer += sent;
                 totalSince += sent;
 
-                if (stop.Elapsed.TotalSeconds > 2)
+                if (totalBytesXfer == file.Length)
+                {
+                    ob.OnNext(new TransferProgress(
+                        0,
+                        file.Length,
+                        file.Length
+                    ));
+                    stop.Stop();
+                }
+                else if (stop.Elapsed.TotalSeconds > 2)
                 {
                     var bytesPerSecond = Convert.ToInt64(totalSince / stop.Elapsed.TotalSeconds);
 
-                    ob.OnNext(new TransferProgress(                        
+                    ob.OnNext(new TransferProgress(
                         bytesPerSecond,
                         file.Length,
                         totalBytesXfer
@@ -103,7 +113,17 @@ public static class HttpClientExtensions
             totalSince += bytesRead;
             totalBytesXfer += bytesRead;
 
-            if (stop.Elapsed.TotalSeconds > 2)
+            if (totalBytesXfer == contentLength)
+            {
+                // completed
+                stop.Stop();
+                ob.OnNext(new TransferProgress(
+                    0,
+                    totalBytesXfer,
+                    totalBytesXfer
+                ));
+            }
+            else if (stop.Elapsed.TotalSeconds > 2)
             {
                 var bytesPerSecond = Convert.ToInt32(totalSince / stop.Elapsed.TotalSeconds);
                 ob.OnNext(new TransferProgress(
