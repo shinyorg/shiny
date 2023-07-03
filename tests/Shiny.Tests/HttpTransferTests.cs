@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Maui.Storage;
 using Shiny.Net.Http;
 
 namespace Shiny.Tests;
@@ -14,7 +15,7 @@ public class HttpTransferTests : AbstractShinyTests
 
     public override void Dispose()
     {
-        var transfers = Directory.GetFiles(".", "*.transfers");
+        var transfers = Directory.GetFiles(FileSystem.AppDataDirectory, "*.transfers");
         foreach (var transfer in transfers)
         {
             try
@@ -94,7 +95,7 @@ public class HttpTransferTests : AbstractShinyTests
             id,
             uri,
             isUpload,
-            $"./{id}.transfer"
+            $"{FileSystem.AppDataDirectory}/{id}.transfer"
         ));
         await tcs.Task.ConfigureAwait(false);
     }
