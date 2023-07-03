@@ -56,6 +56,7 @@ public class HttpTransferTests : AbstractShinyTests
             .Take(1)
             .ToTask();
 
+        // TODO: upload will need an actual file
         var transfer = await manager.Queue(new HttpTransferRequest(
             id,
             uri,
@@ -91,6 +92,7 @@ public class HttpTransferTests : AbstractShinyTests
                 tcs.TrySetException(args.Exception);
         };
 
+        // TODO: upload will need an actual file
         await manager.Queue(new HttpTransferRequest(
             id,
             uri,
@@ -117,11 +119,12 @@ public class HttpTransferTests : AbstractShinyTests
             () => tcs.TrySetResult()
         );
 
+        // TODO: upload will need an actual file
         await manager.Queue(new HttpTransferRequest(
             id,
             uri,
             isUpload,
-            $"./{id}.transfer"
+            $"{FileSystem.AppDataDirectory}/{id}.transfer"
         ));
         await tcs.Task.ConfigureAwait(false);
     }

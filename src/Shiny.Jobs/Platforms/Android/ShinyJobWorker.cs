@@ -42,7 +42,7 @@ public class ShinyJobWorker : ListenableWorker, CallbackToFutureAdapter.IResolve
             else
             {
                 jobManager
-                    .Run(jobName, this.cancelSource.Token)
+                    .Run(jobName!, this.cancelSource.Token)
                     .ContinueWith(x =>
                     {
                         switch (x.Status)

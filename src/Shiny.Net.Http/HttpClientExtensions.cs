@@ -93,17 +93,17 @@ public static class HttpClientExtensions
         foreach (var header in headers)
             request.Headers.TryAddWithoutValidation(header.Name, header.Value);
 
-        using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
         var contentLength = response.Content.Headers.ContentLength;
 
-        using var source = await response.Content.ReadAsStreamAsync();
+        using var source = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         using var dest = File.Create(toFilePath);
 
         var totalBytesXfer = 0L;
         var totalSince = 0L;
         var bytesRead = 0;
         var buffer = new byte[bufferSize];
-            
+
         var stop = new Stopwatch();
         stop.Start();
 
