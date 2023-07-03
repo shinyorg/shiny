@@ -66,8 +66,8 @@ public class FileSystemRepository : IRepository
 
             this.Write(entity);
             list[entity.Identifier] = entity;
-            this.repoSubj.OnNext((RepositoryAction.Add, typeof(TEntity), entity));
         });
+        this.repoSubj.OnNext((RepositoryAction.Add, typeof(TEntity), entity));
     }
 
 
@@ -80,22 +80,24 @@ public class FileSystemRepository : IRepository
 
             this.Write(entity);
             list[entity.Identifier] = entity;
-            this.repoSubj.OnNext((RepositoryAction.Update, typeof(TEntity), entity));
         });
+        this.repoSubj.OnNext((RepositoryAction.Update, typeof(TEntity), entity));
     }
 
 
     public bool Set<TEntity>(TEntity entity) where TEntity : IRepositoryEntity
     {
         var update = true;
+        var action = RepositoryAction.Update;
+
         this.InTransaction<TEntity>(list =>
         {
-            update = this.Write<TEntity>(entity);
+            update = this.Write(entity);
             list[entity.Identifier] = entity;
 
-            var action = update ? RepositoryAction.Update : RepositoryAction.Add;
-            this.repoSubj.OnNext((action, typeof(TEntity), entity));
+            action = update ? RepositoryAction.Update : RepositoryAction.Add;
         });
+        this.repoSubj.OnNext((action, typeof(TEntity), entity));
         return update;
     }
 
@@ -103,36 +105,41 @@ public class FileSystemRepository : IRepository
     public bool Remove<TEntity>(string key) where TEntity : IRepositoryEntity
     {
         var removed = false;
+        object? entity = null;
+
         this.InTransaction<TEntity>(list =>
         {
             var path = this.GetPath<TEntity>(key);
 
             if (File.Exists(path))
             {
-                var entity = list[key];
+                entity = list[key];
                 list.Remove(key);
                 File.Delete(path);
                 removed = true;
-
-                this.repoSubj.OnNext((RepositoryAction.Remove, typeof(TEntity), (object)entity));
             }
         });
+        if (removed && entity != null)
+            this.repoSubj.OnNext((RepositoryAction.Remove, typeof(TEntity), entity));
+
         return removed;
     }
 
 
-    public void Clear<TEntity>() where TEntity : IRepositoryEntity => this.InTransaction<TEntity>(list =>
+    public void Clear<TEntity>() where TEntity : IRepositoryEntity
     {
-        if (!list.Any())
-            return;
+        this.InTransaction<TEntity>(list =>
+        {
+            if (!list.Any())
+                return;
 
-        list.Clear();
-        var files = this.GetFiles<TEntity>();
-        foreach (var file in files)
-            file.Delete();
-
+            list.Clear();
+            var files = this.GetFiles<TEntity>();
+            foreach (var file in files)
+                file.Delete();
+        });
         this.repoSubj.OnNext((RepositoryAction.Clear, typeof(TEntity), default));
-    });
+    }
 
 
     readonly Subject<(RepositoryAction Action, Type EntityType, object? Entity)> repoSubj = new();
