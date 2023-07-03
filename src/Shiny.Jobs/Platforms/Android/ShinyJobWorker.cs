@@ -15,47 +15,53 @@ public class ShinyJobWorker : ListenableWorker, CallbackToFutureAdapter.IResolve
 {
     public const string ShinyJobIdentifier = nameof(ShinyJobIdentifier);
     readonly CancellationTokenSource cancelSource = new();
-    public ShinyJobWorker(Context context, WorkerParameters workerParams) : base(context, workerParams) {}
+    public ShinyJobWorker(Context context, WorkerParameters workerParams) : base(context, workerParams) { }
 
 
     public Java.Lang.Object AttachCompleter(CallbackToFutureAdapter.Completer completer)
     {
-        var jobName = this.InputData.GetString(ShinyJobIdentifier);
-        var jobManager = Host.Current.Services.GetRequiredService<IJobManager>();
-
-        //if (jobManager != null && !jobName.IsEmpty())
-        if (jobName.IsEmpty() || jobManager == null)
+        if (!Host.IsInitialized)
         {
-            //completer.Set(Result.InvokeFailure());
-            completer.Set(Result.InvokeSuccess());
+            completer.SetException(new Java.Lang.Throwable("The Shiny Host is not initialized and cannot run jobs"));
+        }
+        else if (Host.GetService<IJobManager>() == null)
+        {
+            completer.SetException(new Java.Lang.Throwable("JobManager is not registered with Shiny"));
         }
         else
         {
-            jobManager
-                .Run(jobName, this.cancelSource.Token)
-                .ContinueWith(x =>
-                {
-                    switch (x.Status)
+            var host = Host.Current;
+            var jobName = this.InputData.GetString(ShinyJobIdentifier);
+            var jobManager = Host.Current.Services.GetRequiredService<IJobManager>();
+            var logger = host.Logging.CreateLogger<IJobManager>();
+
+            if (jobName.IsEmpty())
+            {
+                completer.Set(Result.InvokeSuccess());
+            }
+            else
+            {
+                jobManager
+                    .Run(jobName, this.cancelSource.Token)
+                    .ContinueWith(x =>
                     {
-                        case TaskStatus.Canceled:
-                            completer.SetCancelled();
-                            break;
+                        switch (x.Status)
+                        {
+                            case TaskStatus.Canceled:
+                                completer.SetCancelled();
+                                break;
 
-                        case TaskStatus.Faulted:
-                            Host
-                                .Current
-                                .Logging
-                                .CreateLogger<IJobManager>()
-                                .LogError(x.Exception, "Error in job");
+                            case TaskStatus.Faulted:
+                                logger.LogError(x.Exception, "Error in job");
+                                completer.SetException(new Java.Lang.Throwable(x.Exception.ToString()));
+                                break;
 
-                            completer.SetException(new Java.Lang.Throwable(x.Exception.ToString()));
-                            break;
-
-                        case TaskStatus.RanToCompletion:
-                            completer.Set(Result.InvokeSuccess());
-                            break;
-                    }
-                });
+                            case TaskStatus.RanToCompletion:
+                                completer.Set(Result.InvokeSuccess());
+                                break;
+                        }
+                    });
+            }
         }
         return "AsyncOp";
     }
