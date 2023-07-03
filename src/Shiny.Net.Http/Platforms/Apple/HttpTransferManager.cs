@@ -149,49 +149,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
-    async Task<NSUrl> CreateUploadTempFile(HttpTransferRequest request)
-    {
-        var httpMethod = new HttpMethod(request.HttpMethod ?? "GET");
-        if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put)
-            throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
-
-        var boundary = Guid.NewGuid().ToString("N");
-
-        var native = request.ToNative();
-        native["Content-Type"] = $"multipart/form-data; boundary={boundary}";
-
-        var tempPath = this.platform.GetUploadTempFilePath(request);
-
-        this.logger.LogInformation("Writing temp form data body to " + tempPath);
-
-        using var fs = new FileStream(tempPath, FileMode.Create);
-        if (!request.PostData.IsEmpty())
-        {
-            fs.WriteString("--" + boundary);
-            fs.WriteString("Content-Type: text/plain; charset=utf-8");
-            fs.WriteString("Content-Disposition: form-data;");
-            fs.WriteLine();
-            fs.WriteString(request.PostData!);
-            fs.WriteLine();
-        }
-
-        using var uploadFile = File.OpenRead(request.LocalFilePath);
-        fs.WriteString("--" + boundary);
-        fs.WriteString("Content-Type: application/octet-stream");
-        fs.WriteString($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFilePath}\"");
-        fs.WriteLine();
-        await uploadFile.CopyToAsync(fs);
-
-        fs.WriteLine();
-        fs.WriteString($"--{boundary}--");
-
-        this.logger.LogInformation("Form body written");
-        var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
-
-        return tempFileUrl;
-    }
-
-
     public override void DidBecomeInvalid(NSUrlSession session, NSError error)
     {
         this.logger.LogDebug($"DidBecomeInvalid");
@@ -235,7 +192,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
     {
-        this.logger.LogDebug("DidFinishEventsForBackgroundSession");
+        this.logger.LogInformation("DidFinishEventsForBackgroundSession");
         this.completionHandler?.Invoke();
     }
 
@@ -245,12 +202,15 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var ht = this.repository.Get<HttpTransfer>(task.TaskDescription!);
         if (ht == null)
         {
-            this.logger.LogDebug("DidCompleteWithError: No transfer was found - " + task.TaskDescription);
+            this.logger.NoTransferFound(task.TaskDescription!);
             return;
         }
 
         this.logger.LogDebug("DidCompleteWithError: " + task.State);
         Exception? exception = null;
+        if (error != null)
+            exception = new InvalidOperationException(error.LocalizedDescription);
+
         switch (task.State)
         {
             //case NSUrlSessionTaskState.Running:
@@ -265,15 +225,20 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
             case NSUrlSessionTaskState.Canceling:
             case NSUrlSessionTaskState.Completed:
-                this.logger.LogInformation($"Transfer {ht.Identifier} was canceled");
-                ht = ht with { Status = HttpTransferState.Canceled };
-                this.repository.Remove<HttpTransfer>(ht.Identifier);
+                if (exception == null)
+                {
+                    this.logger.LogInformation($"Transfer {ht.Identifier} was canceled");
+                    ht = ht with { Status = HttpTransferState.Canceled };
+                }
                 break;
 
             default:
-                exception = new InvalidOperationException(error.LocalizedDescription);
-                this.logger.LogError(exception, "Error with HTTP transfer: " + ht.Identifier);
-                await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, exception), this.logger);
+                if (exception != null)
+                {
+                    this.logger.LogError(exception, "Error with HTTP transfer: " + ht.Identifier);
+                    ht = ht with { Status = HttpTransferState.Error };
+                    await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, exception), this.logger);
+                }
                 break;
         }
 
@@ -290,16 +255,16 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
     {
-        var ht = this.repository.Get<HttpTransfer>(task.TaskDescription);
+        var id = task.TaskDescription!;
+        var ht = this.repository.Get<HttpTransfer>(id);
 
         if (ht == null)
         {
-            this.logger.LogDebug("DidSendBodyData - no transfer found");
+            this.logger.NoTransferFound(id);
         }
         else
         {
-            if (this.logger.IsEnabled(LogLevel.Debug))
-                this.logger.LogDebug($"DidSendBodyData - {totalBytesSent} of {totalBytesExpectedToSend}");
+            this.logger.TransferProgress(id, totalBytesSent, totalBytesExpectedToSend);
 
             ht = ht with
             {
@@ -325,12 +290,11 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
         if (ht == null)
         {
-            this.logger.LogDebug("DidWriteData - No Transfer Found");
+            this.logger.NoTransferFound(downloadTask.TaskDescription!);
         }
         else
         {
-            if (this.logger.IsEnabled(LogLevel.Debug))
-                this.logger.LogDebug($"DidWriteData - {totalBytesWritten} / {totalBytesExpectedToWrite}");
+            this.logger.TransferProgress(downloadTask.TaskDescription!, totalBytesWritten, totalBytesExpectedToWrite);
 
             ht = ht with
             {
@@ -353,15 +317,16 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
     {
-        var transfer = this.repository.Get<HttpTransfer>(downloadTask.TaskDescription);
+        var id = downloadTask.TaskDescription!;
+        var transfer = this.repository.Get<HttpTransfer>(id);
 
         if (transfer == null)
         {
-            this.logger.LogDebug("DidFinishDownloading - no transfer found");
+            this.logger.NoTransferFound(id);
         }
         else
         {
-            this.logger.LogDebug("DidFinishDownloading - " + transfer.Identifier);
+            this.logger.StateMethod(id);
             File.Copy(location.Path!, transfer.Request.LocalFilePath, true);
             this.repository.Remove<HttpTransfer>(transfer.Identifier);
 
@@ -377,6 +342,49 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 null
             ));
         }
+    }
+
+
+    async Task<NSUrl> CreateUploadTempFile(HttpTransferRequest request)
+    {
+        var httpMethod = new HttpMethod(request.HttpMethod ?? "GET");
+        if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put)
+            throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
+
+        var boundary = Guid.NewGuid().ToString("N");
+
+        var native = request.ToNative();
+        native["Content-Type"] = $"multipart/form-data; boundary={boundary}";
+
+        var tempPath = this.platform.GetUploadTempFilePath(request);
+
+        this.logger.LogInformation("Writing temp form data body to " + tempPath);
+
+        using var fs = new FileStream(tempPath, FileMode.Create);
+        if (!request.PostData.IsEmpty())
+        {
+            fs.WriteString("--" + boundary);
+            fs.WriteString("Content-Type: text/plain; charset=utf-8");
+            fs.WriteString("Content-Disposition: form-data;");
+            fs.WriteLine();
+            fs.WriteString(request.PostData!);
+            fs.WriteLine();
+        }
+
+        using var uploadFile = File.OpenRead(request.LocalFilePath);
+        fs.WriteString("--" + boundary);
+        fs.WriteString("Content-Type: application/octet-stream");
+        fs.WriteString($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFilePath}\"");
+        fs.WriteLine();
+        await uploadFile.CopyToAsync(fs);
+
+        fs.WriteLine();
+        fs.WriteString($"--{boundary}--");
+
+        this.logger.LogInformation("Form body written");
+        var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
+
+        return tempFileUrl;
     }
 
 
