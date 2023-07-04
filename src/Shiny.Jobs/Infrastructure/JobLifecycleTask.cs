@@ -9,7 +9,7 @@ using Shiny.Power;
 namespace Shiny.Jobs.Infrastructure;
 
 
-public class JobLifecycleTask : ShinyLifecycleTask
+public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 {
     static TimeSpan interval = TimeSpan.FromSeconds(30);
     public static TimeSpan Interval
@@ -142,5 +142,8 @@ public class JobLifecycleTask : ShinyLifecycleTask
 
         return this.battery.IsPluggedIn();
     }
+
+
+    public void Dispose() => this.timer.Dispose();
 }
 #endif
