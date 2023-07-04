@@ -210,30 +210,7 @@ public class FileSystemRepository : IRepository
                     x => (TEntity)x.Value,
                     StringComparer.InvariantCultureIgnoreCase
                 );
-                this.logger.InternalCount("Updating Internal", en, entityDictionary.Count);
-                var write = action(entityDictionary);
-
-                if (write)
-                {
-                    this.logger.InternalCount("Writing Internal Update", en, entityDictionary.Count);
-                    entityDictionary.ToDictionary(
-                        x => x.Key,
-                        x => (object)x.Value,
-                        StringComparer.InvariantCultureIgnoreCase
-                    ); 
-
-                    // write back
-                    this.memory[en] = entityDictionary.ToDictionary(
-                        x => x.Key,
-                        x => (object)x.Value,
-                        StringComparer.InvariantCultureIgnoreCase
-                    );
-                }
-            }
-            else
-            {
-                var entityDictionary = this.Load<TEntity>();
-                this.logger.InternalCount("Initial Load", en, entityDictionary.Count);
+                this.logger.InternalCount("Read From Cache", en, entityDictionary.Count);
                 var write = action(entityDictionary);
 
                 if (write)
@@ -243,18 +220,29 @@ public class FileSystemRepository : IRepository
                         x => (object)x.Value,
                         StringComparer.InvariantCultureIgnoreCase
                     );
-
-                    this.logger.InternalCount("Post Load Write", en, toWrite.Count);
-
-
-//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Action: Initial Load -Type: HttpTransfer - Type Count: 5
-//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Type: HttpTransfer - Action: Add - Identifier: 94148944 - e105 - 4726 - bb0b - d6950b21a8a1
-//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Action: Post Load Write - Type: HttpTransfer - Type Count: 6
-//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Action: Updating Internal -Type: HttpTransfer - Type Count: 5
-//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: GET MISS -Type: HttpTransfer - Identifier: 94148944 - e105 - 4726 - bb0b - d6950b21a8a1 does not exist - items in type db: 5
-//Shiny.Net.Http.HttpTransferManager: Debug: DidWriteData - No Transfer Found for 94148944 - e105 - 4726 - bb0b - d6950b21a8a1
+                    
+                    // write back
+                    this.memory.Remove(en);
                     this.memory.Add(en, toWrite);
+
+                    this.logger.InternalCount("Writing Internal Cache", en, toWrite.Count);
                 }
+            }
+            else
+            {
+                var entityDictionary = this.Load<TEntity>();
+                this.logger.InternalCount("Initial Cache Load", en, entityDictionary.Count);
+                var write = action(entityDictionary);
+
+                // always write to cache on initial load
+                var toWrite = entityDictionary.ToDictionary(
+                    x => x.Key,
+                    x => (object)x.Value,
+                    StringComparer.InvariantCultureIgnoreCase
+                );
+                this.memory.Add(en, toWrite);
+
+                this.logger.InternalCount("Post Cache Load Write", en, toWrite.Count);
             }
         }
     }

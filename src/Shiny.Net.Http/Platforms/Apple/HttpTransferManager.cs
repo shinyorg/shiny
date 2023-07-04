@@ -14,6 +14,7 @@ using Shiny.Support.Repositories;
 namespace Shiny.Net.Http;
 
 
+// TODO: compare between repo and tasks - task is master list, so clean out repo
 public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                                    IHttpTransferManager,
                                    IIosLifecycle.IHandleEventsForBackgroundUrl
@@ -224,6 +225,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             case NSUrlSessionTaskState.Completed:
                 if (exception == null)
                 {
+                    // already canc
                     this.logger.LogInformation($"Transfer {ht.Identifier} was canceled");
                     ht = ht with { Status = HttpTransferState.Canceled };
                 }
@@ -269,7 +271,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 BytesTransferred = totalBytesSent,
                 Status = HttpTransferState.InProgress
             };
-            this.repository.Set(ht);
+            this.repository.Update(ht);
             var bps = (int)(task.Progress?.Throughput ?? 0);
             this.transferSubj.OnNext(new HttpTransferResult(
                 ht.Request,
@@ -299,7 +301,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 BytesTransferred = totalBytesWritten,
                 Status = HttpTransferState.InProgress
             };
-            this.repository.Set(ht);
+            this.repository.Update(ht);
             var bps = (int)(downloadTask.Progress?.Throughput ?? 0);
 
             this.transferSubj.OnNext(new HttpTransferResult(

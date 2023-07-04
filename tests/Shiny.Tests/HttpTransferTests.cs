@@ -72,7 +72,7 @@ public class HttpTransferTests : AbstractShinyTests
             id,
             uri,
             isUpload,
-            $"./{id}.transfer"
+            $"{FileSystem.AppDataDirectory}/{id}.transfer"
         ));
 
         this.Log("Waiting for transfer to start");
