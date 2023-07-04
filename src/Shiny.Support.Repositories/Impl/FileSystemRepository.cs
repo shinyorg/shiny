@@ -10,8 +10,8 @@ namespace Shiny.Support.Repositories.Impl;
 public class FileSystemRepository : IRepository
 {    
     readonly ISerializer serializer;
-    readonly DirectoryInfo rootDir;
     readonly ILogger logger;
+    readonly DirectoryInfo rootDir;
 
 
     public FileSystemRepository(
@@ -40,7 +40,14 @@ public class FileSystemRepository : IRepository
         this.InTransaction<TEntity>(list =>
         {
             if (list.ContainsKey(identifier))
+            {
                 result = list[identifier];
+            }
+            else
+            {
+                this.logger.GetNotExists(typeof(TEntity).Name, identifier, list.Count);
+            }
+            return false;
         });
         return result;
     }
@@ -49,10 +56,14 @@ public class FileSystemRepository : IRepository
     public IList<TEntity> GetList<TEntity>(Expression<Func<TEntity, bool>>? expression = null) where TEntity : IRepositoryEntity
     {
         var result = new List<TEntity>();
-        this.InTransaction<TEntity>(list => result.AddRange(list
-            .Values
-            .WhereIf(expression)
-        ));
+        this.InTransaction<TEntity>(list =>
+        {
+            result.AddRange(list
+                .Values
+                .WhereIf(expression)
+            );
+            return false;
+        });
         return result;
     }
 
@@ -66,6 +77,9 @@ public class FileSystemRepository : IRepository
 
             this.Write(entity);
             list.Add(entity.Identifier, entity);
+            this.logger.Change(RepositoryAction.Add, typeof(TEntity).Name, entity.Identifier);
+
+            return true;
         });
         this.repoSubj.OnNext((RepositoryAction.Add, typeof(TEntity), entity));
     }
@@ -80,6 +94,9 @@ public class FileSystemRepository : IRepository
 
             this.Write(entity);
             list[entity.Identifier] = entity;
+            this.logger.Change(RepositoryAction.Update, typeof(TEntity).Name, entity.Identifier);
+
+            return true;
         });
         this.repoSubj.OnNext((RepositoryAction.Update, typeof(TEntity), entity));
     }
@@ -96,6 +113,9 @@ public class FileSystemRepository : IRepository
             list[entity.Identifier] = entity;
 
             action = update ? RepositoryAction.Update : RepositoryAction.Add;
+            this.logger.Change(action, typeof(TEntity).Name, entity.Identifier);
+
+            return true;
         });
         this.repoSubj.OnNext((action, typeof(TEntity), entity));
         return update;
@@ -110,15 +130,18 @@ public class FileSystemRepository : IRepository
         this.InTransaction<TEntity>(list =>
         {
             var path = this.GetPath<TEntity>(key);
-
-            if (File.Exists(path))
+            if (list.ContainsKey(key))
             {
                 entity = list[key];
-                list.Remove(key);
-                File.Delete(path);
-                removed = true;
+                removed = list.Remove(key);
             }
+            if (File.Exists(path))
+                File.Delete(path);
+
+            this.logger.Change(RepositoryAction.Remove, typeof(TEntity).Name, key);
+            return removed;
         });
+
         if (removed && entity != null)
             this.repoSubj.OnNext((RepositoryAction.Remove, typeof(TEntity), entity));
 
@@ -130,13 +153,15 @@ public class FileSystemRepository : IRepository
     {
         this.InTransaction<TEntity>(list =>
         {
-            if (!list.Any())
-                return;
+            var write = list.Count > 0;
 
             list.Clear();
             var files = this.GetFiles<TEntity>();
             foreach (var file in files)
                 file.Delete();
+
+            this.logger.Change(RepositoryAction.Clear, typeof(TEntity).Name, String.Empty);
+            return write;
         });
         this.repoSubj.OnNext((RepositoryAction.Clear, typeof(TEntity), default));
     }
@@ -170,9 +195,9 @@ public class FileSystemRepository : IRepository
 
     readonly object syncLock = new();
     readonly Dictionary<string, Dictionary<string, object>> memory = new();
-    void InTransaction<TEntity>(Action<Dictionary<string, TEntity>> action) where TEntity : IRepositoryEntity
+    void InTransaction<TEntity>(Func<Dictionary<string, TEntity>, bool> action) where TEntity : IRepositoryEntity
     {
-        var en = typeof(TEntity).Name;
+        var en = typeof(TEntity).Name; // TODO: this may NOT be enough going forward
 
         lock (this.syncLock)
         {
@@ -183,25 +208,37 @@ public class FileSystemRepository : IRepository
                     x => (TEntity)x.Value,
                     StringComparer.InvariantCultureIgnoreCase
                 );
-                action(entityDictionary);
+                this.logger.InternalCount("Updating Internal", en, entityDictionary.Count);
+                var write = action(entityDictionary);
 
-                // write back
-                this.memory[en] = entityDictionary.ToDictionary(
-                    x => x.Key,
-                    x => (object)x.Value,
-                    StringComparer.InvariantCultureIgnoreCase
-                );
+                if (write)
+                {
+                    this.logger.InternalCount("Writing Internal Update", en, entityDictionary.Count);
+
+                    // write back
+                    this.memory[en] = entityDictionary.ToDictionary(
+                        x => x.Key,
+                        x => (object)x.Value,
+                        StringComparer.InvariantCultureIgnoreCase
+                    );
+                }
             }
             else
             {
                 var entityDictionary = this.Load<TEntity>();
-                action(entityDictionary);
+                this.logger.InternalCount("Initial Load", en, entityDictionary.Count);
+                var write = action(entityDictionary);
 
-                this.memory.Add(en, entityDictionary.ToDictionary(
-                    x => x.Key,
-                    x => (object)x.Value,
-                    StringComparer.InvariantCultureIgnoreCase
-                ));
+                if (write)
+                {
+                    this.logger.InternalCount("Post Load Write", en, entityDictionary.Count);
+
+                    this.memory.Add(en, entityDictionary.ToDictionary(
+                        x => x.Key,
+                        x => (object)x.Value,
+                        StringComparer.InvariantCultureIgnoreCase
+                    ));
+                }
             }
         }
     }
