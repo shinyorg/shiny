@@ -45,4 +45,12 @@ internal static partial class Log
         Message = "{methodName} - {identifier}"
     )]
     public static partial void StateMethod(this ILogger logger, string identifier, [CallerMemberName] string? methodName = null);
+
+
+    [LoggerMessage(
+        EventId = 6,
+        Level = LogLevel.Debug,
+        Message = "HTTP Transfer: {identifier} - {message}"
+    )]
+    public static partial void StandardInfo(this ILogger logger, string identifier, string message);
 }

@@ -55,11 +55,18 @@ public static class HttpTransferExtensions
                 .Subscribe(x =>
                 {
                     if (x.Exception != null)
+                    {
                         ob.OnError(x.Exception);
+                    }
                     else if (x.Status == HttpTransferState.Completed)
-                        ob.OnCompleted();
-                    else
+                    {
                         ob.OnNext(x);
+                        ob.OnCompleted();
+                    }
+                    else
+                    {
+                        ob.OnNext(x);
+                    }
                 })
         );
         

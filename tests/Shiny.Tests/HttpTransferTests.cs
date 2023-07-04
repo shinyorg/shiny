@@ -44,6 +44,16 @@ public class HttpTransferTests : AbstractShinyTests
         var id = Guid.NewGuid().ToString();
         var tcs = new TaskCompletionSource();
 
+        using var sub = manager
+            .WhenUpdateReceived()
+            .Subscribe(x =>
+            {
+                this.Log($"[{x.Request.Identifier}]({x.Status}): {x.Progress.PercentComplete * 100}% - {x.Progress.BytesPerSecond} b/s");
+                if (x.Exception != null)
+                    this.Log("ERROR: " + x.Exception);
+            });
+
+
         var startedTask = manager
             .WhenUpdateReceived()
             .Where(x => x.Status == HttpTransferState.InProgress)
@@ -84,6 +94,10 @@ public class HttpTransferTests : AbstractShinyTests
         var id = Guid.NewGuid().ToString();
         var tcs = new TaskCompletionSource();
 
+        using var sub = manager.WatchTransfer(id).Subscribe(
+            x => this.Log($"{x.Progress.PercentComplete * 100}% complete - b/s: {x.Progress.BytesPerSecond}")
+        );
+
         tdelegate.OnFinish = args =>
         {
             if (args.Exception == null)
@@ -114,7 +128,7 @@ public class HttpTransferTests : AbstractShinyTests
         var tcs = new TaskCompletionSource();
         
         using var sub = manager.WatchTransfer(id).Subscribe(
-            x => this.Log($"%{x.Progress.PercentComplete * 100} complete - bp/s: {x.Progress.BytesPerSecond}"),
+            x => this.Log($"{x.Progress.PercentComplete * 100}% complete - bp/s: {x.Progress.BytesPerSecond}"),
             ex => tcs.TrySetException(ex),
             () => tcs.TrySetResult()
         );

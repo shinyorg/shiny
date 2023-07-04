@@ -68,7 +68,7 @@ public static class HttpClientExtensions
             request.Headers.TryAddWithoutValidation(header.Name, header.Value);
 
         stop.Start();
-        var response = await httpClient.SendAsync(request);
+        var response = await httpClient.SendAsync(request).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     })
     .Subscribe(

@@ -80,10 +80,11 @@ public class TransferJob : IJob
                     var transfer = (HttpTransfer)x.Entity!;
                     if (transfer.Identifier == activeTransfer?.Identifier)
                     {
-                        this.logger.LogDebug("Current transfer has been removed");
+                        this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
                         cancelSrc?.Cancel();
                     }
                 }
+                // TODO: fire subject for cancel
             })
             .DisposedBy(disposer);
 
@@ -94,7 +95,7 @@ public class TransferJob : IJob
             {
                 if (!x.IsInternetAvailable())
                 {
-                    this.logger.LogDebug("No network detected for transfers - pausing");
+                    this.logger.StandardInfo(activeTransfer!.Identifier, "No network detected for transfers - pausing");
                     this.repository.Set(activeTransfer! with
                     {
                         Status = HttpTransferState.PausedByNoNetwork
@@ -103,7 +104,7 @@ public class TransferJob : IJob
                 }
                 else if (x.Access == NetworkAccess.ConstrainedInternet && !activeTransfer!.Request.UseMeteredConnection)
                 {
-                    this.logger.LogDebug("Costed network detected for active transfer - pausing");
+                    this.logger.StandardInfo(activeTransfer!.Identifier, "Costed network detected for active transfer - pausing");
                     this.repository.Set(activeTransfer! with
                     {
                         Status = HttpTransferState.PausedByCostedNetwork
@@ -124,28 +125,28 @@ public class TransferJob : IJob
             {
                 if (activeTransfer.Request.UseMeteredConnection || !this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet))
                 {
-                    this.logger.LogDebug("Staring transfer: " + activeTransfer.Identifier);
+                    this.logger.StandardInfo(activeTransfer!.Identifier, "Starting Transfer");
                     cancelSrc = new();
                     using var _ = cancelToken.Register(() => cancelSrc?.Cancel());
 
                     await this.DoRequest(activeTransfer, cancelSrc.Token).ConfigureAwait(false);
-                    this.logger.LogDebug("Finished transfer: " + activeTransfer.Identifier);
+                    this.logger.StandardInfo(activeTransfer!.Identifier, "Finished Transfer");
 
                     this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
                 }
                 else
                 {
-                    this.logger.LogDebug($"Transfer '{activeTransfer.Identifier}' cannot start on current network configuration. Waiting for next pass");
+                    this.logger.StandardInfo(activeTransfer!.Identifier, "Cannot start on current network configuration. Waiting for next pass");
                 }
             }
             catch (TaskCanceledException)
             {
-                this.logger.LogDebug("Job is being told to suspend");
+                this.logger.StandardInfo(activeTransfer!.Identifier, "Suspend Requested");
             }
             catch (Exception ex)
             {
                 this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
-                this.logger.LogError(ex, "There was an isssue processing request");
+                this.logger.StandardInfo(activeTransfer!.Identifier, "There was an isssue processing request");
             }
             activeTransfer = this.repository
                 .GetList<HttpTransfer>()

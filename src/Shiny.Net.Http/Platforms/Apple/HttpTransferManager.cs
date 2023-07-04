@@ -77,8 +77,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         request.AssertValid();
-        if (this.repository.Exists<HttpTransfer>(request.Identifier))
-            throw new ArgumentException("A request already exists with this identifier: " + request.Identifier);
+        var transfer = new HttpTransfer(request, 0, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
+        this.repository.Insert(transfer);
 
         NSUrlSessionTask task;
         var nativeRequest = request.ToNative();
@@ -92,9 +92,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         {
             task = this.Session.CreateDownloadTask(nativeRequest);
         }
-
-        var transfer = new HttpTransfer(request, 0, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
-        this.repository.Insert(transfer);
 
         try
         { 

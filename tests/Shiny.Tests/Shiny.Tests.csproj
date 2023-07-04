@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>
+        <!--<TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>-->
         <!--<TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>-->
-        <!--<TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>-->
+        <TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <RootNamespace>Shiny.Tests</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -19,17 +19,19 @@
         <ApplicationVersion>1</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net7.0-ios'">
         <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+        <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
     </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+    
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
       <CreatePackage>false</CreatePackage>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
       <CreatePackage>false</CreatePackage>
     </PropertyGroup>
     <ItemGroup>
@@ -51,9 +53,6 @@
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0" />
-
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.5" PrivateAssets="All" />
-        <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.5" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
@@ -81,13 +80,5 @@
         <Compile Remove="Push\FirebaseTests.cs" />
         <Compile Remove="Push\AppleNativeTests.cs" />
         <Compile Remove="Push\AzureNotificationHubTests.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <None Remove="Logging\" />
-      <None Remove="Platforms\Android\Resources\xml\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Logging\" />
-      <Folder Include="Platforms\Android\Resources\xml\" />
     </ItemGroup>
 </Project>

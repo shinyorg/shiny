@@ -65,7 +65,7 @@ public class FileSystemRepository : IRepository
                 throw new ArgumentException($"{typeof(TEntity).FullName} already has a record with identifier '{entity.Identifier}'");
 
             this.Write(entity);
-            list[entity.Identifier] = entity;
+            list.Add(entity.Identifier, entity);
         });
         this.repoSubj.OnNext((RepositoryAction.Add, typeof(TEntity), entity));
     }
