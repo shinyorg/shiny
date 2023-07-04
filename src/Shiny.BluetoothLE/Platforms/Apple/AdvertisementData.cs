@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE;
         readonly NSDictionary adData;
         readonly Lazy<string> localName;
         readonly Lazy<bool> connectable;
-        readonly Lazy<ManufacturerData> manufacturerData;
+        readonly Lazy<ManufacturerData?> manufacturerData;
         readonly Lazy<int> txpower;
         readonly Lazy<string[]> serviceUuids;
         readonly Lazy<AdvertisementServiceData[]> serviceData;
@@ -26,6 +26,10 @@ namespace Shiny.BluetoothLE;
             this.manufacturerData = this.GetLazy(CBAdvertisement.DataManufacturerDataKey, x =>
             {
                 var data = ((NSData)x).ToArray();
+                var len = (data?.Length ?? 0);
+                if (len <= 2)
+                    return null;
+
                 var companyId = ((data[1] & 0xFF) << 8) + (data[0] & 0xFF);
                 var value = new byte[data.Length - 2];
                 Array.Copy(data, 2, value, 0, data.Length - 2);
