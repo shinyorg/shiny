@@ -7,7 +7,8 @@ namespace Shiny.Tests;
 
 public class HttpTransferTests : AbstractShinyTests
 {
-    const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/50MB.zip";
+    const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/5MB.zip";
+    //const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/50MB.zip";
     //const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/512MB.zip";
 
     public HttpTransferTests(ITestOutputHelper output) : base(output) { }
@@ -15,7 +16,7 @@ public class HttpTransferTests : AbstractShinyTests
 
     public override void Dispose()
     {
-        var transfers = Directory.GetFiles(FileSystem.AppDataDirectory, "*.transfers");
+        var transfers = Directory.GetFiles(FileSystem.AppDataDirectory, "*.transfer");
         foreach (var transfer in transfers)
         {
             try

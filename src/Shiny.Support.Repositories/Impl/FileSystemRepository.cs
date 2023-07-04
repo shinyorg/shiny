@@ -96,7 +96,8 @@ public class FileSystemRepository : IRepository
             list[entity.Identifier] = entity;
             this.logger.Change(RepositoryAction.Update, typeof(TEntity).Name, entity.Identifier);
 
-            return true;
+            // we only need to write dictionary if the size is changing
+            return false;
         });
         this.repoSubj.OnNext((RepositoryAction.Update, typeof(TEntity), entity));
     }
@@ -115,7 +116,8 @@ public class FileSystemRepository : IRepository
             action = update ? RepositoryAction.Update : RepositoryAction.Add;
             this.logger.Change(action, typeof(TEntity).Name, entity.Identifier);
 
-            return true;
+            // we only need to write dictionary if the size is changing
+            return action == RepositoryAction.Add;
         });
         this.repoSubj.OnNext((action, typeof(TEntity), entity));
         return update;
@@ -214,6 +216,11 @@ public class FileSystemRepository : IRepository
                 if (write)
                 {
                     this.logger.InternalCount("Writing Internal Update", en, entityDictionary.Count);
+                    entityDictionary.ToDictionary(
+                        x => x.Key,
+                        x => (object)x.Value,
+                        StringComparer.InvariantCultureIgnoreCase
+                    ); 
 
                     // write back
                     this.memory[en] = entityDictionary.ToDictionary(
@@ -231,13 +238,22 @@ public class FileSystemRepository : IRepository
 
                 if (write)
                 {
-                    this.logger.InternalCount("Post Load Write", en, entityDictionary.Count);
-
-                    this.memory.Add(en, entityDictionary.ToDictionary(
+                    var toWrite = entityDictionary.ToDictionary(
                         x => x.Key,
                         x => (object)x.Value,
                         StringComparer.InvariantCultureIgnoreCase
-                    ));
+                    );
+
+                    this.logger.InternalCount("Post Load Write", en, toWrite.Count);
+
+
+//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Action: Initial Load -Type: HttpTransfer - Type Count: 5
+//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Type: HttpTransfer - Action: Add - Identifier: 94148944 - e105 - 4726 - bb0b - d6950b21a8a1
+//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Action: Post Load Write - Type: HttpTransfer - Type Count: 6
+//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: Action: Updating Internal -Type: HttpTransfer - Type Count: 5
+//Shiny.Support.Repositories.Impl.FileSystemRepository: Debug: GET MISS -Type: HttpTransfer - Identifier: 94148944 - e105 - 4726 - bb0b - d6950b21a8a1 does not exist - items in type db: 5
+//Shiny.Net.Http.HttpTransferManager: Debug: DidWriteData - No Transfer Found for 94148944 - e105 - 4726 - bb0b - d6950b21a8a1
+                    this.memory.Add(en, toWrite);
                 }
             }
         }
