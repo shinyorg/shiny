@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
+using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
 
 namespace Shiny.BluetoothLE;
@@ -91,5 +92,10 @@ public partial class Peripheral
     Subject<Unit> servChangeSubj;
     public IObservable<Unit> WhenServicesChanged() => this.servChangeSubj ??= new();
     public override void ModifiedServices(CBPeripheral peripheral, CBService[] services)
-        => this.servChangeSubj?.OnNext(Unit.Default);
+    {
+        if (this.logger.IsEnabled(LogLevel.Debug))
+            this.logger.LogDebug($"[ModifiedServices] Peripheral: {peripheral.Identifier} - Services: {services.Length}");
+
+        this.servChangeSubj?.OnNext(Unit.Default);
+    }
 }

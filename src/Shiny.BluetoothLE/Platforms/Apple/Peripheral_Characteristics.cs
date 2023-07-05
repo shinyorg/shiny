@@ -23,36 +23,52 @@ public partial class Peripheral
 
         if (!this.notifiers.ContainsKey(key))
         {
-            var obs = this
-                .WhenConnected()
-                .Select(_ =>
+            var obs = Observable
+                .Create<BleCharacteristicResult>(ob =>
                 {
-                    this.logger.LogDebug($"Connection Detected - Attempting to hook: {serviceUuid} / {characteristicUuid}");
-                    return this.GetNativeCharacteristic(serviceUuid, characteristicUuid);
-                })
-                .Switch()
-                .Select(ch =>
-                {
-                    this.FromNative(ch).AssertNotify();
-                    this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
-                    this.Native.SetNotifyValue(true, ch);
+                    this.logger.LogInformation($"Initial Notification Hook: {serviceUuid} / {characteristicUuid}");
 
-                    return this.charUpdateSubj
-                        .Where(x => x.Char.Equals(ch))
-                        .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification))
-                        .Finally(() =>
+                    CBCharacteristic native = null!;
+                    this.WhenConnected()
+                        .Select(_ =>
                         {
-                            try
-                            {
-                                this.Native.SetNotifyValue(false, ch);
-                            }
-                            catch (Exception ex)
-                            {
-                                this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid);
-                            }
-                        });
+                            this.logger.LogDebug($"Connection Detected - Attempting to hook: {serviceUuid} / {characteristicUuid}");
+                            return this.GetNativeCharacteristic(serviceUuid, characteristicUuid);
+                        })
+                        .Switch()
+                        .Select(ch =>
+                        {
+                            this.FromNative(ch).AssertNotify();
+
+                            native = ch;
+                            this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
+                            this.Native.SetNotifyValue(true, ch);
+
+                            return this.charUpdateSubj
+                                .Where(x => x.Char.Equals(ch))
+                                .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification));
+                        })
+                        .Switch()
+                        .Subscribe(
+                            ob.OnNext,
+                            ob.OnError
+                        );
+
+                    return () =>
+                    {
+                        if (native == null)
+                            return;
+
+                        try
+                        {
+                            this.Native.SetNotifyValue(false, native);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid);
+                        }
+                    };
                 })
-                .Switch()
                 .Publish()
                 .RefCount();
 
@@ -175,17 +191,28 @@ public partial class Peripheral
 #else
     public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
 #endif
-        => this.charDiscoverySubj.OnNext((service, error));
+    {
+        if (this.logger.IsEnabled(LogLevel.Debug))
+            this.logger.LogDebug($"[DiscoveredCharacteristics] {service.UUID} - Error: {error?.LocalizedDescription ?? "NONE"}");
+
+        this.charDiscoverySubj.OnNext((service, error));
+    }
 
 
     readonly Subject<(CBCharacteristic Char, NSError? Error)> charUpdateSubj = new();
     public override void UpdatedCharacterteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
-        => this.charUpdateSubj.OnNext((characteristic, error));
+    {
+        this.logger.CharacteristicEvent(characteristic.UUID.ToString(), characteristic?.Service?.UUID?.ToString() ?? "NONE", error?.LocalizedDescription ?? "None");
+        this.charUpdateSubj.OnNext((characteristic, error));
+    }
 
 
     readonly Subject<(CBCharacteristic Char, NSError? Error)> charWroteSubj = new();
     public override void WroteCharacteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
-        => this.charWroteSubj.OnNext((characteristic, error));
+    {
+        this.logger.CharacteristicEvent(characteristic.UUID.ToString(), characteristic?.Service?.UUID?.ToString() ?? "NONE", error?.LocalizedDescription ?? "None");
+        this.charWroteSubj.OnNext((characteristic, error));
+    }
 
 
     protected BleCharacteristicResult ToResult(CBCharacteristic ch, BleCharacteristicEvent @event) => new(

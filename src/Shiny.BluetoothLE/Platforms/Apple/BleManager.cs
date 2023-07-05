@@ -181,11 +181,11 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
 
     public override void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
-        => this.RunStateChange(peripheral, true);
+        => this.RunStateChange(peripheral, true, null);
 
 
     public override void DisconnectedPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError? error)
-        => this.RunStateChange(peripheral, false);
+        => this.RunStateChange(peripheral, false, error);
 
 
     public Subject<ScanResult> ScanResultReceived { get; } = new();
@@ -205,14 +205,16 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
 
     readonly Subject<AccessState> stateUpdatedSubj = new();
-    public override void UpdatedState(CBCentralManager central)
+    public override async void UpdatedState(CBCentralManager central)
     {
+        this.logger.ManagerStateChange(central.State);
+
         var state = central.State.FromNative();
         if (state == AccessState.Unknown)
             return;
 
         this.stateUpdatedSubj.OnNext(state);
-        this.services.RunDelegates<IBleDelegate>(
+        await this.services.RunDelegates<IBleDelegate>(
             x => x.OnAdapterStateChanged(state),
             this.logger
         );
@@ -225,8 +227,10 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
         .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));
 
 
-    void RunStateChange(CBPeripheral peripheral, bool connected)
+    void RunStateChange(CBPeripheral peripheral, bool connected, NSError? error)
     {
+        this.logger.PeripheralStateChange(peripheral.Identifier, connected, error?.LocalizedDescription ?? "None");
+
         var p = this.GetPeripheral(peripheral);
 
         // TODO: conn failures

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -44,9 +45,34 @@ internal static partial class Log
     public static partial void DisableNotificationError(this ILogger logger, Exception exception, string serviceUuid, string characteristicUuid);
 
     [LoggerMessage(
-        EventId = 5,
-        Level = LogLevel.Information,
+        EventId = 6,
+        Level = LogLevel.Debug,
         Message = "{message} - {serviceUuid} / {characteristicUuid}"
     )]
     public static partial void CharacteristicInfo(this ILogger logger, string message, string serviceUuid, string characteristicUuid);
+
+
+    [LoggerMessage(
+        EventId = 7,
+        Level = LogLevel.Debug,
+        Message = "[{methodName}] - {serviceUuid} / {characteristicUuid} - ERROR: {error}"
+    )]
+    public static partial void CharacteristicEvent(this ILogger logger, string serviceUuid, string characteristicUuid, string error, [CallerMemberName] string? methodName = null);
+
+
+    [LoggerMessage(
+        EventId = 8,
+        Level = LogLevel.Debug,
+        Message = "Manager State Change: {state} "
+    )]
+    public static partial void ManagerStateChange(this ILogger logger, CBManagerState state);
+
+
+    [LoggerMessage(
+        EventId = 9,
+        Level = LogLevel.Debug,
+        Message = "Peripheral State Change: {peripheralIdentifier} - Connected: {connected} - Error: {error} "
+    )]
+    public static partial void PeripheralStateChange(this ILogger logger, NSUuid peripheralIdentifier, bool connected, string error);
+
 }
