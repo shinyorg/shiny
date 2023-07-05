@@ -111,28 +111,33 @@ public class HttpTransferMonitor : IDisposable
             {
                 // sync lock the collection?
                 var item = this.transfers.FirstOrDefault(y => y.Identifier.Equals(x.Request.Identifier));
-                if (item != null)
-                    this.logger.TransferUpdate(item.Identifier, item.Status);
-
-                if (x.Status == HttpTransferState.Completed && removeFinished)
+                if (item == null)
                 {
-                    if (item != null)
-                        this.transfers.Remove(item);
+                    item = new HttpTransferObject(x.Request);
+                    this.transfers.Add(item);
                 }
-                else if (x.Status == HttpTransferState.Error && removeErrors)
-                {
-                    if (item != null)
-                        this.transfers.Remove(item);
-                }
-                else
-                {
-                    if (item == null)
-                    {
-                        item = new HttpTransferObject(x.Request);
-                        this.transfers.Add(item);
-                    }
 
-                    item.Update(x);
+                item.Update(x);
+                this.logger.TransferUpdate(item.Identifier, item.Status);
+
+                switch (x.Status)
+                {
+                    case HttpTransferState.Completed:
+                        if (removeFinished)
+                            this.transfers.Remove(item);
+                        break;
+
+                    case HttpTransferState.Canceled:
+                        this.transfers.Remove(item);
+                        break;
+
+                    case HttpTransferState.Error:
+                        if (removeErrors)
+                            this.transfers.Remove(item);
+                        break;
+
+                    default:
+                        break;
                 }
             })
             .DisposedBy(this.disposable);
