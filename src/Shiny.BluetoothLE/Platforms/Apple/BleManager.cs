@@ -232,8 +232,6 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
         this.logger.PeripheralStateChange(peripheral.Identifier, connected, error?.LocalizedDescription ?? "None");
 
         var p = this.GetPeripheral(peripheral);
-
-        // TODO: conn failures
         var status = connected ? ConnectionState.Connected : ConnectionState.Disconnected;
         p.ReceiveStateChange(status);
 
