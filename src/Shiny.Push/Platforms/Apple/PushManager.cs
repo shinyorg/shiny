@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using UIKit;
 using UserNotifications;
-
 namespace Shiny.Push;
 
 
@@ -162,47 +161,36 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) { }
+    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+    {
+        this.TryProcessIncomingNotification(notification, "Foreground remote notification received", () =>
+            completionHandler.Invoke(UNNotificationPresentationOptions.List | UNNotificationPresentationOptions.Banner)
+        );
+    }
+
+
+    public void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
+    {
+        this.TryProcessIncomingNotification(response?.Notification, "Background remote notification entry detected", completionHandler);
+    }
+
+
     public void OnRegistered(NSData deviceToken) => this.tokenSource?.TrySetResult(deviceToken);
     public void OnFailedToRegister(NSError error) => this.tokenSource?.TrySetException(new Exception(error.LocalizedDescription));
-    public async void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+    public void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
     {
+        this.logger.LogDebug("Incoming Background remote notification");
+
         var dict = userInfo.FromNsDictionary();
         var data = new PushNotification(dict, null);
-        await this.services
+        this.services
             .RunDelegates<IPushDelegate>(
                 x => x.OnReceived(data),
                 this.logger
             )
-            .ConfigureAwait(false);
+            .ContinueWith(_ => completionHandler.Invoke(UIBackgroundFetchResult.NewData));
+
         completionHandler.Invoke(UIBackgroundFetchResult.NewData);
-    }
-
-
-    public async void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
-    {
-        // if this errors, high level event hub will catch
-        if (response?.Notification?.Request?.Trigger is not UNPushNotificationTrigger push)
-            return;
-
-        this.logger.LogDebug("Foreground remote notification entry detected");
-        var c = response.Notification.Request.Content;
-
-        var notification = new Notification(
-            c.Title,
-            c.Body
-        );
-
-        var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
-        var data = new PushNotification(dict, notification);
-        await this.services
-            .RunDelegates<IPushDelegate>(
-                x => x.OnEntry(data),
-                this.logger
-            )
-            .ConfigureAwait(false);
-
-        completionHandler();
     }
 
 
@@ -224,16 +212,35 @@ public class PushManager : NotifyPropertyChanged,
             dict.Remove("aps");
         }
         var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
+        this.services.RunDelegates<IPushDelegate>(
+            x => x.OnReceived(push),
+            this.logger
+        );
+    }
+
+
+    protected virtual void TryProcessIncomingNotification(UNNotification? notification, string logMessage, Action completionHandler)
+    {
+        // if this errors, high level event hub will catch
+        if (notification?.Request?.Trigger is not UNPushNotificationTrigger push)
+            return;
+
+        this.logger.LogDebug(logMessage);
+
+        var c = notification.Request.Content;
+        var shinyNotification = new Notification(
+            c.Title,
+            c.Body
+        );
+
+        var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
+        var data = new PushNotification(dict, shinyNotification);
         this.services
             .RunDelegates<IPushDelegate>(
-                x => x.OnReceived(push),
+                x => x.OnEntry(data),
                 this.logger
             )
-            .ContinueWith(x =>
-            {
-                if (x.Exception != null)
-                    this.logger.LogError(x.Exception, "Error in PushManager.Handle");
-            });
+            .ContinueWith(_ => completionHandler.Invoke());
     }
 
 
