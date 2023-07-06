@@ -65,8 +65,11 @@ internal static partial class Log
         Level = LogLevel.Debug,
         Message = "Manager State Change: {state} "
     )]
+#if XAMARINIOS
+    public static partial void ManagerStateChange(this ILogger logger, CBCentralManagerState state);
+#else
     public static partial void ManagerStateChange(this ILogger logger, CBManagerState state);
-
+#endif
 
     [LoggerMessage(
         EventId = 9,
