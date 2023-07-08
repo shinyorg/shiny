@@ -26,6 +26,12 @@ public abstract class ShinyAppDelegate : UIApplicationDelegate
     public override void DidEnterBackground(UIApplication application)
         => Host.Lifecycle.OnAppBackgrounding();
 
+    public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
+        => Host.Lifecycle.OnContinueUserActivity(userActivity,  completionHandler);
+
+    public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
+        => Host.Lifecycle.OnHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
+
     public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         => Host.Lifecycle.OnRegisteredForRemoteNotifications(deviceToken);
 

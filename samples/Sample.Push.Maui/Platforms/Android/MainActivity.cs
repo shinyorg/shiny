@@ -22,4 +22,3 @@ public class MainActivity : MauiAppCompatActivity
 {
     //ShinyNotificationIntents.NotificationClickAction
 }
-
