@@ -86,9 +86,7 @@ public partial class Peripheral
     
     public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
     {
-        this.AssertConnnection();
-        
-        if (this.Native.Services != null)
+        if (this.Status == ConnectionState.Connected && this.Native.Services != null)
         {
             foreach (var service in this.Native.Services)
             {
@@ -137,7 +135,7 @@ public partial class Peripheral
                     }
                     else if (service.Characteristics != null)
                     {
-                        // TODO: if existing chars from single discoveries - we likely want second passthrough
+                        // if existing chars from single discoveries - we likely want second passthrough
                         var list = service.Characteristics.Select(this.FromNative).ToList();
                         ob.Respond(list);
                     }

@@ -56,10 +56,11 @@ public partial class Peripheral
     Subject<BleCharacteristicInfo>? charSubSubj;
     public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
     {
-        this.AssertConnection();
         this.charSubSubj ??= new();
 
-        if (!this.RequiresServiceDiscovery && this.Gatt!.Services != null)
+        if (this.Status == ConnectionState.Connected &&
+            !this.RequiresServiceDiscovery &&
+            this.Gatt!.Services != null)
         {
             foreach (var service in this.Gatt!.Services)
             {
@@ -297,6 +298,15 @@ public partial class Peripheral
             this.notifications.Remove(NotifyKey(serviceUuid, characteristicUuid));
     }
 
+
+    void ClearNotifications()
+    {
+        if (this.notifications != null)
+        {
+            lock (this.notifications)
+                this.notifications.Clear();
+        }
+    }
 
     static string NotifyKey(string serviceUuid, string characteristicUuid)
         => $"{serviceUuid}-{characteristicUuid}".ToLower();
