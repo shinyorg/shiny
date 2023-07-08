@@ -20,6 +20,7 @@ public class FileSystemRepository : IRepository
         ILogger<FileSystemRepository> logger
     )
     {
+        //Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) <= replace platform
         this.serializer = serializer;
         this.rootDir = platform.AppData;
         this.logger = logger;
