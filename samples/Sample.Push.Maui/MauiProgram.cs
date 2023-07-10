@@ -31,7 +31,7 @@ public static class MauiProgram
         builder.Services.AddTransient<TagsViewModel>();
 
 #if NATIVE
-#if USE_PUSH_CONFIG && ANDROID
+#if ANDROID
         var cfg = builder.Configuration.GetSection("Firebase");
         builder.Services.AddPush<MyPushDelegate>(new (
             false,
@@ -46,9 +46,18 @@ public static class MauiProgram
 #elif AZURE
         var cfg = builder.Configuration.GetSection("AzureNotificationHubs");
         builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
-            cfg["ListenerConnectionString"],
-            cfg["HubName"]
+            cfg["ListenerConnectionString"]!,
+            cfg["HubName"]!
         );
+#elif FIREBASE
+        var cfg = builder.Configuration.GetSection("Firebase");
+        builder.Services.AddPush<MyPushDelegate>(new (
+            false,
+            cfg["AppId"],
+            cfg["SenderId"],
+            cfg["ProjectId"],
+            cfg["ApiKey"]
+        ));
 #else
         throw new InvalidProgramException("No push provider configuration");
 #endif
