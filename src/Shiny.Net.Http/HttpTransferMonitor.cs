@@ -103,7 +103,6 @@ public class HttpTransferMonitor : IDisposable
             })
             .DisposedBy(this.disposable);
 
-        // TODO: remove cancelled/errors?
         this.manager
             .WhenUpdateReceived()
             .ObserveOnIf(scheduler)

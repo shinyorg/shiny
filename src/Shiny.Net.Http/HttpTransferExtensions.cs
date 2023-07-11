@@ -69,5 +69,11 @@ public static class HttpTransferExtensions
                     }
                 })
         );
-        
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    //public IObservable<int> WatchPendingTransfers() // downloads vs uploads
 }

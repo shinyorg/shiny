@@ -16,23 +16,6 @@ public static class PeripheralExtensions
     public static bool IsConnected(this IPeripheral peripheral)
         => peripheral.Status == ConnectionState.Connected;
     
-    
-    /// <summary>
-    /// Starts connection process if not already connecteds
-    /// </summary>
-    /// <param name="peripheral"></param>
-    /// <param name="config"></param>
-    /// <returns>True if connection attempt was sent, otherwise false</returns>
-    public static bool ConnectIf(this IPeripheral peripheral, ConnectionConfig? config = null)
-    {
-        if (peripheral.Status == ConnectionState.Disconnected)
-        {
-            peripheral.Connect(config);
-            return true;
-        }
-        return false;
-    }
-
 
     /// <summary>
     /// Attempts to connect if not already connected
