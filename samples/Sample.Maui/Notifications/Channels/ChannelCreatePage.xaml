@@ -28,7 +28,7 @@
                         <Entry Text="{Binding Description}" />
                     </HorizontalStackLayout>
 
-                    <HorizontalStackLayout>
+                    <HorizontalStackLayout HorizontalOptions="FillAndExpand">
                         <Label Text="Importance" />
                         <Picker ItemsSource="{Binding Importances}"
                                 SelectedItem="{Binding SelectedImportance}" />

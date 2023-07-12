@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using UIKit;
@@ -18,7 +19,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     readonly IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers;
     readonly IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers;
     readonly IEnumerable<IIosLifecycle.INotificationHandler> notificationHandlers;
-
+    readonly CompositeDisposable disposer = new();
 
     public IosLifecycleExecutor(
         ILogger<IosLifecycleExecutor> logger,
@@ -42,6 +43,24 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 
     public void Start()
     {
+        UIApplication
+            .Notifications
+            .ObserveDidFinishLaunching((_, args) => this.FinishedLaunching(null))
+            .DisposedBy(this.disposer);
+
+        UIApplication
+            .Notifications
+            .ObserveWillEnterForeground((_, _) => this.OnAppForegrounding())
+            .DisposedBy(this.disposer);
+
+        UIApplication
+            .Notifications
+            .ObserveDidEnterBackground((_, _) => this.OnAppBackgrounding())
+            .DisposedBy(this.disposer);
+
+
+
+
         if (this.notificationHandlers != null && this.notificationHandlers.Any())
         {
             if (UNUserNotificationCenter.Current.Delegate != null)
@@ -127,6 +146,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 
     public void Dispose()
     {
+        this.disposer.Dispose();
         if (UNUserNotificationCenter.Current.Delegate is ShinyUNUserNotificationCenterDelegate)
             UNUserNotificationCenter.Current.Delegate = null;
     }

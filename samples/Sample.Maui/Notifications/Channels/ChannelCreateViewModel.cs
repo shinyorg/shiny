@@ -11,7 +11,7 @@ public class ChannelCreateViewModel : ViewModel
         this.Action1 = new ActionViewModel(this.Services);
         this.Action2 = new ActionViewModel(this.Services);
 
-        this.Create = new Command(async () =>
+        this.Create = ReactiveCommand.CreateFromTask(async () =>
         {
             if (this.Identifier.IsEmpty())
             {

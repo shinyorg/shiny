@@ -24,7 +24,7 @@
                         <TextCell Text="Managed Scan" Command="{Binding Navigate}" CommandParameter="BleManagedScan" />
                     </TableSection>
 
-                    <TableSection Title="Shiny.BluetoothLE.Hosting">
+                    <TableSection Title="Shiny.BluetoothLE.Hosting (Server)">
                         <TextCell Text="Standard Model" Command="{Binding Navigate}" CommandParameter="BleHosting" />
                         <TextCell Text="Managed Model" Command="{Binding Navigate}" CommandParameter="BleHostingManaged" />
                         <TextCell Text="Beacon Advertising" Command="{Binding Navigate}" CommandParameter="BleHostingBeaconAdvertise" />

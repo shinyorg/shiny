@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <!--<TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>-->
-        <!--<TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>-->
-        <TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>
+        <!--<TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>-->
         <OutputType>Exe</OutputType>
         <RootNamespace>Shiny.Tests</RootNamespace>
         <UseMaui>true</UseMaui>

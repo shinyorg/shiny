@@ -1,7 +1,7 @@
 # Shiny Samples
 
 These samples make use great open source frameworks like [Prism](https://prismlibrary.com) & ReactiveUI (https://reactiveui.net) as well
-as principles like dependency injection and reactive extensions... much like Shiny itself.  If you find these complex or you simply don't like them, don't complain - the library wasn't built for you'...
+as principles like dependency injection and reactive extensions... much like Shiny itself.  If you find these complex or you simply don't like them, don't complain - the library wasn't built for you...
 remember - this is not a product! 
 
 ## Sample (Sample.Maui)
@@ -19,9 +19,14 @@ This sample also uses Shiny.Framework (https://github.com/shinyorg/framework) wh
 |------------------|---|------------|-------|
 |Native|Yes|Yes|Yes|
 |Azure|Yes|Yes|Yes|
+|Firebase|Yes|No|Yes|
 
 ### Azure Notification Hubs
 * Edit appsettings.json and add the appropriate values to the AzureNotificationHubs section
 
+### Firebase Messaging
+* Edit appsettings.apple.json & appsettings.android.json and enter the appropriate firebase values in each config file
+
 ## Blazor (Sample.Blazor)
-Currently, a vast majority of the APIs that are coming to the web (ie. BluetoothLE, Notifications, & event GPS) are still experimental.  Thus, you need to enable experimental features for Shiny Blazor to work
+Currently, a vast majority of the APIs that are coming to the web (ie. BluetoothLE, Notifications, & event GPS) are still experimental.
+This is a testing platform not meant for general consumption.  Don't expect much
