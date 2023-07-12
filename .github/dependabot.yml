@@ -1,4 +1,6 @@
 version: 2
+
+
 updates:
 - package-ecosystem: nuget
   directory: "/"
@@ -7,5 +9,16 @@ updates:
     time: "10:00"
   open-pull-requests-limit: 10
   target-branch: dev
+  groups:
+    AndroidX:
+      patterns:
+      - "Xamarin.AndroidX.*"
+    AspNetCore:
+      patterns:
+      - "Microsoft.AspNetCore.*"
+      - "Microsoft.JSInterop"
+    Firebase:
+      patterns:
+      - "Xamarin.Firebase.*"
   labels:
   - dependencies
