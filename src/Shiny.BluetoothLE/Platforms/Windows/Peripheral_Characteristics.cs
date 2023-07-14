@@ -52,7 +52,7 @@ public partial class Peripheral
     });
 
 
-    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => throw new NotImplementedException();
+    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
 
 
     readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
