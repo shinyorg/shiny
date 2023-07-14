@@ -13,15 +13,18 @@ public record BleCharacteristicInfo(
     bool IsNotifying,
     CharacteristicProperties Properties
 );
+
 public record BleDescriptorInfo(
     BleCharacteristicInfo Characteristic,
     string Uuid
 );
+
 public record BleCharacteristicResult(
     BleCharacteristicInfo Characteristic,
     BleCharacteristicEvent Event,
     byte[]? Data
 );
+
 public enum BleCharacteristicEvent
 {
     Read,
@@ -70,7 +73,7 @@ public interface IPeripheral
     /// You should call GetService(s) after this is fired if you want to get the state of the change
     /// </summary>
     /// <returns></returns>
-    IObservable<Unit> WhenServicesChanged();
+    IObservable<Unit> WhenServicesChanged();    
 
     /// <summary>
     /// Reads the peripheral RSSI
@@ -116,10 +119,12 @@ public interface IPeripheral
     IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true);
 
     /// <summary>
-    /// Watches for characteristic subscriptions
+    /// Watch a specific characteristic for subscription changes
     /// </summary>
-    /// <returns>A streaming observable - will start with all currently subscribed characteristics across all services</returns>
-    IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged();
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <returns></returns>
+    IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged(string serviceUuid, string characteristicUuid);
 
     /// <summary>
     /// Reads a characteristic

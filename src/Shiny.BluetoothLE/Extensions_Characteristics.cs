@@ -13,26 +13,7 @@ namespace Shiny.BluetoothLE;
 
 
 public static class CharacteristicExtensions
-{
-    /// <summary>
-    /// Waits for a characteristic subscription - if already hooked, it will return immediately
-    /// </summary>
-    /// <param name="peripheral"></param>
-    /// <param name="serviceUuid"></param>
-    /// <param name="characteristicUuid"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public static Task WaitForCharacteristicSubscription(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancellationToken = default) => peripheral
-        .WhenCharacteristicSubscriptionChanged()
-        .Where(x =>
-            x.IsNotifying &&
-            x.Service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase) &&
-            x.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase)
-        )
-        .Take(1)
-        .ToTask(cancellationToken);
-        
-    
+{   
     /// <summary>
     /// Requests all services and characteristics from a peripheral.  Should only be used for niche cases or debugging.
     /// </summary>

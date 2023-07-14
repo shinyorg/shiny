@@ -1,10 +1,31 @@
-﻿using Java.Util;
+﻿using Android.Bluetooth;
+using Java.Util;
 
 namespace Shiny.BluetoothLE;
 
 
 public static class Utils
 {
+    public static bool Is(this BluetoothGattCharacteristic native, string serviceUuid, string characteristicUuid)
+    {
+        var nsUuid = ToUuidType(serviceUuid);
+        var ncUuid = ToUuidType(characteristicUuid);
+
+        return native.Is(nsUuid, ncUuid);
+    }
+
+
+    public static bool Is(this BluetoothGattCharacteristic native, UUID serviceUuid, UUID characteristicUuid)
+    {
+        if (!(native?.Service?.Uuid?.Equals(serviceUuid) ?? false))
+            return false;
+
+        if (!(native?.Uuid?.Equals(characteristicUuid) ?? false))
+            return false;
+
+        return true;
+    }
+
     public static string ToUuidString(string value)
     {
         if (value.Length == 4)

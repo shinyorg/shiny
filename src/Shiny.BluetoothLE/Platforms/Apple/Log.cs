@@ -16,19 +16,28 @@ internal static partial class Log
     )] 
     public static partial void MissingIosPermission(this ILogger logger, string permission);
 
+
     [LoggerMessage(
         EventId = 2,
         Level = LogLevel.Debug,
         Message = "UpdatedNotificationState: {serviceUuid}/{characteristicUuid} - ENABLED: {notifying}"
     )]
-    public static partial void CharacteristicNotifyState(this ILogger logger, CBUUID serviceUuid, CBUUID characteristicUuid, bool notifying);
-    
+    static partial void CharacteristicNotifyState(this ILogger logger, CBUUID serviceUuid, CBUUID characteristicUuid, bool notifying);
+
+    public static void CharacteristicNotifyState(this ILogger logger, CBCharacteristic native)
+        => logger.CharacteristicNotifyState(native.Service?.UUID, native.UUID, native.IsNotifying);
+
+
     [LoggerMessage(
         EventId = 3,
         Level = LogLevel.Debug,
-        Message = "CanSendWriteWithoutResponse: {ready}"
+        Message = "CanSendWriteWithoutResponse: {serviceUuid}/{characteristicUuid} - ready: {ready}"
     )]
-    public static partial void CanSendWriteWithoutResponse(this ILogger logger, bool ready);
+    static partial void CanSendWriteWithoutResponse(this ILogger logger, CBUUID serviceUuid, CBUUID characteristicUuid, bool ready);
+
+    public static void CanSendWriteWithoutResponse(this ILogger logger, CBCharacteristic native, bool ready)
+        => logger.CanSendWriteWithoutResponse(native.Service.UUID, native.UUID, ready);
+
 
     [LoggerMessage(
         EventId = 4,
@@ -37,12 +46,14 @@ internal static partial class Log
     )]
     public static partial void ServiceDiscoveryEvent(this ILogger logger, NSUuid peripheralIdentifier, int serviceCount);
 
+
     [LoggerMessage(
         EventId = 5,
         Level = LogLevel.Warning,
         Message = "Unable to cleanly dispose of characteristic notification - {serviceUuid} / {characteristicUuid}"
     )]
     public static partial void DisableNotificationError(this ILogger logger, Exception exception, string serviceUuid, string characteristicUuid);
+
 
     [LoggerMessage(
         EventId = 6,
@@ -57,7 +68,10 @@ internal static partial class Log
         Level = LogLevel.Debug,
         Message = "[{methodName}] - {serviceUuid} / {characteristicUuid} - ERROR: {error}"
     )]
-    public static partial void CharacteristicEvent(this ILogger logger, string serviceUuid, string characteristicUuid, string error, [CallerMemberName] string? methodName = null);
+    static partial void CharacteristicEvent(this ILogger logger, CBUUID? serviceUuid, CBUUID? characteristicUuid, string? error, [CallerMemberName] string? methodName = null);
+
+    public static void CharacteristicEvent(this ILogger logger, CBCharacteristic native, NSError? error, [CallerMemberName] string? methodName = null)
+        => logger.CharacteristicEvent(native.Service?.UUID, native.UUID, error?.LocalizedDescription, methodName);
 
 
     [LoggerMessage(
@@ -70,6 +84,7 @@ internal static partial class Log
 #else
     public static partial void ManagerStateChange(this ILogger logger, CBManagerState state);
 #endif
+
 
     [LoggerMessage(
         EventId = 9,

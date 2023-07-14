@@ -13,12 +13,31 @@ public static class AsyncExtensions
     public static Task<AccessState> RequestAccessAsync(this IBleManager manager)
         => manager.RequestAccess().ToTask();
 
+
     public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
             .WithConnectIf(config)
             .Timeout(timeout ?? TimeSpan.FromSeconds(30))
             .ToTask(cancelToken);
 
+
+    /// <summary>
+    /// Waits for a characteristic subscription - if already hooked, it will return immediately
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static Task WaitForCharacteristicSubscriptionAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancellationToken = default) => peripheral
+        .WhenCharacteristicSubscriptionChanged(serviceUuid, characteristicUuid)
+        .Where(x =>
+            x.IsNotifying &&
+            x.Service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase) &&
+            x.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase)
+        )
+        .Take(1)
+        .ToTask(cancellationToken);
 
     public static Task<IReadOnlyList<BleServiceInfo>> GetServicesAsync(this IPeripheral peripheral, CancellationToken cancelToken = default)
         => peripheral

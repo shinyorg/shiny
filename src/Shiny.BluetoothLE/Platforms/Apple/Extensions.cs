@@ -24,6 +24,27 @@ internal static class PlatformExtensions
         => state == CBManagerState.Unknown;
 
 
+    public static bool Is(this CBCharacteristic native, string serviceUuid, string characteristicUuid)
+    {
+        var nsUuid = CBUUID.FromString(serviceUuid);
+        var ncUuid = CBUUID.FromString(characteristicUuid);
+
+        return native.Is(nsUuid, ncUuid);
+    }
+
+
+    public static bool Is(this CBCharacteristic native, CBUUID serviceUuid, CBUUID characteristicUuid)
+    {
+        if (!(native?.Service?.UUID?.Equals(serviceUuid) ?? false))
+            return false;
+
+        if (!(native?.UUID?.Equals(characteristicUuid) ?? false))
+            return false;
+
+        return true;
+    }
+
+
     public static AccessState FromNative(this CBManagerState state) => state switch
     {
         CBManagerState.Resetting => AccessState.Available,

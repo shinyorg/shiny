@@ -84,8 +84,11 @@ public partial class Peripheral
         .Select(this.FromNative);
 
     
-    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged() => Observable.Create<BleCharacteristicInfo>(ob =>
+    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged(string serviceUuid, string characteristicUuid) => Observable.Create<BleCharacteristicInfo>(ob =>
     {
+        var nsUuid = CBUUID.FromString(serviceUuid);
+        var ncUuid = CBUUID.FromString(characteristicUuid);
+
         if (this.Status == ConnectionState.Connected && this.Native.Services != null)
         {
             foreach (var service in this.Native.Services)
@@ -94,18 +97,20 @@ public partial class Peripheral
                 {
                     foreach (var ch in service.Characteristics)
                     {
-                        if (ch.IsNotifying)
+                        if (ch.IsNotifying && ch.Is(nsUuid, ncUuid))
                             ob.OnNext(this.FromNative(ch));
                     }
                 }
             }
         }
 
-        return this.notifySubj.Subscribe(x =>
-        {
-            var info = this.FromNative(x.Char);
-            ob.OnNext(info);
-        });
+        return this.notifySubj
+            .Where(x => x.Char.Is(nsUuid, ncUuid))
+            .Subscribe(x =>
+            {
+                var info = this.FromNative(x.Char);
+                ob.OnNext(info);
+            });
     });
 
 
@@ -170,7 +175,7 @@ public partial class Peripheral
     readonly Subject<(CBCharacteristic Char, NSError? Error)> notifySubj = new();
     public override void UpdatedNotificationState(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
     {
-        this.logger.CharacteristicNotifyState(characteristic.Service!.UUID, characteristic.UUID, characteristic.IsNotifying);
+        this.logger.CharacteristicNotifyState(characteristic);
         this.notifySubj.OnNext((characteristic, error));
     }
 
@@ -200,7 +205,7 @@ public partial class Peripheral
     readonly Subject<(CBCharacteristic Char, NSError? Error)> charUpdateSubj = new();
     public override void UpdatedCharacterteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
     {
-        this.logger.CharacteristicEvent(characteristic.UUID.ToString(), characteristic?.Service?.UUID?.ToString() ?? "NONE", error?.LocalizedDescription ?? "None");
+        this.logger.CharacteristicEvent(characteristic, error);
         this.charUpdateSubj.OnNext((characteristic, error));
     }
 
@@ -208,7 +213,7 @@ public partial class Peripheral
     readonly Subject<(CBCharacteristic Char, NSError? Error)> charWroteSubj = new();
     public override void WroteCharacteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
     {
-        this.logger.CharacteristicEvent(characteristic.UUID.ToString(), characteristic?.Service?.UUID?.ToString() ?? "NONE", error?.LocalizedDescription ?? "None");
+        this.logger.CharacteristicEvent(characteristic, error);
         this.charWroteSubj.OnNext((characteristic, error));
     }
 
@@ -275,9 +280,9 @@ public partial class Peripheral
     {
         if (!this.Native.CanSendWriteWithoutResponse)
         {
-            this.logger.CanSendWriteWithoutResponse(false);
+            this.logger.CanSendWriteWithoutResponse(nativeCh, false);
             await this.readyWwrSubj.Take(1).ToTask(ct);
-            this.logger.CanSendWriteWithoutResponse(true);
+            this.logger.CanSendWriteWithoutResponse(nativeCh, true);
         }
         this.logger.LogDebug("Writing characteristic without response");
         var data = NSData.FromArray(value);
