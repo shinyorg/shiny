@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 
     <PropertyGroup>
@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="120.0.0" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="121.0.1.1" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
