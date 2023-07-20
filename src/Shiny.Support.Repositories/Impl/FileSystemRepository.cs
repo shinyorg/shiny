@@ -196,6 +196,7 @@ public class FileSystemRepository : IRepository
                 var entityDictionary = (Dictionary<string, TEntity>)this.memory[en];
                 this.logger.InternalCount("Read From Cache", en, entityDictionary.Count);
                 action(entityDictionary);
+                this.logger.InternalCount("Post Cache Operation", en, entityDictionary.Count);
             }
             else
             {

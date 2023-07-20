@@ -51,23 +51,29 @@ public static class HttpTransferExtensions
         => Observable.Create<HttpTransferResult>(ob =>
             manager
                 .WhenUpdateReceived()
-                .Where(x => x.Request.Identifier.Equals(identifier, StringComparison.InvariantCultureIgnoreCase))
-                .Subscribe(x =>
+                .Where(x =>
                 {
-                    if (x.Exception != null)
-                    {
-                        ob.OnError(x.Exception);
-                    }
-                    else if (x.Status == HttpTransferState.Completed)
-                    {
-                        ob.OnNext(x);
-                        ob.OnCompleted();
-                    }
-                    else
-                    {
-                        ob.OnNext(x);
-                    }
+                    return x.Request.Identifier.Equals(identifier, StringComparison.InvariantCultureIgnoreCase);
                 })
+                .Subscribe(
+                    x =>
+                    {
+                        if (x.Exception != null)
+                        {
+                            ob.OnError(x.Exception);
+                        }
+                        else if (x.Status == HttpTransferState.Completed)
+                        {
+                            ob.OnNext(x);
+                            ob.OnCompleted();
+                        }
+                        else
+                        {
+                            ob.OnNext(x);
+                        }
+                    },
+                    ob.OnError
+                )
         );
 
 

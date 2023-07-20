@@ -112,8 +112,8 @@ public class HttpTransferTests : AbstractShinyTests
 
         await manager.Queue(new HttpTransferRequest(
             id,
-            GetUri(isUpload, includeBody),
-            false,
+            this.GetUri(isUpload, false),
+            isUpload,
             this.GetLocalPath(isUpload),
             Headers: new Dictionary<string, string>
             {
@@ -143,7 +143,7 @@ public class HttpTransferTests : AbstractShinyTests
 
         await manager.Queue(new HttpTransferRequest(
             id,
-            GetUri(isUpload, false),
+            this.GetUri(isUpload, false),
             isUpload,
             this.GetLocalPath(isUpload),
             Headers: new Dictionary<string, string>
@@ -155,13 +155,14 @@ public class HttpTransferTests : AbstractShinyTests
     }
 
 
-    static string GetUri(bool upload, bool includeBody)
+    string GetUri(bool upload, bool includeBody)
     {
-        var uri = TestUri;
+        var uri = TestUri + "/transfers";
         uri += upload ? "/upload" : "/download";
         if (includeBody)
             uri += "/body";
 
+        this.Log($"Upload: {upload} - URI: {uri}");
         return uri;
     }
 
@@ -181,12 +182,14 @@ public class HttpTransferTests : AbstractShinyTests
                 // generate file
                 var data = new byte[8192];
                 var rng = new Random();
-                using var fs = File.OpenWrite(path);
-                
-                for (var i = 0; i < UPLOAD_SIZE_MB * 128; i++)
+                using (var fs = File.OpenWrite(path))
                 {
-                    rng.NextBytes(data);
-                    fs.Write(data, 0, data.Length);
+                    for (var i = 0; i < UPLOAD_SIZE_MB * 128; i++)
+                    {
+                        rng.NextBytes(data);
+                        fs.Write(data, 0, data.Length);
+                    }
+                    fs.Flush();
                 }
                 this.Log("Upload File Generated");
             }

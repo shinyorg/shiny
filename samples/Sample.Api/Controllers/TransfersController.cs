@@ -21,7 +21,12 @@ public class TransfersController : ControllerBase
     [HttpGet("download")]
     public Task<IActionResult> Get()
         => this.GetDownload(50);
-    
+
+
+    [HttpGet("error")]
+    [HttpPost("error")]
+    public IActionResult RequestError()
+        => this.BadRequest();    
 
     [HttpPost("download/body")]
     public Task<IActionResult> DownloadWithBody([FromBody] BodyPackage package)
@@ -34,15 +39,15 @@ public class TransfersController : ControllerBase
     }
 
 
-    [HttpPost("Upload")]
-    public async Task<IActionResult> Upload(FormFile file)
+    [HttpPost("upload")]
+    public async Task<IActionResult> Upload([FromForm] IFormFile file)
     {
         await this.Write(file);
         return this.Ok();
     }
 
 
-    [HttpPost("Upload/body")]
+    [HttpPost("upload/body")]
     public async Task<IActionResult> UploadWithBody([FromForm] BodyPackage package)
     {
         if (package.File == null)
@@ -83,7 +88,7 @@ public class TransfersController : ControllerBase
     }
 
 
-    async Task Write(FormFile file)
+    async Task Write(IFormFile file)
     {
         this.IterateHeaders();
 
@@ -101,5 +106,5 @@ public class TransfersController : ControllerBase
 public class BodyPackage
 {
     public string? Text { get; set; }
-    public FormFile? File { get; set; }
+    public IFormFile? File { get; set; }
 }

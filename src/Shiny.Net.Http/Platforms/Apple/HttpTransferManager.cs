@@ -78,36 +78,34 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         request.AssertValid();
-        var transfer = new HttpTransfer(request, 0, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
-        this.repository.Insert(transfer);
-
-        NSUrlSessionTask task;
-        var nativeRequest = request.ToNative();
-
-        if (request.IsUpload)
-        {
-            var tempFileUri = await this.CreateUploadTempFile(request).ConfigureAwait(false);
-            task = this.Session.CreateUploadTask(nativeRequest, tempFileUri);
-        }
-        else
-        {
-            task = this.Session.CreateDownloadTask(nativeRequest);
-        }
-
         try
-        { 
+        {
+            var transfer = new HttpTransfer(request, 0, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
+            this.repository.Insert(transfer);
+
+            NSUrlSessionTask task;
+            var nativeRequest = request.ToNative();
+
+            if (request.IsUpload)
+            {
+                var tempFileUri = await this.CreateUploadTempFile(request).ConfigureAwait(false);
+                task = this.Session.CreateUploadTask(nativeRequest, tempFileUri);
+            }
+            else
+            {
+                task = this.Session.CreateDownloadTask(nativeRequest);
+            }
+
             task.TaskDescription = request.Identifier;
             task.Resume();
+
+            return transfer;
         }
         catch
         {
             this.repository.Remove<HttpTransfer>(request.Identifier);
             throw;
         }
-        //task.Response
-        //task.Progress
-
-        return transfer;
     }
 
 
@@ -241,12 +239,19 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 break;
         }
 
-        this.transferSubj.OnNext(new HttpTransferResult(
-            ht.Request,
-            ht.Status,
-            new(0, 0, 0),
-            exception
-        ));
+        try
+        {
+            this.transferSubj.OnNext(new HttpTransferResult(
+                ht.Request,
+                ht.Status,
+                new(0, 0, 0),
+                exception
+            ));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
         this.repository.Remove<HttpTransfer>(ht.Identifier);
         this.TryDeleteUploadTempFile(ht);
     }
@@ -346,7 +351,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     async Task<NSUrl> CreateUploadTempFile(HttpTransferRequest request)
     {
-        var httpMethod = new HttpMethod(request.HttpMethod ?? "GET");
+        var httpMethod = request.GetHttpMethod();
         if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put)
             throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 

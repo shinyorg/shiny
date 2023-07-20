@@ -25,12 +25,12 @@ static class PlatformExtensions
     public static NSMutableUrlRequest ToNative(this HttpTransferRequest request)
     {
         var url = NSUrl.FromString(request.Uri)!;
-
         var native = new NSMutableUrlRequest(url)
         {
-            HttpMethod = request.HttpMethod ?? HttpMethod.Get.Method,
+            HttpMethod = request.GetHttpMethod().Method,
             AllowsExpensiveNetworkAccess = request.UseMeteredConnection
         };
+
         if (request is AppleHttpTransferRequest appleRequest)
         {
             native.AllowsCellularAccess = appleRequest.AllowsCellularAccess;
@@ -42,13 +42,13 @@ static class PlatformExtensions
         if (!request.IsUpload && !request.PostData.IsEmpty())        
             native.Body = NSData.FromString(request.PostData!);
         
-        if (request.Headers?.Any() ?? false)
-        {
-            native.Headers = NSDictionary.FromObjectsAndKeys(
-                request.Headers.Values.ToArray(),
-                request.Headers.Keys.ToArray()
-            );
-        }
+        //if (request.Headers?.Any() ?? false)
+        //{
+        //    native.Headers = NSDictionary.FromObjectsAndKeys(
+        //        request.Headers.Values.ToArray(),
+        //        request.Headers.Keys.ToArray()
+        //    );
+        //}
         return native;
     }
 

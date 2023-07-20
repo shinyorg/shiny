@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Net.Http;
@@ -14,7 +15,17 @@ public record HttpTransferRequest(
     string? PostData = null,
     string? HttpMethod = null,
     IDictionary<string, string>? Headers = null
-);
+)
+{
+    
+    public HttpMethod GetHttpMethod()
+    {
+        var defMethod = this.IsUpload ? "POST" : "GET";
+        var httpMethod = new HttpMethod(this.HttpMethod ?? defMethod);
+
+        return httpMethod;
+    }
+}
 
 
 public record HttpTransfer(
