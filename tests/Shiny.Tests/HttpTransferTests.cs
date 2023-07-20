@@ -38,7 +38,7 @@ public class HttpTransferTests : AbstractShinyTests
     [Theory(DisplayName = "HTTP Transfers - Cancel")]
     [InlineData(false)]
     [InlineData(true)]
-    public async void Cancel(bool isUpload)
+    public async Task Cancel(bool isUpload)
     {
         var manager = this.GetService<IHttpTransferManager>();
 
@@ -54,7 +54,6 @@ public class HttpTransferTests : AbstractShinyTests
                     this.Log("ERROR: " + x.Exception);
             });
 
-
         var startedTask = manager
             .WhenUpdateReceived()
             .Where(x => x.Status == HttpTransferState.InProgress)
@@ -67,11 +66,11 @@ public class HttpTransferTests : AbstractShinyTests
             .Take(1)
             .ToTask();
 
-        var transfer = await manager.Queue(new HttpTransferRequest(
+        var transfer = await manager.Queue(new(
             id,
-            "",
+            this.GetUri(isUpload, false),
             isUpload,
-            $"{FileSystem.AppDataDirectory}/{id}.transfer"
+            this.GetLocalPath(isUpload)
         ));
 
         this.Log("Waiting for transfer to start");
@@ -84,6 +83,61 @@ public class HttpTransferTests : AbstractShinyTests
     }
 
 
+    [Theory(DisplayName = "HTTP Transfers - Observable - Error Handling")]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ErrorHandlingObservable(bool isUpload)
+    {
+        var manager = this.GetService<IHttpTransferManager>();
+
+        var id = Guid.NewGuid().ToString();
+        var tcs = new TaskCompletionSource();
+
+        var errorTask = manager
+            .WhenUpdateReceived()
+            .Where(x => x.Status == HttpTransferState.Error)
+            .Take(1)
+            .Timeout(TimeSpan.FromSeconds(10))
+            .ToTask();
+
+        var transfer = await manager.Queue(new(
+            id,
+            TestUri + "/transfers/error",
+            isUpload,
+            this.GetLocalPath(isUpload)
+        ));
+
+        await errorTask.ConfigureAwait(false);
+    }
+
+
+    [Theory(DisplayName = "HTTP Transfers - Delegate - Error Handling")]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ErrorHandlingDelegate(bool isUpload)
+    {
+        var manager = this.GetService<IHttpTransferManager>();
+        var id = Guid.NewGuid().ToString();
+        var tdelegate = this.GetService<TestHttpTransferDelegate>();
+        var tcs = new TaskCompletionSource<Exception?>();
+
+        tdelegate.OnFinish = args => tcs.TrySetResult(args.Exception);
+
+        var transfer = await manager.Queue(new(
+            id,
+            TestUri + "/transfers/error",
+            isUpload,
+            this.GetLocalPath(isUpload)
+        ));
+
+        var exception = await tcs.Task
+            .WaitAsync(TimeSpan.FromSeconds(10))
+            .ConfigureAwait(false);
+
+        exception.Should().NotBeNull("Exception should be set");
+    }
+
+
     [Theory(DisplayName = "HTTP Transfers - Delegate")]
     [InlineData(false, false)]
     [InlineData(false, true)]
@@ -92,8 +146,8 @@ public class HttpTransferTests : AbstractShinyTests
     public async Task TestDelegate(bool isUpload, bool includeBody)
     {
         var manager = this.GetService<IHttpTransferManager>();
-        var tdelegate = this.GetService<TestHttpTransferDelegate>();
         var id = Guid.NewGuid().ToString();
+        var tdelegate = this.GetService<TestHttpTransferDelegate>();
         var tcs = new TaskCompletionSource();
 
         using var sub = manager.WatchTransfer(id).Subscribe(
@@ -110,7 +164,7 @@ public class HttpTransferTests : AbstractShinyTests
 
         var body = includeBody ? JsonSerializer.Serialize(new { Text = "This is test JSON" }) : null;
 
-        await manager.Queue(new HttpTransferRequest(
+        await manager.Queue(new(
             id,
             this.GetUri(isUpload, false),
             isUpload,
