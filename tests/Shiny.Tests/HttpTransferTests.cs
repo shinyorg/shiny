@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text.Json;
 using Microsoft.Maui.Storage;
 using Shiny.Net.Http;
 
@@ -7,9 +8,8 @@ namespace Shiny.Tests;
 
 public class HttpTransferTests : AbstractShinyTests
 {
-    const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/5MB.zip";
-    //const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/50MB.zip";
-    //const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/512MB.zip";
+    // point at our test api
+    const string TestUri = "https://2a71-99-231-104-75.ngrok-free.app";
 
     public HttpTransferTests(ITestOutputHelper output) : base(output) { }
 
@@ -36,9 +36,9 @@ public class HttpTransferTests : AbstractShinyTests
 
 
     [Theory(DisplayName = "HTTP Transfers - Cancel")]
-    [InlineData(TEST_DOWNLOAD_URI, false)]
-    //[InlineData("", true)]
-    public async void Cancel(string uri, bool isUpload)
+    [InlineData(false)]
+    [InlineData(true)]
+    public async void Cancel(bool isUpload)
     {
         var manager = this.GetService<IHttpTransferManager>();
 
@@ -67,10 +67,9 @@ public class HttpTransferTests : AbstractShinyTests
             .Take(1)
             .ToTask();
 
-        // TODO: upload will need an actual file
         var transfer = await manager.Queue(new HttpTransferRequest(
             id,
-            uri,
+            "",
             isUpload,
             $"{FileSystem.AppDataDirectory}/{id}.transfer"
         ));
@@ -86,9 +85,11 @@ public class HttpTransferTests : AbstractShinyTests
 
 
     [Theory(DisplayName = "HTTP Transfers - Delegate")]
-    [InlineData(TEST_DOWNLOAD_URI, false)]
-    //[InlineData("", true)]
-    public async Task TestDelegate(string uri, bool isUpload)
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task TestDelegate(bool isUpload, bool includeBody)
     {
         var manager = this.GetService<IHttpTransferManager>();
         var tdelegate = this.GetService<TestHttpTransferDelegate>();
@@ -107,21 +108,27 @@ public class HttpTransferTests : AbstractShinyTests
                 tcs.TrySetException(args.Exception);
         };
 
-        // TODO: upload will need an actual file
+        var body = includeBody ? JsonSerializer.Serialize(new { Text = "This is test JSON" }) : null;
+
         await manager.Queue(new HttpTransferRequest(
             id,
-            uri,
-            isUpload,
-            $"{FileSystem.AppDataDirectory}/{id}.transfer"
+            GetUri(isUpload, includeBody),
+            false,
+            this.GetLocalPath(isUpload),
+            Headers: new Dictionary<string, string>
+            {
+                { "Test", "Test" }
+            },
+            PostData: body
         ));
         await tcs.Task.ConfigureAwait(false);
     }
 
 
     [Theory(DisplayName = "HTTP Transfers - Observable")]
-    [InlineData(TEST_DOWNLOAD_URI, false)]
-    //[InlineData("", true)]
-    public async void TestObservable(string uri, bool isUpload)
+    [InlineData(true)]
+    [InlineData(false)]
+    public async void TestObservable(bool isUpload)
     {
         var manager = this.GetService<IHttpTransferManager>();
 
@@ -134,14 +141,62 @@ public class HttpTransferTests : AbstractShinyTests
             () => tcs.TrySetResult()
         );
 
-        // TODO: upload will need an actual file
         await manager.Queue(new HttpTransferRequest(
             id,
-            uri,
+            GetUri(isUpload, false),
             isUpload,
-            $"{FileSystem.AppDataDirectory}/{id}.transfer"
+            this.GetLocalPath(isUpload),
+            Headers: new Dictionary<string, string>
+            {
+                { "Test", "Test" }
+            }
         ));
         await tcs.Task.ConfigureAwait(false);
+    }
+
+
+    static string GetUri(bool upload, bool includeBody)
+    {
+        var uri = TestUri;
+        uri += upload ? "/upload" : "/download";
+        if (includeBody)
+            uri += "/body";
+
+        return uri;
+    }
+
+
+    const int UPLOAD_SIZE_MB = 50;
+    string GetLocalPath(bool isUpload)
+    {
+        string path = null!;
+
+        if (isUpload)
+        {
+            path = Path.Combine(FileSystem.AppDataDirectory, "upload.bin");
+            if (!File.Exists(path))
+            {
+                this.Log("Generating Upload Binary");
+
+                // generate file
+                var data = new byte[8192];
+                var rng = new Random();
+                using var fs = File.OpenWrite(path);
+                
+                for (var i = 0; i < UPLOAD_SIZE_MB * 128; i++)
+                {
+                    rng.NextBytes(data);
+                    fs.Write(data, 0, data.Length);
+                }
+                this.Log("Upload File Generated");
+            }
+        }
+        else
+        {
+            var fn = $"{Guid.NewGuid()}.transfer";
+            path = Path.Combine(FileSystem.AppDataDirectory, fn);
+        }
+        return path;
     }
 }
 
