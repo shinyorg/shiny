@@ -85,6 +85,10 @@ public class CreateViewModel : ViewModel
             if (access != AccessState.Available)
                 await this.Dialogs.DisplayAlertAsync("Warning", "You will not get notifications for transfers due to insufficient permissions", "OK");
 
+            TransferHttpContent? content = null;
+            if (!this.PostData.IsEmpty())
+                content = new TransferHttpContent(this.PostData!);
+
             var request = new HttpTransferRequest
             (
                 Guid.NewGuid().ToString(),
@@ -92,7 +96,7 @@ public class CreateViewModel : ViewModel
                 this.IsUpload,
                 this.FilePath!,
                 this.UseMeteredConnection,
-                this.PostData,
+                content,
                 this.HttpVerb
             );
             await manager.Queue(request);

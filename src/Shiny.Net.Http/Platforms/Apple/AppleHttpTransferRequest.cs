@@ -10,7 +10,7 @@ public record AppleHttpTransferRequest(
     bool IsUpload,
     string LocalFilePath,
     bool UseMeteredConnection = true,
-    string? PostData = null,
+    TransferHttpContent? BodyContent = null,
     string? HttpMethod = null,
     IDictionary<string, string>? Headers = null,
     bool AllowsConstrainedNetworkAccess = true,
@@ -27,7 +27,7 @@ public record AppleHttpTransferRequest(
     IsUpload,
     LocalFilePath,
     UseMeteredConnection,
-    PostData,
+    BodyContent,
     HttpMethod,
     Headers
 );

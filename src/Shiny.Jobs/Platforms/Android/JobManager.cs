@@ -39,7 +39,15 @@ public class JobManager : AbstractJobManager
 
     public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
     {
-        // TODO: I could run this through unique job work
+        //https://stackoverflow.com/questions/53297982/how-to-run-workmanager-immediately
+        //https://developer.android.com/reference/androidx/work/ListenableWorker#setForegroundAsync(androidx.work.ForegroundInfo)
+        //https://medium.com/androiddevelopers/use-workmanager-for-immediate-background-execution-a57db502603d
+        /*
+OneTimeWorkRequestBuilder<T>().apply {
+    setInputData(inputData) 
+ setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+}.build()
+         */
         if (!this.platform.IsInManifest(P.WakeLock))
         {
             base.RunTask(taskName, task);

@@ -9,7 +9,7 @@ namespace Shiny.Tests;
 public class HttpTransferTests : AbstractShinyTests
 {
     // point at our test api
-    const string TestUri = "https://2a71-99-231-104-75.ngrok-free.app";
+    const string TestUri = "https://02d1-99-231-104-75.ngrok-free.app";
 
     public HttpTransferTests(ITestOutputHelper output) : base(output) { }
 
@@ -162,18 +162,21 @@ public class HttpTransferTests : AbstractShinyTests
                 tcs.TrySetException(args.Exception);
         };
 
-        var body = includeBody ? JsonSerializer.Serialize(new { Text = "This is test JSON" }) : null;
+        TransferHttpContent? content = null;
+        if (includeBody)
+            content = TransferHttpContent.FromJson(new { Text = "This is test JSON" });
 
         await manager.Queue(new(
             id,
-            this.GetUri(isUpload, false),
+            this.GetUri(isUpload, includeBody),
             isUpload,
             this.GetLocalPath(isUpload),
             Headers: new Dictionary<string, string>
             {
                 { "Test", "Test" }
             },
-            PostData: body
+            HttpContent: content,
+            HttpMethod: includeBody ? "POST" : "GET"
         ));
         await tcs.Task.ConfigureAwait(false);
     }

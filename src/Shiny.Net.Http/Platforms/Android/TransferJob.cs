@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -166,9 +167,16 @@ public class TransferJob : IJob
         if (request.HttpMethod != null)
             httpMethod = new HttpMethod(request.HttpMethod);
 
+        HttpContent? bodyContent = null;
+        var c = transfer.Request.HttpContent;
+        if (c != null)
+        {
+            // TODO: encoding - it doesn't serialize for repo though
+            bodyContent = new StringContent(c.Content, Encoding.UTF8, c.ContentType);
+        }
         var obs = request.IsUpload
-            ? this.httpClient.Upload(request.Uri, request.LocalFilePath, httpMethod, headers)
-            : this.httpClient.Download(request.Uri, request.LocalFilePath, 8192, httpMethod, headers);
+            ? this.httpClient.Upload(request.Uri, request.LocalFilePath, httpMethod, bodyContent, headers)
+            : this.httpClient.Download(request.Uri, request.LocalFilePath, 8192, httpMethod, bodyContent, headers);
 
         var builder = this.StartNotification(request);
         this.notifications.Notify(NOTIFICATION_ID, builder.Build());

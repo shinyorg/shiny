@@ -44,8 +44,13 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
     {
         // this is really only need for unit tests - it will passthrough under normal circumstances
         this.platform.InvokeOnMainThread(() =>
-            ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this)
-        );
+        {
+            try
+            {
+                ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
+            }
+            catch { } //
+        });
     }
 
 

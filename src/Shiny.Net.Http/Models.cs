@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Net.Http;
@@ -12,7 +13,7 @@ public record HttpTransferRequest(
     bool IsUpload,
     string LocalFilePath,
     bool UseMeteredConnection = true,
-    string? PostData = null,
+    TransferHttpContent? HttpContent = null,
     string? HttpMethod = null,
     IDictionary<string, string>? Headers = null
 )
@@ -102,6 +103,24 @@ public record TransferProgress(
         }
     }
 };
+
+
+public record TransferHttpContent(
+    string Content,
+    string ContentType = "text/plain",
+    string Encoding = "utf-8"
+)
+{
+    public static TransferHttpContent FromJson(object obj, JsonSerializerOptions? jsonOptions = null)
+    {
+        var json = JsonSerializer.Serialize(obj, jsonOptions);
+        return new TransferHttpContent(
+            json,
+            "application/json",
+            "utf-8"
+        );
+    }
+}
 
 
 public enum HttpTransferState

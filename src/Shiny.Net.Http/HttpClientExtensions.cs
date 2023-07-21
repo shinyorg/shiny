@@ -12,8 +12,9 @@ public static class HttpClientExtensions
     public static IObservable<TransferProgress> Upload(
         this HttpClient httpClient,
         string uri,
-        string filePath,
+        string filePath,        
         HttpMethod? httpMethod = null,
+        HttpContent? bodyContent = null,
         params (string Name, string Value)[] headers
     ) => Observable.Create<TransferProgress>(ob => Observable.FromAsync(async ct =>
     {
@@ -58,6 +59,9 @@ public static class HttpClientExtensions
             8192
         );
         var multipart = new MultipartFormDataContent();
+        if (bodyContent != null)
+            multipart.Add(bodyContent);
+
         multipart.Add(progress, name: "file", fileName: file.Name);
 
         var request = new HttpRequestMessage();
@@ -84,12 +88,15 @@ public static class HttpClientExtensions
         string toFilePath,
         int bufferSize = 8192,
         HttpMethod? httpMethod = null,
+        HttpContent? bodyContent = null,
         params (string Name, string Value)[] headers
     ) => Observable.Create<TransferProgress>(ob => Observable.FromAsync(async ct =>
     {
         var request = new HttpRequestMessage();
         request.Method = httpMethod ?? HttpMethod.Get;
         request.RequestUri = new Uri(uri);
+        request.Content = bodyContent;
+
         foreach (var header in headers)
             request.Headers.TryAddWithoutValidation(header.Name, header.Value);
 

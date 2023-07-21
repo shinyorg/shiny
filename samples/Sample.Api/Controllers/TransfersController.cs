@@ -1,4 +1,6 @@
-﻿namespace Sample.Api.Controllers;
+﻿using System.Linq;
+
+namespace Sample.Api.Controllers;
 
 
 [ApiController]
@@ -15,18 +17,18 @@ public class TransfersController : ControllerBase
 
 
     [HttpGet("download")]
-    public Task<IActionResult> Get()
+    public IActionResult Get()
         => this.GetDownload(50);
 
 
     [HttpGet("error")]
     [HttpPost("error")]
     public IActionResult RequestError()
-        => this.BadRequest();    
+        => this.BadRequest();
 
 
     [HttpPost("download/body")]
-    public Task<IActionResult> DownloadWithBody([FromBody] BodyPackage package)
+    public IActionResult DownloadWithBody([FromBody] BodyPackage package)
     {
         this.logger.LogInformation("Package Text: " + package?.Text);
         if (!Int32.TryParse(package?.Text, out var size))
@@ -37,8 +39,12 @@ public class TransfersController : ControllerBase
 
 
     [HttpPost("upload")]
-    public async Task<IActionResult> Upload([FromForm] IFormFile file)
+    //public async Task<IActionResult> Upload()
+    public async Task<IActionResult> Upload(IFormFile file)
     {
+        //this.logger.LogInformation("Files Uploading: " + this.Request.Form.Files.Count);
+
+        //await this.Write(this.Request.Form.Files.First());
         await this.Write(file);
         return this.Ok();
     }
@@ -56,7 +62,7 @@ public class TransfersController : ControllerBase
     }
 
 
-    async Task<IActionResult> GetDownload(int size)
+    IActionResult GetDownload(int size)
     {
         this.IterateHeaders();
         var file = this.GetTempFile(size);
