@@ -245,7 +245,8 @@ public class HttpTransferTests : AbstractShinyTests
                     }
                     fs.Flush();
                 }
-                this.Log("Upload File Generated");
+                
+                this.Log($"Upload File Generated - {new FileInfo(path).Length} bytes");
             }
         }
         else

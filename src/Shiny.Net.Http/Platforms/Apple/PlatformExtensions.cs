@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using Foundation;
 
@@ -41,14 +40,14 @@ static class PlatformExtensions
 
         if (!request.IsUpload && !request.PostData.IsEmpty())        
             native.Body = NSData.FromString(request.PostData!);
-        
-        //if (request.Headers?.Any() ?? false)
-        //{
-        //    native.Headers = NSDictionary.FromObjectsAndKeys(
-        //        request.Headers.Values.ToArray(),
-        //        request.Headers.Keys.ToArray()
-        //    );
-        //}
+
+        if (request.Headers?.Any() ?? false)
+        {
+            native.Headers = NSDictionary.FromObjectsAndKeys(
+                request.Headers.Values.ToArray(),
+                request.Headers.Keys.ToArray()
+            );
+        }
         return native;
     }
 

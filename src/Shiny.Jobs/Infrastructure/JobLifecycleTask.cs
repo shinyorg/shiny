@@ -73,7 +73,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
             }
 
             this.logger.LogInformation("Foreground jobs finished");
-            if (this.IsInForeground)
+            if (!this.disposed && this.IsInForeground)
                 this.timer.Start();
         };
     }
@@ -81,6 +81,9 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 
     protected override void OnStateChanged(bool backgrounding)
     {
+        if (this.disposed)
+            return;
+
         if (backgrounding)
         {
             this.timer.Stop();
@@ -144,6 +147,11 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
     }
 
 
-    public void Dispose() => this.timer.Dispose();
+    bool disposed;
+    public void Dispose()
+    {
+        this.disposed = true;
+        this.timer.Dispose();
+    }
 }
 #endif

@@ -69,5 +69,6 @@ public class Host : IHost
     {
         (this.Services as IDisposable)?.Dispose();
         this.Logging.Dispose();
+        currentHost = null;
     }
 }

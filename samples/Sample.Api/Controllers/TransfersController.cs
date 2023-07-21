@@ -1,14 +1,10 @@
-﻿using System.Drawing;
-
-namespace Sample.Api.Controllers;
+﻿namespace Sample.Api.Controllers;
 
 
 [ApiController]
 [Route("[controller]")]
 public class TransfersController : ControllerBase
 {
-    const string TEST_DOWNLOAD_URI = "http://ipv4.download.thinkbroadband.com/{0}MB.zip";
-    static readonly HttpClient httpClient = new();
     readonly ILogger logger;
 
 
@@ -27,6 +23,7 @@ public class TransfersController : ControllerBase
     [HttpPost("error")]
     public IActionResult RequestError()
         => this.BadRequest();    
+
 
     [HttpPost("download/body")]
     public Task<IActionResult> DownloadWithBody([FromBody] BodyPackage package)
@@ -62,19 +59,33 @@ public class TransfersController : ControllerBase
     async Task<IActionResult> GetDownload(int size)
     {
         this.IterateHeaders();
-        switch (size)
-        {
-            case 5:
-            case 50:
-            case 512: break;
-            default: throw new InvalidOperationException("Invalid Size");
-        }
-        var uri = String.Format(TEST_DOWNLOAD_URI, size);
+        var file = this.GetTempFile(size);
         var fn = String.Format("{0}MB.zip", size);
-        var stream = await httpClient.GetStreamAsync(uri);
 
-        return this.File(stream, fn, true);
+        return this.PhysicalFile(file, "application/octet-stream", fn, true);
     }
+
+
+    string GetTempFile(int sizeInMB)
+    {
+        var path = Path.GetTempFileName();
+        var data = new byte[8192];
+        var rng = new Random();
+
+        using (var fs = System.IO.File.OpenWrite(path))
+        {
+            for (var i = 0; i < sizeInMB * 128; i++)
+            {
+                rng.NextBytes(data);
+                fs.Write(data, 0, data.Length);
+            }
+            fs.Flush();
+        }
+
+        this.logger.LogInformation($"Upload File Generated - {new FileInfo(path).Length} bytes");
+        return path;
+    }
+
 
     void IterateHeaders()
     {
