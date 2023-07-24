@@ -120,6 +120,38 @@ public record TransferHttpContent(
             "utf-8"
         );
     }
+
+    public static TransferHttpContent FromFormData(params (string Key,string Value)[] formValues)
+    {
+        var list = new List<KeyValuePair<string, string>>();
+        foreach (var fv in formValues)
+            list.Add(new KeyValuePair<string, string>(fv.Key, fv.Value));
+
+        return FromFormData(list);
+    }
+
+
+    public static TransferHttpContent FromFormData(IDictionary<string, string> dictionary)
+    {
+        var list = new List<KeyValuePair<string, string>>();
+        foreach (var fv in dictionary)
+            list.Add(new KeyValuePair<string, string>(fv.Key, fv.Value));
+
+        return FromFormData(list);
+    }
+
+
+    static TransferHttpContent FromFormData(List<KeyValuePair<string, string>> list)
+    {
+        var form = new FormUrlEncodedContent(list);
+        var encoded = form.ToString()!;
+
+        // TODO: ensure URL encoded
+        return new TransferHttpContent(
+            encoded,
+            "application/x-www-form-urlencoded"
+        );
+    }
 }
 
 
