@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Text.Json;
 using Microsoft.Maui.Storage;
 using Shiny.Net.Http;
 
@@ -9,8 +8,6 @@ namespace Shiny.Tests;
 public class HttpTransferTests : AbstractShinyTests
 {
     // point at our test api
-    const string TestUri = "https://02d1-99-231-104-75.ngrok-free.app";
-
     public HttpTransferTests(ITestOutputHelper output) : base(output) { }
 
 
@@ -125,7 +122,7 @@ public class HttpTransferTests : AbstractShinyTests
 
         var transfer = await manager.Queue(new(
             id,
-            TestUri + "/transfers/error",
+            this.TestUri + "/transfers/error",
             isUpload,
             this.GetLocalPath(isUpload)
         ));
@@ -135,6 +132,32 @@ public class HttpTransferTests : AbstractShinyTests
             .ConfigureAwait(false);
 
         exception.Should().NotBeNull("Exception should be set");
+    }
+
+
+    [Fact(DisplayName = "HTTP Transfers - Upload with Form Data")]
+    public async Task UploadWithFormPost()
+    {
+        var manager = this.GetService<IHttpTransferManager>();
+        var id = Guid.NewGuid().ToString();
+        var tcs = new TaskCompletionSource();
+
+        using var sub = manager.WatchTransfer(id).Subscribe(
+            x => this.Log($"{x.Progress.PercentComplete * 100}% complete - bp/s: {x.Progress.BytesPerSecond}"),
+            ex => tcs.TrySetException(ex),
+            () => tcs.TrySetResult()
+        );
+
+        await manager.Queue(new HttpTransferRequest(
+            id,
+            this.GetUri(true, true),
+            true,
+            this.GetLocalPath(true),
+            HttpContent: TransferHttpContent.FromFormData(
+                ("Text", "This is a test")
+            )
+        ));
+        await tcs.Task.ConfigureAwait(false);
     }
 
 
@@ -214,7 +237,7 @@ public class HttpTransferTests : AbstractShinyTests
 
     string GetUri(bool upload, bool includeBody)
     {
-        var uri = TestUri + "/transfers";
+        var uri = this.TestUri + "/transfers";
         uri += upload ? "/upload" : "/download";
         if (includeBody)
             uri += "/body";
@@ -258,6 +281,20 @@ public class HttpTransferTests : AbstractShinyTests
             path = Path.Combine(FileSystem.AppDataDirectory, fn);
         }
         return path;
+    }
+
+
+    public string TestUri
+    {
+        get
+        {
+            var cfg = MauiProgram.Configuration;
+            var uri = cfg["HttpTestsUrl"];
+            if (String.IsNullOrWhiteSpace(uri))
+                throw new InvalidProgramException("HttpTestsUrl is not set in appsettings.json");
+
+            return uri;
+        }
     }
 }
 
