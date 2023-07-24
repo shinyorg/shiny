@@ -118,6 +118,9 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
         if (task != null)
             task.Cancel();
+
+        var transfer = this.repository.Get<HttpTransfer>(identifier);
+        this.CancelItem(transfer);
     }
 
 
@@ -126,6 +129,27 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var tasks = await this.Session.GetAllTasksAsync();
         foreach (var task in tasks)
             task.Cancel();
+
+        var all = this.repository.GetList<HttpTransfer>();
+        foreach (var transfer in all)
+            this.CancelItem(transfer);
+    }
+
+
+    void CancelItem(HttpTransfer? transfer)
+    {
+        if (transfer == null)
+            return;
+
+        // we fire observable for cancellation here, but not the delegate
+        // cancellation must be triggered by user code and are not triggered by the lib code
+        this.repository.Remove(transfer);
+        this.transferSubj.OnNext(new HttpTransferResult(
+            transfer.Request,
+            HttpTransferState.Canceled,
+            new(0, 0, 0),
+            null
+        ));
     }
 
 
@@ -224,7 +248,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
             case NSUrlSessionTaskState.Completed:
             default:
-                remove = true;
+                remove = true; // TODO: cancelling - downloads & uploads will complete with error - wrong
                 if (exception != null)
                 {
                     this.logger.LogError(exception, $"Transfer {ht.Identifier} was completed with error");
@@ -233,6 +257,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 }
                 else if (ht.Request.IsUpload)
                 {
+                    this.logger.LogInformation($"Transfer Upload {ht.Identifier} was completed");
+                    ht = ht with { Status = HttpTransferState.Completed };
                     await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), this.logger);
                 }
                 else
