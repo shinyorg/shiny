@@ -17,6 +17,9 @@ public enum RepositoryAction
 
 public interface IRepository
 {
+    // TODO: update transaction void UpdateTransaction<T>(string identifier, Action<T> updateFunc)
+    // TODO: update/clear all UpdateAll<T>
+
     /// <summary>
     /// Returns true if a given identifier/type value is found in storage
     /// </summary>

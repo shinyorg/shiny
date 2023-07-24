@@ -71,7 +71,7 @@ public class FileSystemRepository : IRepository
         this.InTransaction<TEntity>(list =>
         {
             if (list.ContainsKey(entity.Identifier))
-                throw new ArgumentException($"{typeof(TEntity).FullName} already has a record with identifier '{entity.Identifier}'");
+                throw new RepositoryException($"{typeof(TEntity).FullName} already has a record with identifier '{entity.Identifier}'");
 
             this.Write(entity);
             list.Add(entity.Identifier, entity);
@@ -86,7 +86,7 @@ public class FileSystemRepository : IRepository
         this.InTransaction<TEntity>(list =>
         {
             if (!list.ContainsKey(entity.Identifier))
-                throw new ArgumentException($"{typeof(TEntity).FullName} already has a record with identifier '{entity.Identifier}'");
+                throw new RepositoryException($"{typeof(TEntity).FullName} - no record exists with identifier '{entity.Identifier}'");
 
             this.Write(entity);
             list[entity.Identifier] = entity;
