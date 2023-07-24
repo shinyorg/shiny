@@ -18,6 +18,8 @@ public record HttpTransferRequest(
     IDictionary<string, string>? Headers = null
 )
 {
+    //public void SetAuthHeader(string authType, string authValue)
+    //    this.Headers.Add("Authentication", $"{authType} {authValue}");
     
     public HttpMethod GetHttpMethod()
     {
