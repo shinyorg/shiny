@@ -99,7 +99,7 @@ public class HttpTransferTests : AbstractShinyTests
 
         var transfer = await manager.Queue(new(
             id,
-            TestUri + "/transfers/error",
+            this.TestUri + "/transfers/error",
             isUpload,
             this.GetLocalPath(isUpload)
         ));
