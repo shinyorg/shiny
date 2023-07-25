@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -146,6 +147,7 @@ public class TransferJob : IJob
             }
             catch (Exception ex)
             {
+                // TODO: error log?
                 this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
                 this.logger.StandardInfo(activeTransfer!.Identifier, "There was an isssue processing request");
             }
@@ -171,12 +173,26 @@ public class TransferJob : IJob
         var c = transfer.Request.HttpContent;
         if (c != null)
         {
-            // TODO: encoding - it doesn't serialize for repo though
             bodyContent = new StringContent(c.Content, Encoding.UTF8, c.ContentType);
         }
         var obs = request.IsUpload
-            ? this.httpClient.Upload(request.Uri, request.LocalFilePath, httpMethod, bodyContent, headers)
-            : this.httpClient.Download(request.Uri, request.LocalFilePath, 8192, httpMethod, bodyContent, headers);
+            ? this.httpClient.Upload(
+                request.Uri,
+                request.LocalFilePath,
+                httpMethod,
+                bodyContent,
+                request.HttpContent?.ContentFormDataName ?? "value",
+                request.FileFormDataName,
+                headers
+            )
+            : this.httpClient.Download(
+                request.Uri,
+                request.LocalFilePath,
+                8192,
+                httpMethod,
+                bodyContent,
+                headers
+            );
 
         var builder = this.StartNotification(request);
         this.notifications.Notify(NOTIFICATION_ID, builder.Build());

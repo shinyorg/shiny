@@ -12,6 +12,7 @@ public record AppleHttpTransferRequest(
     bool UseMeteredConnection = true,
     TransferHttpContent? BodyContent = null,
     string? HttpMethod = null,
+    string FileFormDataName = "file",
     IDictionary<string, string>? Headers = null,
     bool AllowsConstrainedNetworkAccess = true,
     bool AllowsCellularAccess = true,
@@ -29,5 +30,6 @@ public record AppleHttpTransferRequest(
     UseMeteredConnection,
     BodyContent,
     HttpMethod,
+    FileFormDataName,
     Headers
 );

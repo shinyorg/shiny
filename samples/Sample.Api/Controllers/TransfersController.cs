@@ -28,10 +28,10 @@ public class TransfersController : ControllerBase
 
 
     [HttpPost("download/body")]
-    public IActionResult DownloadWithBody([FromBody] BodyPackage package)
+    public IActionResult DownloadWithBody([FromBody] BodyArgs args)
     {
-        this.logger.LogInformation("Package Text: " + package?.Text);
-        if (!Int32.TryParse(package?.Text, out var size))
+        this.logger.LogInformation("Package Text: " + args?.Text);
+        if (!Int32.TryParse(args?.Text, out var size))
             size = 50;
 
         return this.GetDownload(size);
@@ -39,25 +39,27 @@ public class TransfersController : ControllerBase
 
 
     [HttpPost("upload")]
-    //public async Task<IActionResult> Upload()
     public async Task<IActionResult> Upload(IFormFile file)
     {
-        //this.logger.LogInformation("Files Uploading: " + this.Request.Form.Files.Count);
-
-        //await this.Write(this.Request.Form.Files.First());
         await this.Write(file);
         return this.Ok();
     }
 
 
     [HttpPost("upload/body")]
-    public async Task<IActionResult> UploadWithBody([FromForm] BodyPackage package)
+    public async Task<IActionResult> UploadWithBody(
+        [ModelBinder(BinderType = typeof(JsonModelBinder))] BodyArgs value,
+        IFormFile file
+    )
     {
-        if (package.File == null)
+        if (file == null)
             throw new InvalidOperationException("File Not Sent");
 
-        this.logger.LogInformation("Package Text: " + package.Text);
-        await this.Write(package.File!);
+        if (value?.Text == null)
+            throw new InvalidOperationException("No arg text sent");
+
+        this.logger.LogInformation("Argument Text: " + value.Text);
+        await this.Write(file);
         return this.Ok();
     }
 
@@ -120,8 +122,7 @@ public class TransfersController : ControllerBase
 }
 
 
-public class BodyPackage
+public class BodyArgs
 {
     public string? Text { get; set; }
-    public IFormFile? File { get; set; }
 }

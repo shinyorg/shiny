@@ -430,7 +430,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             if (request.HttpContent != null)
             {
                 fs.WriteString("--" + boundary);
-                fs.WriteString("Content-Disposition: form-data;");
+                fs.WriteString($"Content-Disposition: form-data; name=\"{request.HttpContent.ContentFormDataName ?? "value"}\"");
                 fs.WriteString($"Content-Type: {request.HttpContent.ContentType}; charset={request.HttpContent.Encoding}");
                 fs.WriteLine();
                 fs.WriteString(request.HttpContent.Content);
@@ -441,7 +441,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             fs.WriteString("--" + boundary);
 
             // TODO: escape/encode filename - add utf-8 version
-            fs.WriteString($"Content-Disposition: form-data; name=file; filename={fileName}");
+            fs.WriteString($"Content-Disposition: form-data; name={request.FileFormDataName}; filename={fileName}");
             fs.WriteLine();
             using (var uploadFile = File.OpenRead(request.LocalFilePath))
                 await uploadFile.CopyToAsync(fs);

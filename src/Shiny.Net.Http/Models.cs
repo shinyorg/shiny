@@ -15,6 +15,7 @@ public record HttpTransferRequest(
     bool UseMeteredConnection = true,
     TransferHttpContent? HttpContent = null,
     string? HttpMethod = null,
+    string FileFormDataName = "file",
     IDictionary<string, string>? Headers = null
 )
 {
@@ -107,10 +108,18 @@ public record TransferProgress(
 };
 
 
+/// <summary>
+/// How to send POST/PUT args to a transfer request
+/// </summary>
+/// <param name="Content">You actual string content</param>
+/// <param name="ContentType">The content type</param>
+/// <param name="Encoding">Defaults to utf-8, should be the webname of the encodings</param>
+/// <param name="ContentName">This is to match binding names for things like json binding - the name should be small & simple (no spaces or weird characters) to prevent screwing up protocol</param>
 public record TransferHttpContent(
     string Content,
     string ContentType = "text/plain",
-    string Encoding = "utf-8"
+    string Encoding = "utf-8",
+    string? ContentFormDataName = null
 )
 {
     public static TransferHttpContent FromJson(object obj, JsonSerializerOptions? jsonOptions = null)

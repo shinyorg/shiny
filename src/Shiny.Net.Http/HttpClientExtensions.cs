@@ -15,6 +15,8 @@ public static class HttpClientExtensions
         string filePath,        
         HttpMethod? httpMethod = null,
         HttpContent? bodyContent = null,
+        string contenFormDataName = "value",
+        string fileFormDataName = "file",
         params (string Name, string Value)[] headers
     ) => Observable.Create<TransferProgress>(ob => Observable.FromAsync(async ct =>
     {
@@ -60,9 +62,9 @@ public static class HttpClientExtensions
         );
         var multipart = new MultipartFormDataContent();
         if (bodyContent != null)
-            multipart.Add(bodyContent);
+            multipart.Add(bodyContent, contenFormDataName);
 
-        multipart.Add(progress, name: "file", fileName: file.Name);
+        multipart.Add(progress, name: fileFormDataName, fileName: file.Name);
 
         var request = new HttpRequestMessage();
         request.Content = multipart;
