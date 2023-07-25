@@ -96,9 +96,11 @@ public class CreateViewModel : ViewModel
                 this.IsUpload,
                 this.FilePath!,
                 this.UseMeteredConnection,
-                content,
-                this.HttpVerb
-            );
+                content
+            )
+            {
+                HttpMethod = this.HttpVerb
+            };
             await manager.Queue(request);
 
             await this.Navigation.GoBack();

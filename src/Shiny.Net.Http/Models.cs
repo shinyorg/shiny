@@ -14,14 +14,15 @@ public record HttpTransferRequest(
     string LocalFilePath,
     bool UseMeteredConnection = true,
     TransferHttpContent? HttpContent = null,
-    string? HttpMethod = null,
-    string FileFormDataName = "file",
     IDictionary<string, string>? Headers = null
 )
 {
+    public string? HttpMethod { get; set; }
+    public string FileFormDataName { get; set; } = "file";
+
     //public void SetAuthHeader(string authType, string authValue)
     //    this.Headers.Add("Authentication", $"{authType} {authValue}");
-    
+
     public HttpMethod GetHttpMethod()
     {
         var defMethod = this.IsUpload ? "POST" : "GET";
@@ -118,10 +119,11 @@ public record TransferProgress(
 public record TransferHttpContent(
     string Content,
     string ContentType = "text/plain",
-    string Encoding = "utf-8",
-    string? ContentFormDataName = null
+    string Encoding = "utf-8"
 )
 {
+    public string? ContentFormDataName { get; set; }
+
     public static TransferHttpContent FromJson(object obj, JsonSerializerOptions? jsonOptions = null)
     {
         var json = JsonSerializer.Serialize(obj, jsonOptions);

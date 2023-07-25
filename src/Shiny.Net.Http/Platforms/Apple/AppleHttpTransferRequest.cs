@@ -11,15 +11,13 @@ public record AppleHttpTransferRequest(
     string LocalFilePath,
     bool UseMeteredConnection = true,
     TransferHttpContent? BodyContent = null,
-    string? HttpMethod = null,
-    string FileFormDataName = "file",
     IDictionary<string, string>? Headers = null,
     bool AllowsConstrainedNetworkAccess = true,
     bool AllowsCellularAccess = true,
     bool? AssumesHttp3Capable = null
-//native.NetworkServiceType = NSUrlRequestNetworkServiceType.Background
-//native.RequiresDnsSecValidation
-//native.TimeoutInterval
+    //native.NetworkServiceType = NSUrlRequestNetworkServiceType.Background
+    //native.RequiresDnsSecValidation
+    //native.TimeoutInterval
 
 )
 : HttpTransferRequest(
@@ -29,7 +27,5 @@ public record AppleHttpTransferRequest(
     LocalFilePath,
     UseMeteredConnection,
     BodyContent,
-    HttpMethod,
-    FileFormDataName,
     Headers
 );

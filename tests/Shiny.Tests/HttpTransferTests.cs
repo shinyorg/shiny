@@ -198,9 +198,11 @@ public class HttpTransferTests : AbstractShinyTests
             {
                 { "Test", "Test" }
             },
-            HttpContent: content,
-            HttpMethod: includeBody ? "POST" : "GET"
-        ));
+            HttpContent: content
+        )
+        {
+            HttpMethod = includeBody ? "POST" : "GET"
+        });
         await tcs.Task.ConfigureAwait(false);
     }
 
