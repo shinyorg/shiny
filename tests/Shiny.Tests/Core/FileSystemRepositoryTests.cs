@@ -28,6 +28,29 @@ public class FileSystemRepositoryTests : AbstractShinyTests
     }
 
 
+    [Fact(DisplayName = "Repository - Count Watcher")]
+    public void CountWatcherTest()
+    {
+        var repo = this.GetService<IRepository>();
+        var count = 0;
+        var tester = new RepoTest(Guid.NewGuid().ToString(), "Test1");
+
+        using var sub = repo.CreateCountWatcher<RepoTest>().Subscribe(x => count = x);
+        count.Should().Be(0);
+        repo.Set(tester);
+
+        count.Should().Be(1);
+        repo.Remove(tester);
+        count.Should().Be(0);
+
+        repo.Set(tester);
+        count.Should().Be(1);
+        repo.Clear<RepoTest>();
+
+        count.Should().Be(0);
+    }
+
+
     [Fact(DisplayName = "Repository - Inserts")]
     public void InsertTest()
     {
