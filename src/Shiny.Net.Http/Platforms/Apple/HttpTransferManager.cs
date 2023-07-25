@@ -39,32 +39,45 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.repository = repository;
         this.platform = platform;
         this.services = services;
-
-        var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
-        if (config.HttpMaximumConnectionsPerHost != null)
-            cfg.HttpMaximumConnectionsPerHost = config.HttpMaximumConnectionsPerHost.Value;
-
-        if (config.CachePolicy != null)
-            cfg.RequestCachePolicy = config.CachePolicy.Value;
-
-        if (config.HttpShouldUsePipelining != null)
-            cfg.HttpShouldUsePipelining = config.HttpShouldUsePipelining.Value;
-
-        cfg.AllowsCellularAccess = config.AllowsCellularAccess;
-        cfg.AllowsConstrainedNetworkAccess = config.AllowsConstrainedNetworkAccess;
-        cfg.AllowsExpensiveNetworkAccess = config.AllowsExpensiveNetworkAccess;
-
-        cfg.SessionSendsLaunchEvents = true;
-        //cfg.SharedContainerIdentifier
-        //cfg.ShouldUseExtendedBackgroundIdleMode
-        //cfg.WaitsForConnectivity
-
-        this.Session = NSUrlSession.FromConfiguration(cfg, this, new NSOperationQueue());
-        //this.Session.CreateDownloadTaskFromResumeData
+        this.Config = config;
     }
 
 
-    public NSUrlSession Session { get; } // TODO: when session completes/invalidates - we may need to be able to create new one
+    public AppleConfiguration Config { get; }
+
+
+    NSUrlSession? nsUrlSession;
+    public NSUrlSession Session
+    {
+        get
+        {
+            if (this.nsUrlSession == null)
+            {
+                var config = this.Config;
+                var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
+                if (config.HttpMaximumConnectionsPerHost != null)
+                    cfg.HttpMaximumConnectionsPerHost = config.HttpMaximumConnectionsPerHost.Value;
+
+                if (config.CachePolicy != null)
+                    cfg.RequestCachePolicy = config.CachePolicy.Value;
+
+                if (config.HttpShouldUsePipelining != null)
+                    cfg.HttpShouldUsePipelining = config.HttpShouldUsePipelining.Value;
+
+                cfg.AllowsCellularAccess = config.AllowsCellularAccess;
+                cfg.AllowsConstrainedNetworkAccess = config.AllowsConstrainedNetworkAccess;
+                cfg.AllowsExpensiveNetworkAccess = config.AllowsExpensiveNetworkAccess;
+
+                cfg.SessionSendsLaunchEvents = true;
+                //cfg.SharedContainerIdentifier
+                //cfg.ShouldUseExtendedBackgroundIdleMode
+                //cfg.WaitsForConnectivity
+
+                this.nsUrlSession = NSUrlSession.FromConfiguration(cfg, this, new NSOperationQueue());
+            }
+            return this.nsUrlSession!;
+        }
+    } // TODO: when session completes/invalidates - we may need to be able to create new one
 
 
     public Task<IList<HttpTransfer>> GetTransfers()
@@ -83,7 +96,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             this.repository.Insert(transfer);
 
             NSUrlSessionTask task;
-            
 
             if (request.IsUpload)
             {
@@ -118,9 +130,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
         if (task != null)
             task.Cancel();
-
-        var transfer = this.repository.Get<HttpTransfer>(identifier);
-        this.CancelItem(transfer);
     }
 
 
@@ -129,27 +138,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         var tasks = await this.Session.GetAllTasksAsync();
         foreach (var task in tasks)
             task.Cancel();
-
-        var all = this.repository.GetList<HttpTransfer>();
-        foreach (var transfer in all)
-            this.CancelItem(transfer);
-    }
-
-
-    void CancelItem(HttpTransfer? transfer)
-    {
-        if (transfer == null)
-            return;
-
-        // we fire observable for cancellation here, but not the delegate
-        // cancellation must be triggered by user code and are not triggered by the lib code
-        this.repository.Remove(transfer);
-        this.transferSubj.OnNext(new HttpTransferResult(
-            transfer.Request,
-            HttpTransferState.Canceled,
-            new(0, 0, 0),
-            null
-        ));
     }
 
 
@@ -226,59 +214,102 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         }
 
         this.logger.LogDebug("DidCompleteWithError: " + task.State);
-        var remove = false;
-        Exception? exception = null;
-                
-        if (error != null)
-            exception = new InvalidOperationException(error.LocalizedDescription);
-
         switch (task.State)
         {
             case NSUrlSessionTaskState.Suspended:
                 ht = ht with { Status = HttpTransferState.Paused };
-                this.repository.Set(ht);
+                this.repository.Update(ht);
+
+                this.transferSubj.OnNext(new HttpTransferResult(
+                    ht.Request,
+                    ht.Status,
+                    new(0, 0, 0),
+                    null
+                ));
                 break;
 
-            
             case NSUrlSessionTaskState.Canceling:
-                this.logger.LogInformation($"Transfer {ht.Identifier} was canceled");
-                ht = ht with { Status = HttpTransferState.Canceled };
-                remove = true;
+                this.OnCancel(ht);
                 break;
 
             case NSUrlSessionTaskState.Completed:
             default:
-                remove = true; // TODO: cancelling - downloads & uploads will complete with error - wrong
-                if (exception != null)
+                var statusCode = task.GetStatusCode();
+
+                if (task.Error != null)
                 {
-                    this.logger.LogError(exception, $"Transfer {ht.Identifier} was completed with error");
-                    ht = ht with { Status = HttpTransferState.Error };
-                    await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, exception), this.logger);
+                    if (task.IsCancelled())
+                    {
+                        this.OnCancel(ht);
+                    }
+                    else
+                    {
+                        var e = task.Error;
+                        var msg = $"HTTP Transfer Error - {e?.LocalizedDescription} - {e?.LocalizedFailureReason}";
+                        this.OnError(ht, new InvalidOperationException(msg));
+                    }
+                }
+                else if (statusCode < 200 || statusCode > 299)
+                {
+                    this.OnError(ht, new InvalidOperationException("HTTP Transfer Error - Invalid Status Code: " + statusCode));
                 }
                 else if (ht.Request.IsUpload)
                 {
-                    this.logger.LogInformation($"Transfer Upload {ht.Identifier} was completed");
-                    ht = ht with { Status = HttpTransferState.Completed };
-                    await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), this.logger);
+                    // If download, let DidFinishDownloading call this
+                    this.logger.LogInformation($"Transfer {ht.Identifier} was completed");
+                    this.OnFinish(ht);
                 }
-                else
-                {
-                    // DidFinishDownloading will fire for download success completion
-                    remove = false;
-                }                
                 break;
         }
+    }
 
-        if (remove)
-        {
-            this.repository.Remove<HttpTransfer>(ht.Identifier);
-            this.TryDeleteUploadTempFile(ht);
-        }
+
+    void Remove(HttpTransfer ht)
+    {
+        this.repository.Remove(ht);
+        this.TryDeleteUploadTempFile(ht);
+    }
+
+
+    async void OnError(HttpTransfer ht, Exception ex)
+    {
+        this.logger.LogError(ex, $"Transfer {ht.Identifier} was completed with error");
+        this.Remove(ht);
+
+        await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, ex), this.logger);
         this.transferSubj.OnNext(new HttpTransferResult(
             ht.Request,
-            ht.Status,
+            HttpTransferState.Error,
+            new (0, 0, 0),
+            ex
+        ));
+    }
+
+
+    void OnCancel(HttpTransfer ht)
+    {
+        this.logger.LogInformation($"Transfer {ht.Identifier} was canceled");
+        this.Remove(ht);
+
+        this.transferSubj.OnNext(new HttpTransferResult(
+            ht.Request,
+            HttpTransferState.Canceled,
             new(0, 0, 0),
-            exception
+            null
+        ));
+    }
+
+
+    async void OnFinish(HttpTransfer ht)
+    {
+        this.Remove(ht);
+        await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), this.logger);
+
+        this.transferSubj.OnNext(new(
+            ht.Request,
+            HttpTransferState.Completed,
+            new(0, 0, 0),
+            null
         ));
     }
 
@@ -302,14 +333,22 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 BytesTransferred = totalBytesSent,
                 Status = HttpTransferState.InProgress
             };
-            this.repository.Update(ht);
-            var bps = (int)(task.Progress?.Throughput ?? 0);
-            this.transferSubj.OnNext(new HttpTransferResult(
-                ht.Request,
-                ht.Status,
-                new(bps, totalBytesExpectedToSend, totalBytesSent),
-                null
-            ));
+
+            try
+            {
+                this.repository.Update(ht);
+                var bps = (int)(task.Progress?.Throughput ?? 0);
+                this.transferSubj.OnNext(new HttpTransferResult(
+                    ht.Request,
+                    ht.Status,
+                    new(bps, totalBytesExpectedToSend, totalBytesSent),
+                    null
+                ));
+            }
+            catch (RepositoryException) 
+            {
+                // ignore
+            }
         }
     }
 
@@ -332,45 +371,43 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 BytesTransferred = totalBytesWritten,
                 Status = HttpTransferState.InProgress
             };
-            this.repository.Update(ht);
-            var bps = (int)(downloadTask.Progress?.Throughput ?? 0);
 
-            this.transferSubj.OnNext(new HttpTransferResult(
-                ht.Request,
-                ht.Status,
-                new(bps, totalBytesExpectedToWrite, totalBytesWritten),
-                null
-            ));
+            try
+            {
+                this.repository.Update(ht);
+                var bps = (int)(downloadTask.Progress?.Throughput ?? 0);
+
+                this.transferSubj.OnNext(new HttpTransferResult(
+                    ht.Request,
+                    ht.Status,
+                    new(bps, totalBytesExpectedToWrite, totalBytesWritten),
+                    null
+                ));
+            }
+            catch (RepositoryException)
+            {
+            }
         }
     }
 
 
-    public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
+    public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
     {
-        var id = downloadTask.TaskDescription!;
-        var transfer = this.repository.Get<HttpTransfer>(id);
+        if (downloadTask.HasError())
+            return;
 
-        if (transfer == null)
+        var id = downloadTask.TaskDescription!;
+        var ht = this.repository.Get<HttpTransfer>(id);
+
+        if (ht == null)
         {
             this.logger.NoTransferFound(id);
         }
         else
         {
             this.logger.StateMethod(id);
-            File.Copy(location.Path!, transfer.Request.LocalFilePath, true);
-            this.repository.Remove<HttpTransfer>(transfer.Identifier);
-
-            await this.services.RunDelegates<IHttpTransferDelegate>(
-                x => x.OnCompleted(transfer.Request),
-                this.logger
-            );
-
-            this.transferSubj.OnNext(new(
-                transfer.Request,
-                HttpTransferState.Completed,
-                new(0, 0, 0),
-                null
-            ));
+            File.Copy(location.Path!, ht.Request.LocalFilePath, true);
+            this.OnFinish(ht);
         }
     }
 

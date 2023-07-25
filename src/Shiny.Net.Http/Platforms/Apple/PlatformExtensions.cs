@@ -21,6 +21,29 @@ static class PlatformExtensions
         => stream.Write(Encoding.Default.GetBytes("\r\n"));
 
 
+    public static bool HasError(this NSUrlSessionTask task)
+    {
+        if (task.Error != null)
+            return true;
+
+        var statusCode = task.GetStatusCode();
+        return statusCode < 200 || statusCode > 299;
+    }
+
+
+    public static bool IsCancelled(this NSUrlSessionTask task)
+    {
+        if (task.State == NSUrlSessionTaskState.Canceling)
+            return true;
+
+        return (task.Error?.Code ?? 0) == -999;
+    }
+
+
+    public static int GetStatusCode(this NSUrlSessionTask task)
+        => (int)((task.Response as NSHttpUrlResponse)?.StatusCode ?? 0);
+
+
     public static NSMutableUrlRequest ToNative(this HttpTransferRequest request)
     {
         var url = NSUrl.FromString(request.Uri)!;
@@ -54,17 +77,17 @@ static class PlatformExtensions
     }
 
 
-    public static HttpTransferState GetStatus(this NSUrlSessionTask task) => task.State switch
-    {
-        NSUrlSessionTaskState.Canceling => HttpTransferState.Canceled,
-        NSUrlSessionTaskState.Completed => HttpTransferState.Completed,
-        NSUrlSessionTaskState.Running => task.BytesSent > 0 || task.BytesReceived > 0
-            ? HttpTransferState.InProgress
-            : HttpTransferState.Pending,
+    //public static HttpTransferState GetStatus(this NSUrlSessionTask task) => task.State switch
+    //{
+    //    NSUrlSessionTaskState.Canceling => HttpTransferState.Canceled,
+    //    NSUrlSessionTaskState.Completed => HttpTransferState.Completed,
+    //    NSUrlSessionTaskState.Running => task.BytesSent > 0 || task.BytesReceived > 0
+    //        ? HttpTransferState.InProgress
+    //        : HttpTransferState.Pending,
 
-        NSUrlSessionTaskState.Suspended => HttpTransferState.Paused,
-        _ => HttpTransferState.Unknown
-    };
+    //    NSUrlSessionTaskState.Suspended => HttpTransferState.Paused,
+    //    _ => HttpTransferState.Unknown
+    //};
 
 
     public static string GetUploadTempFilePath(this IPlatform platform, HttpTransferRequest request)
