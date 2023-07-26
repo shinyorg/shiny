@@ -13,6 +13,7 @@ public class ListViewModel : ViewModel
     {
         this.jobManager = jobManager;
         this.Create = this.Navigation.Command("JobsCreate");
+        this.RunningJobs = this.jobManager.RunningJobs;
 
         this.LoadJobs = ReactiveCommand.Create(() =>
             this.Jobs = jobManager.GetJobs()
@@ -54,6 +55,7 @@ public class ListViewModel : ViewModel
     public ICommand Create { get; }
 
     [Reactive] public IList<JobInfo> Jobs { get; private set; }
+    [Reactive] public INotifyReadOnlyCollection<JobInfo> RunningJobs { get; private set; }
     [Reactive] public string RunningText { get; private set; }
     [Reactive] public JobInfo? SelectedJob { get; set; }
 

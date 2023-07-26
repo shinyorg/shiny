@@ -35,6 +35,12 @@ public interface IJobManager
 
 
     /// <summary>
+    /// List of jobs currently running
+    /// </summary>
+    INotifyReadOnlyCollection<JobInfo> RunningJobs { get; }
+
+
+    /// <summary>
     /// Requests/ensures appropriate platform permissions where necessary
     /// </summary>
     /// <returns></returns>
@@ -57,6 +63,22 @@ public interface IJobManager
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default);
+    
+    
+    /// <summary>
+    /// Checks to see if a job is currently running
+    /// </summary>
+    /// <param name="jobIdentifier"></param>
+    /// <returns></returns>
+    bool IsJobRunning(string jobIdentifier);
+
+
+    /// <summary>
+    /// Checks to see if a job is currently running
+    /// </summary>
+    /// <param name="jobInfo"></param>
+    /// <returns></returns>
+    bool IsJobRunning(JobInfo jobInfo);
 
 
     /// <summary>

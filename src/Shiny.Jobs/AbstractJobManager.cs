@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ public abstract class AbstractJobManager : IJobManager
 {
     readonly Subject<JobRunResult> jobFinished = new();
     readonly Subject<JobInfo> jobStarted = new();
+    readonly ObservableList<JobInfo> runningJobs = new();
+    readonly CompositeDisposable disposables = new();
     readonly IRepository repository;
     readonly IObjectStoreBinder storeBinder;
     readonly IServiceProvider container;
@@ -33,6 +36,14 @@ public abstract class AbstractJobManager : IJobManager
         this.repository = repository;
         this.storeBinder = storeBinder;
         this.Log = logger;
+
+        this.disposables.Add(this.JobStarted
+            .Subscribe(job => this.runningJobs.Add(job))
+         );
+
+        this.disposables.Add(this.JobFinished
+            .Subscribe(jobResult => this.runningJobs.Remove(jobResult.Job))
+         );
     }
 
 
@@ -68,7 +79,10 @@ public abstract class AbstractJobManager : IJobManager
             if (job == null)
                 throw new ArgumentException("No job found named " + jobName);
 
-            result = await this.RunJob(job, cancelToken).ConfigureAwait(false);
+            if (this.IsJobRunning(job))
+                result = new JobRunResult(actual, new Exception("Job is already running"));
+            else
+                result = await this.RunJob(job, cancelToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -78,6 +92,21 @@ public abstract class AbstractJobManager : IJobManager
 
         return result;
     }
+
+
+    public bool IsJobRunning(string jobIdentifier)
+    {
+        var jobInfo = this.GetJob(jobIdentifier);
+
+        if (jobInfo is null)
+            return false;
+
+        return this.runningJobs.Contains(jobInfo);
+    }
+
+
+    public bool IsJobRunning(JobInfo jobInfo)
+        => this.runningJobs.Contains(jobInfo);
 
 
     public IList<JobInfo> GetJobs()
@@ -93,8 +122,7 @@ public abstract class AbstractJobManager : IJobManager
         var job = this.repository.Get<JobInfo>(jobIdentifier);
         if (job != null)
         {
-            this.CancelNative(job);
-            this.repository.Remove<JobInfo>(jobIdentifier);
+            this.CancelJob(job);
         }
     }
 
@@ -116,6 +144,7 @@ public abstract class AbstractJobManager : IJobManager
     {
         this.CancelNative(job);
         this.repository.Remove<JobInfo>(job.Identifier);
+        this.runningJobs.Remove(job);
     }
 
 
@@ -123,6 +152,7 @@ public abstract class AbstractJobManager : IJobManager
     public TimeSpan? MinimumAllowedPeriodicTime { get; }
     public IObservable<JobInfo> JobStarted => this.jobStarted;
     public IObservable<JobRunResult> JobFinished => this.jobFinished;
+    public INotifyReadOnlyCollection<JobInfo> RunningJobs => this.runningJobs;
 
 
     public void Register(JobInfo jobInfo)
