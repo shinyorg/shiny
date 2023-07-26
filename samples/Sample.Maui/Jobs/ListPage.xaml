@@ -12,10 +12,14 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <Grid RowDefinitions="*, Auto, Auto, Auto">
+        <Grid RowDefinitions="Auto, *, Auto, *, Auto, Auto, Auto">
+            <Label Text="Registered Jobs:"
+                   FontSize="Title"
+                   Grid.Row="0"/>
+
             <RefreshView IsRefreshing="{Binding IsBusy}"
                          Command="{Binding LoadJobs}"
-                         Grid.Row="0">
+                         Grid.Row="1">
                 <CollectionView ItemsSource="{Binding Jobs}"
                                 SelectedItem="{Binding SelectedJob}"
                                 SelectionMode="Single">
@@ -36,18 +40,41 @@
                 </CollectionView>
             </RefreshView>
 
+            <Label Text="Running Jobs:"
+                   FontSize="Title"
+                   Grid.Row="2"/>
+
+            <CollectionView ItemsSource="{Binding RunningJobs}"
+                            SelectionMode="None"
+                            Grid.Row="3">
+
+                <CollectionView.EmptyView>
+                    <Label Text="No Running Jobs"
+                            Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="shiny:JobInfo">
+                        <StackLayout>
+                            <Label Text="{Binding Identifier}" FontSize="Large" />
+                            <BoxView Style="{StaticResource HR}"/>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
             <Label Text="{Binding RunningText}"
                    HorizontalOptions="CenterAndExpand"
                    HorizontalTextAlignment="Center"
-                   Grid.Row="1" />
+                   Grid.Row="4" />
 
             <Button Text="Cancel All Jobs"
                     Command="{Binding CancelAllJobs}"
-                    Grid.Row="2" />
+                    Grid.Row="5" />
 
             <Button Text="Run All Jobs"
                     Command="{Binding RunAllJobs}"
-                    Grid.Row="3" />
+                    Grid.Row="6" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>
