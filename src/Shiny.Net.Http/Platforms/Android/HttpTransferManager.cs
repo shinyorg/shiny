@@ -49,6 +49,12 @@ public class HttpTransferManager : IHttpTransferManager
             DateTimeOffset.UtcNow
         );
         this.repository.Insert(transfer);
+
+        // Run job if it is not already running
+        this.jobManager
+            .RunJobAsTask(typeof(TransferJob).FullName)
+            .Forget();
+            
         return transfer;
     }
 
