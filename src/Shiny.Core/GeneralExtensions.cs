@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Shiny;
 
@@ -191,5 +192,32 @@ public static class GeneralExtensions
         Array.Copy(array, newArray, array.Length);
         Array.Copy(items, 0, newArray, array.Length, items.Length);
         return newArray;
+    }
+
+
+    /// <summary>
+    /// Observes the task to avoid the UnobservedTaskException event to be raised.
+    /// </summary>
+    public static void Forget(this Task task)
+    {
+        // Note: this code is inspired by a tweet from Ben Adams: https://twitter.com/ben_a_adams/status/1045060828700037125
+        // Only care about tasks that may fault (not completed) or are faulted,
+        // so fast-path for SuccessfullyCompleted and Cancelled tasks.
+        if (!task.IsCompleted || task.IsFaulted)
+        {
+            _ = ForgetAwaited(task);
+        }
+
+        async static Task ForgetAwaited(Task task)
+        {
+            try
+            {
+                await task.ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
