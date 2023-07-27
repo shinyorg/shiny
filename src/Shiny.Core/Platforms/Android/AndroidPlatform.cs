@@ -79,12 +79,13 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     public const string ActionServiceStart = "ACTION_START_FOREGROUND_SERVICE";
     public const string ActionServiceStop = "ACTION_STOP_FOREGROUND_SERVICE";
 
-    public void StartService(Type serviceType)
+    public void StartService(Type serviceType, bool stopWithTask = false)
     {
         var intent = new Intent(this.AppContext, serviceType);
         if (OperatingSystemShim.IsAndroidVersionAtLeast(26) && this.IsShinyForegroundService(serviceType))
         {
             intent.SetAction(ActionServiceStart);
+            intent.PutExtra("StopWithTask", stopWithTask);
             this.AppContext.StartForegroundService(intent);
         }
         else

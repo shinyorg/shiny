@@ -141,7 +141,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         (await this.RequestAccess(request)).Assert(allowRestricted: true);
 
         if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
-            this.Platform.StartService(typeof(ShinyGpsService));
+            this.Platform.StartService(typeof(ShinyGpsService), android.StopForegroundServiceWithTask);
 
         await this.RequestLocationUpdates(request);
         this.CurrentSettings = android;
