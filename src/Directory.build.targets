@@ -41,6 +41,7 @@
     <!--
     <ItemGroup Condition="'$(IsWebAssembly)' == 'true'">
         <Compile Include="Platforms\WebAssembly\**\*.cs" />
+        <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="7.0.5" />
         <WasmExtraFilesToDeploy Include="Platforms\WebAssembly\*.css" />
 		<WasmExtraFilesToDeploy Include="Platforms\WebAssembly\*.js" />
 	</ItemGroup>
