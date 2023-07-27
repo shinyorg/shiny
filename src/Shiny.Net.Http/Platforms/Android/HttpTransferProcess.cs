@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -12,13 +11,12 @@ using System.Threading.Tasks;
 using Android.App;
 using AndroidX.Core.App;
 using Microsoft.Extensions.Logging;
-using Shiny.Jobs;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Net.Http;
 
 
-public class TransferJob : IJob
+public class HttpTransferProcess
 {
     const int NOTIFICATION_ID = 222222;
     readonly NotificationManagerCompat notifications;
@@ -30,8 +28,8 @@ public class TransferJob : IJob
     readonly IRepository repository;
     readonly IEnumerable<IHttpTransferDelegate> delegates;
 
-    public TransferJob(
-        ILogger<TransferJob> logger,
+    public HttpTransferProcess(
+        ILogger<HttpTransferProcess> logger,
         AndroidPlatform platform,
         IRepository repository,
         IConnectivity connectivity,
@@ -51,7 +49,7 @@ public class TransferJob : IJob
     public static IObservable<HttpTransferResult> WhenProgress() => progressSubj;
 
 
-    public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
+    async Task Run(CancellationToken cancelToken)
     {
         var requests = this.repository.GetList<HttpTransfer>();
         if (requests.Count == 0)
@@ -147,9 +145,8 @@ public class TransferJob : IJob
             }
             catch (Exception ex)
             {
-                // TODO: error log?
                 this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
-                this.logger.StandardInfo(activeTransfer!.Identifier, "There was an isssue processing request");
+                this.logger.LogError(ex, "There was an error processing transfer: " + activeTransfer?.Identifier);
             }
             activeTransfer = this.repository
                 .GetList<HttpTransfer>()
@@ -233,7 +230,7 @@ public class TransferJob : IJob
                     progressSubj.OnNext(new HttpTransferResult(
                         request,
                         HttpTransferState.Error,
-                        new TransferProgress(0, 0, 0),
+                        TransferProgress.Empty,
                         ex
                     ));
                 }

@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<HttpTransferMonitor>();
         
 #if ANDROID
-        services.AddJob(typeof(TransferJob), requiredNetwork: Jobs.InternetAccess.Any, runInForeground: true);
+        services.AddSingleton<HttpTransferProcess>();
 #else
         services.AddSingleton(config ?? new AppleConfiguration());
 #endif

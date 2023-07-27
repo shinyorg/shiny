@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using System.Web;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
@@ -16,9 +17,10 @@ namespace Shiny.Net.Http;
 
 public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                                    IHttpTransferManager,
+                                   IShinyStartupTask,
                                    IIosLifecycle.IHandleEventsForBackgroundUrl
 {
-    const string SessionName = "Shiny";
+    public static string SessionName = $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
     Action? completionHandler;
 
     readonly ILogger logger;
@@ -42,6 +44,20 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.Config = config;
     }
 
+
+    public async void Start()
+    {
+        try
+        {
+            var tasks = await this.Session.GetAllTasksAsync();
+            foreach (var task in tasks)
+                task.Resume();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Error auto-starting HTTP Transfers");
+        }
+    }
 
     public AppleConfiguration Config { get; }
 
@@ -77,7 +93,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             }
             return this.nsUrlSession!;
         }
-    } // TODO: when session completes/invalidates - we may need to be able to create new one
+    }
 
 
     public Task<IList<HttpTransfer>> GetTransfers()
@@ -141,6 +157,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
+    public IObservable<int> WatchCount() => this.repository.CreateCountWatcher<HttpTransfer>();
+
     readonly Subject<HttpTransferResult> transferSubj = new();
     public IObservable<HttpTransferResult> WhenUpdateReceived() => this.transferSubj;
 
@@ -160,6 +178,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     {
         this.logger.LogDebug($"DidBecomeInvalid");
         //this.manager.CompleteSession(); // TODO: restart session?
+        this.nsUrlSession = null;
+
         if (error != null)
             this.logger.LogError(new InvalidOperationException(error.LocalizedDescription), "DidBecomeInvalid reported an error");
     }
@@ -204,7 +224,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
 
-    public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError? error)
+    public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError? error)
     {
         var ht = this.repository.Get<HttpTransfer>(task.TaskDescription!);
         if (ht == null)
@@ -223,7 +243,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 this.transferSubj.OnNext(new HttpTransferResult(
                     ht.Request,
                     ht.Status,
-                    new(0, 0, 0),
+                    TransferProgress.Empty,
                     null
                 ));
                 break;
@@ -280,7 +300,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.transferSubj.OnNext(new HttpTransferResult(
             ht.Request,
             HttpTransferState.Error,
-            new (0, 0, 0),
+            TransferProgress.Empty,
             ex
         ));
     }
@@ -294,7 +314,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.transferSubj.OnNext(new HttpTransferResult(
             ht.Request,
             HttpTransferState.Canceled,
-            new(0, 0, 0),
+            TransferProgress.Empty,
             null
         ));
     }
@@ -308,7 +328,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.transferSubj.OnNext(new(
             ht.Request,
             HttpTransferState.Completed,
-            new(0, 0, 0),
+            TransferProgress.Empty,
             null
         ));
     }
@@ -386,6 +406,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             }
             catch (RepositoryException)
             {
+                // ignore
             }
         }
     }
@@ -441,6 +462,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             fs.WriteString("--" + boundary);
 
             // TODO: escape/encode filename - add utf-8 version
+            //fileName = HttpUtility.UrlEncode(fileName);
             fs.WriteString($"Content-Disposition: form-data; name={request.FileFormDataName}; filename={fileName}");
             fs.WriteLine();
             using (var uploadFile = File.OpenRead(request.LocalFilePath))

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Shiny.Jobs;
+using Android;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Net.Http;
@@ -10,16 +11,16 @@ namespace Shiny.Net.Http;
 
 public class HttpTransferManager : IHttpTransferManager
 {
-    readonly IJobManager jobManager;
+    readonly AndroidPlatform platform;
     readonly IRepository repository;
 
 
     public HttpTransferManager(
-        IJobManager jobManager,
+        AndroidPlatform platform,
         IRepository repository
     )
     {
-        this.jobManager = jobManager;
+        this.platform = platform;
         this.repository = repository;
     }
 
@@ -33,7 +34,7 @@ public class HttpTransferManager : IHttpTransferManager
 
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
-        (await this.jobManager.RequestAccess()).Assert();
+        (await this.platform.RequestAccess(Manifest.Permission.ForegroundService)).Assert();
         request.AssertValid();
 
         // this will trigger over to the job if it is running
@@ -49,6 +50,8 @@ public class HttpTransferManager : IHttpTransferManager
             DateTimeOffset.UtcNow
         );
         this.repository.Insert(transfer);
+
+        // TODO: start foreground if not started
         return transfer;
     }
 
@@ -57,6 +60,9 @@ public class HttpTransferManager : IHttpTransferManager
     {
         // this will trigger over to the job if it is running
         this.repository.Remove<HttpTransfer>(identifier);
+
+        // TODO: stop foreground if no other transfers?
+            // TODO: foreground will do it, itself
         return Task.CompletedTask;
     }
 
@@ -66,8 +72,12 @@ public class HttpTransferManager : IHttpTransferManager
         // this will trigger over to the job if it is running
         this.repository.Clear<HttpTransfer>();
         return Task.CompletedTask;
+
+        // TODO: stop foreground
+        // TODO: foreground will do it, itself
     }
 
 
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => TransferJob.WhenProgress();
+    public IObservable<int> WatchCount() => this.repository.CreateCountWatcher<HttpTransfer>();
+    public IObservable<HttpTransferResult> WhenUpdateReceived() => HttpTransferProcess.WhenProgress();
 }

@@ -12,5 +12,6 @@ public interface IHttpTransferManager
     Task Cancel(string identifier);
     Task CancelAll();
 
+    IObservable<int> WatchCount();
     IObservable<HttpTransferResult> WhenUpdateReceived();
 }

@@ -62,6 +62,8 @@ public record TransferProgress(
     long BytesTransferred
 )
 {
+    public static TransferProgress Empty { get; } = new(0, 0, 0);
+
     public bool IsDeterministic => this.BytesToTransfer != null;
 
 
