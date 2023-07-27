@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -15,29 +14,27 @@ using Shiny.Hosting;
 namespace Shiny;
 
 
-public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Service
+public abstract class ShinyAndroidForegroundService : Service
 {
+    public static string NotificationChannelId { get; set; } = "Service";
     static int idCount = 7999;
     int? notificationId;
 
-    protected T Resolve<T>() => Host.Current.Services.GetRequiredService<T>()!;
-    protected IEnumerable<T> ResolveAll<T>() => Host.Current.Services.GetServices<T>();
+    protected T GetService<T>() => Host.GetService<T>()!;
+    protected IEnumerable<T> GetServices<T>() => Host.ServiceProvider.GetServices<T>();
     protected CompositeDisposable? DestroyWith { get; private set; }
     protected NotificationManagerCompat? NotificationManager { get; private set; }
+    protected bool StopWithTask { get; private set; }
 
     protected abstract void OnStart(Intent? intent);
     protected abstract void OnStop();
 
-    protected TService? Service { get; private set; }
-    protected IList<TDelegate>? Delegates { get; private set; }
-
 
     ILogger? logger;
-    protected ILogger Logger => this.logger ??= Host.Current.Logging.CreateLogger(this.GetType()!.AssemblyQualifiedName);
+    protected ILogger Logger => this.logger ??= Host.Current.Logging.CreateLogger(this.GetType()!.AssemblyQualifiedName!);
 
-
-    AndroidPlatform ? platform;
-    protected AndroidPlatform Platform => this.platform ??= this.Resolve<AndroidPlatform>();
+    AndroidPlatform? platform;
+    protected AndroidPlatform Platform => this.platform ??= this.GetService<AndroidPlatform>();
 
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
@@ -46,6 +43,7 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         switch (action)
         {
             case AndroidPlatform.ActionServiceStart:
+                this.StopWithTask = intent?.GetBooleanExtra("StopWithTask", false) ?? false;
                 this.Start(intent);
                 break;
 
@@ -59,27 +57,21 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
 
 
     public override IBinder? OnBind(Intent? intent) => null;
-    public static string NotificationChannelId { get; set; } = "Service";
+    public override void OnTaskRemoved(Intent? rootIntent)
+    {
+        if (this.StopWithTask)
+            this.Stop();
+    }
 
 
     protected virtual void Start(Intent? intent)
     {
         this.NotificationManager = NotificationManagerCompat.From(this.Platform.AppContext);
         this.DestroyWith = new CompositeDisposable();
-        this.Service = this.Resolve<TService>();
-        this.Delegates = this.ResolveAll<TDelegate>().ToList();
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
-        {
-            //this.Service
-            //    .WhenAnyProperty()
-            //    .Skip(1)
-            //    .Throttle(TimeSpan.FromMilliseconds(400))
-            //    .Subscribe(_ => this.SetNotification())
-            //    .DisposedBy(this.DestroyWith);
-
             this.SetNotification();
-        }
+
         this.OnStart(intent);
     }
 
@@ -107,7 +99,8 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
         try
         {
             this.EnsureChannel();
-            this.SendNotification();
+            this.builder = this.CreateNotificationBuilder();
+            this.SendNotification(this.builder);
         }
         catch (Exception ex)
         {
@@ -131,59 +124,58 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
     }
 
 
-    protected virtual void SendNotification()
+    protected virtual NotificationCompat.Builder CreateNotificationBuilder()
     {
-        this.builder ??= new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
+        var build = new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
             .SetSmallIcon(this.Platform.GetNotificationIconResource())
             .SetForegroundServiceBehavior((int)NotificationForegroundService.Immediate)
-            .SetOngoing(true);
-
-        this.builder
+            .SetOngoing(true)
             .SetTicker("...")
             .SetContentTitle("Shiny Service")
             .SetContentText("Shiny service is continuing to process data in the background");
 
-        this.Delegates
-            .OfType<IAndroidForegroundServiceDelegate>()
-            .ToList()
-            .ForEach(x => x.Configure(this.builder));
+        return build;
+    }
 
-        //this.builder
-        //    .SetProgress(
-        //        this.Service!.Total,
-        //        this.Service.Progress,
-        //        this.Service.IsIndeterministic
-        //    )
-        //    .SetContentTitle(this.Service.Title ?? "Shiny Service")
-        //    .SetTicker("..")
-        //    .SetContentText(this.Service.Message ?? "Shiny service is continuing to process data in the background");
 
+    protected virtual void SendNotification(NotificationCompat.Builder build)
+    {
         if (this.notificationId == null)
         {
             this.notificationId = ++idCount;
-            this.StartForeground(this.notificationId.Value, this.builder.Build());
+            this.StartForeground(this.notificationId.Value, build.Build());
         }
         else
         {
-            this.NotificationManager!.Notify(this.notificationId.Value, this.builder.Build());
+            this.NotificationManager!.Notify(this.notificationId.Value, build.Build());
         }
     }
 }
 
-//using System;
-//using System.ComponentModel;
 
-//namespace Shiny;
+public abstract class ShinyAndroidForegroundService<TService, TDelegate> : ShinyAndroidForegroundService
+{
+    protected TService Service { get; private set; } = default!;
+    protected IList<TDelegate> Delegates { get; private set; } = null!;
 
 
-//public interface IShinyForegroundManager : INotifyPropertyChanged
-//{
-//    string? Title { get; set; }
-//    string? Message { get; set; }
+    protected override void Start(Intent? intent)
+    {
+        this.Service = this.GetService<TService>();
+        this.Delegates = this.GetServices<TDelegate>().ToList();
 
-//    int Progress { get; set; }
-//    int Total { get; set; }
-//    bool IsIndeterministic { get; set; }
-//    //string? Channel { get; }
-//    //string? Ticker { get; }
-//}
+        base.Start(intent);
+    }
+
+
+    protected override NotificationCompat.Builder CreateNotificationBuilder()
+    {
+        var build = base.CreateNotificationBuilder();
+        this.Delegates!
+            .OfType<IAndroidForegroundServiceDelegate>()
+            .ToList()
+            .ForEach(x => x.Configure(build));
+
+        return build;
+    }
+}

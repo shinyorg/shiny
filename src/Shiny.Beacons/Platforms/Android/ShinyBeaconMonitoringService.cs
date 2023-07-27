@@ -18,7 +18,7 @@ public class ShinyBeaconMonitoringService : ShinyAndroidForegroundService<IBeaco
 
     protected override void OnStart(Intent? intent)
     {
-        this.backgroundTask = this.Resolve<BackgroundTask>();
+        this.backgroundTask = this.GetService<BackgroundTask>();
         this.backgroundTask.Run();
         IsStarted = true;
     }
