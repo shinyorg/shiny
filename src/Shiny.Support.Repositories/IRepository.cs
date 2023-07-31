@@ -83,5 +83,5 @@ public interface IRepository
     /// An observable for watching events within the repository
     /// </summary>
     /// <returns></returns>
-    IObservable<(RepositoryAction Action, Type EntityType, object? Entity)> WhenActionOccurs();
+    IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs();
 }

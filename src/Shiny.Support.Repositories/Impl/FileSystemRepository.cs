@@ -117,7 +117,7 @@ public class FileSystemRepository : IRepository
     public bool Remove<TEntity>(string key) where TEntity : IRepositoryEntity
     {
         var removed = false;
-        object? entity = null;
+        IRepositoryEntity? entity = null;
 
         this.InTransaction<TEntity>(list =>
         {
@@ -157,8 +157,8 @@ public class FileSystemRepository : IRepository
     }
 
 
-    readonly Subject<(RepositoryAction Action, Type EntityType, object? Entity)> repoSubj = new();
-    public IObservable<(RepositoryAction Action, Type EntityType, object? Entity)> WhenActionOccurs() => this.repoSubj;
+    readonly Subject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj = new();
+    public IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs() => this.repoSubj;
 
 
     FileInfo[] GetFiles<TEntity>() => this.rootDir.GetFiles($"{typeof(TEntity).Name}_*.shiny");
