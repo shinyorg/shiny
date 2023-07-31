@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Android;
 using Microsoft.Extensions.Logging;
@@ -83,7 +85,18 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     public Task Cancel(string identifier)
     {
         // this will trigger over to the foreground service which will shut itself down if there are no other transfers
-        this.repository.Remove<HttpTransfer>(identifier);
+        var transfer = this.repository.Get<HttpTransfer>(identifier);
+        if (transfer != null)
+        {
+            this.repository.Remove(transfer);
+
+            this.resultSubj.OnNext(new HttpTransferResult(
+                transfer.Request,
+                HttpTransferState.Canceled,
+                TransferProgress.Empty,
+                null
+            ));
+        }
         return Task.CompletedTask;
     }
 
@@ -97,5 +110,20 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
 
     public IObservable<int> WatchCount() => this.repository.CreateCountWatcher<HttpTransfer>();
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => HttpTransferProcess.WhenProgress();
+
+    readonly Subject<HttpTransferResult> resultSubj = new();
+    public IObservable<HttpTransferResult> WhenUpdateReceived() => Observable.Create<HttpTransferResult>(ob =>
+    {
+        var disposer = new CompositeDisposable();
+        this.resultSubj
+            .Subscribe(ob.OnNext)
+            .DisposedBy(disposer);
+
+        HttpTransferProcess
+            .WhenProgress()
+            .Subscribe(ob.OnNext)
+            .DisposedBy(disposer);
+
+        return disposer;
+    });
 }

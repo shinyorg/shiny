@@ -103,6 +103,8 @@ public static class HttpClientExtensions
             request.Headers.TryAddWithoutValidation(header.Name, header.Value);
 
         using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
         var contentLength = response.Content.Headers.ContentLength;
 
         using var source = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

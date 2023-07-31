@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -48,26 +49,28 @@ public class HttpTransferProcess
         this.disposer = new();
         CancellationTokenSource cancelSrc = null!;
 
+        var queue = new ConcurrentQueue<HttpTransfer>(this.repository
+            .GetList<HttpTransfer>()
+            .OrderBy(x => x.CreatedAt)
+            .ToList()
+        );
+
+        // TODO: costed network
         this.connectivity
             .WhenInternetStatusChanged()
-            .Subscribe(connected =>
+            .Where(x => x == true)
+            .Subscribe(_ =>
             {
                 // this will start with an event triggering everything
+                // current transfers will cancel themselves and set their state when connectivity drops
+                this.logger.LogDebug("Connectivity is restored - starting transfers");
                 cancelSrc = new();
-                if (connected)
+
+                this.TransferLoop(args, queue, cancelSrc.Token).ContinueWith(x =>
                 {
-                    this.logger.LogDebug("Connectivity is restored - starting transfers");
-                    this.TransferLoop(args, cancelSrc.Token).ContinueWith(x =>
-                    {
-                        if (x.Exception != null)
-                            this.logger.LogError(x.Exception, "Transfer loop failed");
-                    });
-                }
-                else
-                {
-                    this.logger.LogDebug("Connectivity is offline");
-                    cancelSrc.Cancel();
-                }
+                    if (x.Exception != null)
+                        this.logger.LogError(x.Exception, "Transfer loop failed");
+                });
             })
             .DisposedBy(this.disposer);
 
@@ -78,6 +81,10 @@ public class HttpTransferProcess
             {
                 switch (x.Action)
                 {
+                    case RepositoryAction.Add:
+                        queue.Enqueue((HttpTransfer)x.Entity!);
+                        break;
+
                     case RepositoryAction.Remove:
                         var transfers = this.repository.GetList<HttpTransfer>();
                         if (transfers.Count == 0)
@@ -88,6 +95,7 @@ public class HttpTransferProcess
                         }
                         else
                         {
+                            queue = new ConcurrentQueue<HttpTransfer>(transfers);
                             this.logger.LogInformation($"{transfers.Count} transfers remaining after remove");
                         }
                         break;
@@ -104,22 +112,13 @@ public class HttpTransferProcess
     }
 
 
-    HttpTransfer? GetNextTransfer() => this.repository
-        .GetList<HttpTransfer>()
-        .OrderBy(x => x.CreatedAt)
-        .FirstOrDefault();
 
-
-    async Task TransferLoop(HttpTransferProcessArgs args, CancellationToken cancelToken)
+    async Task TransferLoop(HttpTransferProcessArgs args, ConcurrentQueue<HttpTransfer> transfers, CancellationToken cancelToken)
     {
-        var transfer = this.GetNextTransfer();
-        while (transfer != null && !cancelToken.IsCancellationRequested)
-        {
+        while (transfers.TryDequeue(out var transfer) && this.connectivity.IsInternetAvailable() && !cancelToken.IsCancellationRequested)
+        { 
             this.UpdateTransferNotification(args, transfer);
             await this.RunTransfer(args, transfer, cancelToken).ConfigureAwait(false);
-
-            // TODO: if this was skipped, I can't keep getting same item otherwise this will loop indefinitely
-            transfer = this.GetNextTransfer();
         }
     }
 
@@ -143,29 +142,39 @@ public class HttpTransferProcess
             });
 
         using var connSub = this.connectivity
-            .WhenChanged()
-            .Where(x => x.Access != NetworkAccess.Internet)
-            .Subscribe(x =>
+            .WhenInternetStatusChanged()
+            .Where(x => !x)
+            .Subscribe(_ =>
             {
-                if (!x.IsInternetAvailable())
+                this.logger.StandardInfo(transfer.Identifier, "No network detected for transfers - pausing");
+                this.repository.Set(transfer with
                 {
-                    this.logger.StandardInfo(transfer.Identifier, "No network detected for transfers - pausing");
-                    this.repository.Set(transfer with
-                    {
-                        Status = HttpTransferState.PausedByNoNetwork
-                    });
-                }
-                else if (x.Access == NetworkAccess.ConstrainedInternet && transfer.Request.UseMeteredConnection)
-                {
-                    this.logger.StandardInfo(transfer.Identifier, "Costed network detected for active transfer - pausing");
-                    this.repository.Set(transfer with
-                    {
-                        Status = HttpTransferState.PausedByCostedNetwork
-                    });
-                    cancelSrc?.Cancel();
-                }
-                this.UpdateTransferNotification(args, transfer);
+                    Status = HttpTransferState.PausedByNoNetwork
+                });
             });
+        //using var connSub = this.connectivity
+        //    .WhenChanged()
+        //    .Subscribe(x =>
+        //    {
+        //        if (!x.IsInternetAvailable())
+        //        {
+        //            this.logger.StandardInfo(transfer.Identifier, "No network detected for transfers - pausing");
+        //            this.repository.Set(transfer with
+        //            {
+        //                Status = HttpTransferState.PausedByNoNetwork
+        //            });
+        //        }
+        //        else if (x.Access == NetworkAccess.ConstrainedInternet && transfer.Request.UseMeteredConnection)
+        //        {
+        //            this.logger.StandardInfo(transfer.Identifier, "Costed network detected for active transfer - pausing");
+        //            this.repository.Set(transfer with
+        //            {
+        //                Status = HttpTransferState.PausedByCostedNetwork
+        //            });
+        //            cancelSrc?.Cancel();
+        //        }
+        //        this.UpdateTransferNotification(args, transfer);
+        //    });
 
         try
         {
@@ -173,6 +182,7 @@ public class HttpTransferProcess
                 .DoRequest(args, transfer, cancelSrc.Token)
                 .ConfigureAwait(false);
 
+            this.logger.LogInformation("Completing Successful transfer: " + transfer.Identifier);
             await this.delegates
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
@@ -214,7 +224,7 @@ public class HttpTransferProcess
     void UpdateTransferNotification(HttpTransferProcessArgs args, HttpTransfer transfer)
     {
         var percentComplete = transfer.IsDeterministic ? Convert.ToInt32(transfer.PercentComplete()! * 100) : 0;
-        
+
         args.Builder.SetContentText("Processing Background Transfers");
         args.Builder.SetProgress(
             100,
@@ -224,7 +234,17 @@ public class HttpTransferProcess
         this.delegates
             .OfType<IAndroidHttpTransferDelegate>()
             .ToList()
-            .ForEach(x => x.ConfigureNotification(args.Builder, transfer));
+            .ForEach(x =>
+            {
+                try
+                {
+                    x.ConfigureNotification(args.Builder, transfer);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning(ex, $"Error updating notification on user delegate: {x.GetType().FullName}");
+                }
+            });
 
         args.SendNotification();
     }
@@ -279,6 +299,7 @@ public class HttpTransferProcess
                         BytesTransferred = x.BytesTransferred
                     });
 
+                    // TODO: log
                     if (x.IsDeterministic)
                     {
                         args.Builder.SetProgress(100, Convert.ToInt32(x.PercentComplete * 100), false);
@@ -293,8 +314,14 @@ public class HttpTransferProcess
                     ));
                 }
             },
-            ex => tcs.TrySetResult(ex),
-            () => tcs.TrySetResult(null!)
+            ex =>
+            {
+                tcs.TrySetException(ex);
+            },
+            () =>
+            {
+                tcs.TrySetResult(null!);
+            }
         );
 
         await tcs.Task.ConfigureAwait(false);

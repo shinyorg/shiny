@@ -77,7 +77,7 @@ public abstract class ShinyAndroidForegroundService : Service
     }
 
 
-    protected virtual void Stop()
+    protected void Stop()
     {
         if (this.DestroyWith == null)
             return;
@@ -101,7 +101,9 @@ public abstract class ShinyAndroidForegroundService : Service
         {
             this.EnsureChannel();
             this.Builder = this.CreateNotificationBuilder();
-            this.SendNotification(this.Builder);
+
+            this.notificationId = ++idCount;
+            this.StartForeground(this.notificationId.Value, this.Builder.Build());
         }
         catch (Exception ex)
         {
@@ -138,19 +140,6 @@ public abstract class ShinyAndroidForegroundService : Service
         return build;
     }
 
-
-    protected virtual void SendNotification(NotificationCompat.Builder build)
-    {
-        if (this.notificationId == null)
-        {
-            this.notificationId = ++idCount;
-            this.StartForeground(this.notificationId.Value, build.Build());
-        }
-        else
-        {
-            this.NotificationManager!.Notify(this.notificationId.Value, build.Build());
-        }
-    }
 }
 
 
