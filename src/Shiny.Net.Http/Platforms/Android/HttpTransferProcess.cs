@@ -8,8 +8,6 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Android.App;
-using AndroidX.Core.App;
 using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
 
@@ -18,146 +16,221 @@ namespace Shiny.Net.Http;
 
 public class HttpTransferProcess
 {
-    const int NOTIFICATION_ID = 222222;
-    readonly NotificationManagerCompat notifications;
     readonly HttpClient httpClient = new();
 
     readonly ILogger logger;
-    readonly AndroidPlatform platform;
     readonly IConnectivity connectivity;
     readonly IRepository repository;
     readonly IEnumerable<IHttpTransferDelegate> delegates;
 
+
     public HttpTransferProcess(
         ILogger<HttpTransferProcess> logger,
-        AndroidPlatform platform,
         IRepository repository,
         IConnectivity connectivity,
         IEnumerable<IHttpTransferDelegate> delegates
     )
     {
         this.logger = logger;
-        this.platform = platform;
         this.repository = repository;
         this.connectivity = connectivity;        
         this.delegates = delegates;
-        this.notifications = NotificationManagerCompat.From(platform.AppContext);
     }
 
 
     static readonly Subject<HttpTransferResult> progressSubj = new();
     public static IObservable<HttpTransferResult> WhenProgress() => progressSubj;
+    CompositeDisposable disposer = null!;
+    
 
-
-    async Task Run(CancellationToken cancelToken)
+    public void Run(HttpTransferProcessArgs args)
     {
-        var requests = this.repository.GetList<HttpTransfer>();
-        if (requests.Count == 0)
-            return;
+        this.disposer = new();
+        CancellationTokenSource cancelSrc = null!;
 
-        var cancelSrc = new CancellationTokenSource();
-        var disposer = new CompositeDisposable();
-        HttpTransfer? activeTransfer = null;
-
-        this.repository
-            .WhenActionOccurs()
-            .Where(x =>
-                x.EntityType == typeof(HttpTransfer) &&
-                (
-                    x.Action == RepositoryAction.Remove ||
-                    x.Action == RepositoryAction.Clear
-                )
-            )
-            .Subscribe(x =>
+        this.connectivity
+            .WhenInternetStatusChanged()
+            .Subscribe(connected =>
             {
-                if (x.Action == RepositoryAction.Clear)
+                // this will start with an event triggering everything
+                cancelSrc = new();
+                if (connected)
                 {
-                    this.logger.LogDebug("All HTTP Transfers have been cleared");
-                    cancelSrc?.Cancel();
+                    this.logger.LogDebug("Connectivity is restored - starting transfers");
+                    this.TransferLoop(args, cancelSrc.Token).ContinueWith(x =>
+                    {
+                        if (x.Exception != null)
+                            this.logger.LogError(x.Exception, "Transfer loop failed");
+                    });
                 }
                 else
                 {
-                    var transfer = (HttpTransfer)x.Entity!;
-                    if (transfer.Identifier == activeTransfer?.Identifier)
-                    {
-                        this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
-                        cancelSrc?.Cancel();
-                    }
+                    this.logger.LogDebug("Connectivity is offline");
+                    cancelSrc.Cancel();
                 }
-                // TODO: fire subject for cancel
             })
-            .DisposedBy(disposer);
+            .DisposedBy(this.disposer);
 
-        this.connectivity
+        this.repository
+            .WhenActionOccurs()
+            .Where(x => x.EntityType == typeof(HttpTransfer))
+            .Subscribe(x =>
+            {
+                switch (x.Action)
+                {
+                    case RepositoryAction.Remove:
+                        var transfers = this.repository.GetList<HttpTransfer>();
+                        if (transfers.Count == 0)
+                        {
+                            this.logger.LogInformation("All transfers completed - shutting down");
+                            this.disposer.Dispose();
+                            args.OnComplete();
+                        }
+                        else
+                        {
+                            this.logger.LogInformation($"{transfers.Count} transfers remaining after remove");
+                        }
+                        break;
+
+                    case RepositoryAction.Clear:
+                        this.logger.LogDebug("All HTTP Transfers have been cleared");
+                        cancelSrc?.Cancel();
+                        this.disposer.Dispose();
+                        args.OnComplete();
+                        break;
+                }
+            })
+            .DisposedBy(this.disposer);
+    }
+
+
+    HttpTransfer? GetNextTransfer() => this.repository
+        .GetList<HttpTransfer>()
+        .OrderBy(x => x.CreatedAt)
+        .FirstOrDefault();
+
+
+    async Task TransferLoop(HttpTransferProcessArgs args, CancellationToken cancelToken)
+    {
+        var transfer = this.GetNextTransfer();
+        while (transfer != null && !cancelToken.IsCancellationRequested)
+        {
+            this.UpdateTransferNotification(args, transfer);
+            await this.RunTransfer(args, transfer, cancelToken).ConfigureAwait(false);
+
+            // TODO: if this was skipped, I can't keep getting same item otherwise this will loop indefinitely
+            transfer = this.GetNextTransfer();
+        }
+    }
+
+
+    async Task RunTransfer(HttpTransferProcessArgs args, HttpTransfer transfer, CancellationToken cancelToken)
+    {
+        var cancelSrc = new CancellationTokenSource();
+        using var _ = cancelToken.Register(() => cancelSrc.Cancel());
+
+        using var repoSub = this.repository
+            .WhenActionOccurs()
+            .Where(x =>
+                x.EntityType == typeof(HttpTransfer) &&
+                x.Action == RepositoryAction.Remove &&
+                transfer.Identifier.Equals(x.Entity!.Identifier)
+            )
+            .Subscribe(x =>
+            {
+                this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
+                cancelSrc?.Cancel();
+            });
+
+        using var connSub = this.connectivity
             .WhenChanged()
-            .Where(_ => activeTransfer != null)
+            .Where(x => x.Access != NetworkAccess.Internet)
             .Subscribe(x =>
             {
                 if (!x.IsInternetAvailable())
                 {
-                    this.logger.StandardInfo(activeTransfer!.Identifier, "No network detected for transfers - pausing");
-                    this.repository.Set(activeTransfer! with
+                    this.logger.StandardInfo(transfer.Identifier, "No network detected for transfers - pausing");
+                    this.repository.Set(transfer with
                     {
                         Status = HttpTransferState.PausedByNoNetwork
                     });
-                    // don't cancel here, the job or the transfer itself will do it
                 }
-                else if (x.Access == NetworkAccess.ConstrainedInternet && !activeTransfer!.Request.UseMeteredConnection)
+                else if (x.Access == NetworkAccess.ConstrainedInternet && transfer.Request.UseMeteredConnection)
                 {
-                    this.logger.StandardInfo(activeTransfer!.Identifier, "Costed network detected for active transfer - pausing");
-                    this.repository.Set(activeTransfer! with
+                    this.logger.StandardInfo(transfer.Identifier, "Costed network detected for active transfer - pausing");
+                    this.repository.Set(transfer with
                     {
                         Status = HttpTransferState.PausedByCostedNetwork
                     });
                     cancelSrc?.Cancel();
                 }
-            })
-            .DisposedBy(disposer);
+                this.UpdateTransferNotification(args, transfer);
+            });
 
-        activeTransfer = this.repository
-            .GetList<HttpTransfer>()
-            .OrderBy(x => x.CreatedAt)
-            .FirstOrDefault();
-
-        while (activeTransfer != null && !cancelToken.IsCancellationRequested)
+        try
         {
-            try
-            {
-                if (activeTransfer.Request.UseMeteredConnection || !this.connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet))
-                {
-                    this.logger.StandardInfo(activeTransfer!.Identifier, "Starting Transfer");
-                    cancelSrc = new();
-                    using var _ = cancelToken.Register(() => cancelSrc?.Cancel());
+            await this
+                .DoRequest(args, transfer, cancelSrc.Token)
+                .ConfigureAwait(false);
 
-                    await this.DoRequest(activeTransfer, cancelSrc.Token).ConfigureAwait(false);
-                    this.logger.StandardInfo(activeTransfer!.Identifier, "Finished Transfer");
+            await this.delegates
+                .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
+                .ConfigureAwait(false);
 
-                    this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
-                }
-                else
-                {
-                    this.logger.StandardInfo(activeTransfer!.Identifier, "Cannot start on current network configuration. Waiting for next pass");
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                this.logger.StandardInfo(activeTransfer!.Identifier, "Suspend Requested");
-            }
-            catch (Exception ex)
-            {
-                this.repository.Remove<HttpTransfer>(activeTransfer.Identifier);
-                this.logger.LogError(ex, "There was an error processing transfer: " + activeTransfer?.Identifier);
-            }
-            activeTransfer = this.repository
-                .GetList<HttpTransfer>()
-                .OrderBy(x => x.CreatedAt)
-                .FirstOrDefault();
+            progressSubj.OnNext(new HttpTransferResult(
+                transfer.Request,
+                HttpTransferState.Completed,
+                new TransferProgress(
+                    0,
+                    transfer.BytesToTransfer,
+                    transfer.BytesTransferred
+                ),
+                null
+            ));
+            this.repository.Remove(transfer);
         }
-        disposer.Dispose();
+        catch (TaskCanceledException)
+        {
+            this.logger.StandardInfo(transfer!.Identifier, "Suspend Requested");
+        }
+        catch (Exception ex)
+        {
+            this.repository.Remove(transfer);
+            this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
+            await this.delegates
+                .RunDelegates(x => x.OnError(transfer!.Request, ex), this.logger)
+                .ConfigureAwait(false);
+
+            progressSubj.OnNext(new HttpTransferResult(
+                transfer!.Request,
+                HttpTransferState.Error,
+                TransferProgress.Empty,
+                ex
+            ));
+        }
     }
 
 
-    async Task DoRequest(HttpTransfer transfer, CancellationToken cancelToken)
+    void UpdateTransferNotification(HttpTransferProcessArgs args, HttpTransfer transfer)
+    {
+        var percentComplete = transfer.IsDeterministic ? Convert.ToInt32(transfer.PercentComplete()! * 100) : 0;
+        
+        args.Builder.SetContentText("Processing Background Transfers");
+        args.Builder.SetProgress(
+            100,
+            percentComplete,
+            !transfer.IsDeterministic
+        );
+        this.delegates
+            .OfType<IAndroidHttpTransferDelegate>()
+            .ToList()
+            .ForEach(x => x.ConfigureNotification(args.Builder, transfer));
+
+        args.SendNotification();
+    }
+
+
+    async Task DoRequest(HttpTransferProcessArgs args, HttpTransfer transfer, CancellationToken cancelToken)
     {
         var request = transfer.Request;
         var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray() ?? Array.Empty<(string Key, string Value)>();
@@ -191,13 +264,10 @@ public class HttpTransferProcess
                 headers
             );
 
-        var builder = this.StartNotification(request);
-        this.notifications.Notify(NOTIFICATION_ID, builder.Build());
-
         var tcs = new TaskCompletionSource<object>();
         using var _ = cancelToken.Register(() => tcs.TrySetCanceled());
 
-        var sub = obs.Subscribe(
+        using var sub = obs.Subscribe(
             x =>
             {
                 if (!cancelToken.IsCancellationRequested)
@@ -209,9 +279,11 @@ public class HttpTransferProcess
                         BytesTransferred = x.BytesTransferred
                     });
 
-                    // allow customization here though android delegate?
-                    builder.SetProgress(100, Convert.ToInt32(x.PercentComplete * 100), false);
-                    this.notifications.Notify(NOTIFICATION_ID, builder.Build());
+                    if (x.IsDeterministic)
+                    {
+                        args.Builder.SetProgress(100, Convert.ToInt32(x.PercentComplete * 100), false);
+                        args.SendNotification();
+                    }
 
                     progressSubj.OnNext(new HttpTransferResult(
                         request,
@@ -221,91 +293,10 @@ public class HttpTransferProcess
                     ));
                 }
             },
-            ex =>
-            {
-                if (ex is not TaskCanceledException)
-                {
-                    this.delegates.RunDelegates(x => x.OnError(request, ex), this.logger);
-
-                    progressSubj.OnNext(new HttpTransferResult(
-                        request,
-                        HttpTransferState.Error,
-                        TransferProgress.Empty,
-                        ex
-                    ));
-                }
-                tcs.TrySetResult(ex);
-            },
-            () =>
-            {
-                this.delegates.RunDelegates(x => x.OnCompleted(request), this.logger);
-                progressSubj.OnNext(new HttpTransferResult(
-                    request,
-                    HttpTransferState.Completed,
-                    new TransferProgress(
-                        0,
-                        transfer.BytesToTransfer,
-                        transfer.BytesTransferred
-                    ),
-                    null
-                ));
-                tcs.TrySetResult(null!);
-            }
+            ex => tcs.TrySetResult(ex),
+            () => tcs.TrySetResult(null!)
         );
 
-        try
-        {
-            await tcs.Task.ConfigureAwait(false);
-        }
-        finally
-        {
-            this.notifications.Cancel(NOTIFICATION_ID);
-            sub.Dispose();
-        }
-    }
-
-    
-    NotificationCompat.Builder? StartNotification(HttpTransferRequest request)
-    {
-        this.EnsureChannel();
-        NotificationCompat.Builder? builder = null;
-
-        try
-        {
-            builder = new NotificationCompat.Builder(this.platform.AppContext, NotificationChannelId)
-                .SetSmallIcon(this.platform.GetNotificationIconResource())
-                .SetOngoing(true)
-                .SetTicker("...")
-                .SetContentTitle("Shiny HTTP Transfer Service")
-                .SetContentText("Shiny service is running in the background")
-                .SetProgress(100, 0, false);
-
-            this.delegates
-                .OfType<IAndroidHttpTransferDelegate>()
-                .ToList()
-                .ForEach(x => x.ConfigureNotification(builder, request));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "Error setting persistent notification for http transfers");
-        }
-        return builder;
-    }
-
-
-    public static string NotificationChannelId { get; set; } = "Transfers";
-    protected virtual void EnsureChannel()
-    {
-        if (this.notifications!.GetNotificationChannel(NotificationChannelId) != null)
-            return;
-
-        var channel = new NotificationChannel(
-            NotificationChannelId,
-            NotificationChannelId,
-            NotificationImportance.Low // to disable sound
-        );
-        channel.SetShowBadge(false);
-        channel.SetSound(null, null);
-        this.notifications.CreateNotificationChannel(channel);
+        await tcs.Task.ConfigureAwait(false);
     }
 }

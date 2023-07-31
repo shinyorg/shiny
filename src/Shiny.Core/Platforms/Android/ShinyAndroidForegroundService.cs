@@ -39,6 +39,7 @@ public abstract class ShinyAndroidForegroundService : Service
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
     {
+        this.notificationId = idCount++;
         var action = intent?.Action ?? AndroidPlatform.ActionServiceStart;
         switch (action)
         {
@@ -93,14 +94,14 @@ public abstract class ShinyAndroidForegroundService : Service
     }
 
 
-    NotificationCompat.Builder? builder;
+    protected NotificationCompat.Builder? Builder { get; private set; }
     protected virtual void SetNotification()
     {
         try
         {
             this.EnsureChannel();
-            this.builder = this.CreateNotificationBuilder();
-            this.SendNotification(this.builder);
+            this.Builder = this.CreateNotificationBuilder();
+            this.SendNotification(this.Builder);
         }
         catch (Exception ex)
         {

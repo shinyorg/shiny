@@ -4,24 +4,46 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android;
+using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Net.Http;
 
 
-public class HttpTransferManager : IHttpTransferManager
+public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 {
     readonly AndroidPlatform platform;
+    readonly ILogger logger;
     readonly IRepository repository;
 
 
     public HttpTransferManager(
         AndroidPlatform platform,
+        ILogger<HttpTransferManager> logger,
         IRepository repository
     )
     {
         this.platform = platform;
+        this.logger = logger;
         this.repository = repository;
+    }
+
+
+    public void Start()
+    {
+        try
+        {
+            if (HttpTransferService.IsStarted)
+                return;
+
+            var transfers = this.repository.GetList<HttpTransfer>();
+            if (transfers.Count > 0)
+                this.platform.StartService(typeof(HttpTransferService));
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Failed to auto-start HTTP Transfer Manager");
+        }
     }
 
 
@@ -51,30 +73,26 @@ public class HttpTransferManager : IHttpTransferManager
         );
         this.repository.Insert(transfer);
 
-        // TODO: start foreground if not started
+        if (!HttpTransferService.IsStarted)
+            this.platform.StartService(typeof(HttpTransferService));
+
         return transfer;
     }
 
 
     public Task Cancel(string identifier)
     {
-        // this will trigger over to the job if it is running
+        // this will trigger over to the foreground service which will shut itself down if there are no other transfers
         this.repository.Remove<HttpTransfer>(identifier);
-
-        // TODO: stop foreground if no other transfers?
-            // TODO: foreground will do it, itself
         return Task.CompletedTask;
     }
 
 
     public Task CancelAll()
     {
-        // this will trigger over to the job if it is running
+        // this will trigger over to the foreground service which will shut itself down
         this.repository.Clear<HttpTransfer>();
         return Task.CompletedTask;
-
-        // TODO: stop foreground
-        // TODO: foreground will do it, itself
     }
 
 

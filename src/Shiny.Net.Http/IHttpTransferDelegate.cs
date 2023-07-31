@@ -15,6 +15,6 @@ public interface IHttpTransferDelegate
 public interface IAndroidHttpTransferDelegate : IHttpTransferDelegate
 {
     // TODO: may want to pass the state, not just the request
-    void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransferRequest request);
+    void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransfer transfer);
 }
 #endif
