@@ -260,20 +260,7 @@ public class HttpTransferTests : AbstractShinyTests
             if (!File.Exists(path))
             {
                 this.Log("Generating Upload Binary");
-
-                // generate file
-                var data = new byte[8192];
-                var rng = new Random();
-                using (var fs = File.OpenWrite(path))
-                {
-                    for (var i = 0; i < UPLOAD_SIZE_MB * 128; i++)
-                    {
-                        rng.NextBytes(data);
-                        fs.Write(data, 0, data.Length);
-                    }
-                    fs.Flush();
-                }
-                
+                Utils.GenerateFile(path, UPLOAD_SIZE_MB);
                 this.Log($"Upload File Generated - {new FileInfo(path).Length} bytes");
             }
         }

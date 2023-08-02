@@ -1,4 +1,6 @@
-﻿namespace Shiny.Tests;
+﻿using System.IO;
+
+namespace Shiny.Tests;
 
 
 public static class Utils
@@ -9,6 +11,30 @@ public static class Utils
     public static IosPlatform GetPlatform() => new IosPlatform();
 #endif
 
+
+    public static string GenerateFullFile(int sizeInMB)
+    {
+        var path = Path.GetTempPath();
+        GenerateFile(path, sizeInMB);
+        return path;
+    }
+
+
+    public static void GenerateFile(string path, int sizeInMB)
+    {
+        // generate file
+        var data = new byte[8192];
+        var rng = new Random();
+        using (var fs = File.OpenWrite(path))
+        {
+            for (var i = 0; i < sizeInMB * 128; i++)
+            {
+                rng.NextBytes(data);
+                fs.Write(data, 0, data.Length);
+            }
+            fs.Flush();
+        }
+    }
 
     /// <summary>
     /// Converts a HEX string to a byte array

@@ -1,4 +1,5 @@
-﻿using Shiny.BluetoothLE;
+﻿using System.IO;
+using Shiny.BluetoothLE;
 
 namespace Shiny.Tests.BluetoothLE;
 
@@ -233,21 +234,31 @@ public class CharacteristicTests : AbstractBleTests
             )
             .Should()
             .NotBeNull($"Did not find service: {serviceUuid} / characteristic: {characteristicUuid}");
-    
-    // [Fact(DisplayName = "BLE Characteristic - Blob Write")]
-    // public async Task BlobWrite()
-    // {
-    //     await this.Setup();
-    //
-    //     // TODO: need stream
-    //     this.Peripheral!.WriteCharacteristicBlob(
-    //         BleConfiguration.ServiceUuid,
-    //         BleConfiguration.WriteCharacteristicUuid,
-    //         
-    //         null,
-    //         TimeSpan.FromSeconds(5)
-    //     );
-    // }
+
+
+    [Fact(DisplayName = "BLE Characteristic - Blob Write")]
+    public async Task BlobWrite()
+    {
+        await this.Setup();
+        var tcs = new TaskCompletionSource();
+        var filePath = Utils.GenerateFullFile(1);
+        using var file = File.OpenRead(filePath);
+
+        this.Peripheral!
+            .WriteCharacteristicBlob(
+                BleConfiguration.ServiceUuid,
+                BleConfiguration.WriteCharacteristicUuid,
+                file,
+                TimeSpan.FromSeconds(5)
+            )
+            .Subscribe(
+                x => this.Log($"Position: {x.Position} / {x.TotalLength} - Chunk Size: {x.Chunk.Length}"),
+                ex => tcs.TrySetException(ex),
+                () => tcs.TrySetResult()
+            ) ;
+
+        await tcs.Task.ConfigureAwait(false);
+    }
 
 
     [Fact(DisplayName = "BLE Characteristic - Concurrent Writes")]
@@ -280,5 +291,30 @@ public class CharacteristicTests : AbstractBleTests
             list.Add(this.Peripheral!.ReadCharacteristicAsync(ch, CancellationToken.None, 5000));
 
         await Task.WhenAll(list);
+    }
+
+
+    [Fact(DisplayName = "BLE Characteristic - 16bit UUID")]
+    public async Task UuidTest()
+    {
+        // this is built for testing against a BLE VEEPEAK dongle
+        IPeripheral? peripheral = null;
+        try
+        {
+            peripheral = await this.Manager
+                .ScanUntilFirstPeripheralFound("FFF0")
+                .Timeout(TimeSpan.FromSeconds(10))
+                .ToTask();
+
+            await peripheral.ConnectAsync().ConfigureAwait(false);
+
+            var ch = await peripheral
+                .GetCharacteristicAsync("FFF0", "FFF1")
+                .ConfigureAwait(false);
+        }
+        finally
+        {
+            peripheral?.CancelConnection();
+        }
     }
 }
