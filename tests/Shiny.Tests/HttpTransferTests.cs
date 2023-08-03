@@ -288,7 +288,7 @@ public class HttpTransferTests : AbstractShinyTests
 }
 
 
-public class TestHttpTransferDelegate : IHttpTransferDelegate
+public partial class TestHttpTransferDelegate : IHttpTransferDelegate
 {
     public Action<(HttpTransferRequest Request, Exception? Exception)>? OnFinish { get; set; }
 
@@ -306,3 +306,14 @@ public class TestHttpTransferDelegate : IHttpTransferDelegate
         return Task.CompletedTask;
     }
 }
+
+#if ANDROID
+public partial class TestHttpTransferDelegate : IAndroidHttpTransferDelegate
+{
+    public void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransfer transfer)
+    {
+
+    }
+}
+
+#endif
