@@ -214,7 +214,8 @@ public class HttpTransferProcess
                 ex
             ));
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
+        //catch (TaskCanceledException)
         {
             this.logger.StandardInfo(transfer!.Identifier, "Suspend Requested");
         }
