@@ -199,11 +199,7 @@ public class HttpTransferProcess
             ));
             this.repository.Remove(transfer);
         }
-        catch (TaskCanceledException)
-        {
-            this.logger.StandardInfo(transfer!.Identifier, "Suspend Requested");
-        }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
             this.repository.Remove(transfer);
             this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
@@ -217,6 +213,15 @@ public class HttpTransferProcess
                 TransferProgress.Empty,
                 ex
             ));
+        }
+        catch (TaskCanceledException)
+        {
+            this.logger.StandardInfo(transfer!.Identifier, "Suspend Requested");
+        }
+        // should always retry unless server fails
+        catch (Exception ex)
+        {
+            this.logger.LogDebug(ex, "Error with transfer");
         }
     }
 
