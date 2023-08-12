@@ -13,18 +13,9 @@ public abstract class ShinyAppDelegate : UIApplicationDelegate
 
     public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
     {
-        var host = this.CreateShinyHost();
-        host.Run();
-
-        Host.Lifecycle.FinishedLaunching(launchOptions);
+        this.CreateShinyHost().Run();
         return base.FinishedLaunching(application, launchOptions);
     }
-
-    public override void WillEnterForeground(UIApplication application)
-        => Host.Lifecycle.OnAppForegrounding();
-
-    public override void DidEnterBackground(UIApplication application)
-        => Host.Lifecycle.OnAppBackgrounding();
 
     public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
         => Host.Lifecycle.OnContinueUserActivity(userActivity,  completionHandler);

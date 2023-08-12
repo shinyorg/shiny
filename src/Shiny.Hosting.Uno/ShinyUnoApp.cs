@@ -16,17 +16,8 @@ public abstract class ShinyUnoApp : Application
 {
 
 #if APPLE
-    public override void WillEnterForeground(UIApplication application)
-        => Host.Lifecycle.OnAppForegrounding();
-
-    public override void DidEnterBackground(UIApplication application)
-        => Host.Lifecycle.OnAppBackgrounding();
-
     public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
         => Host.Lifecycle.OnContinueUserActivity(userActivity, completionHandler);
-
-    public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
-        => Host.Lifecycle.FinishedLaunching(launchOptions);
 
     public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
         => Host.Lifecycle.OnHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);

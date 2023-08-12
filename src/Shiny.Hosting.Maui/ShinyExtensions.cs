@@ -24,10 +24,7 @@ public static class ShinyExtensions
 #elif APPLE
             // Shiny will supply push events & handle background url for http transfers
             events.AddiOS(ios => ios
-                .FinishedLaunching((_, options) => Host.Lifecycle.FinishedLaunching(options))
                 .ContinueUserActivity((_, activity, handler) => Host.Lifecycle.OnContinueUserActivity(activity, handler))
-                .WillEnterForeground(_ => Host.Lifecycle.OnAppForegrounding())
-                .DidEnterBackground(_ => Host.Lifecycle.OnAppBackgrounding())
             );
 #elif WINDOWS
             events.AddWindows(win => win

@@ -8,7 +8,10 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 
-public partial class PlatformStateTests : IAndroidLifecycle.IApplicationLifecycle, IAndroidLifecycle.IOnActivityNewIntent, IAndroidLifecycle.IOnActivityRequestPermissionsResult, IAndroidLifecycle.IOnActivityResult
+public partial class PlatformStateTests : IAndroidLifecycle.IApplicationLifecycle,
+                                          IAndroidLifecycle.IOnActivityNewIntent,
+                                          IAndroidLifecycle.IOnActivityRequestPermissionsResult,
+                                          IAndroidLifecycle.IOnActivityResult
 {
     public void Handle(Activity activity, Intent intent) => this.Log("New Intent");
     public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults) => this.Log("Permission Request");
@@ -22,7 +25,12 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 
-public partial class PlatformStateTests : IIosLifecycle.IApplicationLifecycle, IIosLifecycle.IContinueActivity, IIosLifecycle.IHandleEventsForBackgroundUrl, IIosLifecycle.INotificationHandler, IIosLifecycle.IOnFinishedLaunching, IIosLifecycle.IRemoteNotifications
+public partial class PlatformStateTests : IIosLifecycle.IApplicationLifecycle,
+                                          IIosLifecycle.IContinueActivity,
+                                          IIosLifecycle.IHandleEventsForBackgroundUrl,
+                                          IIosLifecycle.INotificationHandler,
+                                          IIosLifecycle.IOnFinishedLaunching,
+                                          IIosLifecycle.IRemoteNotifications
 {
     public bool Handle(NSUserActivity activity, UIApplicationRestorationHandler completionHandler)
     {
@@ -37,7 +45,7 @@ public partial class PlatformStateTests : IIosLifecycle.IApplicationLifecycle, I
     }
 
 
-    public void Handle(NSDictionary options) => this.Log("Finished Launching");
+    public void Handle(UIApplicationLaunchEventArgs _) => this.Log("Finished Launching");
     public void OnBackground() => this.Log("App Background");
     public void OnForeground() => this.Log("App Foreground");
 

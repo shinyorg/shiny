@@ -194,23 +194,21 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    public void Handle(NSDictionary? options)
+    public void Handle(UIApplicationLaunchEventArgs args)
     {
-        if (!(options?.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey) ?? false))
+        //if (!(options?.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey) ?? false))
+        //    return;
+        if (args.RemoteNotifications == null)
             return;
 
         this.logger.LogDebug("App entry remote notification detected");
-        var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
+        //var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
 
-        Notification? notification = null;
-        IDictionary<string, string>? dict = null;
+        //if (data != null)
+        var notification = this.ToNotification(args.RemoteNotifications);
+        var dict = args.RemoteNotifications.FromNsDictionary();
+        dict.Remove("aps");
 
-        if (data != null)
-        {
-            notification = this.ToNotification(data);
-            dict = data.FromNsDictionary();
-            dict.Remove("aps");
-        }
         var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
         this.services.RunDelegates<IPushDelegate>(
             x => x.OnReceived(push),

@@ -45,20 +45,20 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     {
         UIApplication
             .Notifications
-            .ObserveDidFinishLaunching((_, args) => this.FinishedLaunching(null))
+            .ObserveDidFinishLaunching((_, args) =>
+                this.Execute(this.finishLaunchingHandlers, handler => handler.Handle(args))
+            )
             .DisposedBy(this.disposer);
 
         UIApplication
             .Notifications
-            .ObserveWillEnterForeground((_, _) => this.OnAppForegrounding())
+            .ObserveWillEnterForeground((_, _) => this.Execute(this.appHandlers, x => x.OnForeground()))
             .DisposedBy(this.disposer);
 
         UIApplication
             .Notifications
-            .ObserveDidEnterBackground((_, _) => this.OnAppBackgrounding())
+            .ObserveDidEnterBackground((_, _) => this.Execute(this.appHandlers, x => x.OnBackground()))
             .DisposedBy(this.disposer);
-
-
 
 
         if (this.notificationHandlers != null && this.notificationHandlers.Any())
@@ -77,13 +77,6 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
         }
     }
 
-
-    public bool FinishedLaunching(NSDictionary? options)
-    {
-        this.Execute(this.finishLaunchingHandlers, handler => handler.Handle(options));
-        return true;
-    }
-
     public void OnRegisteredForRemoteNotifications(NSData deviceToken)
         => this.Execute(this.remoteHandlers, x => x.OnRegistered(deviceToken));
 
@@ -95,12 +88,6 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 
     public bool OnContinueUserActivity(NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
         => this.HandleExecute(this.activityHandlers, x => x.Handle(userActivity, completionHandler));
-
-    public void OnAppForegrounding()
-        => this.Execute(this.appHandlers, x => x.OnForeground());
-
-    public void OnAppBackgrounding()
-        => this.Execute(this.appHandlers, x => x.OnBackground());
 
     public bool OnHandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
         => this.HandleExecute(this.bgUrlHandlers, x => x.Handle(sessionIdentifier, completionHandler));
