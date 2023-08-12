@@ -218,7 +218,7 @@ public class PushManager : NotifyPropertyChanged,
             }
             catch (Exception ex)
             {
-
+                this.logger.LogError(ex, "Failed to receive firebase message");
             }
         };
 
