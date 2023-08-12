@@ -86,7 +86,7 @@ public abstract class ShinyAndroidForegroundService : Service
         this.DestroyWith = null;
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
-            this.StopForeground(true);
+            this.StopForeground(StopForegroundFlags.Detach);
 
         this.StopSelf();
         this.notificationId = null;

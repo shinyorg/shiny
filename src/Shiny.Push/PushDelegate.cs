@@ -2,6 +2,7 @@
 
 namespace Shiny.Push;
 
+
 public interface IPushDelegate
 {
     /// <summary>
