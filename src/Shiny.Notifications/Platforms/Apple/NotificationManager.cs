@@ -14,9 +14,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager,
-                                   IIosLifecycle.INotificationHandler,
-                                   IIosLifecycle.IOnFinishedLaunching
+public class NotificationManager : INotificationManager, IIosLifecycle.INotificationHandler
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
     readonly IosConfiguration configuration;
@@ -350,17 +348,5 @@ public class NotificationManager : INotificationManager,
         {
             completionHandler.Invoke(this.configuration.PresentationOptions);
         }
-    }
-
-
-    public void Handle(UIApplicationLaunchEventArgs args)
-    {
-        if (args.Notification == null)
-            return;
-
-        //args.Notification
-
-        // TODO: need to parse this back into a notification
-        //data.FromNsDictionary();
     }
 }
