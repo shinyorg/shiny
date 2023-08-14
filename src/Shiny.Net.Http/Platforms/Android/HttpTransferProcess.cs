@@ -48,29 +48,41 @@ public class HttpTransferProcess
     {
         this.disposer = new();
         CancellationTokenSource cancelSrc = null!;
+        ConcurrentQueue<HttpTransfer> queue = new();
 
-        var queue = new ConcurrentQueue<HttpTransfer>(this.repository
-            .GetList<HttpTransfer>()
-            .OrderBy(x => x.CreatedAt)
-            .ToList()
-        );
-
-        // TODO: costed network
         this.connectivity
             .WhenInternetStatusChanged()
             .Where(x => x == true)
+            .DistinctUntilChanged()
             .Subscribe(_ =>
             {
-                // this will start with an event triggering everything
-                // current transfers will cancel themselves and set their state when connectivity drops
-                this.logger.LogDebug("Connectivity is restored - starting transfers");
-                cancelSrc = new();
-
-                this.TransferLoop(args, queue, cancelSrc.Token).ContinueWith(x =>
+                try
                 {
-                    if (x.Exception != null)
-                        this.logger.LogError(x.Exception, "Transfer loop failed");
-                });
+                    var fullInternet = this.connectivity.Access == NetworkAccess.Internet;
+
+                    var queue = new ConcurrentQueue<HttpTransfer>(this.repository
+                        .GetList<HttpTransfer>(x =>
+                            !x.Request.UseMeteredConnection ||
+                            fullInternet
+                        )
+                        .OrderBy(x => x.CreatedAt)
+                        .ToList()
+                    );
+                    // this will start with an event triggering everything
+                    // current transfers will cancel themselves and set their state when connectivity drops
+                    this.logger.LogDebug("Connectivity is restored - starting transfers");
+                    cancelSrc = new();
+
+                    this.TransferLoop(args, queue, cancelSrc.Token).ContinueWith(x =>
+                    {
+                        if (x.Exception != null)
+                            this.logger.LogError(x.Exception, "Transfer loop failed");
+                    });
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Error in connectivity event");
+                }
             })
             .DisposedBy(this.disposer);
 
@@ -79,33 +91,40 @@ public class HttpTransferProcess
             .Where(x => x.EntityType == typeof(HttpTransfer))
             .Subscribe(x =>
             {
-                switch (x.Action)
+                try
                 {
-                    case RepositoryAction.Add:
-                        queue.Enqueue((HttpTransfer)x.Entity!);
-                        break;
+                    switch (x.Action)
+                    {
+                        case RepositoryAction.Add:
+                            queue.Enqueue((HttpTransfer)x.Entity!);
+                            break;
 
-                    case RepositoryAction.Remove:
-                        var transfers = this.repository.GetList<HttpTransfer>();
-                        if (transfers.Count == 0)
-                        {
-                            this.logger.LogInformation("All transfers completed - shutting down");
+                        case RepositoryAction.Remove:
+                            var transfers = this.repository.GetList<HttpTransfer>();
+                            if (transfers.Count == 0)
+                            {
+                                this.logger.LogInformation("All transfers completed - shutting down");
+                                this.disposer.Dispose();
+                                args.OnComplete();
+                            }
+                            else
+                            {
+                                queue = new ConcurrentQueue<HttpTransfer>(transfers);
+                                this.logger.LogInformation($"{transfers.Count} transfers remaining after remove");
+                            }
+                            break;
+
+                        case RepositoryAction.Clear:
+                            this.logger.LogDebug("All HTTP Transfers have been cleared");
+                            cancelSrc?.Cancel();
                             this.disposer.Dispose();
                             args.OnComplete();
-                        }
-                        else
-                        {
-                            queue = new ConcurrentQueue<HttpTransfer>(transfers);
-                            this.logger.LogInformation($"{transfers.Count} transfers remaining after remove");
-                        }
-                        break;
-
-                    case RepositoryAction.Clear:
-                        this.logger.LogDebug("All HTTP Transfers have been cleared");
-                        cancelSrc?.Cancel();
-                        this.disposer.Dispose();
-                        args.OnComplete();
-                        break;
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Error in repository action");
                 }
             })
             .DisposedBy(this.disposer);
@@ -115,10 +134,16 @@ public class HttpTransferProcess
 
     async Task TransferLoop(HttpTransferProcessArgs args, ConcurrentQueue<HttpTransfer> transfers, CancellationToken cancelToken)
     {
-        while (transfers.TryDequeue(out var transfer) && this.connectivity.IsInternetAvailable() && !cancelToken.IsCancellationRequested)
-        { 
+        while (transfers.TryDequeue(out var transfer) &&
+               this.connectivity.IsInternetAvailable() &&
+               !cancelToken.IsCancellationRequested
+        )
+        {
+            this.logger.LogDebug("LOOP: Starting Transfer - " + transfer.Identifier);
             this.UpdateTransferNotification(args, transfer);
             await this.RunTransfer(args, transfer, cancelToken).ConfigureAwait(false);
+
+            this.logger.LogDebug("LOOP: Stopping/Finished Transfer - " + transfer.Identifier);
         }
     }
 
@@ -152,29 +177,6 @@ public class HttpTransferProcess
                     Status = HttpTransferState.PausedByNoNetwork
                 });
             });
-        //using var connSub = this.connectivity
-        //    .WhenChanged()
-        //    .Subscribe(x =>
-        //    {
-        //        if (!x.IsInternetAvailable())
-        //        {
-        //            this.logger.StandardInfo(transfer.Identifier, "No network detected for transfers - pausing");
-        //            this.repository.Set(transfer with
-        //            {
-        //                Status = HttpTransferState.PausedByNoNetwork
-        //            });
-        //        }
-        //        else if (x.Access == NetworkAccess.ConstrainedInternet && transfer.Request.UseMeteredConnection)
-        //        {
-        //            this.logger.StandardInfo(transfer.Identifier, "Costed network detected for active transfer - pausing");
-        //            this.repository.Set(transfer with
-        //            {
-        //                Status = HttpTransferState.PausedByCostedNetwork
-        //            });
-        //            cancelSrc?.Cancel();
-        //        }
-        //        this.UpdateTransferNotification(args, transfer);
-        //    });
 
         try
         {
@@ -182,7 +184,7 @@ public class HttpTransferProcess
                 .DoRequest(args, transfer, cancelSrc.Token)
                 .ConfigureAwait(false);
 
-            this.logger.LogInformation("Completing Successful transfer: " + transfer.Identifier);
+            this.logger.LogInformation("Completing Successful Transfer: " + transfer.Identifier);
             await this.delegates
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
@@ -215,7 +217,6 @@ public class HttpTransferProcess
             ));
         }
         catch (OperationCanceledException)
-        //catch (TaskCanceledException)
         {
             this.logger.StandardInfo(transfer!.Identifier, "Suspend Requested");
         }
@@ -229,6 +230,7 @@ public class HttpTransferProcess
 
     void UpdateTransferNotification(HttpTransferProcessArgs args, HttpTransfer transfer)
     {
+        this.logger.LogDebug("Updating Foreground Notification");
         var percentComplete = transfer.IsDeterministic ? Convert.ToInt32(transfer.PercentComplete()! * 100) : 0;
 
         args.Builder.SetContentText("Processing Background Transfers");
@@ -253,6 +255,7 @@ public class HttpTransferProcess
             });
 
         args.SendNotification();
+        this.logger.LogDebug("Updated Foreground Notification");
     }
 
 
@@ -305,12 +308,8 @@ public class HttpTransferProcess
                         BytesTransferred = x.BytesTransferred
                     });
 
-                    // TODO: log
                     if (x.IsDeterministic)
-                    {
-                        args.Builder.SetProgress(100, Convert.ToInt32(x.PercentComplete * 100), false);
-                        args.SendNotification();
-                    }
+                        this.UpdateTransferNotification(args, transfer);
 
                     progressSubj.OnNext(new HttpTransferResult(
                         request,
@@ -320,14 +319,8 @@ public class HttpTransferProcess
                     ));
                 }
             },
-            ex =>
-            {
-                tcs.TrySetException(ex);
-            },
-            () =>
-            {
-                tcs.TrySetResult(null!);
-            }
+            ex => tcs.TrySetException(ex),
+            () => tcs.TrySetResult(null!)
         );
 
         await tcs.Task.ConfigureAwait(false);

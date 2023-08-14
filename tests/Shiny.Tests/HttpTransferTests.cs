@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using Microsoft.Maui.Storage;
+using Shiny.Net;
 using Shiny.Net.Http;
+using Shiny.Tests.Mocks;
 
 namespace Shiny.Tests;
 
@@ -28,6 +30,9 @@ public class HttpTransferTests : AbstractShinyTests
 
     protected override void Configure(HostBuilder hostBuilder)
     {
+#if ANDROID
+        hostBuilder.Services.AddSingleton<IConnectivity, MockConnectivity>();
+#endif
         hostBuilder.Services.AddHttpTransfers<TestHttpTransferDelegate>();
     }
 
@@ -72,11 +77,18 @@ public class HttpTransferTests : AbstractShinyTests
 
         this.Log("Waiting for transfer to start");
         await startedTask.ConfigureAwait(false);
+#if ANDROID
+        HttpTransferService.IsStarted.Should().Be(true, "Android foreground service should have started");
+#endif
 
         await manager.CancelAll();
         this.Log("Waiting for transfer to cancel");
 
         await cancelTask.ConfigureAwait(false);
+
+#if ANDROID
+        HttpTransferService.IsStarted.Should().Be(false, "Android foreground service should have stopped");
+#endif
     }
 
 
@@ -105,6 +117,10 @@ public class HttpTransferTests : AbstractShinyTests
         ));
 
         await errorTask.ConfigureAwait(false);
+
+#if ANDROID
+        HttpTransferService.IsStarted.Should().Be(false, "Android foreground service should have stopped");
+#endif
     }
 
 
@@ -132,6 +148,10 @@ public class HttpTransferTests : AbstractShinyTests
             .ConfigureAwait(false);
 
         exception.Should().NotBeNull("Exception should be set");
+
+#if ANDROID
+        HttpTransferService.IsStarted.Should().Be(false, "Android foreground service should have stopped");
+#endif
     }
 
 
@@ -204,6 +224,10 @@ public class HttpTransferTests : AbstractShinyTests
             HttpMethod = includeBody ? "POST" : "GET"
         });
         await tcs.Task.ConfigureAwait(false);
+
+#if ANDROID
+        HttpTransferService.IsStarted.Should().Be(false, "Android foreground service should have stopped");
+#endif
     }
 
 
@@ -236,6 +260,31 @@ public class HttpTransferTests : AbstractShinyTests
         await tcs.Task.ConfigureAwait(false);
     }
 
+
+#if ANDROID
+    // Test connectivity flops by injecting mock connectivity
+    [Fact(DisplayName = "HTTP Transfers (Android) - Connectivity Test")]
+    public async Task AndroidConnectivityTest()
+    {
+        var conn = this.GetService<MockConnectivity>();
+        conn.Change(NetworkAccess.None);
+
+        var manager = this.GetService<IHttpTransferManager>();
+        var id = Guid.NewGuid().ToString();
+
+        //await manager.Queue(new HttpTransferRequest(
+        //    id,
+        //    this.GetUri(isUpload, false),
+        //    isUpload,
+        //    this.GetLocalPath(isUpload),
+        //    Headers: new Dictionary<string, string>
+        //    {
+        //        { "Test", "Test" }
+        //    }
+        //));
+        // TODO: ensure fg service stays on
+    }
+#endif
 
     string GetUri(bool upload, bool includeBody)
     {
