@@ -27,14 +27,18 @@ namespace Shiny.BluetoothLE;
             {
                 var data = ((NSData)x).ToArray();
                 var len = (data?.Length ?? 0);
-                if (len <= 2)
+                if (len < 2)
                     return null;
 
                 var companyId = ((data[1] & 0xFF) << 8) + (data[0] & 0xFF);
+
+                if (len == 2)
+                    return new ManufacturerData((ushort)companyId, Array.Empty<byte>());
+                
                 var value = new byte[data.Length - 2];
                 Array.Copy(data, 2, value, 0, data.Length - 2);
 
-                return new ManufacturerData((ushort)companyId, value);
+                return new ManufacturerData((ushort)companyId, Array.Empty<byte>());
             });
             this.serviceData = this.GetLazy(CBAdvertisement.DataServiceDataKey, item =>
             {
