@@ -189,8 +189,6 @@ public class PushManager : NotifyPropertyChanged,
                 this.logger
             )
             .ContinueWith(_ => completionHandler.Invoke(UIBackgroundFetchResult.NewData));
-
-        completionHandler.Invoke(UIBackgroundFetchResult.NewData);
     }
 
 
