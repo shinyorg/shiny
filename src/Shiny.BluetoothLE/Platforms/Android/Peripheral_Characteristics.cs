@@ -173,15 +173,16 @@ public partial class Peripheral
             if (this.Status == ConnectionState.Connected)
             {
                 this.WriteDescriptor(
-                    serviceUuid,
-                    characteristicUuid,
-                    NotifyDescriptorUuid,
-                    BluetoothGattDescriptor.DisableNotificationValue!.ToArray()
-                )
-                .Subscribe(
-                    _ => { },
-                    ex => this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid)
-                );
+                        serviceUuid,
+                        characteristicUuid,
+                        NotifyDescriptorUuid,
+                        BluetoothGattDescriptor.DisableNotificationValue!.ToArray()
+                    )
+                    .Timeout(TimeSpan.FromSeconds(3))
+                    .Subscribe(
+                        _ => { },
+                        ex => this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid)
+                    );
 
                 if (!this.Gatt!.SetCharacteristicNotification(ch, false))
                     this.logger.DisableNotificationError(null!, serviceUuid, characteristicUuid);

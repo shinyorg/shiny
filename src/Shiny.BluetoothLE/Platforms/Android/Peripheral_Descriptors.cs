@@ -79,7 +79,7 @@ public partial class Peripheral
                 throw new BleException("Unable to set GattDescriptor: " + descriptor.Uuid);
 
             if (!this.Gatt!.WriteDescriptor(descriptor))
-                throw new InvalidOperationException("Could not writte descriptor: " + descriptor.Uuid);
+                throw new InvalidOperationException("Could not write descriptor: " + descriptor.Uuid);
         }
 #endif
         var result = await task.ConfigureAwait(false);
