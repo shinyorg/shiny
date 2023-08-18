@@ -29,7 +29,7 @@ public class HttpTransfersViewModel : ViewModel
 
         this.AddDownload = ReactiveCommand.CreateFromTask(async () =>
         {
-            var path = Path.GetTempPath();
+            var path = Path.GetTempFileName();
             await this.manager.Queue(new HttpTransferRequest(
                 Guid.NewGuid().ToString(),
                 this.GetUrl(false),
@@ -40,8 +40,7 @@ public class HttpTransfersViewModel : ViewModel
 
         this.AddUpload = ReactiveCommand.CreateFromTask(async () =>
         {
-            var path = Path.GetTempPath();
-            GenerateFile(path, 50);
+            var path = GenerateFile(50);
 
             await this.manager.Queue(new HttpTransferRequest(
                 Guid.NewGuid().ToString(),
@@ -114,13 +113,15 @@ public class HttpTransfersViewModel : ViewModel
         if (!url.EndsWith("/"))
             url += "/";
 
-        url += upload ? "Upload" : "Download";
+        url += upload ? "transfers/upload" : "transfers/download";
         return url;
     }
 
 
-    static void GenerateFile(string path, int sizeInMB)
+    static string GenerateFile(int sizeInMB)
     {
+        var path = Path.GetTempFileName();
+
         // generate file
         var data = new byte[8192];
         var rng = new Random();
@@ -132,5 +133,7 @@ public class HttpTransfersViewModel : ViewModel
             fs.Write(data, 0, data.Length);
         }
         fs.Flush();
+
+        return path;
     }
 }
