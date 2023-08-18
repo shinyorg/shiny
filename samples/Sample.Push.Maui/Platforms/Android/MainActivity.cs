@@ -15,9 +15,11 @@ namespace Sample.Push.Maui;
         ConfigChanges.SmallestScreenSize |
         ConfigChanges.Density
 )]
-[IntentFilter(new[] {
-    Shiny.ShinyPushIntents.NotificationClickAction
-})]
+[IntentFilter(
+    new[] {
+        Shiny.ShinyPushIntents.NotificationClickAction
+    }
+)]
 public class MainActivity : MauiAppCompatActivity
 {
     //ShinyNotificationIntents.NotificationClickAction

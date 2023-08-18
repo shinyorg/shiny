@@ -82,7 +82,7 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     public void StartService(Type serviceType, bool stopWithTask = false)
     {
         var intent = new Intent(this.AppContext, serviceType);
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(26) && this.IsShinyForegroundService(serviceType))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
         {
             intent.SetAction(ActionServiceStart);
             intent.PutExtra("StopWithTask", stopWithTask);
@@ -97,22 +97,22 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
 
     public void StopService(Type serviceType)
     {
-        if (!this.IsShinyForegroundService(serviceType))
-        {
+        //if (!this.IsShinyForegroundService(serviceType))
+        //{
             this.AppContext.StopService(new Intent(this.AppContext, serviceType));
-        }
-        else
-        {
-            // HACK: this re-runs the intent to stop the service since OnTaskRemoved isn't running
-            var intent = new Intent(this.AppContext, serviceType);
-            intent.SetAction(ActionServiceStop);
-            this.AppContext.StartService(intent);
-        }
+        //}
+        //else
+        //{
+        //    // HACK: this re-runs the intent to stop the service since OnTaskRemoved isn't running
+        //    var intent = new Intent(this.AppContext, serviceType);
+        //    intent.SetAction(ActionServiceStop);
+        //    this.AppContext.StartService(intent);
+        //}
     }
 
 
-    protected bool IsShinyForegroundService(Type serviceType)
-        => serviceType?.BaseType?.Name.Contains("ShinyAndroidForegroundService") ?? false;
+    //protected bool IsShinyForegroundService(Type serviceType)
+    //    => serviceType?.BaseType?.Name.Contains("ShinyAndroidForegroundService") ?? false;
 
 
     public AccessState GetCurrentAccessState(string androidPermission)

@@ -58,6 +58,7 @@
                         <TextCell Text="App Data" Command="{Binding Navigate}" CommandParameter="AppDataPage" />
                         <TextCell Text="Support Services" Command="{Binding Navigate}" CommandParameter="SupportServicePage" />
                         <TextCell Text="BLE Host for Unit Tests" Command="{Binding Navigate}" CommandParameter="BleHostUnitTests" />
+                        <TextCell Text="HTTP Transfers" Command="{Binding Navigate}" CommandParameter="HttpTransfersDev" />
                     </TableSection>
                     <!--
                     NOT READY

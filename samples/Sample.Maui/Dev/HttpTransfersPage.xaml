@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dev="clr-namespace:Sample.Dev"
+             xmlns:http="clr-namespace:Shiny.Net.Http;assembly=Shiny.Net.Http"
+             x:DataType="dev:HttpTransfersViewModel"
+             x:Class="Sample.Dev.HttpTransfersPage"
+             Title="HTTP Transfers Dev">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear"
+                     Command="{Binding Clear}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="40, *, 40"
+          ColumnDefinitions="1*, 1*">
+
+        <Button Text="Add Download"
+                Command="{Binding AddDownload}"
+                Grid.Row="0"
+                Grid.Column="0" />
+
+        <Button Text="Add Upload"
+                Command="{Binding AddUpload}"
+                Grid.Row="0"
+                Grid.Column="1" />
+
+        <CollectionView ItemsSource="{Binding Transfers}"
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2">
+
+            <CollectionView.EmptyView>
+                <Label Text="No Transfers Active"
+                       Style="{StaticResource NoDataLabel}" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="http:HttpTransferObject">
+                    <Grid RowDefinitions="40, 50, 40, 3"
+                          ColumnDefinitions="1*, 1*"
+                          Margin="10">
+
+                        <Label Grid.Row="0"
+                               Grid.Column="0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Uri}" />
+                                    <Span Text=" (" />
+                                    <Span Text="{Binding Status}" />
+                                    <Span Text=")" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <Label Text="{Binding IsUpload, StringFormat='Upload: {0}'}"
+                               HorizontalTextAlignment="End"
+                               Grid.Row="0"
+                               Grid.Column="1" />
+
+                        <ProgressBar Progress="{Binding PercentComplete}"
+                                     Grid.Row="1"
+                                     Grid.ColumnSpan="2" />
+
+                        <Label Text="{Binding EstimatedTimeRemaining, StringFormat='{0} Time Remaining'}"
+                               Grid.Row="2"
+                               Grid.Column="0" />
+
+                        <Label Text="{Binding BytesPerSecond, StringFormat='{0} bps'}"
+                               HorizontalTextAlignment="End"
+                               Grid.Row="2"
+                               Grid.Column="1" />
+
+                        <BoxView Style="{StaticResource HR}"
+                                 Grid.Row="3"
+                                 Grid.ColumnSpan="2" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="Cancel All"
+                Command="{Binding CancelAll}"
+                Grid.Row="2"
+                Grid.ColumnSpan="2" />
+    </Grid>
+</ContentPage>

@@ -25,15 +25,14 @@ public static class Utils
         // generate file
         var data = new byte[8192];
         var rng = new Random();
-        using (var fs = File.OpenWrite(path))
+        using var fs = File.OpenWrite(path);
+
+        for (var i = 0; i < sizeInMB * 128; i++)
         {
-            for (var i = 0; i < sizeInMB * 128; i++)
-            {
-                rng.NextBytes(data);
-                fs.Write(data, 0, data.Length);
-            }
-            fs.Flush();
+            rng.NextBytes(data);
+            fs.Write(data, 0, data.Length);
         }
+        fs.Flush();
     }
 
     /// <summary>

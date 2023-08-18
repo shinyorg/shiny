@@ -25,14 +25,14 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+        <!--
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 		<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
+        -->
 	</PropertyGroup>
 
+
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
       <CreatePackage>false</CreatePackage>
     </PropertyGroup>
     <ItemGroup>
@@ -41,6 +41,10 @@
 
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
+
+        <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
+        <MauiAsset Include="appsettings.apple.json" LogicalName="appsettings.apple.json" />
+        <MauiAsset Include="appsettings.android.json" LogicalName="appsettings.android.json" />
 	</ItemGroup>
 
     <ItemGroup>
@@ -57,6 +61,7 @@
             <Link>Dev\BleConfiguration.cs</Link>
         </Compile>
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -37,11 +38,45 @@ public class HttpTransferMonitor : IDisposable
     public INotifyReadOnlyCollection<HttpTransferObject> Transfers => this.transfers;
 
     public bool IsStarted => this.disposable != null;
-    
-    
+
+
+    public void Clear(bool removeFinished, bool removeCancelled, bool removeErrors)
+    {
+        var list = this.transfers.ToList();
+        var toRemove = new List<HttpTransferObject>();
+
+        foreach (var item in list)
+        {
+            switch (item.Status)
+            {
+                case HttpTransferState.Completed:
+                    if (removeFinished)
+                        toRemove.Add(item);
+                    break;
+
+                case HttpTransferState.Canceled:
+                    if (removeCancelled)
+                        toRemove.Add(item);
+                    break;
+
+                case HttpTransferState.Error:
+                    if (removeErrors)
+                        toRemove.Remove(item);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        if (toRemove.Count > 0)
+            this.transfers.RemoveRange(toRemove);
+    }
+
+
     public async Task Start(
         bool removeFinished = true,
         bool removeErrors = true,
+        bool removeCancelled = true,
         IScheduler? scheduler = null
     )
     {
@@ -127,7 +162,8 @@ public class HttpTransferMonitor : IDisposable
                         break;
 
                     case HttpTransferState.Canceled:
-                        this.transfers.Remove(item);
+                        if (removeCancelled)
+                            this.transfers.Remove(item);
                         break;
 
                     case HttpTransferState.Error:
@@ -143,9 +179,13 @@ public class HttpTransferMonitor : IDisposable
     }
 
 
-    public void Stop() => this.disposable?.Dispose();
-    
-    public void Dispose() => this.disposable?.Dispose();
+    public void Stop()
+    {
+        this.disposable?.Dispose();
+        this.disposable = null;
+    }
+
+    public void Dispose() => this.Stop();
 }
 
 

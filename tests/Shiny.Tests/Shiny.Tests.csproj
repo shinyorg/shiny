@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>
-        <!--<TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>-->
-        <!--<TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>-->
+        <TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <RootNamespace>Shiny.Tests</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -25,15 +25,9 @@
     
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net7.0-ios'">
         <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-        <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
+        <!--<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>-->
     </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-    </PropertyGroup>
+
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />

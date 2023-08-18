@@ -17,8 +17,20 @@ namespace Shiny;
 public abstract class ShinyAndroidForegroundService : Service
 {
     public static string NotificationChannelId { get; set; } = "Service";
-    static int idCount = 7999;
-    int? notificationId;
+    static int startNotificationId = 7999;
+
+
+    int? privateNotificationId;
+    protected int NotificationId
+    {
+        get
+        {
+            this.privateNotificationId ??= ++startNotificationId;
+            return this.privateNotificationId.Value;
+        }
+        //set => this.notificationId = value;
+    }
+    
 
     protected T GetService<T>() => Host.GetService<T>()!;
     protected IEnumerable<T> GetServices<T>() => Host.ServiceProvider.GetServices<T>();
@@ -39,8 +51,9 @@ public abstract class ShinyAndroidForegroundService : Service
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
     {
-        this.notificationId = idCount++;
         var action = intent?.Action ?? AndroidPlatform.ActionServiceStart;
+        this.Logger.LogDebug($"Foreground Service OnStartCommand - Action: {action} - Notification ID: {this.NotificationId}");
+
         switch (action)
         {
             case AndroidPlatform.ActionServiceStart:
@@ -60,6 +73,7 @@ public abstract class ShinyAndroidForegroundService : Service
     public override IBinder? OnBind(Intent? intent) => null;
     public override void OnTaskRemoved(Intent? rootIntent)
     {
+        this.Logger.LogDebug($"Foreground Service OnTaskRemoved - StopWithTask: {this.StopWithTask}");
         if (this.StopWithTask)
             this.Stop();
     }
@@ -67,11 +81,10 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected virtual void Start(Intent? intent)
     {
+        
         this.NotificationManager = NotificationManagerCompat.From(this.Platform.AppContext);
         this.DestroyWith = new CompositeDisposable();
-
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
-            this.SetNotification();
+        this.SetNotification();
 
         this.OnStart(intent);
     }
@@ -79,17 +92,18 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected void Stop()
     {
-        if (this.DestroyWith == null)
-            return;
-
+        this.Logger.LogDebug("Calling for foreground service stop");
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        {
+            this.Logger.LogDebug("API level requires foreground detach");
             this.StopForeground(StopForegroundFlags.Detach);
-
-        this.StopSelf();
-        this.notificationId = null;
+        }
+        this.Logger.LogDebug($"Foreground service calling for notification ID: {this.NotificationId} to cancel");
+        this.NotificationManager?.Cancel(this.NotificationId);
+        this.StopSelf();        
         this.OnStop();
     }
 
@@ -102,8 +116,12 @@ public abstract class ShinyAndroidForegroundService : Service
             this.EnsureChannel();
             this.Builder = this.CreateNotificationBuilder();
 
-            this.notificationId = ++idCount;
-            this.StartForeground(this.notificationId.Value, this.Builder.Build());
+            this.Logger.LogDebug("Starting Foreground Notification: " + this.NotificationId);
+            var notification = this.Builder.Build();            
+            this.NotificationManager!.Notify(this.NotificationId, notification);
+
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+                this.StartForeground(this.NotificationId, notification);
         }
         catch (Exception ex)
         {

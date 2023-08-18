@@ -194,7 +194,8 @@ public class HttpTransferTests : AbstractShinyTests
         var tcs = new TaskCompletionSource();
 
         using var sub = manager.WatchTransfer(id).Subscribe(
-            x => this.Log($"{x.Progress.PercentComplete * 100}% complete - b/s: {x.Progress.BytesPerSecond}")
+            x => this.Log($"{x.Progress.PercentComplete * 100}% complete - b/s: {x.Progress.BytesPerSecond}"),
+            _ => { }
         );
 
         tdelegate.OnFinish = args =>

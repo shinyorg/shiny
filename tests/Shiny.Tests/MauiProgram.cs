@@ -14,6 +14,8 @@ public static class MauiProgram
 
     public static MauiApp CreateMauiApp()
     {
+        System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+
         Configuration = new ConfigurationBuilder()
             .AddJsonPlatformBundle(optional: false)
             .Build();

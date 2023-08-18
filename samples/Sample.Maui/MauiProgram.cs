@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Markup;
+using Microsoft.Extensions.Configuration;
 using Prism.DryIoc;
 using Sample.Dev;
 
@@ -30,6 +31,7 @@ public static class MauiProgram
 
     static MauiAppBuilder RegisterLogging(this MauiAppBuilder builder)
     {
+        builder.Configuration.AddJsonPlatformBundle();
 #if DEBUG
         builder.Logging.SetMinimumLevel(LogLevel.Trace);
         builder.Logging.AddDebug();
@@ -157,6 +159,7 @@ public static class MauiProgram
 
         // dev
         s.RegisterForNavigation<BleHostUnitTestsPage, BleHostUnitTestsViewModel>("BleHostUnitTests");
+        s.RegisterForNavigation<HttpTransfersPage, HttpTransfersViewModel>("HttpTransfersDev");
         s.RegisterForNavigation<LogsPage, LogsViewModel>();
         s.RegisterForNavigation<AppDataPage, AppDataViewModel>();
         s.RegisterForNavigation<FileViewPage, FileViewViewModel>();

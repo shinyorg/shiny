@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
@@ -14,6 +13,7 @@ public interface INotifyReadOnlyCollection<T> : INotifyCollectionChanged, IReadO
 public interface INotifyCollectionChanged<T> : INotifyCollectionChanged, IList<T>, INotifyReadOnlyCollection<T>
 {
     void AddRange(IEnumerable<T> items);
+    void RemoveRange(IEnumerable<T> items);
     void ReplaceAll(IEnumerable<T> items);
 }
 
@@ -34,6 +34,15 @@ public class ObservableList<T> : ObservableCollection<T>, INotifyCollectionChang
             this.Items.Add(item);
 
         this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items));
+    }
+
+
+    public void RemoveRange(IEnumerable<T> items)
+    {
+        foreach (var item in items)
+            this.Items.Remove(item);
+
+        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, items));
     }
 
 

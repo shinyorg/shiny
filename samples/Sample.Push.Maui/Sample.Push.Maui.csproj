@@ -2,7 +2,8 @@
 
 	<PropertyGroup>
 		<PushProvider>azure</PushProvider>
-		<TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>
 		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
@@ -56,9 +57,12 @@
 		<DefineConstants Condition="'$(PushProvider)' == 'firebase'">$(DefineConstants);FIREBASE</DefineConstants>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+	  <CreatePackage>false</CreatePackage>
+	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" Condition="'$(PushProvider)' == 'native'"/>
-		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" Condition="'$(PushProvider)' == 'azure'"/>
-		<ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" Condition="'$(PushProvider)' == 'firebase'"/>
+		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" Condition="'$(PushProvider)' == 'native'" />
+		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" Condition="'$(PushProvider)' == 'azure'" />
+		<ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" Condition="'$(PushProvider)' == 'firebase'" />
     </ItemGroup>
 </Project>
