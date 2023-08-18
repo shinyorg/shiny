@@ -5,8 +5,10 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny;
 
@@ -45,6 +47,18 @@ public static class ObservableExtensions
             });
     }
 
+
+    public static void OnNextSafe<T>(this Subject<T> subject, T value, ILogger logger)
+    {
+        try
+        {
+            subject.OnNext(value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Error on subject pump");
+        }
+    }
 
     /// <summary>
     /// Notifies whenever a property changes within an INotifyPropertyChanged
