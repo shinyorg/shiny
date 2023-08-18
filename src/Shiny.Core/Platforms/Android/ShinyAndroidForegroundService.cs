@@ -30,7 +30,9 @@ public abstract class ShinyAndroidForegroundService : Service
         }
         //set => this.notificationId = value;
     }
-    
+
+    protected NotificationCompat.Builder? Builder { get; private set; }
+
 
     protected T GetService<T>() => Host.GetService<T>()!;
     protected IEnumerable<T> GetServices<T>() => Host.ServiceProvider.GetServices<T>();
@@ -41,9 +43,8 @@ public abstract class ShinyAndroidForegroundService : Service
     protected abstract void OnStart(Intent? intent);
     protected abstract void OnStop();
 
-
     ILogger? logger;
-    protected ILogger Logger => this.logger ??= Host.Current.Logging.CreateLogger(this.GetType()!.AssemblyQualifiedName!);
+    protected ILogger Logger => this.logger ??= Host.Current.Logging.CreateLogger(this.GetType()!);
 
     AndroidPlatform? platform;
     protected AndroidPlatform Platform => this.platform ??= this.GetService<AndroidPlatform>();
@@ -81,10 +82,21 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected virtual void Start(Intent? intent)
     {
-        
         this.NotificationManager = NotificationManagerCompat.From(this.Platform.AppContext);
         this.DestroyWith = new CompositeDisposable();
-        this.SetNotification();
+
+        this.EnsureChannel();
+        this.Builder = this.CreateNotificationBuilder();
+
+        this.Logger.LogDebug("Starting Foreground Notification: " + this.NotificationId);
+        var notification = this.Builder.Build();
+        this.NotificationManager!.Notify(this.NotificationId, notification);
+
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        {
+            this.StartForeground(this.NotificationId, notification);
+            this.Logger.LogDebug("Started Foreground Service");
+        }
 
         this.OnStart(intent);
     }
@@ -105,28 +117,6 @@ public abstract class ShinyAndroidForegroundService : Service
         this.NotificationManager?.Cancel(this.NotificationId);
         this.StopSelf();        
         this.OnStop();
-    }
-
-
-    protected NotificationCompat.Builder? Builder { get; private set; }
-    protected virtual void SetNotification()
-    {
-        try
-        {
-            this.EnsureChannel();
-            this.Builder = this.CreateNotificationBuilder();
-
-            this.Logger.LogDebug("Starting Foreground Notification: " + this.NotificationId);
-            var notification = this.Builder.Build();            
-            this.NotificationManager!.Notify(this.NotificationId, notification);
-
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
-                this.StartForeground(this.NotificationId, notification);
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogError(ex, "Failed to send notification - your android foreground service will fail because of this error");
-        }
     }
 
 
@@ -157,7 +147,6 @@ public abstract class ShinyAndroidForegroundService : Service
 
         return build;
     }
-
 }
 
 
