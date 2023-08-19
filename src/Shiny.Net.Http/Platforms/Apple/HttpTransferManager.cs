@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using System.Web;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
@@ -20,7 +19,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                                    IShinyStartupTask,
                                    IIosLifecycle.IHandleEventsForBackgroundUrl
 {
-    public static string SessionName = $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
     Action? completionHandler;
 
     readonly ILogger logger;
@@ -60,7 +58,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     }
 
     public AppleConfiguration Config { get; }
-
+    public string SessionName => this.Config.SessionName ?? $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
 
     NSUrlSession? nsUrlSession;
     public NSUrlSession Session
@@ -69,25 +67,26 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         {
             if (this.nsUrlSession == null)
             {
-                var config = this.Config;
-                var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
-                if (config.HttpMaximumConnectionsPerHost != null)
-                    cfg.HttpMaximumConnectionsPerHost = config.HttpMaximumConnectionsPerHost.Value;
+                var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(this.SessionName);
 
-                if (config.CachePolicy != null)
-                    cfg.RequestCachePolicy = config.CachePolicy.Value;
+                cfg.HttpMaximumConnectionsPerHost = this.Config.HttpMaximumConnectionsPerHost;
 
-                if (config.HttpShouldUsePipelining != null)
-                    cfg.HttpShouldUsePipelining = config.HttpShouldUsePipelining.Value;
+                if (this.Config.CachePolicy != null)
+                    cfg.RequestCachePolicy = this.Config.CachePolicy.Value;
 
-                cfg.AllowsCellularAccess = config.AllowsCellularAccess;
-                cfg.AllowsConstrainedNetworkAccess = config.AllowsConstrainedNetworkAccess;
-                cfg.AllowsExpensiveNetworkAccess = config.AllowsExpensiveNetworkAccess;
+                if (this.Config.HttpShouldUsePipelining != null)
+                    cfg.HttpShouldUsePipelining = this.Config.HttpShouldUsePipelining.Value;
 
+                cfg.AllowsCellularAccess = this.Config.AllowsCellularAccess;
+                cfg.AllowsConstrainedNetworkAccess = this.Config.AllowsConstrainedNetworkAccess;
+                cfg.AllowsExpensiveNetworkAccess = this.Config.AllowsExpensiveNetworkAccess;
                 cfg.SessionSendsLaunchEvents = true;
-                //cfg.SharedContainerIdentifier
-                //cfg.ShouldUseExtendedBackgroundIdleMode
-                //cfg.WaitsForConnectivity
+
+                if (this.Config.ShouldUseExtendedBackgroundIdleMode != null)
+                    cfg.ShouldUseExtendedBackgroundIdleMode = this.Config.ShouldUseExtendedBackgroundIdleMode.Value;
+
+                if (this.Config.WaitsForConnectivity != null)
+                    cfg.WaitsForConnectivity = this.Config.WaitsForConnectivity.Value;
 
                 this.nsUrlSession = NSUrlSession.FromConfiguration(cfg, this, new NSOperationQueue());
             }
@@ -165,7 +164,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public bool Handle(string sessionIdentifier, Action incomingCompletionHandler)
     {
-        if (SessionName.Equals(sessionIdentifier))
+        if (this.SessionName.Equals(sessionIdentifier))
         {
             this.completionHandler = incomingCompletionHandler;
             return true;
@@ -240,12 +239,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 ht = ht with { Status = HttpTransferState.Paused };
                 this.repository.Update(ht);
 
-                this.transferSubj.OnNext(new HttpTransferResult(
+                this.transferSubj.OnNextSafe(new HttpTransferResult(
                     ht.Request,
                     ht.Status,
                     TransferProgress.Empty,
                     null
-                ));
+                ), this.logger);
                 break;
 
             case NSUrlSessionTaskState.Canceling:
@@ -297,7 +296,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.Remove(ht);
 
         await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, ex), this.logger);
-        this.transferSubj.OnNext(new HttpTransferResult(
+        this.transferSubj.OnNext(new(
             ht.Request,
             HttpTransferState.Error,
             TransferProgress.Empty,
@@ -311,12 +310,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.logger.LogInformation($"Transfer {ht.Identifier} was canceled");
         this.Remove(ht);
 
-        this.transferSubj.OnNext(new HttpTransferResult(
+        this.transferSubj.OnNextSafe(new(
             ht.Request,
             HttpTransferState.Canceled,
             TransferProgress.Empty,
             null
-        ));
+        ), this.logger);
     }
 
 
@@ -325,12 +324,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.Remove(ht);
         await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), this.logger);
 
-        this.transferSubj.OnNext(new(
+        this.transferSubj.OnNextSafe(new(
             ht.Request,
             HttpTransferState.Completed,
             TransferProgress.Empty,
             null
-        ));
+        ), this.logger);
     }
 
 
@@ -358,12 +357,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             {
                 this.repository.Update(ht);
                 var bps = (int)(task.Progress?.Throughput ?? 0);
-                this.transferSubj.OnNext(new HttpTransferResult(
+                this.transferSubj.OnNextSafe(new(
                     ht.Request,
                     ht.Status,
                     new(bps, totalBytesExpectedToSend, totalBytesSent),
                     null
-                ));
+                ), this.logger);
             }
             catch (RepositoryException) 
             {
@@ -397,12 +396,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 this.repository.Update(ht);
                 var bps = (int)(downloadTask.Progress?.Throughput ?? 0);
 
-                this.transferSubj.OnNext(new HttpTransferResult(
+                this.transferSubj.OnNextSafe(new(
                     ht.Request,
                     ht.Status,
                     new(bps, totalBytesExpectedToWrite, totalBytesWritten),
                     null
-                ));
+                ), this.logger);
             }
             catch (RepositoryException)
             {
