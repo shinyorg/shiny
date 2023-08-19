@@ -5,6 +5,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Disposables;
 using System.Threading;
+using System.Threading.Tasks;
+using Android;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -16,7 +18,9 @@ using Shiny.Hosting;
 namespace Shiny;
 
 
-public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPermissionsResult, IAndroidLifecycle.IOnActivityResult
+public class AndroidPlatform : IPlatform,
+                               IAndroidLifecycle.IOnActivityRequestPermissionsResult,
+                               IAndroidLifecycle.IOnActivityResult
 {
     int requestCode;
     static AndroidActivityLifecycle activityLifecycle; // this should never change once installed on the platform
@@ -76,16 +80,45 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
     });
 
 
+    public async Task<AccessState> RequestForegroundServicePermissions()
+    {
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        {
+            var results = await this.RequestPermissions(
+                Manifest.Permission.ForegroundService,
+                AndroidPermissions.PostNotifications
+            );
+            if (results.IsSuccess())
+                return AccessState.Available;
+
+            if (!results.IsGranted(Manifest.Permission.ForegroundService))
+                return AccessState.NotSetup;
+
+            return AccessState.Restricted; // no post_notifications
+        }
+        else if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        {
+            var results = await this.RequestPermissions(Manifest.Permission.ForegroundService);
+            if (results.IsSuccess())
+                return AccessState.Available;
+
+            return AccessState.NotSetup;
+        }
+
+        return AccessState.Available;
+    }
+
     public const string ActionServiceStart = "ACTION_START_FOREGROUND_SERVICE";
     public const string ActionServiceStop = "ACTION_STOP_FOREGROUND_SERVICE";
+    public const string IntentActionStopWithTask = "StopWithTask";
 
     public void StartService(Type serviceType, bool stopWithTask = false)
     {
         var intent = new Intent(this.AppContext, serviceType);
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             intent.SetAction(ActionServiceStart);
-            intent.PutExtra("StopWithTask", stopWithTask);
+            intent.PutExtra(IntentActionStopWithTask, stopWithTask);
             this.AppContext.StartForegroundService(intent);
         }
         else
@@ -109,10 +142,6 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
         //    this.AppContext.StartService(intent);
         //}
     }
-
-
-    //protected bool IsShinyForegroundService(Type serviceType)
-    //    => serviceType?.BaseType?.Name.Contains("ShinyAndroidForegroundService") ?? false;
 
 
     public AccessState GetCurrentAccessState(string androidPermission)
@@ -160,7 +189,10 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPe
                         androidPermissions,
                         current
                     ),
-                    ex => ob.OnError(new TimeoutException("A current activity was not detected to be able to request permissions", ex))
+                    ex => ob.OnError(new TimeoutException(
+                        "A current activity was not detected to be able to request permissions",
+                        ex
+                    ))
                 )
             );
         }

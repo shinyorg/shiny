@@ -5,7 +5,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using Android;
 using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
 
@@ -40,7 +39,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
             var transfers = this.repository.GetList<HttpTransfer>();
             if (transfers.Count > 0)
-                this.platform.StartService(typeof(HttpTransferService));
+                this.TryStartService();
         }
         catch (Exception ex)
         {
@@ -58,8 +57,8 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
-        (await this.platform.RequestAccess(Manifest.Permission.ForegroundService)).Assert();
         request.AssertValid();
+        (await this.platform.RequestForegroundServicePermissions()).Assert(allowRestricted: true);
 
         // this will trigger over to the job if it is running
         long? contentLength = null;
@@ -74,9 +73,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             DateTimeOffset.UtcNow
         );
         this.repository.Insert(transfer);
-
-        if (!HttpTransferService.IsStarted)
-            this.platform.StartService(typeof(HttpTransferService));
+        this.TryStartService();
 
         return transfer;
     }
@@ -90,12 +87,12 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
         {
             this.repository.Remove(transfer);
 
-            this.resultSubj.OnNext(new HttpTransferResult(
+            this.resultSubj.OnNextSafe(new HttpTransferResult(
                 transfer.Request,
                 HttpTransferState.Canceled,
                 TransferProgress.Empty,
                 null
-            ));
+            ), this.logger);
         }
         return Task.CompletedTask;
     }
@@ -126,4 +123,11 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
 
         return disposer;
     });
+
+
+    void TryStartService()
+    {
+        if (!HttpTransferService.IsStarted)
+            this.platform.StartService(typeof(HttpTransferService), true);
+    }
 }

@@ -58,7 +58,7 @@ public abstract class ShinyAndroidForegroundService : Service
         switch (action)
         {
             case AndroidPlatform.ActionServiceStart:
-                this.StopWithTask = intent?.GetBooleanExtra("StopWithTask", false) ?? false;
+                this.StopWithTask = intent?.GetBooleanExtra(AndroidPlatform.IntentActionStopWithTask, false) ?? false;
                 this.Start(intent);
                 break;
 
