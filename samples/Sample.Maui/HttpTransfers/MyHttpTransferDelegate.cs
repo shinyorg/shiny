@@ -39,7 +39,7 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
 #if ANDROID
 public partial class MyHttpTransferDelegate : IAndroidHttpTransferDelegate
 {
-    public void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransfer transfer)
+    public void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransferResult transfer)
     {
         switch (transfer.Status)
         {

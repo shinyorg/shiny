@@ -10,11 +10,3 @@ public interface IHttpTransferDelegate
     Task OnError(HttpTransferRequest request, Exception ex);
     Task OnCompleted(HttpTransferRequest request);
 }
-
-#if ANDROID
-public interface IAndroidHttpTransferDelegate : IHttpTransferDelegate
-{
-    // TODO: may want to pass the state, not just the request
-    void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransfer transfer);
-}
-#endif

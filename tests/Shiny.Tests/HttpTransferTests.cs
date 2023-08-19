@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using AndroidX.Core.App;
 using Microsoft.Maui.Storage;
 using Shiny.Net;
 using Shiny.Net.Http;
@@ -358,11 +359,13 @@ public partial class TestHttpTransferDelegate : IHttpTransferDelegate
 }
 
 #if ANDROID
-public partial class TestHttpTransferDelegate : IAndroidHttpTransferDelegate
+public partial class TestHttpTransferDelegate : IAndroidForegroundServiceDelegate
 {
-    public void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransfer transfer)
+    public void Configure(NotificationCompat.Builder builder)
     {
-
+        builder
+            .SetContentTitle("Shiny Integration Tests")
+            .SetContentText("Running HTTP Transfer Test");
     }
 }
 

@@ -11,19 +11,14 @@ namespace Shiny.Net.Http;
     Exported = true,
     ForegroundServiceType = ForegroundService.TypeDataSync
 )]
-public class HttpTransferService : ShinyAndroidForegroundService
+public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferManager, IHttpTransferDelegate>
 {
     public static bool IsStarted { get; private set; }
 
 
     protected override void OnStart(Intent? intent)
     {
-        this.GetService<HttpTransferProcess>().Run(new(
-            this.NotificationId,
-            this.Builder!,
-            this.NotificationManager!,
-            () => this.Stop()
-        ));
+        this.GetService<HttpTransferProcess>().Run(() => this.Stop());
         IsStarted = true;
     }
 

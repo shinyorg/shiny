@@ -44,7 +44,7 @@ public class HttpTransferProcess
     CompositeDisposable disposer = null!;
     
 
-    public void Run(HttpTransferProcessArgs args)
+    public void Run(Action onComplete)
     {
         this.disposer = new();
         CancellationTokenSource cancelSrc = null!;
@@ -73,7 +73,7 @@ public class HttpTransferProcess
                     this.logger.LogDebug("Connectivity is restored - starting transfers");
                     cancelSrc = new();
 
-                    this.TransferLoop(args, queue, cancelSrc.Token).ContinueWith(x =>
+                    this.TransferLoop(queue, cancelSrc.Token).ContinueWith(x =>
                     {
                         if (x.Exception != null)
                             this.logger.LogError(x.Exception, "Transfer loop failed");
@@ -105,7 +105,7 @@ public class HttpTransferProcess
                             {
                                 this.logger.LogInformation("All transfers completed - shutting down");
                                 this.disposer.Dispose();
-                                args.OnComplete();
+                                onComplete();
                             }
                             else
                             {
@@ -118,7 +118,7 @@ public class HttpTransferProcess
                             this.logger.LogDebug("All HTTP Transfers have been cleared");
                             cancelSrc?.Cancel();
                             this.disposer.Dispose();
-                            args.OnComplete();
+                            onComplete();
                             break;
                     }
                 }
@@ -132,7 +132,7 @@ public class HttpTransferProcess
 
 
 
-    async Task TransferLoop(HttpTransferProcessArgs args, ConcurrentQueue<HttpTransfer> transfers, CancellationToken cancelToken)
+    async Task TransferLoop(ConcurrentQueue<HttpTransfer> transfers, CancellationToken cancelToken)
     {
         while (transfers.TryDequeue(out var transfer) &&
                this.connectivity.IsInternetAvailable() &&
@@ -140,15 +140,14 @@ public class HttpTransferProcess
         )
         {
             this.logger.LogDebug("LOOP: Starting Transfer - " + transfer.Identifier);
-            this.UpdateTransferNotification(args, transfer);
-            await this.RunTransfer(args, transfer, cancelToken).ConfigureAwait(false);
+            await this.RunTransfer(transfer, cancelToken).ConfigureAwait(false);
 
             this.logger.LogDebug("LOOP: Stopping/Finished Transfer - " + transfer.Identifier);
         }
     }
 
 
-    async Task RunTransfer(HttpTransferProcessArgs args, HttpTransfer transfer, CancellationToken cancelToken)
+    async Task RunTransfer(HttpTransfer transfer, CancellationToken cancelToken)
     {
         var cancelSrc = new CancellationTokenSource();
         using var _ = cancelToken.Register(() => cancelSrc.Cancel());
@@ -181,7 +180,7 @@ public class HttpTransferProcess
         try
         {
             await this
-                .DoRequest(args, transfer, cancelSrc.Token)
+                .DoRequest(transfer, cancelSrc.Token)
                 .ConfigureAwait(false);
 
             this.logger.LogInformation("Completing Successful Transfer: " + transfer.Identifier);
@@ -189,7 +188,7 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
 
-            progressSubj.OnNext(new HttpTransferResult(
+            progressSubj.OnNextSafe(new HttpTransferResult(
                 transfer.Request,
                 HttpTransferState.Completed,
                 new TransferProgress(
@@ -198,7 +197,8 @@ public class HttpTransferProcess
                     transfer.BytesTransferred
                 ),
                 null
-            ));
+            ), this.logger);
+
             this.repository.Remove(transfer);
         }
         catch (HttpRequestException ex)
@@ -209,12 +209,12 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnError(transfer!.Request, ex), this.logger)
                 .ConfigureAwait(false);
 
-            progressSubj.OnNext(new HttpTransferResult(
+            progressSubj.OnNextSafe(new HttpTransferResult(
                 transfer!.Request,
                 HttpTransferState.Error,
                 TransferProgress.Empty,
                 ex
-            ));
+            ), this.logger);
         }
         catch (OperationCanceledException)
         {
@@ -228,38 +228,7 @@ public class HttpTransferProcess
     }
 
 
-    void UpdateTransferNotification(HttpTransferProcessArgs args, HttpTransfer transfer)
-    {
-        this.logger.LogDebug("Updating Foreground Notification");
-        var percentComplete = transfer.IsDeterministic ? Convert.ToInt32(transfer.PercentComplete()! * 100) : 0;
-
-        args.Builder.SetContentText("Processing Background Transfers");
-        args.Builder.SetProgress(
-            100,
-            percentComplete,
-            !transfer.IsDeterministic
-        );
-        this.delegates
-            .OfType<IAndroidHttpTransferDelegate>()
-            .ToList()
-            .ForEach(x =>
-            {
-                try
-                {
-                    x.ConfigureNotification(args.Builder, transfer);
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogWarning(ex, $"Error updating notification on user delegate: {x.GetType().FullName}");
-                }
-            });
-
-        args.SendNotification();
-        this.logger.LogDebug("Updated Foreground Notification");
-    }
-
-
-    async Task DoRequest(HttpTransferProcessArgs args, HttpTransfer transfer, CancellationToken cancelToken)
+    async Task DoRequest(HttpTransfer transfer, CancellationToken cancelToken)
     {
         var request = transfer.Request;
         var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray() ?? Array.Empty<(string Key, string Value)>();
@@ -304,19 +273,17 @@ public class HttpTransferProcess
                     this.repository.Set(transfer with
                     {
                         Status = HttpTransferState.InProgress,
-                        BytesToTransfer = x.IsDeterministic ? x.BytesToTransfer : null,
+                        BytesToTransfer = x.BytesToTransfer,
                         BytesTransferred = x.BytesTransferred
                     });
 
-                    if (x.IsDeterministic)
-                        this.UpdateTransferNotification(args, transfer);
-
-                    progressSubj.OnNext(new HttpTransferResult(
+                    var result = new HttpTransferResult(
                         request,
                         HttpTransferState.InProgress,
                         x,
                         null
-                    ));
+                    );
+                    progressSubj.OnNextSafe(result, this.logger);
                 }
             },
             ex => tcs.TrySetException(ex),
