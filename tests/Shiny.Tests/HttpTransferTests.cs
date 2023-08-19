@@ -1,9 +1,11 @@
 ﻿using System.IO;
-using AndroidX.Core.App;
 using Microsoft.Maui.Storage;
 using Shiny.Net;
 using Shiny.Net.Http;
 using Shiny.Tests.Mocks;
+#if ANDROID
+using AndroidX.Core.App;
+#endif
 
 namespace Shiny.Tests;
 
