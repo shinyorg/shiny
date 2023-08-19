@@ -103,13 +103,12 @@ public static class HttpClientExtensions
             request.Headers.TryAddWithoutValidation(header.Name, header.Value);
 
         using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-
-        var contentLength = response.Content.Headers.ContentLength;
+        response.EnsureSuccessStatusCode();        
 
         using var source = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         using var dest = File.Create(toFilePath);
 
+        var contentLength = response.Content.Headers.ContentLength;
         var totalBytesXfer = 0L;
         var totalSince = 0L;
         var bytesRead = 0;
@@ -139,7 +138,7 @@ public static class HttpClientExtensions
                 var bytesPerSecond = Convert.ToInt32(totalSince / stop.Elapsed.TotalSeconds);
                 ob.OnNext(new TransferProgress(
                     bytesPerSecond,
-                    contentLength ?? 0,
+                    contentLength,
                     totalBytesXfer
                 ));
 

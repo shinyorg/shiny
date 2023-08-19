@@ -41,8 +41,7 @@ public record HttpTransfer(
     DateTimeOffset CreatedAt
 ) : IRepositoryEntity
 {
-    public string Identifier => this.Request.Identifier;
-    public bool IsDeterministic => this.BytesToTransfer != null;
+    public string Identifier => this.Request.Identifier;    
 };
 
 public record HttpTransferResult(
@@ -63,15 +62,16 @@ public record TransferProgress(
 )
 {
     public static TransferProgress Empty { get; } = new(0, 0, 0);
-
     public bool IsDeterministic => this.BytesToTransfer != null;
-
 
     double? percentComplete;
     public double PercentComplete
     {
         get
         {
+            if (!this.IsDeterministic)
+                return -1;
+
             if (this.percentComplete == null)
             {
                 if (this.BytesToTransfer == null)
