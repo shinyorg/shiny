@@ -92,7 +92,7 @@ public abstract class ShinyAndroidForegroundService : Service
         var notification = this.Builder.Build();
         this.NotificationManager!.Notify(this.NotificationId, notification);
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.StartForeground(this.NotificationId, notification);
             this.Logger.LogDebug("Started Foreground Service");
@@ -108,7 +108,7 @@ public abstract class ShinyAndroidForegroundService : Service
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.Logger.LogDebug("API level requires foreground detach");
             this.StopForeground(StopForegroundFlags.Detach);
