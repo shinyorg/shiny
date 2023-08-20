@@ -115,7 +115,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                     status = AccessState.Restricted;
             }
 
-            if (permissionSet.Contains(P.ForegroundService) && result.IsGranted(P.ForegroundService))
+            if (permissionSet.Contains(P.ForegroundService) && !result.IsGranted(P.ForegroundService))
                 return AccessState.NotSetup;
 
             // foreground does not fail - the notification will not show but the service will show up in the task manager as per: https://developer.android.com/develop/ui/views/notifications/notification-permission
