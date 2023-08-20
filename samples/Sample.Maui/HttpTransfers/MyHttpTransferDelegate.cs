@@ -1,7 +1,4 @@
-﻿#if ANDROID
-using AndroidX.Core.App;
-#endif
-using Shiny.Net.Http;
+﻿using Shiny.Net.Http;
 using Shiny.Notifications;
 
 namespace Sample.HttpTransfers;
@@ -43,7 +40,7 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
 
 public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
 {
-    public void Configure(NotificationCompat.Builder builder)
+    public void Configure(AndroidX.Core.App.NotificationCompat.Builder builder)
     {
         builder
             .SetContentTitle("Shiny Sample")
