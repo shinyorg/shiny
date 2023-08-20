@@ -87,12 +87,12 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
         {
             this.repository.Remove(transfer);
 
-            this.resultSubj.OnNextSafe(new HttpTransferResult(
+            this.resultSubj.OnNext(new(
                 transfer.Request,
                 HttpTransferState.Canceled,
                 TransferProgress.Empty,
                 null
-            ), this.logger);
+            ));
         }
         return Task.CompletedTask;
     }

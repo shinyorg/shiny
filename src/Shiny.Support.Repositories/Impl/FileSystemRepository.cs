@@ -1,6 +1,5 @@
 ﻿#if PLATFORM
 using System.Linq.Expressions;
-using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 
@@ -12,6 +11,8 @@ public class FileSystemRepository : IRepository
     readonly ISerializer serializer;
     readonly ILogger logger;
     readonly DirectoryInfo rootDir;
+    readonly ShinySubject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj;
+    //readonly Subject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj = new();
 
 
     public FileSystemRepository(
@@ -24,8 +25,12 @@ public class FileSystemRepository : IRepository
         this.serializer = serializer;
         this.rootDir = platform.AppData;
         this.logger = logger;
+
+        this.repoSubj = new(this.logger);
     }
 
+
+    public IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs() => this.repoSubj;
 
     public bool Exists<TEntity>(string identifier) where TEntity : IRepositoryEntity
     {
@@ -155,10 +160,6 @@ public class FileSystemRepository : IRepository
         });
         this.repoSubj.OnNext((RepositoryAction.Clear, typeof(TEntity), default));
     }
-
-
-    readonly Subject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj = new();
-    public IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs() => this.repoSubj;
 
 
     FileInfo[] GetFiles<TEntity>() => this.rootDir.GetFiles($"{typeof(TEntity).Name}_*.shiny");

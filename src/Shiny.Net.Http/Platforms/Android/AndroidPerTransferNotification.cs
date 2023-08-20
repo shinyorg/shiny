@@ -1,23 +1,28 @@
-﻿//using Microsoft.Extensions.Logging;
+﻿using AndroidX.Core.App;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
-//namespace Shiny.Net.Http;
+namespace Shiny.Net.Http;
 
 
-//public class AndroidPerTransferTransferNotification : IShinyStartupTask
-//{
-//    public AndroidPerTransferTransferNotification(
-//        AndroidPlatform platform,
-//        IHttpTransferManager manager,
-//        ILogger<AndroidPerTransferTransferNotification> logger
-//    )
-//    {
-//    }
+public class AndroidPerTransferTransferNotification : IShinyStartupTask
+{
+    readonly Dictionary<string, (int NotificationId, NotificationCompat.Builder Context)> dictionary = new();
 
-//    public void Start()
-//    {
 
-//    }
-//}
+    public AndroidPerTransferTransferNotification(
+        AndroidPlatform platform,
+        IHttpTransferManager manager,
+        ILogger<AndroidPerTransferTransferNotification> logger
+    )
+    {
+    }
+
+    public void Start()
+    {
+
+    }
+}
 
 ///*
 //using System;
@@ -75,3 +80,44 @@
 //        this.logger.LogDebug("Updated Foreground Notification");
 //    } 
 // */
+
+
+//#if ANDROID
+//public partial class MyHttpTransferDelegate : IAndroidHttpTransferDelegate
+//{
+//    public void ConfigureNotification(AndroidX.Core.App.NotificationCompat.Builder builder, HttpTransferResult transfer)
+//    {
+//        switch (transfer.Status)
+//        {
+//            case HttpTransferState.Pending:
+//                if (transfer.Request.IsUpload)
+//                {
+//                    builder.SetContentText($"Starting Upload {Path.GetFileName(transfer.Request.LocalFilePath)} to {transfer.Request.Uri}");
+//                }
+//                else
+//                {
+//                    builder.SetContentText($"Start Download from {transfer.Request.Uri}");
+//                }
+//                break;
+
+//            case HttpTransferState.Paused:
+//            case HttpTransferState.PausedByNoNetwork:
+//            case HttpTransferState.PausedByCostedNetwork:
+//                var type = transfer.Request.IsUpload ? "Upload" : "Download";
+//                builder.SetContentText($"Paused {type} for {transfer.Request.Uri}");
+//                break;
+
+//            case HttpTransferState.InProgress:
+//                if (transfer.Request.IsUpload)
+//                {
+//                    builder.SetContentText($"Uploading {Path.GetFileName(transfer.Request.LocalFilePath)}");
+//                }
+//                else
+//                {
+//                    builder.SetContentText($"Downloading file from {transfer.Request.Uri}");
+//                }
+//                break;
+//        }
+//    }
+//}
+//#endif

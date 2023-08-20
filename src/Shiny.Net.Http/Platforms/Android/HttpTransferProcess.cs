@@ -36,10 +36,12 @@ public class HttpTransferProcess
         this.repository = repository;
         this.connectivity = connectivity;        
         this.delegates = delegates;
+
+        progressSubj.Logger = logger;
     }
 
 
-    static readonly Subject<HttpTransferResult> progressSubj = new();
+    static readonly ShinySubject<HttpTransferResult> progressSubj = new();
     public static IObservable<HttpTransferResult> WhenProgress() => progressSubj;
     CompositeDisposable disposer = null!;
     
@@ -54,41 +56,33 @@ public class HttpTransferProcess
             .WhenInternetStatusChanged()
             .Where(x => x == true)
             .DistinctUntilChanged()
-            .Subscribe(_ =>
+            .SubscribeAsync(async _ =>
             {
-                try
-                {
-                    var fullInternet = this.connectivity.Access == NetworkAccess.Internet;
+                var fullInternet = this.connectivity.Access == NetworkAccess.Internet;
 
-                    var queue = new ConcurrentQueue<HttpTransfer>(this.repository
-                        .GetList<HttpTransfer>(x =>
-                            !x.Request.UseMeteredConnection ||
-                            fullInternet
-                        )
-                        .OrderBy(x => x.CreatedAt)
-                        .ToList()
-                    );
-                    // this will start with an event triggering everything
-                    // current transfers will cancel themselves and set their state when connectivity drops
-                    this.logger.LogDebug("Connectivity is restored - starting transfers");
-                    cancelSrc = new();
+                var queue = new ConcurrentQueue<HttpTransfer>(this.repository
+                    .GetList<HttpTransfer>(x =>
+                        !x.Request.UseMeteredConnection ||
+                        fullInternet
+                    )
+                    .OrderBy(x => x.CreatedAt)
+                    .ToList()
+                );
+                // this will start with an event triggering everything
+                // current transfers will cancel themselves and set their state when connectivity drops
+                this.logger.LogDebug("Connectivity is restored - starting transfers");
+                cancelSrc = new();
 
-                    this.TransferLoop(queue, cancelSrc.Token).ContinueWith(x =>
-                    {
-                        if (x.Exception != null)
-                            this.logger.LogError(x.Exception, "Transfer loop failed");
-                    });
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(ex, "Error in connectivity event");
-                }
+                await this.TransferLoop(queue, cancelSrc.Token).ConfigureAwait(false);
             })
             .DisposedBy(this.disposer);
 
         this.repository
             .WhenActionOccurs()
-            .Where(x => x.EntityType == typeof(HttpTransfer))
+            .Where(x =>
+                x.EntityType == typeof(HttpTransfer) &&
+                x.Action != RepositoryAction.Update
+            )
             .Subscribe(x =>
             {
                 try
@@ -188,7 +182,7 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
 
-            progressSubj.OnNextSafe(new HttpTransferResult(
+            progressSubj.OnNext(new(
                 transfer.Request,
                 HttpTransferState.Completed,
                 new TransferProgress(
@@ -197,24 +191,25 @@ public class HttpTransferProcess
                     transfer.BytesTransferred
                 ),
                 null
-            ), this.logger);
+            ));
 
             this.repository.Remove(transfer);
         }
         catch (HttpRequestException ex)
         {
-            this.repository.Remove(transfer);
             this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
             await this.delegates
                 .RunDelegates(x => x.OnError(transfer!.Request, ex), this.logger)
                 .ConfigureAwait(false);
 
-            progressSubj.OnNextSafe(new HttpTransferResult(
+            progressSubj.OnNext(new(
                 transfer!.Request,
                 HttpTransferState.Error,
                 TransferProgress.Empty,
                 ex
-            ), this.logger);
+            ));
+
+            this.repository.Remove(transfer);
         }
         catch (OperationCanceledException)
         {
@@ -283,7 +278,7 @@ public class HttpTransferProcess
                         x,
                         null
                     );
-                    progressSubj.OnNextSafe(result, this.logger);
+                    progressSubj.OnNext(result);
                 }
             },
             ex => tcs.TrySetException(ex),

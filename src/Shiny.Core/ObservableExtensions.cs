@@ -48,18 +48,6 @@ public static class ObservableExtensions
     }
 
 
-    public static void OnNextSafe<T>(this Subject<T> subject, T value, ILogger logger)
-    {
-        try
-        {
-            subject.OnNext(value);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Error on subject pump");
-        }
-    }
-
     /// <summary>
     /// Notifies whenever a property changes within an INotifyPropertyChanged
     /// </summary>

@@ -45,7 +45,7 @@ public class HttpTransfersViewModel : ViewModel
             await this.manager.Queue(new HttpTransferRequest(
                 Guid.NewGuid().ToString(),
                 this.GetUrl(true),
-                false,
+                true,
                 path
             ));
         });
@@ -62,7 +62,10 @@ public class HttpTransfersViewModel : ViewModel
                 if (confirm)
                     await manager.CancelAll();
             },
-            manager.WatchCount().Select(x => x > 0)
+            manager
+                .WatchCount()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Select(x => x > 0)
         );
     }
 
@@ -79,10 +82,10 @@ public class HttpTransfersViewModel : ViewModel
     public override async void OnAppearing()
     {
         base.OnAppearing();
-        this.manager
-            .WatchCount()
-            .SubOnMainThread(x => this.TransferCount = x)
-            .DisposedBy(this.DeactivateWith);
+        //this.manager
+        //    .WatchCount()
+        //    .SubOnMainThread(x => this.TransferCount = x)
+        //    .DisposedBy(this.DeactivateWith);
 
         try
         {

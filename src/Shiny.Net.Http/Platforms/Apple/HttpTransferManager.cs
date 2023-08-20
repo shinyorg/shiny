@@ -239,12 +239,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 ht = ht with { Status = HttpTransferState.Paused };
                 this.repository.Update(ht);
 
-                this.transferSubj.OnNextSafe(new HttpTransferResult(
+                this.transferSubj.OnNext(new(
                     ht.Request,
                     ht.Status,
                     TransferProgress.Empty,
                     null
-                ), this.logger);
+                ));
                 break;
 
             case NSUrlSessionTaskState.Canceling:
@@ -310,12 +310,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.logger.LogInformation($"Transfer {ht.Identifier} was canceled");
         this.Remove(ht);
 
-        this.transferSubj.OnNextSafe(new(
+        this.transferSubj.OnNext(new(
             ht.Request,
             HttpTransferState.Canceled,
             TransferProgress.Empty,
             null
-        ), this.logger);
+        ));
     }
 
 
@@ -324,12 +324,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.Remove(ht);
         await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), this.logger);
 
-        this.transferSubj.OnNextSafe(new(
+        this.transferSubj.OnNext(new(
             ht.Request,
             HttpTransferState.Completed,
             TransferProgress.Empty,
             null
-        ), this.logger);
+        ));
     }
 
 
@@ -357,12 +357,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             {
                 this.repository.Update(ht);
                 var bps = (int)(task.Progress?.Throughput ?? 0);
-                this.transferSubj.OnNextSafe(new(
+                this.transferSubj.OnNext(new(
                     ht.Request,
                     ht.Status,
                     new(bps, totalBytesExpectedToSend, totalBytesSent),
                     null
-                ), this.logger);
+                ));
             }
             catch (RepositoryException) 
             {
@@ -396,12 +396,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 this.repository.Update(ht);
                 var bps = (int)(downloadTask.Progress?.Throughput ?? 0);
 
-                this.transferSubj.OnNextSafe(new(
+                this.transferSubj.OnNext(new(
                     ht.Request,
                     ht.Status,
                     new(bps, totalBytesExpectedToWrite, totalBytesWritten),
                     null
-                ), this.logger);
+                ));
             }
             catch (RepositoryException)
             {
