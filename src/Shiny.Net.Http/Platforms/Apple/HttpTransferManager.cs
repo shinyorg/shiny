@@ -20,6 +20,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                                    IIosLifecycle.IHandleEventsForBackgroundUrl
 {
     Action? completionHandler;
+    readonly ShinySubject<HttpTransferResult> transferSubj;
 
     readonly ILogger logger;
     readonly IPlatform platform;
@@ -40,6 +41,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.platform = platform;
         this.services = services;
         this.Config = config;
+
+        this.transferSubj = new(this.logger);
     }
 
 
@@ -59,6 +62,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public AppleConfiguration Config { get; }
     public string SessionName => this.Config.SessionName ?? $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
+
 
     NSUrlSession? nsUrlSession;
     public NSUrlSession Session
@@ -94,6 +98,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         }
     }
 
+
+    public IObservable<HttpTransferResult> WhenUpdateReceived() => this.transferSubj;
 
     public Task<IList<HttpTransfer>> GetTransfers()
     {
@@ -157,9 +163,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
 
     public IObservable<int> WatchCount() => this.repository.CreateCountWatcher<HttpTransfer>();
-
-    readonly Subject<HttpTransferResult> transferSubj = new();
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => this.transferSubj;
 
 
     public bool Handle(string sessionIdentifier, Action incomingCompletionHandler)
