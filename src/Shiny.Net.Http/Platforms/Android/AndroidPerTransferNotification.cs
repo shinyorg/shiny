@@ -1,13 +1,18 @@
-﻿using AndroidX.Core.App;
+﻿using System;
 using System.Collections.Generic;
+using AndroidX.Core.App;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Net.Http;
 
 
-public class AndroidPerTransferTransferNotification : IShinyStartupTask
+public abstract class AndroidPerTransferTransferNotification : IShinyStartupTask
 {
     readonly Dictionary<string, (int NotificationId, NotificationCompat.Builder Context)> dictionary = new();
+    readonly IHttpTransferManager manager;
+    readonly AndroidPlatform platform;
+    readonly ILogger logger;
+    readonly NotificationManagerCompat notifications;
 
 
     public AndroidPerTransferTransferNotification(
@@ -16,12 +21,25 @@ public class AndroidPerTransferTransferNotification : IShinyStartupTask
         ILogger<AndroidPerTransferTransferNotification> logger
     )
     {
+        this.platform = platform;
+        this.manager = manager;
+        this.logger = logger;
+
+        this.notifications = NotificationManagerCompat.From(this.platform.AppContext);
     }
+
 
     public void Start()
     {
+        this.manager
+            .WhenUpdateReceived()
+            .Subscribe(transfer =>
+            {
 
+            });
     }
+
+    protected abstract void Customize(NotificationCompat.Builder builder);
 }
 
 ///*
