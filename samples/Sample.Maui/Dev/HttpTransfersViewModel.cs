@@ -72,7 +72,7 @@ public class HttpTransfersViewModel : ViewModel
 
 
     [Reactive] public int TransferCount { get; private set; }
-    public INotifyReadOnlyCollection<HttpTransferObject> Transfers => this.monitor.Transfers;
+    public INotifyReadOnlyCollection<HttpTransferObject> Transfers { get; private set; } = new ObservableList<HttpTransferObject>();
     public ICommand AddDownload { get; }
     public ICommand AddUpload { get; }
     public ICommand CancelAll { get; }
@@ -82,10 +82,14 @@ public class HttpTransfersViewModel : ViewModel
     public override async void OnAppearing()
     {
         base.OnAppearing();
-        //this.manager
-        //    .WatchCount()
-        //    .SubOnMainThread(x => this.TransferCount = x)
-        //    .DisposedBy(this.DeactivateWith);
+        this.manager
+            .WatchCount()
+            .SubOnMainThread(x =>
+            {
+                this.TransferCount = x;
+                this.Title = $"HTTP Transfers Dev ({x})";
+            })
+            .DisposedBy(this.DeactivateWith);
 
         try
         {
@@ -95,6 +99,8 @@ public class HttpTransfersViewModel : ViewModel
                 false,
                 RxApp.MainThreadScheduler
             );
+
+            this.Transfers = this.monitor.Transfers;
         }
         catch (Exception ex)
         {
@@ -112,7 +118,7 @@ public class HttpTransfersViewModel : ViewModel
 
     string GetUrl(bool upload)
     {
-        var url = this.configuration.GetValue("HttpTestsUrl", "https://192.168.1.5:7133");
+        var url = this.configuration.GetValue("HttpTestsUrl", "https://192.168.1.5:7133")!;
         if (!url.EndsWith("/"))
             url += "/";
 

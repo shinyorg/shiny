@@ -5,7 +5,7 @@
              xmlns:http="clr-namespace:Shiny.Net.Http;assembly=Shiny.Net.Http"
              x:DataType="dev:HttpTransfersViewModel"
              x:Class="Sample.Dev.HttpTransfersPage"
-             Title="HTTP Transfers Dev">
+             Title="{Binding Title}">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Clear"
