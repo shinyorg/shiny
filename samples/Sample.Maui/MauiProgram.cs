@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Prism.DryIoc;
 using Sample.Dev;
-
 namespace Sample;
 
 
@@ -62,6 +61,7 @@ public static class MauiProgram
 
         // shiny.net.http
         s.AddHttpTransfers<HttpTransfers.MyHttpTransferDelegate>();
+        s.AddShinyService<Shiny.Net.Http.PerTransferNotificationStrategy>();
 
         // shiny.bluetoothle & shiny.bluetoothle.hosting
         s.AddBluetoothLE<BleClient.MyBleDelegate>();

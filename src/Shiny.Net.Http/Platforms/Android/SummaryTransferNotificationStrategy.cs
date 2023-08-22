@@ -8,32 +8,29 @@ using Shiny.Support.Repositories;
 namespace Shiny.Net.Http;
 
 
-public abstract class AndroidSummaryTransferNotification : IShinyStartupTask
+public class SummaryTransferNotificationStrategy : AbstractTransferNotificationStrategy
 {
-    readonly AndroidPlatform platform;
-    readonly IHttpTransferManager manager;
-    readonly IRepository repository;
-    readonly ILogger logger;
-    readonly NotificationManagerCompat notifications;
 
-
-    public AndroidSummaryTransferNotification(
-        AndroidPlatform platform,
+    public SummaryTransferNotificationStrategy(
         IRepository repository,
-        ILogger<AndroidSummaryTransferNotification> logger
-    )
+        AndroidPlatform platform,
+        ILogger<SummaryTransferNotificationStrategy> logger
+    ) : base(platform, logger)
     {
-        this.platform = platform;
-        this.repository = repository;
-        this.logger = logger;
-
-        this.notifications = NotificationManagerCompat.From(this.platform.AppContext);
+        this.Repository = repository;
     }
 
+    protected IRepository Repository { get; }
 
-    public void Start()
+
+    public override void Start()
     {
-        var transfers = this.repository.GetList<HttpTransfer>();
+        // TODO: this is only good for uploads really
+        var notificationId = new Random().Next(25000, 999999);
+        var channelId = this.CreateChannel();
+        var builder = this.CreateBuilder(channelId);
+
+        var transfers = this.Repository.GetList<HttpTransfer>();
         var count = transfers.Count;
         var bytesToXfer = transfers.Sum(x => x.BytesToTransfer ?? 0);
         var bytesXfer = transfers.Sum(x => x.BytesTransferred);
@@ -41,9 +38,11 @@ public abstract class AndroidSummaryTransferNotification : IShinyStartupTask
         if (count > 0)
         {
             // TODO: set initial transfer
+            //this.Customize(builder)
+            this.NotificationManager.Notify(notificationId, builder.Build());
         }
 
-        this.repository
+        this.Repository
             .WhenActionOccurs()
             //.TakeLastBuffer(TimeSpan.FromSeconds(2)) // TODO: can only do this if update
             .Where(x => x.EntityType == typeof(HttpTransfer))
@@ -52,7 +51,7 @@ public abstract class AndroidSummaryTransferNotification : IShinyStartupTask
                 if (x.Action == RepositoryAction.Clear)
                 {
                     // TODO: remove notification
-                    this.notifications.Cancel(0);
+                    this.NotificationManager.Cancel(notificationId);
                 }
                 else
                 {
@@ -75,7 +74,7 @@ public abstract class AndroidSummaryTransferNotification : IShinyStartupTask
 
                             if (count == 0)
                             {
-                                this.notifications.Cancel(0);
+                                this.NotificationManager.Cancel(0);
                             }
                             else if (xfer.Status != HttpTransferState.Completed)
                             {
@@ -86,20 +85,25 @@ public abstract class AndroidSummaryTransferNotification : IShinyStartupTask
                     }
                     if (count > 0)
                     {
-                        
+                        //this.Customize(builder,
+                        this.NotificationManager.Notify(notificationId, builder.Build());
                     }
                 }
             });
     }
 
 
-    // TODO: time estimate based on bps (does it apply for different sites though?)
-    // TODO: bps
-    // TODO: percentage
-    protected abstract void Customize(
+    protected virtual void Customize(
         NotificationCompat.Builder builder,
+        int transferRemaining,
         int transferCount,
+        TimeSpan EstimatedTimeRemaining,
+        double percentage,
+        long bytesToTransfer,
         long bytesTransferred,
-        long bytesToTransfer
-    );
+        long bytesPerSecond
+    )
+    {
+
+    }
 }
