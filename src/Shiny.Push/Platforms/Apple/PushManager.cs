@@ -163,15 +163,21 @@ public class PushManager : NotifyPropertyChanged,
 
     public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
     {
-        this.TryProcessIncomingNotification(notification, "Foreground remote notification received", () =>
-            completionHandler.Invoke(UNNotificationPresentationOptions.List | UNNotificationPresentationOptions.Banner)
+        this.TryProcessIncomingNotification(
+            notification,
+            "Foreground remote notification received",
+            () => completionHandler.Invoke(UNNotificationPresentationOptions.List | UNNotificationPresentationOptions.Banner)
         );
     }
 
 
     public void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
     {
-        this.TryProcessIncomingNotification(response?.Notification, "Background remote notification entry detected", completionHandler);
+        this.TryProcessIncomingNotification(
+            response?.Notification,
+            "Background remote notification entry detected",
+            completionHandler
+        );
     }
 
 
@@ -204,7 +210,7 @@ public class PushManager : NotifyPropertyChanged,
 
         var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
         this.services.RunDelegates<IPushDelegate>(
-            x => x.OnReceived(push),
+            x => x.OnEntry(push),
             this.logger
         );
     }
@@ -226,9 +232,10 @@ public class PushManager : NotifyPropertyChanged,
 
         var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
         var data = new PushNotification(dict, shinyNotification);
+
         this.services
             .RunDelegates<IPushDelegate>(
-                x => x.OnEntry(data),
+                x => x.OnReceived(data),
                 this.logger
             )
             .ContinueWith(_ => completionHandler.Invoke());
