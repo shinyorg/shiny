@@ -57,6 +57,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     static T? GetParcel<T>(Intent intent, string name) where T : Java.Lang.Object
     {
         Java.Lang.Object? result;
+#if ANDROID33_0_OR_GREATER
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             var javaCls = Java.Lang.Class.FromType(typeof(T));
@@ -66,7 +67,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             result = intent.GetParcelableExtra(name, javaCls);
             return (T)result;
         }
-
+#endif
         result = intent.GetParcelableExtra(name);
         return (T)result;
     }
