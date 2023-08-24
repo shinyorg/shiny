@@ -54,6 +54,23 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     readonly Subject<(Peripheral Peripheral, Intent Intent)> peripheralEventSubj = new();
 
 
+    static T? GetParcel<T>(Intent intent, string name) where T : Java.Lang.Object
+    {
+        Java.Lang.Object? result;
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        {
+            var javaCls = Java.Lang.Class.FromType(typeof(T));
+            if (javaCls == null)
+                throw new InvalidOperationException("Invalid java type");
+
+            result = intent.GetParcelableExtra(name, javaCls);
+            return (T)result;
+        }
+
+        result = intent.GetParcelableExtra(name);
+        return (T)result;
+    }
+
     public void Start()
     {
         ShinyBleBroadcastReceiver.Process = async intent =>
@@ -61,7 +78,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             if (intent?.Action == Intent.ActionBootCompleted || intent?.Action == null)
                 return;
 
-            var device = intent.GetParcel<BluetoothDevice>(BluetoothDevice.ExtraDevice);
+            var device = GetParcel<BluetoothDevice>(intent, BluetoothDevice.ExtraDevice);
             if (device != null)
             {
                 var peripheral = this.GetPeripheral(device);

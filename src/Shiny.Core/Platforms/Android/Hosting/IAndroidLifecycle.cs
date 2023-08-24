@@ -13,6 +13,11 @@ public interface IAndroidLifecycle
         void OnBackground();
     }
 
+    public interface IOnActivityOnCreate
+    {
+
+    }
+
     public interface IOnActivityRequestPermissionsResult
     {
         void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults);

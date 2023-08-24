@@ -61,7 +61,9 @@ public static class MauiProgram
 
         // shiny.net.http
         s.AddHttpTransfers<HttpTransfers.MyHttpTransferDelegate>();
+#if ANDROID
         s.AddShinyService<Shiny.Net.Http.PerTransferNotificationStrategy>();
+#endif
 
         // shiny.bluetoothle & shiny.bluetoothle.hosting
         s.AddBluetoothLE<BleClient.MyBleDelegate>();

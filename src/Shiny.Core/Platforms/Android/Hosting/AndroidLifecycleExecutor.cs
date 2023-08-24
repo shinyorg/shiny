@@ -16,6 +16,7 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
     readonly ILogger logger;
     readonly AndroidPlatform platform;
     readonly IEnumerable<IAndroidLifecycle.IApplicationLifecycle> appHandlers;
+    readonly IEnumerable<IAndroidLifecycle.IOnActivityOnCreate> onCreateHandlers;
     readonly IEnumerable<IAndroidLifecycle.IOnActivityRequestPermissionsResult> permissionHandlers;
     readonly IEnumerable<IAndroidLifecycle.IOnActivityNewIntent> newIntentHandlers;
     readonly IEnumerable<IAndroidLifecycle.IOnActivityResult> activityResultHandlers;
@@ -26,6 +27,7 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
         ILogger<AndroidLifecycleExecutor> logger,
         AndroidPlatform platform,
         IEnumerable<IAndroidLifecycle.IApplicationLifecycle> appHandlers,
+        IEnumerable<IAndroidLifecycle.IOnActivityOnCreate> onCreateHandlers,
         IEnumerable<IAndroidLifecycle.IOnActivityRequestPermissionsResult> permissionHandlers,
         IEnumerable<IAndroidLifecycle.IOnActivityNewIntent> newIntentHandlers,
         IEnumerable<IAndroidLifecycle.IOnActivityResult> activityResultHandlers
@@ -34,6 +36,7 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
         this.logger = logger;
         this.platform = platform;
         this.appHandlers = appHandlers;
+        this.onCreateHandlers = onCreateHandlers;
         this.permissionHandlers = permissionHandlers;
         this.newIntentHandlers = newIntentHandlers;
         this.activityResultHandlers = activityResultHandlers;
@@ -49,7 +52,10 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
             {
                 ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
             }
-            catch { } //
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Could not attach lifecycle observer");
+            }
         });
     }
 
@@ -89,7 +95,10 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
             {
                 ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Could not remove lifecycle observer");
+            }
         });
         base.Dispose();
     }

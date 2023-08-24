@@ -18,9 +18,9 @@ using Shiny.Hosting;
 namespace Shiny;
 
 
-public class AndroidPlatform : IPlatform,
-                               IAndroidLifecycle.IOnActivityRequestPermissionsResult,
-                               IAndroidLifecycle.IOnActivityResult
+public partial class AndroidPlatform : IPlatform,
+                                       IAndroidLifecycle.IOnActivityRequestPermissionsResult,
+                                       IAndroidLifecycle.IOnActivityResult
 {
     int requestCode;
     static AndroidActivityLifecycle activityLifecycle; // this should never change once installed on the platform
@@ -141,7 +141,7 @@ public class AndroidPlatform : IPlatform,
         //    intent.SetAction(ActionServiceStop);
         //    this.AppContext.StartService(intent);
         //}
-    }
+    }    
 
 
     public AccessState GetCurrentAccessState(string androidPermission)
