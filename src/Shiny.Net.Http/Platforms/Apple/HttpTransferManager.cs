@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -179,7 +178,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     public override void DidBecomeInvalid(NSUrlSession session, NSError error)
     {
         this.logger.LogDebug($"DidBecomeInvalid");
-        //this.manager.CompleteSession(); // TODO: restart session?
         this.nsUrlSession = null;
 
         if (error != null)
@@ -198,18 +196,21 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     ////}
 
 
-    ////public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-    ////{
-    ////    this.logger.LogDebug($"DidReceiveChallenge");
-    ////    completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
-    ////}
+    //public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
+    //{
+    //    this.logger.LogDebug($"DidReceiveChallenge");
+    //    //challenge.ProtectionSpace.AuthenticationMethod == 
+    //    //challenge.ProposedCredential.
+    //    //NSUrlSessionAuthChallengeDisposition.UseCredential
+    //    completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
+    //}
 
 
-    ////public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-    ////{
-    ////    this.logger.LogDebug($"DidReceiveChallenge for task");
-    ////    completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
-    ////}
+    //public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
+    //{
+    //    this.logger.LogDebug($"DidReceiveChallenge for task");
+    //    completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
+    //}
 
 
     //public override void DidResume(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long resumeFileOffset, long expectedTotalBytes)
@@ -305,6 +306,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             TransferProgress.Empty,
             ex
         ));
+        this.TryCompleteSession();
     }
 
 
@@ -319,6 +321,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             TransferProgress.Empty,
             null
         ));
+        this.TryCompleteSession();
     }
 
 
@@ -333,6 +336,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             TransferProgress.Empty,
             null
         ));
+        this.TryCompleteSession();
     }
 
 
@@ -503,6 +507,17 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             {
                 this.logger.LogWarning($"Unable to delete temporary upload file - {transfer.Identifier}", ex);
             }
+        }
+    }
+
+
+    void TryCompleteSession()
+    {
+        var transfers = this.repository.GetList<HttpTransfer>();
+        if (transfers.Count == 0)
+        {
+            this.completionHandler?.Invoke();
+            this.nsUrlSession = null;
         }
     }
 }
