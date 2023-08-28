@@ -160,6 +160,7 @@ public class PushManager : NotifyPropertyChanged,
         return rawToken;
     }
 
+
     // This is called when notification is received in the app.
     public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
     {
@@ -170,14 +171,22 @@ public class PushManager : NotifyPropertyChanged,
         );
     }
 
+
     // This is called when we tap on notification alert
     public void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
     {
-        this.TryProcessTappedNotification(
-            response?.Notification,
-            "Background remote notification entry detected",
-            completionHandler
-        );
+        // if this errors, high level event hub will catch
+        if (response?.Notification?.Request?.Trigger is not UNPushNotificationTrigger push)
+            return;
+
+        this.logger.LogDebug("OnDidReceiveNotificationResponse - Background remote notification entry detected");
+        var data = this.ToPushNotification(response.Notification);
+        this.services
+            .RunDelegates<IPushDelegate>(
+                x => x.OnEntry(data),
+                this.logger
+            )
+            .ContinueWith(_ => completionHandler.Invoke());
     }
 
 
@@ -197,6 +206,7 @@ public class PushManager : NotifyPropertyChanged,
             .ContinueWith(_ => completionHandler.Invoke(UIBackgroundFetchResult.NewData));
     }
 
+
     // This is called when app is fresh launched.
     public void Handle(UIApplicationLaunchEventArgs args)
     {
@@ -215,6 +225,7 @@ public class PushManager : NotifyPropertyChanged,
         );
     }
 
+
     protected virtual void TryProcessIncomingNotification(UNNotification? notification, string logMessage, Action completionHandler)
     {
         // if this errors, high level event hub will catch
@@ -232,22 +243,6 @@ public class PushManager : NotifyPropertyChanged,
             .ContinueWith(_ => completionHandler.Invoke());
     }
 
-    protected virtual void TryProcessTappedNotification(UNNotification? notification, string logMessage, Action completionHandler)
-    {
-        // if this errors, high level event hub will catch
-        if (notification?.Request?.Trigger is not UNPushNotificationTrigger push)
-            return;
-
-        this.logger.LogDebug(logMessage);
-
-        var data = this.ToPushNotification(notification);
-        this.services
-            .RunDelegates<IPushDelegate>(
-                x => x.OnEntry(data),
-                this.logger
-            )
-            .ContinueWith(_ => completionHandler.Invoke());
-    }
 
     protected virtual PushNotification ToPushNotification(UNNotification notification)
     {
@@ -262,6 +257,7 @@ public class PushManager : NotifyPropertyChanged,
 
         return data;
     }
+
 
     protected virtual Notification? ToNotification(NSDictionary data)
     {
