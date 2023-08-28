@@ -83,32 +83,12 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
             foreach (var job in registeredJobs)
             {
                 var jobNew = job with { IsSystemJob = true };
+
+                // will fail if permissions or setup is wrong - that's what we want
+                // we won't crash out, we'll just log a full error
                 this.jobManager.Register(jobNew);
 
                 this.logger.LogWarning($"Registered System Job '{job.Identifier}' of Type '{job.JobType}'");
-            }
-
-            jobs = this.jobManager.GetJobs();
-            if (jobs.Count > 0)
-            {
-                this.jobManager
-                    .RequestAccess()
-                    .ContinueWith(x =>
-                    {
-                        if (x.Exception != null)
-                        {
-                            this.logger.LogError(x.Exception, "Error requesting job permissions");
-                        }
-                        else if (x.Result != AccessState.Available)
-                        {
-                            this.logger.LogWarning("Jobs will not run in background due to insufficient privileges: " + x.Result);
-                        }
-                        else
-                        {
-                            this.logger.LogDebug("Jobs setup for background runs");
-                        }
-                    });
-
             }
         }
         catch (Exception ex)
