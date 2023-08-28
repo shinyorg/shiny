@@ -13,6 +13,7 @@ using CoreBluetooth;
 #if ANDROID
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
+using Shiny.Reflection;
 #endif
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -115,16 +116,28 @@ public partial class BleHostingManager : IShinyStartupTask
     }
 
 
+    static bool IsMethodOverridden(Type type, string methodName, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public)
+    {
+        var method = type.GetMethod(methodName, flags);
+        if (method == null)
+            throw new InvalidOperationException($"No method named '{methodName}' was found on type '{type.FullName}'");
+
+        // var baseType = method.GetBaseDefinition().DeclaringType;
+        var result = !method.DeclaringType!.FullName.Equals(method.GetBaseDefinition().DeclaringType?.FullName);
+
+        return result;
+    }
+
     void BuildCharacteristic(IGattServiceBuilder sb, BleGattCharacteristic characteristic, BleGattCharacteristicAttribute attribute)
     {
         var ctype = characteristic.GetType();
 
         characteristic.Characteristic = sb.AddCharacteristic(attribute.CharacteristicUuid, cb =>
         {
-            var read = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnRead));
-            var requester = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.Request));
-            var write = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnWrite));
-            var notify = ctype.IsMethodOverridden(nameof(BleGattCharacteristic.OnSubscriptionChanged));
+            var read = IsMethodOverridden(ctype, nameof(BleGattCharacteristic.OnRead));
+            var requester = IsMethodOverridden(ctype, nameof(BleGattCharacteristic.Request));
+            var write = IsMethodOverridden(ctype, nameof(BleGattCharacteristic.OnWrite));
+            var notify = IsMethodOverridden(ctype, nameof(BleGattCharacteristic.OnSubscriptionChanged));
 
             if (read)
             {

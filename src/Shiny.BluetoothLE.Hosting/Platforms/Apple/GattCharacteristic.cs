@@ -153,7 +153,17 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             null,
             this.permissions
         );
-        service.Characteristics = service.Characteristics!.Expand(this.native);
+        service.Characteristics = ExpandArray(service.Characteristics!, this.native);
+    }
+
+
+    static T[] ExpandArray<T>(T[] array, params T[] items)
+    {
+        array = array ?? new T[0];
+        var newArray = new T[array.Length + items.Length];
+        Array.Copy(array, newArray, array.Length);
+        Array.Copy(items, 0, newArray, array.Length, items.Length);
+        return newArray;
     }
 
 
