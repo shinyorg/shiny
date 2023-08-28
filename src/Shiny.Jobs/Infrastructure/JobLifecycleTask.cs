@@ -173,7 +173,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
         else
         {
             this.timer.Stop();
-            this.logger.LogDebug("App foreground - stopping foreground timer");
+            this.logger.LogDebug("App foreground - starting foreground timer");
             this.timer.Interval = Interval.TotalMilliseconds;
             this.timer.Start();
         }
