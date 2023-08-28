@@ -1,6 +1,7 @@
 ﻿#if PLATFORM
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.Extensions.Logging;
 using Shiny.Net;
@@ -31,6 +32,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
     readonly ILogger logger;
     readonly IBattery battery;
     readonly IConnectivity connectivity;
+    readonly IJobManager jobManager;
     readonly Timer timer;
 
 
@@ -42,40 +44,52 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
     )
     {
         this.logger = logger;
+        this.jobManager = jobManager;
         this.battery = battery;
         this.connectivity = connectivity;
 
         this.timer = new Timer();
-        this.timer.Elapsed += async (sender, args) =>
+        this.timer.Elapsed += async (sender, args) => this.RunJobs();
+    }
+
+
+    public override void Start()
+    {
+        base.Start();
+        this.RunJobs(); // kick off initial timer
+    }
+
+
+    async Task RunJobs()
+    {
+        this.timer.Stop();
+        this.logger.LogInformation("Starting foreground jobs");
+        
+        var jobs = this.jobManager
+            .GetJobs()
+            .Where(this.CanRun)
+            .ToList();
+
+        foreach (var job in jobs)
         {
-            this.logger.LogInformation("Starting foreground jobs");
-            this.timer.Stop();
-            var jobs = jobManager
-                .GetJobs()
-                .Where(this.CanRun)
-                .ToList();
-
-            foreach (var job in jobs)
+            try
             {
-                try
-                {
-                    this.logger.LogInformation($"Job '{job.Identifier}' Foreground Started");
-                    await jobManager
-                        .RunJobAsTask(job.Identifier)
-                        .ConfigureAwait(false);
+                this.logger.LogInformation($"Job '{job.Identifier}' Foreground Started");
+                await this.jobManager
+                    .RunJobAsTask(job.Identifier)
+                    .ConfigureAwait(false);
 
-                    this.logger.LogInformation($"Job '{job.Identifier}' Foreground Finished Successfully");
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogWarning(ex, $"Job '{job.Identifier}' Foreground Error");
-                }
+                this.logger.LogInformation($"Job '{job.Identifier}' Foreground Finished Successfully");
             }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, $"Job '{job.Identifier}' Foreground Error");
+            }
+        }
 
-            this.logger.LogInformation("Foreground jobs finished");
-            if (!this.disposed && this.IsInForeground)
-                this.timer.Start();
-        };
+        this.logger.LogInformation("Foreground jobs finished");
+        if (!this.disposed && this.IsInForeground != false)
+            this.timer.Start();
     }
 
 
@@ -131,8 +145,8 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 
     bool HasReqInternet(JobInfo job) => job.RequiredInternetAccess switch
     {
-        InternetAccess.Any => this.connectivity.IsInternetAvailable(),
-        InternetAccess.Unmetered => !this.connectivity.Access.HasFlag(NetworkReach.ConstrainedInternet),
+        InternetAccess.Any => this.connectivity.IsInternetAvailable(true),
+        InternetAccess.Unmetered => this.connectivity.IsInternetAvailable(false),
         InternetAccess.None => true,
         _ => false
     };
