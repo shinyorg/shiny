@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 
@@ -18,7 +17,7 @@ public static class ServiceCollectionExtensions
     /// <param name="jobInfo">The job info to register</param>
     public static IServiceCollection AddJob(this IServiceCollection services, JobInfo jobInfo)
     {
-        JobsStartup.AddJob(jobInfo);
+        JobLifecycleTask.AddJob(jobInfo);
         return services.AddJobs();
     }
 
@@ -53,7 +52,6 @@ public static class ServiceCollectionExtensions
         if (!services.HasService<IJobManager>())
         {
             services.AddDefaultRepository();
-            services.AddShinyService<JobsStartup>();
             services.AddShinyService<JobLifecycleTask>();
             services.AddShinyService<JobManager>();
         }

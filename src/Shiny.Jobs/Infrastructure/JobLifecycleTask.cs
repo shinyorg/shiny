@@ -1,5 +1,6 @@
 ﻿#if PLATFORM
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -12,6 +13,10 @@ namespace Shiny.Jobs.Infrastructure;
 
 public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 {
+    static readonly List<JobInfo> registeredJobs = new();
+    public static void AddJob(JobInfo jobInfo) => registeredJobs.Add(jobInfo);
+
+
     static TimeSpan interval = TimeSpan.FromSeconds(30);
     public static TimeSpan Interval
     {
@@ -56,7 +61,64 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
     public override void Start()
     {
         base.Start();
-        this.RunJobs(); // kick off initial timer
+
+        try
+        {
+            // clear all system level jobs and jobs missing Type (type moved or deleted)
+            var jobs = this.jobManager.GetJobs();
+            foreach (var job in jobs)
+            {
+                if (job.JobType == null)
+                {
+                    this.logger.LogWarning($"Job Type for '{job.Identifier}' cannot be found and has been removed");
+                    this.jobManager.Cancel(job.Identifier);
+                }
+                else if (job.IsSystemJob)
+                {
+                    this.logger.LogWarning($"Clearing System Job '{job.Identifier}' - If being registered, job manager will bring it back in a moment");
+                    this.jobManager.Cancel(job.Identifier);
+                }
+            }
+
+            foreach (var job in registeredJobs)
+            {
+                var jobNew = job with { IsSystemJob = true };
+                this.jobManager.Register(jobNew);
+
+                this.logger.LogWarning($"Registered System Job '{job.Identifier}' of Type '{job.JobType}'");
+            }
+
+            jobs = this.jobManager.GetJobs();
+            if (jobs.Count > 0)
+            {
+                this.jobManager
+                    .RequestAccess()
+                    .ContinueWith(x =>
+                    {
+                        if (x.Exception != null)
+                        {
+                            this.logger.LogError(x.Exception, "Error requesting job permissions");
+                        }
+                        else if (x.Result != AccessState.Available)
+                        {
+                            this.logger.LogWarning("Jobs will not run in background due to insufficient privileges: " + x.Result);
+                        }
+                        else
+                        {
+                            this.logger.LogDebug("Jobs setup for background runs");
+                        }
+                    });
+
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Failed to run job startup");
+        }
+
+        // kick off initial timer
+        // foregorund jobs can run regardless of background permission settings
+        this.RunJobs();
     }
 
 
