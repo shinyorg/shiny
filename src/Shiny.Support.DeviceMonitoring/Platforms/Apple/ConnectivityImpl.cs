@@ -7,14 +7,18 @@ using Network;
 namespace Shiny.Net;
 
 
-public class ConnectivityImpl : IConnectivity
+public class ConnectivityImpl : IConnectivity, IDisposable
 {
-    readonly NWPathMonitor netmon = new();
+    readonly NWPathMonitor netmon;
     readonly ILogger logger;
+
 
     public ConnectivityImpl(ILogger<ConnectivityImpl> logger)
     {
         this.logger = logger;
+        this.netmon = new();
+        this.netmon.SetQueue(DispatchQueue.DefaultGlobalQueue);
+        this.netmon.Start();
     }
 
     
@@ -27,20 +31,19 @@ public class ConnectivityImpl : IConnectivity
                 ob.OnNext(this);
             };
             this.netmon.SnapshotHandler += action;
-            this.netmon.SetQueue(DispatchQueue.DefaultGlobalQueue);
-            this.netmon.Start();
+            //this.netmon.Start();
             
             return () =>
             {
-                this.netmon.Cancel();
+                //this.netmon.Cancel();
                 this.netmon.SnapshotHandler -= action;
             };
         })
         .StartWith(this)
         .Publish()
         .RefCount();
-
     
+
     public ConnectionTypes ConnectionTypes
     {
         get
@@ -77,5 +80,12 @@ public class ConnectivityImpl : IConnectivity
 
             return access;
         }
+    }
+
+
+    public void Dispose()
+    {
+        this.netmon.Cancel();
+        this.netmon.Dispose();
     }
 }
