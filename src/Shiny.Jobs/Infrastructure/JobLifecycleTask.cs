@@ -89,7 +89,11 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 
         this.logger.LogInformation("Foreground jobs finished");
         if (!this.disposed && this.IsInForeground != false)
+        {
+            this.timer.Interval = Interval.TotalMilliseconds;
+            this.logger.LogDebug("Foreground Timer Restarting - Interval: " + Interval);
             this.timer.Start();
+        }
     }
 
 
@@ -100,10 +104,12 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 
         if (backgrounding)
         {
+            this.logger.LogDebug("App background - stopping foreground timer");
             this.timer.Stop();
         }
         else
         {
+            this.logger.LogDebug("App foreground - stopping foreground timer");
             this.timer.Interval = Interval.TotalMilliseconds;
             this.timer.Start();
         }
