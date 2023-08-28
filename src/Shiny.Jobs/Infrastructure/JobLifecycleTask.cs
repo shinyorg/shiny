@@ -150,7 +150,9 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
         }
 
         this.logger.LogInformation("Foreground jobs finished");
-        if (!this.disposed && this.IsInForeground != false)
+
+        // always restart timer even if going to the BG - will allow things like GPS to keep spinning the foreground jobs
+        if (!this.disposed)
         {
             this.timer.Interval = Interval.TotalMilliseconds;
             this.logger.LogDebug("Foreground Timer Restarting - Interval: " + Interval);
@@ -166,11 +168,11 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 
         if (backgrounding)
         {
-            this.logger.LogDebug("App background - stopping foreground timer");
-            this.timer.Stop();
+            this.logger.LogDebug("App moving to background - timer will likely be trimmed");
         }
         else
         {
+            this.timer.Stop();
             this.logger.LogDebug("App foreground - stopping foreground timer");
             this.timer.Interval = Interval.TotalMilliseconds;
             this.timer.Start();
