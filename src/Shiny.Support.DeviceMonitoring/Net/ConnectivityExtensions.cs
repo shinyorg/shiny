@@ -11,8 +11,8 @@ public static class ConnectivityExtensions
         => connectivity.Access.HasFlag(NetworkAccess.Internet) || (allowConstrained && connectivity.Access.HasFlag(NetworkAccess.ConstrainedInternet));
 
 
-    public static IObservable<bool> WhenInternetStatusChanged(this IConnectivity connectivity) => connectivity
+    public static IObservable<bool> WhenInternetStatusChanged(this IConnectivity connectivity, bool allowConstrained = true) => connectivity
         .WhenChanged()
-        .Select(x => x.IsInternetAvailable())
-        .StartWith(connectivity.IsInternetAvailable());
+        .Select(x => x.IsInternetAvailable(allowConstrained))
+        .StartWith(connectivity.IsInternetAvailable(allowConstrained));
 }
