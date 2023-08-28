@@ -9,8 +9,10 @@
     <VerticalStackLayout>
         <Label Text="{Binding BatteryLevel, StringFormat='Battery Level: {0} %'}" />
         <Label Text="{Binding BatteryStatus, StringFormat='Battery Status: {0}'}" />
+        <Label Text="{Binding BatteryEvent, StringFormat='Last Battery Event: {0}'}" />
         
         <Label Text="{Binding NetworkAccess, StringFormat='Network Access: {0}'}" />
         <Label Text="{Binding ConnectionTypes, StringFormat='Connection Types: {0}'}" />
+        <Label Text="{Binding ConnectivityEvent, StringFormat='Last Connectivity Event: {0}'}" />
     </VerticalStackLayout>
 </ContentPage>
