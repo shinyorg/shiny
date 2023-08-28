@@ -3,9 +3,8 @@ Shiny
 -----
 
 GitHub: https://github.com/shinyorg/Shiny
-Samples: https://samples.shinylib.net
 Docs: https://shinylib.net
-Blog: https://allanritchie.com
+Blog: https://shinylib.net/blog
 
 
 Help Support Shiny
