@@ -186,7 +186,16 @@ public class PushManager : NotifyPropertyChanged,
                 x => x.OnEntry(data),
                 this.logger
             )
-            .ContinueWith(_ => completionHandler.Invoke());
+            .ContinueWith(_ =>
+            {
+                // This needs be invoked on MainThread,
+                // otherwise iOS app crashes if we tap on push notification alert
+                // from notification center, while App in Active state.
+                UIDevice.CurrentDevice.InvokeOnMainThread(() =>
+                {
+                    completionHandler.Invoke();
+                });
+            });
     }
 
 
