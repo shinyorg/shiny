@@ -54,7 +54,6 @@ body:
       #- label: Blazor
       - label: MAUI
       - label: Native/Classic Xamarin
-      - label: Uno
       - label: Manual
   - type: textarea
     validations:
@@ -95,6 +94,8 @@ body:
         - label: I have supplied a reproducible sample is NOT FROM THE SHINY SAMPLES! 
           required: true
         - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v2.7.1 stable - ALPHAS are not taking issues)
+          required: true
+        - label: My GitHub account is 30+ days old
           required: true
         - label: I understand that if I am checking these boxes and I am not actually following what they are saying, I will be removed from this repository!
           required: true
