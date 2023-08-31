@@ -18,6 +18,9 @@ namespace Sample.Push.Maui;
 [IntentFilter(
     new[] {
         Shiny.ShinyPushIntents.NotificationClickAction
+    },
+    Categories = new[] {        
+        "android.intent.category.DEFAULT"
     }
 )]
 public class MainActivity : MauiAppCompatActivity
