@@ -336,7 +336,9 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 .RunDelegates(x => x.OnEntry(shiny), this.logger)
                 .ConfigureAwait(false);
 
-            completionHandler.Invoke();
+            this.platform.InvokeOnMainThread(() =>
+                completionHandler.Invoke()
+            );
         }
     }
 
@@ -346,7 +348,9 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         var t = notification?.Request?.Trigger;
         if (t == null || t is not UNPushNotificationTrigger)
         {
-            completionHandler.Invoke(this.configuration.PresentationOptions);
+            this.platform.InvokeOnMainThread(() =>
+                completionHandler.Invoke(this.configuration.PresentationOptions)
+            );
         }
     }
 }
