@@ -19,6 +19,12 @@
 		<ApplicationVersion>1</ApplicationVersion>
 	</PropertyGroup>
 
+	<PropertyGroup>	
+		<DefineConstants Condition="'$(PushProvider)' == 'azure'">$(DefineConstants);AZURE</DefineConstants>
+		<DefineConstants Condition="'$(PushProvider)' == 'native'">$(DefineConstants);NATIVE</DefineConstants>
+		<DefineConstants Condition="'$(PushProvider)' == 'firebase'">$(DefineConstants);FIREBASE</DefineConstants>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
 		<SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
     </PropertyGroup>
@@ -48,11 +54,13 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
 	</ItemGroup>
 
-	<PropertyGroup>		
-		<DefineConstants Condition="'$(PushProvider)' == 'azure'">$(DefineConstants);AZURE</DefineConstants>
-		<DefineConstants Condition="'$(PushProvider)' == 'native'">$(DefineConstants);NATIVE</DefineConstants>
-		<DefineConstants Condition="'$(PushProvider)' == 'firebase'">$(DefineConstants);FIREBASE</DefineConstants>
-	</PropertyGroup>
+	<ItemGroup Condition="$(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('ios')) AND '$(Configuration)' == 'Debug'">
+		<CustomEntitlements Include="aps-environment" Type="String" Value="development" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('ios')) AND '$(Configuration)' == 'Release'">
+		<CustomEntitlements Include="aps-environment" Type="String" Value="production" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" Condition="'$(PushProvider)' == 'native'" />
