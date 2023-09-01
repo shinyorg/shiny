@@ -29,28 +29,35 @@ public static class MauiProgram
         builder.Services.AddTransient<TagsPage>();
         builder.Services.AddTransient<TagsViewModel>();
 
-#if NATIVE
-#if ANDROID
         var cfg = builder.Configuration.GetSection("Firebase");
-        builder.Services.AddPush<MyPushDelegate>(new (
+#if ANDROID
+        var firebaseCfg = new FirebaseConfig(
             false,
             cfg["AppId"],
             cfg["SenderId"],
             cfg["ProjectId"],
             cfg["ApiKey"]
-        ));
-#else
-        builder.Services.AddPush<MyPushDelegate>();
-#endif
-#elif AZURE
-        var cfg = builder.Configuration.GetSection("AzureNotificationHubs");
-        builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
-            cfg["ListenerConnectionString"]!,
-            cfg["HubName"]!
         );
+#endif
+
+#if NATIVE
+        builder.Services.AddPush<MyPushDelegate>(
+#if ANDROID
+            firebaseConfig
+#endif
+        );
+#elif AZURE
+        var azureCfg = builder.Configuration.GetSection("AzureNotificationHubs");
+        builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
+            azureCfg["ListenerConnectionString"]!,
+            azureCfg["HubName"]!
+#if ANDROID
+            , firebaseCfg
+#endif
+        );
+
 #elif FIREBASE
-        var cfg = builder.Configuration.GetSection("Firebase");
-        builder.Services.AddPush<MyPushDelegate>(new (
+        builder.Services.AddPushFirebaseMessaging<MyPushDelegate>(new (
             false,
             cfg["AppId"],
             cfg["SenderId"],

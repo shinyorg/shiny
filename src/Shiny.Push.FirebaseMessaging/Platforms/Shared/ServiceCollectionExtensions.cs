@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPushFirebaseMessaging<TPushDelegate>(this IServiceCollection services, FirebaseConfiguration? config = null)
          where TPushDelegate : class, IPushDelegate
     {
-        services.AddSingleton<IPushDelegate, TPushDelegate>();
+        services.AddShinyService<TPushDelegate>();
         services.AddPushFirebaseMessaging(config);
         return services;
     }

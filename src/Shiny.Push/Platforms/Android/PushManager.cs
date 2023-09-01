@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
-using Android;
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
@@ -46,6 +45,7 @@ public class PushManager : NotifyPropertyChanged,
 
     public async void Start()
     {
+        this.TryCreateConfiguredChannel();
         if (this.RegistrationToken.IsEmpty())
             return;
 
@@ -53,6 +53,7 @@ public class PushManager : NotifyPropertyChanged,
         {
             this.NativeToken = await this.RequestNativeToken();
             var regToken = await this.provider.Register(this.NativeToken); // never null on firebase
+
             if (regToken != this.RegistrationToken)
             {
                 this.RegistrationToken = regToken;
@@ -68,6 +69,20 @@ public class PushManager : NotifyPropertyChanged,
         {
             this.logger.LogWarning(ex, "There was an error restarting push services");
         }
+    }
+
+
+    void TryCreateConfiguredChannel()
+    {
+        if (this.config.DefaultChannel == null)
+            return;
+
+        var nativeManager = this.platform.GetSystemService<NotificationManager>(Context.NotificationService);
+        var channel = nativeManager.GetNotificationChannel(this.config.DefaultChannel.Id);
+        if (channel != null)
+            nativeManager.DeleteNotificationChannel(channel.Id);
+
+        nativeManager.CreateNotificationChannel(this.config.DefaultChannel);
     }
 
 

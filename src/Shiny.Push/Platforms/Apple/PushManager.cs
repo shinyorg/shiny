@@ -4,9 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
-using Shiny.Hosting;
 using UIKit;
 using UserNotifications;
+using Shiny.Hosting;
+
 namespace Shiny.Push;
 
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Android.App;
 
 namespace Shiny.Push;
 
@@ -8,7 +9,9 @@ public record FirebaseConfig(
     string? AppId = null,
     string? SenderId = null,
     string? ProjectId = null,
-    string? ApiKey = null
+    string? ApiKey = null,
+
+    NotificationChannel? DefaultChannel = null
 )
 {
     public static FirebaseConfig Embedded { get; } = new(true);
