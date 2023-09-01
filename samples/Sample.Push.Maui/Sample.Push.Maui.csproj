@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<PushProvider>azure</PushProvider>
+		<PushProvider>firebase</PushProvider>
 		<TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>
 		<TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>
 		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
@@ -17,8 +17,6 @@
 		<ApplicationIdGuid>A6C05603-270D-4C88-B2C9-77DABDF2B5F0</ApplicationIdGuid>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
-
-		<DefineConstants Condition="'$(FirebaseUseEmbeddedConfiguration)' != 'true'">$(DefineConstants);USE_PUSH_CONFIG</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
@@ -45,7 +43,6 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 
 		<ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
-		<ProjectReference Include="..\..\src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />
 		<ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
 		<ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
@@ -57,9 +54,6 @@
 		<DefineConstants Condition="'$(PushProvider)' == 'firebase'">$(DefineConstants);FIREBASE</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
-	  <CreatePackage>false</CreatePackage>
-	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" Condition="'$(PushProvider)' == 'native'" />
 		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" Condition="'$(PushProvider)' == 'azure'" />

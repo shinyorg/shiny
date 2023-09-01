@@ -1,5 +1,5 @@
 ﻿using Shiny.Push;
-using Shiny.Notifications;
+//using Shiny.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 #if ANDROID
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -18,10 +18,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush(this IServiceCollection services)
     {
 #if APPLE
-        services.AddChannelManager();
         services.AddShinyService<PushManager>();
-#endif
-#if ANDROID
+#elif ANDROID
         services.AddPush(new FirebaseConfig());
 #endif
         return services;
@@ -51,7 +49,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush(this IServiceCollection services, FirebaseConfig config)
     {
         services.AddSingleton(config);
-        services.AddChannelManager();
         services.AddShinyService<PushManager>();
         return services;
     }

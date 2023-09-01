@@ -16,7 +16,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     readonly IRepository repository;
     readonly AndroidPlatform platform;
     readonly ILogger logger;
-    readonly NotificationManager nativeManager;
+    readonly Android.App.NotificationManager nativeManager;
 
 
     public ChannelManager(
@@ -28,7 +28,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
         this.repository = repository;
         this.logger = logger;
         this.platform = platform;
-        this.nativeManager = platform.GetSystemService<NotificationManager>(Context.NotificationService);
+        this.nativeManager = platform.GetSystemService<Android.App.NotificationManager>(Context.NotificationService);
     }
 
 

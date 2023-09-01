@@ -29,8 +29,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, IosConfiguration? configuration = null)
     {
         services.AddSingleton(configuration ?? new());
-        services.AddChannelManager();
         services.AddShinyService<NotificationManager>();
+
+        services.AddDefaultRepository();
+        if (!services.HasService<IChannelManager>())
+            services.AddShinyService<ChannelManager>();
 
         if (delegateType != null)
             services.AddShinyService(delegateType);
@@ -63,10 +66,11 @@ public static class ServiceCollectionExtensions
         services.AddGeofencing<NotificationGeofenceDelegate>();
         services.TryAddSingleton<AndroidNotificationProcessor>();
         services.TryAddSingleton<AndroidNotificationManager>();
+        services.AddShinyService<NotificationManager>();
 
         services.AddDefaultRepository();
-        services.AddChannelManager();
-        services.AddShinyService<NotificationManager>();
+        if (!services.HasService<IChannelManager>())
+            services.AddShinyService<ChannelManager>();
 
         if (delegateType != null)
             services.AddShinyService(delegateType);
