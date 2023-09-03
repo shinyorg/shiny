@@ -117,8 +117,8 @@ public static class AsyncExtensions
     public static Task<BleCharacteristicResult> ReadCharacteristicAsync(this IPeripheral peripheral, BleCharacteristicInfo info, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => peripheral.ReadCharacteristicAsync(info.Service.Uuid, info.Uuid, cancelToken, timeoutMs);
 
-    public static Task<BleCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, BleCharacteristicInfo info, byte[] data, bool withoutResponse = false, CancellationToken cancelToken = default, int timeoutMs = 3000)
-        => peripheral.WriteCharacteristicAsync(info.Service.Uuid, info.Uuid, data, withoutResponse, cancelToken, timeoutMs);
+    public static Task<BleCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, BleCharacteristicInfo info, byte[] data, bool withResponse = true, CancellationToken cancelToken = default, int timeoutMs = 3000)
+        => peripheral.WriteCharacteristicAsync(info.Service.Uuid, info.Uuid, data, withResponse, cancelToken, timeoutMs);
 
     public static Task<IReadOnlyList<BleDescriptorInfo>> GetDescriptorsAsync(this IPeripheral peripheral, BleCharacteristicInfo info, CancellationToken cancelToken = default)
         => peripheral.GetDescriptorsAsync(info.Service.Uuid, info.Uuid, cancelToken);
