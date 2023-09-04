@@ -38,7 +38,7 @@ namespace Shiny.BluetoothLE;
                 var value = new byte[data.Length - 2];
                 Array.Copy(data, 2, value, 0, data.Length - 2);
 
-                return new ManufacturerData((ushort)companyId, Array.Empty<byte>());
+                return new ManufacturerData((ushort)companyId, value);
             });
             this.serviceData = this.GetLazy(CBAdvertisement.DataServiceDataKey, item =>
             {
