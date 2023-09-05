@@ -1,7 +1,5 @@
-﻿# Shiny v3 BETA for .NET
+﻿# Shiny v3 for .NET
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
-
-## THIS IS THE BETA BRANCH - FOR STABLE [GO HERE](https://github.com/shinyorg/shiny/tree/v2.7.0)
 
 Shiny is a cross platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
@@ -28,7 +26,7 @@ things like dependency injection & logging in a structured way to your code!
 
 ## Links
 * [Documentation](https://shinylib.net)
-* [Change Log](https://shinylib.net/release-notes/)
+* [Change Log](https://shinylib.net/release-notes/client/)
 * [Community Support](https://github.com/shinyorg/shiny/discussions)
 * [NuGets](https://www.nuget.org/profiles/ShinyLib)
 * Samples
