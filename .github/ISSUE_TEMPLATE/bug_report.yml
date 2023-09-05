@@ -26,7 +26,6 @@ body:
         - AppCenter Logging (Shiny.Logging.AppCenter)
         - SQLite Logging (Shiny.Logging.Sqlite)
         - Beacons (Shiny.Beacons)
-        - Speech Recognition (Shiny.SpeechRecognition)
         - Other
     validations:
       required: true
@@ -91,11 +90,11 @@ body:
       label: Code of Conduct
       description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
       options:
-        - label: I have supplied a reproducible sample is NOT FROM THE SHINY SAMPLES! 
+        - label: I have supplied a reproducible sample that is NOT FROM THE SHINY SAMPLES! 
           required: true
-        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v2.7.1 stable - ALPHAS are not taking issues)
+        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v3.0 stable - ALPHAS are not taking issues - Sponsors: I'll still take v2 issues for you')
           required: true
-        - label: My GitHub account is 30+ days old
+        - label: I am Sponsor OR My GitHub account is 30+ days old
           required: true
         - label: I understand that if I am checking these boxes and I am not actually following what they are saying, I will be removed from this repository!
           required: true
