@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
@@ -13,16 +12,13 @@ namespace Shiny.Push;
 
 public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushTagSupport
 {
-    readonly ILogger logger;
     readonly FirebaseConfiguration config;
 
 
     public FirebasePushProvider(
-        ILogger<FirebasePushProvider> logger,
         FirebaseConfiguration config
     )
     {
-        this.logger = logger;
         this.config = config;
     }
 
