@@ -42,23 +42,6 @@ public interface IBleManager
     IObservable<ScanResult> Scan(ScanConfig? scanConfig = null);
 }
 
-
-public record ScanConfig(
-    /// <summary>
-    /// Filters scan to peripherals that advertise specified service UUIDs
-    /// iOS - you must set this to initiate a background scan
-    /// </summary>
-    params string[] ServiceUuids
-);
-
-
-public record ScanResult(
-    IPeripheral Peripheral,
-    int Rssi,
-    IAdvertisementData AdvertisementData
-);
-
-
 //IObservable<IPeripheral> WhenPeripheralStatusChanged();
 //IObservable<AccessState> WhenStatusChanged()
 // this really needs to be handled by a delegate because that's where the status changes, user should still call RequestAccess or trap when it fails starting a scan operation

@@ -84,18 +84,9 @@ public class PushManager : NotifyPropertyChanged,
 
         try
         {
-            // TODO: native token may already have been saved
-            var result = await this.RequestAccessInternal().ConfigureAwait(false);
-            if (result.Status == AccessState.Available && result.RegistrationToken != this.RegistrationToken)
-            {
-                this.RegistrationToken = result.RegistrationToken;
-                await this.services
-                    .RunDelegates<IPushDelegate>(x =>
-                        x.OnTokenRefreshed(result.RegistrationToken!),
-                        this.logger
-                    )
-                    .ConfigureAwait(false);
-            }
+            var result = await this.RequestAccess().ConfigureAwait(false);
+            if (result.Status != AccessState.Available)
+                this.logger.LogInformation("User has removed push notification access - " + result.Status);
         }
         catch (Exception ex)
         {
@@ -110,11 +101,30 @@ public class PushManager : NotifyPropertyChanged,
         if (!result.Item1)
             return PushAccessState.Denied; // or just restricted?
 
-        var access = await this.RequestAccessInternal(cancelToken).ConfigureAwait(false);
-        if (access.Status == AccessState.Available)
-            this.RegistrationToken = access.RegistrationToken;
-        
-        return access;
+        var deviceToken = await this.RequestRawToken(cancelToken).ConfigureAwait(false);
+        var nativeToken = deviceToken.ToPushTokenString();
+        var regToken = nativeToken;
+
+        if (this.provider != null)
+            regToken = await this.provider.Register(deviceToken);
+
+        // if original regtoken was not null (we had registered) and new reg token (provider or native) doesn't
+        // match, we fire the token refresh delegate method
+        if (this.RegistrationToken != null && this.RegistrationToken != regToken)
+        {
+            // TODO: do we want to fire this here, the user may call this and store from the result anyhow
+            await this.services
+                .RunDelegates<IPushDelegate>(
+                    x => x.OnTokenRefreshed(regToken),
+                    this.logger
+                )
+                .ConfigureAwait(false);
+        }
+
+        this.NativeToken = nativeToken;
+        this.RegistrationToken = regToken;
+
+        return new PushAccessState(AccessState.Available, this.RegistrationToken);
     }
 
 
@@ -130,17 +140,6 @@ public class PushManager : NotifyPropertyChanged,
 
         if (this.provider != null)
             await this.provider.UnRegister().ConfigureAwait(false);
-    }
-
-
-    protected async Task<PushAccessState> RequestAccessInternal(CancellationToken cancelToken = default)
-    {
-        var deviceToken = await this.RequestRawToken(cancelToken).ConfigureAwait(false);
-        if (this.provider != null)
-            await this.provider.Register(deviceToken);
-
-        var token = deviceToken.ToPushTokenString();
-        return new PushAccessState(AccessState.Available, token);
     }
 
 
@@ -168,7 +167,10 @@ public class PushManager : NotifyPropertyChanged,
         this.TryProcessIncomingNotification(
             notification,
             "Foreground remote notification received",
-            () => completionHandler.Invoke(UNNotificationPresentationOptions.List | UNNotificationPresentationOptions.Banner)
+            () => completionHandler.Invoke(
+                UNNotificationPresentationOptions.List |
+                UNNotificationPresentationOptions.Banner
+            )
         );
     }
 
@@ -192,10 +194,7 @@ public class PushManager : NotifyPropertyChanged,
                 // This needs be invoked on MainThread,
                 // otherwise iOS app crashes if we tap on push notification alert
                 // from notification center, while App in Active state.
-                UIDevice.CurrentDevice.InvokeOnMainThread(() =>
-                {
-                    completionHandler.Invoke();
-                });
+                this.platform.InvokeOnMainThread(() => completionHandler.Invoke());
             });
     }
 
@@ -213,7 +212,11 @@ public class PushManager : NotifyPropertyChanged,
                 x => x.OnReceived(data),
                 this.logger
             )
-            .ContinueWith(_ => completionHandler.Invoke(UIBackgroundFetchResult.NewData));
+            .ContinueWith(_ =>
+                this.platform.InvokeOnMainThread(
+                    () => completionHandler.Invoke(UIBackgroundFetchResult.NewData)
+                )
+            );
     }
 
 

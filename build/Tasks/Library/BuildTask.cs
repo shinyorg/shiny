@@ -21,6 +21,9 @@ public sealed class BuildTask : FrostingTask<BuildContext>
         //context.MSBuild("Shiny.sln", x => x
         context.MSBuild("Build.slnf", x => x
             .WithRestore()
+            //.SetMSBuildPlatform(MSBuildPlatform.Automatic)
+            //.UseToolVersion(MSBuildToolVersion.VS2022)
+            //.UseToolVersion("17.7")
             .WithTarget("Clean")
             .WithTarget("Build")
             .WithProperty("PublicRelease", "true")

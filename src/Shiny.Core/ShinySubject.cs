@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 
@@ -15,56 +17,36 @@ public class ShinySubject<T> : ISubject<T>
     public ILogger? Logger { get; set; }
     
 
-    public void OnCompleted()
+    public void OnCompleted() => this.Pub(x => x.OnCompleted(), "OnCompleted error on observer");
+    public void OnError(Exception error) => this.Pub(x => x.OnError(error), "OnError error on observer");
+    public void OnNext(T value) => this.Pub(x => x.OnNext(value), "OnNext error on observer"); 
+
+
+    protected virtual void Pub(Action<IObserver<T>> action, string errorDescription)
     {
-        foreach (var observer in this.observers)
+        List<IObserver<T>> copy;
+        lock (this.observers)
+            copy = this.observers.ToList();
+
+        foreach (var observer in copy)
         {
             try
             {
-                observer.OnCompleted();
+                action(observer);
             }
             catch (Exception ex)
             {
-                this.Logger?.LogWarning(ex, "ShinySubject OnCompleted error on observer");
+                this.Logger?.LogWarning(ex, errorDescription);
             }
         }
     }
 
-
-    public void OnError(Exception error)
-    {
-        foreach (var observer in this.observers)
-        {
-            try
-            {
-                observer.OnError(error);
-            }
-            catch (Exception ex)
-            {
-                this.Logger?.LogWarning(ex, "ShinySubject OnError error on observer");
-            }
-        }
-    }
-
-
-    public void OnNext(T value)
-    {
-        foreach (var observer in this.observers)
-        {
-            try
-            {
-                observer.OnNext(value);
-            }
-            catch (Exception ex)
-            {
-                this.Logger?.LogWarning(ex, "ShinySubject OnNext error on observer");
-            }
-        }
-    }
 
     public IDisposable Subscribe(IObserver<T> observer)
     {
-        this.observers.Add(observer);
+        lock (this.observers)
+            this.observers.Add(observer);
+
         return Disposable.Create(() => this.observers.Remove(observer));
     }
 }

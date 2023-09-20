@@ -3,5 +3,8 @@
         "version": "7.0.307",
         "rollForward": "disable",
         "allowPrereleases": false
+        //"version": "8.0.100",
+        //"rollForward": "latestMinor",
+        //"allowPrereleases": true
     }
 }

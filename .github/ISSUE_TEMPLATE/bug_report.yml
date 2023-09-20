@@ -92,7 +92,7 @@ body:
       options:
         - label: I have supplied a reproducible sample that is NOT FROM THE SHINY SAMPLES! 
           required: true
-        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v3.0 stable - ALPHAS are not taking issues - Sponsors: I'll still take v2 issues for you')
+        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v3.0 stable - ALPHAS are not taking issues - Sponsors can still send v2 issues)
           required: true
         - label: I am Sponsor OR My GitHub account is 30+ days old
           required: true

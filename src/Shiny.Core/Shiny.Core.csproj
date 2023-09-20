@@ -8,9 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Reflection\" />
-    </ItemGroup>
-    <ItemGroup>
         <None Include="Shiny.Core.targets" Pack="True" PackagePath="buildTransitive" />
         <PackageReference Include="System.Reactive" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
@@ -27,8 +24,5 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Reflection\" />
-    </ItemGroup>
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>
