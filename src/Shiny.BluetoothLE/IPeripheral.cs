@@ -5,39 +5,6 @@ using System.Reactive;
 namespace Shiny.BluetoothLE;
 
 
-public record BleServiceInfo(string Uuid);
-
-public record BleCharacteristicInfo(
-    BleServiceInfo Service,
-    string Uuid,
-    bool IsNotifying,
-    CharacteristicProperties Properties
-);
-
-public record BleDescriptorInfo(
-    BleCharacteristicInfo Characteristic,
-    string Uuid
-);
-
-public record BleCharacteristicResult(
-    BleCharacteristicInfo Characteristic,
-    BleCharacteristicEvent Event,
-    byte[]? Data
-);
-
-public enum BleCharacteristicEvent
-{
-    Read,
-    Write,
-    WriteWithoutResponse,
-    Notification
-}
-
-public record BleDescriptorResult(
-    BleDescriptorInfo Descriptor,
-    byte[]? Data
-);
-
 public interface IPeripheral
 {
     string Uuid { get; }
