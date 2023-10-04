@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
+using Android.OS;
 using Android.Runtime;
 using Firebase;
 using Firebase.Messaging;
@@ -18,6 +19,7 @@ namespace Shiny.Push;
 public class PushManager : NotifyPropertyChanged,
                            IPushManager,
                            IShinyStartupTask,
+                           IAndroidLifecycle.IOnActivityOnCreate,
                            IAndroidLifecycle.IOnActivityNewIntent
 {
     readonly AndroidPlatform platform;
@@ -145,6 +147,8 @@ public class PushManager : NotifyPropertyChanged,
         await FirebaseMessaging.Instance.DeleteToken().AsAsync().ConfigureAwait(false);
     }
 
+
+    public void ActivityOnCreate(Activity activity, Bundle? savedInstanceState) => this.Handle(activity, activity.Intent);
 
     public void Handle(Activity activity, Intent intent)
     {

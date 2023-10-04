@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.OS;
 
 namespace Shiny.Hosting;
 
@@ -15,7 +16,7 @@ public interface IAndroidLifecycle
 
     public interface IOnActivityOnCreate
     {
-
+        void ActivityOnCreate(Activity activity, Bundle? savedInstanceState);
     }
 
     public interface IOnActivityRequestPermissionsResult
