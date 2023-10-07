@@ -70,12 +70,12 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
             {
                 if (job.JobType == null)
                 {
-                    this.logger.LogWarning($"Job Type for '{job.Identifier}' cannot be found and has been removed");
+                    this.logger.LogInformation($"Job Type for '{job.Identifier}' cannot be found and has been removed");
                     this.jobManager.Cancel(job.Identifier);
                 }
                 else if (job.IsSystemJob)
                 {
-                    this.logger.LogWarning($"Clearing System Job '{job.Identifier}' - If being registered, job manager will bring it back in a moment");
+                    this.logger.LogInformation($"Clearing System Job '{job.Identifier}' - If being registered, job manager will bring it back in a moment");
                     this.jobManager.Cancel(job.Identifier);
                 }
             }
@@ -88,7 +88,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
                 // we won't crash out, we'll just log a full error
                 this.jobManager.Register(jobNew);
 
-                this.logger.LogWarning($"Registered System Job '{job.Identifier}' of Type '{job.JobType}'");
+                this.logger.LogInformation($"Registered System Job '{job.Identifier}' of Type '{job.JobType}'");
             }
         }
         catch (Exception ex)
