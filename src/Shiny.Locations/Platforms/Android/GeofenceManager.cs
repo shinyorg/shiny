@@ -24,7 +24,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     readonly IRepository repository;
     readonly ILogger logger;
 
-    readonly GeofencingClient client;
+    readonly IGeofencingClient client;
     PendingIntent? geofencePendingIntent;
 
 

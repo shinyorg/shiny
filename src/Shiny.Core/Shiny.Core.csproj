@@ -19,9 +19,9 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.9.0.1" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.1.1" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.5.1.1" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.12.0.1" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.6.2.1" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.6.2.1" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />

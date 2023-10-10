@@ -10,7 +10,7 @@ namespace Shiny.Locations;
 
 public class GooglePlayServiceGpsManager : AbstractGpsManager
 {
-    FusedLocationProviderClient? listenerClient;
+    IFusedLocationProviderClient? listenerClient;
     public GooglePlayServiceGpsManager(AndroidPlatform platform, ILogger<GooglePlayServiceGpsManager> logger) : base(platform, logger) { }
 
 

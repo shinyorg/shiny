@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net8.0-android</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net8.0-ios</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net8.0-maccatalyst</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <RootNamespace>Shiny.Tests</RootNamespace>
-        <UseMaui>true</UseMaui>
         <SingleProject>true</SingleProject>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -28,9 +27,6 @@
         <!--<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>-->
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-    </PropertyGroup>
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" />
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -46,7 +42,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.0-rc.1.9171" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0-rc.1.9171" />
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
         <PackageReference Include="Shiny.Xunit.Runners.Maui" Version="1.0.0" />
