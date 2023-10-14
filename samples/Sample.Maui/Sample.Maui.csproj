@@ -44,8 +44,8 @@
 	</ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.0-rc.1.9171" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0-rc.1.9171" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="ReactiveUI.Fody" Version="19.5.1" />
         <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
@@ -72,9 +72,11 @@
         <ProjectReference Include="..\..\src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" />
     </ItemGroup>
     
+    <!--
     <ItemGroup Condition="$(TargetFramework.Contains('ios')) OR $(TargetFramework.Contains('android'))">
         <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
     </ItemGroup>
+    -->
 
 	<ItemGroup>
 		<None Remove="TODO/**" />

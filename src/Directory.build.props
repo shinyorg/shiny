@@ -19,7 +19,8 @@
 
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-        <MicrosoftExtensionsVersion>8.0.0-rc.1.23419.4</MicrosoftExtensionsVersion>
+        <MicrosoftExtensionsVersion>8.0.0-rc.2.23479.6</MicrosoftExtensionsVersion>
+        <MauiVersion>8.0.0-rc.2.9373</MauiVersion>
     </PropertyGroup>
 
     <PropertyGroup>

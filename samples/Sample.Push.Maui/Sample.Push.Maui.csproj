@@ -34,8 +34,6 @@
 		<MauiAsset Include="appsettings.apple.json" LogicalName="appsettings.apple.json" />
 		<MauiAsset Include="appsettings.android.json" LogicalName="appsettings.android.json" />
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-
-
 	</ItemGroup>
 
 	<!--
@@ -49,7 +47,7 @@
 	-->
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.0-rc.1.9171" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
     </ItemGroup>
 
