@@ -22,5 +22,5 @@ public interface IApplePushDelegate : IPushDelegate
     /// </summary>
     /// <param name="notification"></param>
     /// <returns></returns>
-    UIBackgroundFetchResult? ToFetchResult(PushNotification notification);
+    UIBackgroundFetchResult? GetFetchResult(PushNotification notification);
 }
