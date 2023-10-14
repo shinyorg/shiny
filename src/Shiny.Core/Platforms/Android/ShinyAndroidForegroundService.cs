@@ -111,13 +111,14 @@ public abstract class ShinyAndroidForegroundService : Service
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.Logger.LogDebug("API level requires foreground detach");
-            this.StopForeground(StopForegroundFlags.Detach);
+            this.StopForeground(StopForegroundFlags.Detach | StopForegroundFlags.Remove | StopForegroundFlags.Legacy);
+            this.StopSelf();
         }
-        this.Logger.LogDebug("StopSelf called on foreground service");
-        this.StopSelf();
-
-        this.Logger.LogDebug($"Foreground service calling for notification cancellation");
-        this.NotificationManager!.Cancel(this.NotificationId);
+        else
+        {
+            this.StopSelf();
+            this.NotificationManager!.Cancel(this.NotificationId);
+        }
 
         this.Logger.LogDebug("Foreground service stopped successfully");
         this.OnStop();
