@@ -104,7 +104,7 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected void Stop()
     {
-        this.Logger.LogDebug("Calling for foreground service stop");
+        this.Logger.LogDebug($"Calling for foreground service stop.  Notification ID: {this.NotificationId}");
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
@@ -113,9 +113,13 @@ public abstract class ShinyAndroidForegroundService : Service
             this.Logger.LogDebug("API level requires foreground detach");
             this.StopForeground(StopForegroundFlags.Detach);
         }
-        this.Logger.LogDebug($"Foreground service calling for notification ID: {this.NotificationId} to cancel");
-        this.NotificationManager?.Cancel(this.NotificationId);
-        this.StopSelf();        
+        this.Logger.LogDebug("StopSelf called on foreground service");
+        this.StopSelf();
+
+        this.Logger.LogDebug($"Foreground service calling for notification cancellation");
+        this.NotificationManager!.Cancel(this.NotificationId);
+
+        this.Logger.LogDebug("Foreground service stopped successfully");
         this.OnStop();
     }
 
