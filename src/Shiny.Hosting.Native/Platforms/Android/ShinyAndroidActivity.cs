@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.OS;
 using Android.Runtime;
 using AndroidX.AppCompat.App;
 using Shiny.Hosting;
@@ -10,10 +11,10 @@ namespace Shiny;
 
 public abstract class ShinyAndroidActivity : AppCompatActivity
 {
-    protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data)
+    protected override void OnCreate(Bundle? savedInstanceState)
     {
-        base.OnActivityResult(requestCode, resultCode, data);
-        Host.Lifecycle.OnActivityResult(this, requestCode, resultCode, data);
+        base.OnCreate(savedInstanceState);
+        Host.Lifecycle.OnActivityOnCreate(this, savedInstanceState);
     }
 
 
@@ -21,6 +22,13 @@ public abstract class ShinyAndroidActivity : AppCompatActivity
     {
         base.OnNewIntent(intent);
         Host.Lifecycle.OnNewIntent(this, intent);
+    }
+
+
+    protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data)
+    {
+        base.OnActivityResult(requestCode, resultCode, data);
+        Host.Lifecycle.OnActivityResult(this, requestCode, resultCode, data);
     }
 
 
