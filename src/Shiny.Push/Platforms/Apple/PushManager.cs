@@ -167,10 +167,15 @@ public class PushManager : NotifyPropertyChanged,
         this.TryProcessIncomingNotification(
             notification,
             "Foreground remote notification received",
-            () => completionHandler.Invoke(
-                UNNotificationPresentationOptions.List |
-                UNNotificationPresentationOptions.Banner
-            )
+            () =>
+            {
+                
+                // TODO: safety the checks
+                // TODO: take first result that isn't null
+                completionHandler.Invoke(
+                    UNNotificationPresentationOptions.List |
+                    UNNotificationPresentationOptions.Banner);
+            }
         );
     }
 
@@ -213,10 +218,12 @@ public class PushManager : NotifyPropertyChanged,
                 this.logger
             )
             .ContinueWith(_ =>
+            {
+                // TODO: IApplePushDelegate
                 this.platform.InvokeOnMainThread(
                     () => completionHandler.Invoke(UIBackgroundFetchResult.NewData)
-                )
-            );
+                );
+            });
     }
 
 
