@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,6 +59,10 @@ public class HttpTransferProcess
             {
                 var fullInternet = this.connectivity.Access == NetworkAccess.Internet;
 
+                // this will start with an event triggering everything
+                // current transfers will cancel themselves and set their state when connectivity drops
+                this.logger.LogDebug("Connectivity is restored - starting transfers - Full internet: " + fullInternet);
+                
                 var queue = new ConcurrentQueue<HttpTransfer>(this.repository
                     .GetList<HttpTransfer>(x =>
                         !x.Request.UseMeteredConnection ||
@@ -68,12 +71,21 @@ public class HttpTransferProcess
                     .OrderBy(x => x.CreatedAt)
                     .ToList()
                 );
-                // this will start with an event triggering everything
-                // current transfers will cancel themselves and set their state when connectivity drops
-                this.logger.LogDebug("Connectivity is restored - starting transfers");
-                cancelSrc = new();
+                
 
-                await this.TransferLoop(queue, cancelSrc.Token).ConfigureAwait(false);
+                cancelSrc = new();
+                try
+                {
+                    await this.TransferLoop(queue, cancelSrc.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    this.logger.LogInformation("TransferLoop cancelled");
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning(ex, "Error in transfer loop");
+                }
             })
             .DisposedBy(this.disposer);
 
@@ -125,7 +137,6 @@ public class HttpTransferProcess
     }
 
 
-
     async Task TransferLoop(ConcurrentQueue<HttpTransfer> transfers, CancellationToken cancelToken)
     {
         while (transfers.TryDequeue(out var transfer) &&
@@ -157,18 +168,6 @@ public class HttpTransferProcess
             {
                 this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
                 cancelSrc?.Cancel();
-            });
-
-        using var connSub = this.connectivity
-            .WhenInternetStatusChanged()
-            .Where(x => !x)
-            .Subscribe(_ =>
-            {
-                this.logger.StandardInfo(transfer.Identifier, "No network detected for transfers - pausing");
-                this.repository.Set(transfer with
-                {
-                    Status = HttpTransferState.PausedByNoNetwork
-                });
             });
 
         try
@@ -211,15 +210,30 @@ public class HttpTransferProcess
 
             this.repository.Remove(transfer);
         }
+
+        catch (Java.Net.SocketException)
+        {
+            this.PauseTransfer(transfer, "Android Network Disconnected");
+        }
         catch (OperationCanceledException)
         {
-            this.logger.StandardInfo(transfer!.Identifier, "Suspend Requested");
+            // transfer has been cancelled
         }
-        // should always retry unless server fails
         catch (Exception ex)
         {
-            this.logger.LogDebug(ex, "Error with transfer");
+            // should always retry unless server fails
+            this.PauseTransfer(transfer, "Error with transfer - " + ex.ToString());
         }
+    }
+
+
+    void PauseTransfer(HttpTransfer transfer, string reason)
+    {
+        this.logger.StandardInfo(transfer.Identifier, reason);
+        this.repository.Set(transfer with
+        {
+            Status = HttpTransferState.PausedByNoNetwork
+        });
     }
 
 
