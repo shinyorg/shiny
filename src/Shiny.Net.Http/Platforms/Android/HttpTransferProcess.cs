@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive.Disposables;
@@ -53,10 +54,12 @@ public class HttpTransferProcess
 
         this.connectivity
             .WhenInternetStatusChanged()
-            .Where(x => x == true)
             .DistinctUntilChanged()
             .SubscribeAsync(async _ =>
             {
+                if (!this.connectivity.IsInternetAvailable())
+                    return;
+
                 var fullInternet = this.connectivity.Access == NetworkAccess.Internet;
 
                 // this will start with an event triggering everything
@@ -210,10 +213,13 @@ public class HttpTransferProcess
 
             this.repository.Remove(transfer);
         }
-
-        catch (Java.Net.SocketException)
+        catch (IOException ex) when (ex.InnerException is Java.Net.SocketException)
         {
-            this.PauseTransfer(transfer, "Android Network Disconnected");
+            this.PauseTransfer(transfer, "Android Network Disconnected", ex);
+        }
+        catch (Java.Net.SocketException ex)
+        {
+            this.PauseTransfer(transfer, "Android Network Disconnected", ex);
         }
         catch (OperationCanceledException)
         {
@@ -222,14 +228,14 @@ public class HttpTransferProcess
         catch (Exception ex)
         {
             // should always retry unless server fails
-            this.PauseTransfer(transfer, "Error with transfer - " + ex.ToString());
+            this.PauseTransfer(transfer, "Error with transfer - " + ex.ToString(), ex);
         }
     }
 
 
-    void PauseTransfer(HttpTransfer transfer, string reason)
+    void PauseTransfer(HttpTransfer transfer, string reason, Exception exception)
     {
-        this.logger.StandardInfo(transfer.Identifier, reason);
+        this.logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
         this.repository.Set(transfer with
         {
             Status = HttpTransferState.PausedByNoNetwork
