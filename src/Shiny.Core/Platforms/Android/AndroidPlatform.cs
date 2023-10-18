@@ -115,16 +115,13 @@ public partial class AndroidPlatform : IPlatform,
     public void StartService(Type serviceType, bool stopWithTask = true)
     {
         var intent = new Intent(this.AppContext, serviceType);
+        intent.SetAction(ActionServiceStart);
+        intent.PutExtra(IntentActionStopWithTask, stopWithTask);
+
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
-        {
-            intent.SetAction(ActionServiceStart);
-            intent.PutExtra(IntentActionStopWithTask, stopWithTask);
             this.AppContext.StartForegroundService(intent);
-        }
         else
-        {
             this.AppContext.StartService(intent);
-        }
     }
 
 
