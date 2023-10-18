@@ -52,10 +52,8 @@ public abstract class ShinyAndroidForegroundService : Service
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
     {
-        var action = intent?.Action ?? AndroidPlatform.ActionServiceStart;
-        this.Logger.LogDebug($"Foreground Service OnStartCommand - Action: {action} - Notification ID: {this.NotificationId}");
-
-        switch (action)
+        this.Logger.LogDebug($"Foreground Service OnStartCommand - Action: {intent?.Action} - Notification ID: {this.NotificationId}");
+        switch (intent?.Action)
         {
             case AndroidPlatform.ActionServiceStart:
                 this.StopWithTask = intent?.GetBooleanExtra(AndroidPlatform.IntentActionStopWithTask, false) ?? false;
@@ -64,6 +62,10 @@ public abstract class ShinyAndroidForegroundService : Service
 
             case AndroidPlatform.ActionServiceStop:
                 this.Stop();
+                break;
+
+            default:
+                this.Logger.LogDebug($"Invalid Intent Action - {intent?.Action}");
                 break;
         }
 
@@ -97,6 +99,11 @@ public abstract class ShinyAndroidForegroundService : Service
             this.StartForeground(this.NotificationId, notification);
             this.Logger.LogDebug("Started Foreground Service");
         }
+        else
+        {
+            this.NotificationManager!.Notify(this.NotificationId!, notification);
+            this.Logger.LogDebug("Started Classic Foreground Service");
+        }
 
         this.OnStart(intent);
     }
@@ -108,14 +115,21 @@ public abstract class ShinyAndroidForegroundService : Service
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
-            this.Logger.LogDebug("API level requires foreground detach");
+            this.Logger.LogDebug("API level 33+ foreground service shutdown");
+            this.StopForeground(StopForegroundFlags.Detach);
+            this.StopSelf();
+        }
+        else if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        {
+            this.Logger.LogDebug("API level 31 foreground service shutdown");
             this.StopForeground(true);
             this.StopSelf();
         }
         else
         {
+            this.Logger.LogDebug("API level classic foreground service shutdown");
             this.StopSelf();
             this.NotificationManager!.Cancel(this.NotificationId);
         }
