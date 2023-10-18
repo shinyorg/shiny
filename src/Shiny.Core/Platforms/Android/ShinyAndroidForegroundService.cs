@@ -111,7 +111,7 @@ public abstract class ShinyAndroidForegroundService : Service
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.Logger.LogDebug("API level requires foreground detach");
-            this.StopForeground(StopForegroundFlags.Detach | StopForegroundFlags.Remove);
+            this.StopForeground(true);
             this.StopSelf();
         }
         else
