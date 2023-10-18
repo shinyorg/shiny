@@ -112,7 +112,7 @@ public partial class AndroidPlatform : IPlatform,
     public const string ActionServiceStop = "ACTION_STOP_FOREGROUND_SERVICE";
     public const string IntentActionStopWithTask = "StopWithTask";
 
-    public void StartService(Type serviceType, bool stopWithTask = false)
+    public void StartService(Type serviceType, bool stopWithTask = true)
     {
         var intent = new Intent(this.AppContext, serviceType);
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
@@ -130,18 +130,10 @@ public partial class AndroidPlatform : IPlatform,
 
     public void StopService(Type serviceType)
     {
-        //if (!this.IsShinyForegroundService(serviceType))
-        //{
-            this.AppContext.StopService(new Intent(this.AppContext, serviceType));
-        //}
-        //else
-        //{
-        //    // HACK: this re-runs the intent to stop the service since OnTaskRemoved isn't running
-        //    var intent = new Intent(this.AppContext, serviceType);
-        //    intent.SetAction(ActionServiceStop);
-        //    this.AppContext.StartService(intent);
-        //}
-    }    
+        var intent = new Intent(this.AppContext, serviceType);
+        intent.SetAction(ActionServiceStop);
+        this.AppContext.StopService(intent);
+    }
 
 
     public AccessState GetCurrentAccessState(string androidPermission)
