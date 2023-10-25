@@ -63,6 +63,8 @@ public class HttpTransferProcess
                 });
 
             var hasMore = true;
+            //var semaphore = new SemaphoreSlim(1, 2);
+
             while (!cancelSrc.IsCancellationRequested && hasMore)
             {
                 var transfers = this.repository.GetList<HttpTransfer>();
@@ -75,13 +77,25 @@ public class HttpTransferProcess
                     var full = this.connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
                     this.logger.LogDebug("Internet Available - Trying Transfer Loop.  WIFI: " + full);
 
-                    // TODO: look into running multiple transfers
                     foreach (var transfer in transfers)
                     {
                         if (transfer.Request.UseMeteredConnection || full)
                         {
-                            this.logger.LogInformation($"Transfer {transfer.Identifier} starting");
-                            await this.RunTransfer(transfer, cancelSrc.Token).ConfigureAwait(false);
+                            //this.logger.LogDebug("Checking Queue");
+                            //await semaphore.WaitAsync(cancelSrc.Token);
+
+                            //if (!cancelSrc.IsCancellationRequested)
+                            //{
+                                this.logger.LogInformation($"Transfer {transfer.Identifier} starting");
+                                await this.RunTransfer(transfer, cancelSrc.Token).ConfigureAwait(false);
+
+                                //this.RunTransfer(transfer, cancelSrc.Token)
+                                //    .ContinueWith(_ =>
+                                //    {
+                                //        semaphore.Release();
+                                //        this.logger.LogDebug("Releasing Semaphore");
+                                //    });
+                            //}
                         }
                         else
                         {

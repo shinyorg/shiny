@@ -92,6 +92,8 @@ public abstract class ShinyAndroidForegroundService : Service
 
         this.Logger.LogDebug("Starting Foreground Notification: " + this.NotificationId);
         var notification = this.Builder.Build();
+        notification.Flags |= NotificationFlags.ForegroundService;
+
         this.NotificationManager!.Notify(this.NotificationId, notification);
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
@@ -115,13 +117,14 @@ public abstract class ShinyAndroidForegroundService : Service
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
-        {
-            this.Logger.LogDebug("API level 33+ foreground service shutdown");
-            this.StopForeground(StopForegroundFlags.Detach);
-            this.StopSelf();
-        }
-        else if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        //{
+        //    this.Logger.LogDebug("API level 33+ foreground service shutdown");
+        //    this.StopForeground(StopForegroundFlags.Detach);
+        //    this.StopSelf();
+        //}
+        //else
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.Logger.LogDebug("API level 31 foreground service shutdown");
             this.StopForeground(true);
@@ -159,7 +162,8 @@ public abstract class ShinyAndroidForegroundService : Service
         var build = new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
             .SetSmallIcon(this.Platform.GetNotificationIconResource())
             .SetForegroundServiceBehavior((int)NotificationForegroundService.Immediate)
-            .SetOngoing(true)
+            .SetOngoing(false) //.SetOngoing(true)
+            .SetOnlyAlertOnce(true)            
             .SetTicker("...")
             .SetContentTitle("Shiny Service")
             .SetContentText("Shiny service is continuing to process data in the background");
