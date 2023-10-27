@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.OS;
 using Android.Runtime;
 using AndroidX.Lifecycle;
 using Java.Interop;
@@ -23,7 +24,8 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
 
 
     public AndroidLifecycleExecutor(IntPtr handle, JniHandleOwnership ownership) : base(handle, ownership) { }
-        public AndroidLifecycleExecutor(
+
+    public AndroidLifecycleExecutor(
         ILogger<AndroidLifecycleExecutor> logger,
         AndroidPlatform platform,
         IEnumerable<IAndroidLifecycle.IApplicationLifecycle> appHandlers,
@@ -75,6 +77,9 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
     //{
     //    Console.WriteLine("LIFECYCLE: OnDestory");
     //}
+
+    public void OnActivityOnCreate(Activity activity, Bundle? savedInstanceState)
+        => this.Execute(this.onCreateHandlers, x => x.ActivityOnCreate(activity, savedInstanceState));
 
     public void OnRequestPermissionsResult(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
         => this.Execute(this.permissionHandlers, x => x.Handle(activity, requestCode, permissions, grantResults));

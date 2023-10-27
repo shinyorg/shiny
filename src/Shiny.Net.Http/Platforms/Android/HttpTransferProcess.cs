@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,103 +41,104 @@ public class HttpTransferProcess
 
     static readonly ShinySubject<HttpTransferResult> progressSubj = new();
     public static IObservable<HttpTransferResult> WhenProgress() => progressSubj;
-    CompositeDisposable disposer = null!;
     
 
     public void Run(Action onComplete)
     {
-        this.disposer = new();
-        CancellationTokenSource cancelSrc = null!;
-        ConcurrentQueue<HttpTransfer> queue = new();
+        _ = Task.Run(async () =>
+        {
+            this.logger.LogInformation("Starting Transfer Loop Wait");
+            var cancelSrc = new CancellationTokenSource();
 
-        this.connectivity
-            .WhenInternetStatusChanged()
-            .Where(x => x == true)
-            .DistinctUntilChanged()
-            .SubscribeAsync(async _ =>
-            {
-                var fullInternet = this.connectivity.Access == NetworkAccess.Internet;
-
-                var queue = new ConcurrentQueue<HttpTransfer>(this.repository
-                    .GetList<HttpTransfer>(x =>
-                        !x.Request.UseMeteredConnection ||
-                        fullInternet
-                    )
-                    .OrderBy(x => x.CreatedAt)
-                    .ToList()
-                );
-                // this will start with an event triggering everything
-                // current transfers will cancel themselves and set their state when connectivity drops
-                this.logger.LogDebug("Connectivity is restored - starting transfers");
-                cancelSrc = new();
-
-                await this.TransferLoop(queue, cancelSrc.Token).ConfigureAwait(false);
-            })
-            .DisposedBy(this.disposer);
-
-        this.repository
-            .WhenActionOccurs()
-            .Where(x =>
-                x.EntityType == typeof(HttpTransfer) &&
-                x.Action != RepositoryAction.Update
-            )
-            .Subscribe(x =>
-            {
-                try
+            using var sub = this.repository
+                .WhenActionOccurs()
+                .Where(x =>
+                    x.EntityType == typeof(HttpTransfer) &&
+                    x.Action == RepositoryAction.Clear
+                )
+                .Take(1)
+                .Subscribe(_ =>
                 {
-                    switch (x.Action)
-                    {
-                        case RepositoryAction.Add:
-                            queue.Enqueue((HttpTransfer)x.Entity!);
-                            break;
+                    this.logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
+                    cancelSrc.Cancel();
+                });
 
-                        case RepositoryAction.Remove:
-                            var transfers = this.repository.GetList<HttpTransfer>();
-                            if (transfers.Count == 0)
+            //var semaphore = new SemaphoreSlim(1, 2);
+            try
+            {
+                var transfers = this.repository.GetList<HttpTransfer>();
+                while (!cancelSrc.IsCancellationRequested && transfers.Count > 0)
+                {
+                    this.logger.LogDebug("Starting Loop");
+                    if (this.connectivity.IsInternetAvailable())
+                    {
+                        var full = this.connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
+                        this.logger.LogDebug("Internet Available - Trying Transfer Loop.  WIFI: " + full);
+
+                        foreach (var transfer in transfers)
+                        {
+                            var stillExists = this.repository.Exists<HttpTransfer>(transfer.Identifier);
+                            if (cancelSrc.IsCancellationRequested)
                             {
-                                this.logger.LogInformation("All transfers completed - shutting down");
-                                this.disposer.Dispose();
-                                onComplete();
+                                this.logger.LogDebug("Transfer Loop cancelled");
+                            }
+                            else if (!this.repository.Exists<HttpTransfer>(transfer.Identifier))
+                            {
+                                this.logger.LogDebug($"HTTP Transfer {transfer.Identifier} has been removed");
+                            }
+                            else if (transfer.Request.UseMeteredConnection || full)
+                            {
+                                //this.logger.LogDebug("Checking Queue");
+                                //await semaphore.WaitAsync(cancelSrc.Token);
+
+                                //if (!cancelSrc.IsCancellationRequested)
+                                //{
+                                this.logger.LogInformation($"Transfer {transfer.Identifier} starting");
+                                await this.RunTransfer(transfer, cancelSrc.Token).ConfigureAwait(false);
+
+                                //this.RunTransfer(transfer, cancelSrc.Token)
+                                //    .ContinueWith(_ =>
+                                //    {
+                                //        semaphore.Release();
+                                //        this.logger.LogDebug("Releasing Semaphore");
+                                //    });
+                                //}
                             }
                             else
                             {
-                                queue = new ConcurrentQueue<HttpTransfer>(transfers);
-                                this.logger.LogInformation($"{transfers.Count} transfers remaining after remove");
+                                this.logger.LogDebug($"Transfer {transfer.Identifier} is a metered transfer - waiting for WIFI");
                             }
-                            break;
+                        }
+                    }
+                    else
+                    {
+                        this.logger.LogDebug("Internet Unavailable - Waiting for next pass");
+                    }
 
-                        case RepositoryAction.Clear:
-                            this.logger.LogDebug("All HTTP Transfers have been cleared");
-                            cancelSrc?.Cancel();
-                            this.disposer.Dispose();
-                            onComplete();
-                            break;
+                    transfers = this.repository.GetList<HttpTransfer>();
+                    if (transfers.Count > 0)
+                    {
+                        // TODO: configurable
+                        this.logger.LogDebug("Waiting for loop pass");
+                        await Task
+                            .Delay(10000, cancelSrc.Token)
+                            .ConfigureAwait(false);
                     }
                 }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(ex, "Error in repository action");
-                }
-            })
-            .DisposedBy(this.disposer);
+                this.logger.LogDebug("All transfers complete");
+            }
+            catch (TaskCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Error in transfer loop");
+            }
+            this.logger.LogDebug("Shutting down HTTP transfer service");
+            onComplete(); // shutdown service
+        });
     }
-
-
-
-    async Task TransferLoop(ConcurrentQueue<HttpTransfer> transfers, CancellationToken cancelToken)
-    {
-        while (transfers.TryDequeue(out var transfer) &&
-               this.connectivity.IsInternetAvailable() &&
-               !cancelToken.IsCancellationRequested
-        )
-        {
-            this.logger.LogDebug("LOOP: Starting Transfer - " + transfer.Identifier);
-            await this.RunTransfer(transfer, cancelToken).ConfigureAwait(false);
-
-            this.logger.LogDebug("LOOP: Stopping/Finished Transfer - " + transfer.Identifier);
-        }
-    }
-
+    
 
     async Task RunTransfer(HttpTransfer transfer, CancellationToken cancelToken)
     {
@@ -153,22 +152,11 @@ public class HttpTransferProcess
                 x.Action == RepositoryAction.Remove &&
                 transfer.Identifier.Equals(x.Entity!.Identifier)
             )
+            .Take(1)
             .Subscribe(x =>
             {
                 this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
                 cancelSrc?.Cancel();
-            });
-
-        using var connSub = this.connectivity
-            .WhenInternetStatusChanged()
-            .Where(x => !x)
-            .Subscribe(_ =>
-            {
-                this.logger.StandardInfo(transfer.Identifier, "No network detected for transfers - pausing");
-                this.repository.Set(transfer with
-                {
-                    Status = HttpTransferState.PausedByNoNetwork
-                });
             });
 
         try
@@ -192,6 +180,7 @@ public class HttpTransferProcess
                 ),
                 null
             ));
+            repoSub.Dispose(); // dispose of this so cancellation isn't run
 
             this.repository.Remove(transfer);
         }
@@ -208,18 +197,37 @@ public class HttpTransferProcess
                 TransferProgress.Empty,
                 ex
             ));
+            repoSub.Dispose(); // dispose of this so cancellation isn't run
 
             this.repository.Remove(transfer);
         }
+        catch (IOException ex) when (ex.InnerException is Java.Net.SocketException)
+        {
+            this.PauseTransfer(transfer, "Android Network Disconnected", ex);
+        }
+        catch (Java.Net.SocketException ex)
+        {
+            this.PauseTransfer(transfer, "Android Network Disconnected", ex);
+        }
         catch (OperationCanceledException)
         {
-            this.logger.StandardInfo(transfer!.Identifier, "Suspend Requested");
+            // transfer has been cancelled
         }
-        // should always retry unless server fails
         catch (Exception ex)
         {
-            this.logger.LogDebug(ex, "Error with transfer");
+            // should always retry unless server fails
+            this.PauseTransfer(transfer, "Error with transfer - " + ex.ToString(), ex);
         }
+    }
+
+
+    void PauseTransfer(HttpTransfer transfer, string reason, Exception exception)
+    {
+        this.logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
+        this.repository.Set(transfer with
+        {
+            Status = HttpTransferState.PausedByNoNetwork
+        });
     }
 
 

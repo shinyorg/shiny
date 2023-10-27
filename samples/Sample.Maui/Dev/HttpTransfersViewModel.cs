@@ -70,9 +70,8 @@ public class HttpTransfersViewModel : ViewModel
     }
 
 
-
     [Reactive] public int TransferCount { get; private set; }
-    public INotifyReadOnlyCollection<HttpTransferObject> Transfers { get; private set; } = new ObservableList<HttpTransferObject>();
+    public INotifyReadOnlyCollection<HttpTransferObject> Transfers => this.monitor.Transfers;
     public ICommand AddDownload { get; }
     public ICommand AddUpload { get; }
     public ICommand CancelAll { get; }
@@ -99,8 +98,6 @@ public class HttpTransfersViewModel : ViewModel
                 false,
                 RxApp.MainThreadScheduler
             );
-
-            this.Transfers = this.monitor.Transfers;
         }
         catch (Exception ex)
         {

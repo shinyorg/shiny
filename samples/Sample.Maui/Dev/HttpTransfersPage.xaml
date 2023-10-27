@@ -26,6 +26,8 @@
                 Grid.Column="1" />
 
         <CollectionView ItemsSource="{Binding Transfers}"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand"
                         Grid.Row="1"
                         Grid.ColumnSpan="2">
 

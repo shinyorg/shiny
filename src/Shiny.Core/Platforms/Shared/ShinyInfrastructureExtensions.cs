@@ -1,6 +1,4 @@
 ﻿#if PLATFORM
-using System.Runtime.InteropServices;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Hosting;

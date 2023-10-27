@@ -12,6 +12,9 @@ namespace Shiny.Tests;
 
 public class HttpTransferTests : AbstractShinyTests
 {
+    // TODO: test multiple uploads while monitoring
+    // TODO: mock disconnects
+
     // point at our test api
     public HttpTransferTests(ITestOutputHelper output) : base(output) { }
 
@@ -267,27 +270,27 @@ public class HttpTransferTests : AbstractShinyTests
 
 #if ANDROID
     // Test connectivity flops by injecting mock connectivity
-    [Fact(DisplayName = "HTTP Transfers (Android) - Connectivity Test")]
-    public async Task AndroidConnectivityTest()
-    {
-        var conn = this.GetService<MockConnectivity>();
-        conn.Change(NetworkAccess.None);
+    //[Fact(DisplayName = "HTTP Transfers (Android) - Connectivity Test")]
+    //public async Task AndroidConnectivityTest()
+    //{
+    //    var conn = this.GetService<MockConnectivity>();
+    //    conn.Change(NetworkAccess.None);
 
-        var manager = this.GetService<IHttpTransferManager>();
-        var id = Guid.NewGuid().ToString();
+    //    var manager = this.GetService<IHttpTransferManager>();
+    //    var id = Guid.NewGuid().ToString();
 
-        //await manager.Queue(new HttpTransferRequest(
-        //    id,
-        //    this.GetUri(isUpload, false),
-        //    isUpload,
-        //    this.GetLocalPath(isUpload),
-        //    Headers: new Dictionary<string, string>
-        //    {
-        //        { "Test", "Test" }
-        //    }
-        //));
-        // TODO: ensure fg service stays on
-    }
+    //    //await manager.Queue(new HttpTransferRequest(
+    //    //    id,
+    //    //    this.GetUri(isUpload, false),
+    //    //    isUpload,
+    //    //    this.GetLocalPath(isUpload),
+    //    //    Headers: new Dictionary<string, string>
+    //    //    {
+    //    //        { "Test", "Test" }
+    //    //    }
+    //    //));
+    //    // TODO: ensure fg service stays on
+    //}
 #endif
 
     string GetUri(bool upload, bool includeBody)

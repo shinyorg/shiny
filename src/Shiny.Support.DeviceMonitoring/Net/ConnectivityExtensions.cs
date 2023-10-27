@@ -14,5 +14,6 @@ public static class ConnectivityExtensions
     public static IObservable<bool> WhenInternetStatusChanged(this IConnectivity connectivity, bool allowConstrained = true) => connectivity
         .WhenChanged()
         .Select(x => x.IsInternetAvailable(allowConstrained))
-        .StartWith(connectivity.IsInternetAvailable(allowConstrained));
+        .StartWith(connectivity.IsInternetAvailable(allowConstrained))
+        .DistinctUntilChanged();
 }

@@ -52,10 +52,8 @@ public abstract class ShinyAndroidForegroundService : Service
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
     {
-        var action = intent?.Action ?? AndroidPlatform.ActionServiceStart;
-        this.Logger.LogDebug($"Foreground Service OnStartCommand - Action: {action} - Notification ID: {this.NotificationId}");
-
-        switch (action)
+        this.Logger.LogDebug($"Foreground Service OnStartCommand - Action: {intent?.Action} - Notification ID: {this.NotificationId}");
+        switch (intent?.Action)
         {
             case AndroidPlatform.ActionServiceStart:
                 this.StopWithTask = intent?.GetBooleanExtra(AndroidPlatform.IntentActionStopWithTask, false) ?? false;
@@ -64,6 +62,10 @@ public abstract class ShinyAndroidForegroundService : Service
 
             case AndroidPlatform.ActionServiceStop:
                 this.Stop();
+                break;
+
+            default:
+                this.Logger.LogDebug($"Invalid Intent Action - {intent?.Action}");
                 break;
         }
 
@@ -90,12 +92,19 @@ public abstract class ShinyAndroidForegroundService : Service
 
         this.Logger.LogDebug("Starting Foreground Notification: " + this.NotificationId);
         var notification = this.Builder.Build();
+        notification.Flags |= NotificationFlags.ForegroundService;
+
         this.NotificationManager!.Notify(this.NotificationId, notification);
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.StartForeground(this.NotificationId, notification);
             this.Logger.LogDebug("Started Foreground Service");
+        }
+        else
+        {
+            this.NotificationManager!.Notify(this.NotificationId!, notification);
+            this.Logger.LogDebug("Started Classic Foreground Service");
         }
 
         this.OnStart(intent);
@@ -104,18 +113,31 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected void Stop()
     {
-        this.Logger.LogDebug("Calling for foreground service stop");
+        this.Logger.LogDebug($"Calling for foreground service stop.  Notification ID: {this.NotificationId}");
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
+        //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        //{
+        //    this.Logger.LogDebug("API level 33+ foreground service shutdown");
+        //    this.StopForeground(StopForegroundFlags.Detach);
+        //    this.StopSelf();
+        //}
+        //else
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
-            this.Logger.LogDebug("API level requires foreground detach");
-            this.StopForeground(StopForegroundFlags.Detach);
+            this.Logger.LogDebug("API level 31+ foreground service shutdown");
+            this.StopForeground(true);
+            this.StopSelf();
         }
-        this.Logger.LogDebug($"Foreground service calling for notification ID: {this.NotificationId} to cancel");
-        this.NotificationManager?.Cancel(this.NotificationId);
-        this.StopSelf();        
+        else
+        {
+            this.Logger.LogDebug("API level classic foreground service shutdown");
+            this.StopSelf();
+            this.NotificationManager!.Cancel(this.NotificationId);
+        }
+
+        this.Logger.LogDebug("Foreground service stopped successfully");
         this.OnStop();
     }
 
@@ -140,7 +162,8 @@ public abstract class ShinyAndroidForegroundService : Service
         var build = new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
             .SetSmallIcon(this.Platform.GetNotificationIconResource())
             .SetForegroundServiceBehavior((int)NotificationForegroundService.Immediate)
-            .SetOngoing(true)
+            .SetOngoing(false) //.SetOngoing(true)
+            .SetOnlyAlertOnce(true)            
             .SetTicker("...")
             .SetContentTitle("Shiny Service")
             .SetContentText("Shiny service is continuing to process data in the background");

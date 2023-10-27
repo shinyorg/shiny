@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
-using Microsoft.Extensions.Logging;
 using UIKit;
 using UserNotifications;
 using Shiny.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny.Push;
 
@@ -61,7 +63,7 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    public async void Start()
+    public void Start()
     {
         //AppleExtensions.AssertAppDelegateHook(
         //    "application:didReceiveRemoteNotification:fetchCompletionHandler:",
@@ -82,16 +84,22 @@ public class PushManager : NotifyPropertyChanged,
         if (this.RegistrationToken.IsEmpty())
             return;
 
-        try
-        {
-            var result = await this.RequestAccess().ConfigureAwait(false);
-            if (result.Status != AccessState.Available)
-                this.logger.LogInformation("User has removed push notification access - " + result.Status);
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogWarning("Failed to auto start push", ex);
-        }
+        this.RequestAccess()
+            .ContinueWith(x =>
+            {
+                if (x.Exception != null)
+                {
+                    this.logger.LogWarning(x.Exception, "Failed to auto start push");
+                }
+                else if (x.Result.Status != AccessState.Available)
+                {
+                    this.logger.LogInformation("User has removed push notification access - " + x.Result.Status);
+                }
+                else
+                {
+                    this.logger.LogInformation("PushManager still has user permissions");
+                }
+            });
     }
 
 
@@ -167,10 +175,30 @@ public class PushManager : NotifyPropertyChanged,
         this.TryProcessIncomingNotification(
             notification,
             "Foreground remote notification received",
-            () => completionHandler.Invoke(
-                UNNotificationPresentationOptions.List |
-                UNNotificationPresentationOptions.Banner
-            )
+            notification =>
+            {
+                var options = this.services
+                    .GetServices<IPushDelegate>()
+                    .Select(x =>
+                    {
+                        try
+                        {
+                            return (x as IApplePushDelegate)?.GetPresentationOptions(notification);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger.LogError(ex, $"Error executing ApplePushDelegate {x.GetType().FullName}.GetPresentationOptions");
+                            return null;
+                        }
+                    })
+                    .FirstOrDefault(x => x != null);
+
+                this.platform.InvokeOnMainThread(() =>
+                    completionHandler.Invoke(
+                        options ?? UNNotificationPresentationOptions.List | UNNotificationPresentationOptions.Banner
+                    )
+                );
+            }
         );
     }
 
@@ -212,11 +240,28 @@ public class PushManager : NotifyPropertyChanged,
                 x => x.OnReceived(data),
                 this.logger
             )
-            .ContinueWith(_ =>
+            .ContinueWith(x =>
+            {
+                var fetchResult = this.services
+                    .GetServices<IPushDelegate>()
+                    .Select(x =>
+                    {
+                        try
+                        {
+                            return (x as IApplePushDelegate)?.GetFetchResult(data);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger.LogError(ex, $"Error executing ApplePushDelegate {x.GetType().FullName}.GetFetchResult");
+                            return null;
+                        }
+                    })
+                    .FirstOrDefault(x => x != null);
+
                 this.platform.InvokeOnMainThread(
-                    () => completionHandler.Invoke(UIBackgroundFetchResult.NewData)
-                )
-            );
+                    () => completionHandler.Invoke(fetchResult ?? UIBackgroundFetchResult.NewData)
+                );
+            });
     }
 
 
@@ -239,7 +284,7 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    protected virtual void TryProcessIncomingNotification(UNNotification? notification, string logMessage, Action completionHandler)
+    protected virtual void TryProcessIncomingNotification(UNNotification? notification, string logMessage, Action<PushNotification> completionHandler)
     {
         // if this errors, high level event hub will catch
         if (notification?.Request?.Trigger is not UNPushNotificationTrigger push)
@@ -253,7 +298,7 @@ public class PushManager : NotifyPropertyChanged,
                 x => x.OnReceived(data),
                 this.logger
             )
-            .ContinueWith(_ => completionHandler.Invoke());
+            .ContinueWith(_ => completionHandler.Invoke(data));
     }
 
 
