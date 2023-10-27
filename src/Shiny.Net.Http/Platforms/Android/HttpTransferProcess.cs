@@ -56,36 +56,43 @@ public class HttpTransferProcess
                     x.EntityType == typeof(HttpTransfer) &&
                     x.Action == RepositoryAction.Clear
                 )
+                .Take(1)
                 .Subscribe(_ =>
                 {
                     this.logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
                     cancelSrc.Cancel();
                 });
 
-            var hasMore = true;
             //var semaphore = new SemaphoreSlim(1, 2);
-
-            while (!cancelSrc.IsCancellationRequested && hasMore)
+            try
             {
                 var transfers = this.repository.GetList<HttpTransfer>();
-                if (transfers.Count == 0)
+                while (!cancelSrc.IsCancellationRequested && transfers.Count > 0)
                 {
-                    hasMore = false;
-                }
-                else if (this.connectivity.IsInternetAvailable())
-                {
-                    var full = this.connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
-                    this.logger.LogDebug("Internet Available - Trying Transfer Loop.  WIFI: " + full);
-
-                    foreach (var transfer in transfers)
+                    this.logger.LogDebug("Starting Loop");
+                    if (this.connectivity.IsInternetAvailable())
                     {
-                        if (transfer.Request.UseMeteredConnection || full)
-                        {
-                            //this.logger.LogDebug("Checking Queue");
-                            //await semaphore.WaitAsync(cancelSrc.Token);
+                        var full = this.connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
+                        this.logger.LogDebug("Internet Available - Trying Transfer Loop.  WIFI: " + full);
 
-                            //if (!cancelSrc.IsCancellationRequested)
-                            //{
+                        foreach (var transfer in transfers)
+                        {
+                            var stillExists = this.repository.Exists<HttpTransfer>(transfer.Identifier);
+                            if (cancelSrc.IsCancellationRequested)
+                            {
+                                this.logger.LogDebug("Transfer Loop cancelled");
+                            }
+                            else if (!this.repository.Exists<HttpTransfer>(transfer.Identifier))
+                            {
+                                this.logger.LogDebug($"HTTP Transfer {transfer.Identifier} has been removed");
+                            }
+                            else if (transfer.Request.UseMeteredConnection || full)
+                            {
+                                //this.logger.LogDebug("Checking Queue");
+                                //await semaphore.WaitAsync(cancelSrc.Token);
+
+                                //if (!cancelSrc.IsCancellationRequested)
+                                //{
                                 this.logger.LogInformation($"Transfer {transfer.Identifier} starting");
                                 await this.RunTransfer(transfer, cancelSrc.Token).ConfigureAwait(false);
 
@@ -95,24 +102,39 @@ public class HttpTransferProcess
                                 //        semaphore.Release();
                                 //        this.logger.LogDebug("Releasing Semaphore");
                                 //    });
-                            //}
-                        }
-                        else
-                        {
-                            this.logger.LogDebug($"Transfer {transfer.Identifier} is a metered transfer - waiting for WIFI");
+                                //}
+                            }
+                            else
+                            {
+                                this.logger.LogDebug($"Transfer {transfer.Identifier} is a metered transfer - waiting for WIFI");
+                            }
                         }
                     }
+                    else
+                    {
+                        this.logger.LogDebug("Internet Unavailable - Waiting for next pass");
+                    }
+
+                    transfers = this.repository.GetList<HttpTransfer>();
+                    if (transfers.Count > 0)
+                    {
+                        // TODO: configurable
+                        this.logger.LogDebug("Waiting for loop pass");
+                        await Task
+                            .Delay(10000, cancelSrc.Token)
+                            .ConfigureAwait(false);
+                    }
                 }
-                else
-                {
-                    this.logger.LogDebug("Internet Unavailable - Waiting for next pass");
-                }
-                // TODO: configurable
-                await Task
-                    .Delay(10000, cancelSrc.Token)
-                    .ConfigureAwait(false);
+                this.logger.LogDebug("All transfers complete");
             }
-            this.logger.LogDebug("All HTTP transfers completed - shutting down service");
+            catch (TaskCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Error in transfer loop");
+            }
+            this.logger.LogDebug("Shutting down HTTP transfer service");
             onComplete(); // shutdown service
         });
     }
@@ -130,6 +152,7 @@ public class HttpTransferProcess
                 x.Action == RepositoryAction.Remove &&
                 transfer.Identifier.Equals(x.Entity!.Identifier)
             )
+            .Take(1)
             .Subscribe(x =>
             {
                 this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
@@ -157,6 +180,7 @@ public class HttpTransferProcess
                 ),
                 null
             ));
+            repoSub.Dispose(); // dispose of this so cancellation isn't run
 
             this.repository.Remove(transfer);
         }
@@ -173,6 +197,7 @@ public class HttpTransferProcess
                 TransferProgress.Empty,
                 ex
             ));
+            repoSub.Dispose(); // dispose of this so cancellation isn't run
 
             this.repository.Remove(transfer);
         }

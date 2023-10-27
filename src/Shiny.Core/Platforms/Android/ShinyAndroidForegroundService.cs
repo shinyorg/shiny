@@ -126,7 +126,7 @@ public abstract class ShinyAndroidForegroundService : Service
         //else
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
-            this.Logger.LogDebug("API level 31 foreground service shutdown");
+            this.Logger.LogDebug("API level 31+ foreground service shutdown");
             this.StopForeground(true);
             this.StopSelf();
         }
