@@ -28,7 +28,6 @@ public abstract class ShinyAndroidForegroundService : Service
             this.privateNotificationId ??= ++startNotificationId;
             return this.privateNotificationId.Value;
         }
-        //set => this.notificationId = value;
     }
 
     protected NotificationCompat.Builder? Builder { get; private set; }
@@ -94,8 +93,6 @@ public abstract class ShinyAndroidForegroundService : Service
         var notification = this.Builder.Build();
         notification.Flags |= NotificationFlags.ForegroundService;
 
-        this.NotificationManager!.Notify(this.NotificationId, notification);
-
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.StartForeground(this.NotificationId, notification);
@@ -103,7 +100,7 @@ public abstract class ShinyAndroidForegroundService : Service
         }
         else
         {
-            this.NotificationManager!.Notify(this.NotificationId!, notification);
+            //this.NotificationManager!.Notify("SERVICE", this.NotificationId!, notification);
             this.Logger.LogDebug("Started Classic Foreground Service");
         }
 
@@ -117,24 +114,23 @@ public abstract class ShinyAndroidForegroundService : Service
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
+        // this doesn't seem to work for 13 or 14 for me
         //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         //{
         //    this.Logger.LogDebug("API level 33+ foreground service shutdown");
         //    this.StopForeground(StopForegroundFlags.Detach);
-        //    this.StopSelf();
         //}
-        //else
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
         {
             this.Logger.LogDebug("API level 31+ foreground service shutdown");
             this.StopForeground(true);
-            this.StopSelf();
+            //this.StopSelf();
         }
         else
         {
             this.Logger.LogDebug("API level classic foreground service shutdown");
+            //this.NotificationManager!.Cancel(this.NotificationId);
             this.StopSelf();
-            this.NotificationManager!.Cancel(this.NotificationId);
         }
 
         this.Logger.LogDebug("Foreground service stopped successfully");
@@ -162,7 +158,7 @@ public abstract class ShinyAndroidForegroundService : Service
         var build = new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
             .SetSmallIcon(this.Platform.GetNotificationIconResource())
             .SetForegroundServiceBehavior((int)NotificationForegroundService.Immediate)
-            .SetOngoing(false) //.SetOngoing(true)
+            .SetOngoing(true)
             .SetOnlyAlertOnce(true)            
             .SetTicker("...")
             .SetContentTitle("Shiny Service")
