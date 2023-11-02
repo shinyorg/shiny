@@ -129,7 +129,8 @@ public partial class AndroidPlatform : IPlatform,
     {
         var intent = new Intent(this.AppContext, serviceType);
         intent.SetAction(ActionServiceStop);
-        this.AppContext.StopService(intent);
+        this.AppContext.StartService(intent);
+        //this.AppContext.StopService(intent);
     }
 
 
