@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using CoreBluetooth;
-using CoreLocation;
 using Foundation;
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -12,13 +11,13 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public partial class BleHostingManager : IBleHostingManager
 {
-    CBPeripheralManager _manager;
+    CBPeripheralManager manager;
     protected CBPeripheralManager Manager
     {
         get
         {
-            this._manager ??= new();
-            return this._manager;
+            this.manager ??= new();
+            return this.manager;
         }
     }
 
