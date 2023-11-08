@@ -13,7 +13,6 @@ using CoreBluetooth;
 #if ANDROID
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
-using Shiny.Reflection;
 #endif
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -40,16 +39,23 @@ public partial class BleHostingManager : IShinyStartupTask
 #if ANDROID
         this.context = new GattServerContext(platform);
 #endif
-        this.keyStore = keyStore;
         this.logger = logger;
+        this.keyStore = keyStore;
         this.gattChars = services.GetLazyService<IEnumerable<BleGattCharacteristic>>();
     }
 
 
+    const string REG_KEY = "BleHostingManager.IsRegisteredServicesAttached";
     public bool IsRegisteredServicesAttached
     {
-        get => this.keyStore.DefaultStore.Get<bool>(nameof(this.IsRegisteredServicesAttached), false);
-        private set => this.keyStore.DefaultStore.Set(nameof(this.IsRegisteredServicesAttached), value);
+        get => this.keyStore.DefaultStore.Get(REG_KEY, false);
+        set
+        {
+            if (value)
+                this.keyStore.DefaultStore.Set(REG_KEY, true);
+            else
+                this.keyStore.DefaultStore.Remove(REG_KEY);
+        }
     }
 
 
@@ -64,7 +70,7 @@ public partial class BleHostingManager : IShinyStartupTask
             }
             catch (Exception ex)
             {
-                this.logger.LogWarning("Unable to reattach BLE hosted characteristics", ex);
+                this.logger.LogWarning(ex, "Unable to reattach BLE hosted characteristics");
             }
         }
     }
@@ -72,6 +78,9 @@ public partial class BleHostingManager : IShinyStartupTask
 
     public async Task AttachRegisteredServices()
     {
+        if (this.IsRegisteredServicesAttached)
+            return;
+
         (await this.RequestAccess()).Assert();
 
         this.gattServices ??= CollectServices(this.gattChars.Value);
@@ -90,12 +99,13 @@ public partial class BleHostingManager : IShinyStartupTask
         if (!this.IsRegisteredServicesAttached)
             return;
 
-        this.IsRegisteredServicesAttached = false;
         foreach (var serviceUuid in this.gattServices!.Keys)        
             this.RemoveService(serviceUuid);
         
         foreach (var ch in this.gattChars.Value)
             ch.OnStop(); // TODO: error trap this for user?
+
+        this.IsRegisteredServicesAttached = true;
     }
 
 
@@ -194,7 +204,7 @@ public partial class BleHostingManager : IShinyStartupTask
                     }
                     catch (Exception ex)
                     {
-                        this.logger.LogError("Error executing BleGattService notification subscription", ex);
+                        this.logger.LogError(ex, "Error executing BleGattService notification subscription");
                     }
                 }, attribute.Notifications);
             }
@@ -220,7 +230,7 @@ public partial class BleHostingManager : IShinyStartupTask
                     }
                     catch (Exception ex)
                     {
-                        this.logger.LogError("Error executing BleGattService request", ex);
+                        this.logger.LogError(ex, "Error executing BleGattService request");
                         if (!writeSuccess)
                             request.Respond(GattState.Failure);
                     }

@@ -16,29 +16,27 @@ public abstract class Job : NotifyPropertyChanged, IJob
     {
         var fireJob = true;
         this.JobInfo = jobInfo;
-
-        try
-        {        
-            if (this.MinimumTime != null && this.LastRunTime != null)
-            {
-                var timeDiff = this.LastRunTime.Value.Subtract(DateTimeOffset.UtcNow);
-                fireJob = timeDiff >= this.MinimumTime;
-                this.Logger.LogDebug($"Time Difference: {timeDiff} - Firing Job: {fireJob}");
-            }
-
-            if (fireJob)
-                await this.Run(cancelToken).ConfigureAwait(false);
-        }
-        finally
+ 
+        if (this.MinimumTime != null && this.LastRunTime != null)
         {
-            if (fireJob)
-                this.LastRunTime = DateTimeOffset.UtcNow;
+            var timeDiff = DateTimeOffset.UtcNow.Subtract(this.LastRunTime.Value);
+            fireJob = timeDiff >= this.MinimumTime;
+            this.Logger.LogDebug($"Time Difference: {timeDiff} - Firing Job: {fireJob}");
+        }
+
+        if (fireJob)
+        {
+            this.Logger.LogDebug("Running Job");
+            await this.Run(cancelToken).ConfigureAwait(false);
+
+            // if the job errors, we will keep trying
+            this.LastRunTime = DateTimeOffset.UtcNow;
         }
     }
 
 
     protected abstract Task Run(CancellationToken cancelToken);
-    protected JobInfo? JobInfo { get; private set; }
+    protected JobInfo JobInfo { get; private set; }
 
     /// <summary>
     /// Last runtime of this job.  Null if never run before.

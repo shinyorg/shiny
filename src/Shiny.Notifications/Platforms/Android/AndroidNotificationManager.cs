@@ -51,6 +51,9 @@ public class AndroidNotificationManager
             .SetAutoCancel(notification.AutoCancel)
             .SetOngoing(notification.OnGoing);
 
+        if (!notification.Category.IsEmpty())
+            builder.SetCategory(notification.Category);
+
         if (!notification.Thread.IsEmpty())
             builder.SetGroup(notification.Thread);
 

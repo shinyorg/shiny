@@ -45,7 +45,7 @@ public static class MauiProgram
     static MauiAppBuilder RegisterShinyServices(this MauiAppBuilder builder)
     {
         var s = builder.Services;
-        s.AddJob(typeof(SampleJob));
+        s.AddJob(typeof(SampleJob), runInForeground: true);
 
         // shiny.jobs
         //s.AddJobs();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.OS;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Locations;
@@ -14,12 +15,14 @@ using P = Android.Manifest.Permission;
 namespace Shiny.Notifications;
 
 
-public partial class NotificationManager : INotificationManager, IAndroidLifecycle.IOnActivityNewIntent
+public partial class NotificationManager : INotificationManager,
+                                           IAndroidLifecycle.IOnActivityOnCreate,
+                                           IAndroidLifecycle.IOnActivityNewIntent
 {
     readonly Lazy<AndroidNotificationProcessor> processor;
     readonly AndroidPlatform platform;
-    readonly IChannelManager channelManager;
     readonly AndroidNotificationManager manager;
+    readonly IChannelManager channelManager;
     readonly IRepository repository;
     readonly IGeofenceManager geofenceManager;
     readonly IKeyValueStore settings;
@@ -206,4 +209,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
             this.logger.LogError(ex, "Error trying to process intent");
         }
     }
+
+    public void ActivityOnCreate(Android.App.Activity activity, Bundle? savedInstanceState)
+        => this.Handle(activity, activity.Intent!);
 }
