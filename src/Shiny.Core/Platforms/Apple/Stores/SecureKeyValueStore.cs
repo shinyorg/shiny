@@ -7,6 +7,7 @@ namespace Shiny.Stores;
 
 public class SecureKeyValueStore : IKeyValueStore
 {
+    readonly object syncLock = new();
     readonly ISerializer serializer;
     public SecAccessible DefaultAccessible { get; set; } = SecAccessible.Always;
 
@@ -24,49 +25,61 @@ public class SecureKeyValueStore : IKeyValueStore
 
     public void Clear()
     {
-        using var query = new SecRecord(SecKind.GenericPassword) { Service = this.Service };
-        SecKeyChain.Remove(query);
+        lock (this.syncLock)
+        {
+            using var query = new SecRecord(SecKind.GenericPassword) { Service = this.Service };
+            SecKeyChain.Remove(query);
+        }
     }
 
 
     public bool Contains(string key)
     {
-        using var record = this.GetRecord(key);
-        using var match = SecKeyChain.QueryAsRecord(record, out var result);
+        lock (this.syncLock)
+        {
+            using var record = this.GetRecord(key);
+            using var match = SecKeyChain.QueryAsRecord(record, out var result);
 
-        return result == SecStatusCode.Success;
+            return result == SecStatusCode.Success;
+        }
     }
 
 
     public object? Get(Type type, string key)
     {
-        object? result = null;
-        using var record = this.GetRecord(key);
-        using var match = SecKeyChain.QueryAsRecord(record, out var resultCode);
-
-        if (resultCode == SecStatusCode.Success)
+        lock (this.syncLock)
         {
-            var value = NSString.FromData(match.ValueData, NSStringEncoding.UTF8);
-            result = this.serializer.Deserialize(type, value);
+            object? result = null;
+            using var record = this.GetRecord(key);
+            using var match = SecKeyChain.QueryAsRecord(record, out var resultCode);
+
+            if (resultCode == SecStatusCode.Success)
+            {
+                var value = NSString.FromData(match!.ValueData!, NSStringEncoding.UTF8);
+                result = this.serializer.Deserialize(type, value);
+            }
+            return result;
         }
-        return result;
     }
 
 
     public bool Remove(string key)
     {
-        var removed = false;
-        using var record = this.GetRecord(key);
-        using var match = SecKeyChain.QueryAsRecord(record, out var result);
-        if (result == SecStatusCode.Success)
+        lock (this.syncLock)
         {
-            result = SecKeyChain.Remove(record);
-            if (result != SecStatusCode.Success)
-                throw new ArgumentException("Error removing secure value - " + result);
+            var removed = false;
+            using var record = this.GetRecord(key);
+            using var match = SecKeyChain.QueryAsRecord(record, out var result);
+            if (result == SecStatusCode.Success)
+            {
+                result = SecKeyChain.Remove(record);
+                if (result != SecStatusCode.Success)
+                    throw new ArgumentException("Error removing secure value - " + result);
 
-            removed = true;
+                removed = true;
+            }
+            return removed;
         }
-        return removed;
     }
 
 
@@ -74,19 +87,22 @@ public class SecureKeyValueStore : IKeyValueStore
     {
         this.Remove(key);
 
-        var content = this.serializer.Serialize(value);
-        var record = new SecRecord(SecKind.GenericPassword)
+        lock (this.syncLock)
         {
-            Account = key,
-            Service = this.Service,
-            Label = key,
-            Accessible = this.DefaultAccessible,
-            ValueData = NSData.FromString(content, NSStringEncoding.UTF8),
-        };
-        var result = SecKeyChain.Add(record);
+            var content = this.serializer.Serialize(value);
+            var record = new SecRecord(SecKind.GenericPassword)
+            {
+                Account = key,
+                Service = this.Service,
+                Label = key,
+                Accessible = this.DefaultAccessible,
+                ValueData = NSData.FromString(content, NSStringEncoding.UTF8),
+            };
+            var result = SecKeyChain.Add(record);
 
-        if (result != SecStatusCode.Success)
-            throw new ArgumentException("Failed to add secure value - " + result);
+            if (result != SecStatusCode.Success)
+                throw new ArgumentException("Failed to add secure value - " + result);
+        }
     }
 
 
