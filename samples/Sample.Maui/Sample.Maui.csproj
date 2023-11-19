@@ -9,6 +9,7 @@
         <Nullable>enable</Nullable>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
+        <UseMaui>True</UseMaui>
 
         <ApplicationTitle>Shiny</ApplicationTitle>
         <ApplicationId>org.shiny.samples</ApplicationId>
