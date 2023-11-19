@@ -11,6 +11,10 @@ public interface IGpsManager
     /// </summary>
     GpsRequest? CurrentListener { get; }
 
+    /// <summary>
+    /// Get the current access state
+    /// </summary>
+    AccessState GetCurrentStatus(GpsRequest request);
 
     /// <summary>
     /// Request access to use GPS hardware

@@ -7,6 +7,11 @@ namespace Shiny.BluetoothLE;
 public interface IBleManager
 {
     /// <summary>
+    /// Gets current access state
+    /// </summary>
+    AccessState CurrentAccess { get; }
+
+    /// <summary>
     /// Requests necessary permissions to ensure bluetooth LE can be used
     /// </summary>
     /// <returns></returns>

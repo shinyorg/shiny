@@ -22,6 +22,16 @@ public partial class BleHostingManager : IBleHostingManager
         }
     }
 
+    public AccessState AdvertisingAccessStatus => CBPeripheralManager.Authorization switch
+    {
+        CBManagerAuthorization.NotDetermined => AccessState.Unknown,
+        CBManagerAuthorization.Denied => AccessState.Denied,
+        CBManagerAuthorization.Restricted => AccessState.Restricted, // TODO: should do other states?
+        CBManagerAuthorization.AllowedAlways => ToStatus(this.Manager.State)
+    };
+
+    // only one state on iOS/Mac
+    public AccessState GattAccessStatus => this.AdvertisingAccessStatus;
 
     readonly Dictionary<string, GattService> services = new();
 
@@ -135,9 +145,6 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
-        // TODO: not sure about this
-        //if (AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13) && !primary)
-        //    throw new InvalidOperationException("You must specify your service as primary when using bg BLE");
         (await this.RequestAccess(false, true)).Assert();
 
         var service = new GattService(this.Manager, uuid, primary);

@@ -21,6 +21,11 @@ public partial class BleHostingManager : IBleHostingManager
     AdvertisementCallbacks? adCallbacks;
 
 
+    public AccessState AdvertisingAccessStatus => throw new NotImplementedException();
+
+    public AccessState GattAccessStatus => throw new NotImplementedException();
+
+
     public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
         if (!OperatingSystemShim.IsAndroidVersionAtLeast(26))
@@ -112,7 +117,6 @@ public partial class BleHostingManager : IBleHostingManager
 
     public bool IsAdvertising => this.adCallbacks != null;
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
-
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
