@@ -173,5 +173,5 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
 
     public abstract IObservable<GpsReading?> GetLastReading();
     protected abstract Task RequestLocationUpdates(GpsRequest request);
-    protected abstract Task RemoveLocationUpdates()    
+    protected abstract Task RemoveLocationUpdates();    
 }
