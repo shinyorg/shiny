@@ -19,25 +19,26 @@
 
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-        <MicrosoftExtensionsVersion>7.0.0</MicrosoftExtensionsVersion>
+        <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
+        <MauiVersion>8.0.3</MauiVersion>
     </PropertyGroup>
 
     <PropertyGroup>
         <UseMSBuild Condition="$([MSBuild]::IsOSPlatform('windows'))">true</UseMSBuild>
-        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net7.0-windows10.0.19041.0</WindowsTarget>
+        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net8.0-windows10.0.19041.0</WindowsTarget>
         <!--<UseMSBuild>false</UseMSBuild>-->
 
-        <StandardTargetFrameworks>net7.0</StandardTargetFrameworks>
+        <StandardTargetFrameworks>net8.0</StandardTargetFrameworks>
         <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);netstandard2.1</StandardTargetFrameworks>
 
-        <IosTargetFrameworks>net7.0-ios</IosTargetFrameworks>
+        <IosTargetFrameworks>net8.0-ios</IosTargetFrameworks>
         <IosTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(IosTargetFrameworks);xamarin.ios10</IosTargetFrameworks>
 
-        <AndroidTargetFrameworks>net7.0-android</AndroidTargetFrameworks>
+        <AndroidTargetFrameworks>net8.0-android</AndroidTargetFrameworks>
         <AndroidTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(AndroidTargetFrameworks);monoandroid12.0</AndroidTargetFrameworks>
 
-        <MauiPlatformTargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</MauiPlatformTargetFrameworks>
-        <AppleTargetFrameworks>$(IosTargetFrameworks);net7.0-maccatalyst</AppleTargetFrameworks>
+        <MauiPlatformTargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</MauiPlatformTargetFrameworks>
+        <AppleTargetFrameworks>$(IosTargetFrameworks);net8.0-maccatalyst</AppleTargetFrameworks>
         <PlatformOnlyTargetFrameworks>$(AppleTargetFrameworks);$(AndroidTargetFrameworks)</PlatformOnlyTargetFrameworks>
         <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
         <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>
@@ -66,7 +67,7 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>31.0</TargetPlatformMinVersion>
+        <TargetPlatformMinVersion>34.0</TargetPlatformMinVersion>
         <IsAndroidBuild>true</IsAndroidBuild>
     </PropertyGroup>
 
@@ -100,7 +101,7 @@
         <DefineConstants>$(DefineConstants);PLATFORM;WINDOWS</DefineConstants>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
         <IsWebAssembly>true</IsWebAssembly>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <!--

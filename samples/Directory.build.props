@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+        <MauiVersion>8.0.3</MauiVersion>
+        <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
+    </PropertyGroup>
+</Project>

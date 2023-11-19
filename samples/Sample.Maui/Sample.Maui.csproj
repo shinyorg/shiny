@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks);net8.0-android</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net8.0-ios</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net8.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
-		<UseMaui>true</UseMaui>
         <Nullable>enable</Nullable>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
         <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+        <UseMaui>True</UseMaui>
+
         <ApplicationTitle>Shiny</ApplicationTitle>
         <ApplicationId>org.shiny.samples</ApplicationId>
         <ApplicationIdGuid>3E54A75D-D399-4272-8326-54510C872263</ApplicationIdGuid>
@@ -32,9 +33,6 @@
         -->
 	</PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-    </PropertyGroup>
     <ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -48,9 +46,10 @@
 	</ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="ReactiveUI.Fody" Version="19.5.1" />
-        <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
+        <PackageReference Include="Prism.DryIoc.Maui" Version="9.0.271-pre" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
         <PackageReference Include="CommunityToolkit.Maui.Markup" Version="3.3.0" />
@@ -75,9 +74,11 @@
         <ProjectReference Include="..\..\src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" />
     </ItemGroup>
     
+    <!--
     <ItemGroup Condition="$(TargetFramework.Contains('ios')) OR $(TargetFramework.Contains('android'))">
         <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
     </ItemGroup>
+    -->
 
 	<ItemGroup>
 		<None Remove="TODO/**" />
