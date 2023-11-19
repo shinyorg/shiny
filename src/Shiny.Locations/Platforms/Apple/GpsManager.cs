@@ -110,6 +110,7 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 
     public GpsRequest? CurrentListener => this.currentSettings;
 
+    public AccessState CurrentStatus => throw new NotImplementedException();
 
     public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async ct =>
     {

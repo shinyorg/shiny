@@ -167,6 +167,7 @@ public static class MauiProgram
         s.RegisterForNavigation<FileViewPage, FileViewViewModel>();
         s.RegisterForNavigation<ErrorLoggingPage, ErrorLoggingViewModel>();
         s.RegisterForNavigation<SupportServicePage, SupportServiceViewModel>();
+        s.RegisterForNavigation<CurrentPermissionPage, CurrentPermissionViewModel>();
 
         return builder;
     }

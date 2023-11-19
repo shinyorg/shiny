@@ -69,6 +69,13 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public GpsRequest? CurrentListener => this.currentSettings;
 
 
+    public AccessState GetCurrentStatus(GpsRequest request)
+    {
+        return AccessState.Unknown;
+    }
+
+
+
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
         var status = AccessState.Denied;
@@ -166,5 +173,5 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
 
     public abstract IObservable<GpsReading?> GetLastReading();
     protected abstract Task RequestLocationUpdates(GpsRequest request);
-    protected abstract Task RemoveLocationUpdates();
+    protected abstract Task RemoveLocationUpdates()    
 }

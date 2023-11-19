@@ -8,7 +8,9 @@ namespace Shiny.BluetoothLE.Hosting;
 public interface IBleHostingManager
 {
     Task<AccessState> RequestAccess(bool advertise = true, bool connect = true);
-    
+    AccessState AdvertisingAccessStatus { get; }
+    AccessState GattAccessStatus { get; }
+
     bool IsAdvertising { get; }
     Task StartAdvertising(AdvertisementOptions? options = null);
     void StopAdvertising();

@@ -41,6 +41,14 @@ public partial class AndroidPlatform : IPlatform,
             this.Public = new DirectoryInfo(publicDir.AbsolutePath);
     }
 
+    public AccessState GetCurrentPermissionStatus(string androidPermission)
+        => ContextCompat.CheckSelfPermission(this.AppContext, androidPermission) switch
+        {
+            Permission.Granted => AccessState.Available,
+            Permission.Denied => AccessState.Denied,
+            _ => AccessState.Unknown
+        };
+
     // lifecycle hooks
     public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
         => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResults));
