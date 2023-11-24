@@ -44,6 +44,11 @@ jobs:
       with:
           dotnet-version: '8.0.x'
 
+    - uses: AdoptOpenJDK/install-jdk@v1
+      with:
+        version: '13'
+        architecture: x64
+
     - name: Add .NET Workloads
       run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
 
