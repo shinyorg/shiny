@@ -40,26 +40,12 @@ public interface IIosLifecycle
     public interface IContinueActivity
     {
         bool Handle(NSUserActivity activity, UIApplicationRestorationHandler completionHandler);
+
+        //     ios.SceneWillConnect((scene, sceneSession, sceneConnectionOptions)
+        //         => HandleAppLink(sceneConnectionOptions.UserActivities.ToArray()
+        //             .FirstOrDefault(a => a.ActivityType == NSUserActivityType.BrowsingWeb)));
+
+        //     ios.SceneContinueUserActivity((scene, userActivity)
+        //         => HandleAppLink(userActivity));
     }
 }
-
-//ShinyUserNotificationDelegate ndelegate;
-//void EnsureNotificationDelegate()
-//{
-//    this.ndelegate ??= new ShinyUserNotificationDelegate();
-//    UNUserNotificationCenter.Current.Delegate = this.ndelegate;
-//}
-
-
-//public IDisposable RegisterForNotificationReceived(Func<UNNotificationResponse, Task> task)
-//{
-//    this.EnsureNotificationDelegate();
-//    return this.ndelegate.RegisterForNotificationReceived(task);
-//}
-
-
-//public IDisposable RegisterForNotificationPresentation(Func<UNNotification, Task> task)
-//{
-//    this.EnsureNotificationDelegate();
-//    return this.ndelegate.RegisterForNotificationPresentation(task);
-//}
