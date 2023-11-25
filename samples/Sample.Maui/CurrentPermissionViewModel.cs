@@ -21,7 +21,8 @@ public class CurrentPermissionViewModel : ViewModel
             this.BleHostAdvertised = bleHostingManager.AdvertisingAccessStatus;
             this.BleHostGatt = bleHostingManager.GattAccessStatus;
             this.GpsInApp = gpsManager.GetCurrentStatus(GpsRequest.Foreground);
-            //this.Geofencing = geofenceManager.CurrentStatus
+            this.GpsBackground = gpsManager.GetCurrentStatus(GpsRequest.Realtime(false));
+            this.Geofencing = geofenceManager.CurrentStatus;
         });
     }
 
@@ -33,6 +34,7 @@ public class CurrentPermissionViewModel : ViewModel
     [Reactive] public AccessState GpsInApp { get; private set; }
     [Reactive] public AccessState GpsBackground { get; private set; }
     [Reactive] public AccessState Geofencing { get; private set; }
+
 
     public override void OnAppearing()
     {

@@ -38,6 +38,7 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 
         this.readingSubj.OnNext(reading);
     }
+
     internal void OnFailed(NSError error) {}
 
 
@@ -54,7 +55,9 @@ public class GpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
                         await this.StartListenerInternal(this.CurrentSettings);
                 }
                 else
+                {
                     this.logger.LogInformation("User has removed location permissions");
+                }
             }
             catch (Exception ex)
             {

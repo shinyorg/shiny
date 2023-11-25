@@ -27,7 +27,6 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     readonly IGeofencingClient client;
     PendingIntent? geofencePendingIntent;
 
-
     public GeofenceManager(
         AndroidPlatform platform,
         IRepository repository,
@@ -84,6 +83,33 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         catch (Exception ex)
         {
             this.logger.LogWarning(ex, "Failed to restart geofencing");
+        }
+    }
+
+
+    public AccessState CurrentStatus
+    {
+        get
+        {
+            var coarse = this.platform.GetCurrentPermissionStatus(P.AccessCoarseLocation);
+            if (coarse == AccessState.Denied)
+                return AccessState.Denied;
+
+            var fine = this.platform.GetCurrentPermissionStatus(P.AccessFineLocation);
+            if (fine == AccessState.Denied)
+                return AccessState.Denied;
+
+            var bg = AccessState.Available;
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            {
+                bg = this.platform.GetCurrentPermissionStatus(P.AccessBackgroundLocation);
+                if (bg == AccessState.Denied)
+                    return AccessState.Denied;
+            }
+            if (new[] { coarse, fine, bg }.Any(x => x == AccessState.Unknown))
+                return AccessState.Unknown;
+
+            return AccessState.Available;
         }
     }
 

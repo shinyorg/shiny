@@ -38,6 +38,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
             catch (Exception ex)
             {
                 this.logger.LogWarning(ex, "Failed to auto-start GPS");
+                this.CurrentSettings = null; // remove the settings since it can't be autostarted
             }
         }
     }

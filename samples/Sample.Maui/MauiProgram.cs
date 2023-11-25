@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Configuration;
-using Prism.DryIoc;
 using Sample.Dev;
+
 namespace Sample;
 
 

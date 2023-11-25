@@ -5,15 +5,12 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
-using System.Security.Permissions;
 using Android;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
-using AndroidX.Core.App;
-using AndroidX.Core.Content;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
 using SR = Android.Bluetooth.LE.ScanResult;
@@ -53,15 +50,15 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     {
         get
         {
-            //ActivityCompat.ShouldShowRequestPermissionRationale(this.)
-            //var activity = ActivityStateManager.Default.GetCurrentActivity(true);
-            //foreach (var (androidPermission, isRuntime) in RequiredPermissions)
-            //{
-            //    if (isRuntime && ActivityCompat.ShouldShowRequestPermissionRationale(activity, androidPermission))
-            //        return true;
-            //}
+            var perms = GetPlatformPermissions();
+            var states = perms.Select(this.platform.GetCurrentPermissionStatus);
+            if (states.Any(x => x == AccessState.Denied))
+                return AccessState.Denied;
 
-            return this.Native.GetAccessState();
+            if (states.Any(x => x == AccessState.Unknown))
+                return AccessState.Unknown;
+
+            return AccessState.Available;
         }
     }
 

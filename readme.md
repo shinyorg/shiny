@@ -7,10 +7,9 @@ things like dependency injection & logging in a structured way to your code!
 ## Supports
 * Xamarin iOS
 * Xamarin Android
-* .NET 7 for Android
-* .NET 7 for iOS
-* .NET 7 for MacCatalyst
-* .NET 7 for Windows (Core & BLE)
+* .NET 8 for Android
+* .NET 8 for iOS
+* .NET 8 for MacCatalyst
 
 ## Features
 * Handles all of the cruft like Permissions, main thread traversal, persistent storage and app restarts

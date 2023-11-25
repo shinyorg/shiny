@@ -65,6 +65,7 @@ public partial class BleHostingManager : IShinyStartupTask
         {
             try
             {
+                this.IsRegisteredServicesAttached = false; // temp off to allow reprocess
                 await this.AttachRegisteredServices().ConfigureAwait(false);
                 // TODO: what about restarting advertisement?
             }

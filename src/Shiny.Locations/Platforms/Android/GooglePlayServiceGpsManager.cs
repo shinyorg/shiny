@@ -30,7 +30,6 @@ public class GooglePlayServiceGpsManager : AbstractGpsManager
     protected override Task RequestLocationUpdates(GpsRequest request)
     {
         this.listenerClient ??= LocationServices.GetFusedLocationProviderClient(this.Platform.AppContext);
-
         return this.listenerClient.RequestLocationUpdatesAsync(
             request.ToNative(),
             this.Callback,

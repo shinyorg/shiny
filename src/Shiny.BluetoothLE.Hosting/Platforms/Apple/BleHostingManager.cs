@@ -26,7 +26,7 @@ public partial class BleHostingManager : IBleHostingManager
     {
         CBManagerAuthorization.NotDetermined => AccessState.Unknown,
         CBManagerAuthorization.Denied => AccessState.Denied,
-        CBManagerAuthorization.Restricted => AccessState.Restricted, // TODO: should do other states?
+        //CBManagerAuthorization.Restricted => ToStatus(this.Manager.State),
         CBManagerAuthorization.AllowedAlways => ToStatus(this.Manager.State)
     };
 
@@ -62,37 +62,6 @@ public partial class BleHostingManager : IBleHostingManager
         {
             this.Manager.DidPublishL2CapChannel -= handler;
         }
-    }
-
-
-    public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
-    {
-        (await this.RequestAccess(false, true)).Assert();
-
-        var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
-        {
-            //args.Channel.InputStream.Status == NSStreamStatus.Open
-            var c = args.Channel!;
-            c.InputStream.Open();
-            c.OutputStream.Open();
-
-            onOpen(new L2CapChannel(
-                c.Psm,
-                c.Peer.Identifier.ToString(),
-                data => Observable.FromAsync(ct => c.OutputStream.WriteAsync(data, 0, data.Length, ct)),
-                c.InputStream.ListenForData()
-            ));
-        });
-        this.Manager.DidOpenL2CapChannel += handler;
-        var psm = await this.PublishL2Cap(secure);
-        return new L2CapInstance(
-            psm,
-            () =>
-            {
-                this.Manager.UnpublishL2CapChannel(psm);
-                this.Manager.DidOpenL2CapChannel -= handler;
-            }
-        );
     } 
 
 
@@ -117,19 +86,50 @@ public partial class BleHostingManager : IBleHostingManager
 
     public void StopAdvertising() => this.Manager.StopAdvertising();
 
+    //public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
+    //{
+    //    (await this.RequestAccess(false, true)).Assert();
+
+    //    var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
+    //    {
+    //        //args.Channel.InputStream.Status == NSStreamStatus.Open
+    //        var c = args.Channel!;
+    //        c.InputStream.Open();
+    //        c.OutputStream.Open();
+
+    //        onOpen(new L2CapChannel(
+    //            c.Psm,
+    //            c.Peer.Identifier.ToString(),
+    //            data => Observable.FromAsync(ct => c.OutputStream.WriteAsync(data, 0, data.Length, ct)),
+    //            c.InputStream.ListenForData()
+    //        ));
+    //    });
+    //    this.Manager.DidOpenL2CapChannel += handler;
+    //    var psm = await this.PublishL2Cap(secure);
+    //    return new L2CapInstance(
+    //        psm,
+    //        () =>
+    //        {
+    //            this.Manager.UnpublishL2CapChannel(psm);
+    //            this.Manager.DidOpenL2CapChannel -= handler;
+    //        }
+    //    );
+    //}
+
+
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
     {
         NSMutableDictionary data = null!;
 #if MACCATALYST
-        // throw new NotSupportedException("Not supported on MacCatalyst");
-        var bytes = new List<byte>();
-        bytes.AddRange(uuid.ToByteArray());
-        bytes.AddRange(BitConverter.GetBytes(major));
-        bytes.AddRange(BitConverter.GetBytes(minor));
-        bytes.Add((byte)(txpower ?? -75));
+            // throw new NotSupportedException("Not supported on MacCatalyst");
+            var bytes = new List<byte>();
+            bytes.AddRange(uuid.ToByteArray());
+            bytes.AddRange(BitConverter.GetBytes(major));
+            bytes.AddRange(BitConverter.GetBytes(minor));
+            bytes.Add((byte)(txpower ?? -75));
 
-        data = new NSMutableDictionary();
-        data.SetValueForKey(NSData.FromArray(bytes.ToArray()), new NSString("kCBAdvDataAppleBeaconKey"));
+            data = new NSMutableDictionary();
+            data.SetValueForKey(NSData.FromArray(bytes.ToArray()), new NSString("kCBAdvDataAppleBeaconKey"));
 #else
         var id = new CLBeaconIdentityConstraint(uuid.ToNSUuid(), major, minor);
         var beacon = new CLBeaconRegion(id, "ShinyBle");

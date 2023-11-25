@@ -46,7 +46,9 @@ public partial class AndroidPlatform : IPlatform,
         {
             Permission.Granted => AccessState.Available,
             Permission.Denied => AccessState.Denied,
-            _ => AccessState.Unknown
+            _ => ActivityCompat.ShouldShowRequestPermissionRationale(this.CurrentActivity!, androidPermission)
+                ? AccessState.Unknown
+                : AccessState.Denied
         };
 
     // lifecycle hooks
@@ -142,11 +144,11 @@ public partial class AndroidPlatform : IPlatform,
     }
 
 
-    public AccessState GetCurrentAccessState(string androidPermission)
-    {
-        var result = ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
-        return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
-    }
+    //public AccessState GetCurrentAccessState(string androidPermission)
+    //{
+    //    var result = ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
+    //    return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
+    //}
 
 
     public IObservable<AccessState> RequestAccess(string androidPermissions)
