@@ -6,18 +6,28 @@
              x:Class="Sample.CurrentPermissionPage"
              Title="Current Permissions">
 
-    <RefreshView Command="{Binding Refresh}">
-        <TableView Intent="Settings">
-            <TableRoot>
-                <TableSection>
-                    <TextCell Text="BLE" Detail="{Binding BleClient}" />
-                    <TextCell Text="BLE Advertising" Detail="{Binding BleHostAdvertised}" />
-                    <TextCell Text="BLE Host GATT" Detail="{Binding BleHostGatt}" />
-                    <TextCell Text="GPS Foreground" Detail="{Binding GpsInApp}" />
-                    <TextCell Text="GPS Background" Detail="{Binding GpsBackground}" />
-                    <TextCell Text="Geofencing" Detail="{Binding Geofencing}" />
-                </TableSection>
-            </TableRoot>
-        </TableView>
+    <RefreshView Command="{Binding Refresh}"
+                 IsRefreshing="False">
+        <CollectionView ItemsSource="{Binding PermissionSet}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="sample:PermissionViewModel">
+                    <VerticalStackLayout>
+                        <VerticalStackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Request}" />
+                        </VerticalStackLayout.GestureRecognizers>
+
+                        <Label Text="{Binding Description}"
+                               FontSize="Large"
+                               FontAttributes="Bold" />
+
+                        <Label Text="{Binding Status}"
+                               FontSize="Small"
+                               FontAttributes="Italic" />
+
+                        <BoxView Style="{StaticResource HR}" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </RefreshView>
 </ContentPage>
