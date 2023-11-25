@@ -3,10 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Radios;
@@ -54,9 +52,9 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             );
     }
 
-    
 
 
+    public AccessState CurrentAccess => throw new NotImplementedException();
     public bool IsScanning { get; private set; }
     public Radio? SelectedRadio { get; set; }
 
