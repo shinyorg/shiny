@@ -7,7 +7,7 @@
              Title="Current Permissions">
 
     <RefreshView Command="{Binding Refresh}"
-                 IsRefreshing="False">
+                 IsRefreshing="{Binding IsRefreshing}">
         <CollectionView ItemsSource="{Binding PermissionSet}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="sample:PermissionViewModel">

@@ -17,6 +17,7 @@ public class CurrentPermissionViewModel : ViewModel
     {
         this.Refresh = ReactiveCommand.Create(() =>
         {
+            this.IsRefreshing = true;
             this.PermissionSet = new List<PermissionViewModel> {
                 new PermissionViewModel(
                     "BLE Client",
@@ -49,13 +50,14 @@ public class CurrentPermissionViewModel : ViewModel
                     () => geofenceManager.RequestAccess()
                 )
             };
-            this.RaisePropertyChanged(nameof(this.PermissionSet));
+            this.IsRefreshing = false;
         });
     }
 
 
     public ICommand Refresh { get; }
-    public List<PermissionViewModel> PermissionSet { get; private set; } 
+    [Reactive] public bool IsRefreshing { get; private set; }
+    [Reactive] public List<PermissionViewModel> PermissionSet { get; private set; } 
 
     public override void OnAppearing()
     {
