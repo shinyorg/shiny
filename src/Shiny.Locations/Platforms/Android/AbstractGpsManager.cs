@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -70,11 +71,18 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public GpsRequest? CurrentListener => this.currentSettings;
 
 
-    // TODO: Implement
     public AccessState GetCurrentStatus(GpsRequest request)
     {
+        var ps = this.GetPermissionSet(request);
+        var states = ps.Select(this.Platform.GetCurrentPermissionStatus).ToList();
+        if (states.Any(x => x == AccessState.Unknown))
+            return AccessState.Unknown;
 
-        return AccessState.Unknown;
+        if (states.All(x => x == AccessState.Available))
+            return AccessState.Available;
+
+        // TODO: what if fine is denied but coarse is good?  should be restricted
+        return AccessState.Denied;
     }
 
 
@@ -100,8 +108,8 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                 if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
                     permissionSet.Add(P.ForegroundService);
 
-                if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
-                    permissionSet.Add(AndroidPermissions.PostNotifications);
+                //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+                //    permissionSet.Add(AndroidPermissions.PostNotifications);
                 break;
         }
         if (requestBg && OperatingSystemShim.IsAndroidVersionAtLeast(29))

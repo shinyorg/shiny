@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Disposables;
@@ -14,6 +15,8 @@ using Android.OS;
 using AndroidX.Core.Content;
 using AndroidX.Core.App;
 using Shiny.Hosting;
+using Shiny.Stores;
+using Shiny.Stores.Impl;
 
 namespace Shiny;
 
@@ -22,34 +25,45 @@ public partial class AndroidPlatform : IPlatform,
                                        IAndroidLifecycle.IOnActivityRequestPermissionsResult,
                                        IAndroidLifecycle.IOnActivityResult
 {
+    const string PermissionsKey = nameof(PermissionsKey);
     int requestCode;
+    readonly List<string> requestedPermissions;
+
     static AndroidActivityLifecycle activityLifecycle; // this should never change once installed on the platform
     readonly Subject<PermissionRequestResult> permissionSubject = new();
     readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
-
+    readonly SettingsKeyValueStore store;
 
     public AndroidPlatform()
     {
         var app = (Application)Application.Context;
         activityLifecycle ??= new(app);
-
         this.AppContext = app;
         this.AppData = new DirectoryInfo(this.AppContext.FilesDir.AbsolutePath);
         this.Cache = new DirectoryInfo(this.AppContext.CacheDir.AbsolutePath);
         var publicDir = this.AppContext.GetExternalFilesDir(null);
         if (publicDir != null)
             this.Public = new DirectoryInfo(publicDir.AbsolutePath);
+
+        this.store = new(this, new DefaultSerializer());
+        this.requestedPermissions = this.store.Get<List<string>>(PermissionsKey) ?? new List<string>();
     }
 
     public AccessState GetCurrentPermissionStatus(string androidPermission)
-        => ContextCompat.CheckSelfPermission(this.AppContext, androidPermission) switch
-        {
-            Permission.Granted => AccessState.Available,
-            Permission.Denied => AccessState.Denied,
-            _ => ActivityCompat.ShouldShowRequestPermissionRationale(this.CurrentActivity!, androidPermission)
-                ? AccessState.Unknown
-                : AccessState.Denied
-        };
+    {
+        var self = ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
+        if (self == Permission.Granted)
+            return AccessState.Available;
+
+        if (!this.HasRequestedPermission(androidPermission))
+            return AccessState.Unknown;
+
+        //var showRequest = ActivityCompat.ShouldShowRequestPermissionRationale(this.CurrentActivity!, androidPermission);
+        //if (showRequest)
+        //    return AccessState.Unknown;
+
+        return AccessState.Denied;
+    }
 
     // lifecycle hooks
     public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
@@ -171,7 +185,7 @@ public partial class AndroidPlatform : IPlatform,
         {
             //if (this.Status == PlatformState.Background)
             //    throw new ApplicationException("You cannot make permission requests while your application is in the background.  Please call RequestAccess in the Shiny library you are using while your app is in the foreground so your user can respond.  You are getting this message because your user has either not granted these permissions or has removed them.");
-
+            this.SetRequestedPermissions(androidPermissions);
             var current = Interlocked.Increment(ref this.requestCode);
             comp.Add(this
                 .permissionSubject
@@ -199,4 +213,31 @@ public partial class AndroidPlatform : IPlatform,
 
         return comp;
     });
+
+    void SetRequestedPermissions(string[] androidPermissions)
+    {
+        lock (this.requestedPermissions)
+        {
+            var count = this.requestedPermissions.Count;
+            foreach (var p in androidPermissions)
+            {
+                if (!this.requestedPermissions.Contains(p, StringComparer.InvariantCultureIgnoreCase))
+                    this.requestedPermissions.Add(p);
+            }
+            if (count != this.requestedPermissions.Count)
+                this.store.Set(PermissionsKey, this.requestedPermissions);
+        }
+    }
+
+
+    bool HasRequestedPermission(string androidPermission)
+    {
+        lock (this.requestedPermissions)
+        {
+            return this.requestedPermissions.Contains(
+                androidPermission,
+                StringComparer.InvariantCultureIgnoreCase
+            );
+        }
+    }
 }
