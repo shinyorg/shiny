@@ -8,17 +8,17 @@ public interface IPushDelegate
     /// <summary>
     /// This is called when the user taps/responds to a push notification
     /// </summary>
-    /// <param name="data"></param>
+    /// <param name="notification"></param>
     /// <returns></returns>
-    Task OnEntry(PushNotification data);
+    Task OnEntry(PushNotification notification);
 
 
     /// <summary>
     /// Called when a push is received. BACKGROUND NOTE: if your app is in the background, you need to pass data parameters (iOS: content-available:1) to get this to fire
     /// </summary>
-    /// <param name="data"></param>
+    /// <param name="notification"></param>
     /// <returns></returns>
-    Task OnReceived(PushNotification data);
+    Task OnReceived(PushNotification notification);
 
 
     /// <summary>
