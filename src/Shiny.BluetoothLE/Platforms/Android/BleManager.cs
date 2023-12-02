@@ -124,6 +124,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         };
 
         this.platform.RegisterBroadcastReceiver<ShinyBleBroadcastReceiver>(
+            true,
             BluetoothDevice.ActionNameChanged,
             BluetoothDevice.ActionBondStateChanged,
             BluetoothDevice.ActionPairingRequest,
@@ -152,6 +153,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         };
 
         this.platform.RegisterBroadcastReceiver<ShinyBleAdapterStateBroadcastReceiver>(
+            true,
             BluetoothAdapter.ActionStateChanged,
             Intent.ActionBootCompleted
         );
