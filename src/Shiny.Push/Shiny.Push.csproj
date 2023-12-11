@@ -8,11 +8,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <!--<ProjectReference Include="..\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="123.1.1.1" />
+        <PackageReference Include="Xamarin.Firebase.Messaging" Version="123.1.2.2" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />

@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth.LE;
 using Android.OS;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 using static Android.Manifest;
-using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -21,63 +19,41 @@ public partial class BleHostingManager : IBleHostingManager
     AdvertisementCallbacks? adCallbacks;
 
 
-    public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
+    public AccessState AdvertisingAccessStatus
     {
-        if (!OperatingSystemShim.IsAndroidVersionAtLeast(26))
-            throw new InvalidOperationException("L2Cap hosting is only available on Android API26+");
-
-        if (!OperatingSystemShim.IsAndroidVersionAtLeast(29) && secure)
-            throw new InvalidOperationException("Secure L2Cap hosting is only available on Android API29+");
-
-        (await this.RequestAccess()).Assert();
-
-        var ct = new CancellationTokenSource();
-        var ad = this.context.Platform.GetBluetoothAdapter();
-
-        if (ad == null)
-            throw new InvalidOperationException("No Bluetooth Adaptor found");
-
-        var serverSocket = secure
-            ? ad.ListenUsingL2capChannel()
-            : ad.ListenUsingInsecureL2capChannel();
-
-        var psm = Convert.ToUInt16(serverSocket!.Psm);
-
-        _ = Task.Run(() =>
+        get
         {
-            while (!ct.IsCancellationRequested)
-            {
-                try
-                {
-                    var socket = serverSocket.Accept(30000);
-                    if (socket != null && !ct.IsCancellationRequested)
-                    {
-                        //socket.MaxReceivePacketSize
-                        //socket.MaxTransmitPacketSize
-                        onOpen(new L2CapChannel(
-                            psm,
-                            socket.RemoteDevice!.Address!,
-                            data => Observable.FromAsync(ct => socket.InputStream!.WriteAsync(data, 0, data.Length, ct)),
-                            socket.ListenForData()
-                        ));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // error opening connection, but it's fine
-                    Console.WriteLine("Error opening connection - " + ex.ToString());
-                }
-            }
-        });
+            if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
+                return AccessState.NotSupported;
 
-        return new L2CapInstance(
-            psm,
-            () =>
-            {
-                ct.Cancel();
-                serverSocket?.Dispose();
-            }
-        );
+            var status = AccessState.Available;
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+                status = this.context.Platform.GetCurrentPermissionStatus(Permission.BluetoothAdvertise);
+
+            if (status == AccessState.Available)
+                status = this.context.Manager.GetAccessState();
+
+            return status;
+        }
+    }
+
+
+    public AccessState GattAccessStatus
+    {
+        get
+        {
+            if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
+                return AccessState.NotSupported;
+
+            var status = AccessState.Available;
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+                status = this.context.Platform.GetCurrentPermissionStatus(Permission.BluetoothConnect);
+
+            if (status == AccessState.Available)
+                status = this.context.Manager.GetAccessState();
+
+            return status;
+        }
     }
 
 
@@ -112,7 +88,6 @@ public partial class BleHostingManager : IBleHostingManager
 
     public bool IsAdvertising => this.adCallbacks != null;
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
-
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
@@ -202,6 +177,65 @@ public partial class BleHostingManager : IBleHostingManager
         this.adCallbacks = null;
     }
 
+
+    //public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
+    //{
+    //    if (!OperatingSystemShim.IsAndroidVersionAtLeast(26))
+    //        throw new InvalidOperationException("L2Cap hosting is only available on Android API26+");
+
+    //    if (!OperatingSystemShim.IsAndroidVersionAtLeast(29) && secure)
+    //        throw new InvalidOperationException("Secure L2Cap hosting is only available on Android API29+");
+
+    //    (await this.RequestAccess()).Assert();
+
+    //    var ct = new CancellationTokenSource();
+    //    var ad = this.context.Platform.GetBluetoothAdapter();
+
+    //    if (ad == null)
+    //        throw new InvalidOperationException("No Bluetooth Adaptor found");
+
+    //    var serverSocket = secure
+    //        ? ad.ListenUsingL2capChannel()
+    //        : ad.ListenUsingInsecureL2capChannel();
+
+    //    var psm = Convert.ToUInt16(serverSocket!.Psm);
+
+    //    _ = Task.Run(() =>
+    //    {
+    //        while (!ct.IsCancellationRequested)
+    //        {
+    //            try
+    //            {
+    //                var socket = serverSocket.Accept(30000);
+    //                if (socket != null && !ct.IsCancellationRequested)
+    //                {
+    //                    //socket.MaxReceivePacketSize
+    //                    //socket.MaxTransmitPacketSize
+    //                    onOpen(new L2CapChannel(
+    //                        psm,
+    //                        socket.RemoteDevice!.Address!,
+    //                        data => Observable.FromAsync(ct => socket.InputStream!.WriteAsync(data, 0, data.Length, ct)),
+    //                        socket.ListenForData()
+    //                    ));
+    //                }
+    //            }
+    //            catch (Exception ex)
+    //            {
+    //                // error opening connection, but it's fine
+    //                Console.WriteLine("Error opening connection - " + ex.ToString());
+    //            }
+    //        }
+    //    });
+
+    //    return new L2CapInstance(
+    //        psm,
+    //        () =>
+    //        {
+    //            ct.Cancel();
+    //            serverSocket?.Dispose();
+    //        }
+    //    );
+    //}
 
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
     {

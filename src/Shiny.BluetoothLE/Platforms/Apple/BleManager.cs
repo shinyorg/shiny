@@ -74,6 +74,15 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     }
 
 
+    public AccessState CurrentAccess => CBCentralManager.Authorization switch
+    {
+        CBManagerAuthorization.NotDetermined => AccessState.Unknown,
+        CBManagerAuthorization.Restricted => AccessState.Restricted,
+        CBManagerAuthorization.Denied => AccessState.Denied,
+        CBManagerAuthorization.AllowedAlways => this.Manager.State.FromNative()
+    };
+
+
     public IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
     {
         IDisposable? disp = null;

@@ -1,7 +1,4 @@
 ﻿#if IOS || ANDROID
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Tests.Logging;
@@ -14,7 +11,7 @@ public class AppCenterLoggingTests : AbstractShinyTests
 
     protected override void Configure(HostBuilder hostBuilder)
     {
-        hostBuilder.Logging.AddAppCenter("ios=7d746922-5e14-45c6-bfb5-9e86d79930b9;android=;");
+        //hostBuilder.Logging.AddAppCenter("ios=7d746922-5e14-45c6-bfb5-9e86d79930b9;android=;");
         base.Configure(hostBuilder);
     }
 

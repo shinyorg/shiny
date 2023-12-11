@@ -10,6 +10,7 @@ namespace Shiny.Stores.Impl;
 
 public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
 {
+    readonly object syncLock = new();
     readonly Dictionary<object, IKeyValueStore> bindings = new();
     readonly List<INotifyPropertyChanged> boundObjects = new();
     readonly ILogger logger;
@@ -33,7 +34,11 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
         }
         else
         {
-            keyValueStoreAlias = npc.GetType().GetCustomAttribute<ObjectStoreBinderAttribute>()?.StoreAlias;
+            keyValueStoreAlias = npc
+                .GetType()
+                .GetCustomAttribute<ObjectStoreBinderAttribute>()?
+                .StoreAlias;
+
             if (keyValueStoreAlias != null)
                 store = this.factory.GetStore(keyValueStoreAlias); // error if attribute is bad
         }
@@ -72,11 +77,15 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
                     }
                 }
             }
-            npc.PropertyChanged += this.OnPropertyChanged;
-            this.boundObjects.Add(npc);
+            lock (this.syncLock)
+            {
+                // set these before npc hook
+                this.boundObjects.Add(npc);
+                this.bindings.Add(npc, store);
+            }
 
+            npc.PropertyChanged += this.OnPropertyChanged;
             this.logger?.BindInfo("Success", npc.GetType().FullName!, store.Alias);
-            this.bindings.Add(npc, store);
         }
         catch (Exception ex)
         {
@@ -88,16 +97,20 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
     public virtual void UnBind(INotifyPropertyChanged obj)
     {
         obj.PropertyChanged -= this.OnPropertyChanged;
-        this.boundObjects.Remove(obj);
+        lock (this.syncLock)
+            this.boundObjects.Remove(obj);
     }
 
 
     public virtual void UnBindAll()
     {
-        foreach (var boundObj in this.boundObjects)
-            boundObj.PropertyChanged -= this.OnPropertyChanged;
+        lock (this.syncLock)
+        {
+            foreach (var boundObj in this.boundObjects)
+                boundObj.PropertyChanged -= this.OnPropertyChanged;
 
-        this.boundObjects.Clear();
+            this.boundObjects.Clear();
+        }
     }
 
 
@@ -120,8 +133,13 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
         );
 
 
-    protected virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
+    protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs args)
     {
+        if (sender == null)
+        {
+            this.logger.LogDebug("Null sender");
+            return;
+        }
         var prop = this
             .GetTypeProperties(sender.GetType())
             .FirstOrDefault(x => x.Name.Equals(args.PropertyName));
@@ -131,10 +149,13 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
             var key = GetBindingKey(sender.GetType(), prop);
             var value = prop.GetValue(sender);
 
-            if (!this.bindings.ContainsKey(sender))
-                throw new ArgumentException("No key/value store found for current binding object - " + sender.GetType().FullName);
+            lock (this.syncLock)
+            {
+                if (!this.bindings.ContainsKey(sender))
+                    throw new ArgumentException("No key/value store found for current binding object - " + sender.GetType().FullName);
 
-            this.bindings[sender].SetOrRemove(key, value);
+                this.bindings[sender].SetOrRemove(key, value);
+            }
         }
     }
 

@@ -8,6 +8,11 @@ namespace Shiny.Locations;
 public interface IGeofenceManager
 {
     /// <summary>
+    /// Gets the current permission status
+    /// </summary>
+    AccessState CurrentStatus { get; }
+
+    /// <summary>
     /// Requests/ensures appropriate platform permissions where necessary
     /// </summary>
     /// <returns></returns>

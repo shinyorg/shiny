@@ -83,9 +83,10 @@ public static class Extensions
         }
         finally
         {
-            currentLocSemaphore.Release();
             if (iStarted)
                 await gpsManager.StopListener().ConfigureAwait(false);
+
+            currentLocSemaphore.Release();
         }
     });
     static readonly SemaphoreSlim currentLocSemaphore = new SemaphoreSlim(1, 1);

@@ -2,12 +2,11 @@
 
 	<PropertyGroup>
 		<PushProvider>firebase</PushProvider>
-		<TargetFrameworks>$(TargetFrameworks);net7.0-android</TargetFrameworks>
-		<TargetFrameworks>$(TargetFrameworks);net7.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net7.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks);net8.0-android</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks);net8.0-ios</TargetFrameworks>
+		<TargetFrameworks Condition="'$(PushProvider)' != 'firebase'">$(TargetFrameworks);net8.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
-		<UseMaui>true</UseMaui>
 		<Nullable>enable</Nullable>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -25,18 +24,6 @@
 		<DefineConstants Condition="'$(PushProvider)' == 'firebase'">$(DefineConstants);FIREBASE</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-		<SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
-    </PropertyGroup>
-
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
-		<SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-    </PropertyGroup>
-
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
-    </PropertyGroup>
-
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -47,13 +34,9 @@
 		<MauiAsset Include="appsettings.apple.json" LogicalName="appsettings.apple.json" />
 		<MauiAsset Include="appsettings.android.json" LogicalName="appsettings.android.json" />
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-
-		<ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
-		<ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
-		<ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
-		<PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
 	</ItemGroup>
 
+	<!--
 	<ItemGroup Condition="$(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('ios')) AND '$(Configuration)' == 'Debug'">
 		<CustomEntitlements Include="aps-environment" Type="String" Value="development" />
 	</ItemGroup>
@@ -61,8 +44,18 @@
 	<ItemGroup Condition="$(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('ios')) AND '$(Configuration)' == 'Release'">
 		<CustomEntitlements Include="aps-environment" Type="String" Value="production" />
 	</ItemGroup>
+	-->
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
+    </ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
+		<ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
+		<ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+
 		<ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" Condition="'$(PushProvider)' == 'native'" />
 		<ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" Condition="'$(PushProvider)' == 'azure'" />
 		<ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" Condition="'$(PushProvider)' == 'firebase'" />

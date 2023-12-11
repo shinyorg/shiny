@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Configuration;
-using Prism.DryIoc;
 using Sample.Dev;
+
 namespace Sample;
 
 
@@ -167,6 +167,7 @@ public static class MauiProgram
         s.RegisterForNavigation<FileViewPage, FileViewViewModel>();
         s.RegisterForNavigation<ErrorLoggingPage, ErrorLoggingViewModel>();
         s.RegisterForNavigation<SupportServicePage, SupportServiceViewModel>();
+        s.RegisterForNavigation<CurrentPermissionPage, CurrentPermissionViewModel>();
 
         return builder;
     }

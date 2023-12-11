@@ -24,7 +24,6 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
         Accuracy = GpsAccuracy.Normal
     };
 
-
     public GpsGeofenceManagerImpl(
         ILogger<GpsGeofenceManagerImpl> logger,
         IRepository repository, 
@@ -51,6 +50,9 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
         }
     }
 
+
+    public AccessState CurrentStatus
+        => this.gpsManager.GetCurrentStatus(defaultRequest);
 
     public Task<AccessState> RequestAccess()
         => this.gpsManager.RequestAccess(defaultRequest);

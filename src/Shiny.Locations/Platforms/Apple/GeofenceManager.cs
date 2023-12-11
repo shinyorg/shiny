@@ -42,6 +42,7 @@ public class GeofenceManager : IGeofenceManager
 
 
     readonly Subject<(CLCircularRegion Region, CLRegionState State)> regionSubj = new();
+
     internal async void OnStateDetermined(CLRegionState state, CLRegion region)
     {
         if (region is CLCircularRegion native)
@@ -75,10 +76,11 @@ public class GeofenceManager : IGeofenceManager
         }
     }
 
+    public AccessState CurrentStatus
+        => this.locationManager.GetCurrentStatus(true);
 
     public Task<AccessState> RequestAccess()
         => this.locationManager.RequestAccess(true);
-
 
     public IList<GeofenceRegion> GetMonitorRegions()
         => this.repository.GetList<GeofenceRegion>();

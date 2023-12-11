@@ -46,6 +46,22 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
 
+    public AccessState CurrentAccess
+    {
+        get
+        {
+            var perms = GetPlatformPermissions();
+            var states = perms.Select(this.platform.GetCurrentPermissionStatus);
+            if (states.Any(x => x == AccessState.Denied))
+                return AccessState.Denied;
+
+            if (states.Any(x => x == AccessState.Unknown))
+                return AccessState.Unknown;
+
+            return AccessState.Available;
+        }
+    }
+
     public bool IsScanning { get; private set; }
     public BluetoothManager Native { get; }
 
@@ -108,6 +124,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         };
 
         this.platform.RegisterBroadcastReceiver<ShinyBleBroadcastReceiver>(
+            true,
             BluetoothDevice.ActionNameChanged,
             BluetoothDevice.ActionBondStateChanged,
             BluetoothDevice.ActionPairingRequest,
@@ -136,6 +153,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         };
 
         this.platform.RegisterBroadcastReceiver<ShinyBleAdapterStateBroadcastReceiver>(
+            true,
             BluetoothAdapter.ActionStateChanged,
             Intent.ActionBootCompleted
         );

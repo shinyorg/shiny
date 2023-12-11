@@ -10,7 +10,7 @@ namespace Shiny.Locations;
 
 public class GooglePlayServiceGpsManager : AbstractGpsManager
 {
-    FusedLocationProviderClient? listenerClient;
+    IFusedLocationProviderClient? listenerClient;
     public GooglePlayServiceGpsManager(AndroidPlatform platform, ILogger<GooglePlayServiceGpsManager> logger) : base(platform, logger) { }
 
 
@@ -30,7 +30,6 @@ public class GooglePlayServiceGpsManager : AbstractGpsManager
     protected override Task RequestLocationUpdates(GpsRequest request)
     {
         this.listenerClient ??= LocationServices.GetFusedLocationProviderClient(this.Platform.AppContext);
-
         return this.listenerClient.RequestLocationUpdatesAsync(
             request.ToNative(),
             this.Callback,

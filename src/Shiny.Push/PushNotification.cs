@@ -4,6 +4,6 @@ namespace Shiny.Push;
 
 
 public record PushNotification(
-    IDictionary<string, string> data,
+    IDictionary<string, string> Data,
     Notification? Notification
 );

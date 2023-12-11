@@ -1,6 +1,5 @@
 ﻿// modified from Xamarin Essentials source
 using System;
-using System.Security.Cryptography;
 using System.Text;
 using Android.Content;
 using Android.Runtime;

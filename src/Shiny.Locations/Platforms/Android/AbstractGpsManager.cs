@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -33,11 +34,12 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         {
             try
             {
-                await this.StartListener(this.CurrentSettings).ConfigureAwait(false);
+                await this.StartListenerInternal(this.CurrentSettings).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                this.logger.LogWarning("Failed to auto-start GPS", ex);
+                this.logger.LogWarning(ex, "Failed to auto-start GPS");
+                this.CurrentSettings = null; // remove the settings since it can't be autostarted
             }
         }
     }
@@ -69,9 +71,23 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public GpsRequest? CurrentListener => this.currentSettings;
 
 
-    public async Task<AccessState> RequestAccess(GpsRequest request)
+    public AccessState GetCurrentStatus(GpsRequest request)
     {
-        var status = AccessState.Denied;
+        var ps = this.GetPermissionSet(request);
+        var states = ps.Select(this.Platform.GetCurrentPermissionStatus).ToList();
+        if (states.Any(x => x == AccessState.Unknown))
+            return AccessState.Unknown;
+
+        if (states.All(x => x == AccessState.Available))
+            return AccessState.Available;
+
+        // TODO: what if fine is denied but coarse is good?  should be restricted
+        return AccessState.Denied;
+    }
+
+
+    protected virtual List<string> GetPermissionSet(GpsRequest request)
+    {
         var realtime = request.BackgroundMode == GpsBackgroundMode.Realtime;
         var requestBg = false;
         var permissionSet = new List<string> { P.AccessCoarseLocation };
@@ -92,12 +108,25 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                 if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
                     permissionSet.Add(P.ForegroundService);
 
-                if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
-                    permissionSet.Add(AndroidPermissions.PostNotifications);
+                //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+                //    permissionSet.Add(AndroidPermissions.PostNotifications);
                 break;
         }
+        if (requestBg && OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            permissionSet.Add(P.AccessBackgroundLocation);
 
+        return permissionSet;
+    }
+
+    public async Task<AccessState> RequestAccess(GpsRequest request)
+    {
+        var permissionSet = this.GetPermissionSet(request);
+        var status = AccessState.Denied;
+        var requestBg = permissionSet.Contains(P.AccessBackgroundLocation);
+
+        // TODO: test BG permission shouldn't 
         var result = await this.Platform.RequestPermissions(permissionSet.ToArray()).ToTask();
+
         if (result.IsGranted(P.AccessCoarseLocation))
         {
             status = AccessState.Available;
@@ -117,10 +146,6 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
 
             if (permissionSet.Contains(P.ForegroundService) && !result.IsGranted(P.ForegroundService))
                 return AccessState.NotSetup;
-
-            // foreground does not fail - the notification will not show but the service will show up in the task manager as per: https://developer.android.com/develop/ui/views/notifications/notification-permission
-            if (permissionSet.Contains(AndroidPermissions.PostNotifications) && !result.IsGranted(AndroidPermissions.PostNotifications))
-                status = AccessState.Restricted; // without post notifications, foreground service will fail
         }
 
         //if (this.Platform.GetSystemService<LocationManager>(Context.LocationService)!.IsLocationEnabled)
@@ -137,17 +162,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         if (this.CurrentListener != null)
             throw new InvalidOperationException("There is already a GPS listener running");
 
-        request ??= new GpsRequest();
-        if (request is not AndroidGpsRequest android)
-            android = new AndroidGpsRequest(request.BackgroundMode, request.Accuracy, request.DistanceFilterMeters);
-
-        (await this.RequestAccess(request)).Assert(allowRestricted: true);
-
-        if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
-            this.Platform.StartService(typeof(ShinyGpsService), android.StopForegroundServiceWithTask);
-
-        await this.RequestLocationUpdates(request);
-        this.CurrentSettings = android;
+        await this.StartListenerInternal(request);
     }
 
 
@@ -167,4 +182,20 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public abstract IObservable<GpsReading?> GetLastReading();
     protected abstract Task RequestLocationUpdates(GpsRequest request);
     protected abstract Task RemoveLocationUpdates();
+
+
+    protected async Task StartListenerInternal(GpsRequest request)
+    {
+        request ??= new GpsRequest();
+        if (request is not AndroidGpsRequest android)
+            android = new AndroidGpsRequest(request.BackgroundMode, request.Accuracy, request.DistanceFilterMeters);
+
+        (await this.RequestAccess(request)).Assert(allowRestricted: true);
+
+        if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
+            this.Platform.StartService(typeof(ShinyGpsService), android.StopForegroundServiceWithTask);
+
+        await this.RequestLocationUpdates(request);
+        this.CurrentSettings = android;
+    }
 }

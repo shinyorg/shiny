@@ -54,7 +54,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
         this.connectivity = connectivity;
 
         this.timer = new Timer();
-        this.timer.Elapsed += async (sender, args) => this.RunJobs();
+        this.timer.Elapsed += (sender, args) => this.RunJobs();
     }
 
 
@@ -75,7 +75,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
                 }
                 else if (job.IsSystemJob)
                 {
-                    this.logger.LogInformation($"Clearing System Job '{job.Identifier}' - If being registered, job manager will bring it back in a moment");
+                    this.logger.LogDebug($"Clearing System Job '{job.Identifier}' - If being registered, job manager will bring it back in a moment");
                     this.jobManager.Cancel(job.Identifier);
                 }
             }
@@ -88,7 +88,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
                 // we won't crash out, we'll just log a full error
                 this.jobManager.Register(jobNew);
 
-                this.logger.LogInformation($"Registered System Job '{job.Identifier}' of Type '{job.JobType}'");
+                this.logger.LogDebug($"Registered System Job '{job.Identifier}' of Type '{job.JobType}'");
             }
         }
         catch (Exception ex)
@@ -105,7 +105,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
     async Task RunJobs()
     {
         this.timer.Stop();
-        this.logger.LogInformation("Starting foreground jobs");
+        this.logger.LogDebug("Starting foreground jobs");
         
         var jobs = this.jobManager
             .GetJobs()
@@ -116,12 +116,12 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
         {
             try
             {
-                this.logger.LogInformation($"Job '{job.Identifier}' Foreground Started");
+                this.logger.LogDebug($"Job '{job.Identifier}' Foreground Started");
                 await this.jobManager
                     .RunJobAsTask(job.Identifier)
                     .ConfigureAwait(false);
 
-                this.logger.LogInformation($"Job '{job.Identifier}' Foreground Finished Successfully");
+                this.logger.LogDebug($"Job '{job.Identifier}' Foreground Finished Successfully");
             }
             catch (Exception ex)
             {
@@ -129,7 +129,7 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
             }
         }
 
-        this.logger.LogInformation("Foreground jobs finished");
+        this.logger.LogDebug("Foreground jobs finished");
 
         // always restart timer even if going to the BG - will allow things like GPS to keep spinning the foreground jobs
         if (!this.disposed)
