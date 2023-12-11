@@ -14,6 +14,7 @@ namespace Shiny.Locations;
 public class ShinyGpsService : ShinyAndroidForegroundService<IGpsManager, IGpsDelegate>
 {
     public static bool IsStarted { get; private set; }
+    protected override ForegroundService StartForegroundServiceType => ForegroundService.TypeLocation;
 
 
     protected override void OnStart(Intent? intent)
