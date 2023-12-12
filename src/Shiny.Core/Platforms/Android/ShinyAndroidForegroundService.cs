@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.App;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +32,7 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected NotificationCompat.Builder? Builder { get; private set; }
 
-
+    protected virtual ForegroundService StartForegroundServiceType => ForegroundService.TypeNone;
     protected T GetService<T>() => Host.GetService<T>()!;
     protected IEnumerable<T> GetServices<T>() => Host.ServiceProvider.GetServices<T>();
     protected CompositeDisposable? DestroyWith { get; private set; }
@@ -55,7 +55,7 @@ public abstract class ShinyAndroidForegroundService : Service
         switch (intent?.Action)
         {
             case AndroidPlatform.ActionServiceStart:
-                this.StopWithTask = intent?.GetBooleanExtra(AndroidPlatform.IntentActionStopWithTask, false) ?? false;
+                this.StopWithTask = intent.GetBooleanExtra(AndroidPlatform.IntentActionStopWithTask, false);
                 this.Start(intent);
                 break;
 
@@ -93,16 +93,8 @@ public abstract class ShinyAndroidForegroundService : Service
         var notification = this.Builder.Build();
         notification.Flags |= NotificationFlags.ForegroundService;
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
-        {
-            this.StartForeground(this.NotificationId, notification);
-            this.Logger.LogDebug("Started Foreground Service");
-        }
-        else
-        {
-            //this.NotificationManager!.Notify("SERVICE", this.NotificationId!, notification);
-            this.Logger.LogDebug("Started Classic Foreground Service");
-        }
+        ServiceCompat.StartForeground(this, this.NotificationId, notification, (int)this.StartForegroundServiceType);
+        this.Logger.LogDebug("Started Foreground Service");
 
         this.OnStart(intent);
     }
@@ -114,24 +106,8 @@ public abstract class ShinyAndroidForegroundService : Service
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
-        // this doesn't seem to work for 13 or 14 for me
-        //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
-        //{
-        //    this.Logger.LogDebug("API level 33+ foreground service shutdown");
-        //    this.StopForeground(StopForegroundFlags.Detach);
-        //}
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
-        {
-            this.Logger.LogDebug("API level 31+ foreground service shutdown");
-            this.StopForeground(true);
-            //this.StopSelf();
-        }
-        else
-        {
-            this.Logger.LogDebug("API level classic foreground service shutdown");
-            //this.NotificationManager!.Cancel(this.NotificationId);
-            this.StopSelf();
-        }
+        ServiceCompat.StopForeground(this, ServiceCompat.StopForegroundRemove);
+        this.StopSelf();
 
         this.Logger.LogDebug("Foreground service stopped successfully");
         this.OnStop();
@@ -159,7 +135,7 @@ public abstract class ShinyAndroidForegroundService : Service
             .SetSmallIcon(this.Platform.GetNotificationIconResource())
             .SetForegroundServiceBehavior((int)NotificationForegroundService.Immediate)
             .SetOngoing(true)
-            .SetOnlyAlertOnce(true)            
+            .SetOnlyAlertOnce(true)
             .SetTicker("...")
             .SetContentTitle("Shiny Service")
             .SetContentText("Shiny service is continuing to process data in the background");
