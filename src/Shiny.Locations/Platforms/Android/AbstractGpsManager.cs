@@ -108,8 +108,11 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                 if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
                     permissionSet.Add(P.ForegroundService);
 
-                //if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
-                //    permissionSet.Add(AndroidPermissions.PostNotifications);
+                if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+                    permissionSet.Add(AndroidPermissions.PostNotifications);
+
+                if (OperatingSystemShim.IsAndroidVersionAtLeast(34))
+                    permissionSet.Add(P.ForegroundServiceLocation);
                 break;
         }
         if (requestBg && OperatingSystemShim.IsAndroidVersionAtLeast(29))
