@@ -26,16 +26,13 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
-        
-        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+
         <!--
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
         <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
         -->
 	</PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-    </PropertyGroup>
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -74,6 +71,7 @@
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'maccatalyst'" />
     </ItemGroup>
     
     <!--
