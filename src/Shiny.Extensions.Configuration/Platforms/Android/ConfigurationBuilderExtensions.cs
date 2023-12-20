@@ -17,10 +17,11 @@ public static partial class ConfigurationBuilderExtensions
     /// <returns></returns>
     public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, string? environment = null, bool optional = true, bool includePlatformSpecific = true)
     {
+        builder.AddJsonAssetInternal("appsettings.json", environment, optional);
         if (includePlatformSpecific)
             builder.AddJsonAssetInternal("appsettings.android.json", environment, true);
 
-        return builder.AddJsonAssetInternal("appsettings.json", environment, optional);
+        return builder;
     }
 
 

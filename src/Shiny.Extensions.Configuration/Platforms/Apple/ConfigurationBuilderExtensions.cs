@@ -17,6 +17,7 @@ public static partial class ConfigurationBuilderExtensions
     /// <returns></returns>
     public static IConfigurationBuilder AddJsonIosBundle(this IConfigurationBuilder builder, string? environment = null, bool optional = true, bool reloadOnChange = true, bool includePlatformSpecific = true)
     {
+        builder.AddJsonFileInternal("appsettings.json", environment, optional, reloadOnChange);
         if (includePlatformSpecific)
         {
             builder.AddJsonFileInternal("appsettings.apple.json", environment, true, reloadOnChange);
@@ -26,7 +27,7 @@ public static partial class ConfigurationBuilderExtensions
             builder.AddJsonFileInternal("appsettings.maccatalyst.json", environment, true, reloadOnChange);
 #endif
         }
-        return builder.AddJsonFileInternal("appsettings.json", environment, optional, reloadOnChange);
+        return builder;
     }
 
 
@@ -41,12 +42,13 @@ public static partial class ConfigurationBuilderExtensions
 
     static IConfigurationBuilder AddJsonFileInternal(this IConfigurationBuilder builder, string fileName, string? environment, bool optional, bool reloadOnChange)
     {
+        builder.AddJsonFileInternal(fileName, true, reloadOnChange);
         if (!String.IsNullOrWhiteSpace(environment))
         {
             var newFileName = GetEnvFileName(fileName, environment);
             builder.AddJsonFileInternal(newFileName, true, reloadOnChange);
         }
-        return builder.AddJsonFileInternal(fileName, true, reloadOnChange);
+        return builder;
     }
 
 
