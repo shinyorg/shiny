@@ -110,7 +110,7 @@ public partial class AndroidPlatform : IPlatform,
         {
             var results = await this.RequestPermissions(
                 Manifest.Permission.ForegroundService,
-                AndroidPermissions.PostNotifications
+                Manifest.Permission.PostNotifications
             );
             if (results.IsSuccess())
                 return AccessState.Available;
