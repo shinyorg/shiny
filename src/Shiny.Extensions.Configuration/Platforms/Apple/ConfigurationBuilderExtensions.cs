@@ -1,5 +1,6 @@
 ﻿using Foundation;
 using Shiny.Extensions.Configuration;
+using System;
 using System.IO;
 
 namespace Microsoft.Extensions.Configuration;
@@ -14,18 +15,18 @@ public static partial class ConfigurationBuilderExtensions
     /// <param name="fileName"></param>
     /// <param name="optional"></param>
     /// <returns></returns>
-    public static IConfigurationBuilder AddJsonIosBundle(this IConfigurationBuilder builder, bool optional = true, bool reloadOnChange = true, bool includePlatformSpecific = true)
+    public static IConfigurationBuilder AddJsonIosBundle(this IConfigurationBuilder builder, string? environment = null, bool optional = true, bool reloadOnChange = true, bool includePlatformSpecific = true)
     {
         if (includePlatformSpecific)
         {
-            builder.AddJsonFileInternal("appsettings.apple.json", true, reloadOnChange);
+            builder.AddJsonFileInternal("appsettings.apple.json", environment, true, reloadOnChange);
 #if IOS
-            builder.AddJsonFileInternal("appsettings.ios.json", true, reloadOnChange);
+            builder.AddJsonFileInternal("appsettings.ios.json", environment, true, reloadOnChange);
 #elif MACCATALYST
-            builder.AddJsonFileInternal("appsettings.maccatalyst.json", true, reloadOnChange);
+            builder.AddJsonFileInternal("appsettings.maccatalyst.json", environment, true, reloadOnChange);
 #endif
         }
-        return builder.AddJsonFileInternal("appsettings.json", optional, reloadOnChange);
+        return builder.AddJsonFileInternal("appsettings.json", environment, optional, reloadOnChange);
     }
 
 
@@ -38,6 +39,17 @@ public static partial class ConfigurationBuilderExtensions
         => builder.Add(new NSUserDefaultsConfigurationSource());
 
 
+    static IConfigurationBuilder AddJsonFileInternal(this IConfigurationBuilder builder, string fileName, string? environment, bool optional, bool reloadOnChange)
+    {
+        if (!String.IsNullOrWhiteSpace(environment))
+        {
+            var newFileName = GetEnvFileName(fileName, environment);
+            builder.AddJsonFileInternal(newFileName, true, reloadOnChange);
+        }
+        return builder.AddJsonFileInternal(fileName, true, reloadOnChange);
+    }
+
+
     static IConfigurationBuilder AddJsonFileInternal(this IConfigurationBuilder builder, string fileName, bool optional, bool reloadOnChange)
     {
 #if MACCATALYST
@@ -46,5 +58,5 @@ public static partial class ConfigurationBuilderExtensions
         var path = Path.Combine(NSBundle.MainBundle.BundlePath, fileName);
 #endif
         return builder.AddJsonFile(path, optional, reloadOnChange);
-    } 
+    }
 }

@@ -15,12 +15,12 @@ public static partial class ConfigurationBuilderExtensions
     /// <param name="builder"></param>
     /// <param name="optional"></param>
     /// <returns></returns>
-    public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, bool optional = true, bool includePlatformSpecific = true)
+    public static IConfigurationBuilder AddJsonAndroidAsset(this IConfigurationBuilder builder, string? environment = null, bool optional = true, bool includePlatformSpecific = true)
     {
         if (includePlatformSpecific)
-            builder.AddJsonAssetInternal("appsettings.android.json", true);
+            builder.AddJsonAssetInternal("appsettings.android.json", environment, true);
 
-        return builder.AddJsonAssetInternal("appsettings.json", optional);
+        return builder.AddJsonAssetInternal("appsettings.json", environment, optional);
     }
 
 
@@ -31,6 +31,17 @@ public static partial class ConfigurationBuilderExtensions
     /// <returns></returns>
     public static IConfigurationBuilder AddAndroidPreferences(this IConfigurationBuilder builder)
         => builder.Add(new SharedPreferencesConfigurationSource());
+
+
+    static IConfigurationBuilder AddJsonAssetInternal(this IConfigurationBuilder builder, string fileName, string? environment, bool optional)
+    {
+        if (!String.IsNullOrWhiteSpace(environment))
+        {
+            var newFileName = GetEnvFileName(fileName, environment);
+            builder.AddJsonAssetInternal(newFileName, true);
+        }
+        return builder.AddJsonAssetInternal(fileName, optional);
+    }
 
 
     static IConfigurationBuilder AddJsonAssetInternal(this IConfigurationBuilder builder, string fileName, bool optional)
