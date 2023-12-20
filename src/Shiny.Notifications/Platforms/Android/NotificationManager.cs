@@ -100,7 +100,7 @@ public partial class NotificationManager : INotificationManager,
         var list = new List<string>();
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
-            list.Add(AndroidPermissions.PostNotifications); // required
+            list.Add(P.PostNotifications); // required
 
         if (OperatingSystemShim.IsAndroidVersionAtLeast(31) && access.HasFlag(AccessRequestFlags.TimeSensitivity))
             list.Add(P.ScheduleExactAlarm); // if denied, restricted
@@ -109,7 +109,7 @@ public partial class NotificationManager : INotificationManager,
             list.AddRange(new[] { P.AccessCoarseLocation, P.AccessFineLocation }); // required, along with access bg
         
         var result = await this.platform.RequestPermissions(list.ToArray()).ToTask();
-        if (list.Contains(AndroidPermissions.PostNotifications) && !result.IsGranted(AndroidPermissions.PostNotifications))
+        if (list.Contains(P.PostNotifications) && !result.IsGranted(P.PostNotifications))
             return AccessState.Denied;
 
         if (access.HasFlag(AccessRequestFlags.LocationAware))

@@ -12,6 +12,7 @@ public record AndroidPermission(
 /// </summary>
 public static class AndroidPermissions
 {
-        //Manifest.Permission.PostNotifications
-    public const string PostNotifications = "android.permission.POST_NOTIFICATIONS";
+    //Manifest.Permission.PostNotifications
+    //public const string PostNotifications = "android.permission.POST_NOTIFICATIONS";
+    public const string ForegroundServiceLocation = "android.permission.FOREGROUND_SERVICE_LOCATION";
 }

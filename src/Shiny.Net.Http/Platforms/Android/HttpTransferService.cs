@@ -14,6 +14,7 @@ namespace Shiny.Net.Http;
 public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferManager, IHttpTransferDelegate>
 {
     public static bool IsStarted { get; private set; }
+    protected override ForegroundService StartForegroundServiceType => ForegroundService.TypeDataSync;
 
 
     protected override void OnStart(Intent? intent)

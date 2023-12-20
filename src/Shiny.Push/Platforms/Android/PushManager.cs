@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Android;
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
@@ -111,7 +112,7 @@ public class PushManager : NotifyPropertyChanged,
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             var access = await this.platform
-                .RequestAccess(AndroidPermissions.PostNotifications)
+                .RequestAccess(Manifest.Permission.PostNotifications)
                 .ToTask(cancelToken);
 
             if (access != AccessState.Available)

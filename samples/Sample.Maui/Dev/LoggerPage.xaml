@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dev="clr-namespace:Sample.Dev"
+             x:DataType="dev:LoggerViewModel"
+             x:Class="Sample.Dev.LoggerPage"
+             Title="Logger Testing">
+    <TableView>
+        <TableRoot>
+            <TableSection Title="Events">
+                <TextCell Text="Trace"
+                          Command="{Binding LogIt}"
+                          CommandParameter="Trace" />
+
+                <TextCell Text="Debug"
+                          Command="{Binding LogIt}"
+                          CommandParameter="Debug" />
+
+                <TextCell Text="Information"
+                          Command="{Binding LogIt}"
+                          CommandParameter="Information" />
+            </TableSection>
+
+            <TableSection Title="Errors">
+                <TextCell Text="Warning"
+                          Command="{Binding LogIt}"
+                          CommandParameter="Warning" />
+
+                <TextCell Text="Error"
+                          Command="{Binding LogIt}"
+                          CommandParameter="Error" />
+
+                <TextCell Text="Critical"
+                          Command="{Binding LogIt}"
+                          CommandParameter="Critical" />
+            </TableSection>
+        </TableRoot>
+    </TableView>
+</ContentPage>

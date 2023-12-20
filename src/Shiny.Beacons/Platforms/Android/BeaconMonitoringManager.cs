@@ -91,7 +91,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
             var result = await this.platform
                 .RequestFilteredPermissions(
                     new(P.ForegroundService, 31, null),
-                    new(AndroidPermissions.PostNotifications, 33, null) // this isn't required - we ask to be nice
+                    new(P.PostNotifications, 33, null) // this isn't required - we ask to be nice
                 )
                 .ToTask();
 
