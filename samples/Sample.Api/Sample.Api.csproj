@@ -11,7 +11,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Shiny.Extensions.Push" Version="2.0.0-preview-0009" />
+        <PackageReference Include="Shiny.Extensions.Push" Version="2.0.0-preview-0013" />
     </ItemGroup>
 
 </Project>
