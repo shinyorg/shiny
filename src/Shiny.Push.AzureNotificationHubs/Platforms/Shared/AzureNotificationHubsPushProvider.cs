@@ -93,7 +93,7 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
             .CreateOrUpdateInstallationAsync(install)
             .ConfigureAwait(false);
 
-        this.RegisteredTags = null;
+        this.RegisteredTags = tags;
     }
 
 
