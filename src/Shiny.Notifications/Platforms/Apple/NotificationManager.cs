@@ -170,7 +170,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             if (apple.Subtitle != null)
                 content.Subtitle = apple.Subtitle;
             
-            if (OperatingSystemShim.IsAppleVersionAtleast(14))
+            if (OperatingSystemShim.IsAppleVersionAtleast(16))
             {
                 content.FilterCriteria = apple.FilterCriteria;
                 content.RelevanceScore = apple.RelevanceScore;
