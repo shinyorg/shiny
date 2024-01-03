@@ -38,18 +38,6 @@ public class AppCenterLogger : ILogger
             { "Message", message }
         };
 
-        if (state is string s)
-        {
-            scopeVars.Add("Scope", s);
-        }
-        else if (state is IEnumerable<KeyValuePair<string, object>> properties)
-        {
-            foreach (var item in properties)
-            {
-                scopeVars.Add(item.Key, item.Value.ToString()!);
-            }
-        }
-
         this.scopeProvider?.ForEachScope((value, loggingProps) =>
         {
             if (value is string && !scopeVars.ContainsKey("Scope"))
@@ -59,6 +47,14 @@ public class AppCenterLogger : ILogger
             else if (value is IEnumerable<KeyValuePair<string, object>> props)
             {
                 foreach (var pair in props)
+                {
+                    if (!scopeVars.ContainsKey(pair.Key))
+                        scopeVars.Add(pair.Key, pair.Value.ToString()!);
+                }
+            }
+            else if (value is IEnumerable<KeyValuePair<string, string>> props2)
+            {
+                foreach (var pair in props2)
                 {
                     if (!scopeVars.ContainsKey(pair.Key))
                         scopeVars.Add(pair.Key, pair.Value.ToString()!);

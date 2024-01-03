@@ -10,7 +10,7 @@ public class LoggerViewModel : ViewModel
             var l = Enum.Parse<LogLevel>(e);
             using var _ = this.Logger.BeginScope(new Dictionary<string, string>
             {
-                { "Test", "Var" }
+                { "BeginScopeVar", "BeginScopeValue" }
             });
             var ex = new Exception(e.ToUpper());
 
