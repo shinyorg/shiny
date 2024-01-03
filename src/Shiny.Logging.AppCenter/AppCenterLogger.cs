@@ -5,6 +5,7 @@ using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.Extensions.Logging;
 
+
 namespace Shiny.Logging.AppCenter;
 
 
@@ -37,20 +38,29 @@ public class AppCenterLogger : ILogger
             { "Message", message }
         };
 
-        this.scopeProvider?.ForEachScope((scope, dict) =>
+        this.scopeProvider?.ForEachScope((value, loggingProps) =>
         {
-            if (scope is IEnumerable<KeyValuePair<string, object>> properties)
+            if (value is string && !scopeVars.ContainsKey("Scope"))
             {
-                foreach (var pair in properties)
+                scopeVars.Add("Scope", value.ToString()!);
+            }
+            else if (value is IEnumerable<KeyValuePair<string, object>> props)
+            {
+                foreach (var pair in props)
                 {
-                    dict.Add(pair.Key, pair.Value.ToString() ?? String.Empty);
+                    if (!scopeVars.ContainsKey(pair.Key))
+                        scopeVars.Add(pair.Key, pair.Value.ToString()!);
                 }
             }
-            else if (scope != null)
+            else if (value is IEnumerable<KeyValuePair<string, string>> props2)
             {
-                dict.Add("Scope", scope.ToString()!);
+                foreach (var pair in props2)
+                {
+                    if (!scopeVars.ContainsKey(pair.Key))
+                        scopeVars.Add(pair.Key, pair.Value.ToString()!);
+                }
             }
-        }, scopeVars);
+        }, state);
 
         if (logLevel <= LogLevel.Information || exception == null)
         {

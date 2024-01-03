@@ -35,28 +35,31 @@ public static class PlatformExtensions
 
     public static LocationRequest ToNative(this GpsRequest request)
     {
-        var nativeRequest = LocationRequest
-            .Create()
-            .SetSmallestDisplacement((float)request.DistanceFilterMeters)
-            .SetPriority(request.Accuracy switch
-            {
-                GpsAccuracy.Lowest => Priority.PriorityPassive,
-                GpsAccuracy.Low => Priority.PriorityLowPower,
-                GpsAccuracy.Normal => Priority.PriorityBalancedPowerAccuracy,
-                GpsAccuracy.High => Priority.PriorityHighAccuracy,
-                GpsAccuracy.Highest => Priority.PriorityHighAccuracy
-            });
+        var priority = request.Accuracy switch
+        {
+            GpsAccuracy.Lowest => Priority.PriorityPassive,
+            GpsAccuracy.Low => Priority.PriorityLowPower,
+            GpsAccuracy.Normal => Priority.PriorityBalancedPowerAccuracy,
+            GpsAccuracy.High => Priority.PriorityHighAccuracy,
+            GpsAccuracy.Highest => Priority.PriorityHighAccuracy
+        };
+
+        var builder = new LocationRequest.Builder(priority, 1000)
+            .SetGranularity(Granularity.GranularityPermissionLevel);
+
+        if (request.DistanceFilterMeters > 0)
+            builder = builder.SetMinUpdateDistanceMeters((float)request.DistanceFilterMeters);
         
         if (request is AndroidGpsRequest android)
         {
-            nativeRequest = nativeRequest.SetWaitForAccurateLocation(android.WaitForAccurateLocation);
+            builder = builder
+                .SetWaitForAccurateLocation(android.WaitForAccurateLocation);
 
             if (android.IntervalMillis > 0)
-                nativeRequest = nativeRequest.SetInterval(android.IntervalMillis);
-
-            if (android.FastestIntervalMillis > 0)
-                nativeRequest.SetFastestInterval(android.FastestIntervalMillis);
+                builder = builder.SetDurationMillis(android.IntervalMillis);
         }
+
+        var nativeRequest = builder.Build();
         return nativeRequest;
     }
 }

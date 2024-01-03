@@ -13,7 +13,6 @@ namespace Shiny.Locations;
 /// <param name="Accuracy"></param>
 /// <param name="DistanceFilterMeters"></param>
 /// <param name="IntervalMillis"></param>
-/// <param name="FastestIntervalMillis"></param>
 /// <param name="WaitForAccurateLocation"></param>
 /// <param name="StopForegroundServiceWithTask">Will shutdown the foreground service (if applicable) if the app is swiped away</param>
 public record AndroidGpsRequest(
@@ -21,7 +20,6 @@ public record AndroidGpsRequest(
     GpsAccuracy Accuracy = GpsAccuracy.Normal,
     double DistanceFilterMeters = 0,
     int IntervalMillis = 0,
-    int FastestIntervalMillis = 10000, // 10 seconds
     bool WaitForAccurateLocation = false,
     bool StopForegroundServiceWithTask = false
 ) : GpsRequest(
