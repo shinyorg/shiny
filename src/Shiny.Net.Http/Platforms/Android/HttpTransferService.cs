@@ -19,8 +19,11 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
 
     protected override void OnStart(Intent? intent)
     {
-        this.GetService<HttpTransferProcess>().Run(() => this.Stop());
-        IsStarted = true;
+        if (!IsStarted)
+        {
+            this.GetService<HttpTransferProcess>().Run(() => this.Stop());
+            IsStarted = true;
+        }
     }
 
 
