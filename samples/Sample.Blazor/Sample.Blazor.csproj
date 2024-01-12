@@ -23,7 +23,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" PrivateAssets="all" />
     </ItemGroup>
 
-    <!--<ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">
             <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
             <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
@@ -52,13 +52,8 @@
             <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
             <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
-    </ItemGroup>-->
-    <ItemGroup>
-      <None Remove="Pages\" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Pages\" />
-    </ItemGroup>
+
     <ItemGroup>
       <Content Remove="Off\Battery.razor" />
       <Content Remove="Off\Bluetooth.razor" />
