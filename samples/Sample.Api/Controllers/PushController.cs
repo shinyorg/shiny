@@ -15,14 +15,14 @@ public class PushController : Controller
     }
 
 
-    [HttpPost]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterArgs args)
     {
         return this.Ok(null);
     }
 
 
-    [HttpPost]
+    [HttpPost("send")]
     public async Task<ActionResult<object>> Send([FromBody] SendArgs args)
     {
         return this.Ok(null);
