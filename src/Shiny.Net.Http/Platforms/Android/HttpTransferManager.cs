@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
@@ -59,7 +60,10 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     {
         request.AssertValid();
         (await this.platform.RequestForegroundServicePermissions()).Assert(allowRestricted: true);
-
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(34))
+        {
+            (await this.platform.RequestAccess("android.permission.FOREGROUND_SERVICE_DATA_SYNC").ToTask()).Assert();
+        }
         // this will trigger over to the job if it is running
         long? contentLength = null;
         if (request.IsUpload)
