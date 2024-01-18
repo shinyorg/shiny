@@ -17,7 +17,7 @@ namespace Sample.Push.Maui;
 )]
 [IntentFilter(
     new[] {
-        Shiny.ShinyPushIntents.NotificationClickAction
+        ShinyPushIntents.NotificationClickAction
     },
     Categories = new[] {        
         "android.intent.category.DEFAULT"
