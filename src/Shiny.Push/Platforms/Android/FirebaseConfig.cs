@@ -11,7 +11,8 @@ public record FirebaseConfig(
     string? ProjectId = null,
     string? ApiKey = null,
 
-    NotificationChannel? DefaultChannel = null
+    NotificationChannel? DefaultChannel = null,
+    string? IntentAction = null
 )
 {
     public static FirebaseConfig Embedded { get; } = new(true);
