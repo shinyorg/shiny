@@ -1,4 +1,3 @@
-using Shiny;
 using Sample;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

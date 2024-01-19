@@ -1,6 +1,7 @@
 ﻿{
-  "name": "Sample.Blazor",
-  "short_name": "Sample.Blazor",
+  "name": "Shiny",
+  "short_name": "Shiny",
+  "id": "./",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",

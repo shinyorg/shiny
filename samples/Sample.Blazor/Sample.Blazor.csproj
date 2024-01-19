@@ -8,47 +8,61 @@
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(RunConfiguration)' == 'Sample.Blazor' ">
-        <ExternalConsole>true</ExternalConsole>
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' ">
+      <ExternalConsole>true</ExternalConsole>
     </PropertyGroup>
-
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' ">
+      <ExternalConsole>true</ExternalConsole>
+    </PropertyGroup>
     <ItemGroup>
         <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MicrosoftExtensionsVersion)" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+            <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+            <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+            <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+            <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+            <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+            <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+            <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+            <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+            <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+            <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+            <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+            <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj">
-          <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-          <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
+            <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+            <GlobalPropertiesToRemove>;WebPublishProfileFile</GlobalPropertiesToRemove>
         </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Off\Battery.razor" />
+      <Content Remove="Off\Bluetooth.razor" />
+      <Content Remove="Off\Connectivity.razor" />
+      <Content Remove="Off\Gps.razor" />
+      <Content Remove="Off\Home.razor" />
+      <Content Remove="Off\Jobs.razor" />
+      <Content Remove="Off\Push.razor" />
+      <Content Remove="Off\Settings.razor" />
+      <Content Remove="Off\Speech.razor" />
     </ItemGroup>
 </Project>
