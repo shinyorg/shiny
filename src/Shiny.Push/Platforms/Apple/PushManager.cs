@@ -105,6 +105,9 @@ public class PushManager : NotifyPropertyChanged,
 
     public async Task<PushAccessState> RequestAccess(UNAuthorizationOptions options, CancellationToken cancelToken = default)
     {
+        if (AppleExtensions.IsSimulator)
+            return new PushAccessState(AccessState.NotSupported, null);
+
         var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(options);
         if (!result.Item1)
             return PushAccessState.Denied; // or just restricted?
