@@ -18,7 +18,7 @@ public static class AppleExtensions
 #if MACCATALYST || MACOS
 	    false;
 #else
-        Runtime.Arch != Arch.DEVICE;
+        Runtime.Arch == Arch.SIMULATOR;
 #endif
     //public static IObservable<NSNotification> ObserveNotification(this NSNotificationCenter notificationCenter, NSString notificationKey) => Observable.Create<NSNotification>(obs =>
     //{
