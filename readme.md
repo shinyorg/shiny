@@ -73,3 +73,9 @@ Looking for consulting for your .NET applications and Shiny, you can now book a 
 
 
 ![Alt](https://repobeats.axiom.co/api/embed/83185f7533b7bee4a7e92e6943b686d11af40157.svg "Repobeats analytics image")
+
+
+## Podcasting
+For more info on Shiny and other great .NET content, listen to [Jon Dick (aka Redth)](https://github.com/redth) and [Allan Ritchie (Author of Shiny)](https://github.com/aritchie) every week at:
+
+<a href="https://gonemobile.io"><img src="art/gonemobile.jpg" width="200" /></a>
