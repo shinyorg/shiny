@@ -18,10 +18,12 @@ public static class PushExtensions
             .Tags
             .SetTags(tags)
             .ConfigureAwait(false);
+
+        return true;
     }
 
 
-    public static async string[]? TryGetTags(this IPushManager pushManager)
+    public static string[]? TryGetTags(this IPushManager pushManager)
         => pushManager.Tags?.RegisteredTags;
 
 
