@@ -8,6 +8,23 @@ public static class PushExtensions
     public static bool IsTagsSupport(this IPushManager push)
         => push.Tags != null;
 
+
+    public static async Task<bool> TrySetTags(this IPushManager pushManager, params string[] tags)
+    {
+        if (pushManager.Tags == null)
+            return false;
+
+        await pushManager
+            .Tags
+            .SetTags(tags)
+            .ConfigureAwait(false);
+    }
+
+
+    public static async string[]? TryGetTags(this IPushManager pushManager)
+        => pushManager.Tags?.RegisteredTags;
+
+
     public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, params string[] tags)
     {
         var access = await pushManager
@@ -16,13 +33,10 @@ public static class PushExtensions
 
         if (pushManager.Tags != null)
         {
-            foreach (var tag in tags)
-            {
-                await pushManager
-                    .Tags
-                    .AddTag(tag)
-                    .ConfigureAwait(false);
-            }
+            await pushManager
+                .Tags
+                .SetTags(tags)
+                .ConfigureAwait(false);
         }
         return access;
     }
