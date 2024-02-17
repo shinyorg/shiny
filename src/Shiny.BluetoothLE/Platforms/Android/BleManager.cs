@@ -99,25 +99,28 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             {
                 var peripheral = this.GetPeripheral(device);
 
-                if (intent.Action == BluetoothDevice.ActionAclConnected)
+                switch (intent.Action)
                 {
-                    // bg connected
-                    await this.services
-                        .RunDelegates<IBleDelegate>(
-                            x => x.OnPeripheralStateChanged(peripheral),
-                            this.logger
-                        )
-                        .ConfigureAwait(false);
-                }
-                else
-                {
-                    //    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
+                    case BluetoothDevice.ActionAclConnected:
+                    case BluetoothDevice.ActionAclDisconnected:
+                        // bg state
+                        await this.services
+                            .RunDelegates<IBleDelegate>(
+                                x => x.OnPeripheralStateChanged(peripheral),
+                                this.logger
+                            )
+                            .ConfigureAwait(false);
+                        break;
 
-                    //    public override IObservable<string> WhenNameUpdated() => this.Context
-                    //        .ManagerContext
-                    //        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
-                    //        .Select(_ => this.Name);
-                    this.peripheralEventSubj.OnNext((peripheral, intent));
+                    default:
+                        //    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
+
+                        //    public override IObservable<string> WhenNameUpdated() => this.Context
+                        //        .ManagerContext
+                        //        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
+                        //        .Select(_ => this.Name);
+                        this.peripheralEventSubj.OnNext((peripheral, intent));
+                        break;
                 }
             }
         };
@@ -128,6 +131,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             BluetoothDevice.ActionBondStateChanged,
             BluetoothDevice.ActionPairingRequest,
             BluetoothDevice.ActionAclConnected,
+            BluetoothDevice.ActionAclDisconnected,
             Intent.ActionBootCompleted
         );
         ShinyBleAdapterStateBroadcastReceiver.Process = async intent =>
