@@ -25,21 +25,22 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
     readonly IPlatform platform;
     readonly IRepository repository;
     readonly IServiceProvider services;
+    readonly INativeConfigurator? configurator;
 
 
     public HttpTransferManager(
-        AppleConfiguration config,
         ILogger<HttpTransferManager> logger,
         IRepository repository,
         IPlatform platform,
-        IServiceProvider services
+        IServiceProvider services,
+        INativeConfigurator? configurator = null
     )
     {
         this.logger = logger;
         this.repository = repository;
         this.platform = platform;
         this.services = services;
-        this.Config = config;
+        this.configurator = configurator;
 
         this.transferSubj = new(this.logger);
     }
@@ -59,9 +60,6 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         }
     }
 
-    public AppleConfiguration Config { get; }
-    public string SessionName => this.Config.SessionName ?? $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
-
 
     NSUrlSession? nsUrlSession;
     public NSUrlSession Session
@@ -70,27 +68,11 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         {
             if (this.nsUrlSession == null)
             {
-                var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(this.SessionName);
-
-                cfg.HttpMaximumConnectionsPerHost = this.Config.HttpMaximumConnectionsPerHost;
-
-                if (this.Config.CachePolicy != null)
-                    cfg.RequestCachePolicy = this.Config.CachePolicy.Value;
-
-                if (this.Config.HttpShouldUsePipelining != null)
-                    cfg.HttpShouldUsePipelining = this.Config.HttpShouldUsePipelining.Value;
-
-                cfg.AllowsCellularAccess = this.Config.AllowsCellularAccess;
-                cfg.AllowsConstrainedNetworkAccess = this.Config.AllowsConstrainedNetworkAccess;
-                cfg.AllowsExpensiveNetworkAccess = this.Config.AllowsExpensiveNetworkAccess;
+                var sessionName = $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
+                var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(sessionName);
+                cfg.HttpMaximumConnectionsPerHost = 2;
+                this.configurator?.Configure(cfg);
                 cfg.SessionSendsLaunchEvents = true;
-
-                if (this.Config.ShouldUseExtendedBackgroundIdleMode != null)
-                    cfg.ShouldUseExtendedBackgroundIdleMode = this.Config.ShouldUseExtendedBackgroundIdleMode.Value;
-
-                if (this.Config.WaitsForConnectivity != null)
-                    cfg.WaitsForConnectivity = this.Config.WaitsForConnectivity.Value;
-
                 this.nsUrlSession = NSUrlSession.FromConfiguration(cfg, this, new NSOperationQueue());
             }
             return this.nsUrlSession!;
@@ -124,7 +106,9 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             else
             {
                 var nativeRequest = request.ToNative();
+                this.configurator?.Configure(nativeRequest, request);
                 task = this.Session.CreateDownloadTask(nativeRequest);
+                
             }
 
             task.TaskDescription = request.Identifier;
@@ -166,12 +150,14 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
     public bool Handle(string sessionIdentifier, Action incomingCompletionHandler)
     {
-        if (this.SessionName.Equals(sessionIdentifier))
-        {
-            this.completionHandler = incomingCompletionHandler;
-            return true;
-        }
-        return false;
+        //if (this.SessionName.Equals(sessionIdentifier))
+        //{
+        //    this.completionHandler = incomingCompletionHandler;
+        //    return true;
+        //}
+        //return false;
+        this.completionHandler = incomingCompletionHandler; // TODO
+        return true;
     }
 
 
@@ -299,7 +285,12 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
         this.logger.LogError(ex, $"Transfer {ht.Identifier} was completed with error");
         this.Remove(ht);
 
-        await this.services.RunDelegates<IHttpTransferDelegate>(x => x.OnError(ht.Request, ex), this.logger);
+        await this.services
+            .RunDelegates<IHttpTransferDelegate>(
+                x => x.OnError(ht.Request, ex),
+                this.logger
+            );
+
         this.transferSubj.OnNext(new(
             ht.Request,
             HttpTransferState.Error,
@@ -480,8 +471,10 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
         this.logger.LogInformation("Form body written");
         var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
+        this.configurator?.Configure(native, request);
 
         var task = this.Session.CreateUploadTask(native, tempFileUrl);
+        
         return task;
     }
 
