@@ -206,20 +206,26 @@ public class PushManager : NotifyPropertyChanged,
 
         if (this.config.UseEmbeddedConfiguration)
         {
-            FirebaseApp.InitializeApp(this.platform.AppContext);
-            if (FirebaseApp.Instance == null)
-                throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
+            if (!this.IsFirebaseAappAlreadyInitialized())
+            {
+                FirebaseApp.InitializeApp(this.platform.AppContext);
+                if (FirebaseApp.Instance == null)
+                    throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
+            }
         }
         else
         {
-            var options = new FirebaseOptions.Builder()
-                .SetApplicationId(this.config.AppId)
-                .SetProjectId(this.config.ProjectId)
-                .SetApiKey(this.config.ApiKey)
-                .SetGcmSenderId(this.config.SenderId)
-                .Build();
+            if (!this.IsFirebaseAappAlreadyInitialized())
+            {
+                var options = new FirebaseOptions.Builder()
+                        .SetApplicationId(this.config.AppId)
+                        .SetProjectId(this.config.ProjectId)
+                        .SetApiKey(this.config.ApiKey)
+                        .SetGcmSenderId(this.config.SenderId)
+                        .Build();
 
-            FirebaseApp.InitializeApp(this.platform.AppContext, options);
+                FirebaseApp.InitializeApp(this.platform.AppContext, options);
+            }
         }
 
         ShinyFirebaseService.NewToken = async token =>
@@ -264,6 +270,22 @@ public class PushManager : NotifyPropertyChanged,
         };
 
         this.initialized = true;
+    }
+
+    bool IsFirebaseAappAlreadyInitialized()
+    {
+        var isAppInitialized = false;
+        var firebaseApps = FirebaseApp.GetApps(this.platform.AppContext);
+        foreach (var app in firebaseApps)
+        {
+            if (string.Equals(app.Name, FirebaseApp.DefaultAppName))
+            {
+                isAppInitialized = true;
+                break;
+            }
+        }
+
+        return isAppInitialized;
     }
 
 
