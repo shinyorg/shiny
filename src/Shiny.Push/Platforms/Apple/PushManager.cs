@@ -93,6 +93,7 @@ public class PushManager : NotifyPropertyChanged,
                 }
                 else if (x.Result.Status != AccessState.Available)
                 {
+                    // TODO: unregister delegate
                     this.logger.LogInformation("User has removed push notification access - " + x.Result.Status);
                 }
                 else
@@ -126,7 +127,7 @@ public class PushManager : NotifyPropertyChanged,
             // TODO: do we want to fire this here, the user may call this and store from the result anyhow
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnTokenRefreshed(regToken),
+                    x => x.OnNewToken(regToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
@@ -151,6 +152,16 @@ public class PushManager : NotifyPropertyChanged,
 
         if (this.provider != null)
             await this.provider.UnRegister().ConfigureAwait(false);
+
+        await this.services
+            .RunDelegates<IPushDelegate>(
+                x => x.OnUnRegistered(this.RegistrationToken!),
+                this.logger
+            )
+            .ConfigureAwait(false);
+
+        this.NativeToken = null;
+        this.RegistrationToken = null;
     }
 
 

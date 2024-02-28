@@ -62,7 +62,7 @@ public class PushManager : NotifyPropertyChanged,
                 this.RegistrationToken = regToken;
                 await this.services
                     .RunDelegates<IPushDelegate>(
-                        x => x.OnTokenRefreshed(regToken),
+                        x => x.OnNewToken(regToken),
                         this.logger
                     )
                     .ConfigureAwait(false);
@@ -127,7 +127,7 @@ public class PushManager : NotifyPropertyChanged,
             // TODO: do we want to fire this here, the user may call this and store from the result anyhow
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnTokenRefreshed(regToken),
+                    x => x.OnNewToken(regToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
@@ -141,11 +141,18 @@ public class PushManager : NotifyPropertyChanged,
 
     public async Task UnRegister()
     {
-        this.NativeToken = null;
-        this.RegistrationToken = null;
-
         await this.provider.UnRegister().ConfigureAwait(false);
         await FirebaseMessaging.Instance.DeleteToken().AsAsync().ConfigureAwait(false);
+
+        await this.services
+            .RunDelegates<IPushDelegate>(
+                x => x.OnUnRegistered(this.RegistrationToken!),
+                this.logger
+            )
+            .ConfigureAwait(false);
+
+        this.NativeToken = null;
+        this.RegistrationToken = null;
     }
 
 
@@ -219,7 +226,7 @@ public class PushManager : NotifyPropertyChanged,
         {
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnTokenRefreshed(token),
+                    x => x.OnNewToken(token),
                     this.logger
                 )
                 .ConfigureAwait(false);
