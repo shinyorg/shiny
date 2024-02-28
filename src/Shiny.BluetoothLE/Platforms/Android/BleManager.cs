@@ -73,7 +73,6 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     static T? GetParcel<T>(Intent intent, string name) where T : Java.Lang.Object
     {
         Java.Lang.Object? result;
-#if ANDROID33_0_OR_GREATER
         if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
         {
             var javaCls = Java.Lang.Class.FromType(typeof(T));
@@ -83,7 +82,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             result = intent.GetParcelableExtra(name, javaCls);
             return (T)result;
         }
-#endif
+
         result = intent.GetParcelableExtra(name);
         return (T)result;
     }
@@ -100,25 +99,28 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             {
                 var peripheral = this.GetPeripheral(device);
 
-                if (intent.Action == BluetoothDevice.ActionAclConnected)
+                switch (intent.Action)
                 {
-                    // bg connected
-                    await this.services
-                        .RunDelegates<IBleDelegate>(
-                            x => x.OnPeripheralStateChanged(peripheral),
-                            this.logger
-                        )
-                        .ConfigureAwait(false);
-                }
-                else
-                {
-                    //    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
+                    case BluetoothDevice.ActionAclConnected:
+                    case BluetoothDevice.ActionAclDisconnected:
+                        // bg state
+                        await this.services
+                            .RunDelegates<IBleDelegate>(
+                                x => x.OnPeripheralStateChanged(peripheral),
+                                this.logger
+                            )
+                            .ConfigureAwait(false);
+                        break;
 
-                    //    public override IObservable<string> WhenNameUpdated() => this.Context
-                    //        .ManagerContext
-                    //        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
-                    //        .Select(_ => this.Name);
-                    this.peripheralEventSubj.OnNext((peripheral, intent));
+                    default:
+                        //    public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
+
+                        //    public override IObservable<string> WhenNameUpdated() => this.Context
+                        //        .ManagerContext
+                        //        .ListenForMe(BluetoothDevice.ActionNameChanged, this)
+                        //        .Select(_ => this.Name);
+                        this.peripheralEventSubj.OnNext((peripheral, intent));
+                        break;
                 }
             }
         };
@@ -129,6 +131,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             BluetoothDevice.ActionBondStateChanged,
             BluetoothDevice.ActionPairingRequest,
             BluetoothDevice.ActionAclConnected,
+            BluetoothDevice.ActionAclDisconnected,
             Intent.ActionBootCompleted
         );
         ShinyBleAdapterStateBroadcastReceiver.Process = async intent =>
@@ -137,7 +140,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
                 return;
 
             var newState = (State)intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
-            if (newState == State.Connected || newState == State.Disconnected)
+            if (newState == State.On || newState == State.Off)
             {
                 var status = newState == State.Connected
                     ? AccessState.Available

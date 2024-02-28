@@ -62,7 +62,7 @@ public class PushManager : NotifyPropertyChanged,
                 this.RegistrationToken = regToken;
                 await this.services
                     .RunDelegates<IPushDelegate>(
-                        x => x.OnTokenRefreshed(regToken),
+                        x => x.OnNewToken(regToken),
                         this.logger
                     )
                     .ConfigureAwait(false);
@@ -127,7 +127,7 @@ public class PushManager : NotifyPropertyChanged,
             // TODO: do we want to fire this here, the user may call this and store from the result anyhow
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnTokenRefreshed(regToken),
+                    x => x.OnNewToken(regToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
@@ -141,11 +141,18 @@ public class PushManager : NotifyPropertyChanged,
 
     public async Task UnRegister()
     {
-        this.NativeToken = null;
-        this.RegistrationToken = null;
-
         await this.provider.UnRegister().ConfigureAwait(false);
         await FirebaseMessaging.Instance.DeleteToken().AsAsync().ConfigureAwait(false);
+
+        await this.services
+            .RunDelegates<IPushDelegate>(
+                x => x.OnUnRegistered(this.RegistrationToken!),
+                this.logger
+            )
+            .ConfigureAwait(false);
+
+        this.NativeToken = null;
+        this.RegistrationToken = null;
     }
 
 
@@ -197,29 +204,31 @@ public class PushManager : NotifyPropertyChanged,
         if (this.initialized)
             return;
 
-        if (this.config.UseEmbeddedConfiguration)
+        if (!this.IsFirebaseAappAlreadyInitialized())
         {
-            FirebaseApp.InitializeApp(this.platform.AppContext);
-            if (FirebaseApp.Instance == null)
-                throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
-        }
-        else
-        {
-            var options = new FirebaseOptions.Builder()
-                .SetApplicationId(this.config.AppId)
-                .SetProjectId(this.config.ProjectId)
-                .SetApiKey(this.config.ApiKey)
-                .SetGcmSenderId(this.config.SenderId)
-                .Build();
+            if (this.config.UseEmbeddedConfiguration)
+            {
+                FirebaseApp.InitializeApp(this.platform.AppContext);
+                if (FirebaseApp.Instance == null)
+                    throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
+            }
+            else
+            {
+                var options = new FirebaseOptions.Builder()
+                        .SetApplicationId(this.config.AppId)
+                        .SetProjectId(this.config.ProjectId)
+                        .SetApiKey(this.config.ApiKey)
+                        .SetGcmSenderId(this.config.SenderId)
+                        .Build();
 
-            FirebaseApp.InitializeApp(this.platform.AppContext, options);
+                FirebaseApp.InitializeApp(this.platform.AppContext, options);
+            }
         }
-
         ShinyFirebaseService.NewToken = async token =>
         {
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnTokenRefreshed(token),
+                    x => x.OnNewToken(token),
                     this.logger
                 )
                 .ConfigureAwait(false);
@@ -257,6 +266,22 @@ public class PushManager : NotifyPropertyChanged,
         };
 
         this.initialized = true;
+    }
+
+    bool IsFirebaseAappAlreadyInitialized()
+    {
+        var isAppInitialized = false;
+        var firebaseApps = FirebaseApp.GetApps(this.platform.AppContext);
+        foreach (var app in firebaseApps)
+        {
+            if (string.Equals(app.Name, FirebaseApp.DefaultAppName))
+            {
+                isAppInitialized = true;
+                break;
+            }
+        }
+
+        return isAppInitialized;
     }
 
 

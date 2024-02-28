@@ -6,11 +6,7 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-#if APPLE
-    public static IServiceCollection AddHttpTransfers<TDelegate>(this IServiceCollection services, AppleConfiguration? config = null)
-#else
     public static IServiceCollection AddHttpTransfers<TDelegate>(this IServiceCollection services)
-#endif
         where TDelegate : class, IHttpTransferDelegate
     {
         services.AddConnectivity();
@@ -22,8 +18,6 @@ public static class ServiceCollectionExtensions
         
 #if ANDROID
         services.AddSingleton<HttpTransferProcess>();
-#else
-        services.AddSingleton(config ?? new AppleConfiguration());
 #endif
         return services;
     }

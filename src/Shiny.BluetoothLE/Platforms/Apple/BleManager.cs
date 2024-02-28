@@ -148,6 +148,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                     var uuids = scanConfig.ServiceUuids.Select(CBUUID.FromString).ToArray();
                     this.Manager.ScanForPeripherals(uuids, peripheralScanningOptions);
                 }
+                this.IsScanning = true;
                 return this.ScanResultReceived;
             })
             .Subscribe(
@@ -159,6 +160,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
         return () =>
         {
             this.Manager.StopScan();
+            this.IsScanning = false;
             sub?.Dispose();
         };
     });

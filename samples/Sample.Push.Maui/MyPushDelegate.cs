@@ -19,8 +19,11 @@ public class MyPushDelegate : IPushDelegate
     public Task OnReceived(PushNotification push)
         => this.Insert("PUSH RECEIVED");
 
-    public Task OnTokenRefreshed(string token)
-        => this.Insert("PUSH TOKEN REFRESH");
+    public Task OnNewToken(string token)
+        => this.Insert("PUSH TOKEN NEW");
+
+    public Task OnUnRegistered(string token)
+        => this.Insert("PUSH TOKEN UNREGISTERED");
 
     Task Insert(string info) => this.conn.InsertAsync(new ShinyEvent
     {
