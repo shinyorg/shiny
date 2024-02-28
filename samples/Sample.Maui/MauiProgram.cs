@@ -7,25 +7,26 @@ namespace Sample;
 
 public static class MauiProgram
 {
-    public static MauiApp CreateMauiApp() => MauiApp
-        .CreateBuilder()
-        .UseMauiApp<App>()
-        .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
-        .UseMauiCommunityToolkitMarkup()
-        .ConfigureFonts(fonts =>
-        {
-            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-            fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-        })
-        .UsePrism(
-            new DryIocContainerExtension(),
-            prism => prism.OnAppStart("MainPage")
-        )
-        .RegisterLogging()
-        .RegisterServices()
-        .RegisterShinyServices()
-        .RegisterRoutes()
-        .Build();
+    public static MauiApp CreateMauiApp()
+        => MauiApp
+            .CreateBuilder()
+            .UseMauiApp<App>()
+            .UseShiny() // THIS IS REQUIRED FOR SHINY ON MAUI
+            .UseMauiCommunityToolkitMarkup()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            })
+            .UsePrism(
+                new DryIocContainerExtension(),
+                prism => prism.OnAppStart("MainPage")
+            )
+            .RegisterLogging()
+            .RegisterServices()
+            .RegisterShinyServices()
+            .RegisterRoutes()
+            .Build();
 
 
     static MauiAppBuilder RegisterLogging(this MauiAppBuilder builder)
@@ -47,6 +48,8 @@ public static class MauiProgram
     static MauiAppBuilder RegisterShinyServices(this MauiAppBuilder builder)
     {
         var s = builder.Services;
+
+        //builder.Services.AddKeyedSingleton("myKey", new object()); // TEST
         s.AddJob(typeof(SampleJob), runInForeground: true);
 
         // shiny.jobs
