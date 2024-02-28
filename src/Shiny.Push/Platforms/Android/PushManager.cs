@@ -204,18 +204,15 @@ public class PushManager : NotifyPropertyChanged,
         if (this.initialized)
             return;
 
-        if (this.config.UseEmbeddedConfiguration)
+        if (!this.IsFirebaseAappAlreadyInitialized())
         {
-            if (!this.IsFirebaseAappAlreadyInitialized())
+            if (this.config.UseEmbeddedConfiguration)
             {
                 FirebaseApp.InitializeApp(this.platform.AppContext);
                 if (FirebaseApp.Instance == null)
                     throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
             }
-        }
-        else
-        {
-            if (!this.IsFirebaseAappAlreadyInitialized())
+            else
             {
                 var options = new FirebaseOptions.Builder()
                         .SetApplicationId(this.config.AppId)
@@ -227,7 +224,6 @@ public class PushManager : NotifyPropertyChanged,
                 FirebaseApp.InitializeApp(this.platform.AppContext, options);
             }
         }
-
         ShinyFirebaseService.NewToken = async token =>
         {
             await this.services
