@@ -1,6 +1,7 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
+﻿using System.Threading;
+using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Shiny.Auto.Generators;
+namespace Shiny.SourceGenerators;
 
 
 public record GlobalOptions

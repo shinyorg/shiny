@@ -17,19 +17,25 @@
             <ScrollView Grid.Row="0">
                 <StackLayout>
                     <Label Text="ID (Leave blank for auto/default)" />
-                    <Entry Text="{Binding Identifier}" Keyboard="Numeric" />
+                    <Entry Text="{Binding Identifier}"
+                           Keyboard="Numeric"
+                           ReturnType="Next" />
 
                     <Label Text="Title" />
-                    <Entry Text="{Binding NotificationTitle}" />
+                    <Entry Text="{Binding NotificationTitle}"
+                           ReturnType="Next" />
 
                     <Label Text="Message" />
-                    <Entry Text="{Binding NotificationMessage}" />
+                    <Entry Text="{Binding NotificationMessage}"
+                           ReturnType="Next" />
 
                     <Label Text="Image URI" />
-                    <Entry Text="{Binding ImageUri}" />
+                    <Entry Text="{Binding ImageUri}"
+                           ReturnType="Next" />
 
                     <Label Text="Thread" />
-                    <Entry Text="{Binding Thread}" />
+                    <Entry Text="{Binding Thread}"
+                           ReturnType="Next" />
 
                     <Label Text="Channel" />
                     <Picker Title="Channel"
@@ -37,7 +43,9 @@
                             SelectedItem="{Binding Channel}" />
 
                     <Label Text="Payload" />
-                    <Entry Text="{Binding Payload}" />
+                    <Entry Text="{Binding Payload}"
+                           ReturnType="Done"
+                           ReturnCommand="{Binding Send}"/>
 
                     <Frame BorderColor="Black"
                            BackgroundColor="LemonChiffon"
@@ -57,7 +65,8 @@
                             Command="{Binding Navigate}"
                             CommandParameter="NotificationsSchedule" />
 
-                    <Button Text="No Trigger" Command="{Binding SetNoTrigger}" />
+                    <Button Text="No Trigger"
+                            Command="{Binding SetNoTrigger}" />
                 </StackLayout>
             </ScrollView>
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Shiny.Auto.Generators;
+namespace Shiny.SourceGenerators;
 
 
 [Generator]

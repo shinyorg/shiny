@@ -1,13 +1,15 @@
 ﻿/*
 FULL CREDIT FOR THIS GOES TO THE MAUI COMMUNITY TOOLKIT DEV TEAM!
 */
+using System;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Shiny.Auto.Generators;
+namespace Shiny.SourceGenerators;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class UseShinyInitializationAnalyzer : DiagnosticAnalyzer
@@ -48,10 +50,13 @@ public class UseShinyInitializationAnalyzer : DiagnosticAnalyzer
     }
 
     static bool CheckIfItIsUseMauiMethod(ExpressionStatementSyntax expressionStatement) =>
-        expressionStatement.DescendantNodes()
-                            .OfType<GenericNameSyntax>()
-                            .Any(x => x.Identifier.ValueText.Equals("UseShiny", StringComparison.Ordinal)
-                                        && x.TypeArgumentList.Arguments.Count is 1);
+        expressionStatement
+            .DescendantNodes()
+            .OfType<GenericNameSyntax>()
+            .Any(x =>
+                x.Identifier.ValueText.Equals("UseShiny", StringComparison.Ordinal) &&
+                x.TypeArgumentList.Arguments.Count == 1
+            );
 
     static bool HasUseShiny(SyntaxNode root)
     {
