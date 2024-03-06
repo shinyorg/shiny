@@ -38,9 +38,9 @@ public partial class Peripheral
                         .Switch()
                         .Select(ch =>
                         {
+                            native = ch;
                             this.FromNative(ch).AssertNotify();
 
-                            native = ch;
                             this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
                             this.Native.SetNotifyValue(true, ch);
 
