@@ -82,6 +82,8 @@ public partial class Peripheral
                         .Switch()
                         .Select(ch => this.operations.QueueToObservable(async ct =>
                         {
+                            characteristic = ch;
+
                             this.FromNative(ch).AssertNotify();
                             this.logger.LogDebug("Char InstanceID: " + ch.InstanceId);
 
@@ -95,13 +97,13 @@ public partial class Peripheral
                             if (nativeDescriptor == null)
                                 throw new BleException("Characteristic notification descriptor not found");
 
+                            ct.ThrowIfCancellationRequested();
                             await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
                             this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
 
                             this.AddNotify(ch);
                             this.charSubSubj.OnNext(this.FromNative(ch));
 
-                            characteristic = ch;
                             return ch;
                         }))
                         .Switch()
@@ -167,7 +169,7 @@ public partial class Peripheral
     protected void TryNotificationCleanup(BluetoothGattCharacteristic ch, string serviceUuid, string characteristicUuid)
     {
         try
-        {            
+        {
             this.RemoveNotify(ch);
 
             if (this.Status == ConnectionState.Connected)
