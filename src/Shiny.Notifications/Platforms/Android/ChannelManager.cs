@@ -140,7 +140,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
 
     public Channel? Get(string channelId) => this.repository.Get<AndroidChannel>(channelId);
-    public IList<Channel> GetAll() => this.repository.GetList<AndroidChannel>().OfType<Channel>().ToList();
+    public IReadOnlyList<Channel> GetAll() => this.repository.GetList<AndroidChannel>().OfType<Channel>().ToList();
     public void Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);

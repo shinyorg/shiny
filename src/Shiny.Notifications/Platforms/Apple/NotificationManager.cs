@@ -6,18 +6,17 @@ using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using UserNotifications;
-using CoreLocation;
 using Shiny.Hosting;
 using Shiny.Stores;
 using Microsoft.Extensions.Logging;
+using CoreLocation;
 
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager, IIosLifecycle.INotificationHandler
+public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INotificationHandler
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
-    readonly IosConfiguration configuration;
     readonly IPlatform platform;
     readonly ILogger logger;
     readonly IChannelManager channelManager;
@@ -25,7 +24,6 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 
 
     public NotificationManager(
-        IosConfiguration configuration,
         IServiceProvider services,
         ILogger<NotificationManager> logger,
         IPlatform platform,
@@ -33,38 +31,54 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         IKeyValueStoreFactory keystore
     )
     {
-        this.configuration = configuration;
         this.delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
         this.logger = logger;
         this.platform = platform;
         this.channelManager = channelManager;
         this.settings = keystore.DefaultStore;
+
+        this.PresentationOptions = UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound | UNNotificationPresentationOptions.Banner;
     }
 
+
+    // TODO: persist
+    public UNNotificationPresentationOptions PresentationOptions { get; }
 
     public void AddChannel(Channel channel) => this.channelManager.Add(channel);
     public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
     public void ClearChannels() => this.channelManager.Clear();
     public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
+    public IReadOnlyList<Channel> GetChannels() => this.channelManager.GetAll();
 
 
+    // TODO: UNUserNotificationCenter.Current.SetBadge
     public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
-        (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
-    );
-
-
-    public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(() =>
-        UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0
-    );
-
-
-    public Task<AccessState> RequestAccess(AccessRequestFlags access)
     {
-        var tcs = new TaskCompletionSource<AccessState>();
+        
+        //(int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
+    });
 
+
+    public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(async () =>
+    {
+        if (OperatingSystemShim.IsAppleVersionAtleast(16))
+        {
+#pragma warning disable CA1416
+            await UNUserNotificationCenter.Current.SetBadgeCountAsync(badge ?? 0);
+        }
+        else
+        {
+#pragma warning disable CA1422
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0;
+        }
+    });
+
+
+    public async Task RequestAccess(UNAuthorizationOptions authOptions)
+    {
+        var tcs = new TaskCompletionSource<bool>();
         UNUserNotificationCenter.Current.RequestAuthorization(
-            this.configuration.UNAuthorizationOptions,
+            authOptions,
             (approved, error) =>
             {
                 if (error != null)
@@ -73,12 +87,53 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 }
                 else
                 {
-                    var state = approved ? AccessState.Available : AccessState.Denied;
-                    tcs.SetResult(state);
+                    //var state = approved ? AccessState.Available : AccessState.Denied;
+                    //tcs.SetResult(state);
                 }
             });
 
-        return tcs.Task;
+        await tcs.Task.ConfigureAwait(false);
+    }
+
+
+    public async Task<NotificationAccessState> GetCurrentAccess()
+    {
+        // could track this to a persisted var on startup and update in RequestAccess
+
+        // TODO: may need an AppleCurrentAccess
+        var settings = await UNUserNotificationCenter.Current.GetNotificationSettingsAsync();
+        //UNAuthorizationStatus.Ephemeral
+        //UNAuthorizationStatus.Authorized
+        //UNAuthorizationStatus.Denied
+        //UNAuthorizationStatus.NotDetermined
+        //UNAuthorizationStatus.Provisional
+
+        //settings.AuthorizationStatus == UNAuthorizationStatus.Authorized
+        //settings.AnnouncementSetting == UNNotificationSetting.
+        //settings.AlertSetting == UNNotificationSetting
+        //settings.CriticalAlertSetting
+        //settings.CarPlaySetting
+        //settings.LockScreenSetting
+        //settings.ProvidesAppNotificationSettings
+        //settings.ScheduledDeliverySetting == UNNotificationSetting.Enabled
+        //settings.SoundSetting
+        //settings.TimeSensitiveSetting
+        //settings.BadgeSetting
+        return null;
+    }
+
+
+    public async Task<NotificationAccessState> RequestAccess(AccessRequestFlags access)
+    {
+        // TODO: look at presentation options
+        var nativeRequest = UNAuthorizationOptions.None;
+        //if (access.HasFlag(AccessRequestFlags.LocationAware) || access.HasFlag(AccessRequestFlags.TimeSensitivity))
+        //    nativeRequest |= UNAuthorizationOptions.TimeSensitive;
+
+        await this.RequestAccess(nativeRequest);
+
+        //return tcs.Task;
+        return null;
     }
 
 
@@ -86,7 +141,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-    public Task<IList<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
+    public Task<IReadOnlyList<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
     {
         var requests = await UNUserNotificationCenter
             .Current
@@ -94,7 +149,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             .ConfigureAwait(false);
 
         var notifications = requests.Select(x => x.FromNative() as Notification).ToList();
-        return (IList<Notification>)notifications;
+        return (IReadOnlyList<Notification>)notifications;
     });
 
 
@@ -197,6 +252,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             };
         }
 
+        // TODO
         native.CategoryIdentifier = channel.Identifier;
         var useCriticalSound =
             this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
@@ -243,6 +299,8 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 case ChannelImportance.Critical:
                 case ChannelImportance.High:
                     var is12 = OperatingSystemShim.IsAppleVersionAtleast(12);
+
+                    // TODO
                     native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
                         ? UNNotificationSound.DefaultCriticalSound
                         : UNNotificationSound.Default;
@@ -349,8 +407,11 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         if (t == null || t is not UNPushNotificationTrigger)
         {
             this.platform.InvokeOnMainThread(() =>
-                completionHandler.Invoke(this.configuration.PresentationOptions)
+                completionHandler.Invoke(this.PresentationOptions)
             );
         }
     }
+
+    public Task Send(AppleNotification notification) => this.Send((Notification)notification);
+    public void AddChannel(AppleChannel channel) => this.AddChannel((Channel)channel);
 }

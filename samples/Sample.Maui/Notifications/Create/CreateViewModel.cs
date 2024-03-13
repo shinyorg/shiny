@@ -64,17 +64,17 @@ public class CreateViewModel : ViewModel
                 };
             }
 
-            var result = await notificationManager.RequestRequiredAccess(n);
-            if (result != AccessState.Available)
-            {
-                await this.Alert("Invalid Permission: " + result);
-            }
-            else
-            {
-                await notificationManager.Send(n);
-                await this.Dialogs.DisplayAlertAsync("Done", "Notification Sent", "OK");
-                await this.Navigation.GoBack();
-            }
+            //var result = await notificationManager.RequestRequiredAccess(n);
+            //if (result != AccessState.Available)
+            //{
+            //    await this.Alert("Invalid Permission: " + result);
+            //}
+            //else
+            //{
+            //    await notificationManager.Send(n);
+            //    await this.Dialogs.DisplayAlertAsync("Done", "Notification Sent", "OK");
+            //    await this.Navigation.GoBack();
+            //}
         });
     }
 

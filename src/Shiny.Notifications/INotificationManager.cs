@@ -13,20 +13,17 @@ public interface INotificationManager
     /// <returns></returns>
     void AddChannel(Channel channel);
 
-
     /// <summary>
     /// Remove a specific channel - any pending notifications on this channel will also be removed
     /// </summary>
     /// <returns></returns>
     void RemoveChannel(string channelId);
 
-
     /// <summary>
     /// Removes all channels and any pending notifications
     /// </summary>
     /// <returns></returns>
     void ClearChannels();
-
 
     /// <summary>
     /// Get a specific channel by ID
@@ -35,21 +32,24 @@ public interface INotificationManager
     /// <returns></returns>
     Channel? GetChannel(string channelId);
 
-
     /// <summary>
     /// Gets list of channels
     /// </summary>
     /// <returns></returns>
-    IList<Channel> GetChannels();
-
+    IReadOnlyList<Channel> GetChannels();
 
     /// <summary>
     /// Requests/ensures appropriate platform permissions where necessary
     /// </summary>
     /// <param name="flags">You can request multiple types of permissions (TimeSensitive, LocationAware)</param>
     /// <returns></returns>
-    Task<AccessState> RequestAccess(AccessRequestFlags flags = AccessRequestFlags.Notification);
+    Task<NotificationAccessState> RequestAccess(AccessRequestFlags flags = AccessRequestFlags.Notification);
 
+    /// <summary>
+    /// Checks current access states without requesting permissions from user
+    /// </summary>
+    /// <returns></returns>
+    Task<NotificationAccessState> GetCurrentAccess();
 
     /// <summary>
     /// Get a notification by id
@@ -79,7 +79,7 @@ public interface INotificationManager
     /// Gets all pending notifications
     /// </summary>
     /// <returns></returns>
-    Task<IList<Notification>> GetPendingNotifications();
+    Task<IReadOnlyList<Notification>> GetPendingNotifications();
 
 
     /// <summary>

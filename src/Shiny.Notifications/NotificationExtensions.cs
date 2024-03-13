@@ -28,7 +28,7 @@ public static class NotificationExtensions
         };
     }
     
-    public static async Task<AccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
+    public static async Task<NotificationAccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
     {
         var request = AccessRequestFlags.Notification;
         if (notification.RepeatInterval != null)

@@ -58,7 +58,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
 
     public Channel? Get(string channelId) => this.repository.Get<AppleChannel>(channelId);
-    public IList<Channel> GetAll() => this.repository.GetList<AppleChannel>().OfType<Channel>().ToList();
+    public IReadOnlyList<Channel> GetAll() => this.repository.GetList<AppleChannel>().OfType<Channel>().ToList();
 
 
     public void Remove(string channelId)
