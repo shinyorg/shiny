@@ -54,8 +54,8 @@ public class PushManager : NotifyPropertyChanged,
 
         try
         {
-            this.NativeToken = await this.RequestNativeToken();
-            var regToken = await this.provider.Register(this.NativeToken); // never null on firebase
+            this.NativeRegistrationToken = await this.RequestNativeToken();
+            var regToken = await this.provider.Register(this.NativeRegistrationToken); // never null on firebase
 
             if (regToken != this.RegistrationToken)
             {
@@ -100,7 +100,7 @@ public class PushManager : NotifyPropertyChanged,
 
 
     string? nativeToken;
-    public string? NativeToken
+    public string? NativeRegistrationToken
     {
         get => this.nativeToken;
         set => this.Set(ref this.nativeToken, value);
@@ -132,7 +132,7 @@ public class PushManager : NotifyPropertyChanged,
                 )
                 .ConfigureAwait(false);
         }
-        this.NativeToken = nativeToken;
+        this.NativeRegistrationToken = nativeToken;
         this.RegistrationToken = regToken;
 
         return new PushAccessState(AccessState.Available, this.RegistrationToken);
@@ -151,7 +151,7 @@ public class PushManager : NotifyPropertyChanged,
             )
             .ConfigureAwait(false);
 
-        this.NativeToken = null;
+        this.NativeRegistrationToken = null;
         this.RegistrationToken = null;
     }
 

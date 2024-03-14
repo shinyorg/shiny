@@ -56,7 +56,7 @@ public class PushManager : NotifyPropertyChanged,
 
 
     string? nativeToken;
-    public string? NativeToken
+    public string? NativeRegistrationToken
     {
         get => this.nativeToken;
         set => this.Set(ref this.nativeToken, value);
@@ -133,7 +133,7 @@ public class PushManager : NotifyPropertyChanged,
                 .ConfigureAwait(false);
         }
 
-        this.NativeToken = nativeToken;
+        this.NativeRegistrationToken = nativeToken;
         this.RegistrationToken = regToken;
 
         return new PushAccessState(AccessState.Available, this.RegistrationToken);
@@ -160,7 +160,7 @@ public class PushManager : NotifyPropertyChanged,
             )
             .ConfigureAwait(false);
 
-        this.NativeToken = null;
+        this.NativeRegistrationToken = null;
         this.RegistrationToken = null;
     }
 
