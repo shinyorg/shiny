@@ -85,6 +85,7 @@ public partial class NotificationManager : INotificationManager,
                 await this.CancelInternal(notification).ConfigureAwait(false);
             }
             this.repository.Clear<AndroidNotification>();
+            
         }
     }
 

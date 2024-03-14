@@ -6,10 +6,10 @@ using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using UserNotifications;
+using CoreLocation;
+using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Stores;
-using Microsoft.Extensions.Logging;
-using CoreLocation;
 
 namespace Shiny.Notifications;
 
@@ -45,18 +45,24 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
     public UNNotificationPresentationOptions PresentationOptions { get; }
 
     public void AddChannel(Channel channel) => this.channelManager.Add(channel);
+    public void AddChannel(AppleChannel channel) => this.AddChannel((Channel)channel);
+
     public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
     public void ClearChannels() => this.channelManager.Clear();
     public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
     public IReadOnlyList<Channel> GetChannels() => this.channelManager.GetAll();
+    public IList<Channel> GetChannels() => this.channelManager.GetAll();
 
-
-    // TODO: UNUserNotificationCenter.Current.SetBadge
     public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
-    {
-        
-        //(int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
-    });
+        (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
+    );
+    public IReadOnlyList<Channel> GetChannels() => this.channelManager.GetAll();
+    
+
+    public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync(() =>
+#pragma warning disable CA1422
+        (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
+    );
 
 
     public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(async () =>
@@ -153,6 +159,7 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
     });
 
 
+    public Task Send(AppleNotification notification) => this.Send((Notification)notification);
     public Task Send(Notification notification) => this.platform.InvokeTaskOnMainThread(async () =>
     {
         notification.AssertValid();
@@ -245,17 +252,16 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
         {
             native.InterruptionLevel = channel.Importance switch
             {
-                ChannelImportance.Low => UNNotificationInterruptionLevel.Passive,
-                ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive,
-                ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical,
-                _ => UNNotificationInterruptionLevel.Active
+                ChannelImportance.Low => UNNotificationInterruptionLevel.Passive2,
+                ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive2,
+                ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical2,
+                _ => UNNotificationInterruptionLevel.Active2
             };
         }
 
         // TODO
         native.CategoryIdentifier = channel.Identifier;
         var useCriticalSound =
-            this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
             channel.Importance == ChannelImportance.Critical &&
             UIDevice.CurrentDevice.CheckSystemVersion(12, 0);
 
@@ -297,17 +303,10 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
             switch (channel.Importance)
             {
                 case ChannelImportance.Critical:
-                case ChannelImportance.High:
-                    var is12 = OperatingSystemShim.IsAppleVersionAtleast(12);
-
-                    // TODO
-                    native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
-                        ? UNNotificationSound.DefaultCriticalSound
-                        : UNNotificationSound.Default;
+                    native.Sound = UNNotificationSound.DefaultCriticalSound;
                     break;
 
-                case ChannelImportance.Normal:
-                    OperatingSystemShim.IsMacCatalystVersionAtLeast(12);
+                case ChannelImportance.High:
                     native.Sound = UNNotificationSound.Default;
                     break;
 
