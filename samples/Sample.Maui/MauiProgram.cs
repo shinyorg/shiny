@@ -20,7 +20,7 @@ public static class MauiProgram
             })
             .UsePrism(
                 new DryIocContainerExtension(),
-                prism => prism.OnAppStart("MainPage")
+                prism => prism.CreateWindow("MainPage")
             )
             .RegisterLogging()
             .RegisterServices()
@@ -57,9 +57,6 @@ public static class MauiProgram
 
         // shiny.notifications
         s.AddNotifications<Notifications.MyNotificationDelegate>();
-
-        // shiny.speechrecognition
-        s.AddSpeechRecognition();
 
         // shiny.net.http
         s.AddHttpTransfers<HttpTransfers.MyHttpTransferDelegate>();
@@ -101,6 +98,7 @@ public static class MauiProgram
         s.AddSingleton(FilePicker.Default);
         s.AddSingleton(DeviceDisplay.Current);
         s.AddSingleton(AppInfo.Current);
+
         return builder;
     }
 
@@ -152,10 +150,6 @@ public static class MauiProgram
         s.RegisterForNavigation<Notifications.Create.SchedulePage, Notifications.Create.ScheduleViewModel>("NotificationsSchedule");
         s.RegisterForNavigation<Notifications.Channels.ChannelListPage, Notifications.Channels.ChannelListViewModel>("NotificationsChannelList");
         s.RegisterForNavigation<Notifications.Channels.ChannelCreatePage, Notifications.Channels.ChannelCreateViewModel>("NotificationsChannelCreate");
-
-        // speech recoginition
-        s.RegisterForNavigation<SpeechRecognition.DictationPage, SpeechRecognition.DictationViewModel>("SrDictation");
-        s.RegisterForNavigation<SpeechRecognition.ConversationPage, SpeechRecognition.ConversationViewModel>("SrConversation");
 
         // settings/secure store
         s.RegisterForNavigation<Stores.BasicPage, Stores.BasicViewModel>("SettingsBasic");

@@ -71,7 +71,6 @@
         <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" />
     </ItemGroup>
