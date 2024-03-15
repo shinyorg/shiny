@@ -51,14 +51,7 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
     public void ClearChannels() => this.channelManager.Clear();
     public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
     public IReadOnlyList<Channel> GetChannels() => this.channelManager.GetAll();
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
-
-    public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
-        (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
-    );
-    public IReadOnlyList<Channel> GetChannels() => this.channelManager.GetAll();
     
-
     public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync(() =>
 #pragma warning disable CA1422
         (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
@@ -410,7 +403,4 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
             );
         }
     }
-
-    public Task Send(AppleNotification notification) => this.Send((Notification)notification);
-    public void AddChannel(AppleChannel channel) => this.AddChannel((Channel)channel);
 }
