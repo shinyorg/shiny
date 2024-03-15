@@ -18,7 +18,6 @@
       "src\\Shiny.Locations\\Shiny.Locations.csproj",
       "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
       "src\\Shiny.Notifications\\Shiny.Notifications.csproj",
-      "src\\Shiny.SpeechRecognition\\Shiny.SpeechRecognition.csproj",
       "src\\Shiny.Push\\Shiny.Push.csproj",
       "src\\Shiny.Push.AzureNotificationHubs\\Shiny.Push.AzureNotificationHubs.csproj",
       "src\\Shiny.Push.FirebaseMessaging\\Shiny.Push.FirebaseMessaging.csproj",
