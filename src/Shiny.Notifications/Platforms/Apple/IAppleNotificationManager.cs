@@ -6,8 +6,6 @@ namespace Shiny.Notifications;
 
 public interface IAppleNotificationManager : INotificationManager
 {
-    UNNotificationPresentationOptions PresentationOptions { get; }
-
     /// <summary>
     /// 
     /// </summary>

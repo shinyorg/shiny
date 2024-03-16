@@ -37,12 +37,12 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
         this.channelManager = channelManager;
         this.settings = keystore.DefaultStore;
 
-        this.PresentationOptions = UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound | UNNotificationPresentationOptions.Banner;
+        //this.PresentationOptions = UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound | UNNotificationPresentationOptions.Banner;
     }
 
 
     // TODO: persist
-    public UNNotificationPresentationOptions PresentationOptions { get; }
+    //public UNNotificationPresentationOptions PresentationOptions { get; }
 
     public void AddChannel(Channel channel) => this.channelManager.Add(channel);
     public void AddChannel(AppleChannel channel) => this.AddChannel((Channel)channel);
@@ -398,9 +398,15 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
         var t = notification?.Request?.Trigger;
         if (t == null || t is not UNPushNotificationTrigger)
         {
-            this.platform.InvokeOnMainThread(() =>
-                completionHandler.Invoke(this.PresentationOptions)
-            );
+            //var options = this.delegates
+            //    .Value
+            //    .OfType<IAppleNotificationDelegate>()
+            //    .Select(x => x.GetForegroundPresentation(notification))
+            //    .FirstOrDefault(x => x != null);
+
+            //this.platform.InvokeOnMainThread(() =>
+            //    completionHandler.Invoke(options ?? PresentationOP)
+            //);
         }
     }
 }
