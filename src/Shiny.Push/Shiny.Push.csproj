@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
-
     <PropertyGroup>
         <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
         <Description>Shiny addon for all your push notification needs</Description>
@@ -13,6 +11,4 @@
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="123.1.2.2" />
     </ItemGroup>
-
-    <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

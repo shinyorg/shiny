@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
-
     <PropertyGroup>
         <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
         <Description>Shiny addon for all your notification needs</Description>
@@ -16,6 +14,4 @@
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.4" />
     </ItemGroup>
-
-    <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>
