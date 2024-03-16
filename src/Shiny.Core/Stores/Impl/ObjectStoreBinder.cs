@@ -24,25 +24,29 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
     }
 
 
+    public void RemovePersistedValues(INotifyPropertyChanged npc, string? keyValueStoreAlias = null)
+    {
+        var store = this.GetStore(npc, keyValueStoreAlias);
+        this.RemovePersistedValues(npc, store);
+    }
+
+
+    public void RemovePersistedValues(INotifyPropertyChanged npc, IKeyValueStore store)
+    {
+        var type = npc.GetType();
+        var props = this.GetTypeProperties(type).ToList();
+
+        foreach (var prop in props)
+        {
+            var key = GetBindingKey(type, prop);
+            store.Remove(key);
+        }
+    }
+
+
     public void Bind(INotifyPropertyChanged npc, string? keyValueStoreAlias = null)
     {
-        IKeyValueStore? store = null;
-
-        if (keyValueStoreAlias != null)
-        {
-            store = this.factory.GetStore(keyValueStoreAlias);
-        }
-        else
-        {
-            keyValueStoreAlias = npc
-                .GetType()
-                .GetCustomAttribute<ObjectStoreBinderAttribute>()?
-                .StoreAlias;
-
-            if (keyValueStoreAlias != null)
-                store = this.factory.GetStore(keyValueStoreAlias); // error if attribute is bad
-        }
-
+        var store = this.GetStore(npc, keyValueStoreAlias);
         this.Bind(npc, store ?? this.factory.DefaultStore);
     }
 
@@ -120,6 +124,28 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
 
     public static string GetBindingKey(Type type, string propertyName)
         => $"{type.Namespace}.{type.Name}.{propertyName}";
+
+
+    protected virtual IKeyValueStore GetStore(INotifyPropertyChanged npc, string? keyValueStoreAlias)
+    {
+        IKeyValueStore? store = null;
+
+        if (keyValueStoreAlias != null)
+        {
+            store = this.factory.GetStore(keyValueStoreAlias);
+        }
+        else
+        {
+            keyValueStoreAlias = npc
+                .GetType()
+                .GetCustomAttribute<ObjectStoreBinderAttribute>()?
+                .StoreAlias;
+
+            if (keyValueStoreAlias != null)
+                store = this.factory.GetStore(keyValueStoreAlias); // error if attribute is bad
+        }
+        return store ?? this.factory.DefaultStore;
+    }
 
     /// <summary>
     /// Get all type properties with public get and set accessors

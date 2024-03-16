@@ -6,6 +6,8 @@ namespace Shiny.Stores.Impl;
 
 public class MemoryKeyValueStore : IKeyValueStore
 {
+    public IReadOnlyDictionary<string, object> Values => this.values;
+
     public string Alias => "memory";
     public bool IsReadOnly => false;
 
@@ -16,7 +18,7 @@ public class MemoryKeyValueStore : IKeyValueStore
     public void Set(string key, object value) => this.Do(x => x[key] = value);
 
 
-    Dictionary<string, object> values = new Dictionary<string, object>();
+    readonly Dictionary<string, object> values = new();
     readonly object syncLock = new object();
     protected void Do(Action<Dictionary<string, object>> worker) => this.Do<object>(values =>
     {

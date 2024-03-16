@@ -6,6 +6,21 @@ namespace Shiny.Stores;
 public interface IObjectStoreBinder
 {
     /// <summary>
+    /// This will remove ALL values saved for a persisted object
+    /// </summary>
+    /// <param name="npc"></param>
+    /// <param name="keyValueStoreAlias"></param>
+    void RemovePersistedValues(INotifyPropertyChanged npc, string? keyValueStoreAlias = null);
+
+
+    /// <summary>
+    /// This will remove ALL values saved for a persisted object
+    /// </summary>
+    /// <param name="npc"></param>
+    /// <param name="store"></param>
+    void RemovePersistedValues(INotifyPropertyChanged npc, IKeyValueStore store);
+
+    /// <summary>
     /// Attempts to bind an object to a named store, if the alias is not passed, the binder will look at the attribute
     /// </summary>
     /// <param name="npc"></param>
