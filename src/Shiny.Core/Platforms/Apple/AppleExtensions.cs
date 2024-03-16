@@ -123,10 +123,10 @@ public static class AppleExtensions
         if (ifVersion == null)
             return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
 #if IOS
-        if (OperatingSystemShim.IsIOSVersionAtLeast(ifVersion.Value))
+        if (OperatingSystem.IsIOSVersionAtLeast(ifVersion.Value))
             return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
 #elif MACCATALYST
-        if (OperatingSystemShim.IsMacCatalystVersionAtLeast(ifVersion.Value))
+        if (OperatingSystem.IsMacCatalystVersionAtLeast(ifVersion.Value))
             return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
 #endif
         return false;

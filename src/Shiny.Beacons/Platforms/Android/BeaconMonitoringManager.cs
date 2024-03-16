@@ -108,14 +108,14 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     void StartService()
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(29) && !ShinyBeaconMonitoringService.IsStarted)
+        if (OperatingSystem.IsAndroidVersionAtLeast(29) && !ShinyBeaconMonitoringService.IsStarted)
             this.platform.StartService(typeof(ShinyBeaconMonitoringService));
     }
 
 
     void StopService()
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(29) && ShinyBeaconMonitoringService.IsStarted)
+        if (OperatingSystem.IsAndroidVersionAtLeast(29) && ShinyBeaconMonitoringService.IsStarted)
             this.platform.StopService(typeof(ShinyBeaconMonitoringService));
     }
 }

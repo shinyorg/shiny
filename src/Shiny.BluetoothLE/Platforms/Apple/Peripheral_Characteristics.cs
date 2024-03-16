@@ -189,11 +189,7 @@ public partial class Peripheral
     
 
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
-#if XAMARINIOS
-    public override void DiscoveredCharacteristic(CBPeripheral peripheral, CBService service, NSError? error)
-#else
     public override void DiscoveredCharacteristics(CBPeripheral peripheral, CBService service, NSError? error)
-#endif
     {
         if (this.logger.IsEnabled(LogLevel.Debug))
             this.logger.LogDebug($"[DiscoveredCharacteristics] {service.UUID} - Error: {error?.LocalizedDescription ?? "NONE"}");

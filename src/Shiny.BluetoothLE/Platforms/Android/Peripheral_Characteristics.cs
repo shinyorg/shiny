@@ -217,14 +217,7 @@ public partial class Peripheral
             if (ch.Properties.HasFlag(GattProperty.SignedWrite) && this.Native.BondState == Bond.Bonded)
                 ch.WriteType |= GattWriteType.Signed;
 
-#if XAMARIN
-            if (!ch.SetValue(data))
-                throw new BleException("Could not set value of characteristic: " + characteristicUuid);
-
-            if (!this.Gatt!.WriteCharacteristic(ch))
-                throw new BleException("Failed to write to characteristic: " + characteristicUuid);
-#else
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
             {
                 this.Gatt!.WriteCharacteristic(ch, data, (int)ch.WriteType);
             }
@@ -236,7 +229,7 @@ public partial class Peripheral
                 if (!this.Gatt!.WriteCharacteristic(ch))
                     throw new BleException("Failed to write to characteristic: " + characteristicUuid);
             }
-#endif
+
             var result = await task.ConfigureAwait(false);
             if (result.Status != GattStatus.Success)
                 throw ToException($"Failed to write to characteristic: {characteristicUuid}", result.Status);

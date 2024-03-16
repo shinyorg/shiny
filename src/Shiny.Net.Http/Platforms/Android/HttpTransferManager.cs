@@ -60,7 +60,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     {
         request.AssertValid();
         (await this.platform.RequestForegroundServicePermissions()).Assert(allowRestricted: true);
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(34))
+        if (OperatingSystem.IsAndroidVersionAtLeast(34))
         {
             (await this.platform.RequestAccess("android.permission.FOREGROUND_SERVICE_DATA_SYNC").ToTask()).Assert();
         }

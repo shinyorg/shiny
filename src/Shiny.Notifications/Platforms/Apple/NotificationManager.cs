@@ -60,7 +60,7 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
 
     public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(async () =>
     {
-        if (OperatingSystemShim.IsAppleVersionAtleast(16))
+        if (IosPlatform.IsAppleVersionAtleast(16))
         {
 #pragma warning disable CA1416
             await UNUserNotificationCenter.Current.SetBadgeCountAsync(badge ?? 0);
@@ -225,7 +225,7 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
             if (apple.Subtitle != null)
                 content.Subtitle = apple.Subtitle;
             
-            if (OperatingSystemShim.IsAppleVersionAtleast(16))
+            if (IosPlatform.IsAppleVersionAtleast(16))
             {
                 content.FilterCriteria = apple.FilterCriteria;
                 content.RelevanceScore = apple.RelevanceScore;
@@ -241,7 +241,7 @@ public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INot
 
     protected virtual void ApplyChannel(Notification notification, Channel channel, UNMutableNotificationContent native)
     {
-        if (OperatingSystemShim.IsAppleVersionAtleast(15))
+        if (IosPlatform.IsAppleVersionAtleast(15))
         {
             native.InterruptionLevel = channel.Importance switch
             {

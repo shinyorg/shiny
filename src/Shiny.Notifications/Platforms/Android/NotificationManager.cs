@@ -148,13 +148,13 @@ when {
     public async Task<AccessState> RequestAccess(AccessRequestFlags access)
     {
         var list = new List<string>();
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
             list.Add(P.PostNotifications); // required
 
-        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !OperatingSystemShim.IsAndroidVersionAtLeast(32))
+        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !OperatingSystem.IsAndroidVersionAtLeast(32))
         {
             // if denied, restricted
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+            if (OperatingSystem.IsAndroidVersionAtLeast(31))
                 list.Add(P.ScheduleExactAlarm);
         }
              
@@ -171,7 +171,7 @@ when {
             if (!result.IsGranted(P.AccessFineLocation))
                 return AccessState.Denied;
 
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            if (OperatingSystem.IsAndroidVersionAtLeast(29))
             {
                 var bgResult = await this.platform.RequestAccess(P.AccessBackgroundLocation).ToTask();
                 if (bgResult != AccessState.Available)
@@ -179,7 +179,7 @@ when {
             }
         }
 
-        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && OperatingSystemShim.IsAndroidVersionAtLeast(32))
+        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && OperatingSystem.IsAndroidVersionAtLeast(32))
         {
             using var alarm = this.platform.GetSystemService<AlarmManager>(Context.AlarmService);
             if (!alarm.CanScheduleExactAlarms())
