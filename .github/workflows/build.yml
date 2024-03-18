@@ -39,6 +39,10 @@ jobs:
     - name: Add .NET Workloads
       run: dotnet workload install maui
 
+    - name: Setup Nerdbank GitVersioning
+      uses: dotnet/nbgv@master
+      id: nbgv
+
     - name: Build
       run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true
 
@@ -59,28 +63,23 @@ jobs:
       if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGETAPIKEY }} --skip-duplicate
 
-    - name: Install NerdBank.GitVersioning CLI
-      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
-      run: dotnet tool install -g nbgv
-
-    - name: Get Nuget Version from Nerdbank
-      run: nbgv get-version
-
-    #https://shinylib.net/release-notes/mobile/
-    #this.GitVersioningGetVersion().NuGetPackageVersion - Nerdbank versioning in cake
-    - name: Announce to Mastodon
-      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
-      uses: cbrgm/mastodon-github-action@v2
-      with:
-        access-token: ${{ secrets.MASTODON_ACCESS_TOKEN }} # access token
-        url: ${{ secrets.MASTODON_URL }}
-        message: "Hello from GitHub Actions!"
+    - name: Test Release Annoucement
+      run: echo "Shiny ${{ steps.nbgv.outputs.NuGetPackageVersion }} released! Check out the latest info at https://shinylib.net/release-notes/client/"
 
     - name: 'Announce to X/Twitter'
-      uses: ethomson/send-tweet-action@v1
+      uses: nearform-actions/github-action-notify-twitter@master
+      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
       with:
-        status: "Hi, this is a test!"
-        consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
-        consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
-        access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-        access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        message: Shiny ${{ steps.nbgv.outputs.NuGetPackageVersion }} released! Check out the latest info at https://shinylib.net/release-notes/client/
+        twitter-app-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+        twitter-app-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
+        twitter-access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        twitter-access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+
+    - name: Announce to Mastodon
+      uses: cbrgm/mastodon-github-action@v2
+      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
+      with:
+        access-token: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+        url: ${{ secrets.MASTODON_URL }}
+        message: "Shiny ${{ steps.nbgv.outputs.NuGetPackageVersion }} released! Check out the latest info at https://shinylib.net/release-notes/client/"
