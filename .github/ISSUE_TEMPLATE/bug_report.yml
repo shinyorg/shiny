@@ -38,7 +38,6 @@ body:
       - label: iOS (13+ supported)
       - label: Mac Catalyst
       - label: Android (8+ supported)
-      - label: Windows (.NET 7 Target - only Core is currently supported, BLE is coming)
   - type: textarea
     validations:
       required: true

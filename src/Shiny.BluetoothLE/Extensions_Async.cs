@@ -39,41 +39,73 @@ public static class AsyncExtensions
         .Take(1)
         .ToTask(cancellationToken);
 
+    /// <summary>
+    /// Get all services for a peripheral
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
     public static Task<IReadOnlyList<BleServiceInfo>> GetServicesAsync(this IPeripheral peripheral, CancellationToken cancelToken = default)
         => peripheral
             .GetServices()
             .ToTask(cancelToken);
 
+    /// <summary>
+    /// Get a specific service from a peripheral
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="serviceUuid"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
     public static Task<BleServiceInfo> GetServiceAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken cancelToken = default)
         => peripheral
             .GetService(serviceUuid)
             .ToTask(cancelToken);    
 
-    public static Task<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristicsAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken cancelToken = default, TimeSpan? timeout = null)
-        => peripheral
-            .GetAllCharacteristics()
-            .Timeout(timeout ?? TimeSpan.FromSeconds(10))
-            .ToTask(cancelToken);
-
-    
-    public static Task<BleCharacteristicInfo> GetCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
-        => peripheral
-            .GetCharacteristic(serviceUuid, characteristicUuid)
-            .ToTask(cancelToken);
-    
-    
+    /// <summary>
+    /// Get all characteristics across all services on a peripheral
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="cancelToken"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
     public static Task<IReadOnlyList<BleCharacteristicInfo>> GetAllCharacteristicsAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
             .GetAllCharacteristics()
             .Timeout(timeout ?? TimeSpan.FromSeconds(10))
             .ToTask(cancelToken);
 
+    /// <summary>
+    /// Get all characteristics for a specific service on a peripheral
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="serviceUuid"></param>
+    /// <param name="cancelToken"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    public static Task<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristicsAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken cancelToken = default, TimeSpan? timeout = null)
+        => peripheral
+            .GetCharacteristics(serviceUuid)
+            .Timeout(timeout ?? TimeSpan.FromSeconds(10))
+            .ToTask(cancelToken);
+
+    /// <summary>
+    /// Get a specific characteristic under a specific service on a peripheral
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    public static Task<BleCharacteristicInfo> GetCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
+        => peripheral
+            .GetCharacteristic(serviceUuid, characteristicUuid)
+            .ToTask(cancelToken);
     
     public static Task<IReadOnlyList<BleDescriptorInfo>> GetDescriptorsAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
         => peripheral
             .GetDescriptors(serviceUuid, characteristicUuid)
             .ToTask(cancelToken);
-
     
     public static Task<BleCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => peripheral
@@ -81,13 +113,11 @@ public static class AsyncExtensions
             .Timeout(TimeSpan.FromMilliseconds(timeoutMs))
             .ToTask(cancelToken);
 
-
     public static Task<BleCharacteristicResult> ReadCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => peripheral
             .ReadCharacteristic(serviceUuid, characteristicUuid)
             .Timeout(TimeSpan.FromMilliseconds(timeoutMs))
             .ToTask(cancelToken);
-
 
     public static Task<BleDescriptorResult> ReadDescriptorAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, string descriptorUuid, CancellationToken cancelToken = default, int timeoutMs = 3000)
         => peripheral

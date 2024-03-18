@@ -22,11 +22,17 @@ public interface IPushDelegate
 
 
     /// <summary>
-    /// This is called ONLY when the token changes, not during RequestAccess
+    /// This is called when the token changes
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    Task OnTokenRefreshed(string token);
+    Task OnNewToken(string token);
+
+    /// <summary>
+    /// This is fired when the user either denies permission (on a new app session) or IPushManager.UnRegister is called
+    /// </summary>
+    /// <returns></returns>
+    Task OnUnRegistered(string token);
 }
 
 
@@ -34,5 +40,6 @@ public class PushDelegate : IPushDelegate
 {
     public virtual Task OnEntry(PushNotification notification) => Task.CompletedTask;
     public virtual Task OnReceived(PushNotification notification) => Task.CompletedTask;
-    public virtual Task OnTokenRefreshed(string token) => Task.CompletedTask;
+    public virtual Task OnNewToken(string token) => Task.CompletedTask;
+    public virtual Task OnUnRegistered(string token) => Task.CompletedTask;
 }

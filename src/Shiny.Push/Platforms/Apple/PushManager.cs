@@ -56,7 +56,7 @@ public class PushManager : NotifyPropertyChanged,
 
 
     string? nativeToken;
-    public string? NativeToken
+    public string? NativeRegistrationToken
     {
         get => this.nativeToken;
         set => this.Set(ref this.nativeToken, value);
@@ -93,6 +93,7 @@ public class PushManager : NotifyPropertyChanged,
                 }
                 else if (x.Result.Status != AccessState.Available)
                 {
+                    // TODO: unregister delegate
                     this.logger.LogInformation("User has removed push notification access - " + x.Result.Status);
                 }
                 else
@@ -119,20 +120,17 @@ public class PushManager : NotifyPropertyChanged,
         if (this.provider != null)
             regToken = await this.provider.Register(deviceToken);
 
-        // if original regtoken was not null (we had registered) and new reg token (provider or native) doesn't
-        // match, we fire the token refresh delegate method
-        if (this.RegistrationToken != null && this.RegistrationToken != regToken)
+        if (regToken != null && this.RegistrationToken != regToken)
         {
-            // TODO: do we want to fire this here, the user may call this and store from the result anyhow
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnTokenRefreshed(regToken),
+                    x => x.OnNewToken(regToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
         }
 
-        this.NativeToken = nativeToken;
+        this.NativeRegistrationToken = nativeToken;
         this.RegistrationToken = regToken;
 
         return new PushAccessState(AccessState.Available, this.RegistrationToken);
@@ -146,11 +144,24 @@ public class PushManager : NotifyPropertyChanged,
     public async Task UnRegister()
     {
         await this.platform
-            .InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications)
+            .InvokeOnMainThreadAsync(UIApplication
+                .SharedApplication
+                .UnregisterForRemoteNotifications
+            )
             .ConfigureAwait(false);
 
         if (this.provider != null)
             await this.provider.UnRegister().ConfigureAwait(false);
+
+        await this.services
+            .RunDelegates<IPushDelegate>(
+                x => x.OnUnRegistered(this.RegistrationToken!),
+                this.logger
+            )
+            .ConfigureAwait(false);
+
+        this.NativeRegistrationToken = null;
+        this.RegistrationToken = null;
     }
 
 

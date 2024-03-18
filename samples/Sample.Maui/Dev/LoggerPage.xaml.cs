@@ -4,6 +4,6 @@ public partial class LoggerPage : ContentPage
 {
     public LoggerPage()
     {
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }

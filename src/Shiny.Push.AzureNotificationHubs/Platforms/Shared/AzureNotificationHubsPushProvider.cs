@@ -160,7 +160,7 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
 #if APPLE
             Platform = NotificationPlatform.Apns
 #elif ANDROID
-            Platform = NotificationPlatform.Fcm
+            Platform = NotificationPlatform.FcmV1
 #endif
         };
     }

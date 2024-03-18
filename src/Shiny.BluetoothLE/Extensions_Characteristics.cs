@@ -6,14 +6,12 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE;
 
 
 public static class CharacteristicExtensions
-{   
+{
     /// <summary>
     /// Requests all services and characteristics from a peripheral.  Should only be used for niche cases or debugging.
     /// </summary>
@@ -23,7 +21,7 @@ public static class CharacteristicExtensions
         => peripheral
             .GetServices()
             .SelectMany(x => x.Select(y => peripheral.GetCharacteristics(y.Uuid)))
-            .Switch()
+            .Concat()
             .ToArray()
             .Select(results =>
             {
@@ -206,37 +204,37 @@ public static class CharacteristicExtensions
                     {
                         case "2a23":
                         case "00002a23-0000-1000-8000-00805f9b34fb":
-                            dev.SystemId = Encoding.UTF8.GetString(item.Data);
+                            dev = dev with { SystemId = Encoding.UTF8.GetString(item.Data) };
                             break;
 
                         case "2a24":
                         case "00002a24-0000-1000-8000-00805f9b34fb":
-                            dev.ModelNumber = Encoding.UTF8.GetString(item.Data);
+                            dev = dev with { ModelNumber = Encoding.UTF8.GetString(item.Data) };
                             break;
 
                         case "2a25":
                         case "00002a25-0000-1000-8000-00805f9b34fb":
-                            dev.SerialNumber = Encoding.UTF8.GetString(item.Data);
+                            dev = dev with { SerialNumber = Encoding.UTF8.GetString(item.Data) };
                             break;
 
                         case "2a26":
                         case "00002a26-0000-1000-8000-00805f9b34fb":
-                            dev.FirmwareRevision = Encoding.UTF8.GetString(item.Data);
+                            dev = dev with { FirmwareRevision = Encoding.UTF8.GetString(item.Data) };
                             break;
 
                         case "2a27":
                         case "00002a27-0000-1000-8000-00805f9b34fb":
-                            dev.HardwareRevision = Encoding.UTF8.GetString(item.Data);
+                            dev = dev with { HardwareRevision = Encoding.UTF8.GetString(item.Data) };
                             break;
 
                         case "2a28":
                         case "00002a28-0000-1000-8000-00805f9b34fb":
-                            dev.SoftwareRevision = Encoding.UTF8.GetString(item.Data);
+                            dev = dev with { SoftwareRevision = Encoding.UTF8.GetString(item.Data) };
                             break;
 
                         case "2a29":
                         case "00002a29-0000-1000-8000-00805f9b34fb":
-                            dev.ManufacturerName = Encoding.UTF8.GetString(item.Data);
+                            dev = dev with { ManufacturerName = Encoding.UTF8.GetString(item.Data) };
                             break;
                     }
                 }
@@ -274,13 +272,13 @@ public record BleWriteSegment(
 );
 
 
-public class DeviceInfo
-{
-    public string? SystemId { get; set; }
-    public string? ManufacturerName { get; set; }
-    public string? ModelNumber { get; set; }
-    public string? SerialNumber { get; set; }
-    public string? FirmwareRevision { get; set; }
-    public string? HardwareRevision { get; set; }
-    public string? SoftwareRevision { get; set; }
-}
+public record DeviceInfo
+(
+    string? SystemId = null,
+    string? ManufacturerName = null,
+    string? ModelNumber = null,
+    string? SerialNumber = null,
+    string? FirmwareRevision = null,
+    string? HardwareRevision = null,
+    string? SoftwareRevision = null
+);

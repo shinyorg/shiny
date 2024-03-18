@@ -35,7 +35,7 @@ internal static partial class Log
 
     [LoggerMessage(
         EventId = 4,
-        Level = LogLevel.Warning,
+        Level = LogLevel.Information,
         Message = "[Native Method - {methodName}] Service: {serviceUuid} - Characteristic: {characteristicUuid} - Status: {status}"
     )]
     public static partial void CharacteristicEvent(this ILogger logger, UUID? serviceUuid, UUID? characteristicUuid, GattStatus? status, [CallerMemberName] string? methodName = null);

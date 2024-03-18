@@ -34,21 +34,17 @@ public static class NotificationExtensions
         if (notification.RepeatInterval != null)
             request |= AccessRequestFlags.TimeSensitivity;
 
-        if (notification.ScheduleDate != null)
-        {
-            var channelId = notification.Channel ?? Channel.Default.Identifier;
-            var channel = notificationManager.GetChannel(channelId)!;
-
-            if (channel!.Importance == ChannelImportance.High)
-                request |= AccessRequestFlags.TimeSensitivity;
-        }
+        if (notification.ScheduleDate != null || notification.RepeatInterval != null)
+            request |= AccessRequestFlags.TimeSensitivity;
 
         if (notification.Geofence != null)
             request |= AccessRequestFlags.LocationAware;
 
-        return await notificationManager
+        var result = await notificationManager
             .RequestAccess(request)
             .ConfigureAwait(false);
+
+        return result;
     }
 
 

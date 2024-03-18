@@ -48,7 +48,7 @@ public static class ServiceProviderExtensions
     /// <param name="implementationType"></param>
     /// <returns></returns>
     public static bool HasImplementation(this IServiceCollection services, Type implementationType)
-        => services.Any(x => x.ImplementationType == implementationType);
+        => services.Any(x => x.ServiceKey == null && x.ImplementationType == implementationType);
 
 
     /// <summary>

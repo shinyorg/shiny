@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
 using Foundation;
-using Microsoft.Extensions.Logging;
 
 namespace Shiny.Push;
 
@@ -15,9 +14,7 @@ public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushT
     readonly FirebaseConfiguration config;
 
 
-    public FirebasePushProvider(
-        FirebaseConfiguration config
-    )
+    public FirebasePushProvider(FirebaseConfiguration config)
     {
         this.config = config;
     }
@@ -57,7 +54,10 @@ public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushT
         var tags = this.RegisteredTags?.ToList() ?? new List<string>(1);
         tags.Add(tag);
 
-        await Messaging.SharedInstance.SubscribeAsync(tag);
+        await Messaging
+            .SharedInstance
+            .SubscribeAsync(tag)
+            .ConfigureAwait(false);
         this.RegisteredTags = tags.ToArray();
     }
 

@@ -18,6 +18,12 @@ public interface IPushManager
     string? RegistrationToken { get; }
 
     /// <summary>
+    /// This is from the OS and does not necessarily represent the registration token with
+    /// your push provider.  You should use RegistrationToken for everything else - this is for debugging
+    /// </summary>
+    string? NativeRegistrationToken { get; }
+
+    /// <summary>
     /// Requests platform permission to send push notifications
     /// </summary>
     /// <param name="cancelToken"></param>

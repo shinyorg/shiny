@@ -1,0 +1,7 @@
+﻿<Project>
+    <ItemGroup>
+        <CompilerVisibleProperty Include="OutputType" />
+        <CompilerVisibleProperty Include="TargetFrameworkIdentifier" />
+        <CompilerVisibleProperty Include="RootNamespace" />
+    </ItemGroup>
+</Project>

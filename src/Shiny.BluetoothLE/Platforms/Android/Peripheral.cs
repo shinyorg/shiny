@@ -148,6 +148,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     public override void OnConnectionStateChange(BluetoothGatt? gatt, GattStatus status, ProfileState newState)
     {
+        // the BleDelegate is fired by the BleManager.Start under ShinyBleBroadcastReceiver
         this.logger.ConnectionStateChange(status, newState);
 
         if (newState == ProfileState.Disconnected)
