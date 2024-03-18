@@ -122,9 +122,8 @@ public class PushManager : NotifyPropertyChanged,
         var nativeToken = await this.RequestNativeToken();
         var regToken = await this.provider.Register(nativeToken); // never null on firebase
 
-        if (this.RegistrationToken != null && this.RegistrationToken != regToken)
+        if (regToken != null && this.RegistrationToken != regToken)
         {
-            // TODO: do we want to fire this here, the user may call this and store from the result anyhow
             await this.services
                 .RunDelegates<IPushDelegate>(
                     x => x.OnNewToken(regToken),
@@ -267,6 +266,7 @@ public class PushManager : NotifyPropertyChanged,
 
         this.initialized = true;
     }
+
 
     bool IsFirebaseAappAlreadyInitialized()
     {

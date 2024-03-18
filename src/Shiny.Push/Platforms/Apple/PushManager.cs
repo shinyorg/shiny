@@ -120,11 +120,8 @@ public class PushManager : NotifyPropertyChanged,
         if (this.provider != null)
             regToken = await this.provider.Register(deviceToken);
 
-        // if original regtoken was not null (we had registered) and new reg token (provider or native) doesn't
-        // match, we fire the token refresh delegate method
-        if (this.RegistrationToken != null && this.RegistrationToken != regToken)
+        if (regToken != null && this.RegistrationToken != regToken)
         {
-            // TODO: do we want to fire this here, the user may call this and store from the result anyhow
             await this.services
                 .RunDelegates<IPushDelegate>(
                     x => x.OnNewToken(regToken),
@@ -147,7 +144,10 @@ public class PushManager : NotifyPropertyChanged,
     public async Task UnRegister()
     {
         await this.platform
-            .InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications)
+            .InvokeOnMainThreadAsync(UIApplication
+                .SharedApplication
+                .UnregisterForRemoteNotifications
+            )
             .ConfigureAwait(false);
 
         if (this.provider != null)
