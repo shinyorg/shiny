@@ -36,7 +36,15 @@ This is a testing platform not meant for general consumption.  Don't expect much
 * Start Unit Test Project & Run BLE Tests
 
 ## Setup HTTP Transfer Tests
-* IN command line - run "ngrok http https://localhost:7133"
-* In Shiny.Tests, go to appsettings.json and update HttpTestsUrl to the ngrok url
+First get a public URL for your locally running project that you can use for testing.
+
+Install Tunnelmole (an open source tunneling solution) with one of these options:
+- NPM: `npm install -g tunnelmole`
+- Linux: `curl -s https://tunnelmole.com/sh/install-linux.sh | sudo bash`
+- Mac: `curl -s https://tunnelmole.com/sh/install-mac.sh --output install-mac.sh && sudo bash install-mac.sh`
+- Windows: Install with NPM, or if you don't have NodeJS installed download the `exe` file for Windows [here](https://tunnelmole.com/downloads/tmole.exe) and put it somewhere in your PATH.
+* Alternatively, to use ngrok (a popular closed source tunneling solution) first [download the binary for your platform](https://ngrok.com/download) then run "ngrok http https://localhost:7133"
+
+* In Shiny.Tests, go to appsettings.json and update HttpTestsUrl to the tunnelmole or ngrok url
 * Setup launch targets for the Samples.Api and the Shiny.Tests project
 * Run HTTP Tests
