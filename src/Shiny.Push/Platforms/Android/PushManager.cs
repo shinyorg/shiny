@@ -28,7 +28,7 @@ public class PushManager : NotifyPropertyChanged,
     readonly FirebaseConfig config;
     readonly ILogger logger;
     readonly IPushProvider provider;
-
+    bool registrationRequest = false;
 
     public PushManager(
         AndroidPlatform platform,
@@ -109,39 +109,58 @@ public class PushManager : NotifyPropertyChanged,
 
     public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        this.registrationRequest = true;
+        try
         {
-            var access = await this.platform
-                .RequestAccess(Manifest.Permission.PostNotifications)
-                .ToTask(cancelToken);
+            // TODO: verify google signed in
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                var access = await this.platform
+                    .RequestAccess(Manifest.Permission.PostNotifications)
+                    .ToTask(cancelToken);
 
-            if (access != AccessState.Available)
-                return PushAccessState.Denied;
+                if (access != AccessState.Available)
+                    return PushAccessState.Denied;
+            }
+
+            var nativeToken = await this.RequestNativeToken();
+            var regToken = await this.provider.Register(nativeToken); // never null on firebase
+
+            if (regToken != null && this.RegistrationToken != regToken)
+            {
+                await this.services
+                    .RunDelegates<IPushDelegate>(
+                        x => x.OnNewToken(regToken),
+                        this.logger
+                    )
+                    .ConfigureAwait(false);
+            }
+            this.NativeRegistrationToken = nativeToken;
+            this.RegistrationToken = regToken;
+
+            return new PushAccessState(AccessState.Available, this.RegistrationToken);
         }
-
-        var nativeToken = await this.RequestNativeToken();
-        var regToken = await this.provider.Register(nativeToken); // never null on firebase
-
-        if (regToken != null && this.RegistrationToken != regToken)
+        finally
         {
-            await this.services
-                .RunDelegates<IPushDelegate>(
-                    x => x.OnNewToken(regToken),
-                    this.logger
-                )
-                .ConfigureAwait(false);
+            this.registrationRequest = false;
         }
-        this.NativeRegistrationToken = nativeToken;
-        this.RegistrationToken = regToken;
-
-        return new PushAccessState(AccessState.Available, this.RegistrationToken);
     }
 
 
     public async Task UnRegister()
     {
-        await this.provider.UnRegister().ConfigureAwait(false);
-        await FirebaseMessaging.Instance.DeleteToken().AsAsync().ConfigureAwait(false);
+        if (this.RegistrationToken == null)
+            return;
+
+        await this.provider
+            .UnRegister()
+            .ConfigureAwait(false);
+
+        await FirebaseMessaging
+            .Instance
+            .DeleteToken()
+            .AsAsync()
+            .ConfigureAwait(false);
 
         await this.services
             .RunDelegates<IPushDelegate>(
@@ -183,7 +202,9 @@ public class PushManager : NotifyPropertyChanged,
                 x => x.OnEntry(data),
                 this.logger
             )
-            .ContinueWith(x => this.logger.LogInformation("Finished executing push delegates"));
+            .ContinueWith(x =>
+                this.logger.LogInformation("Finished executing push delegates")
+            );
     }
 
 
@@ -223,11 +244,16 @@ public class PushManager : NotifyPropertyChanged,
                 FirebaseApp.InitializeApp(this.platform.AppContext, options);
             }
         }
+
         ShinyFirebaseService.NewToken = async token =>
         {
+            if (this.NativeRegistrationToken == token || this.registrationRequest)
+                return;
+
+            var regToken = await this.provider.Register(token);
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnNewToken(token),
+                    x => x.OnNewToken(regToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
