@@ -250,7 +250,8 @@ public class PushManager : NotifyPropertyChanged,
             if (this.NativeRegistrationToken == token || this.registrationRequest)
                 return;
 
-            var regToken = await this.provider.Register(token);
+            this.NativeRegistrationToken = token;
+            this.RegistrationToken = await this.provider.Register(token);
             await this.services
                 .RunDelegates<IPushDelegate>(
                     x => x.OnNewToken(regToken),
