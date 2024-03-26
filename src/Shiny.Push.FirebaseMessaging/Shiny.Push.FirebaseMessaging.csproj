@@ -4,6 +4,12 @@
         <Description>Shiny Push Integration - Google Firebase Cloud Messaging</Description>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+    </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
     </ItemGroup>
