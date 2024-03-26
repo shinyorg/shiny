@@ -49,9 +49,6 @@
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>34.0</TargetPlatformMinVersion>
         <IsAndroidBuild>true</IsAndroidBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
         <DefineConstants>$(DefineConstants);ANDROID;PLATFORM</DefineConstants>
