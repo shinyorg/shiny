@@ -23,7 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1
 	ProjectSection(SolutionItems) = preProject
 		src\Directory.build.props = src\Directory.build.props
 		src\Directory.build.targets = src\Directory.build.targets
-		src\global.json = src\global.json
 		src\nuget.png = src\nuget.png
 		src\nuget.txt = src\nuget.txt
 		version.json = version.json
