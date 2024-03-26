@@ -254,7 +254,7 @@ public class PushManager : NotifyPropertyChanged,
             this.RegistrationToken = await this.provider.Register(token);
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnNewToken(regToken),
+                    x => x.OnNewToken(this.RegistrationToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
