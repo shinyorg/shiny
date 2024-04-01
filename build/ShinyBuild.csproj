@@ -12,7 +12,7 @@
         <PackageReference Include="Cake.Frosting" Version="4.0.0" />
         <PackageReference Include="Cake.Git" Version="3.0.0" />
         <PackageReference Include="Cake.GitVersioning" Version="3.6.133" />
-        <PackageReference Include="LibGit2Sharp" Version="0.29.0" />
+        <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
         <PackageReference Include="TweetinviAPI" Version="5.0.4" />
         <PackageReference Include="Discord.Net" Version="3.13.0" />
         <PackageReference Include="Mastonet" Version="2.3.1" />
