@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Cake.Frosting" Version="4.0.0" />
-        <PackageReference Include="Cake.Git" Version="3.0.0" />
+        <PackageReference Include="Cake.Git" Version="4.0.0" />
         <PackageReference Include="Cake.GitVersioning" Version="3.6.133" />
         <PackageReference Include="LibGit2Sharp" Version="0.29.0" />
         <PackageReference Include="TweetinviAPI" Version="5.0.4" />
