@@ -15,27 +15,18 @@ public interface IOperationQueue
 }
 
 
-public class SemaphoreOperationQueue : IOperationQueue
+public class SemaphoreOperationQueue(ILogger<SemaphoreOperationQueue> logger) : IOperationQueue
 {
-    readonly ILogger logger;
-
-
-    public SemaphoreOperationQueue(ILogger<SemaphoreOperationQueue> logger)
-    {
-        this.logger = logger;
-    }
-
-
     readonly SemaphoreSlim semaphore = new(1);
 
     public async Task Queue(Func<Task> task, CancellationToken cancellationToken, [CallerMemberName] string? caller = null)
     {
-        if (this.logger.IsEnabled(LogLevel.Debug))        
-            this.logger.LogDebug($"[{caller}] awaiting at BLE operation lock");
+        if (logger.IsEnabled(LogLevel.Debug))        
+            logger.LogDebug($"[{caller}] awaiting at BLE operation lock");
         
         await this.semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-        if (this.logger.IsEnabled(LogLevel.Debug))
-            this.logger.LogDebug($"[{caller}] past BLE operation lock");
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug($"[{caller}] past BLE operation lock");
 
         try
         {
@@ -44,8 +35,8 @@ public class SemaphoreOperationQueue : IOperationQueue
         finally
         {
             this.semaphore.Release();
-            if (this.logger.IsEnabled(LogLevel.Debug))
-                this.logger.LogDebug($"[{caller}] release BLE operation lock");
+            if (logger.IsEnabled(LogLevel.Debug))
+                logger.LogDebug($"[{caller}] release BLE operation lock");
         }
     }
 }

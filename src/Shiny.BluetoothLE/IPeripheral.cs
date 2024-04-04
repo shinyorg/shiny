@@ -77,13 +77,33 @@ public interface IPeripheral
     IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid);
     
     /// <summary>
-    /// Connects to a characteristic if not already subscribed, it will also attempt to auto-reconnect if you keep the observable hooked
+    /// Enable a characteristic notification
     /// </summary>
-    /// <param name="serviceUuid">The service UUID</param>
-    /// <param name="characteristicUuid">The characteristic UUID</param>
-    /// <param name="useIndicationsIfAvailable">Uses indications (acks) if available, otherwise uses standard notify</param>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <param name="useIndictationIfAvailable"></param>
     /// <returns></returns>
-    IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true);
+    IObservable<Unit> EnableCharacteristicNotification(string serviceUuid, string characteristicUuid, bool useIndictationIfAvailable = true);
+
+    /// <summary>
+    /// Disables a characteristic notification
+    /// </summary>
+    /// <param name="serviceUuid"></param>
+    /// <param name="characteristicUuid"></param>
+    /// <returns></returns>
+    IObservable<Unit> DisableCharacteristicNotification(string serviceUuid, string characteristicUuid);
+
+    /// <summary>
+    /// Gets the current list of subscribed characteristics
+    /// </summary>
+    /// <returns></returns>
+    //IReadOnlyList<(string ServiceUuid, string CharacteristicUuid)> GetSubscribedCharacteristics();
+
+    /// <summary>
+    /// Listen to notification/indication events - must call EnableCharacteristicNotification first
+    /// </summary>
+    /// <returns></returns>
+    IObservable<BleCharacteristicResult> WhenNotificationReceived();
 
     /// <summary>
     /// Watch a specific characteristic for subscription changes
