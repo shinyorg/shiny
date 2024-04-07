@@ -174,11 +174,12 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    public void ActivityOnCreate(Activity activity, Bundle? savedInstanceState) => this.Handle(activity, activity.Intent);
+    public void ActivityOnCreate(Activity activity, Bundle? savedInstanceState)
+        => this.Handle(activity, activity.Intent);
 
-    public void Handle(Activity activity, Intent intent)
+    public void Handle(Activity activity, Intent? intent)
     {
-        var intentAction = this.config.IntentAction; //?? ShinyPushIntents.NotificationClickAction;
+        var intentAction = this.config.IntentAction ?? ShinyPushIntents.NotificationClickAction;
         var clickAction = intent?.Action?.Equals(intentAction, StringComparison.InvariantCultureIgnoreCase) ?? false;
         if (!clickAction)
             return;
