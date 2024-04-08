@@ -16,6 +16,7 @@ public record FirebaseConfiguration(
     string? SenderId = null,
     string? ProjectId = null,
     string? ApiKey = null
+
 #if ANDROID
     , NotificationChannel? DefaultChannel = null
     , string? IntentAction = null
@@ -23,7 +24,6 @@ public record FirebaseConfiguration(
 )
 {
     public static FirebaseConfiguration Embedded { get; } = new(true);
-
 
     public void AssertValid()
     {

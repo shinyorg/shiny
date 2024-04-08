@@ -209,7 +209,9 @@ public class PushManager : NotifyPropertyChanged,
 
                 this.platform.InvokeOnMainThread(() =>
                     completionHandler.Invoke(
-                        options ?? UNNotificationPresentationOptions.List | UNNotificationPresentationOptions.Banner
+                        options ??
+                        UNNotificationPresentationOptions.List |
+                        UNNotificationPresentationOptions.Banner
                     )
                 );
             }

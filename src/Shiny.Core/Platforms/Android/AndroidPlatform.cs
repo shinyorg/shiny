@@ -165,6 +165,14 @@ public partial class AndroidPlatform : IPlatform,
     //    return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
     //}
 
+    public int GetDrawableByName(string name) => this
+        .AppContext
+        .Resources!
+        .GetIdentifier(
+            name,
+            "drawable",
+            this.AppContext.PackageName
+        );
 
     public IObservable<AccessState> RequestAccess(string androidPermissions)
         => this.RequestPermissions(new[] { androidPermissions }).Select(x => x.IsSuccess() ? AccessState.Available : AccessState.Denied);
