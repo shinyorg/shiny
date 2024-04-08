@@ -80,7 +80,7 @@ public class PushManager : NotifyPropertyChanged,
         if (this.config.DefaultChannel == null)
             return;
 
-        var nativeManager = this.platform.GetSystemService<NotificationManager>(Context.NotificationService);
+        using var nativeManager = this.platform.GetSystemService<NotificationManager>(Context.NotificationService);
         var channel = nativeManager.GetNotificationChannel(this.config.DefaultChannel.Id);
         if (channel != null)
             nativeManager.DeleteNotificationChannel(channel.Id);
@@ -174,11 +174,12 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
-    public void ActivityOnCreate(Activity activity, Bundle? savedInstanceState) => this.Handle(activity, activity.Intent);
+    public void ActivityOnCreate(Activity activity, Bundle? savedInstanceState)
+        => this.Handle(activity, activity.Intent);
 
-    public void Handle(Activity activity, Intent intent)
+    public void Handle(Activity activity, Intent? intent)
     {
-        var intentAction = this.config.IntentAction; //?? ShinyPushIntents.NotificationClickAction;
+        var intentAction = this.config.IntentAction ?? ShinyPushIntents.NotificationClickAction;
         var clickAction = intent?.Action?.Equals(intentAction, StringComparison.InvariantCultureIgnoreCase) ?? false;
         if (!clickAction)
             return;
@@ -250,10 +251,12 @@ public class PushManager : NotifyPropertyChanged,
             if (this.NativeRegistrationToken == token || this.registrationRequest)
                 return;
 
-            var regToken = await this.provider.Register(token);
+            this.NativeRegistrationToken = token;
+            this.RegistrationToken = await this.provider.Register(token);
+            
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnNewToken(regToken),
+                    x => x.OnNewToken(this.RegistrationToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
@@ -268,15 +271,17 @@ public class PushManager : NotifyPropertyChanged,
 
                 if (native != null)
                 {
-                    //native.ChannelId
-                    //native.ImageUrl
                     notification = new Notification(
                         native.Title,
                         native.Body
                     );
-                    //this.TryTriggerNotification(msg);
                 }
-                var push = new PushNotification(msg.Data, notification);
+                var push = new AndroidPushNotification(
+                    notification,
+                    msg,
+                    this.config,
+                    this.platform
+                );
                 await this.services
                     .RunDelegates<IPushDelegate>(
                         x => x.OnReceived(push),
@@ -309,56 +314,4 @@ public class PushManager : NotifyPropertyChanged,
 
         return isAppInitialized;
     }
-
-
-    //    protected virtual void TryTriggerNotification(RemoteMessage message)
-    //    {
-    //        try
-    //        {
-    //            var notification = message.GetNotification();
-    //            var intent = new Intent(notification.ClickAction ?? ShinyIntents.NotificationClickAction);
-
-    //            if (message.Data != null)
-    //            {
-    //                foreach (var data in message.Data)
-    //                    intent.PutExtra(data.Key, data.Value);
-    //            }
-
-    //            var pendingIntent = PendingIntent.GetActivity(this.platform.AppContext, 99, intent, PendingIntentFlags.Mutable);
-
-    //            var builder = new NotificationCompat
-    //                .Builder(
-    //                    this.platform.AppContext,
-    //                    notification.ChannelId ?? Channel.Default.Identifier
-    //                )
-    //                .SetAutoCancel(true)
-    //                .SetSilent(false)
-    //                .SetSmallIcon(this.platform.GetSmallIconResource(notification.Icon))
-    //                .SetContentIntent(pendingIntent)
-    //                .SetContentTitle(notification.Title);
-
-    //            if (!notification.Ticker.IsEmpty())
-    //                builder.SetTicker(notification.Ticker);
-
-    //            if (!notification.Body.IsEmpty())
-    //                builder.SetContentText(notification.Body);
-
-    //            ///this.platform.TrySetImage(notification.ImageUrl, builder);
-
-    //            if (!notification.Color.IsEmpty())
-    //            {
-    //                var color = this.platform.GetColorResourceId(notification.Color);
-    //                builder.SetColor(color);
-    //            }
-
-    //            var notificationId = this.settings.IncrementValue("NotificationId");
-    //            this.platform
-    //                .GetSystemService<NotificationManager>(Context.NotificationService)
-    //                .Notify(notificationId, builder.Build());
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            this.logger.LogError("Error processing foreground remote notification", ex);
-    //        }
-    //    }
 }

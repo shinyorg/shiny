@@ -20,11 +20,14 @@ public static class ServiceCollectionExtensions
         }
         else
         {
-            services.AddPush(FirebaseConfig.FromValues(
+            services.AddPush(new FirebaseConfig(
+                false,
                 config.AppId,
                 config.SenderId,
                 config.ProjectId,
-                config.ApiKey
+                config.ApiKey,
+                config.DefaultChannel,
+                config.IntentAction
             ));
         }
 #endif

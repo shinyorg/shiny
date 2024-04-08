@@ -1,4 +1,7 @@
 ﻿using System;
+#if ANDROID
+using Android.App;
+#endif
 
 namespace Shiny.Push;
 
@@ -13,16 +16,14 @@ public record FirebaseConfiguration(
     string? SenderId = null,
     string? ProjectId = null,
     string? ApiKey = null
+
+#if ANDROID
+    , NotificationChannel? DefaultChannel = null
+    , string? IntentAction = null
+#endif
 )
 {
     public static FirebaseConfiguration Embedded { get; } = new(true);
-    public static FirebaseConfiguration FromValues(string apiId, string senderId, string projectId, string apiKey)
-    {
-        var cfg = new FirebaseConfiguration(false, apiId, senderId, projectId, apiKey);
-        cfg.AssertValid();
-        return cfg;
-    }
-
 
     public void AssertValid()
     {
