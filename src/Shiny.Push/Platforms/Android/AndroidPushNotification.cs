@@ -22,8 +22,10 @@ public record AndroidPushNotification(
 
         if (not != null)
         {
-            // TODO: config OR click_action
             var intent = new Intent(not.ClickAction ?? ShinyPushIntents.NotificationClickAction);
+            foreach (var item in this.NativeMessage.Data)
+                intent.PutExtra(item.Key, item.Value);
+
             var pendingIntent = PendingIntent.GetActivity(
                 this.Platform.AppContext,
                 99,
