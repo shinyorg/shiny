@@ -1,11 +1,9 @@
-﻿using Android.Bluetooth;
-
-namespace Shiny.BluetoothLE;
+﻿namespace Shiny.BluetoothLE;
 
 
 public record AndroidConnectionConfig(
     bool AutoConnect = true,
-    GattConnectionPriority ConnectionPriority = GattConnectionPriority.Balanced
+    Android.Bluetooth.GattConnectionPriority ConnectionPriority = Android.Bluetooth.GattConnectionPriority.Balanced
 ) : ConnectionConfig(
     AutoConnect
 );
