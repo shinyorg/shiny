@@ -1,0 +1,69 @@
+<Solution>
+    <Configurations>
+        <BuildType Name="Debug" />
+        <BuildType Name="Release" />
+    </Configurations>
+    <Folder Name="/Solution Items/">
+        <File Path=".editorconfig" />
+        <File Path="Build.slnf" />
+        <File Path=".github\workflows\build.yml" />
+        <File Path="LICENSE.md" />
+        <File Path="readme.md" />
+        <File Path="nuget.config" />
+    </Folder>
+    <Folder Name="/samples/">
+        <File Path="samples\readme.md" />
+        <File Path="samples\Directory.build.props" />
+        <Project Path="samples\Sample.Api\Sample.Api.csproj" />
+        <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
+        <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
+        <Project Path="tests\Shiny.SourceGenerators.Tests\Shiny.SourceGenerators.Tests.csproj" />
+        <Project Path="tests\Shiny.Tests\Shiny.Tests.csproj" />
+    </Folder>
+    <Folder Name="/libs/">
+        <File Path="src\Directory.build.props" />
+        <File Path="src\Directory.build.targets" />
+        <File Path="src\nuget.png" />
+        <File Path="src\nuget.txt" />
+        <File Path="version.json" />
+        <Project Path="src\Shiny.Beacons\Shiny.Beacons.csproj" />
+        <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
+        <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+        <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <Project Path="src\Shiny.Core\Shiny.Core.csproj" />
+        <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
+        <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
+        <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" />
+        <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" />
+        <Project Path="src\Shiny.Locations\Shiny.Locations.csproj" />
+        <Project Path="src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj />
+        <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+        <Project Path="src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
+        <Project Path="src\Shiny.Push\Shiny.Push.csproj" />
+        <Project Path="src\Shiny.SourceGenerators\Shiny.SourceGenerators.csproj" />
+        <Project Path="src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
+        <Project Path="src\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
+        <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
+    </Folder>
+    <Folder Name="/build/">
+        <File Path="Build.slnf" />
+        <File Path=".github\workflows\build.yml" />
+    </Folder>
+    <Folder Name="/.github/workflows/">
+        <File Path=".github\workflows\build.yml" />
+    </Folder>
+    <Folder Name="/.github/issue templates/">
+        <File Path=".github\ISSUE_TEMPLATE\bug_report.yml" />
+        <File Path=".github\ISSUE_TEMPLATE\config.yml" />
+        <File Path=".github\ISSUE_TEMPLATE\feature_request.yml" />
+    </Folder>
+    <Folder Name="/.github/">
+        <File Path=".github\CODE_OF_CONDUCT.md" />
+        <File Path=".github\CONTRIBUTING.md" />
+        <File Path=".github\dependabot.yml" />
+        <File Path=".github\FUNDING.yml" />
+        <File Path=".github\PULL_REQUEST_TEMPLATE.md" />
+    </Folder>
+</Solution>
