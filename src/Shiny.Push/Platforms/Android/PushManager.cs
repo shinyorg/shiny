@@ -113,7 +113,7 @@ public class PushManager : NotifyPropertyChanged,
         try
         {
             // TODO: verify google signed in
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
             {
                 var access = await this.platform
                     .RequestAccess(Manifest.Permission.PostNotifications)
