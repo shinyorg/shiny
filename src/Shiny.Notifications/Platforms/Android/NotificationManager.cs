@@ -139,7 +139,7 @@ when {
         var status = new NotificationAccessState(
             notificationStatus,
             this.geofenceManager.CurrentStatus,
-            alarm!.CanScheduleExactAlarms() ? AccessState.Available : AccessState.Denied
+            alarm!.CanScheduleExactAlarms() ? AccessState.Available : AccessState.Restricted
         );
         return Task.FromResult(status);
     }
@@ -221,8 +221,8 @@ when {
         var android = notification.TryToNative<AndroidNotification>();
 
         // TODO: should I cancel an existing id if the user is setting it?
-        if (notification.Id == 0)
-            notification.Id = this.settings.IncrementValue("NotificationId");
+        if (android.Id == 0)
+            android.Id = this.settings.IncrementValue("NotificationId");
 
         var channelId = notification.Channel ?? Channel.Default.Identifier;
         var channel = this.channelManager.Get(channelId);
@@ -234,18 +234,18 @@ when {
         if (notification.Geofence != null)
         {
             await this.geofenceManager.StartMonitoring(new GeofenceRegion(
-                AndroidNotificationProcessor.GetGeofenceId(notification),
-                notification.Geofence!.Center!,
-                notification.Geofence!.Radius!
+                AndroidNotificationProcessor.GetGeofenceId(android),
+                android.Geofence!.Center!,
+                android.Geofence!.Radius!
             ));
         }
         else if (notification.RepeatInterval != null)
         {
             // calc first date if repeating interval
-            notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
+            android.ScheduleDate = android.RepeatInterval!.CalculateNextAlarm();
         }
 
-        if (notification.ScheduleDate == null && notification.Geofence == null)
+        if (android.ScheduleDate == null && notification.Geofence == null)
         {
             var native = builder.Build();
             this.manager.NativeManager.Notify(notification.Id, native);
@@ -253,11 +253,11 @@ when {
         else
         {
             // ensure a channel is set
-            notification.Channel = channel!.Identifier;
-            this.repository.Set(notification);
+            android.Channel = android!.Identifier;
+            this.repository.Set(android);
 
             if (notification.ScheduleDate != null)
-                this.manager.SetAlarm(notification);
+                this.manager.SetAlarm(android);
         }
     }
 
