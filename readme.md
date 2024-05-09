@@ -1,12 +1,10 @@
-﻿# Shiny v3 for .NET
+﻿# Shiny v4 for .NET
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
 
 Shiny is a cross platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
 
 ## Supports
-* Xamarin iOS
-* Xamarin Android
 * .NET 8 for Android
 * .NET 8 for iOS
 * .NET 8 for MacCatalyst
@@ -30,7 +28,7 @@ things like dependency injection & logging in a structured way to your code!
 * [NuGets](https://www.nuget.org/profiles/ShinyLib)
 * Samples
     * [MAUI - Kitchen Sink](https://github.com/shinyorg/shiny/tree/master/samples/Sample.Maui)
-    * [Push](https://github.com/shinyorg/shiny/tree/master/samples/Sample.Push.Maui)
+    * [Push](https://github.com/shinyorg/pushtester)
     * [BLE Client & Hosting](https://github.com/aritchie/digitalscoreboard)
 
 
