@@ -21,6 +21,19 @@ public static class AsyncExtensions
             .ToTask(cancelToken);
 
 
+    public static Task DisconnectAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, TimeSpan? timeout = null)
+    {
+        var task = peripheral
+            .WhenDisconnected()
+            .Take(1)
+            .Timeout(timeout ?? TimeSpan.FromSeconds(10))
+            .ToTask(cancelToken);
+
+        peripheral.CancelConnection();
+        return task;
+    }
+    
+
     /// <summary>
     /// Waits for a characteristic subscription - if already hooked, it will return immediately
     /// </summary>
