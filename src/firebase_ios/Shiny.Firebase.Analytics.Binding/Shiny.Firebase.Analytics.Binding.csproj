@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <IsBindingProject>true</IsBindingProject>
+
+        <XcodeProject>$(MSBuildThisFileDirectory)../native/analytics/MauiFirebaseAnalytics.xcodeproj</XcodeProject>
+        <XcodeBuildXCFramework>true</XcodeBuildXCFramework>
+        <ObjSharpieBind>False</ObjSharpieBind>
+        <ObjSharpieBindNamespace>Firebase</ObjSharpieBindNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ObjcBindingApiDefinition Include="ApiDefinitions.cs" />
+        <NativeReference Include="../native/analytics/.build/MauiFirebaseAnalytics.xcframework">
+            <Kind>Framework</Kind>
+            <SmartLink>True</SmartLink>
+        </NativeReference>
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\Firebase-ios.targets" />
+</Project>

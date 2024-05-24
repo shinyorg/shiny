@@ -1,0 +1,84 @@
+<Project>
+
+	<PropertyGroup>
+		<XcodeDefaultBuildDir>.build</XcodeDefaultBuildDir>
+		<XcodeBuildDirName Condition=" '$(XcodeBuildDirName)' == '' ">$(XcodeDefaultBuildDir)</XcodeBuildDirName>
+
+		<_XcodeProjectFullPath>$([System.IO.Path]::GetFullPath($(XcodeProject)))</_XcodeProjectFullPath>
+
+		<XcodeScheme Condition=" '$(XcodeScheme)' == '' ">$([System.IO.Path]::GetFilenameWithoutExtension($(XcodeProject)))</XcodeScheme>
+
+		<XcodeProjectDir Condition=" '$(XcodeProjectDir)' == '' ">$([System.IO.Path]::GetDirectoryName($(_XcodeProjectFullPath)))</XcodeProjectDir>
+		<XcodeBuildDir Condition=" '$(XcodeBuildDir)' == '' ">$([System.IO.Path]::Combine($(XcodeProjectDir), $(XcodeBuildDirName)))</XcodeBuildDir>
+
+		<XcodeBuildXCFramework Condition=" '$(XcodeBuildXCFramework)' == '' ">True</XcodeBuildXCFramework>
+		
+		<XcodeBuildiOS Condition=" '$(XcodeBuildiOS)' == '' ">True</XcodeBuildiOS>
+		<XcodeBuildiOSSimulator Condition=" '$(XcodeBuildiOSSimulator)' == '' ">True</XcodeBuildiOSSimulator>
+		<XcodeBuildMacCatalyst Condition=" '$(XcodeBuildMacCatalyst)' == '' ">True</XcodeBuildMacCatalyst>
+
+		<_XcodeBuildDirFullPath>$([System.IO.Path]::GetFullPath($(XcodeBuildDir)))</_XcodeBuildDirFullPath>
+		<_XcodeProjectDirFullPath>$([System.IO.Path]::GetFullPath($(XcodeProjectDir)))</_XcodeProjectDirFullPath>
+
+		<_XcArchiveiOSFullPath>$([System.IO.Path]::Combine($(_XcodeBuildDirFullPath), $(XcodeScheme)-ios.xcarchive))</_XcArchiveiOSFullPath>
+		<_XcArchiveiOSSimulatorFullPath>$([System.IO.Path]::Combine($(_XcodeBuildDirFullPath), $(XcodeScheme)-iossimulator.xcarchive))</_XcArchiveiOSSimulatorFullPath>
+		<_XcArchiveMacCatalystFullPath>$([System.IO.Path]::Combine($(_XcodeBuildDirFullPath), $(XcodeScheme)-maccatalyst.xcarchive))</_XcArchiveMacCatalystFullPath>
+
+		<_XcFrameworkFullPath>$([System.IO.Path]::Combine($(_XcodeBuildDirFullPath), $(XcodeScheme).xcframework))</_XcFrameworkFullPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<_XcodeProjectInputs Include="$(_XcodeProjectDirFullPath)/**/*.swift" Exclude="$(_XcodeBuildDirFullPath)/**" />
+		<_XcodeProjectInputs Include="$(_XcodeProjectDirFullPath)/**/*.h" Exclude="$(_XcodeBuildDirFullPath)/**" />
+		<_XcodeProjectInputs Include="$(_XcodeProjectFullPath)/*.pbxproj" />
+		<_XcodeProjectInputs Include="$(_XcodeProjectFullPath)/*.xcworkspace" />
+	</ItemGroup>
+
+	<Target Condition=" '$(XcodeBuildXCFramework)' == 'true' " DependsOnTargets="$(BuildXCFrameworkDependsOnTargets)" BeforeTargets="ProcessFrameworkReferences" Name="BuildXCFramework" Inputs="@(_XcodeProjectInputs)" Outputs="$(_XcFrameworkFullPath)/Info.plist">
+		<Error Condition=" !Exists('$(_XcodeProjectFullPath)') " Text="Xcode project '$(_XcodeProjectFullPath)' not found." />
+
+		<Exec Condition=" '$(XcodeBuildiOS)' == 'True' " Command="xcodebuild -project $(_XcodeProjectFullPath) archive -scheme $(XcodeScheme) -configuration Release -archivePath $(_XcArchiveiOSFullPath) -destination 'generic/platform=iOS'  -derivedDataPath $(_XcodeBuildDirFullPath) -IDECustomBuildProductsPath='' -IDECustomBuildIntermediatesPath='' ENABLE_BITCODE=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES OTHER_SWIFT_FLAGS='-no-verify-emitted-module-interface' OBJC_CFLAGS='-fno-objc-msgsend-selector-stubs -ObjC'" />
+		<Exec Condition=" '$(XcodeBuildiOSSimulator)' == 'True' " Command="xcodebuild -project $(_XcodeProjectFullPath) archive -scheme $(XcodeScheme) -configuration Release -archivePath $(_XcArchiveiOSSimulatorFullPath) -destination 'generic/platform=iOS Simulator'  -derivedDataPath $(_XcodeBuildDirFullPath) -IDECustomBuildProductsPath='' -IDECustomBuildIntermediatesPath='' ENABLE_BITCODE=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES OTHER_SWIFT_FLAGS='-no-verify-emitted-module-interface' OBJC_CFLAGS='-fno-objc-msgsend-selector-stubs -ObjC'" />
+		<Exec Condition=" '$(XcodeBuildMacCatalyst)' == 'True' " Command="xcodebuild -project $(_XcodeProjectFullPath) archive -scheme $(XcodeScheme) -configuration Release -archivePath $(_XcArchiveMacCatalystFullPath) -destination 'generic/platform=macOS,variant=Mac Catalyst'  -derivedDataPath $(_XcodeBuildDirFullPath) -IDECustomBuildProductsPath='' -IDECustomBuildIntermediatesPath='' ENABLE_BITCODE=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES OTHER_SWIFT_FLAGS='-no-verify-emitted-module-interface' OBJC_CFLAGS='-fno-objc-msgsend-selector-stubs -ObjC'" />
+
+		<ItemGroup>
+			<XcodeBuiltFrameworks Condition=" '$(XcodeBuildiOS)' == 'True' " Include="$(_XcArchiveiOSFullPath)/Products/Library/Frameworks/$(XcodeScheme).framework" />
+			<XcodeBuiltFrameworks Condition=" '$(XcodeBuildiOSSimulator)' == 'True' " Include="$(_XcArchiveiOSSimulatorFullPath)/Products/Library/Frameworks/$(XcodeScheme).framework" />
+			<XcodeBuiltFrameworks Condition=" '$(XcodeBuildMacCatalyst)' == 'True' " Include="$(_XcArchiveMacCatalystFullPath)/Products/Library/Frameworks/$(XcodeScheme).framework" />
+		</ItemGroup>
+
+		<RemoveDir Directories="$(_XcFrameworkFullPath)" />
+
+		<Exec Command="xcodebuild -create-xcframework @(XcodeBuiltFrameworks->'-framework %(Identity)', ' ') -output $(_XcFrameworkFullPath)" />
+	</Target>
+
+	<PropertyGroup>
+		<ObjSharpieBind Condition=" '$(ObjSharpieBind)' == '' ">True</ObjSharpieBind>
+		<ObjSharpieBindOutputDir Condition=" '$(ObjSharpieBindOutputDir)' == '' ">$(_XcodeBuildDirFullPath)/Binding</ObjSharpieBindOutputDir>
+		<ObjSharpieSourceHeader>$(_XcArchiveiOSFullPath)/Products/Library/Frameworks/$(XcodeScheme).framework/Headers/$(XcodeScheme)-Swift.h</ObjSharpieSourceHeader>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ObjcBindingApiDefinitionFiles Include="$(ObjSharpieBindOutputDir)/ApiDefinitions.cs" />
+		<_ObjSharpieInputs Include="$(ObjSharpieSourceHeader)" />
+
+	</ItemGroup>
+
+	<Target Name="ObjSharpieBind" BeforeTargets="ProcessFrameworkReferences" DependsOnTargets="BuildXCFramework" Inputs="@(_ObjSharpieInputs)" Outputs="@(ObjcBindingApiDefinitionFiles)" Condition="'$(ObjSharpieBind)' == 'true'">
+
+		<Exec Command="xcodebuild -showsdks" ConsoleToMSBuild="true" Condition=" '$(ObjSharpieBindXcodeSdkName)' == '' ">
+			<Output TaskParameter="ConsoleOutput" PropertyName="_XcodeShowSdksOutput" />
+		</Exec>
+
+		<PropertyGroup>
+			<ObjSharpieBindXcodeSdkName Condition=" '$(ObjSharpieBindXcodeSdkName)' == '' ">$([System.Text.RegularExpressions.Regex]::Match($(_XcodeShowSdksOutput), `iphoneos[^; \n\r\t]+`))</ObjSharpieBindXcodeSdkName>
+			<ObjSharpieBindNamespace Condition=" '$(ObjSharpieBindNamespace)' == '' ">Binding</ObjSharpieBindNamespace>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<ObjSharpieBindScopes Include="$(_XcArchiveiOSFullPath)/Products/Library/Frameworks/$(XcodeScheme).framework/Headers/" />
+		</ItemGroup>
+
+		<Exec Command="sharpie bind --sdk=$(ObjSharpieBindXcodeSdkName) --output=$(ObjSharpieBindOutputDir) --namespace=$(ObjSharpieBindNamespace) @(ObjSharpieBindScopes->'--scope=%(Identity)', ' ') $(ObjSharpieSourceHeader)" />
+	</Target>
+</Project>

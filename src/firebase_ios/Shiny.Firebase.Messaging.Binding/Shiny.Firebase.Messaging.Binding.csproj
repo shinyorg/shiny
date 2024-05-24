@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <IsBindingProject>true</IsBindingProject>
+        <NoBindingEmbedding>true</NoBindingEmbedding>
+        
+        <XcodeProject>$(MSBuildThisFileDirectory)../native/messaging/MauiFirebaseMessaging.xcodeproj</XcodeProject>
+        <ObjSharpieBind>False</ObjSharpieBind>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ObjcBindingApiDefinition Include="ApiDefinitions.cs" />
+        <NativeReference Include="../native/messaging/.build/MauiFirebaseMessaging.xcframework">
+            <Kind>Framework</Kind>
+            <SmartLink>True</SmartLink>
+            <ForceLoad>True</ForceLoad>
+        </NativeReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Firebase.Analytics.Binding\Shiny.Firebase.Analytics.Binding.csproj" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\Firebase-ios.targets" />
+</Project>
