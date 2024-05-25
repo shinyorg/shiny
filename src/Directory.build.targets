@@ -13,15 +13,6 @@
         <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
-    <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
-        <Compile Include="Platforms\NetStandard\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsClassicTarget)' == 'true'">
-        <Compile Include="$(MSBuildThisFileDirectory)IsExternalInit.cs" />
-        <!--<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />-->
-    </ItemGroup>
-
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <Compile Include="Platforms\Android\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />

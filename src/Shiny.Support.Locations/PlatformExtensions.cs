@@ -36,7 +36,7 @@ public static class LocationExtensions
 
     public static AccessState GetCurrentStatus<T>(this CLLocationManager locationManager, bool background) where T : CLRegion
     {
-#if __IOS__
+#if IOS
         if (!CLLocationManager.IsMonitoringAvailable(typeof(T)))
             return AccessState.NotSupported;
 #endif
@@ -47,24 +47,36 @@ public static class LocationExtensions
 
     public static async Task<AccessState> RequestAccess(this CLLocationManager locationManager, bool background)
     {
-        var status = locationManager.GetCurrentStatus(background);
-        if (status != AccessState.Unknown)
-            return status;
+        var status = await RequestTheAccess(locationManager, false);
+        if (status == AccessState.Available && background)
+            status = await RequestTheAccess(locationManager, true);
+
+        return status;
+    }
+
+
+    static async Task<AccessState> RequestTheAccess(CLLocationManager locationManager, bool background)
+    {
+        var successState = background
+            ? CLAuthorizationStatus.AuthorizedAlways
+            : CLAuthorizationStatus.AuthorizedWhenInUse;
+
+        //var status = locationManager.GetCurrentStatus(background);
+        //if (status != AccessState.Unknown)
+        //    return status;
 
         var task = locationManager
             .WhenAccessStatusChanged(background)
             .StartWith()
             .Take(1)
             .ToTask();
-//#if __IOS__
+
         if (background)
             locationManager.RequestAlwaysAuthorization();
         else
             locationManager.RequestWhenInUseAuthorization();
-//#elif !__TVOS__
-//            locationManager.RequestAlwaysAuthorization();
-//#endif
-        status = await task.ConfigureAwait(false);
+
+        var status = await task.ConfigureAwait(false);
         return status;
     }
 }

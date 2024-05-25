@@ -98,24 +98,24 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         {
             case GpsBackgroundMode.Standard:
                 // just always request BG
-                requestBg = !realtime && OperatingSystemShim.IsAndroidVersionAtLeast(29);
+                requestBg = !realtime && OperatingSystem.IsAndroidVersionAtLeast(29);
                 break;
 
             case GpsBackgroundMode.Realtime:
                 // just always request BG
-                requestBg = !realtime && OperatingSystemShim.IsAndroidVersionAtLeast(29);
+                requestBg = !realtime && OperatingSystem.IsAndroidVersionAtLeast(29);
 
-                if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+                if (OperatingSystem.IsAndroidVersionAtLeast(31))
                     permissionSet.Add(P.ForegroundService);
 
-                if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+                if (OperatingSystem.IsAndroidVersionAtLeast(33))
                     permissionSet.Add(P.PostNotifications);
 
-                if (OperatingSystemShim.IsAndroidVersionAtLeast(34))
-                    permissionSet.Add(AndroidPermissions.ForegroundServiceLocation);
+                if (OperatingSystem.IsAndroidVersionAtLeast(34))
+                    permissionSet.Add(P.ForegroundServiceLocation);
                 break;
         }
-        if (requestBg && OperatingSystemShim.IsAndroidVersionAtLeast(29))
+        if (requestBg && OperatingSystem.IsAndroidVersionAtLeast(29))
             permissionSet.Add(P.AccessBackgroundLocation);
 
         return permissionSet;

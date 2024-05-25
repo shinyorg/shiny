@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <IsBindingProject>true</IsBindingProject>
+
+        <XcodeProject>$(MSBuildThisFileDirectory)../firebase_ios/native/analytics/ShinyFirebaseAnalytics.xcodeproj</XcodeProject>
+        <XcodeBuildXCFramework>true</XcodeBuildXCFramework>
+        <ObjSharpieBind>False</ObjSharpieBind>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ObjcBindingApiDefinition Include="ApiDefinitions.cs" />
+        <NativeReference Include="$(MSBuildThisFileDirectory)../firebase_ios/native/analytics/.build/ShinyFirebaseAnalytics.xcframework">
+            <Kind>Framework</Kind>
+            <SmartLink>True</SmartLink>
+        </NativeReference>
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\firebase_ios\Firebase-ios.targets" />
+</Project>

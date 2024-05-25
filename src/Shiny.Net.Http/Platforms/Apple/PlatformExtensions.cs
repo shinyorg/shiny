@@ -57,7 +57,7 @@ static class PlatformExtensions
         {
             native.AllowsCellularAccess = appleRequest.AllowsCellularAccess;
             native.AllowsConstrainedNetworkAccess = appleRequest.AllowsConstrainedNetworkAccess;
-            if (OperatingSystemShim.IsAppleVersionAtleast(14, 5) && appleRequest.AssumesHttp3Capable != null)
+            if (IosPlatform.IsAppleVersionAtleast(14, 5) && appleRequest.AssumesHttp3Capable != null)
                 native.AssumesHttp3Capable = appleRequest.AssumesHttp3Capable.Value;
         }
 

@@ -81,9 +81,9 @@ public class CreateViewModel : ViewModel
                 return;
             }
 
-            var access = await notifications.RequestAccess();
-            if (access != AccessState.Available)
-                await this.Dialogs.DisplayAlertAsync("Warning", "You will not get notifications for transfers due to insufficient permissions", "OK");
+            //var access = await notifications.RequestAccess();
+            //if (access != AccessState.Available)
+            //    await this.Dialogs.DisplayAlertAsync("Warning", "You will not get notifications for transfers due to insufficient permissions", "OK");
 
             TransferHttpContent? content = null;
             if (!this.PostData.IsEmpty())

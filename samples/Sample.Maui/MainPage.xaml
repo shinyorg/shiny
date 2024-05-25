@@ -41,11 +41,6 @@
                         <TextCell Text="Managed Ranging" Command="{Binding Navigate}" CommandParameter="BeaconRangingManaged" />
                     </TableSection>
 
-                    <TableSection Title="Shiny.SpeechRecognition">
-                        <TextCell Text="Dictation" Command="{Binding Navigate}" CommandParameter="SrDictation" />
-                        <TextCell Text="Conversation" Command="{Binding Navigate}" CommandParameter="SrConversation" />
-                    </TableSection>
-
                     <TableSection Title="Shiny.Notifications">
                         <TextCell Text="List" Command="{Binding Navigate}" CommandParameter="NotificationsList" />
                         <TextCell Text="Create" Command="{Binding Navigate}" CommandParameter="NotificationsCreate" />

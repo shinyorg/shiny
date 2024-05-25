@@ -84,21 +84,19 @@ public static class ServiceProviderExtensions
             .Where(x => x != typeof(IDisposable))
             .ToList();
 
-        services.AddSingleton(implementationType);
-
         if (interfaces.Any(x => x == typeof(INotifyPropertyChanged)) || interfaces.Any(x => x == typeof(IShinyComponentStartup)))
         {
-            services.AddSingleton(implementationType, services =>
+            services.AddSingleton(implementationType, sp =>
             {
-                var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("ShinyStartup");
-                var instance = ActivatorUtilities.CreateInstance(services, implementationType);
+                var logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger("ShinyStartup");
+                var instance = ActivatorUtilities.CreateInstance(sp, implementationType);
                 var fn = implementationType.FullName;
 
                 if (instance is INotifyPropertyChanged npc)
                 {
                     logger.LogInformation("Startup Binding for " + fn);
 
-                    services
+                    sp
                         .GetRequiredService<IObjectStoreBinder>()
                         .Bind(npc);
                 }
@@ -112,6 +110,10 @@ public static class ServiceProviderExtensions
             });
             interfaces.Remove(typeof(INotifyPropertyChanged));
             interfaces.Remove(typeof(IShinyComponentStartup));
+        }
+        else
+        {
+            services.AddSingleton(implementationType);
         }
         foreach (var iface in interfaces)
         { 

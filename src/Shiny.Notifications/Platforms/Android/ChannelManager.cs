@@ -100,7 +100,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
         if (android.Description != null)
             native.Description = android.Description;
 
-        if (android.AllowBubbles != null && OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        if (android.AllowBubbles != null && OperatingSystem.IsAndroidVersionAtLeast(26))
             native.SetAllowBubbles(android.AllowBubbles.Value!);
 
         if (android.ShowBadge != null)
@@ -115,10 +115,9 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
         if (android.LockscreenVisibility != null)
             native.LockscreenVisibility = android.LockscreenVisibility.Value;
 
-#if !MONOANDROID
-        if (android.Blockable != null && OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (android.Blockable != null && OperatingSystem.IsAndroidVersionAtLeast(33))
             native.Blockable = android.Blockable.Value;
-#endif
+
 
         if (android.BypassDnd != null)
             native.SetBypassDnd(android.BypassDnd.Value);
@@ -140,7 +139,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
 
     public Channel? Get(string channelId) => this.repository.Get<AndroidChannel>(channelId);
-    public IList<Channel> GetAll() => this.repository.GetList<AndroidChannel>().OfType<Channel>().ToList();
+    public IReadOnlyList<Channel> GetAll() => this.repository.GetList<AndroidChannel>().OfType<Channel>().ToList();
     public void Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);

@@ -17,6 +17,6 @@ public class AndroidNotification : Notification
     public string? ColorResourceName { get; set; }
     public bool UseBigTextStyle { get; set; }
     public Type? LaunchActivityType { get; set; }
-    public ActivityFlags LaunchActivityFlags { get; set; } = ActivityFlags.NewTask | ActivityFlags.ClearTask;
+    public ActivityFlags LaunchActivityFlags { get; set; } = ActivityFlags.SingleTop;
     public string? Ticker { get; set; }
 }

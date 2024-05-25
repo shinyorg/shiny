@@ -15,19 +15,6 @@ on:
     - preview
     - v*
 
-env:
-  NugetApiKey: ${{secrets.NUGETAPIKEY}}
-  TwitterConsumerKey: ${{secrets.TWITTER_CONSUMER_KEY}}
-  TwitterConsumerSecret: ${{secrets.TWITTER_CONSUMER_SECRET}}
-  TwitterAccessToken: ${{secrets.TWITTER_ACCESS_TOKEN}}
-  TwitterAccessTokenSecret: ${{secrets.TWITTER_ACCESS_TOKEN_SECRET}}
-  DiscordToken: ${{secrets.DISCORD_TOKEN}}
-  DiscordGuildId: '679761126598115336'
-  DiscordChannelId: '803717285986566174'
-  MastodonClientId: ${{secrets.MASTODON_CLIENT_ID}}
-  MastodonClientSecret: ${{secrets.MASTODON_CLIENT_SECRET}}
-  MastodonInstance: 'dotnet.social'
-
 jobs:
   build:
 
@@ -50,10 +37,20 @@ jobs:
         architecture: x64
 
     - name: Add .NET Workloads
-      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
+      run: dotnet workload install maui
+
+    - name: Setup Nerdbank GitVersioning
+      uses: dotnet/nbgv@master
+      id: nbgv
 
     - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj
+      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true
+
+    - name: Post NuGet Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: nuget-artifacts
+        path: '**/*.nupkg'
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
@@ -61,3 +58,28 @@ jobs:
         name: nugets
         path: ${{ github.workspace }}/artifacts
         retention-days: 5
+
+    - name: Publish NuGets
+      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
+      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGETAPIKEY }} --skip-duplicate
+
+    - name: Test Release Annoucement
+      run: echo "Shiny ${{ steps.nbgv.outputs.NuGetPackageVersion }} released! Check out the latest info at https://shinylib.net/release-notes/client/"
+
+    - name: 'Announce to X/Twitter'
+      uses: nearform-actions/github-action-notify-twitter@master
+      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
+      with:
+        message: Shiny ${{ steps.nbgv.outputs.NuGetPackageVersion }} released! Check out the latest info at https://shinylib.net/release-notes/client/
+        twitter-app-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+        twitter-app-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
+        twitter-access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        twitter-access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+
+    - name: Announce to Mastodon
+      uses: cbrgm/mastodon-github-action@v2
+      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
+      with:
+        access-token: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+        url: ${{ secrets.MASTODON_URL }}
+        message: "Shiny ${{ steps.nbgv.outputs.NuGetPackageVersion }} released! Check out the latest info at https://shinylib.net/release-notes/client/"

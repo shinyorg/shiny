@@ -26,9 +26,9 @@ public class MainViewModel : ReactiveObject, IPageLifecycleAware
 
         this.NotificationPermissions = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await notifications.RequestAccess();
-            if (result != AccessState.Available)
-                await dialogs.DisplayAlertAsync("Permission Denied", "Most background operations in this app use notifications", "OK");
+            //var result = await notifications.RequestAccess();
+            //if (result != AccessState.Available)
+            //    await dialogs.DisplayAlertAsync("Permission Denied", "Most background operations in this app use notifications", "OK");
         });
 
         this.OpenAppSettings = ReactiveCommand.Create(() => appInfo.ShowSettingsUI());

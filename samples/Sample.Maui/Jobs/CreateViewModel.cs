@@ -35,9 +35,9 @@ public class CreateViewModel : ViewModel
                     return;
                 }
 
-                access = await this.notifications.RequestAccess();
-                if (access != AccessState.Available)
-                    await this.Dialogs.DisplayAlertAsync("Warning", "Invalid permissions for notifications, the job will not display them", "OK");
+                //access = await this.notifications.RequestAccess();
+                //if (access != AccessState.Available)
+                //    await this.Dialogs.DisplayAlertAsync("Warning", "Invalid permissions for notifications, the job will not display them", "OK");
 
                 var job = new JobInfo(
                     this.JobName.Trim(),

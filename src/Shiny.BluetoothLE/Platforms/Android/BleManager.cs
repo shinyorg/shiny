@@ -73,7 +73,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     static T? GetParcel<T>(Intent intent, string name) where T : Java.Lang.Object
     {
         Java.Lang.Object? result;
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             var javaCls = Java.Lang.Class.FromType(typeof(T));
             if (javaCls == null)
@@ -217,7 +217,10 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
 
     public void StopScan()
-        => this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
+    {
+        this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
+        this.IsScanning = false;
+    }
 
     public IEnumerable<IPeripheral> GetConnectedPeripherals()
         => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
@@ -306,7 +309,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
     static string[] GetPlatformPermissions()
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
             return new[]
             {

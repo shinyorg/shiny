@@ -33,7 +33,7 @@ public static class PlatformExtensions
 
     public static async Task InvokeTaskOnMainThread(this IPlatform platform, Func<Task> func, CancellationToken cancelToken = default)
     {
-        var tcs = new TaskCompletionSource<bool>();
+        var tcs = new TaskCompletionSource();
         using (cancelToken.Register(() => tcs.TrySetCanceled()))
         {
             platform.InvokeOnMainThread(async () =>
@@ -41,7 +41,7 @@ public static class PlatformExtensions
                 try
                 {
                     await func();
-                    tcs.TrySetResult(true);
+                    tcs.TrySetResult();
                 }
                 catch (Exception ex)
                 {

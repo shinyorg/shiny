@@ -23,4 +23,7 @@ public interface IApplePushDelegate : IPushDelegate
     /// <param name="notification"></param>
     /// <returns></returns>
     UIBackgroundFetchResult? GetFetchResult(PushNotification notification);
+
+    // TODO: should fetch result run instead OnReceived?
+    //Task<UIBackgroundFetchResult> Get
 }

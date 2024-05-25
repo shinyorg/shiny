@@ -23,11 +23,11 @@ public partial class BleHostingManager : IBleHostingManager
     {
         get
         {
-            if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
+            if (!OperatingSystem.IsAndroidVersionAtLeast(23))
                 return AccessState.NotSupported;
 
             var status = AccessState.Available;
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+            if (OperatingSystem.IsAndroidVersionAtLeast(31))
                 status = this.context.Platform.GetCurrentPermissionStatus(Permission.BluetoothAdvertise);
 
             if (status == AccessState.Available)
@@ -42,11 +42,11 @@ public partial class BleHostingManager : IBleHostingManager
     {
         get
         {
-            if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
+            if (!OperatingSystem.IsAndroidVersionAtLeast(23))
                 return AccessState.NotSupported;
 
             var status = AccessState.Available;
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+            if (OperatingSystem.IsAndroidVersionAtLeast(31))
                 status = this.context.Platform.GetCurrentPermissionStatus(Permission.BluetoothConnect);
 
             if (status == AccessState.Available)
@@ -62,14 +62,14 @@ public partial class BleHostingManager : IBleHostingManager
         if (!advertise && !connect)
             throw new ArgumentException("You must request at least 1 permission");
 
-        if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
+        if (!OperatingSystem.IsAndroidVersionAtLeast(23))
             return AccessState.NotSupported; //throw new InvalidOperationException("BLE Advertiser needs API Level 23+");
 
         var current = this.context.Manager.GetAccessState();
         if (current != AccessState.Available && current != AccessState.Unknown)
             return current;
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
             var perms = new List<string>();
             if (advertise)

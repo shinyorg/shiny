@@ -1,31 +1,16 @@
 # Shiny Samples
 
 These samples make use great open source frameworks like [Prism](https://prismlibrary.com) & ReactiveUI (https://reactiveui.net) as well
-as principles like dependency injection and reactive extensions... much like Shiny itself.  If you find these complex or you simply don't like them, don't complain - the library wasn't built for you...
+as principles like dependency injection and reactive extensions... much like Shiny itself.  
+
+If you find these complex OR you simply don't like them, don't complain - the library wasn't built for you...
 remember - this is not a product! 
 
+[For the push sample, please GO HERE](https://github.com/shinyorg/pushtester)
+
 ## Sample (Sample.Maui)
-A kitchen sink using all of the support libraries that don't require special external entitlements from Apple (like Push).
+A kitchen sink using almost all of Shiny that don't require special external entitlements from Apple (like Push).
 This sample also uses Shiny.Framework (https://github.com/shinyorg/framework) which has helpers around ReactiveUI & Prism.
-
-## MAUI Push (Sample.Push.Maui)
-
-* Open Sample.Push.Maui csproj
-    * Change <PushProvider> to native, firebase, or azure
-
-* Platform Support
-
-|Messaging Platform|iOS|Mac Catalyst|Android|
-|------------------|---|------------|-------|
-|Native|Yes|Yes|Yes|
-|Azure|Yes|Yes|Yes|
-|Firebase|Yes|No|Yes|
-
-### Azure Notification Hubs
-* Edit appsettings.json and add the appropriate values to the AzureNotificationHubs section
-
-### Firebase Messaging
-* Edit appsettings.apple.json & appsettings.android.json and enter the appropriate firebase values in each config file
 
 ## Blazor (Sample.Blazor)
 Currently, a vast majority of the APIs that are coming to the web (ie. BluetoothLE, Notifications, & event GPS) are still experimental.

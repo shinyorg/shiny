@@ -38,7 +38,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.3" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.10" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
