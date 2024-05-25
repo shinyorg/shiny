@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1
 		src\nuget.png = src\nuget.png
 		src\nuget.txt = src\nuget.txt
 		version.json = version.json
+		src\firebase_ios\Firebase-ios.targets = src\firebase_ios\Firebase-ios.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3A15354E-BAD2-4195-BE6B-49ED2B4E56E6}"
@@ -105,14 +106,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.SourceGenerators.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.SourceGenerators", "src\Shiny.SourceGenerators\Shiny.SourceGenerators.csproj", "{A44BB6F8-283F-4FD7-9955-41B6B515AC98}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "firebase-ios", "firebase-ios", "{5418A62F-B22B-4963-B4E4-8B4ECE436EC9}"
-	ProjectSection(SolutionItems) = preProject
-		src\firebase_ios\Firebase-ios.targets = src\firebase_ios\Firebase-ios.targets
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Firebase.Analytics.iOS.Binding", "src\Shiny.Firebase.Analytics.iOS.Binding\Shiny.Firebase.Analytics.iOS.Binding.csproj", "{95304E51-AD99-41EA-A007-16F6FDCEC779}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Firebase.Analytics.Binding", "src\firebase_ios\Shiny.Firebase.Analytics.Binding\Shiny.Firebase.Analytics.Binding.csproj", "{161A2886-7EC4-496B-AE9A-A8D8E9061100}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Firebase.Messaging.Binding", "src\firebase_ios\Shiny.Firebase.Messaging.Binding\Shiny.Firebase.Messaging.Binding.csproj", "{6C63C86E-DC5D-4B60-AA14-A347B3932972}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Firebase.Messaging.iOS.Binding", "src\Shiny.Firebase.Messaging.iOS.Binding\Shiny.Firebase.Messaging.iOS.Binding.csproj", "{F7E69503-E920-4E1E-8F7C-358DD7982738}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -223,14 +219,14 @@ Global
 		{A44BB6F8-283F-4FD7-9955-41B6B515AC98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A44BB6F8-283F-4FD7-9955-41B6B515AC98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A44BB6F8-283F-4FD7-9955-41B6B515AC98}.Release|Any CPU.Build.0 = Release|Any CPU
-		{161A2886-7EC4-496B-AE9A-A8D8E9061100}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{161A2886-7EC4-496B-AE9A-A8D8E9061100}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{161A2886-7EC4-496B-AE9A-A8D8E9061100}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{161A2886-7EC4-496B-AE9A-A8D8E9061100}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C63C86E-DC5D-4B60-AA14-A347B3932972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C63C86E-DC5D-4B60-AA14-A347B3932972}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C63C86E-DC5D-4B60-AA14-A347B3932972}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C63C86E-DC5D-4B60-AA14-A347B3932972}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95304E51-AD99-41EA-A007-16F6FDCEC779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95304E51-AD99-41EA-A007-16F6FDCEC779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95304E51-AD99-41EA-A007-16F6FDCEC779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95304E51-AD99-41EA-A007-16F6FDCEC779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7E69503-E920-4E1E-8F7C-358DD7982738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7E69503-E920-4E1E-8F7C-358DD7982738}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7E69503-E920-4E1E-8F7C-358DD7982738}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7E69503-E920-4E1E-8F7C-358DD7982738}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -263,9 +259,8 @@ Global
 		{C21631E7-A789-4DF8-B83F-03D6A07B57B4} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
 		{4B31F220-D152-40A7-8D0F-2FABA7C3926C} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
 		{A44BB6F8-283F-4FD7-9955-41B6B515AC98} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
-		{5418A62F-B22B-4963-B4E4-8B4ECE436EC9} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
-		{161A2886-7EC4-496B-AE9A-A8D8E9061100} = {5418A62F-B22B-4963-B4E4-8B4ECE436EC9}
-		{6C63C86E-DC5D-4B60-AA14-A347B3932972} = {5418A62F-B22B-4963-B4E4-8B4ECE436EC9}
+		{95304E51-AD99-41EA-A007-16F6FDCEC779} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{F7E69503-E920-4E1E-8F7C-358DD7982738} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {135D86AF-4EC4-4AA0-BD06-75C410F3EA08}

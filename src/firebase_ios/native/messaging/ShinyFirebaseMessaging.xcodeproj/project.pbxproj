@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		64B992DD2B966E8400BAFB55 /* MauiFirebaseMessaging.h in Headers */ = {isa = PBXBuildFile; fileRef = 64B992DC2B966E8400BAFB55 /* MauiFirebaseMessaging.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		64B992E42B966F2D00BAFB55 /* MauiFirebaseMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B992E32B966F2D00BAFB55 /* MauiFirebaseMessaging.swift */; };
+		64B992DD2B966E8400BAFB55 /* FirebaseMessaging.h in Headers */ = {isa = PBXBuildFile; fileRef = 64B992DC2B966E8400BAFB55 /* FirebaseMessaging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		64B992E42B966F2D00BAFB55 /* FirebaseMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B992E32B966F2D00BAFB55 /* FirebaseMessaging.swift */; };
 		E5A6E48D2B9C04EF00B955ED /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = E5A6E48C2B9C04EF00B955ED /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		64B992D92B966E8400BAFB55 /* MauiFirebaseMessaging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MauiFirebaseMessaging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		64B992DC2B966E8400BAFB55 /* MauiFirebaseMessaging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MauiFirebaseMessaging.h; sourceTree = "<group>"; };
-		64B992E32B966F2D00BAFB55 /* MauiFirebaseMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MauiFirebaseMessaging.swift; sourceTree = "<group>"; };
+		64B992D92B966E8400BAFB55 /* ShinyFirebaseMessaging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ShinyFirebaseMessaging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		64B992DC2B966E8400BAFB55 /* FirebaseMessaging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FirebaseMessaging.h; sourceTree = "<group>"; };
+		64B992E32B966F2D00BAFB55 /* FirebaseMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseMessaging.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,7 +33,7 @@
 		64B992CF2B966E8400BAFB55 = {
 			isa = PBXGroup;
 			children = (
-				64B992DB2B966E8400BAFB55 /* MauiFirebaseMessaging */,
+				64B992DB2B966E8400BAFB55 /* ShinyFirebaseMessaging */,
 				64B992DA2B966E8400BAFB55 /* Products */,
 				64B993072B979E9C00BAFB55 /* Frameworks */,
 			);
@@ -42,18 +42,18 @@
 		64B992DA2B966E8400BAFB55 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				64B992D92B966E8400BAFB55 /* MauiFirebaseMessaging.framework */,
+				64B992D92B966E8400BAFB55 /* ShinyFirebaseMessaging.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		64B992DB2B966E8400BAFB55 /* MauiFirebaseMessaging */ = {
+		64B992DB2B966E8400BAFB55 /* ShinyFirebaseMessaging */ = {
 			isa = PBXGroup;
 			children = (
-				64B992DC2B966E8400BAFB55 /* MauiFirebaseMessaging.h */,
-				64B992E32B966F2D00BAFB55 /* MauiFirebaseMessaging.swift */,
+				64B992DC2B966E8400BAFB55 /* FirebaseMessaging.h */,
+				64B992E32B966F2D00BAFB55 /* FirebaseMessaging.swift */,
 			);
-			path = MauiFirebaseMessaging;
+			path = ShinyFirebaseMessaging;
 			sourceTree = "<group>";
 		};
 		64B993072B979E9C00BAFB55 /* Frameworks */ = {
@@ -70,16 +70,16 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64B992DD2B966E8400BAFB55 /* MauiFirebaseMessaging.h in Headers */,
+				64B992DD2B966E8400BAFB55 /* FirebaseMessaging.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		64B992D82B966E8400BAFB55 /* MauiFirebaseMessaging */ = {
+		64B992D82B966E8400BAFB55 /* ShinyFirebaseMessaging */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64B992E02B966E8400BAFB55 /* Build configuration list for PBXNativeTarget "MauiFirebaseMessaging" */;
+			buildConfigurationList = 64B992E02B966E8400BAFB55 /* Build configuration list for PBXNativeTarget "ShinyFirebaseMessaging" */;
 			buildPhases = (
 				64B992D42B966E8400BAFB55 /* Headers */,
 				64B992D52B966E8400BAFB55 /* Sources */,
@@ -90,12 +90,12 @@
 			);
 			dependencies = (
 			);
-			name = MauiFirebaseMessaging;
+			name = ShinyFirebaseMessaging;
 			packageProductDependencies = (
 				E5A6E48C2B9C04EF00B955ED /* FirebaseMessaging */,
 			);
 			productName = MauiFirebaseMessaging;
-			productReference = 64B992D92B966E8400BAFB55 /* MauiFirebaseMessaging.framework */;
+			productReference = 64B992D92B966E8400BAFB55 /* ShinyFirebaseMessaging.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -113,7 +113,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 64B992D32B966E8400BAFB55 /* Build configuration list for PBXProject "MauiFirebaseMessaging" */;
+			buildConfigurationList = 64B992D32B966E8400BAFB55 /* Build configuration list for PBXProject "ShinyFirebaseMessaging" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -129,7 +129,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				64B992D82B966E8400BAFB55 /* MauiFirebaseMessaging */,
+				64B992D82B966E8400BAFB55 /* ShinyFirebaseMessaging */,
 			);
 		};
 /* End PBXProject section */
@@ -149,7 +149,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64B992E42B966F2D00BAFB55 /* MauiFirebaseMessaging.swift in Sources */,
+				64B992E42B966F2D00BAFB55 /* FirebaseMessaging.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,7 +303,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.MauiFirebaseMessaging;
+				PRODUCT_BUNDLE_IDENTIFIER = org.shiny.FirebaseMessaging;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -343,7 +343,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.MauiFirebaseMessaging;
+				PRODUCT_BUNDLE_IDENTIFIER = org.shiny.FirebaseMessaging;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -358,7 +358,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		64B992D32B966E8400BAFB55 /* Build configuration list for PBXProject "MauiFirebaseMessaging" */ = {
+		64B992D32B966E8400BAFB55 /* Build configuration list for PBXProject "ShinyFirebaseMessaging" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64B992DE2B966E8400BAFB55 /* Debug */,
@@ -367,7 +367,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64B992E02B966E8400BAFB55 /* Build configuration list for PBXNativeTarget "MauiFirebaseMessaging" */ = {
+		64B992E02B966E8400BAFB55 /* Build configuration list for PBXNativeTarget "ShinyFirebaseMessaging" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64B992E12B966E8400BAFB55 /* Debug */,

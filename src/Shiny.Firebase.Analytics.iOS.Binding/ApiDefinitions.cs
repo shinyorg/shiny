@@ -1,7 +1,7 @@
 using System;
 using Foundation;
 
-namespace Shiny.Firebase.Analytics.Binding
+namespace Shiny.Firebase.Analytics.iOS.Binding
 {
     [BaseType(typeof(NSObject))]
     interface FirebaseApplication
@@ -11,42 +11,39 @@ namespace Shiny.Firebase.Analytics.Binding
         void AutoConfigure();
 
         [Static]
-        [Export("configure:gcmSenderId:")]
-        void Configure(string googleAppId, string gcmSenderId);
+        [Export("configure:gcmSenderId:apiKey:projectId")]
+        bool Configure(string googleAppId, string gcmSenderId, string? apiKey, string? projectId);
+        
+        [Static]
+        [Export("isConfigured")]
+        bool IsConfigured { get; }
     }
 
 
-    // @interface FirebaseAnalytics : NSObject
     [BaseType (typeof(NSObject))]
 	interface FirebaseAnalytics
 	{
-		// -(void)logEventWithEventName:(NSString * _Nonnull)eventName parameters:(NSDictionary<NSString *,id> * _Nonnull)parameters;
 		[Static]
 		[Export ("logEventWithEventName:parameters:")]
 		void LogEvent (string eventName, NSDictionary<NSString, NSObject> parameters);
 
-        // -(void)getAppInstanceIdWithCompletion:(void (^ _Nonnull)(NSString * _Nullable))completion;
         [Static]
         [Export ("getAppInstanceIdWithCompletion:")]
 		[Async]
 		void GetAppInstanceId (Action<NSString> completion);
 
-        // -(void)setUserIdWithUserId:(NSString * _Nonnull)userId;
         [Static]
         [Export ("setUserIdWithUserId:")]
 		void SetUserId (string userId);
 
-        // -(void)setUserPropertyWithPropertyName:(NSString * _Nonnull)propertyName value:(NSString * _Nonnull)value;
         [Static]
         [Export ("setUserProperty:value:")]
 		void SetUserProperty (string propertyName, string value);
 
-        // -(void)setSessionTimeoutWithSeconds:(NSInteger)seconds;
         [Static]
         [Export ("setSessionTimeoutWithSeconds:")]
 		void SetSessionTimeout (nint seconds);
 
-        // -(void)resetAnalyticsData;
         [Static]
         [Export ("resetAnalyticsData")]
 		void ResetAnalyticsData ();

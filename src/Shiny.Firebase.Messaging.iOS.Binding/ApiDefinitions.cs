@@ -1,7 +1,7 @@
 using System;
 using Foundation;
 
-namespace Shiny.Firebase.Messaging.Binding
+namespace Shiny.Firebase.Messaging.iOS.Binding
 {
     [BaseType(typeof(NSObject))]
     interface FirebaseMessaging
