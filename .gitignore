@@ -5,6 +5,7 @@
 .build/
 build/
 deps/
+xcuserdata/
 
 # User-specific files
 *.suo
