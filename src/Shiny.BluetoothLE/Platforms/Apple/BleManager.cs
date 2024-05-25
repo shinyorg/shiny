@@ -166,7 +166,11 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     });
 
 
-    public void StopScan() => this.Manager.StopScan();
+    public void StopScan()
+    {
+        this.Manager.StopScan();
+        this.IsScanning = false;
+    }
     
 
     public override async void WillRestoreState(CBCentralManager central, NSDictionary dict)

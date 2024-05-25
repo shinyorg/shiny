@@ -217,7 +217,10 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
 
     public void StopScan()
-        => this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
+    {
+        this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
+        this.IsScanning = false;
+    }
 
     public IEnumerable<IPeripheral> GetConnectedPeripherals()
         => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
