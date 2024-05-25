@@ -1,4 +1,6 @@
-﻿namespace Shiny.Push;
+﻿using System.Collections.Generic;
+
+namespace Shiny.Push;
 
 public record PushAccessState(
     AccessState Status,
@@ -13,3 +15,13 @@ public record PushAccessState(
             throw new PermissionException("Push registration fail", this.Status);
     }
 }
+
+public record PushNotification(
+    IDictionary<string, string> Data,
+    Notification? Notification
+);
+
+public record Notification(
+    string? Title,
+    string? Message
+);
