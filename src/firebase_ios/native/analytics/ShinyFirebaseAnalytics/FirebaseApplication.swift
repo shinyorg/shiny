@@ -20,7 +20,7 @@ public class FirebaseApplication : NSObject {
         return isConfigured()
     }
     
-    
+    @objc
     public static func isConfigured() -> Bool {
         return FirebaseApp.app() != nil
     }

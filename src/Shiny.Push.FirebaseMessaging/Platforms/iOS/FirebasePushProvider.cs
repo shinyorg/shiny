@@ -106,7 +106,7 @@ public class FirebasePushProvider(FirebaseConfiguration config) : NotifyProperty
                     config.ProjectId
                 );
             }
-
+        
             if (!FirebaseApplication.IsConfigured)
                 throw new InvalidOperationException("Firebase Application failed to configure - please check your settings");
         }

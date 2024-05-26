@@ -9,7 +9,6 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
-<!--        <ProjectReference Include="..\Shiny.Firebase.Analytics.iOS.Binding\Shiny.Firebase.Analytics.iOS.Binding.csproj" />-->
         <ProjectReference Include="..\Shiny.Firebase.Messaging.iOS.Binding\Shiny.Firebase.Messaging.iOS.Binding.csproj" />
     </ItemGroup>
 </Project>

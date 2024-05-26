@@ -7,7 +7,7 @@ namespace Shiny.Firebase.Messaging.iOS.Binding
     interface FirebaseMessaging
     {
         [Static]
-        [Export("getIsAutoInitEnabled:")]
+        [Export("getIsAutoInitEnabled")]
         bool IsAutoInitEnabled { get; [Bind("setIsAutoInitEnabled:")] set; }
 
         [Static]
@@ -35,3 +35,4 @@ namespace Shiny.Firebase.Messaging.iOS.Binding
         void UnSubscribe(string topic, Action<NSError?> completion);
     }
 }
+
