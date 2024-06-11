@@ -7,33 +7,19 @@ using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 using CoreBluetooth;
 using Foundation;
-using Shiny.BluetoothLE.Intrastructure;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
 
-public class BleManager : CBCentralManagerDelegate, IBleManager
+public class BleManager(
+    AppleBleConfiguration config,
+    IServiceProvider services,
+    IOperationQueue operations,
+    ILogger<BleManager> logger,
+    ILogger<Peripheral> peripheralLogger
+) : CBCentralManagerDelegate, IBleManager
 {
-    readonly IServiceProvider services;
-    readonly IOperationQueue operations;
-    readonly ILogger logger;
-    readonly ILogger<Peripheral> peripheralLogger;
-    readonly AppleBleConfiguration config;
-
-    public BleManager(
-        AppleBleConfiguration config,
-        IServiceProvider services,
-        IOperationQueue operations,
-        ILogger<BleManager> logger,
-        ILogger<Peripheral> peripheralLogger
-    )
-    {
-        this.config = config;
-        this.operations = operations;
-        this.services = services; 
-        this.logger = logger;
-        this.peripheralLogger = peripheralLogger;
-    }
 
     public bool IsScanning { get; private set; }
 
@@ -46,26 +32,26 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
             if (this.manager == null)
             {
                 if (!AppleExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
-                    this.logger.MissingIosPermission("NSBluetoothPeripheralUsageDescription");
+                    logger.MissingIosPermission("NSBluetoothPeripheralUsageDescription");
 
                 if (!AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
-                    this.logger.MissingIosPermission("NSBluetoothAlwaysUsageDescription");
+                    logger.MissingIosPermission("NSBluetoothAlwaysUsageDescription");
 
-                var background = this.services.GetService(typeof(IBleDelegate)) != null;
+                var background = services.GetService(typeof(IBleDelegate)) != null;
                 if (!background)
                 {
-                    this.manager = new CBCentralManager(this, this.config.DispatchQueue);
+                    this.manager = new CBCentralManager(this, config.DispatchQueue);
                     this.manager.Delegate = this;
                 }
                 else
                 {
                     var opts = new CBCentralInitOptions
                     {
-                        ShowPowerAlert = this.config.ShowPowerAlert,
-                        RestoreIdentifier = this.config.RestoreIdentifier ?? "shinyble"
+                        ShowPowerAlert = config.ShowPowerAlert,
+                        RestoreIdentifier = config.RestoreIdentifier ?? "shinyble"
                     };
 
-                    this.manager = new CBCentralManager(this, this.config.DispatchQueue, opts);
+                    this.manager = new CBCentralManager(this, config.DispatchQueue, opts);
                     this.manager.Delegate = this;
                 }
             }
@@ -184,10 +170,10 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
         {
             var item = peripheralArray.GetItem<CBPeripheral>(i);
             var peripheral = this.GetPeripheral(item);
-            await this.services
+            await services
                 .RunDelegates<IBleDelegate>(
                     x => x.OnPeripheralStateChanged(peripheral),
-                    this.logger
+                    logger
                 )
                 .ConfigureAwait(false);
         }
@@ -222,16 +208,16 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     readonly Subject<AccessState> stateUpdatedSubj = new();
     public override async void UpdatedState(CBCentralManager central)
     {
-        this.logger.ManagerStateChange(central.State);
+        logger.ManagerStateChange(central.State);
 
         var state = central.State.FromNative();
         if (state == AccessState.Unknown)
             return;
 
         this.stateUpdatedSubj.OnNext(state);
-        await this.services.RunDelegates<IBleDelegate>(
+        await services.RunDelegates<IBleDelegate>(
             x => x.OnAdapterStateChanged(state),
-            this.logger
+            logger
         );
     }
 
@@ -244,19 +230,19 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
     void RunStateChange(CBPeripheral peripheral, bool connected, NSError? error)
     {
-        this.logger.PeripheralStateChange(peripheral.Identifier, connected, error?.LocalizedDescription ?? "None");
+        logger.PeripheralStateChange(peripheral.Identifier, connected, error?.LocalizedDescription ?? "None");
 
         var p = this.GetPeripheral(peripheral);
         var status = connected ? ConnectionState.Connected : ConnectionState.Disconnected;
         p.ReceiveStateChange(status);
 
-        this.services.RunDelegates<IBleDelegate>(x => x.OnPeripheralStateChanged(p), this.logger);
+        services.RunDelegates<IBleDelegate>(x => x.OnPeripheralStateChanged(p), logger);
     }
 
 
     readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
     Peripheral GetPeripheral(CBPeripheral peripheral) => this.peripherals.GetOrAdd(
         peripheral.Identifier.ToString(),
-        x => new Peripheral(this, peripheral, this.operations, this.peripheralLogger)
+        x => new Peripheral(this, peripheral, operations, peripheralLogger)
     );
 }

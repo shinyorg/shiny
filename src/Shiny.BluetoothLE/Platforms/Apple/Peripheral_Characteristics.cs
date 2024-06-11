@@ -8,7 +8,7 @@ using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
-using Shiny.BluetoothLE.Intrastructure;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Shiny.BluetoothLE.Intrastructure;
+namespace Shiny.BluetoothLE.Infrastructure;
 
 // The operation queue cannot crash if it holds state, but it needs to bubble it's error out
 
