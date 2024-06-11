@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
-using Shiny.BluetoothLE.Intrastructure;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 

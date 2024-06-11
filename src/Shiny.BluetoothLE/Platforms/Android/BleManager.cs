@@ -12,7 +12,7 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Microsoft.Extensions.Logging;
-using Shiny.BluetoothLE.Intrastructure;
+using Shiny.BluetoothLE.Infrastructure;
 using SR = Android.Bluetooth.LE.ScanResult;
 
 namespace Shiny.BluetoothLE;
