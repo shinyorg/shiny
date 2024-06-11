@@ -24,8 +24,8 @@ public class PushManager(
     IIosLifecycle.IRemoteNotifications,
     IIosLifecycle.INotificationHandler
 {
-    static readonly NSString apsKey = new NSString("aps");
-    static readonly NSString alertKey = new NSString("alert");
+    static readonly NSString apsKey = new("aps");
+    static readonly NSString alertKey = new("alert");
 
     TaskCompletionSource<NSData>? tokenSource;
 
@@ -246,11 +246,11 @@ public class PushManager(
             {
                 var fetchResult = services
                     .GetServices<IPushDelegate>()
-                    .Select(x =>
+                    .Select(y =>
                     {
                         try
                         {
-                            return (x as IApplePushDelegate)?.GetFetchResult(data);
+                            return (y as IApplePushDelegate)?.GetFetchResult(data);
                         }
                         catch (Exception ex)
                         {
@@ -258,7 +258,7 @@ public class PushManager(
                             return null;
                         }
                     })
-                    .FirstOrDefault(x => x != null);
+                    .FirstOrDefault(y => y != null);
 
                 platform.InvokeOnMainThread(
                     () => completionHandler.Invoke(fetchResult ?? UIBackgroundFetchResult.NewData)
@@ -304,7 +304,7 @@ public class PushManager(
     }
 
 
-    protected virtual PushNotification ToPushNotification(UNNotification notification)
+    protected virtual ApplePushNotification ToPushNotification(UNNotification notification)
     {
         var c = notification.Request.Content;
         var shinyNotification = new Notification(
@@ -313,7 +313,7 @@ public class PushManager(
         );
 
         var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
-        var data = new PushNotification(dict, shinyNotification);
+        var data = new ApplePushNotification(dict, c.UserInfo, shinyNotification);
 
         return data;
     }
