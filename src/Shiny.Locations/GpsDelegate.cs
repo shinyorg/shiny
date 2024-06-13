@@ -18,6 +18,8 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
         {
             await this.semaphore.WaitAsync().ConfigureAwait(false);
 
+            this.MostRecentReading = reading;
+            
             var fireReading = false;
             if (this.LastReading == null)
             {
@@ -63,6 +65,9 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
 
 
     GpsReading? lastReading;
+    /// <summary>
+    /// This is the last GPS reading before OnReading is raised
+    /// </summary>
     public GpsReading? LastReading
     {
         get => this.lastReading;
@@ -70,6 +75,17 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     }
 
 
+    GpsReading? mostRecentReading;
+    /// <summary>
+    /// This is the most recent reading from the GPS outside of the filters
+    /// If you are gettings this as of OnReading, it will be the current incoming reading
+    /// </summary>
+    public GpsReading? MostRecentReading
+    {
+        get => this.mostRecentReading;
+        set => this.Set(ref this.mostRecentReading, value);
+    }
+    
     Distance? minDistance;
     public Distance? MinimumDistance
     {
