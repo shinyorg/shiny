@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Shiny.Firebase.Analytics.iOS.Binding;
 using Shiny.Firebase.Messaging.iOS.Binding;
 using Foundation;
 
