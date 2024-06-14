@@ -13,6 +13,66 @@ namespace Shiny.BluetoothLE;
 public static class CharacteristicExtensions
 {
     /// <summary>
+    /// Connects to a characteristic if not already subscribed, it will also attempt to auto-reconnect if you keep the observable hooked
+    /// </summary>
+    /// <param name="serviceUuid">The service UUID</param>
+    /// <param name="characteristicUuid">The characteristic UUID</param>
+    /// <param name="useIndicationsIfAvailable">Uses indications (acks) if available, otherwise uses standard notify</param>
+    /// <returns></returns>
+    public static IObservable<BleCharacteristicResult> NotifyCharacteristic(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
+        => Observable.Create<BleCharacteristicResult>(ob =>
+        {
+            var disposer = new CompositeDisposable();
+
+            disposer.Add(peripheral
+                .WhenNotificationReceived()
+                .Where(x =>
+                    x
+                        .Characteristic
+                        .Service
+                        .Uuid
+                        .Equals(
+                            serviceUuid,
+                            StringComparison.InvariantCultureIgnoreCase
+                        ) &&
+                    x
+                        .Characteristic
+                        .Uuid
+                        .Equals(
+                            characteristicUuid,
+                            StringComparison.InvariantCultureIgnoreCase
+                        ) 
+                )
+                .Subscribe(ob.OnNext, ob.OnError)
+            );
+
+            disposer.Add(peripheral
+                .WhenConnected()
+                .Select(x => x
+                    .EnableCharacteristicNotification(serviceUuid, characteristicUuid, useIndicationsIfAvailable)
+                    .Timeout(TimeSpan.FromSeconds(20))
+                )
+                .Subscribe(
+                    _ => { },
+                    ob.OnError
+                )
+            );
+
+            return () =>
+            {
+                disposer.Dispose();
+                peripheral
+                    .DisableCharacteristicNotification(serviceUuid, characteristicUuid)
+                    .Timeout(TimeSpan.FromSeconds(10))
+                    .Subscribe(
+                        _ => { },
+                        ex => { },
+                        () => { }
+                    );
+            };
+        });
+
+    /// <summary>
     /// Requests all services and characteristics from a peripheral.  Should only be used for niche cases or debugging.
     /// </summary>
     /// <param name="peripheral"></param>

@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
-
     <PropertyGroup>
         <TargetFrameworks>$(DefaultTargetFrameworks);$(WindowsTarget)</TargetFrameworks>
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
@@ -8,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="Shiny.Core.targets" Pack="True" PackagePath="buildTransitive" />
+<!--        <None Include="Shiny.Core.targets" Pack="True" PackagePath="buildTransitive" />-->
         <PackageReference Include="System.Reactive" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
@@ -23,6 +21,4 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.6.2.1" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.6.2.1" />
     </ItemGroup>
-
-    <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

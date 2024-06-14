@@ -6,7 +6,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
-using Shiny.BluetoothLE.Intrastructure;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 

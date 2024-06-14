@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
-using Shiny.BluetoothLE.Intrastructure;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -143,9 +142,5 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
 
 
     protected static BleOperationException ToException(NSError error, string message = "") =>
-#if XAMARIN
-        new (message + error.LocalizedDescription, (int)error.Code);
-#else
         new(message + error.LocalizedDescription, error.Code.ToInt32());
-#endif
 }

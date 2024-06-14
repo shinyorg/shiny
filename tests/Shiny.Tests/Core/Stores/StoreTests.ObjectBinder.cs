@@ -88,6 +88,50 @@ public partial class StoreTests
         store.Contains(key).Should().BeFalse();
     }
 
+
+    [Fact(DisplayName = "Store Binding - Temporary Binding")]
+    public void TemporaryBinding()
+    {
+        var store = new MemoryKeyValueStore();
+        var factory = new KeyValueStoreFactory(new[] { store });
+        var binder = new ObjectStoreBinder(factory, null);
+
+        var obj = new TestBind();
+        binder.TemporaryBind(obj, () =>
+        {
+            obj.IntValue = 1;
+            obj.StringProperty = "Testing";
+        }, store);
+
+        obj.StringProperty = "Two Testing";
+
+        var key = ObjectStoreBinder.GetBindingKey(
+            typeof(TestBind),
+            nameof(TestBind.StringProperty)
+        );
+        store.Get<string>(key).Should().Be("Testing", "Value should not have changed in the store");
+    }
+
+
+    [Fact(DisplayName = "Store Binding - Remove All Persisted Values")]
+    public void RemoveAllPersistedValues()
+    {
+        var store = new MemoryKeyValueStore();
+        var factory = new KeyValueStoreFactory(new[] { store });
+        var binder = new ObjectStoreBinder(factory, null);
+
+        var obj = new TestBind();
+        binder.TemporaryBind(obj, () =>
+        {
+            obj.IntValue = 1;
+            obj.StringProperty = "Testing";
+        }, store);
+
+        store.Values.Count.Should().Be(2, "Invalid Value Count");
+        binder.RemovePersistedValues(obj, store);
+        store.Values.Count.Should().Be(0, "Values were not cleared");
+    }
+
     
     [Fact(DisplayName = "Store Binding - Attribute Binding")]
     public void AttributeBinding()
@@ -110,7 +154,6 @@ public partial class StoreTests
     }
 
 
-    
     (IObjectStoreBinder Binder, T BoundObject) SetupBinder<T>(IKeyValueStore store) where T : class, INotifyPropertyChanged, new()
     {
         this.currentStore = store;

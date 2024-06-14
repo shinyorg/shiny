@@ -39,5 +39,5 @@ public interface IChannelManager
     /// Gets list of channels
     /// </summary>
     /// <returns></returns>
-    IList<Channel> GetAll();
+    IReadOnlyList<Channel> GetAll();
 }

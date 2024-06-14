@@ -2,34 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Firebase.CloudMessaging;
-using Firebase.Core;
+using Shiny.Firebase.Analytics.iOS.Binding;
+using Shiny.Firebase.Messaging.iOS.Binding;
 using Foundation;
 
 namespace Shiny.Push;
 
 
-public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushTagSupport
+public class FirebasePushProvider(FirebaseConfiguration config) : NotifyPropertyChanged, IPushProvider, IPushTagSupport
 {
-    readonly FirebaseConfiguration config;
-
-
-    public FirebasePushProvider(FirebaseConfiguration config)
-    {
-        this.config = config;
-    }
-
 
     public async Task<string> Register(NSData nativeToken)
     {
         this.TryStartFirebase();
-
-        Messaging.SharedInstance.ApnsToken = nativeToken;
-        var fcmToken = await Messaging.SharedInstance.FetchTokenAsync();
-
+        var fcmToken = await FirebaseMessaging.RegisterAsync(nativeToken);
         if (fcmToken == null)
-            throw new InvalidOperationException("FCM Token is null");
-
+             throw new InvalidOperationException("FCM Token is null");
+        
         return fcmToken;
     }
 
@@ -37,7 +26,7 @@ public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushT
     public Task UnRegister()
     {
         this.RegisteredTags = null;
-        return Messaging.SharedInstance.DeleteTokenAsync();
+        return FirebaseMessaging.UnRegisterAsync();
     }
 
 
@@ -54,19 +43,15 @@ public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushT
         var tags = this.RegisteredTags?.ToList() ?? new List<string>(1);
         tags.Add(tag);
 
-        await Messaging
-            .SharedInstance
-            .SubscribeAsync(tag)
-            .ConfigureAwait(false);
+        await FirebaseMessaging.SubscribeAsync(tag).ConfigureAwait(false);
         this.RegisteredTags = tags.ToArray();
     }
 
 
     public async Task RemoveTag(string tag)
     {
-        await Messaging
-            .SharedInstance
-            .UnsubscribeAsync(tag)
+        await FirebaseMessaging
+            .UnSubscribeAsync(tag)
             .ConfigureAwait(false);
 
         if (this.RegisteredTags != null)
@@ -84,9 +69,8 @@ public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushT
         {
             foreach (var tag in this.RegisteredTags)
             {
-                await Messaging
-                    .SharedInstance
-                    .UnsubscribeAsync(tag)
+                await FirebaseMessaging
+                    .UnSubscribeAsync(tag)
                     .ConfigureAwait(false);
             }
         }
@@ -107,27 +91,25 @@ public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushT
 
     protected virtual void TryStartFirebase()
     {
-        if (App.DefaultInstance == null)
+        if (!FirebaseApplication.IsConfigured)
         {
-            if (this.config.UseEmbeddedConfiguration)
+            if (config.UseEmbeddedConfiguration)
             {
-                App.Configure();
-                if (Messaging.SharedInstance == null)
-                    throw new ArgumentException("Failed to configure firebase messaging - ensure you have GoogleService-Info.plist included in your iOS project and that it is set to a BundleResource");
-
-                Messaging.SharedInstance!.AutoInitEnabled = true;
+                FirebaseApplication.AutoConfigure();
+                FirebaseMessaging.IsAutoInitEnabled = true;
             }
             else
             {
-                App.Configure(new Options(
-                    this.config.AppId!,
-                    this.config.SenderId!
-                )
-                {
-                    ApiKey = this.config.ApiKey,
-                    ProjectId = this.config.ProjectId
-                });
+                FirebaseApplication.Configure(
+                    config.AppId!,
+                    config.SenderId!,
+                    config.ApiKey,
+                    config.ProjectId
+                );
             }
+        
+            if (!FirebaseApplication.IsConfigured)
+                throw new InvalidOperationException("Firebase Application failed to configure - please check your settings");
         }
     }
 }

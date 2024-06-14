@@ -16,13 +16,6 @@ public record FirebaseConfig(
 )
 {
     public static FirebaseConfig Embedded { get; } = new(true);
-    public static FirebaseConfig FromValues(string appId, string senderId, string projectId, string apiKey)
-    {
-        var cfg = new FirebaseConfig(false, appId, senderId, projectId, apiKey);
-        cfg.AssertValid();
-        return cfg;
-    }
-
 
     public void AssertValid()
     {

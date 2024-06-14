@@ -13,38 +13,24 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Shiny.Push;
 
 
-public class PushManager : NotifyPropertyChanged,
-                           IApplePushManager,
-                           IIosLifecycle.IOnFinishedLaunching,
-                           IIosLifecycle.IRemoteNotifications,
-                           IIosLifecycle.INotificationHandler
+public class PushManager(        
+    IServiceProvider services,
+    IPlatform platform,
+    ILogger<PushManager> logger,
+    IPushProvider? provider = null
+) : NotifyPropertyChanged,
+    IApplePushManager,
+    IIosLifecycle.IOnFinishedLaunching,
+    IIosLifecycle.IRemoteNotifications,
+    IIosLifecycle.INotificationHandler
 {
-    static readonly NSString apsKey = new NSString("aps");
-    static readonly NSString alertKey = new NSString("alert");
+    static readonly NSString apsKey = new("aps");
+    static readonly NSString alertKey = new("alert");
 
-    readonly IServiceProvider services;
-    readonly IPlatform platform;
-    readonly ILogger logger;
-    readonly IPushProvider? provider;
-    
     TaskCompletionSource<NSData>? tokenSource;
 
 
-    public PushManager(
-        IServiceProvider services,
-        IPlatform platform,
-        ILogger<PushManager> logger,
-        IPushProvider? provider = null
-    )
-    {
-        this.services = services;
-        this.platform = platform;
-        this.logger = logger;
-        this.provider = provider;
-    }
-
-
-    public IPushTagSupport? Tags => (this.provider as IPushTagSupport);
+    public IPushTagSupport? Tags => provider as IPushTagSupport;
 
 
     string? registrationToken;
@@ -89,16 +75,16 @@ public class PushManager : NotifyPropertyChanged,
             {
                 if (x.Exception != null)
                 {
-                    this.logger.LogWarning(x.Exception, "Failed to auto start push");
+                    logger.LogWarning(x.Exception, "Failed to auto start push");
                 }
                 else if (x.Result.Status != AccessState.Available)
                 {
                     // TODO: unregister delegate
-                    this.logger.LogInformation("User has removed push notification access - " + x.Result.Status);
+                    logger.LogInformation("User has removed push notification access - " + x.Result.Status);
                 }
                 else
                 {
-                    this.logger.LogInformation("PushManager still has user permissions");
+                    logger.LogInformation("PushManager still has user permissions");
                 }
             });
     }
@@ -117,15 +103,15 @@ public class PushManager : NotifyPropertyChanged,
         var nativeToken = deviceToken.ToPushTokenString();
         var regToken = nativeToken;
 
-        if (this.provider != null)
-            regToken = await this.provider.Register(deviceToken);
+        if (provider != null)
+            regToken = await provider.Register(deviceToken);
 
         if (regToken != null && this.RegistrationToken != regToken)
         {
-            await this.services
+            await services
                 .RunDelegates<IPushDelegate>(
                     x => x.OnNewToken(regToken),
-                    this.logger
+                    logger
                 )
                 .ConfigureAwait(false);
         }
@@ -143,20 +129,20 @@ public class PushManager : NotifyPropertyChanged,
 
     public async Task UnRegister()
     {
-        await this.platform
+        await platform
             .InvokeOnMainThreadAsync(UIApplication
                 .SharedApplication
                 .UnregisterForRemoteNotifications
             )
             .ConfigureAwait(false);
 
-        if (this.provider != null)
-            await this.provider.UnRegister().ConfigureAwait(false);
+        if (provider != null)
+            await provider.UnRegister().ConfigureAwait(false);
 
-        await this.services
+        await services
             .RunDelegates<IPushDelegate>(
                 x => x.OnUnRegistered(this.RegistrationToken!),
-                this.logger
+                logger
             )
             .ConfigureAwait(false);
 
@@ -170,7 +156,7 @@ public class PushManager : NotifyPropertyChanged,
         this.tokenSource = new();
         using var cancelSrc = cancelToken.Register(() => this.tokenSource.TrySetCanceled());
 
-        await this.platform
+        await platform
             .InvokeOnMainThreadAsync(
                 () => UIApplication
                     .SharedApplication
@@ -191,7 +177,7 @@ public class PushManager : NotifyPropertyChanged,
             "Foreground remote notification received",
             notification =>
             {
-                var options = this.services
+                var options = services
                     .GetServices<IPushDelegate>()
                     .Select(x =>
                     {
@@ -201,13 +187,13 @@ public class PushManager : NotifyPropertyChanged,
                         }
                         catch (Exception ex)
                         {
-                            this.logger.LogError(ex, $"Error executing ApplePushDelegate {x.GetType().FullName}.GetPresentationOptions");
+                            logger.LogError(ex, $"Error executing ApplePushDelegate {x.GetType().FullName}.GetPresentationOptions");
                             return null;
                         }
                     })
                     .FirstOrDefault(x => x != null);
 
-                this.platform.InvokeOnMainThread(() =>
+                platform.InvokeOnMainThread(() =>
                     completionHandler.Invoke(
                         options ??
                         UNNotificationPresentationOptions.List |
@@ -226,19 +212,19 @@ public class PushManager : NotifyPropertyChanged,
         if (response?.Notification?.Request?.Trigger is not UNPushNotificationTrigger push)
             return;
 
-        this.logger.LogDebug("OnDidReceiveNotificationResponse - Background remote notification entry detected");
+        logger.LogDebug("OnDidReceiveNotificationResponse - Background remote notification entry detected");
         var data = this.ToPushNotification(response.Notification);
-        this.services
+        services
             .RunDelegates<IPushDelegate>(
                 x => x.OnEntry(data),
-                this.logger
+                logger
             )
             .ContinueWith(_ =>
             {
                 // This needs be invoked on MainThread,
                 // otherwise iOS app crashes if we tap on push notification alert
                 // from notification center, while App in Active state.
-                this.platform.InvokeOnMainThread(() => completionHandler.Invoke());
+                platform.InvokeOnMainThread(() => completionHandler.Invoke());
             });
     }
 
@@ -247,34 +233,34 @@ public class PushManager : NotifyPropertyChanged,
     public void OnFailedToRegister(NSError error) => this.tokenSource?.TrySetException(new Exception(error.LocalizedDescription));
     public void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
     {
-        this.logger.LogDebug("Incoming Background remote notification");
+        logger.LogDebug("Incoming Background remote notification");
 
         var dict = userInfo.FromNsDictionary();
         var data = new PushNotification(dict, null);
-        this.services
+        services
             .RunDelegates<IPushDelegate>(
                 x => x.OnReceived(data),
-                this.logger
+                logger
             )
             .ContinueWith(x =>
             {
-                var fetchResult = this.services
+                var fetchResult = services
                     .GetServices<IPushDelegate>()
-                    .Select(x =>
+                    .Select(y =>
                     {
                         try
                         {
-                            return (x as IApplePushDelegate)?.GetFetchResult(data);
+                            return (y as IApplePushDelegate)?.GetFetchResult(data);
                         }
                         catch (Exception ex)
                         {
-                            this.logger.LogError(ex, $"Error executing ApplePushDelegate {x.GetType().FullName}.GetFetchResult");
+                            logger.LogError(ex, $"Error executing ApplePushDelegate {x.GetType().FullName}.GetFetchResult");
                             return null;
                         }
                     })
-                    .FirstOrDefault(x => x != null);
+                    .FirstOrDefault(y => y != null);
 
-                this.platform.InvokeOnMainThread(
+                platform.InvokeOnMainThread(
                     () => completionHandler.Invoke(fetchResult ?? UIBackgroundFetchResult.NewData)
                 );
             });
@@ -287,15 +273,15 @@ public class PushManager : NotifyPropertyChanged,
         if (args.RemoteNotifications == null)
             return;
 
-        this.logger.LogDebug("App entry remote notification detected");
+        logger.LogDebug("App entry remote notification detected");
         var notification = this.ToNotification(args.RemoteNotifications);
         var dict = args.RemoteNotifications.FromNsDictionary();
         dict.Remove("aps");
 
         var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
-        this.services.RunDelegates<IPushDelegate>(
+        services.RunDelegates<IPushDelegate>(
             x => x.OnEntry(push),
-            this.logger
+            logger
         );
     }
 
@@ -306,19 +292,19 @@ public class PushManager : NotifyPropertyChanged,
         if (notification?.Request?.Trigger is not UNPushNotificationTrigger push)
             return;
 
-        this.logger.LogDebug(logMessage);
+        logger.LogDebug(logMessage);
 
         var data = this.ToPushNotification(notification);
-        this.services
+        services
             .RunDelegates<IPushDelegate>(
                 x => x.OnReceived(data),
-                this.logger
+                logger
             )
             .ContinueWith(_ => completionHandler.Invoke(data));
     }
 
 
-    protected virtual PushNotification ToPushNotification(UNNotification notification)
+    protected virtual ApplePushNotification ToPushNotification(UNNotification notification)
     {
         var c = notification.Request.Content;
         var shinyNotification = new Notification(
@@ -327,7 +313,7 @@ public class PushManager : NotifyPropertyChanged,
         );
 
         var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
-        var data = new PushNotification(dict, shinyNotification);
+        var data = new ApplePushNotification(dict, c.UserInfo, shinyNotification);
 
         return data;
     }

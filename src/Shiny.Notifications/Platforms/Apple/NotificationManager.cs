@@ -7,17 +7,16 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using CoreLocation;
+using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Stores;
-using Microsoft.Extensions.Logging;
 
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager, IIosLifecycle.INotificationHandler
+public class NotificationManager : IAppleNotificationManager, IIosLifecycle.INotificationHandler
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
-    readonly IosConfiguration configuration;
     readonly IPlatform platform;
     readonly ILogger logger;
     readonly IChannelManager channelManager;
@@ -25,7 +24,6 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 
 
     public NotificationManager(
-        IosConfiguration configuration,
         IServiceProvider services,
         ILogger<NotificationManager> logger,
         IPlatform platform,
@@ -33,38 +31,53 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         IKeyValueStoreFactory keystore
     )
     {
-        this.configuration = configuration;
         this.delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
         this.logger = logger;
         this.platform = platform;
         this.channelManager = channelManager;
         this.settings = keystore.DefaultStore;
+
+        //this.PresentationOptions = UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound | UNNotificationPresentationOptions.Banner;
     }
 
 
+    // TODO: persist
+    //public UNNotificationPresentationOptions PresentationOptions { get; }
+
     public void AddChannel(Channel channel) => this.channelManager.Add(channel);
+    public void AddChannel(AppleChannel channel) => this.AddChannel((Channel)channel);
+
     public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
     public void ClearChannels() => this.channelManager.Clear();
     public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
-
-
-    public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
+    public IReadOnlyList<Channel> GetChannels() => this.channelManager.GetAll();
+    
+    public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync(() =>
+#pragma warning disable CA1422
         (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
     );
 
 
-    public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(() =>
-        UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0
-    );
-
-
-    public Task<AccessState> RequestAccess(AccessRequestFlags access)
+    public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(async () =>
     {
-        var tcs = new TaskCompletionSource<AccessState>();
+        if (IosPlatform.IsAppleVersionAtleast(16))
+        {
+#pragma warning disable CA1416
+            await UNUserNotificationCenter.Current.SetBadgeCountAsync(badge ?? 0);
+        }
+        else
+        {
+#pragma warning disable CA1422
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0;
+        }
+    });
 
+
+    public async Task RequestAccess(UNAuthorizationOptions authOptions)
+    {
+        var tcs = new TaskCompletionSource<bool>();
         UNUserNotificationCenter.Current.RequestAuthorization(
-            this.configuration.UNAuthorizationOptions,
+            authOptions,
             (approved, error) =>
             {
                 if (error != null)
@@ -73,12 +86,53 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
                 }
                 else
                 {
-                    var state = approved ? AccessState.Available : AccessState.Denied;
-                    tcs.SetResult(state);
+                    //var state = approved ? AccessState.Available : AccessState.Denied;
+                    //tcs.SetResult(state);
                 }
             });
 
-        return tcs.Task;
+        await tcs.Task.ConfigureAwait(false);
+    }
+
+
+    public async Task<NotificationAccessState> GetCurrentAccess()
+    {
+        // could track this to a persisted var on startup and update in RequestAccess
+
+        // TODO: may need an AppleCurrentAccess
+        var settings = await UNUserNotificationCenter.Current.GetNotificationSettingsAsync();
+        //UNAuthorizationStatus.Ephemeral
+        //UNAuthorizationStatus.Authorized
+        //UNAuthorizationStatus.Denied
+        //UNAuthorizationStatus.NotDetermined
+        //UNAuthorizationStatus.Provisional
+
+        //settings.AuthorizationStatus == UNAuthorizationStatus.Authorized
+        //settings.AnnouncementSetting == UNNotificationSetting.
+        //settings.AlertSetting == UNNotificationSetting
+        //settings.CriticalAlertSetting
+        //settings.CarPlaySetting
+        //settings.LockScreenSetting
+        //settings.ProvidesAppNotificationSettings
+        //settings.ScheduledDeliverySetting == UNNotificationSetting.Enabled
+        //settings.SoundSetting
+        //settings.TimeSensitiveSetting
+        //settings.BadgeSetting
+        return null;
+    }
+
+
+    public async Task<NotificationAccessState> RequestAccess(AccessRequestFlags access)
+    {
+        // TODO: look at presentation options
+        var nativeRequest = UNAuthorizationOptions.None;
+        //if (access.HasFlag(AccessRequestFlags.LocationAware) || access.HasFlag(AccessRequestFlags.TimeSensitivity))
+        //    nativeRequest |= UNAuthorizationOptions.TimeSensitive;
+
+        await this.RequestAccess(nativeRequest);
+
+        //return tcs.Task;
+        return null;
     }
 
 
@@ -86,7 +140,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-    public Task<IList<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
+    public Task<IReadOnlyList<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
     {
         var requests = await UNUserNotificationCenter
             .Current
@@ -94,10 +148,11 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             .ConfigureAwait(false);
 
         var notifications = requests.Select(x => x.FromNative() as Notification).ToList();
-        return (IList<Notification>)notifications;
+        return (IReadOnlyList<Notification>)notifications;
     });
 
 
+    public Task Send(AppleNotification notification) => this.Send((Notification)notification);
     public Task Send(Notification notification) => this.platform.InvokeTaskOnMainThread(async () =>
     {
         notification.AssertValid();
@@ -170,7 +225,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             if (apple.Subtitle != null)
                 content.Subtitle = apple.Subtitle;
             
-            if (OperatingSystemShim.IsAppleVersionAtleast(16))
+            if (IosPlatform.IsAppleVersionAtleast(16))
             {
                 content.FilterCriteria = apple.FilterCriteria;
                 content.RelevanceScore = apple.RelevanceScore;
@@ -186,20 +241,20 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 
     protected virtual void ApplyChannel(Notification notification, Channel channel, UNMutableNotificationContent native)
     {
-        if (OperatingSystemShim.IsAppleVersionAtleast(15))
+        if (IosPlatform.IsAppleVersionAtleast(15))
         {
             native.InterruptionLevel = channel.Importance switch
             {
-                ChannelImportance.Low => UNNotificationInterruptionLevel.Passive,
-                ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive,
-                ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical,
-                _ => UNNotificationInterruptionLevel.Active
+                ChannelImportance.Low => UNNotificationInterruptionLevel.Passive2,
+                ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive2,
+                ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical2,
+                _ => UNNotificationInterruptionLevel.Active2
             };
         }
 
+        // TODO
         native.CategoryIdentifier = channel.Identifier;
         var useCriticalSound =
-            this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
             channel.Importance == ChannelImportance.Critical &&
             UIDevice.CurrentDevice.CheckSystemVersion(12, 0);
 
@@ -241,15 +296,10 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             switch (channel.Importance)
             {
                 case ChannelImportance.Critical:
-                case ChannelImportance.High:
-                    var is12 = OperatingSystemShim.IsAppleVersionAtleast(12);
-                    native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
-                        ? UNNotificationSound.DefaultCriticalSound
-                        : UNNotificationSound.Default;
+                    native.Sound = UNNotificationSound.DefaultCriticalSound;
                     break;
 
-                case ChannelImportance.Normal:
-                    OperatingSystemShim.IsMacCatalystVersionAtLeast(12);
+                case ChannelImportance.High:
                     native.Sound = UNNotificationSound.Default;
                     break;
 
@@ -348,9 +398,15 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
         var t = notification?.Request?.Trigger;
         if (t == null || t is not UNPushNotificationTrigger)
         {
-            this.platform.InvokeOnMainThread(() =>
-                completionHandler.Invoke(this.configuration.PresentationOptions)
-            );
+            //var options = this.delegates
+            //    .Value
+            //    .OfType<IAppleNotificationDelegate>()
+            //    .Select(x => x.GetForegroundPresentation(notification))
+            //    .FirstOrDefault(x => x != null);
+
+            //this.platform.InvokeOnMainThread(() =>
+            //    completionHandler.Invoke(options ?? PresentationOP)
+            //);
         }
     }
 }

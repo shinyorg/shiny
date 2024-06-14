@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Shiny.Stores;
 
 namespace Shiny;
@@ -6,7 +7,58 @@ namespace Shiny;
 
 public static class StoreExtensions
 {
-    static readonly object syncLock = new object();
+    static readonly object syncLock = new();
+
+
+    /// <summary>
+    /// This will temporary bind an object allowing you set values 
+    /// </summary>
+    /// <param name="storeBinder"></param>
+    /// <param name="npc"></param>
+    /// <param name="keyValueStoreAlias"></param>
+    public static void TemporaryBind(
+        this IObjectStoreBinder storeBinder,
+        INotifyPropertyChanged npc,
+        Action runAction,
+        string? keyValueStoreAlias = null
+    )
+    {
+        try
+        {
+            storeBinder.Bind(npc, keyValueStoreAlias);
+            runAction();
+        }
+        finally
+        {
+            storeBinder.UnBind(npc);
+        }
+    }
+
+
+    /// <summary>
+    /// Temporarily binds and change values before unbinding
+    /// </summary>
+    /// <param name="storeBinder"></param>
+    /// <param name="npc"></param>
+    /// <param name="runAction"></param>
+    /// <param name="store"></param>
+    public static void TemporaryBind(
+        this IObjectStoreBinder storeBinder,
+        INotifyPropertyChanged npc,
+        Action runAction,
+        IKeyValueStore store
+    )
+    {
+        try
+        {
+            storeBinder.Bind(npc, store);
+            runAction();
+        }
+        finally
+        {
+            storeBinder.UnBind(npc);
+        }
+    }
 
 
     /// <summary>

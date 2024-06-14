@@ -4,6 +4,7 @@ using Android.Content.PM;
 namespace Sample.Maui;
 
 [Activity(
+    LaunchMode = LaunchMode.SingleTop,
     Theme = "@style/Maui.SplashTheme",
     MainLauncher = true,
     ConfigurationChanges =

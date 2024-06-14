@@ -78,12 +78,12 @@ public class CreateViewModel : ViewModel
                 }
                 try
                 {
-                    access = await notificationManager.RequestAccess();
-                    if (access != AccessState.Available)
-                    {
-                        await this.Alert("Permission denied to notifications - geofence will still be created and events will be stored, but you will not receive notifications");
-                        return;
-                    }
+                    //access = await notificationManager.RequestAccess();
+                    //if (access != AccessState.Available)
+                    //{
+                    //    await this.Alert("Permission denied to notifications - geofence will still be created and events will be stored, but you will not receive notifications");
+                    //    return;
+                    //}
 
                     await geofenceManager.StartMonitoring(new GeofenceRegion(
                         this.Identifier,
