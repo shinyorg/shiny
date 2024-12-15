@@ -22,7 +22,7 @@ public interface INotifyCollectionChanged<T> : INotifyCollectionChanged, IList<T
 
 // Author: James Montemagno
 // https://github.com/jamesmontemagno/mvvm-helpers/blob/master/MvvmHelpers/ObservableRangeCollection.cs
-public class ObservableList<T> : ObservableCollection<T>, INotifyCollectionChanged<T>
+public class ObservableList<T>(IEnumerable<T> collection = null) : ObservableCollection<T>, INotifyCollectionChanged<T>
 {
     /// <summary>
     /// Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class.
@@ -36,7 +36,7 @@ public class ObservableList<T> : ObservableCollection<T>, INotifyCollectionChang
     /// </summary>
     /// <param name="collection">collection: The collection from which the elements are copied.</param>
     /// <exception cref="System.ArgumentNullException">The collection parameter cannot be null.</exception>
-    public ObservableList(IEnumerable<T> collection) : base(collection)
+    public ObservableList: base(collection)
     {
     }
 

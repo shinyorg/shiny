@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample"
+             x:DataType="sample:HealthTestViewModel"
+             x:Class="Sample.HealthTestPage"
+             Title="Health Test">
+
+    <RefreshView IsRefreshing="{Binding IsBusy}"
+                 Command="{Binding Load}">
+
+        <VerticalStackLayout>
+            <Grid RowDefinitions="Auto, Auto, Auto"
+                  ColumnDefinitions="1*, 3*">
+
+                <Label Text="Start"
+                       Grid.Row="0"
+                       Grid.Column="0" />
+
+                <DatePicker Date="{Binding Start}"
+                            Grid.Row="0"
+                            Grid.Column="1" />
+
+                <Label Text="End"
+                       Grid.Row="1"
+                       Grid.Column="0" />
+
+                <DatePicker Date="{Binding End}"
+                            Grid.Row="1"
+                            Grid.Column="1" />
+
+                <Button Text="Query"
+                        Command="{Binding Load}"
+                        Grid.Row="2"
+                        Grid.ColumnSpan="2" />
+            </Grid>
+
+            <TableView Intent="Data">
+                <TableRoot>
+                    <TableSection>
+                        <TextCell Text="Calories (total - kilocalories)"
+                                  Detail="{Binding Calories}"
+                                  Command="{Binding NavToList}"
+                                  CommandParameter="Calories" />
+
+                        <TextCell Text="Distance (total - meters)"
+                                  Detail="{Binding Distance}"
+                                  Command="{Binding NavToList}"
+                                  CommandParameter="Distance" />
+
+                        <TextCell Text="Heart Rate (avg)"
+                                  Detail="{Binding HeartRate}"
+                                  Command="{Binding NavToList}"
+                                  CommandParameter="HeartRate" />
+
+                        <TextCell Text="Steps (total)"
+                                  Detail="{Binding Steps}"
+                                  Command="{Binding NavToList}"
+                                  CommandParameter="StepCount" />
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+        </VerticalStackLayout>
+    </RefreshView>
+</ContentPage>

@@ -7,7 +7,6 @@
 
     <ItemGroup>
 <!--        <None Include="Shiny.Core.targets" Pack="True" PackagePath="buildTransitive" />-->
-        <PackageReference Include="System.Reactive" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>

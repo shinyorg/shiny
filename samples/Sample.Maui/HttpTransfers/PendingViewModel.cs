@@ -72,17 +72,8 @@ public class PendingViewModel : ViewModel
 }
 
 
-public class HttpTransferViewModel : ReactiveObject
+public class HttpTransferViewModel(HttpTransfer transfer, ICommand command) : ReactiveObject
 {
-    public HttpTransferViewModel(HttpTransfer transfer, ICommand cancel)
-    {
-        this.Identifier = transfer.Identifier;
-        this.Uri = transfer.Request.Uri;
-        this.IsUpload = transfer.Request.IsUpload;
-        this.Cancel = cancel;
-    }
-
-
     public string Identifier { get;  }
     public string Uri { get; }
     public bool IsUpload { get; }

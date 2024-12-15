@@ -9,12 +9,10 @@ using Microsoft.Extensions.Logging;
 namespace Shiny;
 
 
-public class ShinySubject<T> : ISubject<T>
+public class ShinySubject<T>(ILogger? logger = null) : ISubject<T>
 {
     readonly HashSet<IObserver<T>> observers = new();
-
-    public ShinySubject(ILogger? logger = null) => this.Logger = logger;
-    public ILogger? Logger { get; set; }
+    public ILogger? Logger { get; set; } = logger;
     
 
     public void OnCompleted() => this.Pub(x => x.OnCompleted(), "OnCompleted error on observer");

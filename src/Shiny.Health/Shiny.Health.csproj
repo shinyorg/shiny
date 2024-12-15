@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>$(DefaultTargetFrameworks);</TargetFrameworks>
+        <Description>Cross Platform health data - Apple Health and Google Fit Integrations</Description>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    
+    <ItemGroup Condition="$(TargetFramework.Contains('android'))">
+        <PackageReference Include="Xamarin.AndroidX.Collection.Jvm" Version="1.3.0.2" />
+        <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.3.0.2" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Auth" Version="120.7.0.1" />
+        <PackageReference Include="Xamarin.Androidx.Health" Version="1.0.0-pre1" />
+    </ItemGroup>
+</Project>

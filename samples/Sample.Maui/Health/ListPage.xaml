@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Sample"
+             xmlns:health="clr-namespace:Shiny.Health;assembly=Shiny.Health"
+             x:DataType="sample:ListViewModel"
+             x:Class="Sample.ListPage"
+             Title="{Binding Title}">
+
+  <StackLayout HorizontalOptions="FillAndExpand"
+               VerticalOptions="FillAndExpand">
+
+        <Grid RowDefinitions="Auto, Auto, Auto"
+              ColumnDefinitions="1*, 2*, 2*">
+
+            <Label Text="Start Date"
+                   Grid.Column="0"
+                   Grid.Row="0" />
+
+            <DatePicker Date="{Binding DateStart}"
+                        Grid.Column="1"
+                        Grid.Row="0" />
+
+            <TimePicker Time="{Binding TimeStart}"
+                        Grid.Column="2"
+                        Grid.Row="0" />
+
+            <Label Text="End Date"
+                   Grid.Column="0"
+                   Grid.Row="1" />
+
+            <DatePicker Date="{Binding DateEnd}"
+                        Grid.Column="1"
+                        Grid.Row="1" />
+
+            <TimePicker Time="{Binding TimeEnd}"
+                        Grid.Column="2"
+                        Grid.Row="1" />
+        </Grid>
+
+        <Button Text="Run Query"
+                Command="{Binding Load}" />
+
+        <CollectionView ItemsSource="{Binding Data}"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand">
+            <CollectionView.EmptyView>
+                <Label Text="No Items" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="health:NumericHealthResult">
+                    <StackLayout Padding="0,5">
+                        <StackLayout Orientation="Horizontal" Spacing="5">
+                            <Label FontAttributes="Bold" Text="{Binding Start, StringFormat='{0:MM/dd/yyyy a\\t h:mm tt}'}" />
+                            <Label FontAttributes="Bold" Text="to" />
+                            <Label FontAttributes="Bold" Text="{Binding End, StringFormat='{0:MM/dd/yyyy a\\t h:mm tt}'}" />
+                        </StackLayout>
+                        <Label Text="{Binding Value, StringFormat='Value: {0}'}" />
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </StackLayout>
+</ContentPage>

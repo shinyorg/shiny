@@ -12,25 +12,25 @@
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
-        <PackageReleaseNotes>https://shinylib.net/release-notes/client/v30/</PackageReleaseNotes>
+        <PackageReleaseNotes>https://shinylib.net/release-notes/client/v40/</PackageReleaseNotes>
         <PackageTags>xamarin ios android ble bluetooth bluetoothle push notifications sensors geofences gps location background jobs settings speech sensors</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-        <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
-        <MauiVersion>8.0.40</MauiVersion>
+        <MicrosoftExtensionsVersion>9.0.0</MicrosoftExtensionsVersion>
+        <MauiVersion>9.0.11</MauiVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net8.0-windows10.0.19041.0</WindowsTarget>
-        <StandardTargetFrameworks>net8.0</StandardTargetFrameworks>
-        <IosTargetFrameworks>net8.0-ios</IosTargetFrameworks>
-        <AndroidTargetFrameworks>net8.0-android</AndroidTargetFrameworks>
+        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net9.0-windows10.0.19041.0</WindowsTarget>
+        <StandardTargetFrameworks>net9.0</StandardTargetFrameworks>
+        <IosTargetFrameworks>net9.0-ios</IosTargetFrameworks>
+        <AndroidTargetFrameworks>net9.0-android</AndroidTargetFrameworks>
 
-        <MauiPlatformTargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</MauiPlatformTargetFrameworks>
-        <AppleTargetFrameworks>$(IosTargetFrameworks);net8.0-maccatalyst</AppleTargetFrameworks>
+        <MauiPlatformTargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</MauiPlatformTargetFrameworks>
+        <AppleTargetFrameworks>$(IosTargetFrameworks);net9.0-maccatalyst</AppleTargetFrameworks>
         <PlatformOnlyTargetFrameworks>$(AppleTargetFrameworks);$(AndroidTargetFrameworks)</PlatformOnlyTargetFrameworks>
         <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
         <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>
@@ -47,7 +47,7 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>34.0</TargetPlatformMinVersion>
+        <TargetPlatformMinVersion>35.0</TargetPlatformMinVersion>
         <IsAndroidBuild>true</IsAndroidBuild>
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
