@@ -1,4 +1,69 @@
-﻿// using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Android.App;
+using Android.Health.Connect;
+using AndroidX.Health.Connect.Client;
+using AndroidX.Health.Connect.Client.Impl.Converters.Time;
+using AndroidX.Health.Connect.Client.Time;
+using AndroidX.Health.Connect.Client.Records;
+using AndroidX.Health.Connect.Client.Request;
+using AndroidX.Health.Connect.Client.Response;
+using Java.Time;
+using Kotlin.Jvm;
+using Kotlin.Reflect;
+using DataOrigin = AndroidX.Health.Connect.Client.Records.Metadata.DataOrigin;
+using ReadRecordsRequest = AndroidX.Health.Connect.Client.Request.ReadRecordsRequest;
+using StepsRecord = Android.Health.Connect.DataTypes.StepsRecord;
+
+namespace Shiny.Health;
+
+
+public class HealthService : IHealthService
+{
+    public Task<IEnumerable<(DataType Type, bool Success)>> RequestPermissions(params DataType[] dataTypes)
+    {
+        var client = HealthConnectClient.GetOrCreate(Application.Context);
+        var stepCountRecordClass = JvmClassMappingKt.GetKotlinClass(
+            Java.Lang.Class.FromType(typeof(StepsRecord))
+        );
+        var trf = TimeRangeFilter.Between(
+            Instant.OfEpochMilli(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())!,
+            Instant.OfEpochMilli(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())!
+        );
+        // new ReadRecordsRequest.Builder<StepsRecord>()
+        //new ReadRecordsRequest.Builder<StepsRecord>();
+        var request = new ReadRecordsRequest(
+            stepCountRecordClass,
+            trf,
+            new List<DataOrigin>(),
+            true,
+            10,
+            "page token"
+        );
+            //new TimeRangeFilterConverterKt()
+        //client.ReadRecords(request)
+        // var i = HealthServices.GetClient(Application.Context);
+        // var healthClient = HealthServices.GetClient(Application.Context);
+        //new HealthDataStore(null);
+        // var dataStore = new HealthDatastore(null);
+        return null;
+    }
+
+    public Task<IList<NumericHealthResult>> GetCalories(DateTimeOffset start, DateTimeOffset end, Interval interval, CancellationToken cancelToken = default) => throw new NotImplementedException();
+
+    public Task<IList<NumericHealthResult>> GetDistances(DateTimeOffset start, DateTimeOffset end, Interval interval, CancellationToken cancelToken = default) => throw new NotImplementedException();
+
+    public Task<IList<NumericHealthResult>> GetStepCounts(DateTimeOffset start, DateTimeOffset end, Interval interval,
+        CancellationToken cancelToken = default) =>
+        throw new NotImplementedException();
+
+    public Task<IList<NumericHealthResult>> GetAverageHeartRate(DateTimeOffset start, DateTimeOffset end, Interval interval,
+        CancellationToken cancelToken = default) =>
+        throw new NotImplementedException();
+}
+// using System;
 // using System.Collections.Generic;
 // using System.Linq;
 // using System.Threading;

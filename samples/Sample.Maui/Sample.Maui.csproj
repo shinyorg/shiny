@@ -26,11 +26,6 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
-        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-        <!--
-        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-        <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
-        -->
 	</PropertyGroup>
 
     <ItemGroup>
