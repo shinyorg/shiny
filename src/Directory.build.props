@@ -37,8 +37,8 @@
         <AndroidTargetFrameworks>net8.0-android</AndroidTargetFrameworks>
         <AndroidTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(AndroidTargetFrameworks);monoandroid13.0</AndroidTargetFrameworks>
 
-        <MauiPlatformTargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</MauiPlatformTargetFrameworks>
-        <AppleTargetFrameworks>$(IosTargetFrameworks);net8.0-maccatalyst</AppleTargetFrameworks>
+        <MauiPlatformTargetFrameworks>net8.0-android34.0;net8.0-ios17.0;net8.0-maccatalyst17.0</MauiPlatformTargetFrameworks>
+        <AppleTargetFrameworks>$(IosTargetFrameworks);net8.0-maccatalyst17.0</AppleTargetFrameworks>
         <PlatformOnlyTargetFrameworks>$(AppleTargetFrameworks);$(AndroidTargetFrameworks)</PlatformOnlyTargetFrameworks>
         <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
         <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>
