@@ -2,9 +2,7 @@
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
 using Shiny.Hosting;
-#if PLATFORM
 using Shiny.Infrastructure;
-#endif
 
 namespace Shiny;
 
@@ -14,9 +12,8 @@ public static class ShinyExtensions
     public static MauiAppBuilder UseShiny(this MauiAppBuilder builder)
     {
         builder.Services.AddSingleton<IMauiInitializeService, ShinyMauiInitializationService>();
-#if PLATFORM
         builder.Services.AddShinyCoreServices();
-#endif
+
         builder.ConfigureLifecycleEvents(events =>
         {
 #if ANDROID

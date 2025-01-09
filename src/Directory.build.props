@@ -31,10 +31,10 @@
         <StandardTargetFrameworks>net8.0</StandardTargetFrameworks>
         <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);netstandard2.1</StandardTargetFrameworks>
 
-        <IosTargetFrameworks>net8.0-ios</IosTargetFrameworks>
+        <IosTargetFrameworks>net8.0-ios17.0</IosTargetFrameworks>
         <IosTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(IosTargetFrameworks);xamarin.ios10</IosTargetFrameworks>
 
-        <AndroidTargetFrameworks>net8.0-android</AndroidTargetFrameworks>
+        <AndroidTargetFrameworks>net8.0-android34.0</AndroidTargetFrameworks>
         <AndroidTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(AndroidTargetFrameworks);monoandroid13.0</AndroidTargetFrameworks>
 
         <MauiPlatformTargetFrameworks>net8.0-android34.0;net8.0-ios17.0;net8.0-maccatalyst17.0</MauiPlatformTargetFrameworks>
@@ -60,18 +60,14 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('monoandroid'))">
-        <IsAndroidBuild>true</IsAndroidBuild>
         <IsClassicTarget>true</IsClassicTarget>
         <DefineConstants>$(DefineConstants);XAMARIN</DefineConstants>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+    <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>34.0</TargetPlatformMinVersion>
         <IsAndroidBuild>true</IsAndroidBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
         <DefineConstants>$(DefineConstants);ANDROID;PLATFORM</DefineConstants>
@@ -101,20 +97,19 @@
         <DefineConstants>$(DefineConstants);PLATFORM;WINDOWS</DefineConstants>
     </PropertyGroup>
 
+    <!--
     <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
         <IsWebAssembly>true</IsWebAssembly>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <!--
         <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
         <WasmMainJSPath>main.js</WasmMainJSPath>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>full</TrimMode>
-		<RunAOTCompilation>true</RunAOTCompilation>
-        -->
+		<RunAOTCompilation>true</RunAOTCompilation>    
 	</PropertyGroup>
-
+    -->
     <Target Name="_DisableRemoteBuildForLibraries" BeforeTargets="BeforeBuild;_SayHello">
 		<PropertyGroup>
 			<IsRemoteBuild>false</IsRemoteBuild>
