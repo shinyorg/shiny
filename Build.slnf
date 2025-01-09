@@ -19,8 +19,7 @@
       "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
       "src\\Shiny.Notifications\\Shiny.Notifications.csproj",
       "src\\Shiny.Push\\Shiny.Push.csproj",
-      "src\\Shiny.Push.AzureNotificationHubs\\Shiny.Push.AzureNotificationHubs.csproj",
-      "src\\Shiny.Push.FirebaseMessaging\\Shiny.Push.FirebaseMessaging.csproj",
+      "src\\Shiny.Push.AzureNotificationHubs\\Shiny.Push.AzureNotificationHubs.csproj"
     ]
   }
 }
