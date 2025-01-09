@@ -89,7 +89,6 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     protected virtual List<string> GetPermissionSet(GpsRequest request)
     {
         var realtime = request.BackgroundMode == GpsBackgroundMode.Realtime;
-        var requestBg = false;
         var permissionSet = new List<string> { P.AccessCoarseLocation };
         if (request.Accuracy > GpsAccuracy.Low)
             permissionSet.Add(P.AccessFineLocation);
@@ -98,26 +97,24 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         {
             case GpsBackgroundMode.Standard:
                 // just always request BG
-                requestBg = !realtime && OperatingSystem.IsAndroidVersionAtLeast(29);
+                if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+                    permissionSet.Add(P.AccessBackgroundLocation);
                 break;
 
             case GpsBackgroundMode.Realtime:
                 // just always request BG
-                requestBg = !realtime && OperatingSystem.IsAndroidVersionAtLeast(29);
-
-                if (OperatingSystem.IsAndroidVersionAtLeast(31))
+                if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
                     permissionSet.Add(P.ForegroundService);
+                else
+                    permissionSet.Add(P.AccessBackgroundLocation);
 
-                if (OperatingSystem.IsAndroidVersionAtLeast(33))
+                if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
                     permissionSet.Add(P.PostNotifications);
 
                 if (OperatingSystem.IsAndroidVersionAtLeast(34))
                     permissionSet.Add(P.ForegroundServiceLocation);
                 break;
         }
-        if (requestBg && OperatingSystem.IsAndroidVersionAtLeast(29))
-            permissionSet.Add(P.AccessBackgroundLocation);
-
         return permissionSet;
     }
 
