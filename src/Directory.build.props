@@ -31,14 +31,14 @@
         <StandardTargetFrameworks>net8.0</StandardTargetFrameworks>
         <StandardTargetFrameworks Condition="'$(CI)' == 'true'">$(StandardTargetFrameworks);netstandard2.1</StandardTargetFrameworks>
 
-        <IosTargetFrameworks>net8.0-ios17.0</IosTargetFrameworks>
+        <IosTargetFrameworks>net8.0-ios18.0</IosTargetFrameworks>
         <IosTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(IosTargetFrameworks);xamarin.ios10</IosTargetFrameworks>
 
         <AndroidTargetFrameworks>net8.0-android34.0</AndroidTargetFrameworks>
         <AndroidTargetFrameworks Condition="'$(UseMSBuild)' == 'true'">$(AndroidTargetFrameworks);monoandroid13.0</AndroidTargetFrameworks>
 
-        <MauiPlatformTargetFrameworks>net8.0-android34.0;net8.0-ios17.0;net8.0-maccatalyst17.0</MauiPlatformTargetFrameworks>
-        <AppleTargetFrameworks>$(IosTargetFrameworks);net8.0-maccatalyst17.0</AppleTargetFrameworks>
+        <MauiPlatformTargetFrameworks>net8.0-android34.0;net8.0-ios18.0;net8.0-maccatalyst14.0</MauiPlatformTargetFrameworks>
+        <AppleTargetFrameworks>$(IosTargetFrameworks);net8.0-maccatalyst14.0</AppleTargetFrameworks>
         <PlatformOnlyTargetFrameworks>$(AppleTargetFrameworks);$(AndroidTargetFrameworks)</PlatformOnlyTargetFrameworks>
         <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
         <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>

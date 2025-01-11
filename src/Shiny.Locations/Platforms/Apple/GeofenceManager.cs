@@ -22,6 +22,21 @@ public class GeofenceManager(
     {
         if (this.monitor == null && createIfNeeded)
         {
+            var psession = CLServiceSession
+                .CreateSession(
+                    CLServiceSessionAuthorizationRequirement.Always, 
+                    "Geofencing",
+                    new DispatchQueue(""),
+                    diag =>
+                    {
+                        // diag.FullAccuracyDenied
+                        if (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
+                            this.CurrentStatus = AccessState.Denied;
+                        else
+                            this.CurrentStatus = AccessState.Available;
+                    }
+                );
+            
             this.session = CLBackgroundActivitySession.Create(); // catalyst 14 or ios17
             this.monitor = await CLMonitor.RequestMonitorAsync(CLMonitorConfiguration.Create(
                 "shiny_geofences",
@@ -47,10 +62,17 @@ public class GeofenceManager(
         }
         return this.monitor;
     }
-    
-    
-    public AccessState CurrentStatus { get; }
-    public Task<AccessState> RequestAccess() => throw new System.NotImplementedException();
+
+
+    public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
+
+    public Task<AccessState> RequestAccess()
+    {
+        var tcs = new TaskCompletionSource<AccessState>();
+
+        
+        return tcs.Task;
+    }
 
     
     public IList<GeofenceRegion> GetMonitorRegions() => repository.GetList<GeofenceRegion>();
