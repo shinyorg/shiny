@@ -37,9 +37,6 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         builder.Logging.AddSqlite(Path.Combine(FileSystem.AppDataDirectory, "logging.db"), LogLevel.Debug);
-#if !MACCATALYST
-        builder.Logging.AddAppCenter("TEST");
-#endif
 
         return builder;
     }

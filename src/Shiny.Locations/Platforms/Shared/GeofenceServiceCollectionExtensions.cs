@@ -38,7 +38,16 @@ public static class GeofenceServiceCollectionExtensions
         }
 #elif APPLE
         if (!services.HasService<IGeofenceManager>())
-            services.AddShinyService<GeofenceManager>();
+        {
+            if (OperatingSystemShim.IsAppleVersionAtleast(17))
+            {
+                services.AddShinyService<GeofenceManager>();
+            }
+            else
+            {
+                services.AddShinyService<CLLocationGeofenceManager>();
+            }
+        }
 #endif
         return services;
     }
