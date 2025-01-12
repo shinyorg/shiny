@@ -13,31 +13,43 @@ public class GeofenceManager(
     ILogger<IGeofenceManager> logger,
     IServiceProvider services,
     IRepository repository
-) : IGeofenceManager
+) : IGeofenceManager, IShinyStartupTask
 {
     CLBackgroundActivitySession? session;
     CLMonitor? monitor;
+    
+    public async void Start()
+    {
+        var items = repository.GetList<GeofenceRegion>();
+        if (items.Count > 0)
+        {
+            try
+            {
+                var status = await this.RequestAccess();
+                if (status != AccessState.Available)
+                {
+                    logger.LogWarning("User has changed permissions which block geofences from running");
+                }
+                else
+                {
+                    var mon = await this.Init(true);
+                    foreach (var item in items)
+                        this.AddToMonitor(mon, item);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to auto-start geofencing");
+            }
+        }
+    }
+    
     
     async Task<CLMonitor?> Init(bool createIfNeeded)
     {
         if (this.monitor == null && createIfNeeded)
         {
-            var psession = CLServiceSession
-                .CreateSession(
-                    CLServiceSessionAuthorizationRequirement.Always, 
-                    "Geofencing",
-                    new DispatchQueue(""),
-                    diag =>
-                    {
-                        // diag.FullAccuracyDenied
-                        if (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
-                            this.CurrentStatus = AccessState.Denied;
-                        else
-                            this.CurrentStatus = AccessState.Available;
-                    }
-                );
-            
-            this.session = CLBackgroundActivitySession.Create(); // catalyst 14 or ios17
+            this.session = CLBackgroundActivitySession.Create();
             this.monitor = await CLMonitor.RequestMonitorAsync(CLMonitorConfiguration.Create(
                 "shiny_geofences",
                 new DispatchQueue("geofences"),
@@ -64,27 +76,54 @@ public class GeofenceManager(
     }
 
 
+    // may need a subject or an await somewhere
     public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
 
+    
+    CLServiceSession? psession = null!;
     public Task<AccessState> RequestAccess()
     {
         var tcs = new TaskCompletionSource<AccessState>();
-
+        CLServiceSession ps = null!;
         
+        try
+        {
+            ps = CLServiceSession.CreateSession(
+                CLServiceSessionAuthorizationRequirement.Always,
+                "Geofencing",
+                new DispatchQueue("shiny_geofence"),
+                diag =>
+                {
+                    if (diag.AuthorizationRequestInProgress)
+                        return; 
+                    
+                    // diag.FullAccuracyDenied
+                    if (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
+                        this.CurrentStatus = AccessState.Denied;
+                    else
+                        this.CurrentStatus = AccessState.Available;
+
+                    tcs.TrySetResult(this.CurrentStatus);
+                }
+            );
+        }
+        finally
+        {
+            ps.Dispose();
+        }
+
         return tcs.Task;
     }
 
     
     public IList<GeofenceRegion> GetMonitorRegions() => repository.GetList<GeofenceRegion>();
 
+    
     public async Task StartMonitoring(GeofenceRegion region)
     {
         var mon = await this.Init(true);
-        var condition = new CLCircularGeographicCondition(
-            new CLLocationCoordinate2D(region.Center.Latitude, region.Center.Longitude),
-            region.Radius.TotalMeters
-        );
-        mon.AddCondition(condition, region.Identifier);
+        this.AddToMonitor(mon, region);
+        repository.Insert(region);
     }
 
     
@@ -99,6 +138,7 @@ public class GeofenceManager(
                 this.DestroyMonitor();
         }
     }
+    
 
     public Task StopAllMonitoring()
     {
@@ -108,13 +148,41 @@ public class GeofenceManager(
     }
 
     
-    public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
+    public Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
     {
-        // CLLocationUpdater.CreateLiveUpdates(DispatchQueue.CurrentQueue, update =>
-        // {
-        //     update.
-        // });
-        return GeofenceState.Entered;
+        var tcs = new TaskCompletionSource<GeofenceState>();
+        var updater = CLLocationUpdater.CreateLiveUpdates(DispatchQueue.CurrentQueue, update =>
+        {
+            if (update.AuthorizationDenied)
+                throw new PermissionException("GPS", AccessState.Denied);
+            
+            if (update.LocationUnavailable || update.Location == null)
+                throw new PermissionException("GPS", AccessState.Disabled);
+
+            var reading = update.Location.FromNative();
+            var available = region.IsPositionInside(reading.Position);
+            var status = available ? GeofenceState.Entered : GeofenceState.Exited;
+            tcs.TrySetResult(status);
+        });
+        using var _ = cancelToken.Register(() => tcs.TrySetCanceled());
+        try
+        {
+            return tcs.Task;
+        }
+        finally
+        {
+            updater?.Dispose();
+        }
+    }
+
+
+    void AddToMonitor(CLMonitor mon, GeofenceRegion region)
+    {
+        var condition = new CLCircularGeographicCondition(
+            new CLLocationCoordinate2D(region.Center.Latitude, region.Center.Longitude),
+            region.Radius.TotalMeters
+        );
+        mon.AddCondition(condition, region.Identifier);
     }
 
 
