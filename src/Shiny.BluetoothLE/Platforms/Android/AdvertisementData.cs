@@ -17,15 +17,22 @@ public class AdvertisementData : IAdvertisementData
         this.manufacturerData = new Lazy<ManufacturerData?>(() =>
         {
             var md = this.result.ScanRecord?.ManufacturerSpecificData;
-            if (md == null || md.Size() == 0)
+            if (md == null)
                 return null;
 
-            var manufacturerId = (ushort)md.KeyAt(0);
-            if (manufacturerId == 0)
-                return null;
-
-            var data = this.result.ScanRecord!.GetManufacturerSpecificData(manufacturerId);
-            return new ManufacturerData(manufacturerId, data!);
+            var size = md.Size();
+            ManufacturerData? result = null;
+            for (var i = 0; i < size; i++)
+            {
+                var manufacturerId = (ushort)md.KeyAt(i);
+                if (manufacturerId > 0)
+                {
+                    var data = this.result.ScanRecord!.GetManufacturerSpecificData(manufacturerId);
+                    result = new ManufacturerData(manufacturerId, data!);
+                    break;
+                }
+            }
+            return result;
         });
 
         this.serviceUuids = new Lazy<string[]?>(() =>
