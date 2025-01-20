@@ -83,6 +83,8 @@ body:
     attributes:
       label: Reproducible Code Sample (should be tiny and Shiny specific)
       description: A Public GitHub Repository Link
+    validations:
+      required: true
   - type: checkboxes
     id: terms
     attributes:
