@@ -55,14 +55,14 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
         <IsIosBuild>true</IsIosBuild>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
-        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
+        <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion>15.0</TargetPlatformMinVersion>
         <IsIosBuild>true</IsIosBuild>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>

@@ -25,23 +25,6 @@ public interface INotifyCollectionChanged<T> : INotifyCollectionChanged, IList<T
 public class ObservableList<T>(IEnumerable<T> collection = null) : ObservableCollection<T>, INotifyCollectionChanged<T>
 {
     /// <summary>
-    /// Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class.
-    /// </summary>
-    public ObservableList() : base()
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class that contains elements copied from the specified collection.
-    /// </summary>
-    /// <param name="collection">collection: The collection from which the elements are copied.</param>
-    /// <exception cref="System.ArgumentNullException">The collection parameter cannot be null.</exception>
-    public ObservableList: base(collection)
-    {
-    }
-
-
-    /// <summary>
     /// Adds the elements of the specified collection to the end of the ObservableCollection(Of T).
     /// </summary>
     public void AddRange(IEnumerable<T> collection, NotifyCollectionChangedAction notificationMode = NotifyCollectionChangedAction.Add)
