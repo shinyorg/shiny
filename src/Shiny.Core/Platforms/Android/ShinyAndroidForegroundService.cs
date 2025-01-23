@@ -35,7 +35,7 @@ public abstract class ShinyAndroidForegroundService : Service
     protected virtual ForegroundService StartForegroundServiceType => ForegroundService.TypeNone;
     protected T GetService<T>() => Host.GetService<T>()!;
     protected IEnumerable<T> GetServices<T>() => Host.ServiceProvider.GetServices<T>();
-    protected CompositeDisposable? DestroyWith { get; private set; }
+    // protected CompositeDisposable? DestroyWith { get; private set; }
     protected NotificationManagerCompat? NotificationManager { get; private set; }
     protected bool StopWithTask { get; private set; }
 

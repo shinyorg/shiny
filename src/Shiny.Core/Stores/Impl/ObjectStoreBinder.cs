@@ -8,21 +8,14 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Stores.Impl;
 
 
-public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
+public class ObjectStoreBinder(
+    IKeyValueStoreFactory factory, 
+    ILogger<ObjectStoreBinder> logger
+) : IObjectStoreBinder, IDisposable
 {
     readonly object syncLock = new();
     readonly Dictionary<object, IKeyValueStore> bindings = new();
     readonly List<INotifyPropertyChanged> boundObjects = new();
-    readonly ILogger logger;
-    readonly IKeyValueStoreFactory factory;
-
-
-    public ObjectStoreBinder(IKeyValueStoreFactory factory, ILogger<ObjectStoreBinder> logger)
-    {
-        this.factory = factory;
-        this.logger = logger;
-    }
-
 
     public void RemovePersistedValues(INotifyPropertyChanged npc, string? keyValueStoreAlias = null)
     {
@@ -47,7 +40,7 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
     public void Bind(INotifyPropertyChanged npc, string? keyValueStoreAlias = null)
     {
         var store = this.GetStore(npc, keyValueStoreAlias);
-        this.Bind(npc, store ?? this.factory.DefaultStore);
+        this.Bind(npc, store ?? factory.DefaultStore);
     }
 
 
@@ -61,7 +54,7 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
             // Skip if there are no properties to bind
             if (props.Count == 0)
             {
-                this.logger?.BindInfo("Skipped (no get/set properties)", npc.GetType()!.FullName!, store.Alias);
+                logger.BindInfo("Skipped (no get/set properties)", npc.GetType()!.FullName!, store.Alias);
                 return;
             }
 
@@ -77,7 +70,7 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
                     }
                     catch (Exception ex)
                     {
-                        this.logger?.PropertyBindError(ex, type.FullName!, prop.Name);
+                        logger.PropertyBindError(ex, type.FullName!, prop.Name);
                     }
                 }
             }
@@ -89,11 +82,11 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
             }
 
             npc.PropertyChanged += this.OnPropertyChanged;
-            this.logger?.BindInfo("Success", npc.GetType().FullName!, store.Alias);
+            logger.BindInfo("Success", npc.GetType().FullName!, store.Alias);
         }
         catch (Exception ex)
         {
-            this.logger?.BindError(ex, npc?.GetType().FullName ?? "Unknown", store.Alias);
+            logger.BindError(ex, npc?.GetType().FullName ?? "Unknown", store.Alias);
         }
     }
 
@@ -132,7 +125,7 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
 
         if (keyValueStoreAlias != null)
         {
-            store = this.factory.GetStore(keyValueStoreAlias);
+            store = factory.GetStore(keyValueStoreAlias);
         }
         else
         {
@@ -142,9 +135,9 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
                 .StoreAlias;
 
             if (keyValueStoreAlias != null)
-                store = this.factory.GetStore(keyValueStoreAlias); // error if attribute is bad
+                store = factory.GetStore(keyValueStoreAlias); // error if attribute is bad
         }
-        return store ?? this.factory.DefaultStore;
+        return store ?? factory.DefaultStore;
     }
 
     /// <summary>
@@ -163,7 +156,7 @@ public class ObjectStoreBinder : IObjectStoreBinder, IDisposable
     {
         if (sender == null)
         {
-            this.logger.LogDebug("Null sender");
+            logger.LogDebug("Null sender");
             return;
         }
         var prop = this

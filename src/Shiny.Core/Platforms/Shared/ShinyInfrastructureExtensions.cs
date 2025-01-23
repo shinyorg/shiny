@@ -21,17 +21,12 @@ public static class ShinyInfrastructureExtensions
         services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
         services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
 #if ANDROID
-        services.AddShinyService<AndroidPlatform>();
-        services.AddShinyService<AndroidLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
 #elif APPLE
-        services.AddShinyService<IosPlatform>();
-        services.AddShinyService<IosLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
 #elif WINDOWS
-        services.AddShinyService<WindowsPlatform>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
 #endif

@@ -5,6 +5,24 @@ namespace Shiny.BluetoothLE;
 
 internal static class PlatformExtensions
 {
+    public static CBPeripheral StripShinyHooks(this Peripheral peripheral)
+    {
+        var native = peripheral.Native;
+        native.Delegate = null;
+        if (native.Services != null)
+        {
+            foreach (var service in native.Services)
+            {
+                if (service.Characteristics != null)
+                {
+                    
+                }
+            }
+        }
+        return native;
+    }
+    
+    
     public static bool Is(this CBCharacteristic native, string serviceUuid, string characteristicUuid)
     {
         var nsUuid = CBUUID.FromString(serviceUuid);

@@ -1,23 +1,44 @@
-﻿using Android.App;
-using Android.OS;
+﻿// using Android.App;
+// using Android.OS;
+//
+// namespace Shiny;
+//
+//
+// public enum ActivityState
+// {
+//     Created,
+//     Resumed,
+//     Paused,
+//     Destroyed,
+// 	SaveInstanceState,
+//     Started,
+//     Stopped
+// }
+//
+//
+// public record ActivityChanged(
+//     Activity Activity, 
+//     ActivityState State, 
+//     Bundle? StateBundle
+// );
 
-namespace Shiny;
-
-
-public enum ActivityState
-{
-    Created,
-    Resumed,
-    Paused,
-    Destroyed,
-	SaveInstanceState,
-    Started,
-    Stopped
-}
-
-
-public record ActivityChanged(
-    Activity Activity, 
-    ActivityState State, 
-    Bundle? StateBundle
-);
+// public record PermissionRequestResult(
+//     int RequestCode, 
+//     string[] Permissions, 
+//     NativePerm[] GrantResults
+// )
+// {
+//     public bool IsSuccess() => this.GrantResults.All(x => x == NativePerm.Granted);
+//     public int Length => this.Permissions?.Length ?? 0;
+//     public (string, NativePerm) this[int index] => (this.Permissions[index], this.GrantResults[index]);
+//
+//
+//     public bool IsGranted(string permission)
+//     {
+//         var index = this.Permissions.ToList().IndexOf(permission);
+//         if (index == -1)
+//             return false;
+//
+//         return this.GrantResults[index] == NativePerm.Granted;
+//     }
+// }
