@@ -81,7 +81,7 @@ body:
   - type: input
     id: codesample
     attributes:
-      label: Reproducible Code Sample (should be tiny and Shiny specific)
+      label: Reproducible Code Sample (should be Small, Shiny specific, Compile & Run)
       description: A Public GitHub Repository Link
     validations:
       required: true
@@ -91,13 +91,13 @@ body:
       label: Code of Conduct
       description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
       options:
-        - label: I have supplied a reproducible sample that is NOT FROM THE SHINY SAMPLES! 
+        - label: I have supplied a reproducible sample that is small, shows the specific issue, compiles, runs, and is NOT FROM THE SHINY SAMPLES! 
           required: true
         - label: I am using the LATEST STABLE version from nuget (v3.3.4)
           required: true
         - label: I am Sponsor OR My GitHub account is 30+ days old
           required: true
-        - label: I acknowledge that this is not technical support and that the maintainer(s) are not here as teachers
+        - label: I acknowledge that this is not technical support and that the maintainer(s) are not here as teachers or to diagnose logs
           required: true
         - label: I understand that this is not a paid product, it is FREE code that I am using, and that documentation may not be perfect. 
           required: true
