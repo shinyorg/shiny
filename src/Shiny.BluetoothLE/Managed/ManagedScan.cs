@@ -99,6 +99,7 @@ public class ManagedScan : IDisposable, IManagedScan
                             result.Rssi = scanResult.Rssi;
                             result.TxPower = scanResult.AdvertisementData?.TxPower;
                             result.LastSeen = DateTimeOffset.UtcNow;
+                            result.FullAdvertisementData = scanResult.AdvertisementData;
                             this.actionSubj.OnNext((action, result));
                         }
                     }
