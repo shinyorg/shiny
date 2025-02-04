@@ -286,6 +286,9 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         if (cfg.UseScanBatching && this.Native.Adapter!.IsOffloadedScanBatchingSupported)
             builder.SetReportDelay(100);
 
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+            builder.SetLegacy(false);
+        
         this.Native.Adapter!.BluetoothLeScanner!.StartScan(
             scanFilters,
             builder.Build(),
