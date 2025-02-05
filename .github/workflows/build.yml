@@ -39,24 +39,24 @@ jobs:
       with:
           fetch-depth: 0
 
-    - name: Setup .NET 8.0
-      uses: actions/setup-dotnet@v3
-      with:
-          dotnet-version: '8.0.404'
+    # - name: Setup .NET 8.0
+    #   uses: actions/setup-dotnet@v3
+    #   with:
+    #       dotnet-version: '8.0.404'
 
     - uses: AdoptOpenJDK/install-jdk@v1
       with:
         version: '13'
         architecture: x64
 
-    - name: Add .NET Workloads
-      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
+#    - name: Add .NET Workloads
+#      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
 
     - name: Build
       run: dotnet run --project build/ShinyBuild.csproj
 
     - name: Publish Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: nugets
         path: ${{ github.workspace }}/artifacts

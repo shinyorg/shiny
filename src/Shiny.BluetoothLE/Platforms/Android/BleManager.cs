@@ -286,6 +286,9 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         if (cfg.UseScanBatching && this.Native.Adapter!.IsOffloadedScanBatchingSupported)
             builder.SetReportDelay(100);
 
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(26))
+            builder.SetLegacy(false);
+        
         this.Native.Adapter!.BluetoothLeScanner!.StartScan(
             scanFilters,
             builder.Build(),
@@ -295,13 +298,10 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
 
-    void Clear()
-    {
-        var connectedDevices = this.peripherals.Values.Select(x => x).ToList(); 
-        this.peripherals.Clear();
-        foreach (var dev in connectedDevices)
-            this.peripherals.TryAdd(dev.Native.Address!, dev);
-    }
+    void Clear() => this.peripherals
+        .Where(x => x.Value.Status != ConnectionState.Connected)
+        .ToList()
+        .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));
 
 
     static string[] GetPlatformPermissions()

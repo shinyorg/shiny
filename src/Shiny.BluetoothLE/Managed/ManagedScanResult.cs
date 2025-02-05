@@ -6,6 +6,7 @@ public class ManagedScanResult : NotifyPropertyChanged, IAdvertisementData
 {
     public ManagedScanResult(IPeripheral peripheral) => this.Peripheral = peripheral;
 
+    public IAdvertisementData? FullAdvertisementData { get; internal set; }
 
     public IPeripheral Peripheral { get; }
     public bool IsConnected => this.Peripheral.Status == ConnectionState.Connected;
