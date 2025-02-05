@@ -24,10 +24,15 @@ public class ManagedScan : IDisposable, IManagedScan
         => this.bleManager = bleManager;
 
 
-    public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.list
-        .ToList()
-        .Where(x => x.Peripheral.Status == ConnectionState.Connected)
-        .Select(x => x.Peripheral);
+    public IEnumerable<IPeripheral> GetConnectedPeripherals()
+    {
+        lock (this.syncLock)
+        {
+            return this.list.ToList()
+                .Where(x => x.Peripheral.Status == ConnectionState.Connected)
+                .Select(x => x.Peripheral);
+        }
+    }
 
 
     public IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan() => this.actionSubj;
@@ -80,7 +85,9 @@ public class ManagedScan : IDisposable, IManagedScan
                         if (show)
                         {
                             var action = ManagedScanListAction.Update;
-                            var result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
+                            ManagedScanResult? result;
+                            lock (this.syncLock)
+                                result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
                             if (result == null)
                             {
                                 action = ManagedScanListAction.Add;
@@ -89,8 +96,6 @@ public class ManagedScan : IDisposable, IManagedScan
                                     ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
                                     ServiceData = scanResult.AdvertisementData?.ServiceData
                                 };
-                                lock (this.syncLock)
-                                    this.list.Add(result);
                             }
                             result.IsConnectable = scanResult.AdvertisementData?.IsConnectable;
                             result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
@@ -99,6 +104,11 @@ public class ManagedScan : IDisposable, IManagedScan
                             result.Rssi = scanResult.Rssi;
                             result.TxPower = scanResult.AdvertisementData?.TxPower;
                             result.LastSeen = DateTimeOffset.UtcNow;
+                            if (action == ManagedScanListAction.Add)
+                            {
+                                lock (this.syncLock)
+                                    this.list.Add(result);
+                            }
                             this.actionSubj.OnNext((action, result));
                         }
                     }
@@ -119,7 +129,9 @@ public class ManagedScan : IDisposable, IManagedScan
                     _ =>
                     {
                         var maxAge = DateTimeOffset.UtcNow.Subtract(clearTime.Value);
-                        var tmp = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
+                        List<ManagedScanResult> tmp;
+                        lock (this.syncLock)
+                            tmp  = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
 
                         foreach (var p in tmp)
                         {
