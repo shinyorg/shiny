@@ -120,6 +120,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notifications", "notificati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "support", "support", "{F7AD08AA-DE04-4A88-AD31-C5BA3A4751A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Hosting.Uno", "src\Shiny.Hosting.Uno\Shiny.Hosting.Uno.csproj", "{4547E6DA-857E-4D0A-9BF9-DE82C8ED14DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -249,6 +251,10 @@ Global
 		{AD01E72B-B53F-4E9A-83F1-F304840F830E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD01E72B-B53F-4E9A-83F1-F304840F830E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD01E72B-B53F-4E9A-83F1-F304840F830E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4547E6DA-857E-4D0A-9BF9-DE82C8ED14DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4547E6DA-857E-4D0A-9BF9-DE82C8ED14DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4547E6DA-857E-4D0A-9BF9-DE82C8ED14DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4547E6DA-857E-4D0A-9BF9-DE82C8ED14DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -288,6 +294,7 @@ Global
 		{AD01E72B-B53F-4E9A-83F1-F304840F830E} = {F7AD08AA-DE04-4A88-AD31-C5BA3A4751A1}
 		{47A57CFE-A1A8-407A-86FA-FA003D562C58} = {F7AD08AA-DE04-4A88-AD31-C5BA3A4751A1}
 		{61751BE5-2EA0-43CF-A271-8DE24E934080} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{4547E6DA-857E-4D0A-9BF9-DE82C8ED14DB} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {135D86AF-4EC4-4AA0-BD06-75C410F3EA08}

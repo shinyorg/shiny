@@ -1,0 +1,15 @@
+<Project Sdk="Uno.Sdk/5.6.22">
+    <PropertyGroup>
+        <TargetFrameworks>net9.0;net9.0-ios18.0;net9.0-maccatalyst;net9.0-android35.0</TargetFrameworks>
+        <UnoSingleProject>true</UnoSingleProject>
+        <OutputType>Library</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <UnoFeatures>Hosting;Storage</UnoFeatures>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj"/>
+    </ItemGroup>
+</Project>
