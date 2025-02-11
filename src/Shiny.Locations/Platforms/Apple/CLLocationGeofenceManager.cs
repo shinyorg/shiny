@@ -115,32 +115,6 @@ public class CLLocationGeofenceManager : IGeofenceManager
         (await this.RequestAccess()).Assert();
         var native = region.ToNative();
 
-        if (OperatingSystem.IsIOSVersionAtLeast(17))
-        {
-            var condition = new CLCircularGeographicCondition(
-                new CLLocationCoordinate2D(region.Center.Latitude, region.Center.Longitude),
-                region.Radius.TotalMeters
-            );
-
-            // can't set identifier/name of the monitor like suggested in the Apple docs
-            var mon = await CLMonitor.RequestMonitorAsync(CLMonitorConfiguration.Create(
-                "shiny_geofences", 
-                DispatchQueue.MainQueue,
-                (monitor, evt) =>
-                {
-                })
-            );
-            mon.AddCondition(condition, region.Identifier);
-            
-            // https://forums.developer.apple.com/forums/thread/768373
-            // https://developer.apple.com/documentation/corelocation/monitoring-the-user-s-proximity-to-geographic-regions
-            // https://developer.apple.com/documentation/corelocation/clmonitor-2r51v/event
-            
-            // this.locationManager.StartMonitoring(condition); // doesn't exist
-            // mon.Events // doesn't exist
-            var session = CLBackgroundActivitySession.Create();
-        }
-
         var tcs = new TaskCompletionSource<object?>();
         this.platform.InvokeOnMainThread(() =>
         {
@@ -170,11 +144,6 @@ public class CLLocationGeofenceManager : IGeofenceManager
         if (region != null)
         {
             this.repository.Remove<GeofenceRegion>(region.Identifier);
-            // if (OperatingSystemShim.IsMacCatalystVersionAtLeast(17))
-            // {
-            //     this.locationManager.RemoveCondition(region.Identifier);
-            // }
-            // this.locationManager.RemoveCondition()
             this.locationManager.StopMonitoring(region.ToNative());
         }
         return Task.CompletedTask;

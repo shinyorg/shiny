@@ -8,7 +8,7 @@ using Shiny.Locations;
 namespace Shiny;
 
 
-public abstract class ShinyLocationDelegate : CLLocationManagerDelegate
+public class ShinyLocationDelegate : CLLocationManagerDelegate
 {
     readonly Subject<CLAuthorizationStatus> statusSubject = new();
 

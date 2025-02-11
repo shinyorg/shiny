@@ -113,7 +113,7 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
     public GpsRequest? CurrentListener => this.currentSettings;
 
-    public AccessState CurrentStatus => throw new NotImplementedException();
+    // public AccessState CurrentStatus => throw new NotImplementedException();
 
     public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async ct =>
     {

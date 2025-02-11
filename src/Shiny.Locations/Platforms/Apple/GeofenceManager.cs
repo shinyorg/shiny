@@ -80,39 +80,40 @@ public class GeofenceManager(
     public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
 
     
-    CLServiceSession? psession = null!;
+    // CLServiceSession? psession = null!;
     public Task<AccessState> RequestAccess()
     {
-        var tcs = new TaskCompletionSource<AccessState>();
-        CLServiceSession ps = null!;
-        
-        try
-        {
-            ps = CLServiceSession.CreateSession(
-                CLServiceSessionAuthorizationRequirement.Always,
-                "Geofencing",
-                new DispatchQueue("shiny_geofence"),
-                diag =>
-                {
-                    if (diag.AuthorizationRequestInProgress)
-                        return; 
-                    
-                    // diag.FullAccuracyDenied
-                    if (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
-                        this.CurrentStatus = AccessState.Denied;
-                    else
-                        this.CurrentStatus = AccessState.Available;
-
-                    tcs.TrySetResult(this.CurrentStatus);
-                }
-            );
-        }
-        finally
-        {
-            ps.Dispose();
-        }
-
-        return tcs.Task;
+        return LocationExtensions.RequestAccess(true);
+        // var tcs = new TaskCompletionSource<AccessState>();
+        // CLServiceSession ps = null!;
+        //
+        // try
+        // {
+        //     ps = CLServiceSession.CreateSession(
+        //         CLServiceSessionAuthorizationRequirement.Always,
+        //         "Geofencing",
+        //         new DispatchQueue("shiny_geofence"),
+        //         diag =>
+        //         {
+        //             if (diag.AuthorizationRequestInProgress)
+        //                 return; 
+        //             
+        //             // diag.FullAccuracyDenied
+        //             if (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
+        //                 this.CurrentStatus = AccessState.Denied;
+        //             else
+        //                 this.CurrentStatus = AccessState.Available;
+        //
+        //             tcs.TrySetResult(this.CurrentStatus);
+        //         }
+        //     );
+        // }
+        // finally
+        // {
+        //     ps.Dispose();
+        // }
+        //
+        // return tcs.Task;
     }
 
     

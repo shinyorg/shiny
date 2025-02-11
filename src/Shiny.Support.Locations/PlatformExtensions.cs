@@ -45,6 +45,15 @@ public static class LocationExtensions
     }
 
 
+    public static Task<AccessState> RequestAccess(bool background)
+    {
+        var lm = new CLLocationManager
+        {
+            Delegate = new ShinyLocationDelegate()
+        };
+        return lm.RequestAccess(background);
+    }
+
     public static async Task<AccessState> RequestAccess(this CLLocationManager locationManager, bool background)
     {
         var status = locationManager.GetCurrentStatus(background);
@@ -52,19 +61,26 @@ public static class LocationExtensions
             return status;
 
         var task = locationManager
-            .WhenAccessStatusChanged(background)
+            .WhenAccessStatusChanged(false)
             .StartWith()
             .Take(1)
             .ToTask();
-//#if __IOS__
-        if (background)
-            locationManager.RequestAlwaysAuthorization();
-        else
-            locationManager.RequestWhenInUseAuthorization();
-//#elif !__TVOS__
-//            locationManager.RequestAlwaysAuthorization();
-//#endif
+        
+        locationManager.RequestWhenInUseAuthorization();
         status = await task.ConfigureAwait(false);
+
+        if (status == AccessState.Available && background)
+        {
+            task = locationManager
+                .WhenAccessStatusChanged(true)
+                .StartWith()
+                .Take(1)
+                .ToTask();
+            
+            locationManager.RequestAlwaysAuthorization();
+            status = await task.ConfigureAwait(false);
+        }
+
         return status;
     }
 }

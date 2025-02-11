@@ -20,7 +20,7 @@ public static class MauiProgram
             })
             .UsePrism(
                 new DryIocContainerExtension(),
-                prism => prism.OnAppStart("MainPage")
+                prism => prism.CreateWindow("MainPage")
             )
             .RegisterLogging()
             .RegisterServices()

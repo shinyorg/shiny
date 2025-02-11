@@ -30,46 +30,47 @@ public class GpsManager : IGpsManager, IShinyStartupTask
 
     public Task<AccessState> RequestAccess(GpsRequest request)
     {
-        var bg = request.BackgroundMode != GpsBackgroundMode.None;
-        var req = bg
-            ? CLServiceSessionAuthorizationRequirement.Always
-            : CLServiceSessionAuthorizationRequirement.WhenInUse;
-
-        CLServiceSession ps = null!;
-        var tcs = new TaskCompletionSource<AccessState>();
-        
-        try
-        {
-            // TODO: full accuracy?
-            ps = CLServiceSession.CreateSession(req, DispatchQueue.CurrentQueue, diag =>
-            {
-                if (diag.AuthorizationRequestInProgress)
-                    return;
-
-                if (bg)
-                {
-                    if (!diag.AlwaysAuthorizationDenied)
-                        tcs.SetResult(AccessState.Available);
-                    else if (!diag.AuthorizationDenied)
-                        tcs.SetResult(AccessState.Restricted);
-                    else
-                        tcs.SetResult(AccessState.Denied);
-                }
-                else
-                {
-                    if (!diag.AuthorizationDenied)
-                        tcs.SetResult(AccessState.Available);
-                    else
-                        tcs.SetResult(AccessState.Denied);
-                }
-            });
-        }
-        finally
-        {
-            ps.Dispose();
-        }
-
-        return tcs.Task;
+       return LocationExtensions.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
+        // var bg = request.BackgroundMode != GpsBackgroundMode.None;
+        // var req = bg
+        //     ? CLServiceSessionAuthorizationRequirement.Always
+        //     : CLServiceSessionAuthorizationRequirement.WhenInUse;
+        //
+        // CLServiceSession ps = null!;
+        // var tcs = new TaskCompletionSource<AccessState>();
+        //
+        // try
+        // {
+        //     // TODO: full accuracy?
+        //     ps = CLServiceSession.CreateSession(req, DispatchQueue.CurrentQueue, diag =>
+        //     {
+        //         if (diag.AuthorizationRequestInProgress)
+        //             return;
+        //
+        //         if (bg)
+        //         {
+        //             if (!diag.AlwaysAuthorizationDenied)
+        //                 tcs.SetResult(AccessState.Available);
+        //             else if (!diag.AuthorizationDenied)
+        //                 tcs.SetResult(AccessState.Restricted);
+        //             else
+        //                 tcs.SetResult(AccessState.Denied);
+        //         }
+        //         else
+        //         {
+        //             if (!diag.AuthorizationDenied)
+        //                 tcs.SetResult(AccessState.Available);
+        //             else
+        //                 tcs.SetResult(AccessState.Denied);
+        //         }
+        //     });
+        // }
+        // finally
+        // {
+        //     ps.Dispose();
+        // }
+        //
+        // return tcs.Task;
     }
 
 
