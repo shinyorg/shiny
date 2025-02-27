@@ -21,7 +21,4 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\Shiny.SourceGenerators\Shiny.SourceGenerators.csproj" />
-    </ItemGroup>
 </Project>
