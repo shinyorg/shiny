@@ -8,7 +8,7 @@ namespace Shiny.Beacons;
 public static class BeaconExtensions
 {
     public static ManagedScan CreateManagedScan(this IBeaconRangingManager manager)
-        => new ManagedScan(manager);
+        => new(manager);
 
 
     public static bool IsBeaconInRegion(this BeaconRegion region, Beacon beacon)

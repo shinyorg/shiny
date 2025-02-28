@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Shiny.Beacons.Abstractions\Shiny.Beacons.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
         <ProjectReference Include="..\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
