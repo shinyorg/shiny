@@ -1,5 +1,4 @@
-﻿using System;
-using AndroidX.Core.App;
+﻿using AndroidX.Core.App;
 
 namespace Shiny;
 

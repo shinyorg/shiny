@@ -54,7 +54,7 @@ public class ObjectStoreBinder(
             // Skip if there are no properties to bind
             if (props.Count == 0)
             {
-                logger.BindInfo("Skipped (no get/set properties)", npc.GetType()!.FullName!, store.Alias);
+                // logger.BindInfo("Skipped (no get/set properties)", npc.GetType()!.FullName!, store.Alias);
                 return;
             }
 
@@ -70,7 +70,7 @@ public class ObjectStoreBinder(
                     }
                     catch (Exception ex)
                     {
-                        logger.PropertyBindError(ex, type.FullName!, prop.Name);
+                        // logger.PropertyBindError(ex, type.FullName!, prop.Name);
                     }
                 }
             }
@@ -82,11 +82,11 @@ public class ObjectStoreBinder(
             }
 
             npc.PropertyChanged += this.OnPropertyChanged;
-            logger.BindInfo("Success", npc.GetType().FullName!, store.Alias);
+            // logger.BindInfo("Success", npc.GetType().FullName!, store.Alias);
         }
         catch (Exception ex)
         {
-            logger.BindError(ex, npc?.GetType().FullName ?? "Unknown", store.Alias);
+            // logger.BindError(ex, npc?.GetType().FullName ?? "Unknown", store.Alias);
         }
     }
 

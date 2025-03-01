@@ -1,7 +1,5 @@
 ﻿using System;
-using Javax.Crypto;
 using Microsoft.Extensions.Logging;
-using Shiny.Reflection;
 
 namespace Shiny.Stores;
 
@@ -16,20 +14,19 @@ public class SecureKeyValueStore : IKeyValueStore
 
     public SecureKeyValueStore(
         ILogger<SecureKeyValueStore> logger,
-        AndroidPlatform platform, 
         ISerializer serializer
     )
     {
-        this.settingsStore = new SettingsKeyValueStore(platform, serializer);
-        this.serializer = serializer;
-
-        this.keyStore = new AndroidKeyStore(
-            platform.AppContext,
-            this.settingsStore,
-            logger,
-            $"{platform.AppContext.PackageName}.secure",
-            false
-        );
+        // this.settingsStore = new SettingsKeyValueStore(platform, serializer);
+        // this.serializer = serializer;
+        //
+        // this.keyStore = new AndroidKeyStore(
+        //     platform.AppContext,
+        //     this.settingsStore,
+        //     logger,
+        //     $"{platform.AppContext.PackageName}.secure",
+        //     false
+        // );
     }
 
 
@@ -47,28 +44,29 @@ public class SecureKeyValueStore : IKeyValueStore
     public bool Contains(string key) => this.settingsStore.Contains(SecureKey(key));
     public object? Get(Type type, string key)
     {
-        var result = type.GetDefaultValue();
-        var secureKey = SecureKey(key);
-
-        if (this.settingsStore.Contains(secureKey))
-        {
-            var encValue = this.settingsStore.Get<string>(secureKey);
-            var data = Convert.FromBase64String(encValue);
-            lock (this.syncLock)
-            {
-                try
-                {
-                    var value = this.keyStore.Decrypt(data);
-                    result = this.serializer.Deserialize(type, value);
-                }
-                catch (AEADBadTagException)
-                {
-                    // unable to decrypt due to app uninstall, removing old key
-                    this.Remove(key);
-                }
-            }
-        }
-        return result;
+        // var result = type.GetDefaultValue();
+        // var secureKey = SecureKey(key);
+        //
+        // if (this.settingsStore.Contains(secureKey))
+        // {
+        //     var encValue = this.settingsStore.Get<string>(secureKey);
+        //     var data = Convert.FromBase64String(encValue);
+        //     lock (this.syncLock)
+        //     {
+        //         try
+        //         {
+        //             var value = this.keyStore.Decrypt(data);
+        //             result = this.serializer.Deserialize(type, value);
+        //         }
+        //         catch (AEADBadTagException)
+        //         {
+        //             // unable to decrypt due to app uninstall, removing old key
+        //             this.Remove(key);
+        //         }
+        //     }
+        // }
+        // return result;
+        return null;
     }
 
     public bool Remove(string key) => this.settingsStore.Remove(SecureKey(key));

@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Shiny.Support.Reactive\Shiny.Support.Reactive.csproj" />
+    </ItemGroup>
+
 </Project>

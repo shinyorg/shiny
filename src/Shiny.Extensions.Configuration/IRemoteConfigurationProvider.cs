@@ -1,4 +1,7 @@
-﻿namespace Shiny.Extensions.Configuration;
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Shiny.Extensions.Configuration;
 
 public interface IRemoteConfigurationProvider : IConfigurationProvider
 {

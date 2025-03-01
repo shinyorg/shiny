@@ -1,9 +1,15 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny.Extensions.Configuration.Infrastructure;
 
 
-public class RemoteConfigurationSource(RemoteConfig config, Func<RemoteConfig, CancellationToken, Task<object>>? getData, IServiceCollection? services) : IConfigurationSource
+public class RemoteConfigurationSource(
+    RemoteConfig config, 
+    Func<RemoteConfig, CancellationToken, Task<object>>? getData, 
+    IServiceCollection? services
+) : IConfigurationSource
 {
     public IConfigurationProvider Build(IConfigurationBuilder builder)
     {

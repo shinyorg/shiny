@@ -1,6 +1,5 @@
 ﻿using System;
 using Foundation;
-using Shiny.Reflection;
 
 namespace Shiny.Stores;
 
@@ -29,8 +28,8 @@ public class SettingsKeyValueStore : IKeyValueStore
 
     public object? Get(Type type, string key) => this.GetValue(false, prefs =>
     {
-        if (prefs.ValueForKey(new NSString(key)) == null)
-            return type.GetDefaultValue();
+        // if (prefs.ValueForKey(new NSString(key)) == null)
+        //     return type.GetDefaultValue();
 
         return Type.GetTypeCode(type) switch
         {

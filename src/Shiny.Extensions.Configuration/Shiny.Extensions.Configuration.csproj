@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
         <TargetFrameworks>$(PlatformOnlyTargetFrameworks)</TargetFrameworks>
-        <Description>Xamarin Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
+        <Description>Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
 	</PropertyGroup>
 
     <ItemGroup>
@@ -9,6 +9,7 @@
 		<Compile Remove="Platforms\**\*.cs" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftExtensionsVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">

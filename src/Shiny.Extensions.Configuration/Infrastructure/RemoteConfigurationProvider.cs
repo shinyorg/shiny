@@ -1,11 +1,18 @@
+using System.IO;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading;
+using System.Threading.Tasks;
 using Timer = System.Timers.Timer;
 
 namespace Shiny.Extensions.Configuration.Infrastructure;
 
 
-public class RemoteConfigurationProvider(RemoteConfig config, Func<RemoteConfig, CancellationToken, Task<object>>? getData) : ConfigurationProvider, IRemoteConfigurationProvider
+public class RemoteConfigurationProvider(
+    RemoteConfig config, 
+    Func<RemoteConfig, CancellationToken, Task<object>>? getData
+) : ConfigurationProvider, IRemoteConfigurationProvider
 {
     const string LAST_LOAD_KEY = "__LastLoaded";
     

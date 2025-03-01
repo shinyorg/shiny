@@ -12,11 +12,11 @@ public class SecureKeyValueStore : IKeyValueStore
     public SecAccessible DefaultAccessible { get; set; } = SecAccessible.Always;
 
 
-    public SecureKeyValueStore(IosPlatform platform, ISerializer serializer)
-    {
-        this.Service = $"{platform.AppIdentifier}.secure";
-        this.serializer = serializer;
-    }
+    // public SecureKeyValueStore(IosPlatform platform, ISerializer serializer)
+    // {
+    //     this.Service = $"{platform.AppIdentifier}.secure";
+    //     this.serializer = serializer;
+    // }
 
 
     public string Alias => "secure";

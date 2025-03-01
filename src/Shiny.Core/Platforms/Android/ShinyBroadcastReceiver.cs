@@ -10,9 +10,9 @@ namespace Shiny;
 
 public abstract class ShinyBroadcastReceiver : BroadcastReceiver
 {
-    protected T Resolve<T>() => Host.Current.Services.GetRequiredService<T>()!;
-    protected virtual void LogError<T>(Exception exception, string message)
-        => Host.Current.Logging.CreateLogger<T>().LogError(exception, message);
+    // protected T Resolve<T>() => Host.Current.Services.GetRequiredService<T>()!;
+    // protected virtual void LogError<T>(Exception exception, string message)
+    //     => Host.Current.Logging.CreateLogger<T>().LogError(exception, message);
 
 
     protected abstract Task OnReceiveAsync(Context? context, Intent? intent);
@@ -23,7 +23,7 @@ public abstract class ShinyBroadcastReceiver : BroadcastReceiver
         {
             if (x.IsFaulted)
             {
-                this.LogError<ShinyBroadcastReceiver>(x.Exception!, "Error in broadcast receiver");
+                // this.LogError<ShinyBroadcastReceiver>(x.Exception!, "Error in broadcast receiver");
             }
             pendingResult!.Finish();
         });

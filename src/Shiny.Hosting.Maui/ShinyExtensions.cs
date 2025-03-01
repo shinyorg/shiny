@@ -17,24 +17,24 @@ public static class ShinyExtensions
         builder.ConfigureLifecycleEvents(events =>
         {
 #if ANDROID
-            events.AddAndroid(android => android
-                // Shiny will supply app foreground/background events
-                .OnCreate((activity, savedInstanceState) => Host.Lifecycle.OnActivityOnCreate(activity, savedInstanceState))
-                .OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) => Host.Lifecycle.OnRequestPermissionsResult(activity, requestCode, permissions, grantResults))
-                .OnActivityResult((activity, requestCode, result, intent) => Host.Lifecycle.OnActivityResult(activity, requestCode, result, intent))
-                .OnNewIntent((activity, intent) => Host.Lifecycle.OnNewIntent(activity, intent))
-            );
+            // events.AddAndroid(android => android
+            //     // Shiny will supply app foreground/background events
+            //     .OnCreate((activity, savedInstanceState) => Host.Lifecycle.OnActivityOnCreate(activity, savedInstanceState))
+            //     .OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) => Host.Lifecycle.OnRequestPermissionsResult(activity, requestCode, permissions, grantResults))
+            //     .OnActivityResult((activity, requestCode, result, intent) => Host.Lifecycle.OnActivityResult(activity, requestCode, result, intent))
+            //     .OnNewIntent((activity, intent) => Host.Lifecycle.OnNewIntent(activity, intent))
+            // );
 #elif APPLE
             // Shiny will supply push events & handle background url for http transfers
-            events.AddiOS(ios => ios
-                .ContinueUserActivity((_, activity, handler) => Host.Lifecycle.OnContinueUserActivity(activity, handler))
-            );
+            // events.AddiOS(ios => ios
+            //     .ContinueUserActivity((_, activity, handler) => Host.Lifecycle.OnContinueUserActivity(activity, handler))
+            // );
 #elif WINDOWS
-            events.AddWindows(win => win
-                .OnLaunching((app, args) => { })
-                .OnClosed((app, args) => { })
-                .OnVisibilityChanged((app, args) => { })
-            );
+            // events.AddWindows(win => win
+            //     .OnLaunching((app, args) => { })
+            //     .OnClosed((app, args) => { })
+            //     .OnVisibilityChanged((app, args) => { })
+            // );
 #endif
         });
 

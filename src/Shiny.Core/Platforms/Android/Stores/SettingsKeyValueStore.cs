@@ -1,21 +1,20 @@
 ﻿using System;
 using Android.Content;
-using Shiny.Reflection;
 
 namespace Shiny.Stores;
 
 
 public class SettingsKeyValueStore : IKeyValueStore
 {
-    readonly AndroidPlatform platform;
+    // readonly AndroidPlatform platform;
     readonly ISerializer serializer;
 
 
-    public SettingsKeyValueStore(AndroidPlatform platform, ISerializer serializer)
-    {
-        this.platform = platform;
-        this.serializer = serializer;
-    }
+    // public SettingsKeyValueStore(AndroidPlatform platform, ISerializer serializer)
+    // {
+    //     this.platform = platform;
+    //     this.serializer = serializer;
+    // }
 
 
     public string Alias => "settings";
@@ -33,8 +32,8 @@ public class SettingsKeyValueStore : IKeyValueStore
         lock (this.syncLock)
         {
             using var prefs = this.GetPrefs();
-            if (!prefs.Contains(key))
-                return type.GetDefaultValue();
+            // if (!prefs.Contains(key))
+            //     return type.GetDefaultValue();
 
             return Type.GetTypeCode(type) switch
             {
@@ -111,6 +110,6 @@ public class SettingsKeyValueStore : IKeyValueStore
     }
 
 
-    protected ISharedPreferences GetPrefs()
-        => this.platform.AppContext.GetSharedPreferences("Shiny", FileCreationMode.Private)!;
+    protected ISharedPreferences GetPrefs() => null;
+    // => this.platform.AppContext.GetSharedPreferences("Shiny", FileCreationMode.Private)!;
 }
