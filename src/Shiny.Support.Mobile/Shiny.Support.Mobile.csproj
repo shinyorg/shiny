@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Include="Platforms\Android\ActionBroadcastReceiver.cs" />
+      <Compile Include="Platforms\Android\ActivityChanged.cs" />
+      <Compile Include="Platforms\Android\AndroidShinyHost.cs" />
+      <Compile Include="Platforms\Android\IAndroidForegroundServiceDelegate.cs" />
+      <Compile Include="Platforms\Android\IAndroidLifecycle.cs" />
+      <Compile Include="Platforms\Android\PermissionRequestResult.cs" />
+      <Compile Include="Platforms\Android\ShinyAndroidForegroundService.cs" />
+      <Compile Include="Platforms\Android\ShinyBroadcastReceiver.cs" />
+      <Compile Include="Platforms\Android\Stores\AndroidKeyStore.cs" />
+      <Compile Include="Platforms\Android\Stores\SecureKeyValueStore.cs" />
+      <Compile Include="Platforms\Android\Stores\SettingsKeyValueStore.cs" />
+      <Compile Include="Platforms\Apple\AppleExtensions.cs" />
+      <Compile Include="Platforms\Apple\AppleShinyHost.cs" />
+      <Compile Include="Platforms\Apple\IIosLifecycle.cs" />
+      <Compile Include="Platforms\Apple\ShinyUNUserNotificationCenterDelegate.cs" />
+      <Compile Include="Platforms\Apple\Stores\SecureKeyValueStore.cs" />
+      <Compile Include="Platforms\Apple\Stores\SettingsKeyValueStore.cs" />
+      <Compile Include="Platforms\Shared\LifecycleTask.cs" />
+      <Compile Include="Platforms\Shared\PlatformExtensions.cs" />
+      <Compile Include="Platforms\Shared\ShinyInfrastructureExtensions.cs" />
+    </ItemGroup>
+
+</Project>

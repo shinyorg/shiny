@@ -36,8 +36,8 @@ public class ManagedScan : IDisposable, IManagedScan
 
 
     public IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan() => this.actionSubj;
-
     public INotifyReadOnlyCollection<ManagedScanResult> Peripherals => this.list;
+    
     public bool IsScanning { get; private set; }
     public TimeSpan BufferTimeSpan { get; private set; }
     public ScanConfig? ScanConfig { get; private set; }
@@ -77,42 +77,7 @@ public class ManagedScan : IDisposable, IManagedScan
             .Where(x => x?.Any() ?? false)
             .ObserveOnIf(this.Scheduler)
             .Subscribe(
-                scanResults =>
-                {
-                    foreach (var scanResult in scanResults)
-                    {
-                        var show = predicate?.Invoke(scanResult!) ?? true;
-                        if (show)
-                        {
-                            var action = ManagedScanListAction.Update;
-                            ManagedScanResult? result;
-                            lock (this.syncLock)
-                                result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
-                            if (result == null)
-                            {
-                                action = ManagedScanListAction.Add;
-                                result = new ManagedScanResult(scanResult.Peripheral)
-                                {
-                                    ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
-                                    ServiceData = scanResult.AdvertisementData?.ServiceData
-                                };
-                            }
-                            result.IsConnectable = scanResult.AdvertisementData?.IsConnectable;
-                            result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
-                            result.Name = scanResult.Peripheral.Name;
-                            result.LocalName = scanResult.AdvertisementData?.LocalName;
-                            result.Rssi = scanResult.Rssi;
-                            result.TxPower = scanResult.AdvertisementData?.TxPower;
-                            result.LastSeen = DateTimeOffset.UtcNow;
-                            if (action == ManagedScanListAction.Add)
-                            {
-                                lock (this.syncLock)
-                                    this.list.Add(result);
-                            }
-                            this.actionSubj.OnNext((action, result));
-                        }
-                    }
-                },
+                scanResults => this.OnScanResults(scanResults, predicate),
                 this.actionSubj.OnError
             )
             .DisposedBy(this.disposer);
@@ -126,20 +91,7 @@ public class ManagedScan : IDisposable, IManagedScan
                 .Interval(TimeSpan.FromSeconds(10))
                 .ObserveOnIf(this.Scheduler)
                 .Subscribe(
-                    _ =>
-                    {
-                        var maxAge = DateTimeOffset.UtcNow.Subtract(clearTime.Value);
-                        List<ManagedScanResult> tmp;
-                        lock (this.syncLock)
-                            tmp  = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
-
-                        foreach (var p in tmp)
-                        {
-                            this.actionSubj.OnNext((ManagedScanListAction.Remove, p));
-                            lock (this.syncLock)
-                                this.list.Remove(p);
-                        }
-                    },
+                    _ => this.OnClean(clearTime.Value),
                     ex =>
                     {
                         this.actionSubj.OnError(ex);
@@ -151,6 +103,63 @@ public class ManagedScan : IDisposable, IManagedScan
     }
 
 
+    void OnScanResults(IList<ScanResult> scanResults, Func<ScanResult, bool>? predicate = null)
+    {
+        foreach (var scanResult in scanResults)
+        {
+            var show = predicate?.Invoke(scanResult!) ?? true;
+            if (show)
+            {
+                var action = ManagedScanListAction.Update;
+                ManagedScanResult? result;
+                
+                lock (this.syncLock)
+                {
+                    result = this.list.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
+
+                    if (result == null)
+                    {
+                        action = ManagedScanListAction.Add;
+                        result = new ManagedScanResult(scanResult.Peripheral)
+                        {
+                            ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
+                            ServiceData = scanResult.AdvertisementData?.ServiceData
+                        };
+                        
+                        // TODO: addrange
+                        this.list.Add(result);
+                    }
+                }
+
+                result.IsConnectable = scanResult.AdvertisementData?.IsConnectable;
+                result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
+                result.Name = scanResult.Peripheral.Name;
+                result.LocalName = scanResult.AdvertisementData?.LocalName;
+                result.Rssi = scanResult.Rssi;
+                result.TxPower = scanResult.AdvertisementData?.TxPower;
+                result.LastSeen = DateTimeOffset.UtcNow;
+                this.actionSubj.OnNext((action, result));
+            }
+        }
+    }
+    
+    void OnClean(TimeSpan clearTime)
+    {
+        var maxAge = DateTimeOffset.UtcNow.Subtract(clearTime);
+        lock (this.syncLock)
+        {
+            var tmp = this.list.Where(x => x.LastSeen < maxAge).ToList();
+            foreach (var p in tmp)
+            {
+                this.actionSubj.OnNext((ManagedScanListAction.Remove, p));
+                
+                // TODO: need a removelist
+                this.list.Remove(p);
+            }
+        }        
+    }
+
+    
     public void Dispose()
     {
         this.Stop();
