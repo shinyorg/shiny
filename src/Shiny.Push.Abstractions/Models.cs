@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Shiny.Push;
+﻿namespace Shiny.Push;
 
 public record PushAccessState(
     AccessState Status,
