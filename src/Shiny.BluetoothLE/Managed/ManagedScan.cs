@@ -13,7 +13,7 @@ namespace Shiny.BluetoothLE.Managed;
 
 public class ManagedScan : IDisposable, IManagedScan
 {
-    readonly Subject<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> actionSubj = new();
+    readonly ShinySubject<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> actionSubj = new();
     readonly ObservableList<ManagedScanResult> list = new();
     readonly object syncLock = new();
     readonly IBleManager bleManager;
@@ -28,7 +28,8 @@ public class ManagedScan : IDisposable, IManagedScan
     {
         lock (this.syncLock)
         {
-            return this.list.ToList()
+            return this.list
+                .ToList() // copy
                 .Where(x => x.Peripheral.Status == ConnectionState.Connected)
                 .Select(x => x.Peripheral);
         }
@@ -67,52 +68,18 @@ public class ManagedScan : IDisposable, IManagedScan
             .ConfigureAwait(false);
 
         access.Assert();
-        this.list.Clear();
         this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
         this.disposer = new();
-
+        lock (this.syncLock)
+            this.list.Clear();
+        
         this.bleManager
             .Scan(this.ScanConfig)
             .Buffer(this.BufferTimeSpan)
             .Where(x => x?.Any() ?? false)
             .ObserveOnIf(this.Scheduler)
             .Subscribe(
-                scanResults =>
-                {
-                    foreach (var scanResult in scanResults)
-                    {
-                        var show = predicate?.Invoke(scanResult!) ?? true;
-                        if (show)
-                        {
-                            var action = ManagedScanListAction.Update;
-                            ManagedScanResult? result;
-                            lock (this.syncLock)
-                            {
-                                result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
-                                if (result == null)
-                                {
-                                    action = ManagedScanListAction.Add;
-                                    result = new ManagedScanResult(scanResult.Peripheral)
-                                    {
-                                        ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
-                                        ServiceData = scanResult.AdvertisementData?.ServiceData
-                                    };
-                                    this.list.Add(result);
-                                }
-                            }
-                            result.IsConnectable = scanResult.AdvertisementData?.IsConnectable;
-                            result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
-                            result.Name = scanResult.Peripheral.Name;
-                            result.LocalName = scanResult.AdvertisementData?.LocalName;
-                            result.Rssi = scanResult.Rssi;
-                            result.TxPower = scanResult.AdvertisementData?.TxPower;
-                            result.LastSeen = DateTimeOffset.UtcNow;
-                            result.FullAdvertisementData = scanResult.AdvertisementData;
-
-                            this.actionSubj.OnNext((action, result));
-                        }
-                    }
-                },
+                scanResults => this.OnScanResults(scanResults, predicate),
                 this.actionSubj.OnError
             )
             .DisposedBy(this.disposer);
@@ -126,20 +93,7 @@ public class ManagedScan : IDisposable, IManagedScan
                 .Interval(TimeSpan.FromSeconds(10))
                 .ObserveOnIf(this.Scheduler)
                 .Subscribe(
-                    _ =>
-                    {
-                        var maxAge = DateTimeOffset.UtcNow.Subtract(clearTime.Value);
-                        List<ManagedScanResult> tmp;
-                        lock (this.syncLock)
-                            tmp  = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
-
-                        foreach (var p in tmp)
-                        {
-                            this.actionSubj.OnNext((ManagedScanListAction.Remove, p));
-                            lock (this.syncLock)
-                                this.list.Remove(p);
-                        }
-                    },
+                    _ => this.OnCleanup(clearTime.Value),
                     ex =>
                     {
                         this.actionSubj.OnError(ex);
@@ -150,6 +104,69 @@ public class ManagedScan : IDisposable, IManagedScan
         }
     }
 
+
+    void OnScanResults(IList<ScanResult> scanResults, Func<ScanResult, bool>? predicate)
+    {
+        var adds = new List<ManagedScanResult>();
+        
+        foreach (var scanResult in scanResults)
+        {
+            var show = predicate?.Invoke(scanResult!) ?? true;
+            if (show)
+            {
+                var action = ManagedScanListAction.Update;
+                ManagedScanResult? result;
+                lock (this.syncLock)
+                {
+                    result = this.list.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
+
+                    if (result == null)
+                    {
+                        action = ManagedScanListAction.Add;
+                        result = new ManagedScanResult(scanResult.Peripheral)
+                        {
+                            ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
+                            ServiceData = scanResult.AdvertisementData?.ServiceData
+                        };
+                        adds.Add(result);
+                    }
+                }
+
+                result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
+                result.Name = scanResult.Peripheral.Name;
+                result.LocalName = scanResult.AdvertisementData?.LocalName;
+                result.Rssi = scanResult.Rssi;
+                result.TxPower = scanResult.AdvertisementData?.TxPower;
+                result.LastSeen = DateTimeOffset.UtcNow;
+                result.FullAdvertisementData = scanResult.AdvertisementData;
+
+                this.actionSubj.OnNext((action, result));
+            }
+        }
+
+        if (adds.Count > 0)
+        {
+            lock (this.syncLock)
+                this.list.AddRange(adds);
+        }
+    }
+    
+
+    void OnCleanup(TimeSpan clearTime)
+    {
+        var maxAge = DateTimeOffset.UtcNow.Subtract(clearTime);
+        List<ManagedScanResult> remove = null!;
+        
+        lock (this.syncLock)
+        {
+            remove = this.list.Where(x => x.LastSeen < maxAge).ToList();
+            if (remove.Count > 0)
+                this.list.RemoveRange(remove);
+        }
+        foreach (var scanResult in remove)
+            this.actionSubj.OnNext((ManagedScanListAction.Remove, scanResult));
+    }
+    
 
     public void Dispose()
     {
