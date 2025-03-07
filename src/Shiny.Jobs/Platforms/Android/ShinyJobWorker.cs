@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using AndroidX.Concurrent.Futures;
@@ -17,7 +18,7 @@ public class ShinyJobWorker : ListenableWorker, CallbackToFutureAdapter.IResolve
     readonly CancellationTokenSource cancelSource = new();
     public ShinyJobWorker(Context context, WorkerParameters workerParams) : base(context, workerParams) { }
 
-
+    
     public Java.Lang.Object AttachCompleter(CallbackToFutureAdapter.Completer completer)
     {
         if (!Host.IsInitialized)
@@ -45,25 +46,33 @@ public class ShinyJobWorker : ListenableWorker, CallbackToFutureAdapter.IResolve
                     .Run(jobName!, this.cancelSource.Token)
                     .ContinueWith(x =>
                     {
-                        switch (x.Status)
+                        try
                         {
-                            case TaskStatus.Canceled:
-                                completer.SetCancelled();
-                                break;
 
-                            case TaskStatus.Faulted:
-                                logger.LogError(x.Exception, "Error in job");
-                                completer.SetException(new Java.Lang.Throwable(x.Exception.ToString()));
-                                break;
+                            switch (x.Status)
+                            {
+                                case TaskStatus.Canceled:
+                                    completer.SetCancelled();
+                                    break;
 
-                            case TaskStatus.RanToCompletion:
-                                completer.Set(Result.InvokeSuccess());
-                                break;
+                                case TaskStatus.Faulted:
+                                    logger.LogError(x.Exception, "Error in job");
+                                    completer.SetException(new Java.Lang.Throwable(x.Exception.ToString()));
+                                    break;
+
+                                case TaskStatus.RanToCompletion:
+                                    completer.Set(Result.InvokeSuccess());
+                                    break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogWarning(ex, "Android Worker Callback failed, but was trapped");
                         }
                     });
             }
         }
-        return "AsyncOp";
+        return completer;
     }
 
 
