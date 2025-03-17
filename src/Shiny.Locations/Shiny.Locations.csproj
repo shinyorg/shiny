@@ -12,6 +12,6 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="121.0.1.1" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Location" />
     </ItemGroup>
 </Project>
