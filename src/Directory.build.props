@@ -22,7 +22,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net8.0-windows10.0.19041.0</WindowsTarget>
+        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net9.0-windows10.0.19041.0</WindowsTarget>
 
         <StandardTargetFrameworks>net9.0</StandardTargetFrameworks>
         <IosTargetFrameworks>net9.0-ios18.0</IosTargetFrameworks>
