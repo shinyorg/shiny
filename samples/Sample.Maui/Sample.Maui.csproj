@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>$(TargetFrameworks);net8.0-android</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);net8.0-ios</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks);net9.0-android</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net9.0-ios</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);net9.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Sample</RootNamespace>
         <Nullable>enable</Nullable>
@@ -11,6 +11,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
         <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
         <UseMaui>True</UseMaui>
+        <MauiVersion>9.0.50</MauiVersion>
 
         <ApplicationTitle>Shiny</ApplicationTitle>
         <ApplicationId>org.shiny.samples</ApplicationId>
@@ -20,12 +21,12 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">35.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
 
         <!--
         <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
@@ -68,7 +69,6 @@
         <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" />
     </ItemGroup>

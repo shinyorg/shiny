@@ -9,11 +9,15 @@ on:
         default: 'warning'
   push:
     branches:
-    - master
-    - main
-    - dev
-    - preview
-    - v*
+      - master
+      - main
+      - dev
+      - preview
+      - v*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   NugetApiKey: ${{secrets.NUGETAPIKEY}}
@@ -39,10 +43,10 @@ jobs:
       with:
           fetch-depth: 0
 
-    # - name: Setup .NET 8.0
-    #   uses: actions/setup-dotnet@v3
-    #   with:
-    #       dotnet-version: '8.0.404'
+#    - name: Setup .NET 9.0
+#      uses: actions/setup-dotnet@v3
+#      with:
+#          dotnet-version: '9.0.200'
 
     - uses: AdoptOpenJDK/install-jdk@v1
       with:
@@ -53,7 +57,7 @@ jobs:
 #      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
 
     - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj
+      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
@@ -61,3 +65,7 @@ jobs:
         name: nugets
         path: ${{ github.workspace }}/artifacts
         retention-days: 5
+
+    - name: Publish NuGets
+      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
+      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGETAPIKEY }} --skip-duplicate

@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.Notifications;
+﻿using Shiny.Notifications;
 
 namespace Sample.Notifications;
 

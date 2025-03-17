@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.Locations;
+﻿using Shiny.Locations;
 using Shiny.Notifications;
 
 namespace Sample.Geofencing;

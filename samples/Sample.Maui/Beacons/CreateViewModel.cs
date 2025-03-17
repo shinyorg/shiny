@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.Beacons;
+﻿using Shiny.Beacons;
 
 namespace Sample.Beacons;
 

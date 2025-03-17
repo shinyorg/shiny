@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
     
     <PropertyGroup>
         <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
@@ -11,8 +10,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('android'))">
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1" />
+        <PackageReference Include="Xamarin.AndroidX.AppCompat" />
     </ItemGroup>
 
-    <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" Version="$(MSBuildSdkExtrasVersion)" Condition="'$(UseMSBuild)' == 'true'" />
 </Project>

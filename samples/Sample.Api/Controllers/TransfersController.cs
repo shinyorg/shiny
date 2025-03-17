@@ -5,17 +5,8 @@ namespace Sample.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class TransfersController : ControllerBase
+public class TransfersController(ILogger<TransfersController> logger) : ControllerBase
 {
-    readonly ILogger logger;
-
-
-    public TransfersController(ILogger<TransfersController> logger)
-    {
-        this.logger = logger;
-    }
-
-
     [HttpGet("download")]
     public IActionResult Get()
         => this.GetDownload(50);
@@ -30,7 +21,7 @@ public class TransfersController : ControllerBase
     [HttpPost("download/body")]
     public IActionResult DownloadWithBody([FromBody] BodyArgs args)
     {
-        this.logger.LogInformation("Package Text: " + args?.Text);
+        logger.LogInformation("Package Text: " + args?.Text);
         if (!Int32.TryParse(args?.Text, out var size))
             size = 50;
 
@@ -58,7 +49,7 @@ public class TransfersController : ControllerBase
         if (value?.Text == null)
             throw new InvalidOperationException("No arg text sent");
 
-        this.logger.LogInformation("Argument Text: " + value.Text);
+        logger.LogInformation("Argument Text: " + value.Text);
         await this.Write(file);
         return this.Ok();
     }
@@ -90,7 +81,7 @@ public class TransfersController : ControllerBase
             fs.Flush();
         }
 
-        this.logger.LogInformation($"Upload File Generated - {new FileInfo(path).Length} bytes");
+        logger.LogInformation($"Upload File Generated - {new FileInfo(path).Length} bytes");
         return path;
     }
 
@@ -101,7 +92,7 @@ public class TransfersController : ControllerBase
         {
             foreach (var value in header.Value)
             {
-                this.logger.LogInformation($"HEADER: {header.Key} - VALUE: {value}");
+                logger.LogInformation($"HEADER: {header.Key} - VALUE: {value}");
             }
         }
     }
@@ -112,12 +103,12 @@ public class TransfersController : ControllerBase
         this.IterateHeaders();
 
         var filePath = Path.Combine(Path.GetTempPath(), file.FileName);
-        this.logger.LogInformation($"Writing to '{filePath}' with size of {file.Length} bytes");
+        logger.LogInformation($"Writing to '{filePath}' with size of {file.Length} bytes");
 
         using (var fs = System.IO.File.Create(filePath))
             await file.CopyToAsync(fs);
 
-        this.logger.LogInformation("Write Complete");
+        logger.LogInformation("Write Complete");
     }
 }
 

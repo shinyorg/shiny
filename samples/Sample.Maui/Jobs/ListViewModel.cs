@@ -1,5 +1,4 @@
 ﻿using Shiny.Jobs;
-using Shiny;
 
 namespace Sample.Jobs;
 
