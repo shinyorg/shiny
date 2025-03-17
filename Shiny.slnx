@@ -30,6 +30,7 @@
   <Folder Name="/build/">
     <File Path="Build.slnf" />
     <File Path=".github\workflows\build.yml" />
+    <File Path="version.json" />
   </Folder>
   <Folder Name="/libs/">
     <Project Path="src\Shiny.Beacons\Shiny.Beacons.csproj" />
@@ -71,8 +72,6 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
-    <File Path="Build.slnf" />
-    <File Path=".github\workflows\build.yml" />
     <File Path="LICENSE.md" />
     <File Path="readme.md" />
     <File Path="nuget.config" />

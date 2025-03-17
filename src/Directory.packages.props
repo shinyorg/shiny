@@ -12,6 +12,7 @@
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0" />
 
+        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
 
         <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.2.0" />
