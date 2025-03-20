@@ -23,7 +23,6 @@ body:
         - Push - Azure Notification Hub (Shiny.Push.AzureNotificationHubs)
         - BluetoothLE Client (Shiny.BluetoothLE)
         - BluetoothLE Hosting (Shiny.BluetoothLE.Hosting)
-        - AppCenter Logging (Shiny.Logging.AppCenter)
         - SQLite Logging (Shiny.Logging.Sqlite)
         - Beacons (Shiny.Beacons)
         - Other
@@ -37,22 +36,12 @@ body:
       options:
       - label: iOS (13+ supported)
       - label: Mac Catalyst
-      - label: Android (8+ supported)
+      - label: Android (12+ supported)
   - type: textarea
     validations:
       required: true
     attributes:
       label: Version(s) of Operation Systems
-  - type: checkboxes
-    id: platforms
-    attributes:
-      label: Hosting Model
-      description: You really should only select one of these
-      options:
-      #- label: Blazor
-      - label: MAUI
-      - label: Native/Classic Xamarin
-      - label: Manual
   - type: textarea
     validations:
       required: true
@@ -91,7 +80,7 @@ body:
       options:
         - label: I have supplied a reproducible sample that is NOT FROM THE SHINY SAMPLES! 
           required: true
-        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v3.0 stable - ALPHAS are not taking issues - Sponsors can still send v2 issues)
+        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v3.0 stable - BETAs are not taking issues unless you are a sponsor)
           required: true
         - label: I am Sponsor OR My GitHub account is 30+ days old
           required: true
