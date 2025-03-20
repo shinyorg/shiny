@@ -19,12 +19,12 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
             await this.semaphore.WaitAsync().ConfigureAwait(false);
             if (this.DetectStationary)
                 this.DetectIfStationary(reading);
-            
+
+            var fireReading = true;
             this.MostRecentReading = reading;
-            var fireReading = false;
+
             if (this.LastReading == null)
             {
-                fireReading = true;
                 this.Logger.LogDebug("No previous reading");
             }
             else
@@ -73,26 +73,39 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
 
         if (this.MostRecentReading != null)
         {
-            var distance = reading.Position.GetDistanceTo(this.MostRecentReading.Position);
-            if (distance.TotalMeters < this.StationaryMetersThreshold)
+            var distance = reading.Position.GetDistanceTo(this.lastReading.Position);
+            if (distance.TotalMeters < StationaryMetersThreshold)
             {
                 var time = reading.Timestamp - this.lastMovement;
-                if (time.Value.TotalSeconds >= this.StationarySecondsThreshold)
+                if (time.Value.TotalSeconds >= StationarySecondsThreshold)
                 {
-                    if (!this.IsStationary)
+                    if (this.IsStationary)
+                    {
+                        logger.LogDebug("Still stationary");
+                    }
+                    else
                     {
                         this.IsStationary = true;
-                        logger.LogDebug("GPS showing stationary");
+                        logger.LogDebug("Stationary Detected");
                     }
+                }
+                else
+                {
+                    logger.LogDebug("Stationary Detected, but insufficient time has past: " + time);
                 }
             }
             else
             {
+                logger.LogDebug("Stationary Threshold Not Reached - {Meters}m", distance.TotalMeters);
                 this.lastMovement = reading.Timestamp;
                 if (this.IsStationary)
                 {
                     this.IsStationary = false;
-                    logger.LogDebug("GPS showing movement");
+                    logger.LogDebug("Stationary Changed to In-Motion");
+                }
+                else
+                {
+                    logger.LogDebug("Still in-motion");
                 }
             }
         }
