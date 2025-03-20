@@ -197,7 +197,7 @@ public class HttpTransferObject : NotifyPropertyChanged
     public HttpTransferRequest Request { get; }
     public string Identifier => this.Request.Identifier;
     public string Uri => this.Request.Uri;
-    public bool IsUpload => this.Request.IsUpload;
+    public TransferType Type => this.Request.Type;
 
 
     double percent;

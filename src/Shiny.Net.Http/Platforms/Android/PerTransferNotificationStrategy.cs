@@ -60,7 +60,7 @@ public class PerTransferNotificationStrategy : AbstractTransferNotificationStrat
         this.Logger.LogDebug("Updating Foreground Notification");
         var percentComplete = result.IsDeterministic ? Convert.ToInt32(result.Progress.PercentComplete * 100) : 0;
 
-        var transferTxt = result.Request.IsUpload ? "Uploading to" : "Downloading from";
+        var transferTxt = result.Request.Type.IsUpload() ? "Uploading to" : "Downloading from";
         builder
             .SetContentTitle("File Transfers")
             //.SetContentInfo("")

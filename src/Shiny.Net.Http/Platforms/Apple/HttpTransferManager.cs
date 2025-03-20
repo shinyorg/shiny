@@ -99,7 +99,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
             NSUrlSessionTask task;
 
-            if (request.IsUpload)
+            if (request.Type.IsUpload())
             {
                 task = await this.CreateUpload(request).ConfigureAwait(false);
             }
@@ -262,7 +262,7 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
                 {
                     this.OnError(ht, new InvalidOperationException("HTTP Transfer Error - Invalid Status Code: " + statusCode));
                 }
-                else if (ht.Request.IsUpload)
+                else if (ht.Request.Type.IsUpload())
                 {
                     // If download, let DidFinishDownloading call this
                     this.logger.LogInformation($"Transfer {ht.Identifier} was completed");
@@ -437,6 +437,25 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
             throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 
         var native = request.ToNative();
+        
+        // TODO: multipart or raw here
+        this.configurator?.Configure(native, request);
+
+        if (request.Type == TransferType.UploadMultipart)
+            return await this.UploadAsMultipartRequest(request, native).ConfigureAwait(false);
+
+        if (request.HttpContent != null)
+            throw new InvalidOperationException("HttpContent cannot be sent for raw uploads");
+        
+        // native.Body = NSData.From
+        var fileUrl = NSUrl.CreateFileUrl(request.LocalFilePath, null);
+        var task = this.Session.CreateUploadTask(native, fileUrl);
+        return task;
+    }
+
+
+    async Task<NSUrlSessionUploadTask> UploadAsMultipartRequest(HttpTransferRequest request, NSMutableUrlRequest native)
+    {
         var boundary = Guid.NewGuid().ToString("N");
         native["Content-Type"] = $"multipart/form-data; boundary=\"{boundary}\"";
 
@@ -471,17 +490,13 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
         this.logger.LogInformation("Form body written");
         var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
-        this.configurator?.Configure(native, request);
-
         var task = this.Session.CreateUploadTask(native, tempFileUrl);
-        
         return task;
     }
 
-
     void TryDeleteUploadTempFile(HttpTransfer transfer)
     {
-        if (!transfer.Request.IsUpload)
+        if (!transfer.Request.Type.IsUpload())
             return;
 
         var path = this.platform.GetUploadTempFilePath(transfer.Request);

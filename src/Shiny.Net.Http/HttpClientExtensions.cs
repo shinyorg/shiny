@@ -12,7 +12,8 @@ public static class HttpClientExtensions
     public static IObservable<TransferProgress> Upload(
         this HttpClient httpClient,
         string uri,
-        string filePath,        
+        string filePath,
+        bool sendAsMultipart,
         HttpMethod? httpMethod = null,
         HttpContent? bodyContent = null,
         string contenFormDataName = "value",
@@ -60,14 +61,21 @@ public static class HttpClientExtensions
             },
             8192
         );
-        var multipart = new MultipartFormDataContent();
-        if (bodyContent != null)
-            multipart.Add(bodyContent, contenFormDataName);
-
-        multipart.Add(progress, name: fileFormDataName, fileName: file.Name);
-
         var request = new HttpRequestMessage();
-        request.Content = multipart;
+        if (sendAsMultipart)
+        {
+            var multipart = new MultipartFormDataContent();
+            if (bodyContent != null)
+                multipart.Add(bodyContent, contenFormDataName);
+
+            multipart.Add(progress, name: fileFormDataName, fileName: file.Name);
+            request.Content = multipart;
+        }
+        else
+        {
+            request.Content = progress;
+        }
+        
         request.Method = httpMethod ?? HttpMethod.Post;
         request.RequestUri = new Uri(uri);
         foreach (var header in headers)

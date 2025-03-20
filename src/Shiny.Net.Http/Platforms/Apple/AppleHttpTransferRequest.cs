@@ -6,7 +6,7 @@ namespace Shiny.Net.Http;
 public record AppleHttpTransferRequest(
     string Identifier,
     string Uri,
-    bool IsUpload,
+    TransferType Type,
     string LocalFilePath,
     bool UseMeteredConnection = true,
     TransferHttpContent? BodyContent = null,
@@ -22,7 +22,7 @@ public record AppleHttpTransferRequest(
 : HttpTransferRequest(
     Identifier,
     Uri,
-    IsUpload,
+    Type,
     LocalFilePath,
     UseMeteredConnection,
     BodyContent,

@@ -28,7 +28,7 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
     async Task CreateHttpTransferEvent(HttpTransferRequest request, Exception? exception = null)
     {
         var state = exception == null ? $"Completed" : "Failed";
-        var direction = request.IsUpload ? "Upload" : "Download";
+        var direction = request.Type.IsUpload() ? "Upload" : "Download";
         var msg = $"{direction} of {Path.GetFileName(request.LocalFilePath)} {state}";
 
         await this.conn.Log("HTTP Transfer", msg, exception?.ToString());

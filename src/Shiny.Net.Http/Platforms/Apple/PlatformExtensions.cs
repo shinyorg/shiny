@@ -61,7 +61,7 @@ static class PlatformExtensions
                 native.AssumesHttp3Capable = appleRequest.AssumesHttp3Capable.Value;
         }
 
-        if (!request.IsUpload && request.HttpContent != null)
+        if (!request.Type.IsUpload() && request.HttpContent != null)
         {
             native.Body = NSData.FromString(request.HttpContent.Content); //, NSStringEncoding.UTF8);
         }

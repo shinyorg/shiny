@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using Shiny.Support.Repositories;
@@ -10,7 +11,7 @@ namespace Shiny.Net.Http;
 public record HttpTransferRequest(
     string Identifier,
     string Uri,
-    bool IsUpload,
+    TransferType Type,
     string LocalFilePath,
     bool UseMeteredConnection = true,
     TransferHttpContent? HttpContent = null,
@@ -25,13 +26,49 @@ public record HttpTransferRequest(
 
     public HttpMethod GetHttpMethod()
     {
-        var defMethod = this.IsUpload ? "POST" : "GET";
+        var defMethod = this.Type == TransferType.Download ? "GET" : "POST";
         var httpMethod = new HttpMethod(this.HttpMethod ?? defMethod);
 
         return httpMethod;
     }
+
+
+    public static HttpTransferRequest CreateAzureBlobStorageUpload(
+        string identifier, 
+        string localFilePath, 
+        bool useMeteredConnection
+    )
+    {
+        // https://learn.microsoft.com/en-us/rest/api/storageservices/put-blob?tabs=microsoft-entra-id
+        
+        // Authorization	Required. Specifies the authorization scheme, account name, and signature. For more information, see Authorize requests to Azure Storage.
+        //     Date or x-ms-date	Required. Specifies the Coordinated Universal Time (UTC) for the request. For more information, see Authorize requests to Azure Storage.
+        //     x-ms-version	Required for all authorized requests. Specifies the version of the operation to use for this request. For more information, see Versioning for the Azure Storage services.
+        var headers = new Dictionary<string, string>();
+
+        headers.Add("x-ms-blob-type", "BlockBlob");
+        headers.Add("Content-Length", new FileInfo(localFilePath).Length.ToString());
+        return new HttpTransferRequest(
+            identifier,
+            "",
+            TransferType.UploadRaw,
+            localFilePath,
+            useMeteredConnection,
+            null,
+            headers
+        )
+        {
+            HttpMethod = "PUT"
+        };
+    }
 }
 
+public enum TransferType
+{
+    UploadMultipart,
+    UploadRaw,
+    Download
+}
 
 public record HttpTransfer(
     HttpTransferRequest Request,

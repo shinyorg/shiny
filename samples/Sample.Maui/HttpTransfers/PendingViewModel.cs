@@ -78,7 +78,7 @@ public class HttpTransferViewModel : ReactiveObject
     {
         this.Identifier = transfer.Identifier;
         this.Uri = transfer.Request.Uri;
-        this.IsUpload = transfer.Request.IsUpload;
+        this.IsUpload = transfer.Request.Type.IsUpload();
         this.Cancel = cancel;
     }
 

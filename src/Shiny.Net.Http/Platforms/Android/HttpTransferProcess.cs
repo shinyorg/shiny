@@ -246,10 +246,12 @@ public class HttpTransferProcess
         {
             bodyContent = new StringContent(c.Content, Encoding.UTF8, c.ContentType);
         }
-        var obs = request.IsUpload
+        
+        var obs = request.Type.IsUpload()
             ? this.httpClient.Upload(
                 request.Uri,
                 request.LocalFilePath,
+                request.Type == TransferType.UploadMultipart,
                 httpMethod,
                 bodyContent,
                 request.HttpContent?.ContentFormDataName ?? "value",

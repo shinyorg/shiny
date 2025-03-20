@@ -33,7 +33,7 @@ public class HttpTransfersViewModel : ViewModel
             await this.manager.Queue(new HttpTransferRequest(
                 Guid.NewGuid().ToString(),
                 this.GetUrl(false),
-                false,
+                TransferType.Download,
                 path
             ));
         });
@@ -45,7 +45,7 @@ public class HttpTransfersViewModel : ViewModel
             await this.manager.Queue(new HttpTransferRequest(
                 Guid.NewGuid().ToString(),
                 this.GetUrl(true),
-                true,
+                TransferType.UploadMultipart,
                 path
             ));
         });

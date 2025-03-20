@@ -66,7 +66,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
         }
         // this will trigger over to the job if it is running
         long? contentLength = null;
-        if (request.IsUpload)
+        if (request.Type.IsUpload())
             contentLength = new FileInfo(request.LocalFilePath).Length;
 
         var transfer = new HttpTransfer(

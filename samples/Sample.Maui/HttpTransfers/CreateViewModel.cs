@@ -93,7 +93,7 @@ public class CreateViewModel : ViewModel
             (
                 Guid.NewGuid().ToString(),
                 this.Url,
-                this.IsUpload,
+                this.IsUpload ? TransferType.UploadMultipart : TransferType.Download,
                 this.FilePath!,
                 this.UseMeteredConnection,
                 content
