@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Azure.NotificationHubs;
 
 namespace Shiny;
 
@@ -15,5 +17,10 @@ public record AzureNotificationConfig(
     /// <summary>
     /// This will set a specific time to expire your tokens with Azure.  NOTE: that every call to RequestAccess or tag setting, will bump the expiration forward
     /// </summary>
-    TimeSpan? ExpirationTime = null
+    TimeSpan? ExpirationTime = null,
+    
+    /// <summary>
+    /// Allows you to configure things like templates & tags before sending to ANH
+    /// </summary>
+    Func<Installation, Task>? BeforeSendInstallation = null
 );

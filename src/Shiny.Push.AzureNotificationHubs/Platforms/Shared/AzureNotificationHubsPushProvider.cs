@@ -16,16 +16,19 @@ namespace Shiny.Push;
 public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushProvider, IPushTagSupport
 {
     readonly AzureNotificationConfig config;
+    readonly IServiceProvider services;
     readonly ILogger logger;
     readonly NotificationHubClient client;
 
 
     public AzureNotificationHubsPushProvider(
         AzureNotificationConfig config,
+        IServiceProvider services,
         ILogger<AzureNotificationHubsPushProvider> logger
     )
     {
         this.config = config;
+        this.services = services;
         this.logger = logger;
         this.client = new NotificationHubClient(
             config.ListenerConnectionString,
@@ -164,14 +167,38 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
 #endif
         };
     }
+    
 
     protected async Task Update(string nativeRegToken, CancellationToken cancelToken = default)
     {
         var install = this.GetInstallation(nativeRegToken);
         this.logger.LogInformation($"ANH Token: {this.InstallationId}");
 
+        await this.RunInstallEvents(install).ConfigureAwait(false);
         await this.client
             .CreateOrUpdateInstallationAsync(install, cancelToken)
+            .ConfigureAwait(false);
+    }
+
+    
+    protected async Task RunInstallEvents(Installation installation)
+    {
+        if (this.config.BeforeSendInstallation != null)
+        {
+            try
+            {
+                await this.config
+                    .BeforeSendInstallation(installation)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to run AzureNotificationConfig.BeforeSendInstallation");
+            }
+        }
+
+        await this.services
+            .RunDelegates<IPushInstallationEvent>(x => x.OnBeforeSend(installation), this.logger)
             .ConfigureAwait(false);
     }
 }
