@@ -53,6 +53,7 @@ public static class LocationExtensions
         };
         return lm.RequestAccess(background);
     }
+    
 
     public static async Task<AccessState> RequestAccess(this CLLocationManager locationManager, bool background)
     {
@@ -62,7 +63,7 @@ public static class LocationExtensions
 
         var task = locationManager
             .WhenAccessStatusChanged(false)
-            .StartWith()
+            .Where(x => x != AccessState.Unknown)
             .Take(1)
             .ToTask();
         
@@ -73,7 +74,7 @@ public static class LocationExtensions
         {
             task = locationManager
                 .WhenAccessStatusChanged(true)
-                .StartWith()
+                // .StartWith()
                 .Take(1)
                 .ToTask();
             

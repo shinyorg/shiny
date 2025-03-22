@@ -95,11 +95,12 @@ public class GpsManager : IGpsManager, IShinyStartupTask
     public IObservable<GpsReading> WhenReading() => this.readSubject;
 
     
-    public Task StartListener(GpsRequest request)
+    public async Task StartListener(GpsRequest request)
     {
         if (this.updater != null)
             throw new InvalidOperationException("Already GPS listener running");
         
+        (await this.RequestAccess(request)).Assert();
         if (request.BackgroundMode != GpsBackgroundMode.None)
             this.session = CLBackgroundActivitySession.Create();
         
@@ -116,7 +117,6 @@ public class GpsManager : IGpsManager, IShinyStartupTask
                 .ConfigureAwait(false);
         });
         this.CurrentListener = request;
-        return Task.CompletedTask;
     }
 
     
