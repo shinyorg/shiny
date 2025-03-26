@@ -37,6 +37,10 @@ public class ObservableList<T> : ObservableCollection<T>, INotifyCollectionChang
     }
 
 
+    /// <summary>
+    /// Remove a range of items
+    /// </summary>
+    /// <param name="items"></param>
     public void RemoveRange(IEnumerable<T> items)
     {
         foreach (var item in items)
