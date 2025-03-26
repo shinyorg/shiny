@@ -4,20 +4,12 @@ using Shiny.Notifications;
 namespace Sample.HttpTransfers;
 
 
-public partial class MyHttpTransferDelegate : IHttpTransferDelegate
+public partial class MyHttpTransferDelegate(
+    INotificationManager notificationManager, 
+    SampleSqliteConnection conn
+) : IHttpTransferDelegate
 {
-    readonly INotificationManager notificationManager;
-    readonly SampleSqliteConnection conn;
-
-
-    public MyHttpTransferDelegate(INotificationManager notificationManager, SampleSqliteConnection conn)
-    {
-        this.notificationManager = notificationManager;
-        this.conn = conn;
-    }
-
-
-    public Task OnError(HttpTransferRequest request, Exception ex)
+    public Task OnError(HttpTransferRequest request, int statusCode, Exception ex)
         => this.CreateHttpTransferEvent(request, ex);
 
 
@@ -31,8 +23,8 @@ public partial class MyHttpTransferDelegate : IHttpTransferDelegate
         var direction = request.Type.IsUpload() ? "Upload" : "Download";
         var msg = $"{direction} of {Path.GetFileName(request.LocalFilePath)} {state}";
 
-        await this.conn.Log("HTTP Transfer", msg, exception?.ToString());
-        await this.notificationManager.Send("HTTP Transfer", msg);
+        await conn.Log("HTTP Transfer", msg, exception?.ToString());
+        await notificationManager.Send("HTTP Transfer", msg);
     }
 }
 
