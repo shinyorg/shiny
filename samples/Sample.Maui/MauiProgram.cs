@@ -111,7 +111,8 @@ public static class MauiProgram
         // HTTP Transfers
         s.RegisterForNavigation<HttpTransfers.CreatePage, HttpTransfers.CreateViewModel>("HttpTransfersCreate");
         s.RegisterForNavigation<HttpTransfers.PendingPage, HttpTransfers.PendingViewModel>("HttpTransfers");
-
+        s.RegisterForNavigation<HttpTransfers.AzureBlobPage, HttpTransfers.AzureBlobViewModel>("AzureBlobs");
+        
         // jobs
         s.RegisterForNavigation<Jobs.ListPage, Jobs.ListViewModel>("Jobs");
         s.RegisterForNavigation<Jobs.CreatePage, Jobs.CreateViewModel>("JobsCreate");

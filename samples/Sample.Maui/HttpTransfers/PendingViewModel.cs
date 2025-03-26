@@ -14,9 +14,9 @@ public class PendingViewModel : ViewModel
         this.httpTransfers = httpTransfers;
 
         this.Create = this.Navigation.Command("HttpTransfersCreate");
+        this.AzureBlob = this.Navigation.Command("AzureBlob");
         this.Load = this.LoadingCommand(async () =>
         {
-            var transfers = await httpTransfers.GetTransfers();
             this.Transfers = (await httpTransfers.GetTransfers())
                 .Select(transfer => new HttpTransferViewModel(
                     transfer,
@@ -65,6 +65,7 @@ public class PendingViewModel : ViewModel
     }
 
     public ICommand Create { get; }
+    public ICommand AzureBlob { get; }
     public ICommand Load { get; }
     public ICommand CancelAll { get; }
 
