@@ -9,6 +9,6 @@ public interface IHttpTransferDelegate
     // void OnQueueChanged(int itemCount);
     
     // could offer a chance to ask delegate if error should continue? maybe put that in a separate concern?
-    Task OnError(HttpTransferRequest request, Exception ex);
+    Task OnError(HttpTransferRequest request, int statusCode, Exception ex);
     Task OnCompleted(HttpTransferRequest request);
 }

@@ -77,7 +77,7 @@ public class HttpTransferProcess
 
                         foreach (var transfer in transfers)
                         {
-                            var stillExists = this.repository.Exists<HttpTransfer>(transfer.Identifier);
+                            //var stillExists = this.repository.Exists<HttpTransfer>(transfer.Identifier);
                             if (cancelSrc.IsCancellationRequested)
                             {
                                 this.logger.LogDebug("Transfer Loop cancelled");
@@ -153,7 +153,7 @@ public class HttpTransferProcess
                 transfer.Identifier.Equals(x.Entity!.Identifier)
             )
             .Take(1)
-            .Subscribe(x =>
+            .Subscribe(_ =>
             {
                 this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
                 cancelSrc?.Cancel();
@@ -188,7 +188,7 @@ public class HttpTransferProcess
         {
             this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
             await this.delegates
-                .RunDelegates(x => x.OnError(transfer!.Request, ex), this.logger)
+                .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), this.logger)
                 .ConfigureAwait(false);
 
             progressSubj.OnNext(new(
@@ -216,7 +216,7 @@ public class HttpTransferProcess
         catch (Exception ex)
         {
             // should always retry unless server fails
-            this.PauseTransfer(transfer, "Error with transfer - " + ex.ToString(), ex);
+            this.PauseTransfer(transfer, "Error with transfer - " + ex, ex);
         }
     }
 
