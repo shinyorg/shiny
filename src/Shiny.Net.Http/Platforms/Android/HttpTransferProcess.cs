@@ -186,6 +186,8 @@ public class HttpTransferProcess
         }
         catch (HttpRequestException ex)
         {
+            this.repository.Remove(transfer);
+            
             this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
             await this.delegates
                 .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), this.logger)
@@ -198,8 +200,6 @@ public class HttpTransferProcess
                 ex
             ));
             repoSub.Dispose(); // dispose of this so cancellation isn't run
-
-            this.repository.Remove(transfer);
         }
         catch (IOException ex) when (ex.InnerException is Java.Net.SocketException)
         {

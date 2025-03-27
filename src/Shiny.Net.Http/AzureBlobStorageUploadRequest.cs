@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Shiny.Net.Http;
 
@@ -22,10 +20,11 @@ public class AzureBlobStorageUploadRequest(string localFilePath)
     public Dictionary<string, string> Headers { get; } = new();
 
 
-    public async Task<AzureBlobStorageUploadRequest> WithSasTokenRequest(CancellationToken cancellationToken = default)
-    {
-        return this;
-    }
+    // public async Task<AzureBlobStorageUploadRequest> WithSasTokenRequest(CancellationToken cancellationToken = default)
+    // {
+    //     this.SasToken = 
+    //     return this;
+    // }
     
     public AzureBlobStorageUploadRequest WithBlobContainer(string tenant, string containerName)
     {

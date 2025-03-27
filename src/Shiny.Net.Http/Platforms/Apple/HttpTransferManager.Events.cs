@@ -108,19 +108,19 @@ public partial class HttpTransferManager
     }
     
 
-    public override void DidReceiveChallenge(
-        NSUrlSession session,
-        NSUrlSessionTask task,
-        NSUrlAuthenticationChallenge challenge,
-        Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler
-    )
-    {
-        logger.LogDebug("DidReceiveChallenge");
-        
-        // challenge.ProtectionSpace.AuthenticationMethod    
-        
-        completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
-    }
+    // public override void DidReceiveChallenge(
+    //     NSUrlSession session,
+    //     NSUrlSessionTask task,
+    //     NSUrlAuthenticationChallenge challenge,
+    //     Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler
+    // )
+    // {
+    //     logger.LogDebug("DidReceiveChallenge");
+    //     
+    //     // challenge.ProtectionSpace.AuthenticationMethod    
+    //     
+    //     completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null!);
+    // }
 
     
     public override void DidBecomeInvalid(NSUrlSession session, NSError error)
