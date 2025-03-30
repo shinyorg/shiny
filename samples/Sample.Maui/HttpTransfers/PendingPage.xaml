@@ -7,8 +7,7 @@
              Title="HTTP Transfers">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Multipart" Command="{Binding Create}" />
-        <ToolbarItem Text="Azure" Command="" />
+        <ToolbarItem Text="Create" Command="{Binding Create}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Configuration;
 using Sample.Dev;
+using Sample.HttpTransfers;
 
 namespace Sample;
 
@@ -156,6 +157,7 @@ public static class MauiProgram
         s.RegisterForNavigation<Stores.BindPage, Stores.BindViewModel>("SettingsBind");
 
         // dev
+        s.RegisterForNavigation<AzureBlobPage, AzureBlobViewModel>();
         s.RegisterForNavigation<BleHostUnitTestsPage, BleHostUnitTestsViewModel>("BleHostUnitTests");
         s.RegisterForNavigation<HttpTransfersPage, HttpTransfersViewModel>("HttpTransfersDev");
         s.RegisterForNavigation<LogsPage, LogsViewModel>();
