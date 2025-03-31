@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
@@ -457,10 +458,8 @@ public class HttpTransferManager : NSUrlSessionDownloadDelegate,
 
             var fileName = Path.GetFileName(request.LocalFilePath);
             fs.WriteString("--" + boundary);
-
-            // TODO: escape/encode filename - add utf-8 version
-            //fileName = HttpUtility.UrlEncode(fileName);
-            fs.WriteString($"Content-Disposition: form-data; name={request.FileFormDataName}; filename={fileName}");
+            
+            fs.WriteString($"Content-Disposition: form-data; name=\"{request.FileFormDataName}\"; filename=\"{HttpUtility.UrlEncode(fileName)}\"; filename*=UTF-8''{fileName}");
             fs.WriteLine();
             using (var uploadFile = File.OpenRead(request.LocalFilePath))
                 await uploadFile.CopyToAsync(fs);
