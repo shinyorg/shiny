@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
+using Shiny.Collections;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Net.Http;
@@ -34,7 +35,7 @@ public class HttpTransferMonitor : IDisposable
     }
 
 
-    readonly ObservableList<HttpTransferObject> transfers = new();
+    readonly BindingList<HttpTransferObject> transfers = new();
     public INotifyReadOnlyCollection<HttpTransferObject> Transfers => this.transfers;
 
     public bool IsStarted => this.disposable != null;

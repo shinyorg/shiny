@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Shiny.Collections;
 
 namespace Shiny.Beacons.Managed;
 
 
-public class ManagedScan : IDisposable
+public class ManagedScan(IBeaconRangingManager beaconManager) : IDisposable
 {
-    readonly IBeaconRangingManager beaconManager;
     IScheduler? scheduler;
     IDisposable? clearSub;
     IDisposable? scanSub;
 
 
-    public ManagedScan(IBeaconRangingManager beaconManager)
-        => this.beaconManager = beaconManager;
-
-
-    public ObservableCollection<ManagedBeacon> Beacons { get; } = new();
+    readonly BindingList<ManagedBeacon> beacons = new();
+    public INotifyReadOnlyCollection<ManagedBeacon> Beacons => this.beacons;
+    
     public BeaconRegion? ScanningRegion { get; private set; }
     public bool IsScanning => this.ScanningRegion != null;
 
@@ -44,8 +42,8 @@ public class ManagedScan : IDisposable
                     {
                         var maxAge = DateTimeOffset.UtcNow.Subtract(value.Value);
                         var tmp = this.Beacons.Where(x => x.LastSeen < maxAge).ToList();
-                        foreach (var beacon in tmp)
-                            this.Beacons.Remove(beacon);
+                        if (tmp.Any())
+                            this.beacons.RemoveRange(tmp);
                     });
             }
         }
@@ -56,33 +54,35 @@ public class ManagedScan : IDisposable
         if (this.IsScanning)
             throw new ArgumentException("A beacon scan is already running");
 
-        (await this.beaconManager.RequestAccess()).Assert();
+        (await beaconManager.RequestAccess()).Assert();
 
         this.scheduler = scheduler;
         this.ScanningRegion = scanRegion;
-        this.Beacons.Clear();
+        this.beacons.Clear();
 
         // restart clear if applicable
         this.ClearTime = this.ClearTime;
 
-        this.scanSub = this.beaconManager
+        this.scanSub = beaconManager
             .WhenBeaconRanged(scanRegion)
             .Buffer(TimeSpan.FromSeconds(2))
             .ObserveOnIf(this.scheduler)
-            .Synchronize(this.Beacons)
-            .Subscribe(beacons =>
+            .Subscribe(scanList =>
             {
-                foreach (var beacon in beacons)
+                var add = new List<ManagedBeacon>();
+                foreach (var beacon in scanList)
                 {
-                    var managed = this.Beacons.FirstOrDefault(x => x.Beacon.Equals(beacon));
+                    var managed = this.beacons.FirstOrDefault(x => x.Beacon.Equals(beacon));
                     if (managed == null)
                     {
                         managed = new ManagedBeacon(beacon, scanRegion.Identifier);
-                        this.Beacons.Add(managed);
+                        add.Add(managed);
                     }
                     managed.Proximity = beacon.Proximity;
                     managed.LastSeen = DateTimeOffset.UtcNow;
                 }
+                if (add.Count > 0)
+                    this.beacons.AddRange(add);
             });
     }
 
@@ -99,6 +99,6 @@ public class ManagedScan : IDisposable
     public void Dispose()
     {
         this.Stop();
-        this.Beacons.Clear();
+        this.beacons.Clear();
     }
 }

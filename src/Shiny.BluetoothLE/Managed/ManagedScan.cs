@@ -4,36 +4,24 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using Shiny.Collections;
 
 namespace Shiny.BluetoothLE.Managed;
 
 
-public class ManagedScan : IDisposable, IManagedScan
+public class ManagedScan(IBleManager bleManager) : IDisposable, IManagedScan
 {
     readonly ShinySubject<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> actionSubj = new();
-    readonly ObservableList<ManagedScanResult> list = new();
-    readonly object syncLock = new();
-    readonly IBleManager bleManager;
+    readonly BindingList<ManagedScanResult> list = new();
     CompositeDisposable? disposer;
 
 
-    public ManagedScan(IBleManager bleManager)
-        => this.bleManager = bleManager;
-
-
-    public IEnumerable<IPeripheral> GetConnectedPeripherals()
-    {
-        lock (this.syncLock)
-        {
-            return this.list
-                .ToList() // copy
-                .Where(x => x.Peripheral.Status == ConnectionState.Connected)
-                .Select(x => x.Peripheral);
-        }
-    }
+    public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.list
+        .ToList() // copy
+        .Where(x => x.Peripheral.Status == ConnectionState.Connected)
+        .Select(x => x.Peripheral);
 
 
     public IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan() => this.actionSubj;
@@ -62,7 +50,7 @@ public class ManagedScan : IDisposable, IManagedScan
         this.BufferTimeSpan = bufferTime ?? TimeSpan.FromSeconds(3);
         this.ClearTime = clearTime;
 
-        var access = await this.bleManager
+        var access = await bleManager
             .RequestAccess()
             .ToTask()
             .ConfigureAwait(false);
@@ -70,10 +58,9 @@ public class ManagedScan : IDisposable, IManagedScan
         access.Assert();
         this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
         this.disposer = new();
-        lock (this.syncLock)
-            this.list.Clear();
+        this.list.Clear();
         
-        this.bleManager
+        bleManager
             .Scan(this.ScanConfig)
             .Buffer(this.BufferTimeSpan)
             .Where(x => x?.Any() ?? false)
@@ -115,21 +102,17 @@ public class ManagedScan : IDisposable, IManagedScan
             if (show)
             {
                 var action = ManagedScanListAction.Update;
-                ManagedScanResult? result;
-                lock (this.syncLock)
-                {
-                    result = this.list.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
+                var result = this.list.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
 
-                    if (result == null)
+                if (result == null)
+                {
+                    action = ManagedScanListAction.Add;
+                    result = new ManagedScanResult(scanResult.Peripheral)
                     {
-                        action = ManagedScanListAction.Add;
-                        result = new ManagedScanResult(scanResult.Peripheral)
-                        {
-                            ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
-                            ServiceData = scanResult.AdvertisementData?.ServiceData
-                        };
-                        adds.Add(result);
-                    }
+                        ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
+                        ServiceData = scanResult.AdvertisementData?.ServiceData
+                    };
+                    adds.Add(result);
                 }
 
                 result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
@@ -145,24 +128,18 @@ public class ManagedScan : IDisposable, IManagedScan
         }
 
         if (adds.Count > 0)
-        {
-            lock (this.syncLock)
-                this.list.AddRange(adds);
-        }
+            this.list.AddRange(adds);
     }
     
 
     void OnCleanup(TimeSpan clearTime)
     {
         var maxAge = DateTimeOffset.UtcNow.Subtract(clearTime);
-        List<ManagedScanResult> remove = null!;
+        var remove = this.list.Where(x => x.LastSeen < maxAge).ToList();
         
-        lock (this.syncLock)
-        {
-            remove = this.list.Where(x => x.LastSeen < maxAge).ToList();
-            if (remove.Count > 0)
-                this.list.RemoveRange(remove);
-        }
+        if (remove.Count > 0)
+            this.list.RemoveRange(remove);
+
         foreach (var scanResult in remove)
             this.actionSubj.OnNext((ManagedScanListAction.Remove, scanResult));
     }

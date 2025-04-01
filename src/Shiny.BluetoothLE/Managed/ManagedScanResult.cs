@@ -21,8 +21,8 @@ public class ManagedScanResult : NotifyPropertyChanged, IAdvertisementData
     }
 
 
-    string name;
-    public string Name
+    string? name;
+    public string? Name
     {
         get => this.name;
         internal set => this.Set(ref this.name, value);
