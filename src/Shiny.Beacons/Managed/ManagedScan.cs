@@ -9,7 +9,9 @@ using Shiny.Collections;
 namespace Shiny.Beacons.Managed;
 
 
-public class ManagedScan(IBeaconRangingManager beaconManager) : IDisposable
+public class ManagedScan(
+    IBeaconRangingManager beaconManager
+) : IDisposable
 {
     IScheduler? scheduler;
     IDisposable? clearSub;
@@ -70,9 +72,14 @@ public class ManagedScan(IBeaconRangingManager beaconManager) : IDisposable
             .Subscribe(scanList =>
             {
                 var add = new List<ManagedBeacon>();
+                var copy = this.beacons.ToList();
+                
                 foreach (var beacon in scanList)
                 {
-                    var managed = this.beacons.FirstOrDefault(x => x.Beacon.Equals(beacon));
+                    var managed = 
+                        copy.FirstOrDefault(x => x.Beacon.Equals(beacon)) ?? 
+                        add.FirstOrDefault(x => x.Beacon.Equals(beacon));
+                    
                     if (managed == null)
                     {
                         managed = new ManagedBeacon(beacon, scanRegion.Identifier);

@@ -11,19 +11,6 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
 {
     readonly ReaderWriterLockSlim locker = new();
 
-    // protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-    // {
-    //     this.locker.EnterWriteLock();
-    //     try
-    //     {
-    //         base.OnCollectionChanged(e);
-    //     }
-    //     finally
-    //     {
-    //         this.locker.ExitWriteLock();
-    //     }
-    // }
-    
 
     protected override void InsertItem(int index, T item)
     {
@@ -98,7 +85,8 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
         {
             this.locker.ExitWriteLock();
         }
-        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<T>(items)));
+        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        //this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items));
     }
 
     
@@ -106,17 +94,18 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
     {
         if (!items.Any())
             return;
-        
-        var removedItems = new List<T>();
+
+        var itemRemoved = false;
         this.locker.EnterWriteLock();
         try
         {
-            
             foreach (var item in items)
             {
-                if (base.Remove(item))
+                var index = this.IndexOf(item);
+                if (index > -1)
                 {
-                    removedItems.Add(item);
+                    base.RemoveItem(index);
+                    itemRemoved = true;
                 }
             }
         }
@@ -124,9 +113,10 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
         {
             this.locker.ExitWriteLock();
         }
-        if (removedItems.Count > 0)
+        if (itemRemoved)
         {
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItems));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            //this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItems));
         }
     }
     

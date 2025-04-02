@@ -73,7 +73,6 @@ public class ManagedScan(IBleManager bleManager) : IDisposable, IManagedScan
 
         this.IsScanning = true;
 
-
         if (clearTime != null)
         {
             Observable
@@ -94,6 +93,7 @@ public class ManagedScan(IBleManager bleManager) : IDisposable, IManagedScan
 
     void OnScanResults(IList<ScanResult> scanResults, Func<ScanResult, bool>? predicate)
     {
+        var copy = this.list.ToList();
         var adds = new List<ManagedScanResult>();
         
         foreach (var scanResult in scanResults)
@@ -102,7 +102,9 @@ public class ManagedScan(IBleManager bleManager) : IDisposable, IManagedScan
             if (show)
             {
                 var action = ManagedScanListAction.Update;
-                var result = this.list.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
+                var result = 
+                    copy.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral)) ?? 
+                    adds.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
 
                 if (result == null)
                 {
