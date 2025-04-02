@@ -89,4 +89,9 @@
 		<MauiXaml Remove="TODO/**" />
 		<Content Include="TODO/**" />
     </ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="HttpTransfers\funny.jpeg" />
+	  <EmbeddedResource Include="HttpTransfers\funny.jpeg" />
+	</ItemGroup>
 </Project>

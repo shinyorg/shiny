@@ -18,7 +18,10 @@
             
             <TableSection>
                 <TextCell Text="Queue Upload" 
-                          Command="{Binding QueueBlobCommand}" />
+                          Command="{Binding QueueBlobCommand}" 
+                          IsEnabled="True"/>
+                
+                <TextCell Text="{Binding ProgressText}" />
             </TableSection>
         </TableRoot>
     </TableView>

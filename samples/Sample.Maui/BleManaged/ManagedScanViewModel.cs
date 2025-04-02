@@ -29,8 +29,9 @@ public class ManagedScanViewModel : ViewModel
             }
             else
             {
-                logger.LogTrace("Start Scan");
-                await this.scanner.Start(
+                try
+                {
+                    await this.scanner.Start(
 #if ANDROID
                     new AndroidScanConfig(
                         Android.Bluetooth.LE.ScanMode.Opportunistic,
@@ -38,21 +39,27 @@ public class ManagedScanViewModel : ViewModel
                         null
                     ),
 #else
-                    new ScanConfig(
-                    ),
+                        new ScanConfig(
+                        ),
 #endif
-                    x =>
-                    {
-                        // optional predicate filter
-                        var found = true;
-                        var pName = (x.Peripheral.Name ?? "None");
-                        logger.LogTrace("Peripheral Name: " + pName);
-                        return found;
-                    },
-                    RxApp.MainThreadScheduler,
-                    null, // buffer time - default is 3 seconds
-                    TimeSpan.FromSeconds(10)
-                );
+                        x =>
+                        {
+                            // optional predicate filter
+                            var found = true;
+                            var pName = (x.Peripheral.Name ?? "None");
+                            logger.LogTrace("Peripheral Name: " + pName);
+                            return found;
+                        },
+                        RxApp.MainThreadScheduler,
+                        null, // buffer time - default is 3 seconds
+                        TimeSpan.FromSeconds(10)
+                    );
+                    logger.LogTrace("Start Scan");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to Start Scan");
+                }
             }
             this.IsBusy = this.scanner.IsScanning;
         });

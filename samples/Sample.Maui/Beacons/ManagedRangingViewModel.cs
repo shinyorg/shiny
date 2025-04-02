@@ -58,12 +58,11 @@ public class ManagedRangingViewModel : ViewModel
     [Reactive] public string Uuid { get; private set; }
     [Reactive] public string Major { get; private set; }
     [Reactive] public string Minor { get; private set; }
-    public ObservableCollection<ManagedBeacon> Beacons => this.scanner.Beacons;
+    public INotifyReadOnlyCollection<ManagedBeacon> Beacons => this.scanner.Beacons;
 
     void Stop()
     {
         this.scanner.Stop();
         this.IsBusy = false;
-        this.scanner.Beacons.Clear();
     }
 }

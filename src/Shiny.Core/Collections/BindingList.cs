@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Shiny.Collections;
@@ -10,18 +11,18 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
 {
     readonly ReaderWriterLockSlim locker = new();
 
-    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-    {
-        this.locker.EnterWriteLock();
-        try
-        {
-            base.OnCollectionChanged(e);
-        }
-        finally
-        {
-            this.locker.ExitWriteLock();
-        }
-    }
+    // protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+    // {
+    //     this.locker.EnterWriteLock();
+    //     try
+    //     {
+    //         base.OnCollectionChanged(e);
+    //     }
+    //     finally
+    //     {
+    //         this.locker.ExitWriteLock();
+    //     }
+    // }
     
 
     protected override void InsertItem(int index, T item)
@@ -82,6 +83,9 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
 
     public void AddRange(params IEnumerable<T> items)
     {
+        if (!items.Any())
+            return;
+        
         this.locker.EnterWriteLock();
         try
         {
@@ -100,10 +104,14 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
     
     public void RemoveRange(params IEnumerable<T> items)
     {
+        if (!items.Any())
+            return;
+        
+        var removedItems = new List<T>();
         this.locker.EnterWriteLock();
         try
         {
-            var removedItems = new List<T>();
+            
             foreach (var item in items)
             {
                 if (base.Remove(item))
@@ -111,20 +119,23 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
                     removedItems.Add(item);
                 }
             }
-            if (removedItems.Count > 0)
-            {
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItems));
-            }
         }
         finally
         {
             this.locker.ExitWriteLock();
         }
+        if (removedItems.Count > 0)
+        {
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItems));
+        }
     }
     
     
-    public void ReplaceAll(IEnumerable<T> newItems)
+    public void ReplaceAll(params IEnumerable<T> newItems)
     {
+        if (!newItems.Any())
+            return;
+        
         this.locker.EnterWriteLock();
         try
         {
@@ -133,11 +144,25 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
             {
                 base.InsertItem(this.Count, item);
             }
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
         finally
         {
             this.locker.ExitWriteLock();
+        }
+        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+    }
+    
+    
+    public new IEnumerator<T> GetEnumerator()
+    {
+        this.locker.EnterReadLock();
+        try
+        {
+            return this.ToList().GetEnumerator();
+        }
+        finally
+        {
+            this.locker.ExitReadLock();
         }
     }
 }
