@@ -93,12 +93,12 @@ public class BindingList<T> : ObservableCollection<T>, INotifyCollectionChanged<
             {
                 base.InsertItem(this.Count, item);
             }
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<T>(items)));
         }
         finally
         {
             this.locker.ExitWriteLock();
         }
+        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<T>(items)));
     }
 
     
