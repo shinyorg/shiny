@@ -12,25 +12,12 @@ using Shiny.Support.Repositories;
 namespace Shiny.Net.Http;
 
 
-public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
+public class HttpTransferManager(
+    AndroidPlatform platform,
+    ILogger<HttpTransferManager> logger,
+    IRepository repository
+) : IHttpTransferManager, IShinyStartupTask
 {
-    readonly AndroidPlatform platform;
-    readonly ILogger logger;
-    readonly IRepository repository;
-
-
-    public HttpTransferManager(
-        AndroidPlatform platform,
-        ILogger<HttpTransferManager> logger,
-        IRepository repository
-    )
-    {
-        this.platform = platform;
-        this.logger = logger;
-        this.repository = repository;
-    }
-
-
     public void Start()
     {
         try
@@ -38,20 +25,20 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             if (HttpTransferService.IsStarted)
                 return;
 
-            var transfers = this.repository.GetList<HttpTransfer>();
+            var transfers = repository.GetList<HttpTransfer>();
             if (transfers.Count > 0)
                 this.TryStartService();
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Failed to auto-start HTTP Transfer Manager");
+            logger.LogError(ex, "Failed to auto-start HTTP Transfer Manager");
         }
     }
 
 
     public Task<IList<HttpTransfer>> GetTransfers()
     {
-        var transfers = this.repository.GetList<HttpTransfer>();
+        var transfers = repository.GetList<HttpTransfer>();
         return Task.FromResult(transfers);
     }
 
@@ -59,15 +46,28 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         request.AssertValid();
-        (await this.platform.RequestForegroundServicePermissions()).Assert(allowRestricted: true);
+        (await platform.RequestForegroundServicePermissions()).Assert(allowRestricted: true);
         if (OperatingSystemShim.IsAndroidVersionAtLeast(34))
         {
-            (await this.platform.RequestAccess("android.permission.FOREGROUND_SERVICE_DATA_SYNC").ToTask()).Assert();
+            (await platform.RequestAccess("android.permission.FOREGROUND_SERVICE_DATA_SYNC").ToTask()).Assert();
         }
         // this will trigger over to the job if it is running
         long? contentLength = null;
         if (request.Type.IsUpload())
-            contentLength = new FileInfo(request.LocalFilePath).Length;
+        {
+            var file = new FileInfo(request.LocalFilePath);
+            if (!file.Exists)
+                throw new InvalidOperationException("File to be uploaded does not exist");
+            
+            contentLength = file.Length;
+        }
+        else
+        {
+            var dir = Path.GetDirectoryName(request.LocalFilePath);
+            if (!Directory.Exists(dir))
+                throw new InvalidOperationException("Download directory does not exist");
+        }
+        
 
         var transfer = new HttpTransfer(
             request,
@@ -76,7 +76,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
             HttpTransferState.Pending,
             DateTimeOffset.UtcNow
         );
-        this.repository.Insert(transfer);
+        repository.Insert(transfer);
         this.TryStartService();
 
         return transfer;
@@ -86,10 +86,10 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     public Task Cancel(string identifier)
     {
         // this will trigger over to the foreground service which will shut itself down if there are no other transfers
-        var transfer = this.repository.Get<HttpTransfer>(identifier);
+        var transfer = repository.Get<HttpTransfer>(identifier);
         if (transfer != null)
         {
-            this.repository.Remove(transfer);
+            repository.Remove(transfer);
 
             this.resultSubj.OnNext(new(
                 transfer.Request,
@@ -105,12 +105,12 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     public Task CancelAll()
     {
         // this will trigger over to the foreground service which will shut itself down
-        this.repository.Clear<HttpTransfer>();
+        repository.Clear<HttpTransfer>();
         return Task.CompletedTask;
     }
 
 
-    public IObservable<int> WatchCount() => this.repository.CreateCountWatcher<HttpTransfer>();
+    public IObservable<int> WatchCount() => repository.CreateCountWatcher<HttpTransfer>();
 
     readonly Subject<HttpTransferResult> resultSubj = new();
     public IObservable<HttpTransferResult> WhenUpdateReceived() => Observable.Create<HttpTransferResult>(ob =>
@@ -132,6 +132,6 @@ public class HttpTransferManager : IHttpTransferManager, IShinyStartupTask
     void TryStartService()
     {
         if (!HttpTransferService.IsStarted)
-            this.platform.StartService(typeof(HttpTransferService), true);
+            platform.StartService(typeof(HttpTransferService), true);
     }
 }

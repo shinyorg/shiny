@@ -15,24 +15,13 @@ namespace Shiny.Net.Http;
 /// <summary>
 /// This class is used to monitor a list of transfers within your user interface
 /// </summary>
-public class HttpTransferMonitor : IDisposable
+public class HttpTransferMonitor(
+    IHttpTransferManager manager, 
+    IRepository repository,
+    ILogger<HttpTransferMonitor> logger
+) : IDisposable
 {
-    readonly IHttpTransferManager manager;
-    readonly IRepository repository;
-    readonly ILogger logger;
     CompositeDisposable? disposable;
-    
-    
-    public HttpTransferMonitor(
-        IHttpTransferManager manager, 
-        IRepository repository,
-        ILogger<HttpTransferMonitor> logger
-    )
-    {
-        this.manager = manager;
-        this.repository = repository;
-        this.logger = logger;
-    }
 
 
     readonly BindingList<HttpTransferObject> transfers = new();
@@ -64,9 +53,6 @@ public class HttpTransferMonitor : IDisposable
                     if (removeErrors)
                         toRemove.Remove(item);
                     break;
-
-                default:
-                    break;
             }
         }
         if (toRemove.Count > 0)
@@ -87,7 +73,7 @@ public class HttpTransferMonitor : IDisposable
         this.disposable = new();
         this.transfers.Clear();
         
-        var current = (await this.manager.GetTransfers())
+        var current = (await manager.GetTransfers())
             .Select(x =>
             {
                 var obj = new HttpTransferObject(x.Request);
@@ -106,7 +92,7 @@ public class HttpTransferMonitor : IDisposable
         
         this.transfers.AddRange(current);
 
-        this.repository
+        repository
             .WhenActionOccurs()
             .ObserveOnIf(scheduler)
             .Where(x => x.EntityType == typeof(HttpTransfer))
@@ -114,13 +100,13 @@ public class HttpTransferMonitor : IDisposable
             {
                 if (x.Action == RepositoryAction.Clear)
                 {
-                    this.logger.LogInformation("Incoming HTTP Transfer Repository Clear");
+                    logger.LogInformation("Incoming HTTP Transfer Repository Clear");
                     this.transfers.Clear();
                 }
                 else
                 {
                     var e = (HttpTransfer)x.Entity!;
-                    this.logger.RepositoryChange(x.Action, e.Identifier, e.Request.Uri);
+                    logger.RepositoryChange(x.Action, e.Identifier, e.Request.Uri);
 
                     switch (x.Action)
                     {
@@ -139,7 +125,7 @@ public class HttpTransferMonitor : IDisposable
             })
             .DisposedBy(this.disposable);
 
-        this.manager
+        manager
             .WhenUpdateReceived()
             .ObserveOnIf(scheduler)
             .Subscribe(x =>
@@ -153,7 +139,7 @@ public class HttpTransferMonitor : IDisposable
                 }
 
                 item.Update(x);
-                this.logger.TransferUpdate(item.Identifier, item.Status);
+                logger.TransferUpdate(item.Identifier, item.Status);
 
                 switch (x.Status)
                 {
