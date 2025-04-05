@@ -10,39 +10,47 @@ namespace Shiny.Net.Http;
 public abstract partial class HttpTransferDelegate(
     ILogger logger, 
     IHttpTransferManager manager,
-    int maxRetries = 0
+    int maxErrorRetries = 0
 ) : IHttpTransferDelegate
 {
     protected ILogger Logger => logger;
     protected IHttpTransferManager TransferManager => manager;
     
-    const string RetryHeader = "Retries";
-    public int MaxRetryAttempts { get; set; } = maxRetries;
+    const string AuthRetries = nameof(AuthRetries);
+    const string ErrorRetries = nameof(ErrorRetries);
+    public int MaxErrorRetryAttempts { get; set; } = maxErrorRetries;
 
-    // return null if cancelling
+    /// <summary>
+    /// Create a new HttpTransferRequest with new authorization headers or return null to cancel request
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="retries"></param>
+    /// <returns></returns>
     protected virtual Task<HttpTransferRequest?> OnAuthorizationFailed(HttpTransferRequest request, int retries) =>
         Task.FromResult((HttpTransferRequest?)null);
 
+    /// <summary>
+    /// Mutate the HttpTransferRequest before sending a retry or return null to cancel request
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="retries"></param>
+    /// <returns></returns>
     protected virtual Task<HttpTransferRequest?> OnBeforeRetry(HttpTransferRequest request, int retries) 
-        => Task.FromResult(request);
-
-    
-    protected virtual Task<bool> ShouldRetry(HttpTransferRequest request, int statusCode, int retries)
-    {
-        var needsAuth = statusCode == (int)HttpStatusCode.Unauthorized;
-        return Task.FromResult(retries <= this.MaxRetryAttempts || needsAuth);
-    }
+        => Task.FromResult<HttpTransferRequest?>(request);
     
     
     public async Task OnError(HttpTransferRequest request, int statusCode, Exception ex)
     {
-        
+        // TODO: auth vs error retries
         var needsAuth = statusCode == (int)HttpStatusCode.Unauthorized;
-        var retries = 0;
-        if (request.Headers?.TryGetValue(RetryHeader, out var retryHeader) ?? false)
-        {
-            retries = Int32.Parse(retryHeader);
-        }
+        var authRetries = 0;
+        var errorRetries = 0;
+        
+        if (request.Headers?.TryGetValue(ErrorRetries, out var retryHeader) ?? false)
+            errorRetries = Int32.Parse(retryHeader);
+
+        if (request.Headers?.TryGetValue(AuthRetries, out var authHeader) ?? false)
+            authRetries = Int32.Parse(authHeader);
         
         using (logger.BeginScope(new Dictionary<string, string>
         {
@@ -51,38 +59,55 @@ public abstract partial class HttpTransferDelegate(
             ["Method"] = request.HttpMethod!,
             ["Type"] = request.Type.ToString(),
             ["HttpStatusCode"] = statusCode.ToString(),
-            ["RetryCount"] = retries.ToString()
+            ["ErrorRetries"] = errorRetries.ToString(),
+            ["AuthRetries"] = authRetries.ToString()
         }))
         {
-            var shouldRetry = await this.ShouldRetry(request, statusCode, retries).ConfigureAwait(false);
-            if (!shouldRetry)
-            {
-                logger.LogDebug("User cancelled http transfer.");
-                return;
-            }
-
             if (needsAuth)
             {
-                // does not count as a retry
-                request = await this.OnAuthorizationFailed(request, retries).ConfigureAwait(false);
-                if (request == null)
+                var newRequest = await this.OnAuthorizationFailed(request, authRetries).ConfigureAwait(false);
+                if (newRequest == null)
                 {
-                    logger.LogDebug("Cancelling Retry from Auth");
+                    logger.LogInformation("Authorization Retry was cancelled after {Attempts} attempts", authRetries);
                 }
                 else
                 {
-                    logger.LogDebug(ex, "Requeue Auth Failure Transfer");
+                    authRetries++;
+                    logger.LogInformation("Authorization Retry Attempt: {Attempt}", authRetries);
+                    var headers = newRequest.Headers ?? new Dictionary<string, string>();
+                    headers[AuthRetries] = authRetries.ToString();
+                    newRequest = newRequest with { Headers = headers };
+                    await manager.Queue(newRequest).ConfigureAwait(false);
                 }
             }
-            retries++;
-            var headers = request!.Headers ?? new Dictionary<string, string>();
-            headers[RetryHeader] = retries.ToString();
-            request = request with { Headers = headers };
-            request = await this.OnBeforeRetry(request, retries).ConfigureAwait(false);
-            if (request != null)
-                await manager.Queue(request).ConfigureAwait(false);
+            else
+            {
+                errorRetries++;
+                if (errorRetries >= this.MaxErrorRetryAttempts)
+                {
+                    logger.LogInformation("Max Errors Exceeded");
+                }
+                else 
+                {
+                    
+                    var newRequest = await this.OnBeforeRetry(request, errorRetries).ConfigureAwait(false);
+                    if (newRequest == null)
+                    {
+                        logger.LogInformation("Error Retry was cancelled");
+                    }
+                    else
+                    {
+                        logger.LogInformation("Error Retry Attempt");
+                        var headers = newRequest.Headers ?? new Dictionary<string, string>();
+                        headers[ErrorRetries] = errorRetries.ToString();
+                        newRequest = newRequest with { Headers = headers };
+                        await manager.Queue(newRequest).ConfigureAwait(false);
+                    }
+                }
+            }
         };
     }
+    
     
     public virtual Task OnCompleted(HttpTransferRequest request) => Task.CompletedTask;
 }
