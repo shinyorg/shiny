@@ -5,7 +5,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
@@ -208,6 +210,8 @@ public partial class HttpTransferManager(
         var httpMethod = request.GetHttpMethod();
         if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put)
             throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
+        
+        var content = new MultipartFormDataContent();
 
         var native = request.ToNative();
         configurator?.Configure(native, request);
@@ -227,39 +231,43 @@ public partial class HttpTransferManager(
 
     async Task<NSUrlSessionUploadTask> UploadAsMultipartRequest(HttpTransferRequest request, NSMutableUrlRequest native)
     {
-        var boundary = Guid.NewGuid().ToString("N");
-        native["Content-Type"] = $"multipart/form-data; boundary=\"{boundary}\"";
-
         var tempPath = platform.GetUploadTempFilePath(request);
-        logger.LogInformation("Writing temp form data body to " + tempPath);
+        var content = new MultipartFormDataContent();
 
-        using (var fs = new FileStream(tempPath, FileMode.Create))
-        { 
-            if (request.HttpContent != null)
-            {
-                fs.WriteString("--" + boundary);
-                fs.WriteString($"Content-Disposition: form-data; name=\"{request.HttpContent.ContentFormDataName ?? "value"}\"");
-                fs.WriteString($"Content-Type: {request.HttpContent.ContentType}; charset={request.HttpContent.Encoding}");
-                fs.WriteLine();
-                fs.WriteString(request.HttpContent.Content);
-                fs.WriteLine();
-            }
+        if (request.HttpContent != null)
+        {
+            content.Add(
+                new StringContent(
+                    request.HttpContent.Content,
+                    Encoding.GetEncoding(request.HttpContent.Encoding),
+                    request.HttpContent.ContentType
+                ),
+                request.HttpContent.ContentFormDataName ?? "value"
+            );
+        }
+        
+        var tempPath = this.platform.GetUploadTempFilePath(request);
+        this.logger.LogInformation("Writing temp form data body to {Path}", tempPath);
 
+        await using (var uploadFile = File.OpenRead(request.LocalFilePath))
+        {
             var fileName = Path.GetFileName(request.LocalFilePath);
-            fs.WriteString("--" + boundary);
+            
+            var innerContent = new StreamContent(uploadFile);
+            content.Add(innerContent, request.FileFormDataName, fileName);
+            innerContent.Headers.ContentDisposition!.FileNameStar = null;
 
-            // TODO: escape/encode filename - add utf-8 version
-            //fileName = HttpUtility.UrlEncode(fileName);
-            fs.WriteString($"Content-Disposition: form-data; name={request.FileFormDataName}; filename={fileName}");
-            fs.WriteLine();
-            using (var uploadFile = File.OpenRead(request.LocalFilePath))
-                await uploadFile.CopyToAsync(fs);
-
-            fs.WriteLine();
-            fs.WriteString($"--{boundary}--");
+            await using (var fs = File.Create(tempPath))
+                await content.CopyToAsync(fs);
         }
 
         logger.LogInformation("Form body written");
+        
+        this.logger.LogInformation("Form body written");
+
+        var native = request.ToNative();
+        native["Content-Type"] = content.Headers.ContentType!.ToString();
+        
         var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
         var task = this.Session.CreateUploadTask(native, tempFileUrl);
         return task;
