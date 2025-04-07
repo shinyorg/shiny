@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
@@ -10,18 +11,12 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Locations;
 
 
-public class GpsManager : IGpsManager, IShinyStartupTask
+[SupportedOSPlatform("ios17.0")]
+public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) : IGpsManager, IShinyStartupTask
 {
     CLBackgroundActivitySession? session;
     CLLocationUpdater? updater;
-    readonly ILogger logger;
-    readonly Lazy<IEnumerable<IGpsDelegate>> delegates;
-    
-    public GpsManager(IServiceProvider services, ILogger<IGpsManager> logger)
-    {
-        this.delegates = services.GetLazyService<IEnumerable<IGpsDelegate>>();
-        this.logger = logger;
-    }
+    Lazy<IEnumerable<IGpsDelegate>> delegates => services.GetLazyService<IEnumerable<IGpsDelegate>>();
     
     
     public GpsRequest? CurrentListener { get; set; }
@@ -29,8 +24,7 @@ public class GpsManager : IGpsManager, IShinyStartupTask
 
 
     public Task<AccessState> RequestAccess(GpsRequest request)
-    {
-       return LocationExtensions.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
+       => LocationExtensions.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
         // var bg = request.BackgroundMode != GpsBackgroundMode.None;
         // var req = bg
         //     ? CLServiceSessionAuthorizationRequirement.Always
@@ -71,7 +65,6 @@ public class GpsManager : IGpsManager, IShinyStartupTask
         // }
         //
         // return tcs.Task;
-    }
 
 
     public IObservable<GpsReading?> GetLastReading() => Observable.Empty<GpsReading?>();
@@ -112,7 +105,7 @@ public class GpsManager : IGpsManager, IShinyStartupTask
                 .Value
                 .RunDelegates(
                     x => x.OnReading(reading),
-                    this.logger
+                    logger
                 )
                 .ConfigureAwait(false);
         });
@@ -145,7 +138,7 @@ public class GpsManager : IGpsManager, IShinyStartupTask
         }
         catch (Exception ex)
         {
-            this.logger.LogInformation(ex, "Failed to restart GPS listener");
+            logger.LogInformation(ex, "Failed to restart GPS listener");
         }
     }
 }

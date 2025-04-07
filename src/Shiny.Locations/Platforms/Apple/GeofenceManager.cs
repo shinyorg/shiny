@@ -1,20 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
+using Shiny.Locations;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Locations;
 
+[SupportedOSPlatform("ios17.0")]
 public class GeofenceManager(
     ILogger<IGeofenceManager> logger,
     IServiceProvider services,
     IRepository repository
 ) : IGeofenceManager, IShinyStartupTask
 {
+    readonly CLLocationManager locationManager = new();
     CLBackgroundActivitySession? session;
     CLMonitor? monitor;
     
@@ -50,6 +54,7 @@ public class GeofenceManager(
         if (this.monitor == null && createIfNeeded)
         {
             this.session = CLBackgroundActivitySession.Create();
+
             this.monitor = await CLMonitor.RequestMonitorAsync(CLMonitorConfiguration.Create(
                 "shiny_geofences",
                 new DispatchQueue("geofences"),
@@ -76,14 +81,11 @@ public class GeofenceManager(
     }
 
 
-    // may need a subject or an await somewhere
-    public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
+    public AccessState CurrentStatus => this.locationManager.GetCurrentStatus(true);
 
     
     // CLServiceSession? psession = null!;
-    public Task<AccessState> RequestAccess()
-    {
-        return LocationExtensions.RequestAccess(true);
+    public Task<AccessState> RequestAccess() => this.locationManager.RequestAccess(true);
         // var tcs = new TaskCompletionSource<AccessState>();
         // CLServiceSession ps = null!;
         //
@@ -114,7 +116,6 @@ public class GeofenceManager(
         // }
         //
         // return tcs.Task;
-    }
 
     
     public IList<GeofenceRegion> GetMonitorRegions() => repository.GetList<GeofenceRegion>();
@@ -122,6 +123,8 @@ public class GeofenceManager(
     
     public async Task StartMonitoring(GeofenceRegion region)
     {
+        (await this.RequestAccess()).Assert();
+        
         var mon = await this.Init(true);
         this.AddToMonitor(mon, region);
         repository.Insert(region);
@@ -183,7 +186,14 @@ public class GeofenceManager(
             new CLLocationCoordinate2D(region.Center.Latitude, region.Center.Longitude),
             region.Radius.TotalMeters
         );
-        mon.AddCondition(condition, region.Identifier);
+        try
+        {
+            mon.AddCondition(condition, region.Identifier);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 
 

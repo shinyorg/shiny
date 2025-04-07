@@ -113,7 +113,6 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
     public GpsRequest? CurrentListener => this.currentSettings;
 
-    // public AccessState CurrentStatus => throw new NotImplementedException();
 
     public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async ct =>
     {
@@ -167,6 +166,15 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
             GpsAccuracy.Lowest => CLLocation.AccuracyThreeKilometers
         };
 
+        // this.locationManager.UpdatedHeading
+        // this.locationManager.DeferredUpdatesFinished
+        // this.locationManager.ShouldDisplayHeadingCalibration
+        // this.locationManager.DismissHeadingCalibrationDisplay();
+        // this.locationManager.Heading
+        // this.locationManager.AccuracyAuthorization
+        // if (this.locationManager.StopUpdatingHeading();
+        // this.locationManager.StartUpdatingHeading();
+        
         var bg = request.BackgroundMode != GpsBackgroundMode.None;
         this.locationManager.AllowsBackgroundLocationUpdates = bg;
         this.locationManager.PausesLocationUpdatesAutomatically = false;

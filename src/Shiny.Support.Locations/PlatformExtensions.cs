@@ -61,6 +61,10 @@ public static class LocationExtensions
         if (status != AccessState.Unknown)
             return status;
 
+        locationManager.Delegate ??= new ShinyLocationDelegate();
+        if (locationManager.Delegate is not ShinyLocationDelegate)
+            throw new NotSupportedException("You cannot call this method with non-ShinyLocationDleegate");
+        
         var task = locationManager
             .WhenAccessStatusChanged(false)
             .Where(x => x != AccessState.Unknown)

@@ -57,6 +57,8 @@ public record GpsRequest(
     /// Distance filter in meters
     /// </summary>
     double DistanceFilterMeters = 0
+    
+    // bool RequestFineLocation
 )
 {
     public static GpsRequest Realtime(bool background, double distanceFilterMeters = 0) => new(

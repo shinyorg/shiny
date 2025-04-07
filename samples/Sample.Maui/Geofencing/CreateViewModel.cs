@@ -13,6 +13,8 @@ public class CreateViewModel : ViewModel
         INotificationManager notificationManager
     ) : base(services)
     {
+        this.AccessStatus = geofenceManager.CurrentStatus;
+        
         this.SetCurrentLocation = new Command(async ct =>
         {
             var loc = await gpsManager.GetCurrentPosition().ToTask(ct);
@@ -41,7 +43,6 @@ public class CreateViewModel : ViewModel
 
         this.CreateGeofence = ReactiveCommand.CreateFromTask(async () =>
         {
-
             var access = await geofenceManager.RequestAccess();
 
             if (access != AccessState.Available)
