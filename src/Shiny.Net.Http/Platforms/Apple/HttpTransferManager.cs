@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
@@ -216,15 +213,21 @@ public partial class HttpTransferManager(
         var native = request.ToNative();
         configurator?.Configure(native, request);
 
+        NSUrlSessionUploadTask task = null!;
         if (request.Type == TransferType.UploadMultipart)
-            return await this.UploadAsMultipartRequest(request, native).ConfigureAwait(false);
+        {
+            task = await this.UploadAsMultipartRequest(request, native).ConfigureAwait(false);
+        }
+        else
+        {
+            if (request.HttpContent != null)
+                throw new InvalidOperationException("HttpContent cannot be sent for raw uploads");
 
-        if (request.HttpContent != null)
-            throw new InvalidOperationException("HttpContent cannot be sent for raw uploads");
-        
-        // native.Body = NSData.From
-        var fileUrl = NSUrl.CreateFileUrl(request.LocalFilePath, null);
-        var task = this.Session.CreateUploadTask(native, fileUrl);
+            // native.Body = NSData.From
+            var fileUrl = NSUrl.CreateFileUrl(request.LocalFilePath, null);
+            task = this.Session.CreateUploadTask(native, fileUrl);
+        }
+
         return task;
     }
 
@@ -232,6 +235,8 @@ public partial class HttpTransferManager(
     async Task<NSUrlSessionUploadTask> UploadAsMultipartRequest(HttpTransferRequest request, NSMutableUrlRequest native)
     {
         var tempPath = platform.GetUploadTempFilePath(request);
+        logger.LogInformation("Writing temp form data body to {Path}", tempPath);
+        
         var content = new MultipartFormDataContent();
 
         if (request.HttpContent != null)
@@ -245,10 +250,7 @@ public partial class HttpTransferManager(
                 request.HttpContent.ContentFormDataName ?? "value"
             );
         }
-        
-        var tempPath = this.platform.GetUploadTempFilePath(request);
-        this.logger.LogInformation("Writing temp form data body to {Path}", tempPath);
-
+   
         await using (var uploadFile = File.OpenRead(request.LocalFilePath))
         {
             var fileName = Path.GetFileName(request.LocalFilePath);
@@ -262,10 +264,6 @@ public partial class HttpTransferManager(
         }
 
         logger.LogInformation("Form body written");
-        
-        this.logger.LogInformation("Form body written");
-
-        var native = request.ToNative();
         native["Content-Type"] = content.Headers.ContentType!.ToString();
         
         var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Foundation;
 
 namespace Shiny.Net.Http;
@@ -9,18 +8,6 @@ namespace Shiny.Net.Http;
 
 static class PlatformExtensions
 {
-    public static void WriteString(this Stream stream, string value, bool includeNewLine = true)
-    {
-        stream.Write(Encoding.Default.GetBytes(value));
-        if (includeNewLine)
-            stream.WriteLine();
-    }
-
-
-    public static void WriteLine(this Stream stream)
-        => stream.Write(Encoding.Default.GetBytes("\r\n"));
-
-
     public static bool HasError(this NSUrlSessionTask task)
     {
         if (task.Error != null)
