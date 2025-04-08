@@ -6,116 +6,50 @@ using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
-using Shiny.Locations;
 using Shiny.Support.Repositories;
 
 namespace Shiny.Locations;
 
-[SupportedOSPlatform("ios17.0")]
+
+[SupportedOSPlatform("ios18.0")]
+[SupportedOSPlatform("maccatalyst18.0")]
 public class GeofenceManager(
     ILogger<IGeofenceManager> logger,
     IServiceProvider services,
+    IPlatform platform,
     IRepository repository
-) : IGeofenceManager, IShinyStartupTask
+) : IGeofenceManager
 {
-    readonly CLLocationManager locationManager = new();
-    CLBackgroundActivitySession? session;
-    CLMonitor? monitor;
-    
-    public async void Start()
+    public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
+
+
+    CLServiceSession? session;
+    public async Task<AccessState> RequestAccess()
     {
-        var items = repository.GetList<GeofenceRegion>();
-        if (items.Count > 0)
-        {
-            try
+        if (this.CurrentStatus != AccessState.Unknown)
+            return this.CurrentStatus;
+        
+        var tcs = new TaskCompletionSource<AccessState>();
+        this.session ??= CLServiceSession.CreateSession(
+            CLServiceSessionAuthorizationRequirement.Always,
+            String.Empty,
+            DispatchQueue.MainQueue, 
+            diag =>
             {
-                var status = await this.RequestAccess();
-                if (status != AccessState.Available)
-                {
-                    logger.LogWarning("User has changed permissions which block geofences from running");
-                }
+                if (diag.AuthorizationRequestInProgress)
+                    return;
+
+                if (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
+                    this.CurrentStatus = AccessState.Denied;
                 else
-                {
-                    var mon = await this.Init(true);
-                    foreach (var item in items)
-                        this.AddToMonitor(mon, item);
-                }
+                    this.CurrentStatus = AccessState.Available;
+                
+                tcs.TrySetResult(this.CurrentStatus);
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to auto-start geofencing");
-            }
-        }
+        );
+
+        return await tcs.Task.ConfigureAwait(false);
     }
-    
-    
-    async Task<CLMonitor?> Init(bool createIfNeeded)
-    {
-        if (this.monitor == null && createIfNeeded)
-        {
-            this.session = CLBackgroundActivitySession.Create();
-
-            this.monitor = await CLMonitor.RequestMonitorAsync(CLMonitorConfiguration.Create(
-                "shiny_geofences",
-                new DispatchQueue("geofences"),
-                async (mon, evt) =>
-                {
-                    var region = repository.Get<GeofenceRegion>(evt.Identifier);
-                    if (region != null)
-                    {
-                        var status = evt.State == CLMonitoringState.Satisfied
-                            ? GeofenceState.Entered
-                            : GeofenceState.Exited;
-
-                        await services
-                            .RunDelegates<IGeofenceDelegate>(
-                                x => x.OnStatusChanged(status, region),
-                                logger
-                            )
-                            .ConfigureAwait(false);
-                    }
-                }
-            ));
-        }
-        return this.monitor;
-    }
-
-
-    public AccessState CurrentStatus => this.locationManager.GetCurrentStatus(true);
-
-    
-    // CLServiceSession? psession = null!;
-    public Task<AccessState> RequestAccess() => this.locationManager.RequestAccess(true);
-        // var tcs = new TaskCompletionSource<AccessState>();
-        // CLServiceSession ps = null!;
-        //
-        // try
-        // {
-        //     ps = CLServiceSession.CreateSession(
-        //         CLServiceSessionAuthorizationRequirement.Always,
-        //         "Geofencing",
-        //         new DispatchQueue("shiny_geofence"),
-        //         diag =>
-        //         {
-        //             if (diag.AuthorizationRequestInProgress)
-        //                 return; 
-        //             
-        //             // diag.FullAccuracyDenied
-        //             if (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
-        //                 this.CurrentStatus = AccessState.Denied;
-        //             else
-        //                 this.CurrentStatus = AccessState.Available;
-        //
-        //             tcs.TrySetResult(this.CurrentStatus);
-        //         }
-        //     );
-        // }
-        // finally
-        // {
-        //     ps.Dispose();
-        // }
-        //
-        // return tcs.Task;
 
     
     public IList<GeofenceRegion> GetMonitorRegions() => repository.GetList<GeofenceRegion>();
@@ -123,9 +57,9 @@ public class GeofenceManager(
     
     public async Task StartMonitoring(GeofenceRegion region)
     {
-        (await this.RequestAccess()).Assert();
+        (await this.RequestAccess().ConfigureAwait(false)).Assert();
         
-        var mon = await this.Init(true);
+        var mon = await this.GetMonitor();
         this.AddToMonitor(mon, region);
         repository.Insert(region);
     }
@@ -133,14 +67,12 @@ public class GeofenceManager(
     
     public async Task StopMonitoring(string identifier)
     {
-        var mon = await this.Init(false);
-        if (mon != null)
-        {
-            repository.Remove<GeofenceRegion>(identifier);
-            mon.RemoveCondition(identifier);
-            if (repository.GetList<GeofenceRegion>().Count == 0)
-                this.DestroyMonitor();
-        }
+        repository.Remove<GeofenceRegion>(identifier);
+        var mon = await this.GetMonitor();
+        mon.RemoveCondition(identifier);
+        
+        if (repository.GetList<GeofenceRegion>().Count == 0)
+            this.DestroyMonitor();
     }
     
 
@@ -151,58 +83,105 @@ public class GeofenceManager(
         return Task.CompletedTask;
     }
 
-    
-    public Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
-    {
-        var tcs = new TaskCompletionSource<GeofenceState>();
-        var updater = CLLocationUpdater.CreateLiveUpdates(DispatchQueue.CurrentQueue, update =>
-        {
-            if (update.AuthorizationDenied)
-                throw new PermissionException("GPS", AccessState.Denied);
-            
-            if (update.LocationUnavailable || update.Location == null)
-                throw new PermissionException("GPS", AccessState.Disabled);
 
-            var reading = update.Location.FromNative();
-            var available = region.IsPositionInside(reading.Position);
-            var status = available ? GeofenceState.Entered : GeofenceState.Exited;
-            tcs.TrySetResult(status);
-        });
-        using var _ = cancelToken.Register(() => tcs.TrySetCanceled());
-        try
+    public Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default) =>
+        platform.InvokeTaskOnMainThread(async () =>
         {
-            return tcs.Task;
-        }
-        finally
-        {
-            updater?.Dispose();
-        }
-    }
+            (await this.RequestAccess()).Assert();
+            var mon = await this.GetMonitor();
+            var rec = mon.GetMonitoringRecord(region.Identifier);
+            if (rec == null)
+                return GeofenceState.Unknown; // throw?
+
+            return rec.LastEvent.State switch
+            {
+                CLMonitoringState.Satisfied => GeofenceState.Entered,
+                CLMonitoringState.Unsatisfied => GeofenceState.Exited,
+                _ => GeofenceState.Unknown
+            };
+        }, cancelToken);
 
 
     void AddToMonitor(CLMonitor mon, GeofenceRegion region)
     {
+        if (region is { NotifyOnEntry: false, NotifyOnExit: false })
+            throw new InvalidOperationException("Region is not set to notify on entry or exit");
+
+        var rec = mon.GetMonitoringRecord(region.Identifier);
+        if (rec != null)
+            throw new InvalidOperationException($"A region with the identifier '{region.Identifier}' already exists");
+        
         var condition = new CLCircularGeographicCondition(
             new CLLocationCoordinate2D(region.Center.Latitude, region.Center.Longitude),
             region.Radius.TotalMeters
         );
-        try
-        {
-            mon.AddCondition(condition, region.Identifier);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
+        
+        // we monitor ALL state changes for RequestState, but we only fire delegates according to flags
+        mon.AddCondition(condition, region.Identifier);
     }
 
+    
+    CLMonitor? monitor;
+    async ValueTask<CLMonitor> GetMonitor() => this.monitor ??= await CLMonitor.RequestMonitorAsync(
+        CLMonitorConfiguration.Create(
+            "shinygeofences",
+            DispatchQueue.MainQueue,
+            async (mon, evt) =>
+            {
+                // TODO: prevent initial state firing?
+                var lastEvent = mon.GetMonitoringRecord(evt.Identifier)!.LastEvent;
+                if (lastEvent.State == evt.State)
+                {
+                    logger.LogDebug("Geofence State Matches");
+                    return;
+                }
+                
+                var region = repository.Get<GeofenceRegion>(evt.Identifier);
+                if (region != null)
+                {
+                    switch (evt.State)
+                    {
+                        case CLMonitoringState.Satisfied:
+                            if (region.NotifyOnEntry)
+                                await this.FireDelegate(region, evt).ConfigureAwait(false);
+                            
+                            break;
+                        
+                        case CLMonitoringState.Unsatisfied:
+                            if (region.NotifyOnExit)
+                                await this.FireDelegate(region, evt).ConfigureAwait(false);
+                            break;
+                    }
+                }
+            }
+        )
+    );
 
+
+    async Task FireDelegate(GeofenceRegion region, CLMonitoringEvent evt)
+    {
+        var status = evt.State == CLMonitoringState.Satisfied
+            ? GeofenceState.Entered
+            : GeofenceState.Exited;
+        
+        await services
+            .RunDelegates<IGeofenceDelegate>(
+                x => x.OnStatusChanged(status, region),
+                logger
+            )
+            .ConfigureAwait(false);
+
+        if (region.SingleUse)
+            await this.StopMonitoring(region.Identifier).ConfigureAwait(false);
+    }
+
+    
     void DestroyMonitor()
     {
         this.monitor?.Dispose();
         this.monitor = null;
         
-        this.session?.Dispose();
+        this.session?.Invalidate();
         this.session = null;
     }
 }
