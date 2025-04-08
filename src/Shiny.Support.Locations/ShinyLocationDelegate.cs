@@ -13,6 +13,11 @@ public class ShinyLocationDelegate : CLLocationManagerDelegate
     readonly Subject<CLAuthorizationStatus> statusSubject = new();
 
 
+    // public override void UpdatedHeading(CLLocationManager manager, CLHeading newHeading)
+    // {
+    //     newHeading.TrueHeading
+    // }
+
     public IObservable<AccessState> WhenAccessStatusChanged(bool background) => this.statusSubject
         .Where(x => x != CLAuthorizationStatus.NotDetermined)
         .Select(x => x.FromNative(background));

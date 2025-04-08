@@ -24,7 +24,10 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
     {
         this.delegates = services.GetLazyService<IEnumerable<IGpsDelegate>>();
         this.logger = logger;
-        this.locationManager = new CLLocationManager { Delegate = new GpsManagerDelegate(this) };
+        this.locationManager = new CLLocationManager
+        {
+            Delegate = new GpsManagerDelegate(this)
+        };
     }
 
 

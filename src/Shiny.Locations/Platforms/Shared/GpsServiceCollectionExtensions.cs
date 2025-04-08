@@ -36,7 +36,7 @@ public static class GpsServiceCollectionExtensions
             services.AddShinyService<LocationServicesGpsManager>();
 
 #elif APPLE
-        if (OperatingSystemShim.IsIOSVersionAtLeast(18) || OperatingSystemShim.IsMacCatalystVersionAtLeast(14))
+        if (OperatingSystemShim.IsIOSVersionAtLeast(18) || OperatingSystemShim.IsMacCatalystVersionAtLeast(18))
         {
             services.AddShinyService<GpsManager>();    
         }
