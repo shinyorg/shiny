@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.Versioning;
@@ -11,80 +10,70 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Locations;
 
 
-[SupportedOSPlatform("ios17.0")]
+[SupportedOSPlatform("ios18.0")]
+[SupportedOSPlatform("maccatalyst18.0")]
 public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) : IGpsManager, IShinyStartupTask
 {
-    CLBackgroundActivitySession? session;
+    CLBackgroundActivitySession? bgSession;
+    CLServiceSession? session;
     CLLocationUpdater? updater;
-    Lazy<IEnumerable<IGpsDelegate>> delegates => services.GetLazyService<IEnumerable<IGpsDelegate>>();
     
     
     public GpsRequest? CurrentListener { get; set; }
-    public AccessState GetCurrentStatus(GpsRequest request) => AccessState.Unknown;
+
+    AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request
+    public AccessState GetCurrentStatus(GpsRequest request) => this.currentAccess;
 
 
-    public Task<AccessState> RequestAccess(GpsRequest request)
-       => LocationExtensions.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
-        // var bg = request.BackgroundMode != GpsBackgroundMode.None;
-        // var req = bg
-        //     ? CLServiceSessionAuthorizationRequirement.Always
-        //     : CLServiceSessionAuthorizationRequirement.WhenInUse;
-        //
-        // CLServiceSession ps = null!;
-        // var tcs = new TaskCompletionSource<AccessState>();
-        //
-        // try
-        // {
-        //     // TODO: full accuracy?
-        //     ps = CLServiceSession.CreateSession(req, DispatchQueue.CurrentQueue, diag =>
-        //     {
-        //         if (diag.AuthorizationRequestInProgress)
-        //             return;
-        //
-        //         if (bg)
-        //         {
-        //             if (!diag.AlwaysAuthorizationDenied)
-        //                 tcs.SetResult(AccessState.Available);
-        //             else if (!diag.AuthorizationDenied)
-        //                 tcs.SetResult(AccessState.Restricted);
-        //             else
-        //                 tcs.SetResult(AccessState.Denied);
-        //         }
-        //         else
-        //         {
-        //             if (!diag.AuthorizationDenied)
-        //                 tcs.SetResult(AccessState.Available);
-        //             else
-        //                 tcs.SetResult(AccessState.Denied);
-        //         }
-        //     });
-        // }
-        // finally
-        // {
-        //     ps.Dispose();
-        // }
-        //
-        // return tcs.Task;
+    public async Task<AccessState> RequestAccess(GpsRequest request)
+    {
+        if (this.session != null && this.currentAccess != AccessState.Unknown)
+            return this.currentAccess;
+        
+        var requirement = request.BackgroundMode == GpsBackgroundMode.None
+            ? CLServiceSessionAuthorizationRequirement.WhenInUse
+            : CLServiceSessionAuthorizationRequirement.Always;
+
+        var tcs = new TaskCompletionSource<AccessState>();
+        this.session ??= CLServiceSession.CreateSession(
+            requirement,
+            String.Empty,
+            DispatchQueue.MainQueue, 
+            diag =>
+            {
+                if (diag.AuthorizationRequestInProgress)
+                    return;
+
+                if (request.BackgroundMode != GpsBackgroundMode.None)
+                {
+                    if (diag.AlwaysAuthorizationDenied)
+                        this.currentAccess = AccessState.Available;
+                    
+                    else if (diag.AuthorizationRestricted)
+                        this.currentAccess = AccessState.Restricted;
+                    
+                    else
+                        this.currentAccess = AccessState.Denied;
+                }
+                else
+                {
+                    this.currentAccess = diag.AuthorizationDenied 
+                        ? AccessState.Denied 
+                        : AccessState.Available;
+                }
+
+                tcs.SetResult(this.currentAccess);
+            }
+        );
+
+        return await tcs.Task.ConfigureAwait(false);    
+    }
 
 
     public IObservable<GpsReading?> GetLastReading() => Observable.Empty<GpsReading?>();
-        // .FromAsync(() => this.RequestAccess(GpsRequest.Foreground))
-        // .Do(x =>
-        // {
-        //     if (x != AccessState.Available)
-        //         throw new InvalidOperationException("Invalid Permissions - " + x);
-        // })
-    // {
-    //     
-    //     CLLocationUpdater.CreateLiveUpdates(new DispatchQueue("shiny_gps"), async update =>
-    //     {
-    //         
-    //     });
-    //     return Observable.Empty<GpsReading>();
-    // }
 
     
-    readonly Subject<GpsReading> readSubject = new();
+    readonly ShinySubject<GpsReading> readSubject = new();
     public IObservable<GpsReading> WhenReading() => this.readSubject;
 
     
@@ -95,21 +84,41 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
         
         (await this.RequestAccess(request)).Assert();
         if (request.BackgroundMode != GpsBackgroundMode.None)
-            this.session = CLBackgroundActivitySession.Create();
+            this.bgSession = CLBackgroundActivitySession.Create();
+
+        var appleRequest = request.ToApple();
         
-        this.updater = CLLocationUpdater.CreateLiveUpdates(new DispatchQueue("shiny_gps"), async update =>
-        {
-            var reading = update.Location.FromNative();
-            this.readSubject.OnNext(reading); // safety?
-            await this.delegates
-                .Value
-                .RunDelegates(
-                    x => x.OnReading(reading),
-                    logger
-                )
-                .ConfigureAwait(false);
-        });
-        this.CurrentListener = request;
+        //https://developer.apple.com/documentation/corelocation/supporting-live-updates-in-swiftui-and-mac-catalyst-apps
+        this.updater = CLLocationUpdater.CreateLiveUpdates(
+            appleRequest.ModernActivityType,
+            new DispatchQueue("shinygps"), 
+            async update =>
+            {
+                if (update.Location == null)
+                    return;
+                
+                // update.Location.Floor.Level
+                var reading = new GpsReading(
+                    update.Location.Coordinate.FromNative(),
+                    update.Location.HorizontalAccuracy,
+                    DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(update.Location.Timestamp.SecondsSince1970)),
+                    update.Location.Course,
+                    update.Location.VerticalAccuracy,
+                    update.Location.Altitude,
+                    update.Location.Speed,
+                    update.Location.SpeedAccuracy
+                );
+                this.readSubject.OnNext(reading);
+                
+                await services
+                    .RunDelegates<IGpsDelegate>(
+                        x => x.OnReading(reading),
+                        logger
+                    )
+                    .ConfigureAwait(false);
+            }
+        );
+        this.CurrentListener = appleRequest;
     }
 
     
@@ -117,11 +126,14 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
     {
         this.CurrentListener = null;
         
-        this.updater?.Dispose();
+        this.updater?.Invalidate();
         this.updater = null;
         
-        this.session?.Dispose();
+        this.session?.Invalidate();
         this.session = null;
+        
+        this.bgSession?.Invalidate();
+        this.bgSession = null;
         
         return Task.CompletedTask;
     }

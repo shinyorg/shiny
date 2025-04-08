@@ -1,5 +1,4 @@
-﻿using System.Reactive.Disposables;
-using Shiny.Locations;
+﻿using Shiny.Locations;
 
 namespace Sample.Gps;
 
@@ -42,17 +41,11 @@ public class GpsViewModel : ViewModel
                 }
                 else
                 {
-                    var access = await this.manager.RequestAccess(new GpsRequest
-                    {
-                        BackgroundMode = this.GetMode()
-                    });
-                    this.Access = access.ToString();
-
-                    if (access != AccessState.Available)
-                    {
-                        await this.Dialogs.DisplayAlertAsync("ERROR", "Insufficient permissions - " + access, "OK");
-                        return;
-                    }
+                    // if (access != AccessState.Available)
+                    // {
+                    //     await this.Dialogs.DisplayAlertAsync("ERROR", "Insufficient permissions - " + access, "OK");
+                    //     return;
+                    // }
 
                     var accuracy = (GpsAccuracy)Enum.Parse(typeof(GpsAccuracy), this.SelectedAccuracy);
                     var request = new GpsRequest
@@ -60,6 +53,7 @@ public class GpsViewModel : ViewModel
                         BackgroundMode = this.GetMode(),
                         Accuracy = accuracy
                     };
+
                     try
                     {
                         await this.manager.StartListener(request);

@@ -41,43 +41,27 @@ public enum GpsAccuracy
 }
 
 
+/// <summary>
+/// Distance filter in meters
+/// </summary>
 public record GpsRequest(    
-
-    /// <summary>
-    /// Sets the background mode - null means "don't run in background"
-    /// </summary>
     GpsBackgroundMode BackgroundMode = GpsBackgroundMode.None,
-
-    /// <summary>
-    /// The desired accuracy of the GPS lock
-    /// </summary>
     GpsAccuracy Accuracy = GpsAccuracy.Normal,
-
-    /// <summary>
-    /// Distance filter in meters
-    /// </summary>
-    double DistanceFilterMeters = 0
-    
-    // bool RequestFineLocation
+    double DistanceFilterMeters = 0,
+    bool RequestFineLocation = true
 )
 {
-    public static GpsRequest Realtime(bool background, double distanceFilterMeters = 0) => new(
+    public static GpsRequest Realtime(bool background, double distanceFilterMeters = 0, bool requestFineLocation = true) => new(
         background
             ? GpsBackgroundMode.Realtime
             : GpsBackgroundMode.None,
 
         GpsAccuracy.Highest,
-
-        distanceFilterMeters
+        distanceFilterMeters,
+        requestFineLocation
     );
 
     public static GpsRequest Foreground => new(GpsBackgroundMode.None, GpsAccuracy.Normal);
-
-
-    /// <summary>
-    /// Sets if the location should be precise or approximate b
-    /// </summary>
-    //public bool Precise { get; set; } = true;
 
 
     ///// <summary>
@@ -92,8 +76,8 @@ public record GpsRequest(
     //public TimeSpan? ThrottledInterval { get; set; }
 
 
-    /// <summary>
-    /// The minimum distance travelled before firing event
-    /// </summary>
+    // /// <summary>
+    // /// The minimum distance travelled before firing event
+    // /// </summary>
     //public Distance? MinimumDistance { get; set; }
 }

@@ -71,6 +71,8 @@ public static class LocationExtensions
             .Take(1)
             .ToTask();
         
+        // locationManager.AccuracyAuthorization 
+        // locationManager.RequestTemporaryFullAccuracyAuthorizationAsync()
         locationManager.RequestWhenInUseAuthorization();
         status = await task.ConfigureAwait(false);
 
@@ -88,5 +90,6 @@ public static class LocationExtensions
 
         return status;
     }
+    
 }
 #endif
