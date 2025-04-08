@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -15,14 +14,14 @@ namespace Shiny.Locations;
 public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
     readonly Subject<GpsReading> readingSubj = new();
-    readonly Lazy<IEnumerable<IGpsDelegate>> delegates;
+    readonly IServiceProvider services;
     readonly CLLocationManager locationManager;
     readonly ILogger logger;
 
 
     public CLLocationGpsManager(IServiceProvider services, ILogger<IGpsManager> logger)
     {
-        this.delegates = services.GetLazyService<IEnumerable<IGpsDelegate>>();
+        this.services = services;
         this.logger = logger;
         this.locationManager = new CLLocationManager
         {
@@ -34,9 +33,11 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
     internal async void LocationsUpdated(CLLocation[] locations)
     {
         var reading = locations.Last().FromNative();
-        await this.delegates
-            .Value
-            .RunDelegates(x => x.OnReading(reading), this.logger)
+        await this.services
+            .RunDelegates<IGpsDelegate>(
+                x => x.OnReading(reading), 
+                this.logger
+            )
             .ConfigureAwait(false);
 
         this.readingSubj.OnNext(reading);
@@ -78,13 +79,13 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         var bg = request.BackgroundMode != GpsBackgroundMode.None;
         var status = await this.locationManager.RequestAccess(bg);
 
-        if (status == AccessState.Available &&
-            request.Accuracy > GpsAccuracy.Lowest &&
-            UIDevice.CurrentDevice.CheckSystemVersion(14, 0) &&
-            this.locationManager.AccuracyAuthorization != CLAccuracyAuthorization.FullAccuracy)
-        {
-            status = AccessState.Restricted;
-        }
+        // if (status == AccessState.Available &&
+        //     request.Accuracy > GpsAccuracy.Lowest &&
+        //     UIDevice.CurrentDevice.CheckSystemVersion(14, 0) &&
+        //     //this.locationManager.AccuracyAuthorization != CLAccuracyAuthorization.FullAccuracy)
+        // {
+        //     status = AccessState.Restricted;
+        // }
 
         return status;
     }
@@ -182,26 +183,13 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         this.locationManager.AllowsBackgroundLocationUpdates = bg;
         this.locationManager.PausesLocationUpdatesAutomatically = false;
 
-        var useSignificant = false;
-        if (request is AppleGpsRequest appleRequest)
-        {
-            this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
-            this.locationManager.ShowsBackgroundLocationIndicator = bg && appleRequest.ShowsBackgroundLocationIndicator;
-            useSignificant = appleRequest.UseSignificantLocationChanges;
+        var appleRequest = request.ToApple();
+        this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
+        this.locationManager.ShowsBackgroundLocationIndicator = bg && appleRequest.ShowsBackgroundLocationIndicator;
+        this.locationManager.ActivityType = appleRequest.ActivityType;
+        this.CurrentSettings = appleRequest;
 
-            if (appleRequest.ActivityType != null)
-                this.locationManager.ActivityType = appleRequest.ActivityType.Value;
-            
-            this.CurrentSettings = appleRequest;
-        }
-        else
-        {
-            this.CurrentSettings = new AppleGpsRequest(
-                BackgroundMode: request.BackgroundMode,
-                Accuracy: request.Accuracy
-            );
-        }
-        if (useSignificant)
+        if (appleRequest.UseSignificantLocationChanges)
             this.locationManager.StartMonitoringSignificantLocationChanges();
         else
             this.locationManager.StartUpdatingLocation();
