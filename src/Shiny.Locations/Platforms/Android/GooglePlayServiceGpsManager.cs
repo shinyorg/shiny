@@ -8,11 +8,12 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Locations;
 
 
-public class GooglePlayServiceGpsManager : AbstractGpsManager
+public class GooglePlayServiceGpsManager(
+    AndroidPlatform platform, 
+    ILogger<GooglePlayServiceGpsManager> logger
+) : AbstractGpsManager(platform, logger)
 {
     IFusedLocationProviderClient? listenerClient;
-    public GooglePlayServiceGpsManager(AndroidPlatform platform, ILogger<GooglePlayServiceGpsManager> logger) : base(platform, logger) { }
-
 
     public override IObservable<GpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
     {
@@ -27,11 +28,18 @@ public class GooglePlayServiceGpsManager : AbstractGpsManager
     });
 
 
-    protected override Task RequestLocationUpdates(GpsRequest request)
+    protected override Task RequestLocationUpdates(AndroidGpsRequest request)
     {
+        var builder = new LocationRequest.Builder((int)request.GpsPriority, request.IntervalMillis)
+            .SetWaitForAccurateLocation(request.WaitForAccurateLocation)
+            .SetGranularity(Granularity.GranularityPermissionLevel);
+
+        if (request.DistanceFilterMeters > 0)
+            builder = builder.SetMinUpdateDistanceMeters((float)request.DistanceFilterMeters);
+
         this.listenerClient ??= LocationServices.GetFusedLocationProviderClient(this.Platform.AppContext);
         return this.listenerClient.RequestLocationUpdatesAsync(
-            request.ToNative(),
+            builder.Build(),
             this.Callback,
             Looper.MainLooper
         );

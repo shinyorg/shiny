@@ -34,16 +34,18 @@ public class CurrentPermissionViewModel : ViewModel
                     () => bleHostingManager.GattAccessStatus,
                     () => bleHostingManager.RequestAccess(false, true)
                 ),
-                new PermissionViewModel(
-                    "GPS - In App",
-                    () => gpsManager.GetCurrentStatus(GpsRequest.Foreground),
-                    () => gpsManager.RequestAccess(GpsRequest.Foreground)
-                ),
-                new PermissionViewModel(
-                    "GPS - Background",
-                    () => gpsManager.GetCurrentStatus(GpsRequest.Realtime(false)),
-                    () => gpsManager.RequestAccess(GpsRequest.Realtime(false))
-                ),
+                
+                // TODO
+                // new PermissionViewModel(
+                //     "GPS - In App",
+                //     () => gpsManager.GetCurrentStatus(GpsRequest.Foreground),
+                //     () => gpsManager.RequestAccess(GpsRequest.Foreground)
+                // ),
+                // new PermissionViewModel(
+                //     "GPS - Background",
+                //     () => gpsManager.GetCurrentStatus(GpsRequest.Realtime(false)),
+                //     () => gpsManager.RequestAccess(GpsRequest.Realtime(false))
+                // ),
                 new PermissionViewModel(
                     "Geofencing",
                     () => geofenceManager.CurrentStatus,

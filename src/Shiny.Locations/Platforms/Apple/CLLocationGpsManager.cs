@@ -76,16 +76,21 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
-        var bg = request.BackgroundMode != GpsBackgroundMode.None;
-        var status = await this.locationManager.RequestAccess(bg);
-
-        // if (status == AccessState.Available &&
-        //     request.Accuracy > GpsAccuracy.Lowest &&
-        //     UIDevice.CurrentDevice.CheckSystemVersion(14, 0) &&
-        //     //this.locationManager.AccuracyAuthorization != CLAccuracyAuthorization.FullAccuracy)
-        // {
-        //     status = AccessState.Restricted;
-        // }
+        var status = await this.locationManager.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
+        
+        if (
+            status == AccessState.Available &&
+            request.RequestPreciseAccuracy &&
+            UIDevice.CurrentDevice.CheckSystemVersion(14, 0) &&
+            this.locationManager.AccuracyAuthorization == CLAccuracyAuthorization.ReducedAccuracy
+        )
+        {
+            await this.locationManager.RequestTemporaryFullAccuracyAuthorizationAsync("shinygps");
+            
+            status = this.locationManager.AccuracyAuthorization == CLAccuracyAuthorization.ReducedAccuracy 
+                ? AccessState.Restricted
+                : AccessState.Available;
+        }
 
         return status;
     }
@@ -158,17 +163,17 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
     {
         (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
 
-        this.locationManager.DistanceFilter = request.DistanceFilterMeters;
-        this.locationManager.DesiredAccuracy = request.Accuracy switch
-        {
-            //CLLocation.AccurracyBestForNavigation;
-            //CLLocation.AccuracyReduced
-            GpsAccuracy.Highest => CLLocation.AccuracyBest,
-            GpsAccuracy.High => CLLocation.AccuracyNearestTenMeters,
-            GpsAccuracy.Normal => CLLocation.AccuracyHundredMeters,
-            GpsAccuracy.Low => CLLocation.AccuracyKilometer,
-            GpsAccuracy.Lowest => CLLocation.AccuracyThreeKilometers
-        };
+        // this.locationManager.DistanceFilter = request.DistanceFilterMeters;
+        // this.locationManager.DesiredAccuracy = request.Accuracy switch
+        // {
+        //     //CLLocation.AccurracyBestForNavigation;
+        //     //CLLocation.AccuracyReduced
+        //     GpsAccuracy.Highest => CLLocation.AccuracyBest,
+        //     GpsAccuracy.High => CLLocation.AccuracyNearestTenMeters,
+        //     GpsAccuracy.Normal => CLLocation.AccuracyHundredMeters,
+        //     GpsAccuracy.Low => CLLocation.AccuracyKilometer,
+        //     GpsAccuracy.Lowest => CLLocation.AccuracyThreeKilometers
+        // };
 
         // this.locationManager.UpdatedHeading
         // this.locationManager.DeferredUpdatesFinished
@@ -179,19 +184,29 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         // if (this.locationManager.StopUpdatingHeading();
         // this.locationManager.StartUpdatingHeading();
         
-        var bg = request.BackgroundMode != GpsBackgroundMode.None;
-        this.locationManager.AllowsBackgroundLocationUpdates = bg;
-        this.locationManager.PausesLocationUpdatesAutomatically = false;
-
         var appleRequest = request.ToApple();
         this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
-        this.locationManager.ShowsBackgroundLocationIndicator = bg && appleRequest.ShowsBackgroundLocationIndicator;
         this.locationManager.ActivityType = appleRequest.ActivityType;
-        this.CurrentSettings = appleRequest;
 
-        if (appleRequest.UseSignificantLocationChanges)
-            this.locationManager.StartMonitoringSignificantLocationChanges();
-        else
-            this.locationManager.StartUpdatingLocation();
+        switch (request.BackgroundMode)
+        {
+            case GpsBackgroundMode.None:
+                this.locationManager.StartUpdatingLocation();
+                break;
+            
+            case GpsBackgroundMode.Standard:
+                this.locationManager.AllowsBackgroundLocationUpdates = true;
+                this.locationManager.ShowsBackgroundLocationIndicator = appleRequest.ShowsBackgroundLocationIndicator;
+                this.locationManager.StartMonitoringSignificantLocationChanges();
+                break;
+            
+            case GpsBackgroundMode.Realtime:
+                
+                this.locationManager.AllowsBackgroundLocationUpdates = true;
+                this.locationManager.ShowsBackgroundLocationIndicator = appleRequest.ShowsBackgroundLocationIndicator;
+                this.locationManager.StartUpdatingLocation();
+                break;
+        }
+        this.CurrentSettings = appleRequest;
     }
 }

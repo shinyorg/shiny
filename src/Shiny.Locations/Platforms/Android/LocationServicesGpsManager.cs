@@ -18,6 +18,7 @@ public class LocationServicesGpsManager : AbstractGpsManager
 
     public override IObservable<GpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
     {
+        
         (await this.RequestAccess(GpsRequest.Foreground)).Assert(null, true);
 
         var criteria = new Criteria
@@ -39,7 +40,7 @@ public class LocationServicesGpsManager : AbstractGpsManager
     });
 
 
-    protected override Task RequestLocationUpdates(GpsRequest request)
+    protected override Task RequestLocationUpdates(AndroidGpsRequest request)
     {
         var criteria = new Criteria
         {
@@ -49,15 +50,8 @@ public class LocationServicesGpsManager : AbstractGpsManager
         };
 
         this.client.RequestLocationUpdates(
-            0,
-            request.Accuracy switch
-            {
-                GpsAccuracy.Highest => 0F,
-                GpsAccuracy.High => 10F,
-                GpsAccuracy.Normal => 100F,
-                GpsAccuracy.Low => 1000F,
-                GpsAccuracy.Lowest => 3000F
-            },
+            1000, 
+            (float)request.DistanceFilterMeters,
             criteria,
             this.Callback,
             Looper.MainLooper

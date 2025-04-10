@@ -1,6 +1,5 @@
 using System;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CoreFoundation;
@@ -21,6 +20,7 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
     
     public GpsRequest? CurrentListener { get; set; }
 
+    // could check against current listener
     AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request
     public AccessState GetCurrentStatus(GpsRequest request) => this.currentAccess;
 
@@ -33,23 +33,30 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
         var requirement = request.BackgroundMode == GpsBackgroundMode.None
             ? CLServiceSessionAuthorizationRequirement.WhenInUse
             : CLServiceSessionAuthorizationRequirement.Always;
-
+        
         var tcs = new TaskCompletionSource<AccessState>();
+        var fullAccuracy = request.RequestPreciseAccuracy 
+            ? "shinygps"
+            : String.Empty;
+        
         this.session ??= CLServiceSession.CreateSession(
             requirement,
-            String.Empty,
-            DispatchQueue.MainQueue, 
+            fullAccuracy,
+            DispatchQueue.MainQueue,
             diag =>
             {
                 if (diag.AuthorizationRequestInProgress)
                     return;
-
+                
                 if (request.BackgroundMode != GpsBackgroundMode.None)
                 {
-                    if (diag.AlwaysAuthorizationDenied)
+                    if (!diag.AlwaysAuthorizationDenied)
+                    {
                         this.currentAccess = AccessState.Available;
-                    
-                    else if (diag.AuthorizationRestricted)
+                        if (request.RequestPreciseAccuracy && diag.FullAccuracyDenied)
+                            this.currentAccess = AccessState.Restricted;
+                    }
+                    else if (!diag.AuthorizationRestricted)
                         this.currentAccess = AccessState.Restricted;
                     
                     else
@@ -70,38 +77,50 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
     }
 
 
+    // TODO: I'll have to store this
     public IObservable<GpsReading?> GetLastReading() => Observable.Empty<GpsReading?>();
 
     
     readonly ShinySubject<GpsReading> readSubject = new();
     public IObservable<GpsReading> WhenReading() => this.readSubject;
 
-    
+
     public async Task StartListener(GpsRequest request)
     {
         if (this.updater != null)
             throw new InvalidOperationException("Already GPS listener running");
-        
+
         (await this.RequestAccess(request)).Assert();
         if (request.BackgroundMode != GpsBackgroundMode.None)
             this.bgSession = CLBackgroundActivitySession.Create();
 
         var appleRequest = request.ToApple();
+        var modernActivityType = appleRequest.ActivityType switch
+        {
+            CLActivityType.Airborne => CLLiveUpdateConfiguration.Airborne,
+            CLActivityType.Fitness => CLLiveUpdateConfiguration.Fitness,
+            CLActivityType.AutomotiveNavigation => CLLiveUpdateConfiguration.AutomotiveNavigation,
+            CLActivityType.OtherNavigation => CLLiveUpdateConfiguration.OtherNavigation,
+            _ => CLLiveUpdateConfiguration.Default
+        };
         
         //https://developer.apple.com/documentation/corelocation/supporting-live-updates-in-swiftui-and-mac-catalyst-apps
         this.updater = CLLocationUpdater.CreateLiveUpdates(
-            appleRequest.ModernActivityType,
+            modernActivityType,
             new DispatchQueue("shinygps"), 
             async update =>
             {
                 if (update.Location == null)
                     return;
-                
+
+                var epochTimestamp = Convert.ToInt64(update.Location.Timestamp.SecondsSince1970);
+                var timestamp = DateTimeOffset.FromUnixTimeSeconds(epochTimestamp);
+                    
                 // update.Location.Floor.Level
                 var reading = new GpsReading(
                     update.Location.Coordinate.FromNative(),
                     update.Location.HorizontalAccuracy,
-                    DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(update.Location.Timestamp.SecondsSince1970)),
+                    timestamp,
                     update.Location.Course,
                     update.Location.VerticalAccuracy,
                     update.Location.Altitude,

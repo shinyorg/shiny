@@ -90,8 +90,10 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     {
         var realtime = request.BackgroundMode == GpsBackgroundMode.Realtime;
         var permissionSet = new List<string> { P.AccessCoarseLocation };
-        if (request.Accuracy > GpsAccuracy.Low)
-            permissionSet.Add(P.AccessFineLocation);
+        
+        // TODO: fine access required - we can't ask this on iOS 
+        // if (request.Accuracy > GpsAccuracy.Low)
+        //     permissionSet.Add(P.AccessFineLocation);
 
         switch (request.BackgroundMode)
         {
@@ -180,7 +182,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
 
 
     public abstract IObservable<GpsReading?> GetLastReading();
-    protected abstract Task RequestLocationUpdates(GpsRequest request);
+    protected abstract Task RequestLocationUpdates(AndroidGpsRequest request);
     protected abstract Task RemoveLocationUpdates();
 
 
@@ -188,14 +190,14 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     {
         request ??= new GpsRequest();
         if (request is not AndroidGpsRequest android)
-            android = new AndroidGpsRequest(request.BackgroundMode, request.Accuracy, request.DistanceFilterMeters);
+            android = new AndroidGpsRequest(request.BackgroundMode);
 
         (await this.RequestAccess(request)).Assert(allowRestricted: true);
 
         if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
             this.Platform.StartService(typeof(ShinyGpsService), android.StopForegroundServiceWithTask);
 
-        await this.RequestLocationUpdates(request);
+        await this.RequestLocationUpdates(android);
         this.CurrentSettings = android;
     }
 }

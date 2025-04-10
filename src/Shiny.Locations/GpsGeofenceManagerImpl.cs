@@ -20,8 +20,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     static readonly GpsRequest defaultRequest = new GpsRequest
     {
-        BackgroundMode = GpsBackgroundMode.Realtime,
-        Accuracy = GpsAccuracy.Normal
+        BackgroundMode = GpsBackgroundMode.Realtime
     };
 
     public GpsGeofenceManagerImpl(

@@ -30,7 +30,12 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true />
-	</dict>	
+	</dict>
+    <key>NSLocationTemporaryUsageDescriptionDictionary</key>
+    <dict>
+        <key>shinygps</key>
+        <string>This app wants to know EXACTLY where you are</string>
+    </dict>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Say something useful here that your users will understand</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

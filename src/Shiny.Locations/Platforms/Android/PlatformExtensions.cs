@@ -31,37 +31,6 @@ public static class PlatformExtensions
         androidTask.AddOnSuccessListener(src);
         return src.Task;
     }
-
-
-    public static LocationRequest ToNative(this GpsRequest request)
-    {
-        var priority = request.Accuracy switch
-        {
-            GpsAccuracy.Lowest => Priority.PriorityPassive,
-            GpsAccuracy.Low => Priority.PriorityLowPower,
-            GpsAccuracy.Normal => Priority.PriorityBalancedPowerAccuracy,
-            GpsAccuracy.High => Priority.PriorityHighAccuracy,
-            GpsAccuracy.Highest => Priority.PriorityHighAccuracy
-        };
-
-        var builder = new LocationRequest.Builder(priority, 1000)
-            .SetGranularity(Granularity.GranularityPermissionLevel);
-
-        if (request.DistanceFilterMeters > 0)
-            builder = builder.SetMinUpdateDistanceMeters((float)request.DistanceFilterMeters);
-        
-        if (request is AndroidGpsRequest android)
-        {
-            builder = builder
-                .SetWaitForAccurateLocation(android.WaitForAccurateLocation);
-
-            if (android.IntervalMillis > 0)
-                builder = builder.SetDurationMillis(android.IntervalMillis);
-        }
-
-        var nativeRequest = builder.Build();
-        return nativeRequest;
-    }
 }
 
 

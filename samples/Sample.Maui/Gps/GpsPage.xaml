@@ -23,15 +23,14 @@
             <Label Text="{Binding HeadingAccuracy, StringFormat='Heading Accuracy: {0}'}" />
             <Label Text="{Binding Timestamp, StringFormat='Timestamp: {0}'}" />
 
+            <Label Text="Precise Location" />
+            <CheckBox IsChecked="{Binding }" />
+            
             <Label Text="Background" />
             <CheckBox IsChecked="{Binding UseBackground}" />
 
             <Label Text="Real-Time Background" />
             <CheckBox IsChecked="{Binding UseRealtime}" />
-
-            <Label Text="Priority/Accuracy" />
-            <Picker ItemsSource="{Binding Accuracies}"
-                    SelectedItem="{Binding SelectedAccuracy}" />
 
             <Button Text="{Binding ListenerText}"
                     Command="{Binding ToggleUpdates}" />

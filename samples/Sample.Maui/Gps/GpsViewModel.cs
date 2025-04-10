@@ -18,19 +18,10 @@ public class GpsViewModel : ViewModel
         var mode = l?.BackgroundMode ?? GpsBackgroundMode.None;
         this.UseBackground = mode != GpsBackgroundMode.None;
         this.UseRealtime = mode == GpsBackgroundMode.Realtime;
-        this.SelectedAccuracy = (l?.Accuracy ?? GpsAccuracy.Normal).ToString();
 
         this.GetCurrentPosition = this.CreateOneReading(LocationRetrieve.Current);
         this.GetLastReading = this.CreateOneReading(LocationRetrieve.Last);
         this.GetLastOrCurrent = this.CreateOneReading(LocationRetrieve.LastOrCurrent);
-        this.Accuracies = new[]
-        {
-            GpsAccuracy.Highest.ToString(),
-            GpsAccuracy.High.ToString(),
-            GpsAccuracy.Normal.ToString(),
-            GpsAccuracy.Low.ToString(),
-            GpsAccuracy.Lowest.ToString()
-        };
 
         this.ToggleUpdates = new Command(
             async () =>
@@ -41,17 +32,10 @@ public class GpsViewModel : ViewModel
                 }
                 else
                 {
-                    // if (access != AccessState.Available)
-                    // {
-                    //     await this.Dialogs.DisplayAlertAsync("ERROR", "Insufficient permissions - " + access, "OK");
-                    //     return;
-                    // }
-
-                    var accuracy = (GpsAccuracy)Enum.Parse(typeof(GpsAccuracy), this.SelectedAccuracy);
                     var request = new GpsRequest
                     {
                         BackgroundMode = this.GetMode(),
-                        Accuracy = accuracy
+                        RequestPreciseAccuracy = this.UsePreciseLocation
                     };
 
                     try
@@ -96,20 +80,18 @@ public class GpsViewModel : ViewModel
     }
 
 
-    public Command SelectAccuracy { get; }
     public Command GetLastReading { get; }
     public Command GetCurrentPosition { get; }
     public Command GetLastOrCurrent { get; }
     public Command RequestAccess { get; }
     public Command ToggleUpdates { get; }
 
-    public string[] Accuracies { get; }
-    [Reactive] public string SelectedAccuracy { get; set; }
     [Reactive] public string ListenerText { get; private set; }
     [Reactive] public string NotificationTitle { get; set; }
     [Reactive] public string NotificationMessage { get; set; }
     [Reactive] public bool UseBackground { get; set; }
     [Reactive] public bool UseRealtime { get; set; }
+    [Reactive] public bool UsePreciseLocation { get; set; }
     [Reactive] public string Access { get; private set; }
     [Reactive] public bool IsUpdating { get; private set; }
 
