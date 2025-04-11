@@ -42,5 +42,9 @@ public record GpsReading(
     /// <summary>
     /// The accuracy in meters per second for the speed
     /// </summary>
-    double SpeedAccuracy
+    double SpeedAccuracy,
+    
+    
+    int Floor = 0,
+    bool IsStationary = false
 );

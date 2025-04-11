@@ -22,9 +22,11 @@
             <Label Text="{Binding Heading, StringFormat='Heading: {0}'}" />
             <Label Text="{Binding HeadingAccuracy, StringFormat='Heading Accuracy: {0}'}" />
             <Label Text="{Binding Timestamp, StringFormat='Timestamp: {0}'}" />
+            <Label Text="{Binding Floor, StringFormat='Floor: {0}'}" />
+            <Label Text="{Binding IsStationary, StringFormat='Stationary: {0}'}" />
 
             <Label Text="Precise Location" />
-            <CheckBox IsChecked="{Binding }" />
+            <CheckBox IsChecked="{Binding UsePreciseLocation}" />
             
             <Label Text="Background" />
             <CheckBox IsChecked="{Binding UseBackground}" />

@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
+using Foundation;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Locations;
@@ -104,6 +105,7 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
             _ => CLLiveUpdateConfiguration.Default
         };
         
+        //https://developer.apple.com/videos/play/wwdc2023/10180/
         //https://developer.apple.com/documentation/corelocation/supporting-live-updates-in-swiftui-and-mac-catalyst-apps
         this.updater = CLLocationUpdater.CreateLiveUpdates(
             modernActivityType,
@@ -125,7 +127,9 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
                     update.Location.VerticalAccuracy,
                     update.Location.Altitude,
                     update.Location.Speed,
-                    update.Location.SpeedAccuracy
+                    update.Location.SpeedAccuracy,
+                    update.Location.Floor?.Level.ToInt32() ?? 0,
+                    update.IsStationary
                 );
                 this.readSubject.OnNext(reading);
                 
@@ -137,6 +141,7 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
                     .ConfigureAwait(false);
             }
         );
+        this.updater!.Resume();
         this.CurrentListener = appleRequest;
     }
 

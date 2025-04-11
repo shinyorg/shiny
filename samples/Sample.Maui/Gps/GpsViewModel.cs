@@ -102,6 +102,8 @@ public class GpsViewModel : ViewModel
     [Reactive] public double Heading { get; private set; }
     [Reactive] public double HeadingAccuracy { get; private set; }
     [Reactive] public double Speed { get; private set; }
+    [Reactive] public bool IsStationary { get; private set; }
+    [Reactive] public int Floor { get; private set; }
     [Reactive] public DateTimeOffset Timestamp { get; private set; }
 
 
@@ -116,6 +118,8 @@ public class GpsViewModel : ViewModel
         this.HeadingAccuracy = reading.HeadingAccuracy;
         this.Speed = reading.Speed;
         this.Timestamp = reading.Timestamp;
+        this.IsStationary = reading.IsStationary;
+        this.Floor = reading.Floor;
     }
 
 
