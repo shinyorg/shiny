@@ -44,9 +44,9 @@ public class HttpTransferTests : AbstractShinyTests
 
 
     [Theory(DisplayName = "HTTP Transfers - Cancel")]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Cancel(bool isUpload)
+    [InlineData(TransferType.Download)]
+    [InlineData(TransferType.UploadMultipart)]
+    public async Task Cancel(TransferType transferType)
     {
         var manager = this.GetService<IHttpTransferManager>();
 
@@ -76,9 +76,9 @@ public class HttpTransferTests : AbstractShinyTests
 
         var transfer = await manager.Queue(new(
             id,
-            this.GetUri(isUpload, false),
-            isUpload,
-            this.GetLocalPath(isUpload)
+            this.GetUri(transferType, false),
+            TransferType.UploadMultipart,
+            this.GetLocalPath(transferType)
         ));
 
         this.Log("Waiting for transfer to start");
@@ -99,9 +99,9 @@ public class HttpTransferTests : AbstractShinyTests
 
 
     [Theory(DisplayName = "HTTP Transfers - Observable - Error Handling")]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task ErrorHandlingObservable(bool isUpload)
+    [InlineData(TransferType.Download)]
+    [InlineData(TransferType.UploadMultipart)]
+    public async Task ErrorHandlingObservable(TransferType transferType)
     {
         var manager = this.GetService<IHttpTransferManager>();
 
@@ -118,8 +118,8 @@ public class HttpTransferTests : AbstractShinyTests
         var transfer = await manager.Queue(new(
             id,
             this.TestUri + "/transfers/error",
-            isUpload,
-            this.GetLocalPath(isUpload)
+            transferType,
+            this.GetLocalPath(transferType)
         ));
 
         await errorTask.ConfigureAwait(false);
@@ -131,9 +131,9 @@ public class HttpTransferTests : AbstractShinyTests
 
 
     [Theory(DisplayName = "HTTP Transfers - Delegate - Error Handling")]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task ErrorHandlingDelegate(bool isUpload)
+    [InlineData(TransferType.Download)]
+    [InlineData(TransferType.UploadMultipart)]
+    public async Task ErrorHandlingDelegate(TransferType transferType)
     {
         var manager = this.GetService<IHttpTransferManager>();
         var id = Guid.NewGuid().ToString();
@@ -145,8 +145,8 @@ public class HttpTransferTests : AbstractShinyTests
         var transfer = await manager.Queue(new(
             id,
             this.TestUri + "/transfers/error",
-            isUpload,
-            this.GetLocalPath(isUpload)
+            transferType,
+            this.GetLocalPath(transferType)
         ));
 
         var exception = await tcs.Task
@@ -176,9 +176,9 @@ public class HttpTransferTests : AbstractShinyTests
 
         await manager.Queue(new HttpTransferRequest(
             id,
-            this.GetUri(true, true),
-            true,
-            this.GetLocalPath(true),
+            this.GetUri(TransferType.UploadMultipart, true),
+            TransferType.UploadMultipart,
+            this.GetLocalPath(TransferType.UploadMultipart),
             HttpContent: TransferHttpContent.FromFormData(
                 ("Text", "This is a test")
             )
@@ -188,11 +188,11 @@ public class HttpTransferTests : AbstractShinyTests
 
 
     [Theory(DisplayName = "HTTP Transfers - Delegate")]
-    [InlineData(false, false)]
-    [InlineData(false, true)]
-    [InlineData(true, false)]
-    [InlineData(true, true)]
-    public async Task TestDelegate(bool isUpload, bool includeBody)
+    [InlineData(TransferType.Download, false)]
+    [InlineData(TransferType.Download, true)]
+    [InlineData(TransferType.UploadMultipart, false)]
+    [InlineData(TransferType.UploadMultipart, true)]
+    public async Task TestDelegate(TransferType transferType, bool includeBody)
     {
         var manager = this.GetService<IHttpTransferManager>();
         var id = Guid.NewGuid().ToString();
@@ -218,9 +218,9 @@ public class HttpTransferTests : AbstractShinyTests
 
         await manager.Queue(new(
             id,
-            this.GetUri(isUpload, includeBody),
-            isUpload,
-            this.GetLocalPath(isUpload),
+            this.GetUri(transferType, includeBody),
+            transferType,
+            this.GetLocalPath(transferType),
             Headers: new Dictionary<string, string>
             {
                 { "Test", "Test" }
@@ -239,9 +239,9 @@ public class HttpTransferTests : AbstractShinyTests
 
 
     [Theory(DisplayName = "HTTP Transfers - Observable")]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async void TestObservable(bool isUpload)
+    [InlineData(TransferType.Download)]
+    [InlineData(TransferType.UploadMultipart)]
+    public async void TestObservable(TransferType transferType)
     {
         var manager = this.GetService<IHttpTransferManager>();
 
@@ -256,9 +256,9 @@ public class HttpTransferTests : AbstractShinyTests
 
         await manager.Queue(new HttpTransferRequest(
             id,
-            this.GetUri(isUpload, false),
-            isUpload,
-            this.GetLocalPath(isUpload),
+            this.GetUri(transferType, false),
+            transferType,
+            this.GetLocalPath(transferType),
             Headers: new Dictionary<string, string>
             {
                 { "Test", "Test" }
@@ -293,24 +293,24 @@ public class HttpTransferTests : AbstractShinyTests
     //}
 #endif
 
-    string GetUri(bool upload, bool includeBody)
+    string GetUri(TransferType transferType, bool includeBody)
     {
         var uri = this.TestUri + "/transfers";
-        uri += upload ? "/upload" : "/download";
+        uri += transferType == TransferType.Download ? "/download" : "/upload";
         if (includeBody)
             uri += "/body";
 
-        this.Log($"Upload: {upload} - URI: {uri}");
+        this.Log($"Type: {transferType} - URI: {uri}");
         return uri;
     }
 
 
     const int UPLOAD_SIZE_MB = 50;
-    string GetLocalPath(bool isUpload)
+    string GetLocalPath(TransferType transferType)
     {
         string path = null!;
 
-        if (isUpload)
+        if (transferType == TransferType.UploadMultipart)
         {
             path = Path.Combine(FileSystem.AppDataDirectory, "upload.bin");
             if (!File.Exists(path))
