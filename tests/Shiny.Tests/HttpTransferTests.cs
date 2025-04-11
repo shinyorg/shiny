@@ -356,7 +356,7 @@ public partial class TestHttpTransferDelegate : IHttpTransferDelegate
     }
 
 
-    public Task OnError(HttpTransferRequest request, Exception ex)
+    public Task OnError(HttpTransferRequest request, int statusCode, Exception ex)
     {
         this.OnFinish?.Invoke((request, ex));
         return Task.CompletedTask;

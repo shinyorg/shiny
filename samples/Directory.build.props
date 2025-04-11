@@ -1,6 +1,5 @@
 <Project>
     <PropertyGroup>
         <MauiVersion>9.0.50</MauiVersion>
-        <MicrosoftExtensionsVersion>9.0.0</MicrosoftExtensionsVersion>
     </PropertyGroup>
 </Project>
