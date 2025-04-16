@@ -91,9 +91,8 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         var realtime = request.BackgroundMode == GpsBackgroundMode.Realtime;
         var permissionSet = new List<string> { P.AccessCoarseLocation };
         
-        // TODO: fine access required - we can't ask this on iOS 
-        // if (request.Accuracy > GpsAccuracy.Low)
-        //     permissionSet.Add(P.AccessFineLocation);
+        if (request.RequestPreciseAccuracy)
+            permissionSet.Add(P.AccessFineLocation);
 
         switch (request.BackgroundMode)
         {
@@ -124,9 +123,6 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     {
         var permissionSet = this.GetPermissionSet(request);
         var status = AccessState.Denied;
-        var requestBg = permissionSet.Contains(P.AccessBackgroundLocation);
-
-        // TODO: test BG permission shouldn't 
         var result = await this.Platform.RequestPermissions(permissionSet.ToArray()).ToTask();
 
         if (result.IsGranted(P.AccessCoarseLocation))
@@ -138,12 +134,12 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                 status = AccessState.Restricted;
             }
 
-            if (requestBg)
+            if (permissionSet.Contains(P.AccessBackgroundLocation))
             {
                 // bg permission must be requested independently from others
                 var bgResult = await this.Platform.RequestAccess(P.AccessBackgroundLocation).ToTask();
                 if (bgResult != AccessState.Available)
-                    status = AccessState.Restricted;
+                    status = AccessState.Denied;
             }
 
             if (permissionSet.Contains(P.ForegroundService) && !result.IsGranted(P.ForegroundService))
