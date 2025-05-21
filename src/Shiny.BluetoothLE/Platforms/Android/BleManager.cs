@@ -142,7 +142,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             var newState = (State)intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
             if (newState == State.On || newState == State.Off)
             {
-                var status = newState == State.Connected
+                var status = newState == State.On
                     ? AccessState.Available
                     : AccessState.Disabled;
 
