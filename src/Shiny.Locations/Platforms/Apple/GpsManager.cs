@@ -70,7 +70,7 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
                         : AccessState.Available;
                 }
 
-                tcs.SetResult(this.currentAccess);
+                tcs.TrySetResult(this.currentAccess);
             }
         );
 
