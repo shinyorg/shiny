@@ -10,16 +10,50 @@ namespace Shiny.BluetoothLE;
 
 public static class AsyncExtensions
 {
+    /// <summary>
+    /// Requests access/permission
+    /// </summary>
+    /// <param name="manager"></param>
+    /// <returns></returns>
     public static Task<AccessState> RequestAccessAsync(this IBleManager manager)
         => manager.RequestAccess().ToTask();
 
 
+    /// <summary>
+    /// Connects to peripheral (if not already connected) and waits for successful event
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="config"></param>
+    /// <param name="cancelToken"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
     public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken cancelToken = default, TimeSpan? timeout = null)
         => peripheral
             .WithConnectIf(config)
             .Timeout(timeout ?? TimeSpan.FromSeconds(30))
             .ToTask(cancelToken);
 
+    /// <summary>
+    /// Disconnects a peripheral and waits for the successful event
+    /// </summary>
+    /// <param name="peripheral"></param>
+    /// <param name="cancelToken"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    public static Task DisconnectAsync(this IPeripheral peripheral, CancellationToken cancelToken = default, TimeSpan? timeout = null)
+    {
+        if (!peripheral.IsConnected())
+            return Task.CompletedTask;
+        
+        var task = peripheral
+            .WhenDisconnected()
+            .Take(1)
+            .Timeout(timeout ?? TimeSpan.FromSeconds(30))
+            .ToTask(cancelToken);
+        
+        peripheral.CancelConnection();
+        return task;
+    }
 
     /// <summary>
     /// Waits for a characteristic subscription - if already hooked, it will return immediately
