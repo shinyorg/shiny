@@ -208,8 +208,6 @@ public partial class HttpTransferManager(
         if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put)
             throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
         
-        var content = new MultipartFormDataContent();
-
         var native = request.ToNative();
         configurator?.Configure(native, request);
 
