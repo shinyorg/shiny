@@ -29,7 +29,7 @@ public partial class Peripheral
                     this.logger.LogInformation($"Initial Notification Hook: {serviceUuid} / {characteristicUuid}");
 
                     CBCharacteristic native = null!;
-                    this.WhenConnected()
+                    var sub = this.WhenConnected()
                         .Select(_ =>
                         {
                             this.logger.LogDebug($"Connection Detected - Attempting to hook: {serviceUuid} / {characteristicUuid}");
@@ -56,6 +56,7 @@ public partial class Peripheral
 
                     return () =>
                     {
+                        sub?.Dispose();
                         if (native == null)
                             return;
 

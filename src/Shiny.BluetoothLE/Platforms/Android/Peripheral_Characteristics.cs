@@ -119,10 +119,9 @@ public partial class Peripheral
 
                     return () =>
                     {
+                        sub?.Dispose();
                         if (characteristic != null)
                             this.TryNotificationCleanup(characteristic, serviceUuid, characteristicUuid);
-
-                        sub?.Dispose();
                     };
                 })
                 .Publish()
