@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,10 +19,30 @@ public class GeofenceManager(
     IServiceProvider services,
     IPlatform platform,
     IRepository repository
-) : IGeofenceManager
+) : IGeofenceManager, IShinyStartupTask
 {
+    public async void Start()
+    {
+        try
+        {
+            var regions = repository.GetList<GeofenceRegion>();
+            if (regions.Any())
+                (await this.RequestAccess().ConfigureAwait(false)).Assert();
+            
+            var mon = await this.GetMonitor();
+            
+            foreach (var region in regions)
+                this.AddToMonitor(mon, region);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error starting GeofenceManager");
+        }
+    }
+    
+    
     public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
-
+    
 
     CLServiceSession? session;
     public async Task<AccessState> RequestAccess()
