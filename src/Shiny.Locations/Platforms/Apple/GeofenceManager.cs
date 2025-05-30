@@ -27,12 +27,13 @@ public class GeofenceManager(
         {
             var regions = repository.GetList<GeofenceRegion>();
             if (regions.Any())
+            {
                 (await this.RequestAccess().ConfigureAwait(false)).Assert();
-            
-            var mon = await this.GetMonitor();
-            
-            foreach (var region in regions)
-                this.AddToMonitor(mon, region);
+                var mon = await this.GetMonitor();
+
+                foreach (var region in regions)
+                    this.AddToMonitor(mon, region);
+            }
         }
         catch (Exception ex)
         {
