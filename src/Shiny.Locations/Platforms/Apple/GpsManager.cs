@@ -12,14 +12,37 @@ namespace Shiny.Locations;
 
 [SupportedOSPlatform("ios18.0")]
 [SupportedOSPlatform("maccatalyst18.0")]
-public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) : IGpsManager, IShinyStartupTask
+public class GpsManager(
+    IServiceProvider services, 
+    ILogger<IGpsManager> logger
+) : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
     CLBackgroundActivitySession? bgSession;
     CLServiceSession? session;
     CLLocationUpdater? updater;
     
     
-    public GpsRequest? CurrentListener { get; set; }
+    AppleGpsRequest? currentSettings;
+    public AppleGpsRequest? CurrentSettings
+    {
+        get => this.currentSettings;
+        set
+        {
+            var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
+            if (bg != GpsBackgroundMode.None)
+            {
+                this.Set(ref this.currentSettings, value);
+            }
+            else
+            {
+                this.Set(ref this.currentSettings, null);
+                this.currentSettings = value;
+            }
+        }
+    }
+
+
+    public GpsRequest? CurrentListener => this.currentSettings;
 
     // could check against current listener
     AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request
@@ -142,13 +165,13 @@ public class GpsManager(IServiceProvider services, ILogger<IGpsManager> logger) 
             }
         );
         this.updater!.Resume();
-        this.CurrentListener = appleRequest;
+        this.CurrentSettings = appleRequest;
     }
 
     
     public Task StopListener()
     {
-        this.CurrentListener = null;
+        this.CurrentSettings = null;
         
         this.updater?.Invalidate();
         this.updater = null;
