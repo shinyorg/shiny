@@ -7,16 +7,12 @@
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.7.115" />
 
         <PackageVersion Include="Microsoft.Maui.Core" Version="9.0.50" />
-        
         <PackageVersion Include="System.Reactive" Version="6.0.0" />
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0" />
-
         <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
-
         <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.2.0" />
-
         <PackageVersion Include="sqlite-net-pcl" Version="1.9.172" />
     </ItemGroup>
     
