@@ -2,7 +2,7 @@
 
 
 /// <summary>
-/// Registering this in your Shiny.Startup (using RegisterStartupTask) will run these tasks immediately after the
+/// Registering this with your service collection instance run these tasks immediately after the
 /// service container has been built
 /// </summary>
 public interface IShinyStartupTask
