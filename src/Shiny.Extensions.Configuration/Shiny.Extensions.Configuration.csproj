@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-        <TargetFrameworks>$(PlatformOnlyTargetFrameworks)</TargetFrameworks>
-        <Description>Xamarin Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
+        <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+        <Description>Remote URL and Mobile Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
 	</PropertyGroup>
     
     <ItemGroup>

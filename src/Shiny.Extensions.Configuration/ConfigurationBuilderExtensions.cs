@@ -1,12 +1,23 @@
-﻿#if APPLE || ANDROID
-using System;
-using System.IO;
+﻿using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny.Extensions.Configuration;
+using Shiny.Extensions.Configuration.Infrastructure;
 
 namespace Microsoft.Extensions.Configuration;
 
 
 public static partial class ConfigurationBuilderExtensions
 {
+    #if APPLE || ANDROID
+    
+    /// <summary>
+    /// Adds a JSON configuration file from the platform-specific bundle or assets.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="environment"></param>
+    /// <param name="optional"></param>
+    /// <param name="addPlatformSpecific"></param>
+    /// <returns></returns>
     public static IConfigurationBuilder AddJsonPlatformBundle(this IConfigurationBuilder builder, string? environment = null, bool optional = true, bool addPlatformSpecific = true)
     {
 #if APPLE
@@ -18,6 +29,11 @@ public static partial class ConfigurationBuilderExtensions
     }
 
 
+    /// <summary>
+    /// Adds platform-specific preferences to the configuration pipeline.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
     public static IConfigurationBuilder AddPlatformPreferences(this IConfigurationBuilder builder)
     {
 #if APPLE
@@ -28,6 +44,32 @@ public static partial class ConfigurationBuilderExtensions
         return builder;
     }
 
+    
+    /// <summary>
+    /// Adds remote configuration to the configuration pipeline
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configurationUri"></param>
+    /// <param name="configurationFileName"></param>
+    /// <param name="getData"></param>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static IConfigurationBuilder AddRemote(
+        this IConfigurationBuilder builder,
+        string configurationUri,
+        string configurationFileName = "remotesettings.json",
+        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null,
+        IServiceCollection? services = null
+    ) => builder.AddRemote(
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
+            configurationFileName
+        ),
+        configurationUri,
+        getData,
+        false,
+        services
+    );
 
     internal static string GetEnvFileName(string fileName, string environment)
     {
@@ -37,14 +79,54 @@ public static partial class ConfigurationBuilderExtensions
         return newFileName;
     }
 
-    //public static T BindTwoWay<T>(this IConfiguration configuration, T obj) where T : INotifyPropertyChanged
-    //{
-    //    // TODO: sub-binding if deep binding set?
-    //    obj.PropertyChanged += (sender, args) =>
-    //    {
+    #endif
+    
+    
+    /// <summary>
+    /// Adds remote configuration to the configuration pipeline
+    /// </summary>
+    /// <param name="builder">The configuration builder</param>
+    /// <param name="configurationFilePath">The location of where the remote settings should be persisted</param>
+    /// <param name="configurationUri">This allows you to get the configuration URI from the previous remote call & allows you to update the ConfigurationUri if needed</param>
+    /// <param name="getData">If you wish to control how/what data is returned, pass this function</param>
+    /// <param name="waitForRemoteLoad">If you want the network call to be waited until completion before returning</param>
+    /// <param name="services">If presented to the extension method, IRemoteConfigurationProvider is installed to the service container</param>
+    /// <returns>The current configuration builder to allow for chaining</returns>
+    public static IConfigurationBuilder AddRemote(
+        this IConfigurationBuilder builder, 
+        string configurationFilePath, 
+        string configurationUri,
+        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null,
+        bool waitForRemoteLoad = true,
+        IServiceCollection? services = null
+    )
+    {
+        builder.AddJsonFile(configurationFilePath, true, true);
+        var configuration = builder.Build();
+        builder.Add(new RemoteConfigurationSource(new RemoteConfig(
+            configurationUri,
+            configuration,
+            waitForRemoteLoad,
+            configurationFilePath
+        ), getData, services));
+        
+        return builder;
+    }
 
-    //    };
-    //    return obj;
-    //}
+    // public static MauiAppBuilder AddRemoteConfigurationMaui(
+    //     this MauiAppBuilder builder, 
+    //     string configurationUri,
+    //     Func<RemoteConfig, CancellationToken, Task<object>>? getData = null, 
+    //     string configurationFileName = "remotesettings.json"
+    // )
+    // {
+    //     builder.Configuration.AddRemote(
+    //         Path.Combine(FileSystem.AppDataDirectory, configurationFileName),
+    //         configurationUri,
+    //         getData,
+    //         false,
+    //         builder.Services
+    //     );
+    //     return builder;
+    // } 
 }
-#endif
