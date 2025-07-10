@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using Shiny.Extensions.Configuration;
 using Shiny.Extensions.Configuration.Infrastructure;
 
@@ -58,8 +58,7 @@ public static partial class ConfigurationBuilderExtensions
         this IConfigurationBuilder builder,
         string configurationUri,
         string configurationFileName = "remotesettings.json",
-        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null,
-        IServiceCollection? services = null
+        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null
     ) => builder.AddRemote(
         Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
@@ -67,8 +66,7 @@ public static partial class ConfigurationBuilderExtensions
         ),
         configurationUri,
         getData,
-        false,
-        services
+        false
     );
 
     internal static string GetEnvFileName(string fileName, string environment)
@@ -80,6 +78,19 @@ public static partial class ConfigurationBuilderExtensions
     }
 
     #endif
+
+    /// <summary>
+    /// Gets the remote configuration provider from the configuration root.
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static IRemoteConfigurationProvider GetRemoteConfigurationProvider(this IConfigurationRoot configuration)
+        => configuration
+            .Providers
+            .OfType<IRemoteConfigurationProvider>()
+            .FirstOrDefault() 
+            ?? throw new InvalidOperationException("No remote configuration provider found in the configuration root.");
     
     
     /// <summary>
@@ -97,8 +108,7 @@ public static partial class ConfigurationBuilderExtensions
         string configurationFilePath, 
         string configurationUri,
         Func<RemoteConfig, CancellationToken, Task<object>>? getData = null,
-        bool waitForRemoteLoad = true,
-        IServiceCollection? services = null
+        bool waitForRemoteLoad = true
     )
     {
         builder.AddJsonFile(configurationFilePath, true, true);
@@ -108,7 +118,7 @@ public static partial class ConfigurationBuilderExtensions
             configuration,
             waitForRemoteLoad,
             configurationFilePath
-        ), getData, services));
+        ), getData));
         
         return builder;
     }
