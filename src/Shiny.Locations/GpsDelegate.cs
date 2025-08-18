@@ -14,9 +14,11 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
 
     public async Task OnReading(GpsReading reading)
     {
+        var entered = false;
         try
         {
             await this.semaphore.WaitAsync().ConfigureAwait(false);
+            entered = true;
             if (this.DetectStationary)
                 this.DetectIfStationary(reading);
 
@@ -60,7 +62,8 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
         }
         finally
         {
-            this.semaphore.Release();
+            if (entered)
+                this.semaphore.Release();
         }
     }
 
