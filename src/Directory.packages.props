@@ -21,7 +21,7 @@
         <PackageVersion Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.4"/>
         <PackageVersion Include="Xamarin.GooglePlayServices.Location" Version="121.0.1.1"/>
         <PackageVersion Include="Xamarin.AndroidX.Preference" Version="1.2.1.1"/>
-        <PackageVersion Include="Xamarin.Firebase.Messaging" Version="123.1.2.2"/>
+        <PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.0.0.1"/>
         <PackageVersion Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.4"/>
     </ItemGroup>
 </Project>
