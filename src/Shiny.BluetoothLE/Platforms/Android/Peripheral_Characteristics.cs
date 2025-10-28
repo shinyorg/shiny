@@ -108,7 +108,7 @@ public partial class Peripheral
                         }))
                         .Switch()
                         .Select(ch => this.notifySubj
-                            .Where(x => x.Equals(ch))
+                            .Where(x => x.Is(ch.Service!.Uuid!, ch.Uuid!))
                             .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
                         )
                         .Switch()
