@@ -24,17 +24,17 @@
     <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-    <Project Path="src\Shiny.Core\Shiny.Core.csproj" Type="C#" />
+    <Project Path="src\Shiny.Core\Shiny.Core.csproj" />
     <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
     <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
-    <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" Type="C#" />
-    <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" Type="C#" />
+    <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" />
+    <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" />
     <Project Path="src\Shiny.Locations\Shiny.Locations.csproj" />
-    <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" Type="C#" />
-    <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" Type="C#" />
+    <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+    <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" />
     <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
-    <Project Path="src\Shiny.Push\Shiny.Push.csproj" Type="C#" />
-    <Project Path="src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" Type="C#" />
-    <Project Path="src\Shiny.Support.Locations\Shiny.Support.Locations.csproj" Type="C#" />
+    <Project Path="src\Shiny.Push\Shiny.Push.csproj" />
+    <Project Path="src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
+    <Project Path="src\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
     <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
 </Solution>
