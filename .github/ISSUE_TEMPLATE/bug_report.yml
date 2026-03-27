@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for filing an issue.  Please only file issues against the LATEST STABLE or LATEST BETA version of Shiny from Nuget (ALPHAs are not accepted for issues).  If you are a sponsor, you can discuss issues with preview releases in the SponsorConnect Discord channel
+        Thank you for filing an issue.  Please only file issues against the LATEST STABLE or LATEST BETA version of Shiny from Nuget (ALPHAs are not accepted for issues). 
         If you have questions, please post them in GitHub discussions. 
   - type: dropdown
     id: component
@@ -23,8 +23,6 @@ body:
         - Push - Azure Notification Hub (Shiny.Push.AzureNotificationHubs)
         - BluetoothLE Client (Shiny.BluetoothLE)
         - BluetoothLE Hosting (Shiny.BluetoothLE.Hosting)
-        - SQLite Logging (Shiny.Logging.Sqlite)
-        - Beacons (Shiny.Beacons)
         - Other
     validations:
       required: true
@@ -37,6 +35,7 @@ body:
       - label: iOS (13+ supported)
       - label: Mac Catalyst
       - label: Android (12+ supported)
+      - label: Windows
   - type: textarea
     validations:
       required: true
@@ -72,17 +71,3 @@ body:
     attributes:
       label: Code Sample
       description: Please include a github repo with your reproducible sample
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
-      options:
-        - label: I have supplied a reproducible sample that is NOT FROM THE SHINY SAMPLES! 
-          required: true
-        - label: I am a Sponsor OR I am using the LATEST stable/beta version from nuget (v3.0 stable - BETAs are not taking issues unless you are a sponsor)
-          required: true
-        - label: I am Sponsor OR My GitHub account is 30+ days old
-          required: true
-        - label: I understand that if I am checking these boxes and I am not actually following what they are saying, I will be removed from this repository!
-          required: true
