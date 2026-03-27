@@ -108,6 +108,11 @@ When generating BLE client code, follow these conventions:
 
 10. **Connection auto-reconnect**: `ConnectionConfig.AutoConnect = true` (default) enables automatic reconnection. Set to `false` for faster initial connections.
 
+## Namespace Ambiguities
+
+- **`IPeripheral`**: Both `Shiny.BluetoothLE` and `Shiny.BluetoothLE.Hosting` define an `IPeripheral` interface. If both packages are referenced, do NOT add `Shiny.BluetoothLE.Hosting` as a global using. Use file-level `using` or FQN (`Shiny.BluetoothLE.IPeripheral`) to disambiguate.
+- **`DeviceInfo`**: `Shiny.BluetoothLE` has a `DeviceInfo` class that conflicts with `Microsoft.Maui.Devices.DeviceInfo` in MAUI apps. Use FQN when needed.
+
 ## Best Practices
 
 - Use `ScanConfig` with `ServiceUuids` to filter scans, especially on iOS where background scanning requires a service UUID filter.

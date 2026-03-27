@@ -115,6 +115,16 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 ### Queuing Transfers
 
 - Always use `IHttpTransferManager` via dependency injection; never instantiate directly.
+- `HttpTransferRequest` requires 4 positional parameters: `Identifier`, `Uri`, `TransferType`, `LocalFilePath`:
+  ```csharp
+  var request = new HttpTransferRequest(
+      "my-download",
+      "https://example.com/file.zip",
+      TransferType.Download,
+      Path.Combine(FileSystem.AppDataDirectory, "file.zip")
+  );
+  await transferManager.Queue(request);
+  ```
 - Use a unique `Identifier` for each `HttpTransferRequest` so individual transfers can be tracked and cancelled.
 - For uploads, ensure the `LocalFilePath` points to an existing file before queuing.
 - Set `UseMeteredConnection = false` to restrict large transfers to Wi-Fi only.

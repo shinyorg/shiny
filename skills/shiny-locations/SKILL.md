@@ -83,9 +83,10 @@ services.AddGpsDirectGeofencing<MyGeofenceDelegate>();
 When generating code for Shiny.Locations:
 
 1. **Always request permissions before starting listeners.** Call `RequestAccess` and check the returned `AccessState` before calling `StartListener` or `StartMonitoring`.
-2. **Use `GpsRequest` static factories** instead of constructing manually:
-   - `GpsRequest.Foreground` for foreground-only use
-   - `GpsRequest.Realtime(true)` for background realtime with precise accuracy
+2. **Use `GpsRequest` factories or constructor** based on the background mode needed:
+   - `GpsRequest.Foreground` for foreground-only use (equivalent to `new GpsRequest(GpsBackgroundMode.None)`)
+   - `new GpsRequest(GpsBackgroundMode.Standard)` for standard background (iOS: significant location changes; Android: 3-4 updates/hour)
+   - `GpsRequest.Realtime(true)` for background realtime with precise accuracy (iOS/Android: updates every 1 second)
 3. **Inject `IGpsManager` or `IGeofenceManager`** via constructor injection. Never instantiate managers directly.
 4. **Implement `IGpsDelegate`** for background GPS processing, or subclass the abstract `GpsDelegate` base class for built-in filtering by distance/time and stationary detection.
 5. **Implement `IGeofenceDelegate`** for geofence enter/exit events.

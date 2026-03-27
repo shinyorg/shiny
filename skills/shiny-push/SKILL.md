@@ -143,6 +143,10 @@ builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
 
 10. **Do NOT reference platform-specific types** (e.g., `AndroidPushNotification`, `ApplePushNotification`, `IApplePushManager`, `IApplePushDelegate`, `FirebaseConfig`) in shared/cross-platform code. Guard them with `#if ANDROID` / `#if APPLE` preprocessor directives or use runtime platform checks.
 
+## Namespace Ambiguities
+
+- **`Notification`**: Both `Shiny.Push` and `Shiny.Notifications` define a `Notification` type. If both packages are referenced in the same project, do NOT add both namespaces as global usings. Use `Shiny.Push.PushNotification` or FQN to disambiguate.
+
 ## Best Practices
 
 - Always handle `OnNewToken` in your delegate to sync the updated token with your backend server.

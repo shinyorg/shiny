@@ -112,6 +112,7 @@ When generating job-related code, follow these conventions:
 - Place job classes in a `Jobs/` folder or namespace within the project.
 - Always handle exceptions inside `Run` gracefully; unhandled exceptions are logged but the job is marked as failed.
 - Use `JobInfo.Parameters` dictionary for passing simple configuration data to jobs.
+- `JobInfo` does NOT have a `LastRunUtc` property. Last run tracking is on the `Job` abstract base class (`LastRunTime` property), not on `JobInfo`.
 
 ## Best Practices
 

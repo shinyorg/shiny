@@ -131,6 +131,10 @@ When generating code that uses Shiny Notifications, follow these conventions:
     - `CancelScope.Pending` -- clears only scheduled/triggered notifications.
     - `CancelScope.All` -- clears everything (default).
 
+## Namespace Ambiguities
+
+- **`Notification`**: Both `Shiny.Notifications` and `Shiny.Push` define a `Notification` type. If both packages are referenced in the same project, do NOT add both namespaces as global usings. Use `Shiny.Notifications.Notification` FQN or a file-level `using Shiny.Notifications;` directive to disambiguate.
+
 ## Best Practices
 
 - Always check the `AccessState` result before attempting to send notifications.

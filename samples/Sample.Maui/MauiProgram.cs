@@ -20,13 +20,19 @@ public static class MauiProgram
         var s = builder.Services;
 
         s.AddBluetoothLE<SampleBleDelegate>();
+        s.AddConnectivity();
+        s.AddBattery();
+
+#if !WINDOWS
         s.AddBluetoothLeHosting();
         s.AddGps<SampleGpsDelegate>();
         s.AddGeofencing<SampleGeofenceDelegate>();
         s.AddNotifications<SampleNotificationDelegate>();
         s.AddPush<SamplePushDelegate>();
         s.AddHttpTransfers<SampleHttpTransferDelegate>();
+        s.AddJobs();
         s.AddJob(typeof(SampleJob), "SampleJob");
+#endif
 
         return builder.Build();
     }

@@ -287,6 +287,10 @@ cb.SetWrite(request =>
 - Managed characteristics: `BleHosting/{Name}Characteristic.cs`
 - Or by feature: `Features/{Feature}/{Name}Characteristic.cs`
 
+## Namespace Ambiguities
+
+- **`IPeripheral`**: Both `Shiny.BluetoothLE` (client) and `Shiny.BluetoothLE.Hosting` define an `IPeripheral` interface with different members. If both packages are referenced in the same project, do NOT add both namespaces as global usings. Use file-level `using` directives or FQN (`Shiny.BluetoothLE.Hosting.IPeripheral`) to disambiguate.
+
 ## Best Practices
 
 1. **Always request access first** -- call `RequestAccess()` and check the result before any hosting operations

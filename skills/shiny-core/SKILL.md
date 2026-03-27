@@ -179,6 +179,26 @@ When generating code that uses Shiny.Core, follow these conventions:
 - Use `System.Reactive` (`IObservable<T>`) for event streams, not C# events.
 - Extension methods in `Shiny` namespace are available when the appropriate package is referenced.
 
+## Namespace Ambiguities with MAUI
+
+When using Shiny in a MAUI app, several Shiny types collide with MAUI implicit usings. **Do NOT add all Shiny namespaces as global usings.** Use explicit namespaces or FQNs for these:
+
+| Type | Shiny Namespace | MAUI Namespace | Resolution |
+|------|----------------|----------------|------------|
+| `IConnectivity` | `Shiny.Net` | `Microsoft.Maui.Networking` | Use `Shiny.Net.IConnectivity` FQN |
+| `IBattery` | `Shiny.Power` | `Microsoft.Maui.Devices` | Use `Shiny.Power.IBattery` FQN |
+| `DeviceInfo` | `Shiny.BluetoothLE` | `Microsoft.Maui.Devices` | Use FQN for whichever you need |
+
+**Safe global usings** (won't conflict with MAUI):
+```csharp
+global using Shiny;
+global using Shiny.Stores;
+global using Shiny.Jobs;
+global using Shiny.Locations;
+global using Shiny.BluetoothLE;
+// Do NOT globally use: Shiny.Net, Shiny.Power, Shiny.Notifications, Shiny.Push, Shiny.BluetoothLE.Hosting
+```
+
 ## Best Practices
 
 - **Initialize Shiny early** -- `UseShiny()` must be called in the builder chain before building the MAUI app. For native apps, the host must be created and `Run()` called in the application startup.
