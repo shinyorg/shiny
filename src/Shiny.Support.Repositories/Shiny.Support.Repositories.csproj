@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-android</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-android;$(WindowsTarget)</TargetFrameworks>
         <Description>Shiny Internal Repository Library</Description>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>

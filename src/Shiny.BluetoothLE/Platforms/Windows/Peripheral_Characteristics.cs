@@ -39,7 +39,7 @@ public partial class Peripheral
             .ConfigureAwait(false);
 
         chResult.Status.Assert("GetCharacteristics", serviceUuid);
-        return (IReadOnlyList<BleCharacteristicInfo>)chResult.Characteristics.Select(ToCharInfo).ToList();
+        return (IReadOnlyList<BleCharacteristicInfo>)chResult.Characteristics.Select(x => ToCharInfo(x)).ToList();
     });
 
 

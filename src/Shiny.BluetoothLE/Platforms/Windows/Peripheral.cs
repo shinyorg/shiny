@@ -30,6 +30,7 @@ public partial class Peripheral : IPeripheral
 
 
     public BluetoothLEDevice? Native { get; private set; }
+    public DeviceInformation DeviceInfo => this.Native!.DeviceInformation;
     public string Uuid { get; }
     public string? Name => this.Native?.Name;
 
