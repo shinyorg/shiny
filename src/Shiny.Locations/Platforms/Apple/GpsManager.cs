@@ -111,10 +111,20 @@ public class GpsManager(
     }
 
 
-    // TODO: I'll have to store this
-    public IObservable<GpsReading?> GetLastReading() => Observable.Empty<GpsReading?>();
+    GpsReading? lastReading;
+    public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(_ =>
+    {
+        if (this.lastReading != null)
+            return Task.FromResult<GpsReading?>(this.lastReading);
 
-    
+        using var locationManager = new CLLocationManager();
+        if (locationManager.Location != null)
+            return Task.FromResult<GpsReading?>(locationManager.Location.FromNative());
+
+        return Task.FromResult<GpsReading?>(null);
+    });
+
+
     readonly ShinySubject<GpsReading> readSubject = new();
     public IObservable<GpsReading> WhenReading() => this.readSubject;
 
@@ -164,8 +174,9 @@ public class GpsManager(
                     update.Location.Floor?.Level.ToInt32() ?? 0,
                     update.IsStationary
                 );
+                this.lastReading = reading;
                 this.readSubject.OnNext(reading);
-                
+
                 await services
                     .RunDelegates<IGpsDelegate>(
                         x => x.OnReading(reading),
