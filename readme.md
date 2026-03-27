@@ -1,13 +1,8 @@
-﻿# Shiny v4 for .NET (beta)
+﻿# Shiny Client for .NET
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
 
 Shiny is a cross platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
-
-## Supports
-* .NET 10 for Android
-* .NET 10 for iOS
-* .NET 10 for MacCatalyst
 
 ## Features
 * Handles all of the cruft like Permissions, main thread traversal, persistent storage and app restarts
