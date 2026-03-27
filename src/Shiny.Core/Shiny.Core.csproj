@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>$(DefaultTargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework)-android;$(BaseTargetFramework)-ios;$(BaseTargetFramework)-maccatalyst;$(WindowsTarget)</TargetFrameworks>
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
@@ -12,7 +12,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-android</TargetFrameworks>
         <Description>Shiny addon for all your notification needs</Description>
     </PropertyGroup>
 
@@ -11,7 +11,7 @@
         <ProjectReference Include="..\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
+    <ItemGroup Condition="$(TargetFramwork.Contains('android'))">
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
     </ItemGroup>

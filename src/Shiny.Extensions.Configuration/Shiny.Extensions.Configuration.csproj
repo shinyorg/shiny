@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-        <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-android</TargetFrameworks>
         <Description>Remote URL and Mobile Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
 	</PropertyGroup>
     
@@ -11,7 +11,7 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
 		<PackageReference Include="Xamarin.AndroidX.Preference"/>
     </ItemGroup>
 

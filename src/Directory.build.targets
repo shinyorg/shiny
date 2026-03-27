@@ -12,18 +12,18 @@
         <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
     </ItemGroup>
     
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
         <Compile Include="Platforms\Android\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst'))">
         <Compile Include="Platforms\Apple\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
+    <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
         <Compile Include="Platforms\Windows\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup> 

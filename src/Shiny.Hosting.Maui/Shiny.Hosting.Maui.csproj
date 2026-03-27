@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(MauiPlatformTargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework)-ios;$(BaseTargetFramework)-android;$(WindowsTarget)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,5 +1,7 @@
 ﻿<Project>
     <PropertyGroup>
+        <BaseTargetFramework>net10.0</BaseTargetFramework>
+        
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
         <LangVersion>latest</LangVersion>
@@ -12,26 +14,15 @@
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://shinylib.net/release-notes/client/v30/</PackageReleaseNotes>
-        <PackageTags>xamarin ios android ble bluetooth bluetoothle push notifications sensors geofences gps location background jobs settings speech sensors</PackageTags>
+        <PackageTags>ios android ble bluetooth bluetoothle push notifications sensors geofences gps location background jobs settings speech sensors</PackageTags>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-    </PropertyGroup>
 
-    <PropertyGroup>
-        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">net9.0-windows10.0.19041.0</WindowsTarget>
-
-        <StandardTargetFrameworks>net9.0</StandardTargetFrameworks>
-        <IosTargetFrameworks>net9.0-ios18.0</IosTargetFrameworks>
-        <AndroidTargetFrameworks>net9.0-android35.0</AndroidTargetFrameworks>
-        <MauiPlatformTargetFrameworks>net9.0-android35.0;net9.0-ios18.0;net9.0-maccatalyst18.0</MauiPlatformTargetFrameworks>
-        <AppleTargetFrameworks>$(IosTargetFrameworks);net9.0-maccatalyst18.0</AppleTargetFrameworks>
-        <PlatformOnlyTargetFrameworks>$(AppleTargetFrameworks);$(AndroidTargetFrameworks)</PlatformOnlyTargetFrameworks>
-        <DefaultMobileTargetFrameworks>$(StandardTargetFrameworks);$(IosTargetFrameworks);$(AndroidTargetFrameworks)</DefaultMobileTargetFrameworks>
-        <DefaultTargetFrameworks>$(StandardTargetFrameworks);$(PlatformOnlyTargetFrameworks)</DefaultTargetFrameworks>
+        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">$(BaseTargetFramework)-windows10.0.19041.0</WindowsTarget>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -46,47 +37,23 @@
     <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
         <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>35.0</TargetPlatformMinVersion>
-        <IsAndroidBuild>true</IsAndroidBuild>
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
-        <DefineConstants>$(DefineConstants);ANDROID;PLATFORM</DefineConstants>
+        <DefineConstants>$(DefineConstants);PLATFORM</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
-        <IsIosBuild>true</IsIosBuild>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
         <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>15.0</TargetPlatformMinVersion>
-        <IsIosBuild>true</IsIosBuild>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
-        <IsWindowsBuild>true</IsWindowsBuild>
         <DefineConstants>$(DefineConstants);PLATFORM;WINDOWS</DefineConstants>
     </PropertyGroup>
-
-    <!--
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-        <IsWebAssembly>true</IsWebAssembly>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
-        <WasmMainJSPath>main.js</WasmMainJSPath>
-		<OutputType>Exe</OutputType>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<PublishTrimmed>true</PublishTrimmed>
-		<TrimMode>full</TrimMode>
-		<RunAOTCompilation>true</RunAOTCompilation>    
-	</PropertyGroup>
-    -->
-    <Target Name="_DisableRemoteBuildForLibraries" BeforeTargets="BeforeBuild;_SayHello">
-		<PropertyGroup>
-			<IsRemoteBuild>false</IsRemoteBuild>
-			<ServerAddress></ServerAddress>
-		</PropertyGroup>
-	</Target>
 </Project>
