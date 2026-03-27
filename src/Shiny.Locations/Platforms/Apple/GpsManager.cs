@@ -46,7 +46,16 @@ public class GpsManager(
 
     // could check against current listener
     AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request
-    public AccessState GetCurrentStatus(GpsRequest request) => this.currentAccess;
+
+    public AccessState GetCurrentStatus(GpsRequest request)
+    {
+        using var locationManager = new CLLocationManager();
+        this.currentAccess = locationManager.GetCurrentStatus(
+            request.BackgroundMode != GpsBackgroundMode.None,
+            request.RequestPreciseAccuracy
+        );
+        return this.currentAccess;
+    }
 
 
     public async Task<AccessState> RequestAccess(GpsRequest request)
@@ -114,7 +123,7 @@ public class GpsManager(
         if (this.updater != null)
             throw new InvalidOperationException("Already GPS listener running");
 
-        (await this.RequestAccess(request)).Assert();
+        (await this.RequestAccess(request)).Assert(allowRestricted: true);
         if (request.BackgroundMode != GpsBackgroundMode.None)
             this.bgSession = CLBackgroundActivitySession.Create();
 

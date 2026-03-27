@@ -97,7 +97,10 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
 
     public AccessState GetCurrentStatus(GpsRequest request)
-        => this.locationManager.GetCurrentStatus(request.BackgroundMode != GpsBackgroundMode.None);
+        => this.locationManager.GetCurrentStatus(
+            request.BackgroundMode != GpsBackgroundMode.None,
+            request.RequestPreciseAccuracy
+        );
 
 
     AppleGpsRequest? currentSettings;

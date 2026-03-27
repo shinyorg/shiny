@@ -34,6 +34,22 @@ public static class LocationExtensions
     }
 
 
+    public static AccessState GetCurrentStatus(this CLLocationManager locationManager, bool background, bool precise)
+    {
+        var status = locationManager.GetCurrentStatus(background);
+        if (
+            status == AccessState.Available &&
+            precise &&
+            locationManager.AccuracyAuthorization == CLAccuracyAuthorization.ReducedAccuracy
+        )
+        {
+            return AccessState.Restricted;
+        }
+
+        return status;
+    }
+
+
     public static AccessState GetCurrentStatus<T>(this CLLocationManager locationManager, bool background) where T : CLRegion
     {
 #if __IOS__
