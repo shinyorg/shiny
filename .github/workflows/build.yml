@@ -52,8 +52,8 @@ jobs:
 #        version: '13'
 #        architecture: x64
 
-#    - name: Add .NET Workloads
-#      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
+    - name: Add .NET Workloads
+      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
 
     - name: Build
       run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true
