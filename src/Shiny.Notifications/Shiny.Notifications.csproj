@@ -7,12 +7,11 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
-        <ProjectReference Include="..\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramwork.Contains('android'))">
-        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
     </ItemGroup>
 
