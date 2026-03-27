@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 namespace Shiny.BluetoothLE.Managed;
 
 
+/// <summary>
+/// Represents the type of change in the managed scan peripheral list
+/// </summary>
 public enum ManagedScanListAction
 {
     Add,
@@ -16,16 +19,55 @@ public enum ManagedScanListAction
 }
 
 
+/// <summary>
+/// Provides a managed BLE scan that maintains an observable collection of discovered peripherals
+/// </summary>
 public interface IManagedScan : IDisposable
 {
+    /// <summary>
+    /// Gets the time after which peripherals are removed if not re-detected
+    /// </summary>
     TimeSpan? ClearTime { get; }
+
+    /// <summary>
+    /// Gets the buffer time span for batching scan results
+    /// </summary>
     TimeSpan BufferTimeSpan { get; }
+
+    /// <summary>
+    /// Gets whether the scan is currently running
+    /// </summary>
     bool IsScanning { get; }
+
+    /// <summary>
+    /// Gets the observable collection of discovered peripherals
+    /// </summary>
     INotifyReadOnlyCollection<ManagedScanResult> Peripherals { get; }
+
+    /// <summary>
+    /// Gets the current scan configuration
+    /// </summary>
     ScanConfig? ScanConfig { get; }
+
+    /// <summary>
+    /// Gets the scheduler used for collection updates
+    /// </summary>
     IScheduler? Scheduler { get; }
 
+    /// <summary>
+    /// Gets all currently connected peripherals from the scan results
+    /// </summary>
+    /// <returns>The connected peripherals</returns>
     IEnumerable<IPeripheral> GetConnectedPeripherals();
+
+    /// <summary>
+    /// Starts the managed BLE scan
+    /// </summary>
+    /// <param name="scanConfig">Optional scan configuration</param>
+    /// <param name="predicate">Optional filter predicate for scan results</param>
+    /// <param name="scheduler">Optional scheduler for collection updates</param>
+    /// <param name="bufferTime">Optional buffer time for batching results</param>
+    /// <param name="clearTime">Optional time after which stale peripherals are removed</param>
     Task Start(
         ScanConfig? scanConfig = null,
         Func<ScanResult, bool>? predicate = null,
@@ -33,6 +75,15 @@ public interface IManagedScan : IDisposable
         TimeSpan? bufferTime = null,
         TimeSpan? clearTime = null
     );
+
+    /// <summary>
+    /// Stops the managed BLE scan
+    /// </summary>
     void Stop();
+
+    /// <summary>
+    /// Returns an observable that emits scan list change events
+    /// </summary>
+    /// <returns>An observable of scan list actions and associated scan results</returns>
     IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan();
 }
