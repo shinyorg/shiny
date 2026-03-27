@@ -1,62 +1,61 @@
 ﻿<Solution>
     <Folder Name="/.github/">
-        <File Path=".github\CODE_OF_CONDUCT.md"/>
-        <File Path=".github\CONTRIBUTING.md"/>
-        <File Path=".github\dependabot.yml"/>
-        <File Path=".github\FUNDING.yml"/>
-        <File Path=".github\PULL_REQUEST_TEMPLATE.md"/>
+        <File Path=".github\CODE_OF_CONDUCT.md" />
+        <File Path=".github\CONTRIBUTING.md" />
+        <File Path=".github\dependabot.yml" />
+        <File Path=".github\FUNDING.yml" />
+        <File Path=".github\PULL_REQUEST_TEMPLATE.md" />
     </Folder>
     <Folder Name="/.github/issue templates/">
-        <File Path=".github\ISSUE_TEMPLATE\bug_report.yml"/>
-        <File Path=".github\ISSUE_TEMPLATE\config.yml"/>
-        <File Path=".github\ISSUE_TEMPLATE\feature_request.yml"/>
+        <File Path=".github\ISSUE_TEMPLATE\bug_report.yml" />
+        <File Path=".github\ISSUE_TEMPLATE\config.yml" />
+        <File Path=".github\ISSUE_TEMPLATE\feature_request.yml" />
     </Folder>
     <Folder Name="/.github/workflows/">
-        <File Path=".github\workflows\build.yml"/>
+        <File Path=".github\workflows\build.yml" />
     </Folder>
     <Folder Name="/build/">
-        <File Path="Build.slnf"/>
-        <File Path=".github\workflows\build.yml"/>
-        <File Path="version.json"/>
+        <File Path="Build.slnf" />
+        <File Path=".github\workflows\build.yml" />
+        <File Path="version.json" />
     </Folder>
     <Folder Name="/libs/">
-        <Project Path="src\Shiny.Beacons\Shiny.Beacons.csproj"/>
-        <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj"/>
-        <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj"/>
-        <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj"/>
-        <Project Path="src\Shiny.Core\Shiny.Core.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj"/>
-        <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj"/>
-        <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Locations\Shiny.Locations.csproj"/>
-        <Project Path="src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj"/>
-        <Project Path="src\Shiny.Push\Shiny.Push.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Support.DeviceMonitoring.Razor\Shiny.Support.DeviceMonitoring.Razor.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Support.Locations\Shiny.Support.Locations.csproj" Type="Classic C#"/>
-        <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj"/>
-        <File Path="src\Directory.build.props"/>
-        <File Path="src\Directory.build.targets"/>
-        <File Path="src\nuget.png"/>
-        <File Path="src\nuget.txt"/>
-        <File Path="version.json"/>
-        <File Path="src\Directory.packages.props"/>
+        <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
+        <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+        <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <Project Path="src\Shiny.Core\Shiny.Core.csproj" Type="C#" />
+        <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
+        <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
+        <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" Type="C#" />
+        <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" Type="C#" />
+        <Project Path="src\Shiny.Locations\Shiny.Locations.csproj" />
+        <Project Path="src\Shiny.Logging.Sqlite\Shiny.Logging.Sqlite.csproj" Type="C#" />
+        <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" Type="C#" />
+        <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" Type="C#" />
+        <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+        <Project Path="src\Shiny.Push\Shiny.Push.csproj" Type="C#" />
+        <Project Path="src\Shiny.Support.DeviceMonitoring.Razor\Shiny.Support.DeviceMonitoring.Razor.csproj" Type="C#" />
+        <Project Path="src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" Type="C#" />
+        <Project Path="src\Shiny.Support.Locations\Shiny.Support.Locations.csproj" Type="C#" />
+        <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
+        <File Path="src\Directory.build.props" />
+        <File Path="src\Directory.build.targets" />
+        <File Path="src\nuget.png" />
+        <File Path="src\nuget.txt" />
+        <File Path="version.json" />
+        <File Path="src\Directory.packages.props" />
     </Folder>
     <Folder Name="/samples/">
-        <Project Path="samples\Sample.Api\Sample.Api.csproj" Type="Classic C#"/>
-        <Project Path="samples\Sample.Maui\Sample.Maui.csproj" Type="Classic C#"/>
-        <Project Path="tests\Shiny.Tests\Shiny.Tests.csproj" Type="Classic C#"/>
-        <File Path="samples\readme.md"/>
-        <File Path="samples\Directory.build.props"/>
+        <Project Path="samples\Sample.Api\Sample.Api.csproj" Type="C#" />
+        <Project Path="samples\Sample.Maui\Sample.Maui.csproj" Type="C#" />
+        <Project Path="tests\Shiny.Tests\Shiny.Tests.csproj" Type="C#" />
+        <File Path="samples\readme.md" />
+        <File Path="samples\Directory.build.props" />
     </Folder>
     <Folder Name="/Solution Items/">
-        <File Path=".editorconfig"/>
-        <File Path="LICENSE.md"/>
-        <File Path="readme.md"/>
-        <File Path="nuget.config"/>
+        <File Path=".editorconfig" />
+        <File Path="LICENSE.md" />
+        <File Path="readme.md" />
+        <File Path="nuget.config" />
     </Folder>
 </Solution>

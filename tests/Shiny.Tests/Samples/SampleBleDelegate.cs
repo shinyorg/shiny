@@ -1,5 +1,4 @@
-﻿using Shiny;
-using Shiny.BluetoothLE;
+﻿using Shiny.BluetoothLE;
 
 namespace Sample;
 

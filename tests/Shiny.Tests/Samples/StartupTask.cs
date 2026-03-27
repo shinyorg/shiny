@@ -1,6 +1,4 @@
-﻿using Shiny;
-
-namespace Sample;
+﻿namespace Sample;
 
 
 public class StartupTask : NotifyPropertyChanged, IShinyStartupTask
