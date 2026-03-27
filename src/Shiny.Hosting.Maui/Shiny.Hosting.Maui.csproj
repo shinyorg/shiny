@@ -8,4 +8,23 @@
         <PackageReference Include="Microsoft.Maui.Core" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel.Ktx" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Android" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx.Android" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" />
+        <PackageReference Include="Xamarin.AndroidX.Fragment" />
+        <PackageReference Include="Xamarin.AndroidX.Fragment.Ktx" />
+        <PackageReference Include="Xamarin.AndroidX.Activity" />
+        <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" />
+        <PackageReference Include="Xamarin.AndroidX.SavedState" />
+        <PackageReference Include="Xamarin.AndroidX.SavedState.SavedState.Ktx" />
+    </ItemGroup>
 </Project>
