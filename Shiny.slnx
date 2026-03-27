@@ -3,7 +3,6 @@
         <File Path=".editorconfig" />
         <File Path=".github\CODE_OF_CONDUCT.md" />
         <File Path=".github\CONTRIBUTING.md" />
-        <File Path=".github\dependabot.yml" />
         <File Path=".github\FUNDING.yml" />
         <File Path=".github\ISSUE_TEMPLATE\bug_report.yml" />
         <File Path=".github\ISSUE_TEMPLATE\config.yml" />
@@ -37,4 +36,7 @@
     <Project Path="src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
     <Project Path="src\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
     <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
+    <Folder Name="/Samples/">
+        <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
+    </Folder>
 </Solution>

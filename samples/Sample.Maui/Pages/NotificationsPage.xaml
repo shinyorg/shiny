@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Maui.Pages"
+             x:Class="Sample.Maui.Pages.NotificationsPage"
+             x:DataType="vm:NotificationsViewModel"
+             Title="Notifications">
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="12">
+            <Button Text="Request Access" Command="{Binding RequestAccessCommand}" />
+            <Label Text="{Binding AccessStatus}" />
+            <Button Text="Send Now" Command="{Binding SendNowCommand}" />
+            <Button Text="Send in 10 Seconds" Command="{Binding SendScheduledCommand}" />
+            <Label Text="{Binding PendingCount, StringFormat='Pending: {0}'}" />
+            <Button Text="Cancel All" Command="{Binding CancelAllCommand}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

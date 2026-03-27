@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(DefaultTargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-android;$(WindowsTarget)</TargetFrameworks>
         <Description>Shiny Reactive BluetoothLE Plugin for client/central operations</Description>
     </PropertyGroup>
 

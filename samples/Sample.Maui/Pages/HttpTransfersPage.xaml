@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Maui.Pages"
+             x:Class="Sample.Maui.Pages.HttpTransfersPage"
+             x:DataType="vm:HttpTransfersViewModel"
+             Title="HTTP Transfers">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="8">
+        <HorizontalStackLayout Spacing="8">
+            <Button Text="Queue Download" Command="{Binding QueueDownloadCommand}" />
+            <Button Text="Cancel All" Command="{Binding CancelAllCommand}" />
+        </HorizontalStackLayout>
+        <Label Grid.Row="1" Text="{Binding Status}" />
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Transfers}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:TransferViewModel">
+                    <Grid Padding="8" ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Identifier}" FontAttributes="Bold" />
+                            <Label Text="{Binding Uri}" FontSize="12" TextColor="Gray" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="1" Text="{Binding Status}" VerticalOptions="Center" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Maui.Pages.Locations"
+             x:Class="Sample.Maui.Pages.Locations.GpsPage"
+             x:DataType="vm:GpsViewModel"
+             Title="GPS">
+    <VerticalStackLayout Padding="16" Spacing="12">
+        <Button Text="{Binding ListenText}" Command="{Binding ToggleListenerCommand}" />
+        <Label Text="{Binding Latitude, StringFormat='Latitude: {0:F6}'}" FontSize="16" />
+        <Label Text="{Binding Longitude, StringFormat='Longitude: {0:F6}'}" FontSize="16" />
+        <Label Text="{Binding Altitude, StringFormat='Altitude: {0:F1}m'}" FontSize="16" />
+        <Label Text="{Binding Speed, StringFormat='Speed: {0:F1} m/s'}" FontSize="16" />
+        <Label Text="{Binding Heading, StringFormat='Heading: {0:F1}°'}" FontSize="16" />
+    </VerticalStackLayout>
+</ContentPage>

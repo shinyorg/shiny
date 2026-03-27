@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Maui.Pages.Locations"
+             x:Class="Sample.Maui.Pages.Locations.GeofencingPage"
+             x:DataType="vm:GeofencingViewModel"
+             Title="Geofencing">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="8">
+        <HorizontalStackLayout Spacing="8">
+            <Button Text="Add Current Location" Command="{Binding AddGeofenceCommand}" />
+            <Button Text="Remove All" Command="{Binding RemoveAllCommand}" />
+        </HorizontalStackLayout>
+        <Label Grid.Row="1" Text="{Binding Status}" FontSize="14" />
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Regions}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:GeofenceRegionViewModel">
+                    <Grid Padding="8" ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Identifier}" FontAttributes="Bold" />
+                            <Label Text="{Binding Position}" FontSize="12" TextColor="Gray" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="1" Text="{Binding CurrentState}" VerticalOptions="Center" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

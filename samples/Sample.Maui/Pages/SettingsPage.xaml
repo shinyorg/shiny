@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Maui.Pages"
+             x:Class="Sample.Maui.Pages.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Settings">
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="12">
+            <Label Text="Connectivity" FontSize="18" FontAttributes="Bold" />
+            <Label Text="{Binding NetworkAccess, StringFormat='Network: {0}'}" />
+            <Label Text="{Binding ConnectionTypes, StringFormat='Type: {0}'}" />
+
+            <Label Text="Battery" FontSize="18" FontAttributes="Bold" />
+            <Label Text="{Binding BatteryLevel, StringFormat='Level: {0:P0}'}" />
+            <Label Text="{Binding BatteryState, StringFormat='State: {0}'}" />
+
+            <Label Text="Platform" FontSize="18" FontAttributes="Bold" />
+            <Label Text="{Binding Platform}" />
+
+            <Label Text="Key/Value Store" FontSize="18" FontAttributes="Bold" />
+            <Entry Placeholder="Key" Text="{Binding StoreKey}" />
+            <Entry Placeholder="Value" Text="{Binding StoreValue}" />
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="Set" Command="{Binding SetValueCommand}" />
+                <Button Text="Get" Command="{Binding GetValueCommand}" />
+                <Button Text="Remove" Command="{Binding RemoveValueCommand}" />
+            </HorizontalStackLayout>
+            <Label Text="{Binding StoreResult}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
