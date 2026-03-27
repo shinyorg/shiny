@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 
@@ -79,7 +80,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     }
 
 
-    public async Task Build(GattServiceProviderResult native)
+    public async Task Build(GattServiceProvider serviceProvider)
     {
         var parameters = new GattLocalCharacteristicParameters
         {
@@ -89,7 +90,11 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         };
 
         var uuid = UuidHelper.ToUuid(this.Uuid);
-        var result = await native.ServiceProvider.Service.CreateCharacteristicAsync(uuid, parameters);
+        var result = await serviceProvider.Service.CreateCharacteristicAsync(uuid, parameters);
+
+        if (result.Error != BluetoothError.Success)
+            throw new InvalidOperationException($"Failed to create GATT characteristic '{this.Uuid}': {result.Error}");
+
         this.native = result.Characteristic;
 
         if (this.onRead != null)
@@ -106,7 +111,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         if (this.native == null)
             throw new InvalidOperationException("Characteristic has not been built");
 
-        var writer = new DataWriter();
+        using var writer = new DataWriter();
         writer.WriteBytes(data);
         var buffer = writer.DetachBuffer();
 
@@ -132,9 +137,12 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     {
         if (this.native != null)
         {
-            this.native.ReadRequested -= this.OnReadRequested;
-            this.native.WriteRequested -= this.OnWriteRequested;
-            this.native.SubscribedClientsChanged -= this.OnSubscribedClientsChanged;
+            if (this.onRead != null)
+                this.native.ReadRequested -= this.OnReadRequested;
+            if (this.onWrite != null)
+                this.native.WriteRequested -= this.OnWriteRequested;
+            if (this.onSubscribe != null)
+                this.native.SubscribedClientsChanged -= this.OnSubscribedClientsChanged;
         }
     }
 
@@ -142,21 +150,30 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     async void OnReadRequested(GattLocalCharacteristic sender, GattReadRequestedEventArgs args)
     {
         using var deferral = args.GetDeferral();
-        var request = await args.GetRequestAsync();
-        var peripheral = new Peripheral(args.Session);
-        var readRequest = new ReadRequest(this, peripheral, (int)request.Offset);
-
-        var result = await this.onRead!(readRequest);
-
-        if (result.Status == GattState.Success && result.Data != null)
+        try
         {
-            var writer = new DataWriter();
-            writer.WriteBytes(result.Data);
-            request.RespondWithValue(writer.DetachBuffer());
+            var request = await args.GetRequestAsync();
+            if (request == null)
+                return;
+
+            var peripheral = new Peripheral(args.Session);
+            var readRequest = new ReadRequest(this, peripheral, (int)request.Offset);
+            var result = await this.onRead!.Invoke(readRequest);
+
+            if (result.Status == GattState.Success && result.Data != null)
+            {
+                using var writer = new DataWriter();
+                writer.WriteBytes(result.Data);
+                request.RespondWithValue(writer.DetachBuffer());
+            }
+            else
+            {
+                request.RespondWithProtocolError((byte)result.Status);
+            }
         }
-        else
+        catch
         {
-            request.RespondWithProtocolError((byte)result.Status);
+            // async void - swallow to prevent crash
         }
     }
 
@@ -164,64 +181,85 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     async void OnWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
     {
         using var deferral = args.GetDeferral();
-        var request = await args.GetRequestAsync();
-        var peripheral = new Peripheral(args.Session);
+        try
+        {
+            var request = await args.GetRequestAsync();
+            if (request == null)
+                return;
 
-        var reader = DataReader.FromBuffer(request.Value);
-        var data = new byte[request.Value.Length];
-        reader.ReadBytes(data);
+            var peripheral = new Peripheral(args.Session);
 
-        var isReplyNeeded = request.Option == GattWriteOption.WriteWithResponse;
-        var responded = false;
+            using var reader = DataReader.FromBuffer(request.Value);
+            var data = new byte[request.Value.Length];
+            reader.ReadBytes(data);
 
-        var writeRequest = new WriteRequest(
-            this,
-            peripheral,
-            data,
-            (int)request.Offset,
-            isReplyNeeded,
-            state =>
-            {
-                responded = true;
-                if (isReplyNeeded)
+            var isReplyNeeded = request.Option == GattWriteOption.WriteWithResponse;
+            var responded = false;
+
+            var writeRequest = new WriteRequest(
+                this,
+                peripheral,
+                data,
+                (int)request.Offset,
+                isReplyNeeded,
+                state =>
                 {
-                    if (state == GattState.Success)
-                        request.Respond();
-                    else
-                        request.RespondWithProtocolError((byte)state);
+                    responded = true;
+                    if (isReplyNeeded)
+                    {
+                        if (state == GattState.Success)
+                            request.Respond();
+                        else
+                            request.RespondWithProtocolError((byte)state);
+                    }
                 }
-            }
-        );
+            );
 
-        await this.onWrite!(writeRequest);
+            await this.onWrite!.Invoke(writeRequest);
 
-        if (!responded && isReplyNeeded)
-            request.Respond();
+            if (!responded && isReplyNeeded)
+                request.Respond();
+        }
+        catch
+        {
+            // async void - swallow to prevent crash
+        }
     }
 
 
     async void OnSubscribedClientsChanged(GattLocalCharacteristic sender, object args)
     {
-        var currentIds = new HashSet<string>();
-        foreach (var client in sender.SubscribedClients)
+        try
         {
-            var deviceId = client.Session.DeviceId.Id;
-            currentIds.Add(deviceId);
-
-            if (!this.subscribers.ContainsKey(deviceId))
+            var currentIds = new HashSet<string>();
+            foreach (var client in sender.SubscribedClients)
             {
-                var peripheral = new Peripheral(client.Session);
-                this.subscribers[deviceId] = peripheral;
-                await this.onSubscribe!(new CharacteristicSubscription(this, peripheral, true));
+                var deviceId = client.Session.DeviceId.Id;
+                currentIds.Add(deviceId);
+
+                if (!this.subscribers.ContainsKey(deviceId))
+                {
+                    var peripheral = new Peripheral(client.Session);
+                    this.subscribers[deviceId] = peripheral;
+
+                    if (this.onSubscribe != null)
+                        await this.onSubscribe.Invoke(new CharacteristicSubscription(this, peripheral, true));
+                }
+            }
+
+            var removedIds = this.subscribers.Keys.Where(k => !currentIds.Contains(k)).ToList();
+            foreach (var id in removedIds)
+            {
+                var peripheral = this.subscribers[id];
+                this.subscribers.Remove(id);
+
+                if (this.onSubscribe != null)
+                    await this.onSubscribe.Invoke(new CharacteristicSubscription(this, peripheral, false));
             }
         }
-
-        var removedIds = this.subscribers.Keys.Where(k => !currentIds.Contains(k)).ToList();
-        foreach (var id in removedIds)
+        catch
         {
-            var peripheral = this.subscribers[id];
-            this.subscribers.Remove(id);
-            await this.onSubscribe!(new CharacteristicSubscription(this, peripheral, false));
+            // async void - swallow to prevent crash
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -10,7 +11,7 @@ namespace Shiny.BluetoothLE.Hosting;
 public class GattService : IGattService, IGattServiceBuilder, IDisposable
 {
     readonly List<GattCharacteristic> characteristics;
-    GattServiceProviderResult? native;
+    GattServiceProvider? serviceProvider;
 
 
     public GattService(string uuid, bool primary)
@@ -40,9 +41,15 @@ public class GattService : IGattService, IGattServiceBuilder, IDisposable
 
     public async Task Build()
     {
-        this.native = await GattServiceProvider.CreateAsync(UuidHelper.ToUuid(this.Uuid));
+        var result = await GattServiceProvider.CreateAsync(UuidHelper.ToUuid(this.Uuid));
+
+        if (result.Error != BluetoothError.Success || result.ServiceProvider == null)
+            throw new InvalidOperationException($"Failed to create GATT service '{this.Uuid}': {result.Error}");
+
+        this.serviceProvider = result.ServiceProvider;
+
         foreach (var ch in this.characteristics)
-            await ch.Build(this.native);
+            await ch.Build(this.serviceProvider);
     }
 
 

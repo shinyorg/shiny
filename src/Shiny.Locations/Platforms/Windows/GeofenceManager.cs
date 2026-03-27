@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
+using WinGeofenceState = Windows.Devices.Geolocation.Geofencing.GeofenceState;
 
 namespace Shiny.Locations;
 
@@ -64,12 +65,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         get
         {
             var status = Geolocator.RequestAccessAsync().AsTask().GetAwaiter().GetResult();
-            return status switch
-            {
-                GeolocationAccessStatus.Allowed => AccessState.Available,
-                GeolocationAccessStatus.Denied => AccessState.Denied,
-                _ => AccessState.Unknown
-            };
+            return FromNative(status);
         }
     }
 
@@ -77,12 +73,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     public async Task<AccessState> RequestAccess()
     {
         var status = await Geolocator.RequestAccessAsync();
-        return status switch
-        {
-            GeolocationAccessStatus.Allowed => AccessState.Available,
-            GeolocationAccessStatus.Denied => AccessState.Denied,
-            _ => AccessState.Unknown
-        };
+        return FromNative(status);
     }
 
 
@@ -201,12 +192,12 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
                 var state = report.NewState switch
                 {
-                    GeofenceState.Entered => Locations.GeofenceState.Entered,
-                    GeofenceState.Exited => Locations.GeofenceState.Exited,
-                    _ => Locations.GeofenceState.Unknown
+                    WinGeofenceState.Entered => GeofenceState.Entered,
+                    WinGeofenceState.Exited => GeofenceState.Exited,
+                    _ => GeofenceState.Unknown
                 };
 
-                if (state == Locations.GeofenceState.Unknown)
+                if (state == GeofenceState.Unknown)
                     continue;
 
                 await this.services
@@ -225,4 +216,12 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
             this.logger.LogError(ex, "Error processing geofence state change");
         }
     }
+
+
+    static AccessState FromNative(GeolocationAccessStatus status) => status switch
+    {
+        GeolocationAccessStatus.Allowed => AccessState.Available,
+        GeolocationAccessStatus.Denied => AccessState.Denied,
+        _ => AccessState.Unknown
+    };
 }

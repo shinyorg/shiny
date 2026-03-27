@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE.Hosting;
 public partial class BleHostingManager : IBleHostingManager
 {
     readonly BluetoothLEAdvertisementPublisher publisher = new();
-    readonly Dictionary<string, GattService> services = new();
+    readonly Dictionary<string, GattService> gattSvcs = new();
 
 
     public AccessState AdvertisingAccessStatus
@@ -45,7 +45,7 @@ public partial class BleHostingManager : IBleHostingManager
 
     public bool IsAdvertising => this.publisher.Status == BluetoothLEAdvertisementPublisherStatus.Started;
 
-    public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
+    public IReadOnlyList<IGattService> Services => this.gattSvcs.Values.Cast<IGattService>().ToList();
 
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
@@ -53,27 +53,27 @@ public partial class BleHostingManager : IBleHostingManager
         var sb = new GattService(uuid, primary);
         serviceBuilder(sb);
         await sb.Build();
-        this.services.Add(uuid, sb);
+        this.gattSvcs.Add(uuid, sb);
         return sb;
     }
 
 
     public void ClearServices()
     {
-        foreach (var service in this.services.Values)
+        foreach (var service in this.gattSvcs.Values)
             service.Dispose();
 
-        this.services.Clear();
+        this.gattSvcs.Clear();
     }
 
 
     public void RemoveService(string serviceUuid)
     {
-        if (!this.services.ContainsKey(serviceUuid))
+        if (!this.gattSvcs.ContainsKey(serviceUuid))
             return;
 
-        this.services[serviceUuid].Dispose();
-        this.services.Remove(serviceUuid);
+        this.gattSvcs[serviceUuid].Dispose();
+        this.gattSvcs.Remove(serviceUuid);
     }
 
 
@@ -81,7 +81,7 @@ public partial class BleHostingManager : IBleHostingManager
     {
         options ??= new AdvertisementOptions();
         if (!options.LocalName.IsEmpty())
-            this.publisher.Advertisement.LocalName = options.LocalName;
+            this.publisher.Advertisement.LocalName = options.LocalName!;
 
         this.publisher.Advertisement.Flags = BluetoothLEAdvertisementFlags.ClassicNotSupported;
         this.publisher.Advertisement.ManufacturerData.Clear();
