@@ -48,6 +48,11 @@ public static class GeofenceServiceCollectionExtensions
                 services.AddShinyService<CLLocationGeofenceManager>();
             }
         }
+#elif WINDOWS
+        if (!services.HasService<IGeofenceManager>())
+        {
+            services.AddShinyService<GeofenceManager>();
+        }
 #endif
         return services;
     }

@@ -48,6 +48,31 @@ public static class GpsServiceCollectionExtensions
         return services;
     }
 
+    #elif WINDOWS
+    /// <summary>
+    /// This registers GPS services with the Shiny container - Windows supports foreground GPS only (no background)
+    /// </summary>
+    /// <typeparam name="T">The IGpsDelegate to call</typeparam>
+    /// <param name="services">The servicecollection to configure</param>
+    /// <returns></returns>
+    public static IServiceCollection AddGps<T>(this IServiceCollection services) where T : class, IGpsDelegate
+        => services.AddGps(typeof(T));
+
+    /// <summary>
+    /// This registers GPS services with the Shiny container - Windows supports foreground GPS only (no background)
+    /// </summary>
+    /// <param name="services">The servicecollection to configure</param>
+    /// <param name="delegateType">The IGpsDelegate to call</param>
+    /// <returns></returns>
+    public static IServiceCollection AddGps(this IServiceCollection services, Type? delegateType = null)
+    {
+        if (delegateType != null)
+            services.AddShinyService(delegateType);
+
+        services.AddShinyService<GpsManager>();
+        return services;
+    }
+
     #elif ANDROID
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received

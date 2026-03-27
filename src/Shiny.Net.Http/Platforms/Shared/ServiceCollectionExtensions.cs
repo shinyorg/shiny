@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         services.AddDefaultRepository();
         services.AddSingleton<HttpTransferMonitor>();
         
-#if ANDROID
+#if ANDROID || WINDOWS
         services.AddSingleton<HttpTransferProcess>();
 #endif
         return services;

@@ -45,23 +45,23 @@ public class GpsManager(
     public GpsRequest? CurrentListener => this.currentSettings;
 
     // could check against current listener
-    AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request
+    // AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request
 
     public AccessState GetCurrentStatus(GpsRequest request)
     {
         using var locationManager = new CLLocationManager();
-        this.currentAccess = locationManager.GetCurrentStatus(
+        return locationManager.GetCurrentStatus(
             request.BackgroundMode != GpsBackgroundMode.None,
             request.RequestPreciseAccuracy
         );
-        return this.currentAccess;
     }
 
 
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
-        if (this.session != null && this.currentAccess != AccessState.Unknown)
-            return this.currentAccess;
+        var access = this.GetCurrentStatus(request);
+        if (this.session != null && access != AccessState.Unknown)
+            return access;
         
         var requirement = request.BackgroundMode == GpsBackgroundMode.None
             ? CLServiceSessionAuthorizationRequirement.WhenInUse
@@ -78,6 +78,7 @@ public class GpsManager(
             DispatchQueue.MainQueue,
             diag =>
             {
+                var currentAccess = AccessState.Unknown;
                 if (diag.AuthorizationRequestInProgress)
                     return;
                 
@@ -85,24 +86,24 @@ public class GpsManager(
                 {
                     if (!diag.AlwaysAuthorizationDenied)
                     {
-                        this.currentAccess = AccessState.Available;
+                        currentAccess = AccessState.Available;
                         if (request.RequestPreciseAccuracy && diag.FullAccuracyDenied)
-                            this.currentAccess = AccessState.Restricted;
+                            currentAccess = AccessState.Restricted;
                     }
                     else if (!diag.AuthorizationRestricted)
-                        this.currentAccess = AccessState.Restricted;
+                        currentAccess = AccessState.Restricted;
                     
                     else
-                        this.currentAccess = AccessState.Denied;
+                        currentAccess = AccessState.Denied;
                 }
                 else
                 {
-                    this.currentAccess = diag.AuthorizationDenied 
+                    currentAccess = diag.AuthorizationDenied 
                         ? AccessState.Denied 
                         : AccessState.Available;
                 }
 
-                tcs.TrySetResult(this.currentAccess);
+                tcs.TrySetResult(currentAccess);
             }
         );
 
