@@ -1,81 +1,83 @@
-﻿//using System;
-//using System.Linq;
-//using System.Runtime.InteropServices.WindowsRuntime;
+using System;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Devices.Bluetooth.Advertisement;
 
-//using Windows.Devices.Bluetooth.Advertisement;
-
-
-//namespace Shiny.BluetoothLE
-//{
-//    public class AdvertisementData : IAdvertisementData
-//    {
-//        readonly BluetoothLEAdvertisementReceivedEventArgs adData;
-//        readonly Lazy<string[]?> serviceUuids;
-//        readonly Lazy<ManufacturerData?> manufacturerData;
-//        readonly Lazy<int?> txPower;
+namespace Shiny.BluetoothLE;
 
 
-//        public AdvertisementData(BluetoothLEAdvertisementReceivedEventArgs args)
-//        {
-//            this.adData = args;
-
-//            this.manufacturerData = new Lazy<ManufacturerData?>(() => args
-//                .Advertisement
-//                .ManufacturerData
-//                .Select(x => new ManufacturerData(x.CompanyId, x.Data.ToArray()))
-//                .FirstOrDefault()
-//            );
-//            this.serviceUuids = new Lazy<string[]?>(() => args
-//                .Advertisement
-//                .ServiceUuids
-//                .Select(x => x.ToString())
-//                .ToArray()
-//            );
-//            this.txPower = new Lazy<int?>(() => args.Advertisement.GetTxPower());
-//        }
+public class AdvertisementData : IAdvertisementData
+{
+    readonly BluetoothLEAdvertisementReceivedEventArgs adData;
+    readonly Lazy<string[]?> serviceUuids;
+    readonly Lazy<ManufacturerData?> manufacturerData;
+    readonly Lazy<AdvertisementServiceData[]?> serviceData;
+    readonly Lazy<int?> txPower;
 
 
-//        public BluetoothLEAdvertisement Native => this.adData.Advertisement;
-//        public ulong BluetoothAddress => this.adData.BluetoothAddress;
-//        public string? LocalName => this.adData.Advertisement.LocalName;
-//        public bool? IsConnectable => this.adData.AdvertisementType == BluetoothLEAdvertisementType.ConnectableDirected ||
-//                                      this.adData.AdvertisementType == BluetoothLEAdvertisementType.ConnectableUndirected;
+    public AdvertisementData(BluetoothLEAdvertisementReceivedEventArgs args)
+    {
+        this.adData = args;
 
-//        public AdvertisementServiceData[]? ServiceData { get; } = null;
-//        public ManufacturerData? ManufacturerData => this.manufacturerData.Value;
-//        public string[]? ServiceUuids => this.serviceUuids.Value;
-//        public int? TxPower => this.txPower.Value;
-//    }
-//}
-
-
-/*
- public static string GetDeviceName(this BluetoothLEAdvertisement adv)
+        this.manufacturerData = new Lazy<ManufacturerData?>(() =>
         {
-            var data = adv.GetSectionDataOrNull(BluetoothLEAdvertisementDataTypes.CompleteLocalName);
-            if (data == null)
-                return adv.LocalName;
+            var md = args.Advertisement.ManufacturerData.FirstOrDefault();
+            if (md == null)
+                return null;
 
-            var name = Encoding.UTF8.GetString(data);
-            return name;
-        }
+            return new ManufacturerData(md.CompanyId, md.Data?.ToArray() ?? Array.Empty<byte>());
+        });
 
+        this.serviceUuids = new Lazy<string[]?>(() => args
+            .Advertisement
+            .ServiceUuids
+            .Select(x => x.ToString())
+            .ToArray()
+        );
 
-        public static sbyte GetTxPower(this BluetoothLEAdvertisement adv)
+        this.serviceData = new Lazy<AdvertisementServiceData[]?>(() =>
         {
-            var data = adv.GetSectionDataOrNull(BluetoothLEAdvertisementDataTypes.TxPowerLevel);
-            return data == null ? (sbyte)0 : (sbyte) data[0];
-        }
+            var sections = args.Advertisement.GetSectionsByType(BluetoothLEAdvertisementDataTypes.ServiceData16BitUuids);
+            if (sections == null || sections.Count == 0)
+                return null;
 
+            return sections
+                .Select(x =>
+                {
+                    var data = x.Data?.ToArray() ?? Array.Empty<byte>();
+                    if (data.Length < 2)
+                        return null;
 
-        public static byte[] GetManufacturerSpecificData(this BluetoothLEAdvertisement adv)
-            => adv.GetSectionDataOrNull(BluetoothLEAdvertisementDataTypes.ManufacturerSpecificData);
+                    var uuid = $"0000{data[1]:X2}{data[0]:X2}-0000-1000-8000-00805F9B34FB";
+                    var value = data.Length > 2 ? data.Skip(2).ToArray() : Array.Empty<byte>();
+                    return new AdvertisementServiceData(uuid, value);
+                })
+                .Where(x => x != null)
+                .ToArray()!;
+        });
 
-
-        static byte[] GetSectionDataOrNull(this BluetoothLEAdvertisement adv, byte recType)
+        this.txPower = new Lazy<int?>(() =>
         {
-            var section = adv.DataSections.FirstOrDefault(x => x.DataType == recType);
-            var data = section?.Data.ToArray();
-            return data;
-        }
- */
+            var sections = args.Advertisement.GetSectionsByType(BluetoothLEAdvertisementDataTypes.TxPowerLevel);
+            if (sections == null || sections.Count == 0)
+                return null;
+
+            var data = sections.First().Data?.ToArray();
+            if (data == null || data.Length == 0)
+                return null;
+
+            return (sbyte)data[0];
+        });
+    }
+
+
+    public string? LocalName => this.adData.Advertisement.LocalName;
+
+    public bool? IsConnectable => this.adData.AdvertisementType == BluetoothLEAdvertisementType.ConnectableDirected ||
+                                  this.adData.AdvertisementType == BluetoothLEAdvertisementType.ConnectableUndirected;
+
+    public AdvertisementServiceData[]? ServiceData => this.serviceData.Value;
+    public ManufacturerData? ManufacturerData => this.manufacturerData.Value;
+    public string[]? ServiceUuids => this.serviceUuids.Value;
+    public int? TxPower => this.txPower.Value;
+}

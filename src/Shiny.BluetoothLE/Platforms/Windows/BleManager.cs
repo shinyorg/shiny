@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Radios;
 using Windows.Foundation;
@@ -17,6 +19,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
 {
     readonly IServiceProvider services;
     readonly ILogger logger;
+    BluetoothLEAdvertisementWatcher? watcher;
 
 
     public BleManager(IServiceProvider services, ILogger<IBleManager> logger)
@@ -32,18 +35,17 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         if (delegates.Count == 0)
             return;
 
-        // TODO: monitor SelectedRadio
         this.GetRadio()
             .Where(x => x != null)
             .Subscribe(
                 radio =>
                 {
-
                     var handler = new TypedEventHandler<Radio, object>((sender, args) =>
                     {
                         var status = sender.GetAccessStatus();
                         delegates.RunDelegates(x => x.OnAdapterStateChanged(status), this.logger);
                     });
+                    radio!.StateChanged += handler;
                 },
                 ex =>
                 {
@@ -53,36 +55,112 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     }
 
 
+    public AccessState CurrentAccess
+    {
+        get
+        {
+            if (this.SelectedRadio == null)
+                return AccessState.Unknown;
 
-    public AccessState CurrentAccess => throw new NotImplementedException();
+            return this.SelectedRadio.GetAccessStatus();
+        }
+    }
+
     public bool IsScanning { get; private set; }
     public Radio? SelectedRadio { get; set; }
 
 
-    public IEnumerable<IPeripheral> GetConnectedPeripherals() => throw new NotImplementedException();
-    public IPeripheral? GetKnownPeripheral(string peripheralUuid) => throw new NotImplementedException();
-    //public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid) => Observable.FromAsync(async ct =>
-    //{
-    //    var mac = Guid.Parse(peripheralUuid).ToBluetoothAddress();
-    //    var per = this.context.GetPeripheral(mac);
+    public IEnumerable<IPeripheral> GetConnectedPeripherals()
+        => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
 
-    //    if (per == null)
-    //    {
-    //        var native = await BluetoothLEDevice.FromBluetoothAddressAsync(mac).AsTask(ct);
-    //        if (native != null)
-    //            per = this.context.AddOrGetPeripheral(native);
-    //    }
 
-    //    return per;
-    //});
+    public IPeripheral? GetKnownPeripheral(string peripheralUuid)
+        => this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
 
 
     public IObservable<AccessState> RequestAccess() => this.GetRadio().Select(x => x.GetAccessStatus());
 
 
-    public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => throw new NotImplementedException();
-    public void StopScan() => throw new NotImplementedException();
+    public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => this.RequestAccess()
+        .Do(access =>
+        {
+            if (access != AccessState.Available)
+                throw new PermissionException("BluetoothLE", access);
+        })
+        .Select(_ => this.CreateScanner(scanConfig))
+        .Switch()
+        .Select(args => Observable.FromAsync(async ct =>
+        {
+            var peripheral = this.GetOrCreatePeripheral(args.BluetoothAddress);
+            if (peripheral == null)
+            {
+                var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
+                if (btDevice != null)
+                    peripheral = this.GetPeripheral(btDevice);
+            }
 
+            if (peripheral == null)
+                return null;
+
+            var adData = new AdvertisementData(args);
+            return new ScanResult(peripheral, args.RawSignalStrengthInDBm, adData);
+        }))
+        .Switch()
+        .Where(x => x != null)
+        .Select(x => x!);
+
+
+    public void StopScan()
+    {
+        this.watcher?.Stop();
+        this.watcher = null;
+        this.IsScanning = false;
+    }
+
+
+    IObservable<BluetoothLEAdvertisementReceivedEventArgs> CreateScanner(ScanConfig? config)
+        => Observable.Create<BluetoothLEAdvertisementReceivedEventArgs>(ob =>
+        {
+            if (this.IsScanning)
+                throw new InvalidOperationException("There is already an active scan");
+
+            this.Clear();
+            config ??= new ScanConfig();
+
+            this.watcher = new BluetoothLEAdvertisementWatcher();
+
+            if (config.ServiceUuids.Length > 0)
+            {
+                foreach (var serviceUuid in config.ServiceUuids)
+                    this.watcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(Utils.ToUuidType(serviceUuid));
+            }
+
+            this.watcher.ScanningMode = BluetoothLEScanningMode.Active;
+
+            var handler = new TypedEventHandler<BluetoothLEAdvertisementWatcher, BluetoothLEAdvertisementReceivedEventArgs>(
+                (sender, args) => ob.OnNext(args)
+            );
+
+            var stoppedHandler = new TypedEventHandler<BluetoothLEAdvertisementWatcher, BluetoothLEAdvertisementWatcherStoppedEventArgs>(
+                (sender, args) =>
+                {
+                    if (args.Error != BluetoothError.Success)
+                        ob.OnError(new BleException($"Scan stopped with error: {args.Error}"));
+                }
+            );
+
+            this.watcher.Received += handler;
+            this.watcher.Stopped += stoppedHandler;
+            this.watcher.Start();
+            this.IsScanning = true;
+
+            return () =>
+            {
+                this.watcher.Received -= handler;
+                this.watcher.Stopped -= stoppedHandler;
+                this.StopScan();
+            };
+        });
 
 
     public IObservable<Radio?> GetRadio() => Observable.Create<Radio?>(ob =>
@@ -95,7 +173,6 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         }
         else
         {
-            //BluetoothAdapter.GetDefaultAsync().AsTask(ct)
             sub = this.GetRadios().Subscribe(x =>
             {
                 this.SelectedRadio = x.FirstOrDefault();
@@ -116,8 +193,6 @@ public partial class BleManager : IBleManager, IShinyStartupTask
 
         foreach (var dev in peripherals)
         {
-            //Log.Info(BleLogCategory.Adapter, "found - {dev.Name} ({dev.Kind} - {dev.Id})");
-
             var native = await BluetoothAdapter.FromIdAsync(dev.Id);
             if (native.IsLowEnergySupported)
             {
@@ -129,12 +204,31 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     });
 
 
-    readonly ConcurrentDictionary<ulong, IPeripheral> peripherals = new();
+    readonly ConcurrentDictionary<ulong, Peripheral> peripherals = new();
 
-    IPeripheral GetPeripheral(BluetoothLEDevice native)
+    Peripheral? GetOrCreatePeripheral(ulong bluetoothAddress)
     {
-        var peripheral = this.peripherals.GetOrAdd(native.BluetoothAddress, id => new Peripheral(null, native));
+        this.peripherals.TryGetValue(bluetoothAddress, out var peripheral);
         return peripheral;
+    }
+
+
+    Peripheral GetPeripheral(BluetoothLEDevice native)
+    {
+        var peripheral = this.peripherals.GetOrAdd(
+            native.BluetoothAddress,
+            _ => new Peripheral(this, native, this.services.GetRequiredService<ILogger<IPeripheral>>())
+        );
+        return peripheral;
+    }
+
+
+    internal void FirePeripheralStateChanged(Peripheral peripheral)
+    {
+        this.services.RunDelegates<IBleDelegate>(
+            x => x.OnPeripheralStateChanged(peripheral),
+            this.logger
+        );
     }
 
 
@@ -143,133 +237,3 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         .ToList()
         .ForEach(x => this.peripherals.TryRemove(x.Key, out _));
 }
-
-
-/*       
-
-
-        public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null) => this.GetDevices(
-            BluetoothLEDevice.GetDeviceSelectorFromConnectionStatus(BluetoothConnectionStatus.Connected)
-        );
-
-
-        public override IObservable<ScanResult> Scan(ScanConfig? config = null)
-        {
-            if (this.IsScanning)
-                throw new ArgumentException("There is already an active scan");
-
-            return this.RequestAccess()
-                .Do(result =>
-                {
-                    if (result != AccessState.Available)
-                        throw new PermissionException("BluetoothLE", result);
-
-                    this.IsScanning = true;
-                    this.context.Clear();
-                })
-                .Select(_ => this.GetRadio())
-                .Switch()
-                .Select(_ => this.CreateScanner(config))
-                .Switch()
-                .Select(args => Observable.FromAsync(async ct =>
-                {
-                    var device = this.context.GetPeripheral(args.BluetoothAddress);
-                    if (device == null)
-                    {
-                        var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress);
-                        if (btDevice != null)
-                            device = this.context.AddOrGetPeripheral(btDevice);
-                    }
-                    ScanResult? scanResult = null;
-                    if (device != null)
-                    {
-                        var adData = new AdvertisementData(args);
-                        scanResult = new ScanResult(device, args.RawSignalStrengthInDBm, adData);
-                    }
-                    return scanResult;
-                }))
-                .Switch()
-                .Where(x => x != null)
-                .Finally(() => this.IsScanning = false);
-        }
-
-
-        IObservable<BluetoothLEAdvertisementReceivedEventArgs> CreateScanner(ScanConfig? config)
-             => Observable.Create<BluetoothLEAdvertisementReceivedEventArgs>(ob =>
-             {
-                 this.context.Clear();
-                 config ??= new ScanConfig { ScanType = BleScanType.Balanced };
-
-                 var adWatcher = new BluetoothLEAdvertisementWatcher();
-                 if (config.ServiceUuids != null)
-                 {
-                     foreach (var serviceUuid in config.ServiceUuids)
-                     {
-                         adWatcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(Utils.ToUuidType(serviceUuid));
-                     }
-                }
-
-                 switch (config.ScanType)
-                 {
-                     case BleScanType.Balanced:
-                         adWatcher.ScanningMode = BluetoothLEScanningMode.Active;
-                         break;
-
-                     //case BleScanType.Background:
-                     case BleScanType.LowLatency:
-                     case BleScanType.LowPowered:
-                         adWatcher.ScanningMode = BluetoothLEScanningMode.Passive;
-                         break;
-                 }
-                 var handler = new TypedEventHandler<BluetoothLEAdvertisementWatcher, BluetoothLEAdvertisementReceivedEventArgs>
-                     ((sender, args) => ob.OnNext(args)
-                 );
-
-                 adWatcher.Received += handler;
-                 adWatcher.Start();
-
-                 return () =>
-                 {
-                     adWatcher.Stop();
-                     adWatcher.Received -= handler;
-                 };
-             });
-
-
-        IObservable<Radio> GetRadio() => Observable.FromAsync(async ct =>
-        {
-            if (this.radio != null)
-                return this.radio;
-
-            this.native = await BluetoothAdapter.GetDefaultAsync().AsTask(ct);
-            if (this.native == null)
-                throw new ArgumentException("No bluetooth adapter found");
-
-            this.radio = await this.native.GetRadioAsync().AsTask(ct);
-            return this.radio;
-        });
-
-
-        IObservable<IEnumerable<IPeripheral>> GetDevices(string selector) => Observable.FromAsync(async ct =>
-        {
-            string[] requestedProperties = { "System.Devices.ContainerId" };
-            var devices = await DeviceInformation
-                .FindAllAsync(
-                    selector,
-                    requestedProperties,
-                    DeviceInformationKind.AssociationEndpoint
-                )
-                .AsTask(ct);
-
-            var results = new List<IPeripheral>();
-            foreach (var deviceInfo in devices)
-            {
-                var native = await BluetoothLEDevice.FromIdAsync(deviceInfo.Id).AsTask(ct);
-                var wrap = this.context.AddOrGetPeripheral(native);
-                results.Add(wrap);
-            }
-
-            return results;
-        });
-
- */

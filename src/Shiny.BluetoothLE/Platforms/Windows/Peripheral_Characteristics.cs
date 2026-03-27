@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -14,33 +15,23 @@ public partial class Peripheral
 {
     public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => Observable.FromAsync<BleCharacteristicInfo>(async ct =>
     {
-        var sid = Utils.ToUuidType(serviceUuid);
-        var cid = Utils.ToUuidType(characteristicUuid);
+        this.AssertConnection();
 
-        var service = await this.Native!
-            .GetGattServicesForUuidAsync(sid)
-            .AsTask(ct)
-            .ConfigureAwait(false);
-
-        //service.Status.Assert();
-
-        //service.ProtocolError
-        var chars = await service.Services.First().GetCharacteristicsForUuidAsync(cid).AsTask(ct).ConfigureAwait(false);
-        //chars.Status.Assert();
-        var ch = chars.Characteristics.First();
-
-        return ToChar(ch);
+        var ch = await this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct).ConfigureAwait(false);
+        return ToCharInfo(ch);
     });
 
 
     public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => Observable.FromAsync(async ct =>
     {
+        this.AssertConnection();
+
         var suid = Utils.ToUuidType(serviceUuid);
+        var result = await this.Native!.GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Cached).AsTask(ct).ConfigureAwait(false);
+        result.Status.Assert("GetServices", serviceUuid);
 
-        var result = await this.Native!.GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Cached).AsTask();
-        result.Status.Assert("Get", serviceUuid);
-
-        var service = result.Services.FirstOrDefault();
+        var service = result.Services.FirstOrDefault()
+            ?? throw new BleException($"Service '{serviceUuid}' not found");
 
         var chResult = await service
             .GetCharacteristicsAsync(BluetoothCacheMode.Uncached)
@@ -48,49 +39,85 @@ public partial class Peripheral
             .ConfigureAwait(false);
 
         chResult.Status.Assert("GetCharacteristics", serviceUuid);
-        return chResult.Characteristics.Select(ToChar).ToList();
+        return (IReadOnlyList<BleCharacteristicInfo>)chResult.Characteristics.Select(ToCharInfo).ToList();
     });
 
 
-    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged(string serviceUuid, string characteristicUuid) => throw new NotImplementedException();
+    readonly Subject<BleCharacteristicInfo> charSubChangedSubj = new();
+    public IObservable<BleCharacteristicInfo> WhenCharacteristicSubscriptionChanged(string serviceUuid, string characteristicUuid)
+    {
+        var key = $"{serviceUuid}-{characteristicUuid}";
+        return this.charSubChangedSubj
+            .Where(x =>
+                x.Service.Uuid.Equals(serviceUuid, StringComparison.OrdinalIgnoreCase) &&
+                x.Uuid.Equals(characteristicUuid, StringComparison.OrdinalIgnoreCase)
+            );
+    }
 
 
     readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
+        this.AssertConnection();
+
         var key = $"{serviceUuid}-{characteristicUuid}";
 
-        if (this.notifiers.ContainsKey(key))
+        if (!this.notifiers.ContainsKey(key))
         {
             var obs = this.WhenConnected()
-                .Select(_ => this.GetNativeCharacteristic(serviceUuid, characteristicUuid))
+                .Select(_ => Observable.FromAsync(ct => this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct)))
                 .Switch()
-                .Select(x => Observable.Create<BleCharacteristicResult>(ob =>
+                .Select(ch => Observable.Create<BleCharacteristicResult>(ob =>
                 {
                     var handler = new TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs>((sender, args) =>
                     {
-                        //args.CharacteristicValue.AsStream()
+                        var data = args.CharacteristicValue?.ToArray();
+                        var info = ToCharInfo(sender);
+                        ob.OnNext(new BleCharacteristicResult(info, BleCharacteristicEvent.Notification, data));
                     });
-                    x.ValueChanged += handler;
-                    var notifyValue = useIndicationsIfAvailable && x.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate)
+
+                    ch.ValueChanged += handler;
+
+                    var notifyValue = useIndicationsIfAvailable && ch.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate)
                         ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
                         : GattClientCharacteristicConfigurationDescriptorValue.Notify;
 
-                    x.WriteClientCharacteristicConfigurationDescriptorAsync(notifyValue)
+                    ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyValue)
                         .AsTask()
-                        .ContinueWith(result =>
+                        .ContinueWith(task =>
                         {
-
+                            if (task.IsFaulted)
+                            {
+                                ob.OnError(task.Exception!.InnerException ?? task.Exception);
+                            }
+                            else
+                            {
+                                var info = ToCharInfo(ch, isNotifying: true);
+                                this.charSubChangedSubj.OnNext(info);
+                            }
                         });
-                    // TODO: fire that it is hooked
 
-                    return () => x.ValueChanged -= handler;
+                    return () =>
+                    {
+                        ch.ValueChanged -= handler;
+
+                        try
+                        {
+                            ch.WriteClientCharacteristicConfigurationDescriptorAsync(
+                                GattClientCharacteristicConfigurationDescriptorValue.None
+                            ).AsTask().ContinueWith(_ =>
+                            {
+                                var info = ToCharInfo(ch, isNotifying: false);
+                                this.charSubChangedSubj.OnNext(info);
+                            });
+                        }
+                        catch
+                        {
+                            // Device may already be disconnected
+                        }
+                    };
                 }))
                 .Switch()
-                .Finally(() =>
-                {
-                    // TODO: unhook
-                })
                 .Publish()
                 .RefCount();
 
@@ -100,63 +127,101 @@ public partial class Peripheral
     }
 
 
-    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => this
-        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
-        .Select(ch => Observable.FromAsync(async ct => 
-        {
-            //    //this.AssertRead();
-            var result = await ch
-                .ReadValueAsync(BluetoothCacheMode.Uncached)
-                .AsTask(ct)
-                .ConfigureAwait(false);
+    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => Observable.FromAsync(async ct =>
+    {
+        this.AssertConnection();
 
-            //    if (result.Status != GattCommunicationStatus.Success)
-            //        throw new BleException($"Failed to read characteristic - {result.Status}");
+        var ch = await this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct).ConfigureAwait(false);
 
-            return new BleCharacteristicResult(
-                ToChar(ch),
-                BleCharacteristicEvent.Read,
-                result.Value?.ToArray()
-            );
-        }))
-        .Switch();
+        var result = await ch
+            .ReadValueAsync(BluetoothCacheMode.Uncached)
+            .AsTask(ct)
+            .ConfigureAwait(false);
 
+        result.Status.Assert("Read", serviceUuid, characteristicUuid);
 
-    public IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
-        .GetNativeCharacteristic(serviceUuid, characteristicUuid)
-        .Select(ch => Observable.FromAsync(async ct =>
-        {
-            //this.AssertWrite(withResponse);
-
-            var writeType = withResponse
-                ? GattWriteOption.WriteWithResponse
-                : GattWriteOption.WriteWithoutResponse;
-
-            await ch
-                //.WriteValueAsync(value.AsBuffer(), writeType)
-                //.Execute(ct)
-                .WriteValueAsync(null, writeType)
-                .AsTask(ct)
-                .ConfigureAwait(false);
-
-            return new BleCharacteristicResult(
-                ToChar(ch),
-                BleCharacteristicEvent.Write,
-                data
-            );
-        }))
-        .Switch();
+        return new BleCharacteristicResult(
+            ToCharInfo(ch),
+            BleCharacteristicEvent.Read,
+            result.Value?.ToArray()
+        );
+    });
 
 
-    protected static BleCharacteristicInfo ToChar(GattCharacteristic ch) => new BleCharacteristicInfo(
+    public IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => Observable.FromAsync(async ct =>
+    {
+        this.AssertConnection();
+
+        var ch = await this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct).ConfigureAwait(false);
+
+        var writeType = withResponse
+            ? GattWriteOption.WriteWithResponse
+            : GattWriteOption.WriteWithoutResponse;
+
+        var buffer = data.AsBuffer();
+        var result = await ch
+            .WriteValueAsync(buffer, writeType)
+            .AsTask(ct)
+            .ConfigureAwait(false);
+
+        result.Assert("Write", serviceUuid, characteristicUuid);
+
+        var ev = withResponse ? BleCharacteristicEvent.Write : BleCharacteristicEvent.WriteWithoutResponse;
+        return new BleCharacteristicResult(
+            ToCharInfo(ch),
+            ev,
+            data
+        );
+    });
+
+
+    protected void ClearNotifications() => this.notifiers.Clear();
+
+
+    protected static BleCharacteristicInfo ToCharInfo(GattCharacteristic ch, bool? isNotifying = null) => new(
         new BleServiceInfo(ch.Service.Uuid.ToString()),
         ch.Uuid.ToString(),
-        false, //ch.ValueChanged != null, 
-        CharacteristicProperties.Broadcast
+        isNotifying ?? false,
+        MapProperties(ch.CharacteristicProperties)
     );
 
 
-    protected IObservable<GattCharacteristic> GetNativeCharacteristic(string serviceUuid, string characteristicUuid) => Observable.FromAsync(async ct =>
+    static CharacteristicProperties MapProperties(GattCharacteristicProperties native)
+    {
+        var props = (CharacteristicProperties)0;
+
+        if (native.HasFlag(GattCharacteristicProperties.Broadcast))
+            props |= CharacteristicProperties.Broadcast;
+
+        if (native.HasFlag(GattCharacteristicProperties.Read))
+            props |= CharacteristicProperties.Read;
+
+        if (native.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
+            props |= CharacteristicProperties.WriteWithoutResponse;
+
+        if (native.HasFlag(GattCharacteristicProperties.Write))
+            props |= CharacteristicProperties.Write;
+
+        if (native.HasFlag(GattCharacteristicProperties.Notify))
+            props |= CharacteristicProperties.Notify;
+
+        if (native.HasFlag(GattCharacteristicProperties.Indicate))
+            props |= CharacteristicProperties.Indicate;
+
+        if (native.HasFlag(GattCharacteristicProperties.AuthenticatedSignedWrites))
+            props |= CharacteristicProperties.AuthenticatedSignedWrites;
+
+        if (native.HasFlag(GattCharacteristicProperties.ExtendedProperties))
+            props |= CharacteristicProperties.ExtendedProperties;
+
+        return props;
+    }
+
+
+    protected async System.Threading.Tasks.Task<GattCharacteristic> GetNativeCharacteristicAsync(
+        string serviceUuid,
+        string characteristicUuid,
+        System.Threading.CancellationToken ct)
     {
         var suid = Utils.ToUuidType(serviceUuid);
 
@@ -165,11 +230,10 @@ public partial class Peripheral
             .AsTask(ct)
             .ConfigureAwait(false);
 
-        result.Status.Assert("Get", serviceUuid);
-        
-        var service = result.Services.FirstOrDefault();
-        if (service == null)
-            throw new BleException("");
+        result.Status.Assert("GetService", serviceUuid);
+
+        var service = result.Services.FirstOrDefault()
+            ?? throw new BleException($"Service '{serviceUuid}' not found");
 
         var cuid = Utils.ToUuidType(characteristicUuid);
         var chResult = await service
@@ -177,11 +241,11 @@ public partial class Peripheral
             .AsTask(ct)
             .ConfigureAwait(false);
 
-        chResult.Status.Assert("Get", serviceUuid, characteristicUuid);
-        var ch = chResult.Characteristics.FirstOrDefault();
-        if (ch == null)
-            throw new BleException($"No characteristic '{characteristicUuid}' found under service '{serviceUuid}'");
+        chResult.Status.Assert("GetCharacteristic", serviceUuid, characteristicUuid);
+
+        var ch = chResult.Characteristics.FirstOrDefault()
+            ?? throw new BleException($"Characteristic '{characteristicUuid}' not found in service '{serviceUuid}'");
 
         return ch;
-    });
+    }
 }

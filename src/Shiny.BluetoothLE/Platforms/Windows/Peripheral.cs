@@ -1,5 +1,8 @@
-﻿using System;
+using System;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 
@@ -8,22 +11,41 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral : IPeripheral
 {
-    public Peripheral(DeviceInformation deviceInfo, BluetoothLEDevice device)
-    {
-        this.Native = device;
-        this.DeviceInfo = deviceInfo;
+    readonly BleManager manager;
+    readonly ILogger logger;
+    readonly Subject<ConnectionState> connSubj = new();
+    readonly Subject<BleException> connFailedSubj = new();
+    readonly Subject<Unit> servicesChangedSubj = new();
 
-        this.Uuid = device.BluetoothDeviceId!.ToString();
+
+    public Peripheral(BleManager manager, BluetoothLEDevice device, ILogger<IPeripheral> logger)
+    {
+        this.manager = manager;
+        this.logger = logger;
+        this.Native = device;
+        this.Uuid = device.GetDeviceId().ToString();
+
+        this.HookNativeEvents();
     }
 
 
-
     public BluetoothLEDevice? Native { get; private set; }
-    public DeviceInformation DeviceInfo { get; }
-
     public string Uuid { get; }
-    public string? Name =>this.Native?.Name;
-    public int Mtu => -1;
+    public string? Name => this.Native?.Name;
+
+    public int Mtu
+    {
+        get
+        {
+            if (this.Native == null || this.Status != ConnectionState.Connected)
+                return -1;
+
+            // Windows doesn't expose MTU directly on BluetoothLEDevice
+            // Default BLE MTU is 23, but negotiated MTU may be higher
+            // The actual MTU is determined per-session when writing characteristics
+            return -1;
+        }
+    }
 
 
     public ConnectionState Status
@@ -42,17 +64,45 @@ public partial class Peripheral : IPeripheral
     }
 
 
-    public IObservable<BleException> WhenConnectionFailed() => null;
-
-    public void Connect(ConnectionConfig? config)
+    public void Connect(ConnectionConfig? config = null)
     {
-        //if (this.NativeDevice != null && this.NativeDevice.ConnectionStatus == BluetoothConnectionStatus.Connected)
-        //    return;
+        if (this.Native != null && this.Native.ConnectionStatus == BluetoothConnectionStatus.Connected)
+            return;
 
-        //this.connSubject.OnNext(ConnectionState.Connecting);
-        //this.NativeDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(this.bluetoothAddress);
-        //this.NativeDevice.ConnectionStatusChanged += this.OnNativeConnectionStatusChanged;
-        //await this.NativeDevice.GetGattServicesAsync(BluetoothCacheMode.Uncached); // HACK: kick the connection on
+        try
+        {
+            this.connSubj.OnNext(ConnectionState.Connecting);
+
+            // Windows BLE connections are implicit - they occur when you access GATT services
+            // Calling GetGattServicesAsync forces the connection
+            Observable.FromAsync(async ct =>
+            {
+                if (this.Native == null)
+                    throw new BleException("Device is disposed");
+
+                var result = await this.Native
+                    .GetGattServicesAsync(BluetoothCacheMode.Uncached)
+                    .AsTask(ct)
+                    .ConfigureAwait(false);
+
+                if (result.Status != Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
+                    throw new BleException($"Failed to connect: {result.Status}");
+            })
+            .Subscribe(
+                _ => { },
+                ex =>
+                {
+                    this.logger.LogWarning(ex, "Failed to connect to peripheral");
+                    this.connFailedSubj.OnNext(new BleException(ex.Message, ex));
+                    this.connSubj.OnNext(ConnectionState.Disconnected);
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            this.connFailedSubj.OnNext(new BleException(ex.Message, ex));
+            this.connSubj.OnNext(ConnectionState.Disconnected);
+        }
     }
 
 
@@ -60,6 +110,10 @@ public partial class Peripheral : IPeripheral
     {
         if (this.Native == null)
             return;
+
+        this.connSubj.OnNext(ConnectionState.Disconnecting);
+
+        this.ClearNotifications();
 
         foreach (var service in this.Native.GattServices)
         {
@@ -69,65 +123,65 @@ public partial class Peripheral : IPeripheral
         this.Native.Dispose();
         this.Native = null;
 
-        GC.Collect();        
-    }    
+        this.connSubj.OnNext(ConnectionState.Disconnected);
+        this.manager.FirePeripheralStateChanged(this);
+    }
 
 
-    const string SS_KEY = "System.Devices.Aep.SignalStrength";
-    public IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
+    public IObservable<ConnectionState> WhenStatusChanged() => Observable.Create<ConnectionState>(ob =>
     {
-        //if (this.DeviceInfo.Properties.ContainsKey(SS_KEY))
-        return () => { };
+        ob.OnNext(this.Status);
+        return this.connSubj.Subscribe(ob.OnNext);
     });
 
 
-    public IObservable<ConnectionState> WhenStatusChanged() => throw new NotImplementedException();
+    public IObservable<BleException> WhenConnectionFailed() => this.connFailedSubj;
+
+
+    public IObservable<Unit> WhenServicesChanged() => this.servicesChangedSubj;
+
+
+    public IObservable<int> ReadRssi() => Observable.Empty<int>();
+    // Windows UWP doesn't provide a way to read RSSI from a connected device
+    // RSSI is only available during scanning via the advertisement
+
+
+    void HookNativeEvents()
+    {
+        if (this.Native == null)
+            return;
+
+        this.Native.ConnectionStatusChanged += this.OnConnectionStatusChanged;
+        this.Native.GattServicesChanged += this.OnGattServicesChanged;
+    }
+
+
+    void OnConnectionStatusChanged(BluetoothLEDevice sender, object args)
+    {
+        var state = sender.ConnectionStatus == BluetoothConnectionStatus.Connected
+            ? ConnectionState.Connected
+            : ConnectionState.Disconnected;
+
+        this.logger.LogDebug("Peripheral {Uuid} connection status changed to {State}", this.Uuid, state);
+
+        if (state == ConnectionState.Disconnected)
+            this.ClearNotifications();
+
+        this.connSubj.OnNext(state);
+        this.manager.FirePeripheralStateChanged(this);
+    }
+
+
+    void OnGattServicesChanged(BluetoothLEDevice sender, object args)
+    {
+        this.logger.LogDebug("Peripheral {Uuid} GATT services changed", this.Uuid);
+        this.servicesChangedSubj.OnNext(Unit.Default);
+    }
+
+
+    protected void AssertConnection()
+    {
+        if (this.Status != ConnectionState.Connected)
+            throw new InvalidOperationException("GATT is not connected");
+    }
 }
-
-/*
-
-        public async Task Disconnect()
-        {
-            if (this.NativeDevice == null)
-                return;
-
-            this.connSubject.OnNext(ConnectionState.Disconnecting);
-            foreach (var ch in this.subscribers)
-            {
-                try
-                {
-                    await ch.Disconnect();
-                }
-                catch (Exception e)
-                {
-                    //Log.Info(BleLogCategory.Device, "Disconnect Error - " + e);
-                }
-            }
-            this.subscribers.Clear();
-
-            this.managerContext.RemovePeripheral(this.NativeDevice.BluetoothAddress);
-            this.NativeDevice.ConnectionStatusChanged -= this.OnNativeConnectionStatusChanged;
-            this.NativeDevice?.Dispose();
-            this.NativeDevice = null;
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            this.connSubject.OnNext(ConnectionState.Disconnected);
-        }
-
-
-        public void SetNotifyCharacteristic(GattCharacteristic characteristic)
-        {
-            lock (this.syncLock)
-            {
-                if (characteristic.IsNotifying)
-                {
-                    this.subscribers.Add(characteristic);
-                }
-                else
-                {
-                    this.subscribers.Remove(characteristic);
-                }
-            }
-        }
- */

@@ -1,30 +1,50 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Shiny.BluetoothLE;
 
 
-public partial class Peripheral : IPeripheral
+public partial class Peripheral
 {
-    public IObservable<Unit> WhenServicesChanged() => null;
-    public IObservable<BleServiceInfo> GetService(string serviceUuid) => throw new NotImplementedException();
+    public IObservable<BleServiceInfo> GetService(string serviceUuid) => Observable.FromAsync(async ct =>
+    {
+        this.AssertConnection();
+
+        var suid = Utils.ToUuidType(serviceUuid);
+        var result = await this.Native!
+            .GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Cached)
+            .AsTask(ct)
+            .ConfigureAwait(false);
+
+        result.Status.Assert("GetService", serviceUuid);
+
+        var service = result.Services.FirstOrDefault();
+        if (service == null)
+            throw new BleException($"Service '{serviceUuid}' not found");
+
+        return new BleServiceInfo(service.Uuid.ToString());
+    });
+
+
     public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => Observable.FromAsync(async ct =>
     {
+        this.AssertConnection();
+
         var result = await this.Native!
             .GetGattServicesAsync(BluetoothCacheMode.Uncached)
             .AsTask(ct)
             .ConfigureAwait(false);
 
-        // TODO
-        //result.Status.Assert();
-        return result
+        result.Status.Assert("GetServices", "all");
+
+        return (IReadOnlyList<BleServiceInfo>)result
             .Services
             .Select(x => new BleServiceInfo(x.Uuid.ToString()))
             .ToList();
     });
-
 }
