@@ -15,6 +15,7 @@ public class AzureBlobStorageUploadRequest(string localFilePath)
     public string? SharedAuthorizationKey { get; set; }
     public DateTimeOffset? AuthVersion { get; set; }
     public DateTimeOffset? AuthDate { get; set; }
+    public string? RemoteFileName { get; set; }
     
     public string? SasToken { get; set; }
     public Dictionary<string, string> Headers { get; } = new();
@@ -53,6 +54,11 @@ public class AzureBlobStorageUploadRequest(string localFilePath)
         return this;
     }
 
+    public AzureBlobStorageUploadRequest WithRemoteFileName(string fileName)
+    {
+        this.RemoteFileName = fileName;
+        return this;
+    }
 
     public AzureBlobStorageUploadRequest WithSasToken(string sasToken)
     {
@@ -86,7 +92,9 @@ public class AzureBlobStorageUploadRequest(string localFilePath)
         this.Headers.Add("x-ms-blob-type", "BlockBlob");
         
         var fileName = Path.GetFileName(this.LocalFilePath);
-        this.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+        var fn = this.RemoteFileName ?? fileName;
+        this.Headers.Add("Content-Disposition", $"attachment; filename=\"{fn}\"");
+        uri += "/" + fn;
 
         if (this.SasToken != null)
         {
