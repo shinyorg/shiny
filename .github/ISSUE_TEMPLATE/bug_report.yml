@@ -32,9 +32,9 @@ body:
       label: What operating system(s) are effected?
       description: You may select more than one
       options:
-      - label: iOS (13+ supported)
+      - label: iOS
       - label: Mac Catalyst
-      - label: Android (12+ supported)
+      - label: Android
       - label: Windows
   - type: textarea
     validations:
