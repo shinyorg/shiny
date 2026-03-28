@@ -8,3 +8,4 @@ global using Shiny.Locations;
 global using Shiny.Net.Http;
 global using Shiny.Jobs;
 global using Shiny.Stores;
+global using Shiny.Maui.TableView;

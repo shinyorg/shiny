@@ -17,8 +17,9 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         list.Add(new("GPS", "Track location with GPS", "gps"));
         list.Add(new("Geofencing", "Monitor geofence regions", "geofencing"));
         list.Add(new("Notifications", "Local notifications", "notifications"));
+        list.Add(new("Notification Channels", "Manage notification channels", "notificationchannels"));
         list.Add(new("Push", "Push notification registration", "push"));
-        list.Add(new("HTTP Transfers", "Background file downloads", "httptransfers"));
+        list.Add(new("HTTP Transfers", "Background uploads & downloads", "httptransfers"));
         list.Add(new("Jobs", "Background job scheduling", "jobs"));
 #endif
 

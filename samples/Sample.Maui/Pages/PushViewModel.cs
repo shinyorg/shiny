@@ -12,15 +12,15 @@ public partial class PushViewModel(IPushManager pushManager) : ObservableObject
     async Task Register()
     {
         var result = await pushManager.RequestAccess();
-        Status = result.Status.ToString();
-        Token = pushManager.RegistrationToken ?? "N/A";
+        this.Status = result.Status.ToString();
+        this.Token = pushManager.RegistrationToken ?? "N/A";
     }
 
     [RelayCommand]
     async Task UnRegister()
     {
         await pushManager.UnRegister();
-        Status = "Unregistered";
-        Token = string.Empty;
+        this.Status = "Unregistered";
+        this.Token = string.Empty;
     }
 }

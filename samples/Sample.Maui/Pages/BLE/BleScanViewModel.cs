@@ -1,26 +1,26 @@
 namespace Sample.Maui.Pages.BLE;
 
 [ShellMap<BleScanPage>("blescan")]
-public partial class BleScanViewModel(IBleManager bleManager) : ObservableObject, IDisposable
+public partial class BleScanViewModel(IBleManager bleManager, INavigator navigator) : ObservableObject, IDisposable
 {
-    IDisposable? _scanSub;
+    IDisposable? scanSub;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ScanText))]
     bool isScanning;
 
-    public string ScanText => IsScanning ? "Stop Scan" : "Start Scan";
+    public string ScanText => this.IsScanning ? "Stop Scan" : "Start Scan";
 
     public ObservableCollection<PeripheralViewModel> Peripherals { get; } = [];
 
     [RelayCommand]
     async Task ToggleScan()
     {
-        if (IsScanning)
+        if (this.IsScanning)
         {
-            _scanSub?.Dispose();
-            _scanSub = null;
-            IsScanning = false;
+            this.scanSub?.Dispose();
+            this.scanSub = null;
+            this.IsScanning = false;
             return;
         }
 
@@ -31,23 +31,23 @@ public partial class BleScanViewModel(IBleManager bleManager) : ObservableObject
             return;
         }
 
-        Peripherals.Clear();
-        IsScanning = true;
-        _scanSub = bleManager
+        this.Peripherals.Clear();
+        this.IsScanning = true;
+        this.scanSub = bleManager
             .Scan()
             .Subscribe(
                 result =>
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        var existing = Peripherals.FirstOrDefault(x => x.Uuid == result.Peripheral.Uuid);
+                        var existing = this.Peripherals.FirstOrDefault(x => x.Uuid == result.Peripheral.Uuid);
                         if (existing != null)
                         {
                             existing.Rssi = result.Rssi;
                         }
                         else
                         {
-                            Peripherals.Add(new PeripheralViewModel
+                            this.Peripherals.Add(new PeripheralViewModel
                             {
                                 Name = result.Peripheral.Name ?? "Unknown",
                                 Uuid = result.Peripheral.Uuid,
@@ -56,27 +56,29 @@ public partial class BleScanViewModel(IBleManager bleManager) : ObservableObject
                         }
                     });
                 },
-                ex =>
-                {
-                    IsScanning = false;
-                }
+                ex => this.IsScanning = false
             );
     }
 
-    public void Dispose()
+    [RelayCommand]
+    async Task SelectPeripheral(PeripheralViewModel? peripheral)
     {
-        _scanSub?.Dispose();
+        if (peripheral == null)
+            return;
+
+        this.scanSub?.Dispose();
+        this.scanSub = null;
+        this.IsScanning = false;
+
+        await navigator.NavigateTo("bleperipheral", ("PeripheralUuid", peripheral.Uuid));
     }
+
+    public void Dispose() => this.scanSub?.Dispose();
 }
 
 public partial class PeripheralViewModel : ObservableObject
 {
-    [ObservableProperty]
-    string name = string.Empty;
-
-    [ObservableProperty]
-    string uuid = string.Empty;
-
-    [ObservableProperty]
-    int rssi;
+    [ObservableProperty] string name = string.Empty;
+    [ObservableProperty] string uuid = string.Empty;
+    [ObservableProperty] int rssi;
 }

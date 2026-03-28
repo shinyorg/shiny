@@ -2,7 +2,6 @@
     <Folder Name="/Solution Items/">
         <File Path=".editorconfig" />
         <File Path=".github\CODE_OF_CONDUCT.md" />
-        <File Path=".github\CONTRIBUTING.md" />
         <File Path=".github\FUNDING.yml" />
         <File Path=".github\ISSUE_TEMPLATE\bug_report.yml" />
         <File Path=".github\ISSUE_TEMPLATE\config.yml" />

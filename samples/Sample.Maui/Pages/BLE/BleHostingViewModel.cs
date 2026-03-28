@@ -8,44 +8,41 @@ public partial class BleHostingViewModel(IBleHostingManager hostingManager) : Ob
     static readonly string ServiceUuid = "A495FF20-C5B1-4B44-B512-1370F02D74DE";
     static readonly string CharacteristicUuid = "A495FF21-C5B1-4B44-B512-1370F02D74DE";
 
-    IGattService? _service;
+    IGattService? service;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AdvertiseText))]
     bool isAdvertising;
 
-    [ObservableProperty]
-    string status = "Not advertising";
+    [ObservableProperty] string status = "Not advertising";
+    [ObservableProperty] int subscriberCount;
 
-    [ObservableProperty]
-    int subscriberCount;
-
-    public string AdvertiseText => IsAdvertising ? "Stop Advertising" : "Start Advertising";
+    public string AdvertiseText => this.IsAdvertising ? "Stop Advertising" : "Start Advertising";
 
     [RelayCommand]
     async Task ToggleAdvertising()
     {
-        if (IsAdvertising)
+        if (this.IsAdvertising)
         {
             hostingManager.StopAdvertising();
-            if (_service != null)
+            if (this.service != null)
             {
                 hostingManager.RemoveService(ServiceUuid);
-                _service = null;
+                this.service = null;
             }
-            IsAdvertising = false;
-            Status = "Not advertising";
+            this.IsAdvertising = false;
+            this.Status = "Not advertising";
             return;
         }
 
         var access = await hostingManager.RequestAccess();
         if (access != AccessState.Available)
         {
-            Status = $"Access: {access}";
+            this.Status = $"Access: {access}";
             return;
         }
 
-        _service = await hostingManager.AddService(ServiceUuid, true, sb =>
+        this.service = await hostingManager.AddService(ServiceUuid, true, sb =>
         {
             sb.AddCharacteristic(CharacteristicUuid, cb =>
             {
@@ -53,14 +50,14 @@ public partial class BleHostingViewModel(IBleHostingManager hostingManager) : Ob
                 cb.SetWrite(request =>
                 {
                     var value = System.Text.Encoding.UTF8.GetString(request.Data);
-                    MainThread.BeginInvokeOnMainThread(() => Status = $"Received: {value}");
+                    MainThread.BeginInvokeOnMainThread(() => this.Status = $"Received: {value}");
                     return Task.CompletedTask;
                 });
                 cb.SetNotification(sub =>
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        SubscriberCount += sub.IsSubscribing ? 1 : -1;
+                        this.SubscriberCount += sub.IsSubscribing ? 1 : -1;
                     });
                     return Task.CompletedTask;
                 });
@@ -71,23 +68,21 @@ public partial class BleHostingViewModel(IBleHostingManager hostingManager) : Ob
         {
             LocalName = "ShinySample"
         });
-        IsAdvertising = true;
-        Status = "Advertising...";
+        this.IsAdvertising = true;
+        this.Status = "Advertising...";
     }
 
     [RelayCommand]
     async Task SendNotification()
     {
-        if (_service == null) return;
-        // Notify subscribers with a timestamp
+        if (this.service == null) return;
         var data = System.Text.Encoding.UTF8.GetBytes($"Notify: {DateTime.Now:T}");
-        // characteristic notify would go here through the service
-        Status = "Notification sent";
+        this.Status = "Notification sent";
     }
 
     public void Dispose()
     {
-        if (IsAdvertising)
+        if (this.IsAdvertising)
         {
             hostingManager.StopAdvertising();
             hostingManager.ClearServices();

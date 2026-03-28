@@ -22,8 +22,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#1A1A2E" />
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#1A1A2E" BaseSize="128,128" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.51" />
-        <PackageReference Include="Shiny.Maui.Shell" Version="3.1-1" />
+        <PackageReference Include="Shiny.Maui.Shell" Version="3.1.1" />
+        <PackageReference Include="Shiny.Maui.TableView" Version="1.0.2" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     </ItemGroup>
 

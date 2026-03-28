@@ -7,7 +7,8 @@ body:
     attributes:
       value: |
         Thank you for filing an issue.  Please only file issues against the LATEST STABLE or LATEST BETA version of Shiny from Nuget (ALPHAs are not accepted for issues). 
-        If you have questions, please post them in GitHub discussions. 
+        If you have questions, please post them in GitHub discussions. Please make sure that the component you are reporting against supports the operating systems you link.
+        Documentation is at https://shinylib.net
   - type: dropdown
     id: component
     attributes:
@@ -21,6 +22,7 @@ body:
         - Notifications (Shiny.Notifications)
         - Push - Native (Shiny.Push)
         - Push - Azure Notification Hub (Shiny.Push.AzureNotificationHubs)
+        - Push - Firebase Cloud Messaging (Shiny.Push.FirebaseCloudMessaging) 
         - BluetoothLE Client (Shiny.BluetoothLE)
         - BluetoothLE Hosting (Shiny.BluetoothLE.Hosting)
         - Other

@@ -10,6 +10,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseShiny()
+            .UseShinyTableView()
             .UseShinyShell(x => x.AddGeneratedMaps())
             .ConfigureFonts(fonts =>
             {

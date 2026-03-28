@@ -6,8 +6,8 @@ namespace Sample.Maui.Pages;
 [ShellMap<SettingsPage>("settings")]
 public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shiny.Power.IBattery battery, IKeyValueStore store) : ObservableObject, IPageLifecycleAware, IDisposable
 {
-    IDisposable? _connSub;
-    IDisposable? _batterySub;
+    IDisposable? connSub;
+    IDisposable? batterySub;
 
     [ObservableProperty] string networkAccess = string.Empty;
     [ObservableProperty] string connectionTypes = string.Empty;
@@ -20,66 +20,66 @@ public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shi
 
     public void OnAppearing()
     {
-        UpdateConnectivity();
-        UpdateBattery();
-        Platform = $"{Microsoft.Maui.Devices.DeviceInfo.Platform} {Microsoft.Maui.Devices.DeviceInfo.VersionString} ({Microsoft.Maui.Devices.DeviceInfo.Manufacturer} {Microsoft.Maui.Devices.DeviceInfo.Model})";
+        this.UpdateConnectivity();
+        this.UpdateBattery();
+        this.Platform = $"{Microsoft.Maui.Devices.DeviceInfo.Platform} {Microsoft.Maui.Devices.DeviceInfo.VersionString} ({Microsoft.Maui.Devices.DeviceInfo.Manufacturer} {Microsoft.Maui.Devices.DeviceInfo.Model})";
 
-        _connSub = connectivity
+        this.connSub = connectivity
             .WhenChanged()
-            .Subscribe(_ => MainThread.BeginInvokeOnMainThread(UpdateConnectivity));
+            .Subscribe(_ => MainThread.BeginInvokeOnMainThread(this.UpdateConnectivity));
 
-        _batterySub = battery
+        this.batterySub = battery
             .WhenChanged()
-            .Subscribe(_ => MainThread.BeginInvokeOnMainThread(UpdateBattery));
+            .Subscribe(_ => MainThread.BeginInvokeOnMainThread(this.UpdateBattery));
     }
 
     public void OnDisappearing()
     {
-        _connSub?.Dispose();
-        _connSub = null;
-        _batterySub?.Dispose();
-        _batterySub = null;
+        this.connSub?.Dispose();
+        this.connSub = null;
+        this.batterySub?.Dispose();
+        this.batterySub = null;
     }
 
     void UpdateConnectivity()
     {
-        NetworkAccess = connectivity.Access.ToString();
-        ConnectionTypes = connectivity.ConnectionTypes.ToString();
+        this.NetworkAccess = connectivity.Access.ToString();
+        this.ConnectionTypes = connectivity.ConnectionTypes.ToString();
     }
 
     void UpdateBattery()
     {
-        BatteryLevel = battery.Level;
-        BatteryState = battery.Status.ToString();
+        this.BatteryLevel = battery.Level;
+        this.BatteryState = battery.Status.ToString();
     }
 
     [RelayCommand]
     void SetValue()
     {
-        if (string.IsNullOrWhiteSpace(StoreKey)) return;
-        store.Set(StoreKey, StoreValue);
-        StoreResult = $"Set '{StoreKey}' = '{StoreValue}'";
+        if (string.IsNullOrWhiteSpace(this.StoreKey)) return;
+        store.Set(this.StoreKey, this.StoreValue);
+        this.StoreResult = $"Set '{this.StoreKey}' = '{this.StoreValue}'";
     }
 
     [RelayCommand]
     void GetValue()
     {
-        if (string.IsNullOrWhiteSpace(StoreKey)) return;
-        var value = store.Get(typeof(string), StoreKey);
-        StoreResult = value != null ? $"'{StoreKey}' = '{value}'" : $"'{StoreKey}' not found";
+        if (string.IsNullOrWhiteSpace(this.StoreKey)) return;
+        var value = store.Get(typeof(string), this.StoreKey);
+        this.StoreResult = value != null ? $"'{this.StoreKey}' = '{value}'" : $"'{this.StoreKey}' not found";
     }
 
     [RelayCommand]
     void RemoveValue()
     {
-        if (string.IsNullOrWhiteSpace(StoreKey)) return;
-        var removed = store.Remove(StoreKey);
-        StoreResult = removed ? $"Removed '{StoreKey}'" : $"'{StoreKey}' not found";
+        if (string.IsNullOrWhiteSpace(this.StoreKey)) return;
+        var removed = store.Remove(this.StoreKey);
+        this.StoreResult = removed ? $"Removed '{this.StoreKey}'" : $"'{this.StoreKey}' not found";
     }
 
     public void Dispose()
     {
-        _connSub?.Dispose();
-        _batterySub?.Dispose();
+        this.connSub?.Dispose();
+        this.batterySub?.Dispose();
     }
 }

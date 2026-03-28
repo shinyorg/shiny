@@ -3,7 +3,7 @@ namespace Sample.Maui.Pages.Locations;
 [ShellMap<GpsPage>("gps")]
 public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, IDisposable
 {
-    IDisposable? _gpsSub;
+    IDisposable? gpsSub;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ListenText))]
@@ -15,17 +15,17 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
     [ObservableProperty] double speed;
     [ObservableProperty] double heading;
 
-    public string ListenText => IsListening ? "Stop Listener" : "Start Listener";
+    public string ListenText => this.IsListening ? "Stop Listener" : "Start Listener";
 
     [RelayCommand]
     async Task ToggleListener()
     {
-        if (IsListening)
+        if (this.IsListening)
         {
-            _gpsSub?.Dispose();
-            _gpsSub = null;
+            this.gpsSub?.Dispose();
+            this.gpsSub = null;
             await gpsManager.StopListener();
-            IsListening = false;
+            this.IsListening = false;
             return;
         }
 
@@ -38,21 +38,18 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
         }
 
         await gpsManager.StartListener(request);
-        IsListening = true;
-        _gpsSub = gpsManager
+        this.IsListening = true;
+        this.gpsSub = gpsManager
             .WhenReading()
             .Subscribe(reading => MainThread.BeginInvokeOnMainThread(() =>
             {
-                Latitude = reading.Position.Latitude;
-                Longitude = reading.Position.Longitude;
-                Altitude = reading.Altitude;
-                Speed = reading.Speed;
-                Heading = reading.Heading;
+                this.Latitude = reading.Position.Latitude;
+                this.Longitude = reading.Position.Longitude;
+                this.Altitude = reading.Altitude;
+                this.Speed = reading.Speed;
+                this.Heading = reading.Heading;
             }));
     }
 
-    public void Dispose()
-    {
-        _gpsSub?.Dispose();
-    }
+    public void Dispose() => this.gpsSub?.Dispose();
 }

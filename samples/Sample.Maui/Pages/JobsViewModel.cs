@@ -4,46 +4,54 @@ namespace Sample.Maui.Pages;
 public partial class JobsViewModel(IJobManager jobManager) : ObservableObject, IPageLifecycleAware
 {
     [ObservableProperty] string status = string.Empty;
-    public ObservableCollection<JobViewModel> Jobs { get; } = [];
 
-    public void OnAppearing() => LoadJobs();
+    public List<JobViewModel> Jobs
+    {
+        get;
+        private set
+        {
+            field = value;
+            this.OnPropertyChanged();
+        }
+    } = [];
+
+    public void OnAppearing() => this.LoadJobs();
     public void OnDisappearing() { }
 
     void LoadJobs()
     {
-        Jobs.Clear();
-        foreach (var job in jobManager.GetJobs())
-        {
-            Jobs.Add(new JobViewModel
+        this.Jobs = jobManager
+            .GetJobs()
+            .Select(job => new JobViewModel
             {
                 Identifier = job.Identifier,
                 LastRunTime = job.Identifier
-            });
-        }
+            })
+            .ToList();
     }
 
     [RelayCommand]
     async Task RunAll()
     {
-        Status = "Running all jobs...";
+        this.Status = "Running all jobs...";
         var access = await jobManager.RequestAccess();
         if (access != AccessState.Available)
         {
-            Status = $"Access: {access}";
+            this.Status = $"Access: {access}";
             return;
         }
 
         var results = await jobManager.RunAll();
-        Status = $"Completed {results.Count()} jobs";
-        LoadJobs();
+        this.Status = $"Completed {results.Count()} jobs";
+        this.LoadJobs();
     }
 
     [RelayCommand]
     void CancelAll()
     {
         jobManager.CancelAll();
-        Status = "All jobs cancelled";
-        LoadJobs();
+        this.Status = "All jobs cancelled";
+        this.LoadJobs();
     }
 }
 

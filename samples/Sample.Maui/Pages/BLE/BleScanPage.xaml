@@ -7,7 +7,7 @@
              Title="BLE Scanner">
     <Grid RowDefinitions="Auto,*" Padding="16" RowSpacing="8">
         <Button Text="{Binding ScanText}" Command="{Binding ToggleScanCommand}" />
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Peripherals}">
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Peripherals}" SelectionMode="Single" SelectionChangedCommand="{Binding SelectPeripheralCommand}" SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:PeripheralViewModel">
                     <Grid Padding="8" ColumnDefinitions="*,Auto">

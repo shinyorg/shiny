@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:vm="clr-namespace:Sample.Maui.Pages.HttpTransfers"
+             x:Class="Sample.Maui.Pages.HttpTransfers.HttpTransferAzureBlobPage"
+             x:DataType="vm:HttpTransferAzureBlobViewModel"
+             Title="Azure Blob Upload">
+    <tv:TableView>
+        <tv:TableRoot>
+            <tv:TableSection Title="Azure Blob Storage">
+                <tv:EntryCell Title="Tenant" ValueText="{Binding BlobTenant, Mode=TwoWay}" Placeholder="myaccount" />
+                <tv:EntryCell Title="Container" ValueText="{Binding BlobContainer, Mode=TwoWay}" Placeholder="my-container" />
+                <tv:EntryCell Title="SAS Token" ValueText="{Binding BlobSasToken, Mode=TwoWay}" Placeholder="without leading ?" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="File">
+                <tv:EntryCell Title="Remote Name" ValueText="{Binding RemoteFileName, Mode=TwoWay}" Placeholder="Uses local file name if blank" />
+                <tv:LabelCell Title="Selected File" ValueText="{Binding SelectedFileName}" Description="Tap 'Pick File' to choose" />
+                <tv:CommandCell Title="Pick File" Command="{Binding PickFileCommand}" ShowArrow="False" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Options">
+                <tv:SwitchCell Title="Use Metered Connection" On="{Binding UseMeteredConnection, Mode=TwoWay}" />
+            </tv:TableSection>
+
+            <tv:TableSection>
+                <tv:ButtonCell Title="Upload to Azure Blob" Command="{Binding UploadCommand}" />
+                <tv:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </tv:TableSection>
+        </tv:TableRoot>
+    </tv:TableView>
+</ContentPage>
