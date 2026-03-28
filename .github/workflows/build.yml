@@ -9,9 +9,7 @@ on:
         default: 'warning'
   push:
     branches:
-      - master
-      - main
-      - dev
+      - preview
       - v*
 
 concurrency:
@@ -56,5 +54,5 @@ jobs:
         retention-days: 5
 
     - name: Publish NuGets
-      if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v') }}
+      if: ${{ github.ref == 'refs/heads/preview' || startsWith(github.ref, 'refs/heads/v') }}
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGETAPIKEY }} --skip-duplicate
