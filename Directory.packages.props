@@ -5,6 +5,11 @@
         <MsftExtensionVersion>10.0.0</MsftExtensionVersion>
     </PropertyGroup>
     <ItemGroup>
+        <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
+        <PackageVersion Include="Shiny.Maui.Shell" Version="3.1.1" />
+        <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    </ItemGroup>
+    <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
         <PackageVersion Include="Microsoft.Maui.Core" Version="10.0.51"/>
         <PackageVersion Include="Shiny.Reflector" Version="1.7.1"/>
