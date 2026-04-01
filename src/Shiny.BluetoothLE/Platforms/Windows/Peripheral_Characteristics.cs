@@ -32,6 +32,7 @@ public partial class Peripheral
 
         var service = result.Services.FirstOrDefault()
             ?? throw new BleException($"Service '{serviceUuid}' not found");
+        this.TrackService(service);
 
         var chResult = await service
             .GetCharacteristicsAsync(BluetoothCacheMode.Uncached)
@@ -69,11 +70,14 @@ public partial class Peripheral
                 .Switch()
                 .Select(ch => Observable.Create<BleCharacteristicResult>(ob =>
                 {
+                    var characteristicInfo = ToCharInfo(ch);
+                    var notifyingInfo = ToCharInfo(ch, isNotifying: true);
+                    var notifyingOffInfo = ToCharInfo(ch, isNotifying: false);
+
                     var handler = new TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs>((sender, args) =>
                     {
                         var data = args.CharacteristicValue?.ToArray();
-                        var info = ToCharInfo(sender);
-                        ob.OnNext(new BleCharacteristicResult(info, BleCharacteristicEvent.Notification, data));
+                        ob.OnNext(new BleCharacteristicResult(characteristicInfo, BleCharacteristicEvent.Notification, data));
                     });
 
                     ch.ValueChanged += handler;
@@ -92,8 +96,7 @@ public partial class Peripheral
                             }
                             else
                             {
-                                var info = ToCharInfo(ch, isNotifying: true);
-                                this.charSubChangedSubj.OnNext(info);
+                                this.charSubChangedSubj.OnNext(notifyingInfo);
                             }
                         });
 
@@ -107,8 +110,7 @@ public partial class Peripheral
                                 GattClientCharacteristicConfigurationDescriptorValue.None
                             ).AsTask().ContinueWith(_ =>
                             {
-                                var info = ToCharInfo(ch, isNotifying: false);
-                                this.charSubChangedSubj.OnNext(info);
+                                this.charSubChangedSubj.OnNext(notifyingOffInfo);
                             });
                         }
                         catch
@@ -234,6 +236,7 @@ public partial class Peripheral
 
         var service = result.Services.FirstOrDefault()
             ?? throw new BleException($"Service '{serviceUuid}' not found");
+        this.TrackService(service);
 
         var cuid = Utils.ToUuidType(characteristicUuid);
         var chResult = await service
