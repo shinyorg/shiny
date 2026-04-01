@@ -13,11 +13,11 @@
         <File Path="LICENSE.md" />
         <File Path="readme.md" />
         <File Path="nuget.config" />
-        <File Path="src\Directory.build.props" />
-        <File Path="src\Directory.build.targets" />
-        <File Path="src\Directory.packages.props" />
-        <File Path="src\nuget.png" />
-        <File Path="src\nuget.txt" />
+        <File Path="Directory.build.props" />
+        <File Path="Directory.build.targets" />
+        <File Path="Directory.packages.props" />
+        <File Path="nuget.png" />
+        <File Path="nuget.txt" />
         <File Path="version.json" />
     </Folder>
     <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
