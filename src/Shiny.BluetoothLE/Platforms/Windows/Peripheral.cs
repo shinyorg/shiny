@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Shiny.BluetoothLE;
 
@@ -16,6 +19,7 @@ public partial class Peripheral : IPeripheral
     readonly Subject<ConnectionState> connSubj = new();
     readonly Subject<BleException> connFailedSubj = new();
     readonly Subject<Unit> servicesChangedSubj = new();
+    readonly HashSet<GattDeviceService> trackedServices = new();
 
 
     public Peripheral(BleManager manager, BluetoothLEDevice device, ILogger<IPeripheral> logger)
@@ -23,6 +27,7 @@ public partial class Peripheral : IPeripheral
         this.manager = manager;
         this.logger = logger;
         this.Native = device;
+        this.BluetoothAddress = device.BluetoothAddress;
         this.Uuid = device.GetDeviceId().ToString();
 
         this.HookNativeEvents();
@@ -30,6 +35,7 @@ public partial class Peripheral : IPeripheral
 
 
     public BluetoothLEDevice? Native { get; private set; }
+    public ulong BluetoothAddress { get; }
     public DeviceInformation DeviceInfo => this.Native!.DeviceInformation;
     public string Uuid { get; }
     public string? Name => this.Native?.Name;
@@ -113,16 +119,7 @@ public partial class Peripheral : IPeripheral
             return;
 
         this.connSubj.OnNext(ConnectionState.Disconnecting);
-
-        this.ClearNotifications();
-
-        foreach (var service in this.Native.GattServices)
-        {
-            service.Session?.Dispose();
-            service.Dispose();
-        }
-        this.Native.Dispose();
-        this.Native = null;
+        this.ReleaseNativeResources();
 
         this.connSubj.OnNext(ConnectionState.Disconnected);
         this.manager.FirePeripheralStateChanged(this);
@@ -166,7 +163,10 @@ public partial class Peripheral : IPeripheral
         this.logger.LogDebug("Peripheral {Uuid} connection status changed to {State}", this.Uuid, state);
 
         if (state == ConnectionState.Disconnected)
-            this.ClearNotifications();
+        {
+            this.ReleaseNativeResources();
+            this.manager.RemovePeripheral(this);
+        }
 
         this.connSubj.OnNext(state);
         this.manager.FirePeripheralStateChanged(this);
@@ -184,5 +184,48 @@ public partial class Peripheral : IPeripheral
     {
         if (this.Status != ConnectionState.Connected)
             throw new InvalidOperationException("GATT is not connected");
+    }
+
+
+    protected GattDeviceService TrackService(GattDeviceService service)
+    {
+        lock (this.trackedServices)
+            this.trackedServices.Add(service);
+
+        return service;
+    }
+
+
+    void ReleaseNativeResources(bool disposeNative = true)
+    {
+        this.ClearNotifications();
+
+        List<GattDeviceService> services;
+        lock (this.trackedServices)
+        {
+            services = this.trackedServices.ToList();
+            this.trackedServices.Clear();
+        }
+
+        foreach (var service in services)
+        {
+            try
+            {
+                service.Session?.Dispose();
+                service.Dispose();
+            }
+            catch
+            {
+                // best effort cleanup
+            }
+        }
+
+        if (disposeNative && this.Native != null)
+        {
+            this.Native.ConnectionStatusChanged -= this.OnConnectionStatusChanged;
+            this.Native.GattServicesChanged -= this.OnGattServicesChanged;
+            this.Native.Dispose();
+            this.Native = null;
+        }
     }
 }
