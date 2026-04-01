@@ -8,6 +8,7 @@
         <File Path=".github\ISSUE_TEMPLATE\feature_request.yml" />
         <File Path=".github\PULL_REQUEST_TEMPLATE.md" />
         <File Path=".github\workflows\build.yml" />
+        <File Path=".github\workflows\sync-skills.yml" />
         <File Path="Build.slnf" />
         <File Path="LICENSE.md" />
         <File Path="readme.md" />
