@@ -27,6 +27,7 @@ public partial class Peripheral
         if (service == null)
             throw new BleException($"Service '{serviceUuid}' not found");
 
+        this.TrackService(service);
         return new BleServiceInfo(service.Uuid.ToString());
     });
 
@@ -41,6 +42,9 @@ public partial class Peripheral
             .ConfigureAwait(false);
 
         result.Status.Assert("GetServices", "all");
+
+        foreach (var service in result.Services)
+            this.TrackService(service);
 
         return (IReadOnlyList<BleServiceInfo>)result
             .Services

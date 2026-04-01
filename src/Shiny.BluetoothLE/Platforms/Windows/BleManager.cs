@@ -232,6 +232,12 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     }
 
 
+    internal void RemovePeripheral(Peripheral peripheral)
+    {
+        this.peripherals.TryRemove(peripheral.BluetoothAddress, out _);
+    }
+
+
     void Clear() => this.peripherals
         .Where(x => x.Value.Status != ConnectionState.Connected)
         .ToList()
