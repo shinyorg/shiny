@@ -7,6 +7,7 @@
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
         <PackageVersion Include="Shiny.Maui.Shell" Version="3.1.1" />
+        <PackageVersion Include="Shiny.Maui.TableView" Version="1.1.0" />
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     </ItemGroup>
     <ItemGroup>
