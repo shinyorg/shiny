@@ -148,7 +148,7 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
         }
         catch (Exception ex)
         {
-            this.Status = $"Error: {ex.Message}";
+            this.Status = "Error: " + ex;
         }
     }
 
