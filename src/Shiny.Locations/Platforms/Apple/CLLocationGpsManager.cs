@@ -128,7 +128,6 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
     public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async ct =>
     {
-        (await this.RequestAccess(GpsRequest.Foreground)).Assert();
         if (this.locationManager.Location == null)
             return null;
 
@@ -164,8 +163,6 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
     protected virtual async Task StartListenerInternal(GpsRequest request)
     {
-        (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
-
         // this.locationManager.DistanceFilter = request.DistanceFilterMeters;
         // this.locationManager.DesiredAccuracy = request.Accuracy switch
         // {

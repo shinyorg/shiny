@@ -83,8 +83,6 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     public async Task StartMonitoring(GeofenceRegion region)
     {
-        (await this.RequestAccess().ConfigureAwait(false)).Assert();
-
         this.AddNativeGeofence(region);
         this.repository.Set(region);
 
@@ -122,8 +120,6 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
     {
-        (await this.RequestAccess().ConfigureAwait(false)).Assert();
-
         var loc = new Geolocator();
         var position = await loc.GetGeopositionAsync().AsTask(cancelToken).ConfigureAwait(false);
         if (position?.Coordinate == null)

@@ -81,14 +81,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     public IObservable<AccessState> RequestAccess() => this.GetRadio().Select(x => x.GetAccessStatus());
 
 
-    public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => this.RequestAccess()
-        .Do(access =>
-        {
-            if (access != AccessState.Available)
-                throw new PermissionException("BluetoothLE", access);
-        })
-        .Select(_ => this.CreateScanner(scanConfig))
-        .Switch()
+    public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => this.CreateScanner(scanConfig)
         .Select(args => Observable.FromAsync(async ct =>
         {
             var peripheral = this.GetOrCreatePeripheral(args.BluetoothAddress);

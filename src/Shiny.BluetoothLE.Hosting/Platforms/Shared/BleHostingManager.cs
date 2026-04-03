@@ -82,8 +82,6 @@ public partial class BleHostingManager : IShinyStartupTask
         if (this.IsRegisteredServicesAttached)
             return;
 
-        (await this.RequestAccess()).Assert();
-
         this.gattServices ??= CollectServices(this.gattChars.Value);
         if (!this.gattServices.Any())
             throw new InvalidOperationException("There are no register BLE services");

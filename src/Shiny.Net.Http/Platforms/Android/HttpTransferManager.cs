@@ -46,11 +46,6 @@ public class HttpTransferManager(
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         request.AssertValid();
-        (await platform.RequestForegroundServicePermissions()).Assert(allowRestricted: true);
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(34))
-        {
-            (await platform.RequestAccess("android.permission.FOREGROUND_SERVICE_DATA_SYNC").ToTask()).Assert();
-        }
         // this will trigger over to the job if it is running
         long? contentLength = null;
         if (request.Type.IsUpload())

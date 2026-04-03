@@ -135,7 +135,6 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     public async Task StartMonitoring(GeofenceRegion region)
     {
-        (await this.RequestAccess().ConfigureAwait(false)).Assert();
         await this.Create(region).ConfigureAwait(false);
         this.repository.Set(region);
     }

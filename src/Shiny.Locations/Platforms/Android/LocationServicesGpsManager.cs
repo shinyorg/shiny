@@ -18,9 +18,6 @@ public class LocationServicesGpsManager : AbstractGpsManager
 
     public override IObservable<GpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
     {
-        
-        (await this.RequestAccess(GpsRequest.Foreground)).Assert(null, true);
-
         var criteria = new Criteria
         {
             BearingRequired = false,

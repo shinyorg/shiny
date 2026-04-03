@@ -91,8 +91,6 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
-        (await this.RequestAccess(false, true)).Assert();
-
         var service = new GattService(this.context, uuid, primary);
         serviceBuilder(service);
 
@@ -281,8 +279,6 @@ public partial class BleHostingManager : IBleHostingManager
 
     async Task DoAdvertise(AdvertiseSettings.Builder settings, AdvertiseData.Builder data)
     {
-        (await this.RequestAccess(true, false)).Assert();
-
         var tcs = new TaskCompletionSource<bool>();
         this.adCallbacks = new AdvertisementCallbacks(
             () => tcs.SetResult(true),

@@ -128,32 +128,24 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
         this.Clear();
         scanConfig ??= new ScanConfig();
-        var sub = this.RequestAccess()
-            .Do(access =>
-            {
-                if (access != AccessState.Available)
-                    throw new PermissionException("BluetoothLE", access);
-            })
-            .SelectMany(_ =>
-            {
-                if (scanConfig.ServiceUuids == null || scanConfig.ServiceUuids.Length == 0)
-                {
-                    this.Manager.ScanForPeripherals(
-                        null!,
-                        peripheralScanningOptions
-                    );
-                }
-                else
-                {
-                    var uuids = scanConfig.ServiceUuids.Select(CBUUID.FromString).ToArray();
-                    this.Manager.ScanForPeripherals(uuids, peripheralScanningOptions);
-                }
-                this.IsScanning = true;
-                return this.ScanResultReceived;
-            })
+
+        if (scanConfig.ServiceUuids == null || scanConfig.ServiceUuids.Length == 0)
+        {
+            this.Manager.ScanForPeripherals(
+                null!,
+                peripheralScanningOptions
+            );
+        }
+        else
+        {
+            var uuids = scanConfig.ServiceUuids.Select(CBUUID.FromString).ToArray();
+            this.Manager.ScanForPeripherals(uuids, peripheralScanningOptions);
+        }
+        this.IsScanning = true;
+        var sub = this.ScanResultReceived
             .Subscribe(
                 ob.OnNext,
-                ob.OnError, 
+                ob.OnError,
                 ob.OnCompleted
             );
 

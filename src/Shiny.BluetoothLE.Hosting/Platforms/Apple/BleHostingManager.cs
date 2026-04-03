@@ -145,8 +145,6 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
-        (await this.RequestAccess(false, true)).Assert();
-
         var service = new GattService(this.Manager, uuid, primary);
         serviceBuilder(service);
 
@@ -233,8 +231,6 @@ public partial class BleHostingManager : IBleHostingManager
 
     async Task DoAdvertise(NSDictionary parameters)
     {
-        (await this.RequestAccess(true, false)).Assert();
-
         if (this.Manager.Advertising)
             throw new InvalidOperationException("Advertising is already active");
         

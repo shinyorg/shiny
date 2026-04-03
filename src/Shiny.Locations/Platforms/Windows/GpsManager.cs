@@ -65,8 +65,6 @@ public class GpsManager : IGpsManager
         if (request.BackgroundMode != GpsBackgroundMode.None)
             throw new InvalidOperationException("Background GPS is not supported on Windows");
 
-        (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
-
         this.geolocator = new Geolocator();
 
         if (request.RequestPreciseAccuracy)

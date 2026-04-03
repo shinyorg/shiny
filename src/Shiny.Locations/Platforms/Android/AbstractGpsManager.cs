@@ -188,8 +188,6 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         if (request is not AndroidGpsRequest android)
             android = new AndroidGpsRequest(request.BackgroundMode);
 
-        (await this.RequestAccess(request)).Assert(allowRestricted: true);
-
         if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
             this.Platform.StartService(typeof(ShinyGpsService), android.StopForegroundServiceWithTask);
 

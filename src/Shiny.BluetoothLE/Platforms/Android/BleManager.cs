@@ -181,39 +181,36 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
 
     readonly Subject<(SR? Native, ScanFailure? Failure)> scanSubj = new();
-    public IObservable<ScanResult> Scan(ScanConfig? config = null) => this.RequestAccess()
-        .Do(x => Assert(x))
-        .Select(x => Observable.Create<ScanResult>(ob =>
+    public IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(ob =>
+    {
+        if (this.IsScanning)
+            throw new InvalidOperationException("There is already an active scan");
+
+        this.Clear();
+
+        var disp = this.scanSubj.Subscribe(x =>
         {
-            if (this.IsScanning)
-                throw new InvalidOperationException("There is already an active scan");
-        
-            this.Clear();
-
-            var disp = this.scanSubj.Subscribe(x =>
+            if (x.Failure == null)
             {
-                if (x.Failure == null)
+                if (x.Native != null)
                 {
-                    if (x.Native != null)
-                    {
-                        ob.OnNext(this.FromNative(x.Native));
-                    }
+                    ob.OnNext(this.FromNative(x.Native));
                 }
-                else
-                {
-                    ob.OnError(new InvalidOperationException("Scan Error: " + x.Failure));
-                }
-            });
-            this.StartScan(config);
-
-            return () =>
+            }
+            else
             {
-                this.IsScanning = false;
-                this.StopScan();
-                disp?.Dispose();
-            };
-        }))
-        .Switch();
+                ob.OnError(new InvalidOperationException("Scan Error: " + x.Failure));
+            }
+        });
+        this.StartScan(config);
+
+        return () =>
+        {
+            this.IsScanning = false;
+            this.StopScan();
+            disp?.Dispose();
+        };
+    });
 
 
     public void StopScan()

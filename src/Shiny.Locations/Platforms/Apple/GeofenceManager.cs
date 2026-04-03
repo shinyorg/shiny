@@ -78,8 +78,6 @@ public class GeofenceManager(
     
     public async Task StartMonitoring(GeofenceRegion region)
     {
-        (await this.RequestAccess().ConfigureAwait(false)).Assert();
-        
         var mon = await this.GetMonitor();
         this.AddToMonitor(mon, region);
         repository.Insert(region);
@@ -108,7 +106,6 @@ public class GeofenceManager(
     public Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default) =>
         platform.InvokeTaskOnMainThread(async () =>
         {
-            (await this.RequestAccess()).Assert();
             var mon = await this.GetMonitor();
             var rec = mon.GetMonitoringRecord(region.Identifier);
             if (rec == null)

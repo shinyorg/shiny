@@ -17,8 +17,6 @@ public class GooglePlayServiceGpsManager(
 
     public override IObservable<GpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
     {
-        (await this.RequestAccess(GpsRequest.Foreground).ConfigureAwait(false)).Assert(null, true);
-
         var location = await LocationServices
             .GetFusedLocationProviderClient(this.Platform.AppContext)
             .GetLastLocationAsync()
