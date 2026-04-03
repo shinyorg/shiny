@@ -59,6 +59,20 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
     );
 
 
+    public async Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)
+    {
+        var settings = await UNUserNotificationCenter.Current.GetNotificationSettingsAsync();
+        return settings.AuthorizationStatus switch
+        {
+            UNAuthorizationStatus.Authorized => AccessState.Available,
+            UNAuthorizationStatus.Denied => AccessState.Denied,
+            UNAuthorizationStatus.Provisional => AccessState.Available,
+            UNAuthorizationStatus.Ephemeral => AccessState.Available,
+            _ => AccessState.Unknown
+        };
+    }
+
+
     public Task<AccessState> RequestAccess(AccessRequestFlags access)
     {
         var tcs = new TaskCompletionSource<AccessState>();

@@ -19,6 +19,7 @@ public class PushManager : IPushManager, IShinyWebAssemblyService
     public DateTime? CurrentRegistrationTokenDate => throw new NotImplementedException();
     public string? CurrentRegistrationToken => throw new NotImplementedException();
     
+    public Task<AccessState> GetCurrentAccess() => throw new NotImplementedException();
     public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => throw new NotImplementedException();
     public Task UnRegister() => throw new NotImplementedException();
     public IObservable<PushNotification> WhenReceived() => throw new NotImplementedException();

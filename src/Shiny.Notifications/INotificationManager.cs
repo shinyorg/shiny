@@ -44,6 +44,13 @@ public interface INotificationManager
 
 
     /// <summary>
+    /// Gets the current notification access state without prompting the user
+    /// </summary>
+    /// <param name="flags">You can check multiple types of permissions (TimeSensitive, LocationAware)</param>
+    /// <returns></returns>
+    Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification);
+
+    /// <summary>
     /// Requests/ensures appropriate platform permissions where necessary
     /// </summary>
     /// <param name="flags">You can request multiple types of permissions (TimeSensitive, LocationAware)</param>

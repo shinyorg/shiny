@@ -89,6 +89,23 @@ public class PushManager(
     }
 
 
+    public async Task<AccessState> GetCurrentAccess()
+    {
+        if (AppleExtensions.IsSimulator)
+            return AccessState.NotSupported;
+
+        var settings = await UNUserNotificationCenter.Current.GetNotificationSettingsAsync();
+        return settings.AuthorizationStatus switch
+        {
+            UNAuthorizationStatus.Authorized => AccessState.Available,
+            UNAuthorizationStatus.Denied => AccessState.Denied,
+            UNAuthorizationStatus.Provisional => AccessState.Available,
+            UNAuthorizationStatus.Ephemeral => AccessState.Available,
+            _ => AccessState.Unknown
+        };
+    }
+
+
     public async Task<PushAccessState> RequestAccess(UNAuthorizationOptions options, CancellationToken cancelToken = default)
     {
         if (AppleExtensions.IsSimulator)

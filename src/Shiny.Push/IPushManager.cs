@@ -24,6 +24,12 @@ public interface IPushManager
     string? NativeRegistrationToken { get; }
 
     /// <summary>
+    /// Gets the current push notification access state without prompting the user
+    /// </summary>
+    /// <returns></returns>
+    Task<AccessState> GetCurrentAccess();
+
+    /// <summary>
     /// Requests platform permission to send push notifications
     /// </summary>
     /// <param name="cancelToken"></param>

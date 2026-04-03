@@ -107,6 +107,17 @@ public class PushManager : NotifyPropertyChanged,
     }
 
 
+    public Task<AccessState> GetCurrentAccess()
+    {
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        {
+            var status = this.platform.GetCurrentPermissionStatus(Manifest.Permission.PostNotifications);
+            return Task.FromResult(status);
+        }
+        return Task.FromResult(AccessState.Available);
+    }
+
+
     public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
     {
         this.registrationRequest = true;

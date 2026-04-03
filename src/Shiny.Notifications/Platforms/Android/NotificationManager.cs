@@ -96,6 +96,42 @@ public partial class NotificationManager : INotificationManager,
         => Task.FromResult((IList<Notification>)this.repository.GetList<AndroidNotification>().OfType<Notification>().ToList());
 
 
+    public Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)
+    {
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        {
+            var status = this.platform.GetCurrentPermissionStatus(P.PostNotifications);
+            if (status != AccessState.Available)
+                return Task.FromResult(status);
+        }
+
+        if (!this.manager.NativeManager.AreNotificationsEnabled())
+            return Task.FromResult(AccessState.Disabled);
+
+        if (flags.HasFlag(AccessRequestFlags.LocationAware))
+        {
+            var fineLocation = this.platform.GetCurrentPermissionStatus(P.AccessFineLocation);
+            if (fineLocation != AccessState.Available)
+                return Task.FromResult(AccessState.Denied);
+
+            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            {
+                var bgLocation = this.platform.GetCurrentPermissionStatus(P.AccessBackgroundLocation);
+                if (bgLocation != AccessState.Available)
+                    return Task.FromResult(AccessState.Denied);
+            }
+        }
+
+        if (OperatingSystemShim.IsAndroidVersionAtLeast(31) && flags.HasFlag(AccessRequestFlags.TimeSensitivity))
+        {
+            if (!this.manager.Alarms.CanScheduleExactAlarms())
+                return Task.FromResult(AccessState.Restricted);
+        }
+
+        return Task.FromResult(AccessState.Available);
+    }
+
+
     public async Task<AccessState> RequestAccess(AccessRequestFlags access)
     {
         var list = new List<string>();
