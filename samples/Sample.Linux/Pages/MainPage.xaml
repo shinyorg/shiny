@@ -5,22 +5,9 @@
              x:Class="Sample.Linux.Pages.MainPage"
              x:DataType="vm:MainViewModel"
              Title="Shiny BLE Sample">
-    <CollectionView ItemsSource="{Binding Features}" SelectionMode="None">
-        <CollectionView.ItemTemplate>
-            <DataTemplate x:DataType="vm:FeatureItem">
-                <Grid Padding="16,12" ColumnDefinitions="*,Auto">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=NavigateCommand}"
-                            CommandParameter="{Binding Route}" />
-                    </Grid.GestureRecognizers>
-                    <VerticalStackLayout>
-                        <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" />
-                        <Label Text="{Binding Description}" FontSize="13" TextColor="Gray" />
-                    </VerticalStackLayout>
-                    <Label Grid.Column="1" Text=">" FontSize="20" VerticalOptions="Center" TextColor="Gray" />
-                </Grid>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+    <VerticalStackLayout Padding="16" Spacing="8">
+        <Button Text="BLE Scanner"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="blescan" />
+    </VerticalStackLayout>
 </ContentPage>
