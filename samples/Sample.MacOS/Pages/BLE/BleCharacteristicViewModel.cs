@@ -1,6 +1,7 @@
 namespace Sample.MacOS.Pages.BLE;
 
-public partial class BleCharacteristicViewModel(IBleManager bleManager) : ObservableObject, IQueryAttributable, IDisposable
+[ShellMap<BleCharacteristicPage>("blecharacteristic")]
+public partial class BleCharacteristicViewModel(IBleManager bleManager) : ObservableObject, IQueryAttributable, IPageLifecycleAware, IDisposable
 {
     IPeripheral? peripheral;
     string? serviceUuid;
@@ -46,6 +47,8 @@ public partial class BleCharacteristicViewModel(IBleManager bleManager) : Observ
                 ex => MainThread.BeginInvokeOnMainThread(() => this.Status = $"Error: {ex.Message}")
             );
     }
+
+    public void OnDisappearing() { }
 
     public void Dispose()
     {

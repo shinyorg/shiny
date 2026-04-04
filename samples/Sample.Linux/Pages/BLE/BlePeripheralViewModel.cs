@@ -1,6 +1,7 @@
 namespace Sample.Linux.Pages.BLE;
 
-public partial class BlePeripheralViewModel(IBleManager bleManager) : ObservableObject, IQueryAttributable, IDisposable
+[ShellMap<BlePeripheralPage>("bleperipheral")]
+public partial class BlePeripheralViewModel(IBleManager bleManager, INavigator navigator) : ObservableObject, IQueryAttributable, IPageLifecycleAware, IDisposable
 {
     IPeripheral? peripheral;
     IDisposable? statusSub;
@@ -100,11 +101,11 @@ public partial class BlePeripheralViewModel(IBleManager bleManager) : Observable
         if (svc == null || this.peripheral == null)
             return;
 
-        await Shell.Current.GoToAsync("blecharacteristic", new Dictionary<string, object>
-        {
-            { "PeripheralUuid", this.peripheral.Uuid },
-            { "ServiceUuid", svc.Uuid }
-        });
+        await navigator.NavigateTo(
+            "blecharacteristic",
+            ("PeripheralUuid", this.peripheral.Uuid),
+            ("ServiceUuid", svc.Uuid)
+        );
     }
 
     public void Dispose()

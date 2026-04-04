@@ -1,6 +1,7 @@
 namespace Sample.Linux.Pages.BLE;
 
-public partial class BleScanViewModel(IBleManager bleManager) : ObservableObject, IDisposable
+[ShellMap<BleScanPage>("blescan")]
+public partial class BleScanViewModel(IBleManager bleManager, INavigator navigator) : ObservableObject, IDisposable
 {
     IDisposable? scanSub;
 
@@ -69,10 +70,7 @@ public partial class BleScanViewModel(IBleManager bleManager) : ObservableObject
         this.scanSub = null;
         this.IsScanning = false;
 
-        await Shell.Current.GoToAsync("bleperipheral", new Dictionary<string, object>
-        {
-            { "PeripheralUuid", peripheral.Uuid }
-        });
+        await navigator.NavigateTo("bleperipheral", ("PeripheralUuid", peripheral.Uuid));
     }
 
     public void Dispose() => this.scanSub?.Dispose();

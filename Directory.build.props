@@ -54,6 +54,10 @@
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 
+    <PropertyGroup Condition="$(TargetFramework.Contains('-macos'))">
+        <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
+    </PropertyGroup>
+
     <PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
         <DefineConstants>$(DefineConstants);PLATFORM;WINDOWS</DefineConstants>
     </PropertyGroup>

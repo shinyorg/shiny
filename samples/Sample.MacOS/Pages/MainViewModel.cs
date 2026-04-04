@@ -1,6 +1,7 @@
 namespace Sample.MacOS.Pages;
 
-public partial class MainViewModel : ObservableObject
+[ShellMap<MainPage>(registerRoute: false)]
+public partial class MainViewModel(INavigator navigator) : ObservableObject
 {
     public List<FeatureItem> Features { get; } =
     [
@@ -8,7 +9,7 @@ public partial class MainViewModel : ObservableObject
     ];
 
     [RelayCommand]
-    Task Navigate(string route) => Shell.Current.GoToAsync(route);
+    Task Navigate(string route) => navigator.NavigateTo(route);
 }
 
 public record FeatureItem(string Title, string Description, string Route);
