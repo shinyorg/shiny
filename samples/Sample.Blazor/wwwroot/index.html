@@ -3,9 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shiny BLE Sample</title>
+    <title>Shiny Sample</title>
     <base href="/" />
+    <link rel="preload" id="webassembly" />
     <link href="css/app.css" rel="stylesheet" />
+    <script type="importmap"></script>
 </head>
 <body>
     <div id="app">
@@ -21,6 +23,6 @@
         <a href="." class="reload">Reload</a>
         <a class="dismiss">X</a>
     </div>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>
 </html>

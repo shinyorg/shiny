@@ -10,6 +10,7 @@
         <PackageVersion Include="Shiny.Maui.TableView" Version="1.1.0" />
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)" />
         <PackageVersion Include="Platform.Maui.MacOS" Version="0.3.0" />
         <PackageVersion Include="Platform.Maui.MacOS.Essentials" Version="0.3.0" />
         <PackageVersion Include="Platform.Maui.Linux.Gtk4" Version="0.6.0" />
