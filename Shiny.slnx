@@ -23,6 +23,8 @@
     <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+    <Project Path="src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
+    <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
     <Project Path="src\Shiny.Core\Shiny.Core.csproj" />
     <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
     <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
@@ -38,5 +40,8 @@
     <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
     <Folder Name="/Samples/">
         <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
+        <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
+        <Project Path="samples\Sample.MacOS\Sample.MacOS.csproj" />
+        <Project Path="samples\Sample.Linux\Sample.Linux.csproj" />
     </Folder>
 </Solution>

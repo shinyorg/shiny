@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Linux.Pages.BLE"
+             x:Class="Sample.Linux.Pages.BLE.BlePeripheralPage"
+             x:DataType="vm:BlePeripheralViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="8">
+        <HorizontalStackLayout Spacing="8">
+            <Button Text="{Binding ConnectText}" Command="{Binding ToggleConnectionCommand}" />
+            <Label Text="{Binding Status}" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+        <Label Grid.Row="1" Text="Services" FontSize="18" FontAttributes="Bold" />
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Services}" SelectionMode="Single" SelectionChangedCommand="{Binding SelectServiceCommand}" SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:BleServiceViewModel">
+                    <Grid Padding="8">
+                        <Label Text="{Binding Uuid}" FontAttributes="Bold" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

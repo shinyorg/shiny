@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Shiny.BluetoothLE;
 
@@ -15,6 +15,4 @@ public class JsScanResult
 
     [JsonPropertyName("txPower")]
     public int TxPower { get; set; }
-
-    // manufacturer data?
 }

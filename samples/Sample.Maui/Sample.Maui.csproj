@@ -12,7 +12,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
 
-        <ApplicationTitle>Shiny Sample</ApplicationTitle>
+        <ApplicationTitle>Shiny Client</ApplicationTitle>
         <ApplicationId>org.shiny.sample</ApplicationId>
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
@@ -33,10 +33,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Shiny.Maui.TableView"/>
         <PackageReference Include="Microsoft.Maui.Controls"/>
-        <PackageReference Include="Shiny.Maui.Shell"/>
         <PackageReference Include="CommunityToolkit.Mvvm"/>
+        <PackageReference Include="Shiny.Maui.TableView"/>
+        <PackageReference Include="Shiny.Maui.Shell"/>
     </ItemGroup>
 
     <ItemGroup>

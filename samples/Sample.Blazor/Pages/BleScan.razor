@@ -1,0 +1,124 @@
+@page "/blescan"
+@inject IBleManager BleManager
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>BLE Scanner</PageTitle>
+
+<h3>BLE Scanner</h3>
+
+<button class="btn btn-primary mb-3" @onclick="ToggleScan">
+    @(isScanning ? "Stop Scan" : "Start Scan")
+</button>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>UUID</th>
+            <th>RSSI</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in peripherals.Values.OrderByDescending(x => x.Rssi))
+        {
+            <tr>
+                <td>@(p.Name ?? "Unknown")</td>
+                <td><code>@p.Uuid</code></td>
+                <td>@p.Rssi dBm</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" @onclick="() => SelectPeripheral(p)">
+                        Connect
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    bool isScanning;
+    string? error;
+    IDisposable? scanSub;
+    readonly Dictionary<string, PeripheralInfo> peripherals = new();
+
+    async Task ToggleScan()
+    {
+        if (isScanning)
+        {
+            scanSub?.Dispose();
+            scanSub = null;
+            isScanning = false;
+            return;
+        }
+
+        error = null;
+        var access = await BleManager.RequestAccess();
+        if (access != AccessState.Available)
+        {
+            error = $"BLE access is {access}";
+            return;
+        }
+
+        peripherals.Clear();
+        isScanning = true;
+
+        scanSub = BleManager
+            .Scan()
+            .Subscribe(
+                result =>
+                {
+                    InvokeAsync(() =>
+                    {
+                        var uuid = result.Peripheral.Uuid;
+                        if (peripherals.TryGetValue(uuid, out var existing))
+                        {
+                            existing.Rssi = result.Rssi;
+                        }
+                        else
+                        {
+                            peripherals[uuid] = new PeripheralInfo
+                            {
+                                Name = result.Peripheral.Name,
+                                Uuid = uuid,
+                                Rssi = result.Rssi
+                            };
+                        }
+                        StateHasChanged();
+                    });
+                },
+                ex =>
+                {
+                    InvokeAsync(() =>
+                    {
+                        error = ex.Message;
+                        isScanning = false;
+                        StateHasChanged();
+                    });
+                }
+            );
+    }
+
+    void SelectPeripheral(PeripheralInfo p)
+    {
+        scanSub?.Dispose();
+        scanSub = null;
+        isScanning = false;
+        Navigation.NavigateTo($"/bleperipheral/{Uri.EscapeDataString(p.Uuid)}");
+    }
+
+    public void Dispose() => scanSub?.Dispose();
+
+    class PeripheralInfo
+    {
+        public string? Name { get; set; }
+        public string Uuid { get; set; } = string.Empty;
+        public int Rssi { get; set; }
+    }
+}

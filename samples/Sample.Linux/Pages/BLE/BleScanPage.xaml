@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Linux.Pages.BLE"
+             x:Class="Sample.Linux.Pages.BLE.BleScanPage"
+             x:DataType="vm:BleScanViewModel"
+             Title="BLE Scanner">
+    <Grid RowDefinitions="Auto,*" Padding="16" RowSpacing="8">
+        <Button Text="{Binding ScanText}" Command="{Binding ToggleScanCommand}" />
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Peripherals}" SelectionMode="Single" SelectionChangedCommand="{Binding SelectPeripheralCommand}" SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:PeripheralViewModel">
+                    <Grid Padding="8" ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Name}" FontAttributes="Bold" />
+                            <Label Text="{Binding Uuid}" FontSize="12" TextColor="Gray" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="1" Text="{Binding Rssi, StringFormat='RSSI: {0}'}" VerticalOptions="Center" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,186 @@
+@page "/blecharacteristic/{PeripheralUuid}/{ServiceUuid}"
+@inject IBleManager BleManager
+@implements IDisposable
+
+<PageTitle>Service - @ServiceUuid</PageTitle>
+
+<h3>Service @ServiceUuid</h3>
+
+@if (!string.IsNullOrEmpty(status))
+{
+    <div class="alert alert-info">@status</div>
+}
+
+@foreach (var ch in characteristics)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title"><code>@ch.Info.Uuid</code></h5>
+            <p class="card-text text-muted">@ch.Info.Properties</p>
+
+            @if (!string.IsNullOrEmpty(ch.Value))
+            {
+                <div class="alert alert-secondary py-1 px-2">@ch.Value</div>
+            }
+
+            <div class="btn-group mb-2">
+                @if (ch.Info.CanRead())
+                {
+                    <button class="btn btn-sm btn-outline-primary" @onclick="() => ReadCharacteristic(ch)">Read</button>
+                }
+                @if (ch.Info.CanNotifyOrIndicate())
+                {
+                    <button class="btn btn-sm btn-outline-info" @onclick="() => ToggleNotify(ch)">
+                        @(ch.IsNotifying ? "Stop Notify" : "Notify")
+                    </button>
+                }
+            </div>
+
+            @if (ch.Info.CanWrite())
+            {
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Hex bytes (e.g. 01FF)" @bind="ch.WriteValue" />
+                    <button class="btn btn-outline-secondary" @onclick="() => WriteCharacteristic(ch)">Write</button>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string PeripheralUuid { get; set; } = string.Empty;
+    [Parameter] public string ServiceUuid { get; set; } = string.Empty;
+
+    IPeripheral? peripheral;
+    string? status;
+    List<CharacteristicItem> characteristics = [];
+
+    protected override void OnInitialized()
+    {
+        peripheral = BleManager.GetKnownPeripheral(Uri.UnescapeDataString(PeripheralUuid));
+        if (peripheral == null)
+        {
+            status = "Peripheral not found.";
+            return;
+        }
+
+        status = "Loading characteristics...";
+        var svcUuid = Uri.UnescapeDataString(ServiceUuid);
+
+        peripheral
+            .GetCharacteristics(svcUuid)
+            .Subscribe(
+                chars => InvokeAsync(() =>
+                {
+                    characteristics = chars.Select(c => new CharacteristicItem { Info = c }).ToList();
+                    status = $"{chars.Count} characteristic(s)";
+                    StateHasChanged();
+                }),
+                ex => InvokeAsync(() =>
+                {
+                    status = $"Error: {ex.Message}";
+                    StateHasChanged();
+                })
+            );
+    }
+
+    void ReadCharacteristic(CharacteristicItem ch)
+    {
+        if (peripheral == null) return;
+
+        peripheral
+            .ReadCharacteristic(ch.Info.Service.Uuid, ch.Info.Uuid)
+            .Subscribe(
+                result => InvokeAsync(() =>
+                {
+                    ch.Value = result.Data != null ? $"[{BitConverter.ToString(result.Data)}]" : "[empty]";
+                    StateHasChanged();
+                }),
+                ex => InvokeAsync(() =>
+                {
+                    ch.Value = $"Read error: {ex.Message}";
+                    StateHasChanged();
+                })
+            );
+    }
+
+    void ToggleNotify(CharacteristicItem ch)
+    {
+        if (peripheral == null) return;
+
+        if (ch.IsNotifying)
+        {
+            ch.NotifySub?.Dispose();
+            ch.NotifySub = null;
+            ch.IsNotifying = false;
+            return;
+        }
+
+        ch.IsNotifying = true;
+        ch.NotifySub = peripheral
+            .NotifyCharacteristic(ch.Info.Service.Uuid, ch.Info.Uuid)
+            .Subscribe(
+                result => InvokeAsync(() =>
+                {
+                    ch.Value = result.Data != null ? $"[{BitConverter.ToString(result.Data)}]" : "[empty]";
+                    StateHasChanged();
+                }),
+                ex => InvokeAsync(() =>
+                {
+                    ch.Value = $"Notify error: {ex.Message}";
+                    ch.IsNotifying = false;
+                    StateHasChanged();
+                })
+            );
+    }
+
+    void WriteCharacteristic(CharacteristicItem ch)
+    {
+        if (peripheral == null || string.IsNullOrWhiteSpace(ch.WriteValue))
+            return;
+
+        byte[] data;
+        try
+        {
+            var hex = ch.WriteValue.Replace("-", "").Replace(" ", "");
+            data = new byte[hex.Length / 2];
+            for (var i = 0; i < data.Length; i++)
+                data[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+        }
+        catch
+        {
+            ch.Value = "Invalid hex input";
+            return;
+        }
+
+        peripheral
+            .WriteCharacteristic(ch.Info.Service.Uuid, ch.Info.Uuid, data)
+            .Subscribe(
+                result => InvokeAsync(() =>
+                {
+                    ch.Value = result.Data != null ? $"Wrote [{BitConverter.ToString(result.Data)}]" : "Write OK";
+                    StateHasChanged();
+                }),
+                ex => InvokeAsync(() =>
+                {
+                    ch.Value = $"Write error: {ex.Message}";
+                    StateHasChanged();
+                })
+            );
+    }
+
+    public void Dispose()
+    {
+        foreach (var ch in characteristics)
+            ch.NotifySub?.Dispose();
+    }
+
+    class CharacteristicItem
+    {
+        public BleCharacteristicInfo Info { get; set; } = null!;
+        public string? Value { get; set; }
+        public string? WriteValue { get; set; }
+        public bool IsNotifying { get; set; }
+        public IDisposable? NotifySub { get; set; }
+    }
+}

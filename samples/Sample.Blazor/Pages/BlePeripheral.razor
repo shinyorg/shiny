@@ -1,0 +1,122 @@
+@page "/bleperipheral/{PeripheralUuid}"
+@inject IBleManager BleManager
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>Peripheral - @Title</PageTitle>
+
+<h3>@Title</h3>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="ToggleConnection">
+        @(connectionState == ConnectionState.Connected ? "Disconnect" : "Connect")
+    </button>
+    <span class="ms-2 badge bg-secondary">@connectionState</span>
+</div>
+
+@if (!string.IsNullOrEmpty(status))
+{
+    <div class="alert alert-info">@status</div>
+}
+
+@if (services.Count > 0)
+{
+    <h4>Services</h4>
+    <div class="list-group">
+        @foreach (var svc in services)
+        {
+            <button class="list-group-item list-group-item-action" @onclick="() => SelectService(svc)">
+                @svc.Uuid
+            </button>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string PeripheralUuid { get; set; } = string.Empty;
+
+    IPeripheral? peripheral;
+    IDisposable? statusSub;
+    ConnectionState connectionState;
+    string Title = "Peripheral";
+    string? status;
+    List<BleServiceInfo> services = [];
+
+    protected override void OnInitialized()
+    {
+        peripheral = BleManager.GetKnownPeripheral(Uri.UnescapeDataString(PeripheralUuid));
+        if (peripheral != null)
+        {
+            Title = peripheral.Name ?? peripheral.Uuid;
+            connectionState = peripheral.Status;
+
+            statusSub = peripheral
+                .WhenStatusChanged()
+                .Subscribe(state =>
+                {
+                    InvokeAsync(() =>
+                    {
+                        connectionState = state;
+                        status = state.ToString();
+                        if (state == ConnectionState.Connected)
+                            LoadServices();
+                        else if (state == ConnectionState.Disconnected)
+                            services = [];
+                        StateHasChanged();
+                    });
+                });
+
+            if (peripheral.Status == ConnectionState.Connected)
+                LoadServices();
+        }
+        else
+        {
+            status = "Peripheral not found. Please scan first.";
+        }
+    }
+
+    void ToggleConnection()
+    {
+        if (peripheral == null) return;
+
+        if (peripheral.Status == ConnectionState.Connected)
+        {
+            peripheral.CancelConnection();
+        }
+        else
+        {
+            peripheral.Connect(null);
+            status = "Connecting...";
+        }
+    }
+
+    void LoadServices()
+    {
+        if (peripheral == null) return;
+
+        peripheral
+            .GetServices()
+            .Subscribe(
+                svcs => InvokeAsync(() =>
+                {
+                    services = svcs.ToList();
+                    StateHasChanged();
+                }),
+                ex => InvokeAsync(() =>
+                {
+                    status = $"Error: {ex.Message}";
+                    StateHasChanged();
+                })
+            );
+    }
+
+    void SelectService(BleServiceInfo svc)
+    {
+        Navigation.NavigateTo($"/blecharacteristic/{Uri.EscapeDataString(PeripheralUuid)}/{Uri.EscapeDataString(svc.Uuid)}");
+    }
+
+    public void Dispose()
+    {
+        statusSub?.Dispose();
+    }
+}

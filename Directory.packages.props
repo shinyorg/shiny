@@ -9,6 +9,11 @@
         <PackageVersion Include="Shiny.Maui.Shell" Version="3.1.1" />
         <PackageVersion Include="Shiny.Maui.TableView" Version="1.1.0" />
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)" />
+        <PackageVersion Include="Platform.Maui.MacOS" Version="0.3.0" />
+        <PackageVersion Include="Platform.Maui.MacOS.Essentials" Version="0.3.0" />
+        <PackageVersion Include="Platform.Maui.Linux.Gtk4" Version="0.6.0" />
+        <PackageVersion Include="Platform.Maui.Linux.Gtk4.Essentials" Version="0.6.0" />
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
@@ -20,6 +25,8 @@
         <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.2.0"/>
+        <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)"/>
+        <PackageVersion Include="Tmds.DBus.Protocol" Version="0.20.0"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.17.0.2"/>

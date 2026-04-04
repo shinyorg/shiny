@@ -33,7 +33,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-          dotnet-version: '10.0.102'
+          dotnet-version: '10.0.201'
 
 #    - uses: AdoptOpenJDK/install-jdk@v1
 #      with:
@@ -41,7 +41,7 @@ jobs:
 #        architecture: x64
 
     - name: Add .NET Workloads
-      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows
+      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows macos wasm-tools
 
     - name: Build
       run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true

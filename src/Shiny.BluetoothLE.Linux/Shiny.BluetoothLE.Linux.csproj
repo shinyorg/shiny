@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny BluetoothLE Plugin for Linux via BlueZ/D-Bus</Description>
+        <RootNamespace>Shiny.BluetoothLE</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Tmds.DBus.Protocol" />
+    </ItemGroup>
+</Project>

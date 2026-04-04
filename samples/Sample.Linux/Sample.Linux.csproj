@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <ApplicationTitle>Shiny Sample</ApplicationTitle>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Platform.Maui.Linux.Gtk4" />
+        <PackageReference Include="Platform.Maui.Linux.Gtk4.Essentials" />
+        <PackageReference Include="CommunityToolkit.Mvvm" />
+        <PackageReference Include="Shiny.Maui.TableView"/>
+        <PackageReference Include="Shiny.Maui.Shell"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
+    </ItemGroup>
+</Project>
