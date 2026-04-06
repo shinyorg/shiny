@@ -25,6 +25,18 @@ public static class OperatingSystemShim
     {
 #if IOS || XAMARINIOS || MACCATALYST
         return IsIOSVersionAtLeast(osMajor, osMinor) || IsMacCatalystVersionAtLeast(osMajor, osMinor);
+#elif MACOS
+        return IsMacOSVersionAtLeast(osMajor, osMinor);
+#else
+        return false;
+#endif
+    }
+
+
+    public static bool IsMacOSVersionAtLeast(int osMajor, int osMinor = 0)
+    {
+#if MACOS
+        return OperatingSystem.IsMacOSVersionAtLeast(osMajor, osMinor);
 #else
         return false;
 #endif

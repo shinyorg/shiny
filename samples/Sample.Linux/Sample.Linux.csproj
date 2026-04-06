@@ -8,16 +8,18 @@
         <ApplicationTitle>Shiny Sample</ApplicationTitle>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Platform.Maui.Linux.Gtk4" />
-        <PackageReference Include="Platform.Maui.Linux.Gtk4.Essentials" />
-        <PackageReference Include="CommunityToolkit.Mvvm" />
+        <PackageReference Include="Platform.Maui.Linux.Gtk4"/>
+        <PackageReference Include="Platform.Maui.Linux.Gtk4.Essentials"/>
+        <PackageReference Include="CommunityToolkit.Mvvm"/>
         <PackageReference Include="Shiny.Maui.TableView"/>
         <PackageReference Include="Shiny.Maui.Shell"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring.Linux\Shiny.Support.DeviceMonitoring.Linux.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj"/>
     </ItemGroup>
 </Project>

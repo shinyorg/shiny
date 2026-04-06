@@ -1,0 +1,56 @@
+@page "/battery"
+@using System.Reactive.Linq
+@using Shiny.Power
+@implements IDisposable
+@inject IBattery BatteryService
+
+<PageTitle>Battery</PageTitle>
+
+<h1>Battery</h1>
+
+<p>
+    Live battery state via the browser's Battery Status API. Note: many browsers
+    (Firefox, Safari) no longer expose this API for privacy reasons; level will
+    show 100% and status Unknown there.
+</p>
+
+<div class="mb-3">
+    <button class="btn btn-primary me-2" @onclick="Refresh">Refresh</button>
+</div>
+
+<table class="table">
+    <tbody>
+        <tr><th>Level</th><td>@($"{level * 100:F0}%")</td></tr>
+        <tr><th>Status</th><td>@status</td></tr>
+        <tr><th>Last change</th><td>@(lastChange?.ToString("HH:mm:ss") ?? "—")</td></tr>
+    </tbody>
+</table>
+
+@code {
+    double level;
+    BatteryState status;
+    DateTime? lastChange;
+    IDisposable? sub;
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+        sub = BatteryService
+            .WhenChanged()
+            .Subscribe(b => InvokeAsync(() =>
+            {
+                level = b.Level;
+                status = b.Status;
+                lastChange = DateTime.Now;
+                StateHasChanged();
+            }));
+    }
+
+    void Refresh()
+    {
+        level = BatteryService.Level;
+        status = BatteryService.Status;
+    }
+
+    public void Dispose() => sub?.Dispose();
+}

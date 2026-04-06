@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
 using Shiny.Jobs.Blazor;
-using Shiny.Support.Repositories;
 
 namespace Shiny;
 
@@ -41,7 +39,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddBattery();
             services.AddConnectivity();
-            services.TryAddSingleton<IRepository, InMemoryRepository>();
+            services.AddLocalStorageRepository();
             services.AddShinyService<JobManager>();
         }
 

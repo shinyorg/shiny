@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Linux.Pages.Device"
+             x:Class="Sample.Linux.Pages.Device.ConnectivityPage"
+             x:DataType="vm:ConnectivityViewModel"
+             Title="Connectivity">
+    <VerticalStackLayout Padding="16" Spacing="8">
+        <Label Text="{Binding Access, StringFormat='Access: {0}'}" FontSize="20" />
+        <Label Text="{Binding Types, StringFormat='Types: {0}'}" />
+        <Label Text="{Binding LastChange, StringFormat='Last change: {0}'}" />
+
+        <Button Text="Refresh" Command="{Binding RefreshCommand}" />
+        <Button Text="Start Watching" Command="{Binding StartCommand}" />
+        <Button Text="Stop Watching" Command="{Binding StopCommand}" />
+    </VerticalStackLayout>
+</ContentPage>

@@ -10,7 +10,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\Shiny.Support.DeviceMonitoring.Blazor\Shiny.Support.DeviceMonitoring.Blazor.csproj" />
-        <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
+        <ProjectReference Include="..\Shiny.Support.Storage.Blazor\Shiny.Support.Storage.Blazor.csproj" />
     </ItemGroup>
 
 </Project>

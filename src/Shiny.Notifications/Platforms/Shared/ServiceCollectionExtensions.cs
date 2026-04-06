@@ -42,6 +42,34 @@ public static class ServiceCollectionExtensions
     }
 #endif
 
+#if MACOS
+
+    /// <summary>
+    /// Registers notification manager with Shiny
+    /// </summary>
+    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, MacConfiguration? configuration = null) where TDelegate : INotificationDelegate
+        => services.AddNotifications(typeof(TDelegate), configuration);
+
+
+    /// <summary>
+    /// Registers notification manager with Shiny
+    /// </summary>
+    public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, MacConfiguration? configuration = null)
+    {
+        services.AddSingleton(configuration ?? new());
+        services.AddShinyService<NotificationManager>();
+
+        services.AddDefaultRepository();
+        if (!services.HasService<IChannelManager>())
+            services.AddShinyService<ChannelManager>();
+
+        if (delegateType != null)
+            services.AddShinyService(delegateType);
+
+        return services;
+    }
+#endif
+
 #if ANDROID
 
     /// <summary>
@@ -69,6 +97,34 @@ public static class ServiceCollectionExtensions
         services.AddShinyService<NotificationManager>();
 
         services.AddDefaultRepository();
+        if (!services.HasService<IChannelManager>())
+            services.AddShinyService<ChannelManager>();
+
+        if (delegateType != null)
+            services.AddShinyService(delegateType);
+
+        return services;
+    }
+
+#endif
+
+#if WINDOWS
+
+    /// <summary>
+    /// Registers notification manager with Shiny
+    /// </summary>
+    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services) where TDelegate : INotificationDelegate
+        => services.AddNotifications(typeof(TDelegate));
+
+
+    /// <summary>
+    /// Registers notification manager with Shiny
+    /// </summary>
+    public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null)
+    {
+        services.AddShinyService<NotificationManager>();
+        services.AddDefaultRepository();
+
         if (!services.HasService<IChannelManager>())
             services.AddShinyService<ChannelManager>();
 

@@ -25,9 +25,14 @@ public static class ShinyInfrastructureExtensions
         services.AddShinyService<AndroidLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
-#elif APPLE
+#elif IOS || MACCATALYST
         services.AddShinyService<IosPlatform>();
         services.AddShinyService<IosLifecycleExecutor>();
+        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+#elif MACOS
+        services.AddShinyService<MacPlatform>();
+        services.AddShinyService<MacLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
 #elif WINDOWS

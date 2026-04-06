@@ -120,8 +120,8 @@ public partial class BleHostingManager : IBleHostingManager
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
     {
         NSMutableDictionary data = null!;
-#if MACCATALYST
-            // throw new NotSupportedException("Not supported on MacCatalyst");
+#if MACCATALYST || MACOS
+            // CLBeaconRegion.GetPeripheralData is unavailable on MacCatalyst/macOS - build raw beacon advertisement
             var bytes = new List<byte>();
             bytes.AddRange(uuid.ToByteArray());
             bytes.AddRange(BitConverter.GetBytes(major));

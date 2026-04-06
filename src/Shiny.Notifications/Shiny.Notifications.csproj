@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-maccatalyst;$(BaseTargetFramework)-android</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-maccatalyst;$(BaseTargetFramework)-macos;$(BaseTargetFramework)-android</TargetFrameworks>
+        <TargetFrameworks Condition="'$(WindowsTarget)' != ''">$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
         <Description>Shiny addon for all your notification needs</Description>
     </PropertyGroup>
 

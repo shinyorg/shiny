@@ -1,0 +1,57 @@
+@page "/push"
+@using Shiny.Push
+@inject IPushManager PushManager
+
+<PageTitle>Push</PageTitle>
+
+<h1>Web Push</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary me-2" @onclick="GetAccess">Get Current Access</button>
+    <button class="btn btn-success me-2" @onclick="RequestAccess">Request Access</button>
+    <button class="btn btn-danger" @onclick="Unregister">Unregister</button>
+</div>
+
+@if (!string.IsNullOrEmpty(status))
+{
+    <div class="alert alert-info">@status</div>
+}
+
+@if (!string.IsNullOrEmpty(token))
+{
+    <div class="card">
+        <div class="card-header">Subscription</div>
+        <div class="card-body">
+            <p><strong>Endpoint:</strong> <code>@endpoint</code></p>
+            <pre style="white-space: pre-wrap; word-break: break-all;">@token</pre>
+        </div>
+    </div>
+}
+
+@code {
+    string? status;
+    string? token;
+    string? endpoint;
+
+    async Task GetAccess()
+    {
+        var s = await PushManager.GetCurrentAccess();
+        status = $"Current access: {s}";
+    }
+
+    async Task RequestAccess()
+    {
+        var result = await PushManager.RequestAccess();
+        status = $"Result: {result.Status}";
+        token = PushManager.RegistrationToken;
+        endpoint = PushManager.NativeRegistrationToken;
+    }
+
+    async Task Unregister()
+    {
+        await PushManager.UnRegister();
+        token = null;
+        endpoint = null;
+        status = "Unregistered";
+    }
+}

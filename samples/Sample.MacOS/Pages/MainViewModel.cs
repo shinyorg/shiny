@@ -5,7 +5,12 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
 {
     public List<FeatureItem> Features { get; } =
     [
-        new("BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan")
+        new("BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
+        new("BLE Hosting", "Advertise a GATT server from this Mac", "blehosting"),
+        new("Push Notifications", "Register for and receive APNs push", "push"),
+        new("Local Notifications", "Schedule and send local notifications", "notifications"),
+        new("Battery", "Monitor battery level and charging state", "battery"),
+        new("Connectivity", "Monitor network connectivity", "connectivity")
     ];
 
     [RelayCommand]

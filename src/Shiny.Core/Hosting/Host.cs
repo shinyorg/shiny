@@ -29,9 +29,12 @@ public class Host : IHost
     public static ILoggerFactory LoggingFactory => Current.Logging;
     public static T? GetService<T>() => ServiceProvider.GetService<T>();
 
-#if APPLE
+#if IOS || MACCATALYST
     public static IosPlatform Platform => ServiceProvider.GetRequiredService<IosPlatform>();
     public static IosLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<IosLifecycleExecutor>();
+#elif MACOS
+    public static MacPlatform Platform => ServiceProvider.GetRequiredService<MacPlatform>();
+    public static MacLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<MacLifecycleExecutor>();
 #elif ANDROID
     public static AndroidPlatform Platform => ServiceProvider.GetRequiredService<AndroidPlatform>();
     public static AndroidLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<AndroidLifecycleExecutor>();

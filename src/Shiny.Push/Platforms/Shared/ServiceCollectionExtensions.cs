@@ -21,6 +21,8 @@ public static class ServiceCollectionExtensions
         services.AddShinyService<PushManager>();
 #elif ANDROID
         services.AddPush(new FirebaseConfig());
+#elif WINDOWS
+        services.AddShinyService<PushManager>();
 #endif
         return services;
     }

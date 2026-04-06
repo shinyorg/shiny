@@ -19,6 +19,10 @@ public static class MauiProgram
             });
 
         builder.Services.AddBluetoothLE();
+        builder.Services.AddBluetoothLeHosting();
+        builder.Services.AddBattery();
+        builder.Services.AddConnectivity();
+        builder.Services.AddNotifications();
 
         return builder.Build();
     }

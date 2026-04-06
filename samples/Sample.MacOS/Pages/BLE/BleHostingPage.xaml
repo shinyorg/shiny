@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.MacOS.Pages.BLE"
+             x:Class="Sample.MacOS.Pages.BLE.BleHostingPage"
+             x:DataType="vm:BleHostingViewModel"
+             Title="BLE Hosting">
+    <VerticalStackLayout Padding="16" Spacing="12">
+        <Button Text="{Binding AdvertiseText}" Command="{Binding ToggleAdvertisingCommand}" />
+        <Label Text="{Binding Status}" FontSize="16" />
+        <Label Text="{Binding SubscriberCount, StringFormat='Subscribers: {0}'}" />
+    </VerticalStackLayout>
+</ContentPage>

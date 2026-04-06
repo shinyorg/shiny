@@ -1,0 +1,55 @@
+@page "/connectivity"
+@using System.Reactive.Linq
+@using Shiny.Net
+@implements IDisposable
+@inject IConnectivity ConnectivityService
+
+<PageTitle>Connectivity</PageTitle>
+
+<h1>Connectivity</h1>
+
+<p>
+    Live network state via the browser's Network Information / online APIs.
+    Connection type granularity depends on the browser.
+</p>
+
+<div class="mb-3">
+    <button class="btn btn-primary me-2" @onclick="Refresh">Refresh</button>
+</div>
+
+<table class="table">
+    <tbody>
+        <tr><th>Access</th><td>@access</td></tr>
+        <tr><th>Connection types</th><td>@types</td></tr>
+        <tr><th>Last change</th><td>@(lastChange?.ToString("HH:mm:ss") ?? "—")</td></tr>
+    </tbody>
+</table>
+
+@code {
+    NetworkAccess access;
+    ConnectionTypes types;
+    DateTime? lastChange;
+    IDisposable? sub;
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+        sub = ConnectivityService
+            .WhenChanged()
+            .Subscribe(c => InvokeAsync(() =>
+            {
+                access = c.Access;
+                types = c.ConnectionTypes;
+                lastChange = DateTime.Now;
+                StateHasChanged();
+            }));
+    }
+
+    void Refresh()
+    {
+        access = ConnectivityService.Access;
+        types = ConnectivityService.ConnectionTypes;
+    }
+
+    public void Dispose() => sub?.Dispose();
+}

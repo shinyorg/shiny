@@ -9,5 +9,20 @@
         <Button Text="BLE Scanner"
                 Command="{Binding NavigateCommand}"
                 CommandParameter="blescan" />
+        <Button Text="BLE Hosting"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="blehosting" />
+        <Button Text="Push Notifications"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="push" />
+        <Button Text="Local Notifications"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="notifications" />
+        <Button Text="Battery"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="battery" />
+        <Button Text="Connectivity"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="connectivity" />
     </VerticalStackLayout>
 </ContentPage>
