@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny Background Jobs for Blazor PWA</Description>
+        <RootNamespace>Shiny.Jobs</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
+        <ProjectReference Include="..\Shiny.Support.DeviceMonitoring.Blazor\Shiny.Support.DeviceMonitoring.Blazor.csproj" />
+        <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
+    </ItemGroup>
+
+</Project>
