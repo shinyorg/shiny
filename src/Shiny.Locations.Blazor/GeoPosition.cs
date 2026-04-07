@@ -1,4 +1,3 @@
-﻿using System;
 using System.Text.Json.Serialization;
 
 namespace Shiny.Locations.Blazor;
@@ -13,7 +12,7 @@ public class GeoPosition
     public double Longitude { get; set; }
 
     [JsonPropertyName("altitudeAccuracy")]
-    public long? AltitudeAccuracy { get; set; }
+    public double? AltitudeAccuracy { get; set; }
 
     [JsonPropertyName("timestamp")]
     public long Epoch { get; set; }
@@ -29,11 +28,4 @@ public class GeoPosition
 
     [JsonPropertyName("altitude")]
     public double? RawAltitude { get; set; }
-
-    Position? position;
-    [JsonIgnore]
-    public Position Position => this.position ??= new Position(this.Latitude, this.Longitude);
-
-    [JsonIgnore]
-    public DateTimeOffset Timestamp => DateTimeOffset.FromUnixTimeMilliseconds(this.Epoch);
 }

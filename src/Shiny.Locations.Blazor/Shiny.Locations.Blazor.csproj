@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny Locations - GPS support for Blazor WebAssembly via the browser Geolocation API. Foreground only - the browser does not expose true background GPS or geofencing.</Description>
+        <RootNamespace>Shiny.Locations</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.JSInterop" />
+    </ItemGroup>
+
+</Project>

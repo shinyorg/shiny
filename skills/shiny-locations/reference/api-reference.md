@@ -2,11 +2,21 @@
 
 ## Installation
 
+For MAUI / native targets:
+
 ```xml
 <PackageReference Include="Shiny.Locations" Version="4.*" />
 ```
 
+For Blazor WebAssembly:
+
+```xml
+<PackageReference Include="Shiny.Locations.Blazor" Version="4.*" />
+```
+
 The support library `Shiny.Support.Locations` is included transitively and provides the `Position` and `Distance` types.
+
+> **Blazor / Web limitations.** `Shiny.Locations.Blazor` only implements `IGpsManager`, and only for foreground use via `navigator.geolocation`. There is no `IGeofenceManager` (the browser has no Geofence API), no significant-location-change API, and no way to keep the page alive in the background. Background modes on a `GpsRequest` are accepted but logged and treated as foreground; `IGpsDelegate` is invoked but only while the tab is alive.
 
 ## Namespaces
 

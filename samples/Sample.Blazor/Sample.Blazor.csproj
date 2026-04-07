@@ -14,6 +14,7 @@
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs.Blazor\Shiny.Jobs.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring.Blazor\Shiny.Support.DeviceMonitoring.Blazor.csproj" />
     </ItemGroup>
 </Project>

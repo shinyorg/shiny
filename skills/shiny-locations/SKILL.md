@@ -46,9 +46,9 @@ Use this skill when the user needs to:
 
 | Property   | Value                        |
 |------------|------------------------------|
-| NuGet      | `Shiny.Locations`            |
+| NuGet      | `Shiny.Locations` (MAUI), `Shiny.Locations.Blazor` (Blazor WASM) |
 | Namespace  | `Shiny.Locations`            |
-| Platforms  | iOS, Android, WebAssembly    |
+| Platforms  | iOS, Android, Windows, Blazor WebAssembly (foreground GPS only) |
 | DI Namespace | `Shiny` (extension methods on `IServiceCollection`) |
 | Support Library | `Shiny.Support.Locations` (provides `Position` and `Distance`) |
 
@@ -65,6 +65,23 @@ services.AddGps();
 // GPS with a background delegate
 services.AddGps<MyGpsDelegate>();
 ```
+
+### Blazor WebAssembly GPS Registration
+
+Register GPS in `Program.cs` of a Blazor WebAssembly project. Only foreground GPS
+is supported - the browser does not expose background location, geofencing, or
+significant-location-change APIs. Background modes on a `GpsRequest` are silently
+treated as foreground.
+
+```csharp
+builder.Services.AddGps();
+// or with a foreground-only delegate:
+builder.Services.AddGps<MyGpsDelegate>();
+```
+
+Geofencing (`AddGeofencing`, `AddGpsDirectGeofencing`) is **not** available in
+`Shiny.Locations.Blazor`. For region-entry behavior on the web, evaluate regions
+server-side from GPS reports and notify the client via `Shiny.Push.Blazor`.
 
 ### Geofence Registration
 

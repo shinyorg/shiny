@@ -1,0 +1,115 @@
+@page "/gps"
+@using System.Reactive.Linq
+@using Shiny.Locations
+@implements IAsyncDisposable
+@inject IGpsManager GpsService
+
+<PageTitle>GPS</PageTitle>
+
+<h1>GPS</h1>
+
+<p>
+    Live GPS readings via the browser's Geolocation API. Blazor WebAssembly cannot run in
+    the background — readings only flow while this tab is open and focused. There is no
+    geofencing API in the browser, so <code>Shiny.Locations.Blazor</code> ships GPS only.
+</p>
+
+<div class="mb-3">
+    <button class="btn btn-secondary me-2" @onclick="GetLast">Get Current</button>
+    <button class="btn btn-primary me-2" @onclick="Start" disabled="@isListening">Start Listener</button>
+    <button class="btn btn-danger me-2" @onclick="Stop" disabled="@(!isListening)">Stop Listener</button>
+</div>
+
+@if (error != null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<table class="table">
+    <tbody>
+        <tr><th>Access</th><td>@access</td></tr>
+        <tr><th>Listening</th><td>@isListening</td></tr>
+        <tr><th>Latitude</th><td>@reading?.Position.Latitude</td></tr>
+        <tr><th>Longitude</th><td>@reading?.Position.Longitude</td></tr>
+        <tr><th>Accuracy (m)</th><td>@reading?.PositionAccuracy</td></tr>
+        <tr><th>Altitude</th><td>@reading?.Altitude</td></tr>
+        <tr><th>Heading</th><td>@reading?.Heading</td></tr>
+        <tr><th>Speed</th><td>@reading?.Speed</td></tr>
+        <tr><th>Timestamp</th><td>@reading?.Timestamp.ToLocalTime().ToString("HH:mm:ss")</td></tr>
+    </tbody>
+</table>
+
+@code {
+    GpsReading? reading;
+    AccessState access = AccessState.Unknown;
+    bool isListening;
+    string? error;
+    IDisposable? sub;
+
+    protected override void OnInitialized()
+    {
+        sub = GpsService
+            .WhenReading()
+            .Subscribe(r => InvokeAsync(() =>
+            {
+                reading = r;
+                error = null;
+                StateHasChanged();
+            }));
+    }
+
+    async Task GetLast()
+    {
+        try
+        {
+            error = null;
+            access = await GpsService.RequestAccess(GpsRequest.Foreground);
+            if (access != AccessState.Available)
+                return;
+
+            reading = await GpsService.GetLastReading();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    async Task Start()
+    {
+        try
+        {
+            error = null;
+            access = await GpsService.RequestAccess(GpsRequest.Foreground);
+            if (access != AccessState.Available)
+                return;
+
+            await GpsService.StartListener(GpsRequest.Foreground);
+            isListening = true;
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    async Task Stop()
+    {
+        try
+        {
+            await GpsService.StopListener();
+            isListening = false;
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        sub?.Dispose();
+        if (isListening)
+            await GpsService.StopListener();
+    }
+}
