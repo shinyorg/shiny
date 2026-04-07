@@ -1,6 +1,6 @@
 ---
 name: shiny-jobs
-description: Background job scheduling and execution for .NET MAUI, iOS, and Android using Shiny.Jobs
+description: Background job scheduling and execution for .NET MAUI (iOS/Android native OS schedulers) and in-process jobs for plain .NET, Linux, macOS, and Blazor WASM using Shiny.Jobs
 auto_invoke: true
 triggers:
   - background job
@@ -20,7 +20,9 @@ triggers:
 
 # Shiny Jobs
 
-Shiny.Jobs provides cross-platform background job scheduling and execution for .NET MAUI applications targeting iOS and Android. Jobs run periodically in the background with support for constraints such as network availability, charging status, and battery level.
+Shiny.Jobs provides cross-platform background job scheduling and execution. On iOS and Android it uses the native OS schedulers (BGTaskScheduler / AndroidX WorkManager). On plain .NET targets (Linux, macOS server, Blazor WASM, console, etc.) it runs an in-process managed JobManager driven by a recurring timer — jobs run only while the host process is alive; there is no OS-level scheduler on those targets. All platforms support the same constraints (network availability, charging, battery).
+
+> **Blazor WASM caveat**: background jobs only run while the tab is open and foregrounded. Service Worker / Periodic Background Sync cannot invoke C# because the SW has no access to the Blazor WASM runtime. For true background HTTP work on Blazor, use `Shiny.Net.Http.Blazor` (which uses Service Worker Background Sync in pure JS and reconciles results to C# when the tab reopens).
 
 ## When to Use This Skill
 
@@ -33,11 +35,11 @@ Shiny.Jobs provides cross-platform background job scheduling and execution for .
 
 ## Library Overview
 
-| Item       | Value                  |
-|------------|------------------------|
-| NuGet      | `Shiny.Jobs`           |
-| Namespace  | `Shiny.Jobs`           |
-| Platforms  | iOS, Android           |
+| Item       | Value                                                                       |
+|------------|-----------------------------------------------------------------------------|
+| NuGet      | `Shiny.Jobs`                                                                |
+| Namespace  | `Shiny.Jobs`                                                                |
+| Platforms  | iOS, Android (native OS); Linux, macOS, Blazor WASM, .NET base (in-process) |
 
 ## Setup
 
@@ -90,6 +92,38 @@ Also enable the `processing` background mode.
 ### Android Setup
 
 No additional manifest setup is required. Shiny.Jobs uses AndroidX WorkManager under the hood. If you want wake-lock support for `RunTask`, add the `WAKE_LOCK` permission to your `AndroidManifest.xml`.
+
+### Plain .NET Setup (Linux, macOS, Blazor WASM, Console)
+
+On the base .NET TFM there is no native OS scheduler — Shiny runs an in-process managed `JobManager` on a recurring timer (default 30s; configurable via the static `JobManager.Interval` property, minimum 15s, maximum 5 minutes). Jobs only execute while the host process is alive.
+
+You must register an `IBattery` and `IConnectivity` implementation before resolving the job manager. A default JSON filesystem repository is registered automatically and stores entries under `{LocalApplicationData}/Shiny` using the same `{EntityName}_{Id}.shiny` convention as iOS/Android.
+
+```csharp
+using Shiny;
+using Shiny.Jobs;
+
+// Linux / console — battery + connectivity come from Shiny.Support.DeviceMonitoring.Linux
+services.AddConnectivity();
+services.AddBattery();
+
+// Blazor WASM — from Shiny.Support.DeviceMonitoring.Blazor
+// services.AddConnectivity();
+// services.AddBattery();
+// Optionally override the default filesystem repo with browser localStorage:
+// services.AddLocalStorageRepository();  // Shiny.Support.Storage.Blazor
+
+services.AddJob(
+    typeof(MySyncJob),
+    identifier: "MySync",
+    runInForeground: true,
+    requiredNetwork: InternetAccess.Any
+);
+```
+
+Jobs registered via `AddJob(...)` on the base TFM are treated as **system jobs**: on startup the manager clears any previously-registered system jobs, then re-registers them from the static in-memory list. This mirrors the iOS/Android behavior where system jobs survive across process restarts.
+
+**Blazor WASM caveat**: the in-process JobManager only runs while the tab is open. Background tabs are throttled (~1 min timer floor on Chromium), may be frozen after ~5 minutes, and iOS Safari kills background WASM aggressively. There is no way to run C# jobs via Service Worker Background Sync because the SW has no access to the WASM runtime. For background HTTP work specifically, use `Shiny.Net.Http.Blazor`.
 
 ## Code Generation Instructions
 
