@@ -44,6 +44,7 @@
         <Project Path="src/Shiny.Support.Storage.Blazor/Shiny.Support.Storage.Blazor.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
         <Project Path="src/Shiny.Locations.Blazor/Shiny.Locations.Blazor.csproj" />
+        <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="samples\Sample.Linux\Sample.Linux.csproj" />

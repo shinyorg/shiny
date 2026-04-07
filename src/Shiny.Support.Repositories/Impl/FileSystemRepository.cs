@@ -1,5 +1,4 @@
-﻿#if PLATFORM
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 
@@ -7,24 +6,25 @@ namespace Shiny.Support.Repositories.Impl;
 
 
 public class FileSystemRepository : IRepository
-{    
+{
     readonly ISerializer serializer;
     readonly ILogger logger;
     readonly DirectoryInfo rootDir;
     readonly ShinySubject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj;
-    //readonly Subject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj = new();
 
 
     public FileSystemRepository(
-        IPlatform platform,
+        DirectoryInfo rootDir,
         ISerializer serializer,
         ILogger<FileSystemRepository> logger
     )
     {
-        //Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) <= replace platform
         this.serializer = serializer;
-        this.rootDir = platform.AppData;
+        this.rootDir = rootDir;
         this.logger = logger;
+
+        if (!this.rootDir.Exists)
+            this.rootDir.Create();
 
         this.repoSubj = new(this.logger);
     }
@@ -226,4 +226,3 @@ public class FileSystemRepository : IRepository
         return dict;
     }
 }
-#endif

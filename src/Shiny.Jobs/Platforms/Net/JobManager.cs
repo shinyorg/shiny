@@ -1,5 +1,5 @@
 using System;
-using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timer = System.Timers.Timer;
 using Microsoft.Extensions.Logging;
@@ -8,13 +8,21 @@ using Shiny.Power;
 using Shiny.Stores;
 using Shiny.Support.Repositories;
 
-namespace Shiny.Jobs.Blazor;
+namespace Shiny.Jobs;
 
 
+/// <summary>
+/// Managed, in-process JobManager for plain .NET targets (Linux, macOS server,
+/// Blazor Server, console, etc). Jobs run only while the host process is alive —
+/// there is no OS-level scheduling. Foreground jobs are executed on a recurring
+/// <see cref="Interval"/> timer subject to the standard InternetAccess / battery /
+/// charging constraints.
+/// </summary>
 public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposable
 {
-    static readonly System.Collections.Generic.List<JobInfo> registeredJobs = new();
+    static readonly List<JobInfo> registeredJobs = new();
     internal static void AddJob(JobInfo jobInfo) => registeredJobs.Add(jobInfo);
+
 
     static TimeSpan interval = TimeSpan.FromSeconds(30);
     public static TimeSpan Interval
@@ -63,11 +71,35 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
 
     public void ComponentStart()
     {
-        foreach (var job in registeredJobs)
+        try
         {
-            var jobNew = job with { IsSystemJob = true };
-            this.Register(jobNew);
-            this.Log.LogDebug("Registered System Job '{Identifier}' of Type '{JobType}'", job.Identifier, job.JobType);
+            // clear stale system jobs (types moved/deleted) and previously-registered system jobs
+            // before re-registering them below
+            var jobs = this.GetJobs();
+            foreach (var job in jobs)
+            {
+                if (job.JobType == null)
+                {
+                    this.Log.LogInformation("Job Type for '{Identifier}' cannot be found and has been removed", job.Identifier);
+                    this.Cancel(job.Identifier);
+                }
+                else if (job.IsSystemJob)
+                {
+                    this.Log.LogDebug("Clearing System Job '{Identifier}' - will be re-registered", job.Identifier);
+                    this.Cancel(job.Identifier);
+                }
+            }
+
+            foreach (var job in registeredJobs)
+            {
+                var jobNew = job with { IsSystemJob = true };
+                this.Register(jobNew);
+                this.Log.LogDebug("Registered System Job '{Identifier}' of Type '{JobType}'", job.Identifier, job.JobType);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.Log.LogError(ex, "Failed to run job startup");
         }
 
         this.RunForegroundJobs();
@@ -77,13 +109,17 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
     public override Task<AccessState> RequestAccess()
         => Task.FromResult(AccessState.Available);
 
-    protected override void CancelNative(JobInfo jobInfo) { }
+    // no OS scheduler on plain .NET - jobs only run while the process is alive
     protected override void RegisterNative(JobInfo jobInfo) { }
+    protected override void CancelNative(JobInfo jobInfo) { }
 
 
     async void RunForegroundJobs()
     {
         this.timer.Stop();
+        if (this.disposed)
+            return;
+
         this.Log.LogDebug("Starting foreground jobs");
 
         var jobs = this.GetJobs();

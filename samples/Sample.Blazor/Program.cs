@@ -11,6 +11,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBluetoothLE();
 builder.Services.AddBattery();
 builder.Services.AddConnectivity();
+builder.Services.AddLocalStorageRepository();
 builder.Services.AddGps();
 
 builder.Services.AddPush<SamplePushDelegate>(new WebPushOptions

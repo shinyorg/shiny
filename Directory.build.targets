@@ -31,7 +31,11 @@
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
         <Compile Include="Platforms\Windows\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-    </ItemGroup> 
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <Compile Include="Platforms\Net\**\*.cs" />
+    </ItemGroup>
 
     <!--
     <ItemGroup Condition="'$(IsWebAssembly)' == 'true'">
