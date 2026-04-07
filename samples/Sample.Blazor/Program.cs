@@ -26,4 +26,6 @@ builder.Services.AddJob(
     runInForeground: true
 );
 
+builder.Services.AddBlazorHttpTransfers<SampleHttpTransferDelegate>();
+
 await builder.Build().RunAsync();

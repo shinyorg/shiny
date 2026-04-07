@@ -21,5 +21,7 @@
         <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj"/>
         <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring.Linux\Shiny.Support.DeviceMonitoring.Linux.csproj"/>
         <ProjectReference Include="..\..\src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj"/>
     </ItemGroup>
 </Project>

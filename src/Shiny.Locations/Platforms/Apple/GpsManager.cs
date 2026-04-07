@@ -22,27 +22,27 @@ public class GpsManager(
     CLLocationUpdater? updater;
     
     
-    AppleGpsRequest? currentSettings;
     public AppleGpsRequest? CurrentSettings
     {
-        get => this.currentSettings;
+        get;
         set
         {
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
             if (bg != GpsBackgroundMode.None)
             {
-                this.Set(ref this.currentSettings, value);
+                this.Set(ref field, value);
             }
             else
             {
-                this.Set(ref this.currentSettings, null);
-                this.currentSettings = value;
+                // don't remember across sessions
+                this.Set(ref field, null);
+                field = value;
             }
         }
     }
 
 
-    public GpsRequest? CurrentListener => this.currentSettings;
+    public GpsRequest? CurrentListener => this.CurrentSettings != null;
 
     // could check against current listener
     // AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request

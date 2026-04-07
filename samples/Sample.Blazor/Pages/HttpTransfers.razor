@@ -1,0 +1,93 @@
+@page "/httptransfers"
+@using Shiny.Net.Http
+@inject IHttpTransferManager TransferManager
+
+<PageTitle>HTTP Transfers</PageTitle>
+
+<h1>HTTP Transfers</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary me-2" @onclick="Refresh">Refresh</button>
+    <button class="btn btn-success me-2" @onclick="QueueDownload">Queue Download</button>
+    <button class="btn btn-warning" @onclick="CancelAll">Cancel All</button>
+</div>
+
+@if (!string.IsNullOrEmpty(status))
+{
+    <div class="alert alert-info">@status</div>
+}
+
+@if (transfers.Count == 0)
+{
+    <p>No transfers queued.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Identifier</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>URI</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in transfers)
+            {
+                <tr>
+                    <td>@t.Request.Identifier</td>
+                    <td>@t.Request.Type</td>
+                    <td>@t.Status</td>
+                    <td>@FormatProgress(t)</td>
+                    <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis;">@t.Request.Uri</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    IList<HttpTransfer> transfers = new List<HttpTransfer>();
+    string? status;
+
+    protected override async Task OnInitializedAsync() => await Refresh();
+
+    async Task Refresh()
+    {
+        transfers = await TransferManager.GetTransfers();
+        status = $"Loaded {transfers.Count} transfer(s)";
+    }
+
+    async Task QueueDownload()
+    {
+        var id = $"sample-{Guid.NewGuid():N}";
+        var request = new HttpTransferRequest(
+            id,
+            "https://speed.hetzner.de/1MB.bin",
+            TransferType.Download,
+            $"{id}.bin"
+        );
+        await TransferManager.Queue(request);
+        status = $"Queued {id}";
+        await Refresh();
+    }
+
+    async Task CancelAll()
+    {
+        await TransferManager.CancelAll();
+        status = "All transfers cancelled";
+        await Refresh();
+    }
+
+    static string FormatProgress(HttpTransfer t)
+    {
+        if (t.BytesToTransfer is long total && total > 0)
+        {
+            var pct = (double)t.BytesTransferred / total;
+            return pct.ToString("P0");
+        }
+        return $"{t.BytesTransferred} bytes";
+    }
+}
