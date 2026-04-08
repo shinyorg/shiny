@@ -25,10 +25,12 @@ public record AndroidGpsRequest(
     int IntervalMillis = 1000,
     bool WaitForAccurateLocation = false,
     bool StopForegroundServiceWithTask = false,
-    bool RequestPreciseAccuracy = false
+    bool RequestPreciseAccuracy = false,
+    bool AutoRestart = true
 ) : GpsRequest(
     BackgroundMode,
-    RequestPreciseAccuracy
+    RequestPreciseAccuracy,
+    AutoRestart
 );
 
 public enum GpsPriority : int

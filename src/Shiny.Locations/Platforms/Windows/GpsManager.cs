@@ -8,22 +8,13 @@ using Windows.Devices.Geolocation;
 namespace Shiny.Locations;
 
 
-public class GpsManager : IGpsManager
+public class GpsManager(        
+    IServiceProvider services,
+    ILogger<IGpsManager> logger
+) : IGpsManager
 {
     readonly Subject<GpsReading> readSubject = new();
-    readonly IServiceProvider services;
-    readonly ILogger logger;
     Geolocator? geolocator;
-
-
-    public GpsManager(
-        IServiceProvider services,
-        ILogger<IGpsManager> logger
-    )
-    {
-        this.services = services;
-        this.logger = logger;
-    }
 
 
     public GpsRequest? CurrentListener { get; private set; }
@@ -97,14 +88,14 @@ public class GpsManager : IGpsManager
             if (reading != null)
             {
                 this.readSubject.OnNext(reading);
-                await this.services
-                    .RunDelegates<IGpsDelegate>(x => x.OnReading(reading), this.logger)
+                await services
+                    .RunDelegates<IGpsDelegate>(x => x.OnReading(reading), logger)
                     .ConfigureAwait(false);
             }
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error processing GPS reading");
+            logger.LogError(ex, "Error processing GPS reading");
         }
     }
 

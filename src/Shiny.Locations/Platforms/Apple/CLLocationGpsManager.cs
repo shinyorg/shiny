@@ -48,25 +48,27 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
     public async void Start()
     {
-        if (this.CurrentSettings != null)
+        if (this.CurrentSettings is not { AutoRestart: true })
         {
-            try
+            this.CurrentSettings = null;
+            return;
+        }
+        try
+        {
+            // only auto-start if auth status was changed to FULL authorized, not restricted
+            if (this.locationManager.AuthorizationStatus == CLAuthorizationStatus.Authorized)
             {
-                // only auto-start if auth status was changed to FULL authorized, not restricted
-                if (this.locationManager.AuthorizationStatus == CLAuthorizationStatus.Authorized)
-                {
-                    if (this.CurrentSettings != null)
-                        await this.StartListenerInternal(this.CurrentSettings);
-                }
-                else
-                {
-                    this.logger.LogInformation("User has removed location permissions");
-                }
+                if (this.CurrentSettings != null)
+                    await this.StartListenerInternal(this.CurrentSettings);
             }
-            catch (Exception ex)
+            else
             {
-                this.logger.LogError(ex, "Error trying to restart GPS");
+                this.logger.LogInformation("User has removed location permissions");
             }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Error trying to restart GPS");
         }
     }
 

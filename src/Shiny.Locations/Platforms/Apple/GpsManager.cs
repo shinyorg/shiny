@@ -4,7 +4,6 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
-using Foundation;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Locations;
@@ -42,7 +41,7 @@ public class GpsManager(
     }
 
 
-    public GpsRequest? CurrentListener => this.CurrentSettings != null;
+    public GpsRequest? CurrentListener => this.CurrentSettings;
 
     // could check against current listener
     // AccessState currentAccess = AccessState.Unknown; // TODO: this won't apply for different request types unless I record deltas of the request
@@ -134,7 +133,6 @@ public class GpsManager(
         if (this.updater != null)
             throw new InvalidOperationException("Already GPS listener running");
 
-        (await this.RequestAccess(request)).Assert(allowRestricted: true);
         if (request.BackgroundMode != GpsBackgroundMode.None)
             this.bgSession = CLBackgroundActivitySession.Create();
 
@@ -172,7 +170,7 @@ public class GpsManager(
                     update.Location.Speed,
                     update.Location.SpeedAccuracy,
                     update.Location.Floor?.Level.ToInt32() ?? 0,
-                    update.IsStationary
+                    update.Stationary
                 );
                 this.lastReading = reading;
                 this.readSubject.OnNext(reading);
@@ -209,9 +207,12 @@ public class GpsManager(
 
     public async void Start()
     {
-        if (this.CurrentListener == null)
+        if (this.CurrentListener is not { AutoRestart: true })
+        {
+            this.CurrentSettings = null;
             return;
-        
+        }
+
         try
         {
             await this.StartListener(this.CurrentListener!);

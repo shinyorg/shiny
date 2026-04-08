@@ -30,17 +30,19 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
 
     public virtual async void Start()
     {
-        if (this.CurrentSettings != null)
+        if (this.CurrentSettings is not { AutoRestart: true })
         {
-            try
-            {
-                await this.StartListenerInternal(this.CurrentSettings).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogWarning(ex, "Failed to auto-start GPS");
-                this.CurrentSettings = null; // remove the settings since it can't be autostarted
-            }
+            this.CurrentSettings = null;
+            return;
+        }
+        try
+        {
+            await this.StartListenerInternal(this.CurrentSettings).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Failed to auto-start GPS");
+            this.CurrentSettings = null; // remove the settings since it can't be autostarted
         }
     }
 
@@ -184,7 +186,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
 
     protected async Task StartListenerInternal(GpsRequest request)
     {
-        request ??= new GpsRequest();
+        request ??= new();
         if (request is not AndroidGpsRequest android)
             android = new AndroidGpsRequest(request.BackgroundMode);
 
