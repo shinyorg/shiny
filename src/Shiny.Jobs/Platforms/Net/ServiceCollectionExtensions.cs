@@ -1,7 +1,10 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
+using Shiny.Stores;
+using Shiny.Stores.Impl;
 
 namespace Shiny;
 
@@ -51,6 +54,8 @@ public static class ServiceCollectionExtensions
         if (!services.HasService<IJobManager>())
         {
             services.AddDefaultRepository();
+            services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+            services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
             services.AddShinyService<JobManager>();
         }
         return services;

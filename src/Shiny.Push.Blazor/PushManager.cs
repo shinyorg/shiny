@@ -8,52 +8,36 @@ using Microsoft.JSInterop;
 namespace Shiny.Push.Blazor;
 
 
-public class PushManager : NotifyPropertyChanged, IPushManager, IAsyncDisposable
+public class PushManager(
+    IJSRuntime jsRuntime,
+    WebPushOptions options,
+    IServiceProvider services,
+    ILogger<PushManager> logger
+) : NotifyPropertyChanged, IPushManager, IAsyncDisposable
 {
-    readonly IJSRuntime jsRuntime;
-    readonly WebPushOptions options;
-    readonly IServiceProvider services;
-    readonly ILogger logger;
     IJSObjectReference? module;
     DotNetObjectReference<PushManager>? selfRef;
-
-
-    public PushManager(
-        IJSRuntime jsRuntime,
-        WebPushOptions options,
-        IServiceProvider services,
-        ILogger<PushManager> logger
-    )
-    {
-        this.jsRuntime = jsRuntime;
-        this.options = options;
-        this.services = services;
-        this.logger = logger;
-    }
-
 
     public IPushTagSupport? Tags => null;
 
 
-    string? regToken;
     public string? RegistrationToken
     {
-        get => this.regToken;
-        set => this.Set(ref this.regToken, value);
+        get;
+        set => this.Set(ref field, value);
     }
 
 
-    string? nativeToken;
     public string? NativeRegistrationToken
     {
-        get => this.nativeToken;
-        set => this.Set(ref this.nativeToken, value);
+        get;
+        set => this.Set(ref field, value);
     }
 
 
     async Task<IJSObjectReference> GetModule()
     {
-        this.module ??= await this.jsRuntime
+        this.module ??= await jsRuntime
             .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Push.Blazor/push.js")
             .ConfigureAwait(false);
 
@@ -78,8 +62,8 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IAsyncDisposable
             .InvokeAsync<SubscribeResult?>(
                 "subscribe",
                 cancelToken,
-                this.options.VapidPublicKey,
-                this.options.ServiceWorkerPath,
+                options.VapidPublicKey,
+                options.ServiceWorkerPath,
                 this.selfRef
             )
             .ConfigureAwait(false);
@@ -96,10 +80,10 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IAsyncDisposable
             this.NativeRegistrationToken = result.Endpoint;
             this.RegistrationToken = result.Subscription;
 
-            await this.services
+            await services
                 .RunDelegates<IPushDelegate>(
                     x => x.OnNewToken(result.Subscription),
-                    this.logger
+                    logger
                 )
                 .ConfigureAwait(false);
         }
@@ -120,10 +104,10 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IAsyncDisposable
         this.RegistrationToken = null;
         this.NativeRegistrationToken = null;
 
-        await this.services
+        await services
             .RunDelegates<IPushDelegate>(
                 x => x.OnUnRegistered(oldToken),
-                this.logger
+                logger
             )
             .ConfigureAwait(false);
     }
@@ -134,7 +118,7 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IAsyncDisposable
     {
         var notification = (title != null || body != null) ? new Notification(title, body) : null;
         var push = new PushNotification(data ?? new Dictionary<string, string>(), notification);
-        return this.services.RunDelegates<IPushDelegate>(x => x.OnReceived(push), this.logger);
+        return services.RunDelegates<IPushDelegate>(x => x.OnReceived(push), logger);
     }
 
 
@@ -143,7 +127,7 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IAsyncDisposable
     {
         var notification = (title != null || body != null) ? new Notification(title, body) : null;
         var push = new PushNotification(data ?? new Dictionary<string, string>(), notification);
-        return this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(push), this.logger);
+        return services.RunDelegates<IPushDelegate>(x => x.OnEntry(push), logger);
     }
 
 
@@ -153,10 +137,10 @@ public class PushManager : NotifyPropertyChanged, IPushManager, IAsyncDisposable
         this.NativeRegistrationToken = newEndpoint;
         this.RegistrationToken = newSubscription;
 
-        await this.services
+        await services
             .RunDelegates<IPushDelegate>(
                 x => x.OnNewToken(newSubscription),
-                this.logger
+                logger
             )
             .ConfigureAwait(false);
     }

@@ -9,23 +9,11 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBluetoothLE();
-builder.Services.AddBattery();
-builder.Services.AddConnectivity();
-builder.Services.AddLocalStorageRepository();
 builder.Services.AddGps();
-
+builder.Services.AddBlazorHttpTransfers<SampleHttpTransferDelegate>();
 builder.Services.AddPush<SamplePushDelegate>(new WebPushOptions
 {
     // Replace with your own VAPID public key generated for your push backend
     VapidPublicKey = "BNbxGYNMhEIi9zrneh7mqV4oUanjLUK3m-REPLACE-ME"
 });
-
-builder.Services.AddJob(
-    typeof(SampleJob),
-    identifier: "SampleJob",
-    runInForeground: true
-);
-
-builder.Services.AddBlazorHttpTransfers<SampleHttpTransferDelegate>();
-
 await builder.Build().RunAsync();

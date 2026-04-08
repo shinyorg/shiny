@@ -1,15 +1,51 @@
 @page "/httptransfers"
+@using System.Reactive.Linq
+@using Microsoft.AspNetCore.Components.Forms
 @using Shiny.Net.Http
+@using BlazorTransferManager = Shiny.Net.Http.Blazor.HttpTransferManager
 @inject IHttpTransferManager TransferManager
+@inject IJSRuntime JS
+@implements IDisposable
 
 <PageTitle>HTTP Transfers</PageTitle>
 
 <h1>HTTP Transfers</h1>
 
+<div class="card mb-3">
+    <div class="card-header">Queue a download</div>
+    <div class="card-body">
+        <div class="input-group mb-2">
+            <span class="input-group-text">URL</span>
+            <input class="form-control" @bind="downloadUrl" placeholder="https://..." />
+            <button class="btn btn-success" @onclick="QueueDownload" disabled="@string.IsNullOrWhiteSpace(downloadUrl)">Queue Download</button>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary" @onclick='() => downloadUrl = "https://speed.hetzner.de/1MB.bin"'>1 MB</button>
+            <button class="btn btn-outline-secondary" @onclick='() => downloadUrl = "https://speed.hetzner.de/10MB.bin"'>10 MB</button>
+            <button class="btn btn-outline-secondary" @onclick='() => downloadUrl = "https://speed.hetzner.de/100MB.bin"'>100 MB</button>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">Queue an upload</div>
+    <div class="card-body">
+        <div class="input-group mb-2">
+            <span class="input-group-text">POST to</span>
+            <input class="form-control" @bind="uploadUrl" placeholder="https://httpbin.org/post" />
+        </div>
+        <InputFile OnChange="OnUploadFileSelected" class="form-control" />
+        @if (!string.IsNullOrEmpty(uploadStatus))
+        {
+            <div class="form-text">@uploadStatus</div>
+        }
+    </div>
+</div>
+
 <div class="mb-3">
     <button class="btn btn-primary me-2" @onclick="Refresh">Refresh</button>
-    <button class="btn btn-success me-2" @onclick="QueueDownload">Queue Download</button>
-    <button class="btn btn-warning" @onclick="CancelAll">Cancel All</button>
+    <button class="btn btn-warning" @onclick="CancelAll" disabled="@(transfers.Count == 0)">Cancel All</button>
+    <span class="ms-3 text-muted">Live events received: @eventCount</span>
 </div>
 
 @if (!string.IsNullOrEmpty(status))
@@ -23,7 +59,7 @@
 }
 else
 {
-    <table class="table">
+    <table class="table table-sm align-middle">
         <thead>
             <tr>
                 <th>Identifier</th>
@@ -31,17 +67,40 @@ else
                 <th>Status</th>
                 <th>Progress</th>
                 <th>URI</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var t in transfers)
             {
                 <tr>
-                    <td>@t.Request.Identifier</td>
+                    <td><code>@t.Request.Identifier</code></td>
                     <td>@t.Request.Type</td>
                     <td>@t.Status</td>
-                    <td>@FormatProgress(t)</td>
-                    <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis;">@t.Request.Uri</td>
+                    <td style="min-width: 160px;">
+                        @if (t.BytesToTransfer is long total && total > 0)
+                        {
+                            var pct = (int)Math.Round((double)t.BytesTransferred / total * 100);
+                            <div class="progress" style="height: 16px;">
+                                <div class="progress-bar" role="progressbar" style="@($"width: {pct}%")">@pct%</div>
+                            </div>
+                            <small class="text-muted">@FormatBytes(t.BytesTransferred) / @FormatBytes(total)</small>
+                        }
+                        else
+                        {
+                            <span>@FormatBytes(t.BytesTransferred)</span>
+                        }
+                    </td>
+                    <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis;">
+                        <small>@t.Request.Uri</small>
+                    </td>
+                    <td class="text-end">
+                        @if (t.Status == HttpTransferState.Completed && t.Request.Type == TransferType.Download)
+                        {
+                            <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => SaveDownload(t.Request.Identifier)">Save</button>
+                        }
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => Cancel(t.Request.Identifier)">Cancel</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -50,27 +109,103 @@ else
 
 @code {
     IList<HttpTransfer> transfers = new List<HttpTransfer>();
+    IDisposable? updateSub;
     string? status;
+    string downloadUrl = "https://speed.hetzner.de/1MB.bin";
+    string uploadUrl = "https://httpbin.org/post";
+    string? uploadStatus;
+    int eventCount;
 
-    protected override async Task OnInitializedAsync() => await Refresh();
+    protected override async Task OnInitializedAsync()
+    {
+        // Live-refresh the table whenever the manager reports a state change.
+        // Throttle so rapid progress pings don't overwhelm the render loop.
+        updateSub = TransferManager
+            .WhenUpdateReceived()
+            .Sample(TimeSpan.FromMilliseconds(500))
+            .Subscribe(async _ =>
+            {
+                eventCount++;
+                await InvokeAsync(Refresh);
+            });
+
+        await Refresh();
+    }
 
     async Task Refresh()
     {
         transfers = await TransferManager.GetTransfers();
         status = $"Loaded {transfers.Count} transfer(s)";
+        StateHasChanged();
     }
 
     async Task QueueDownload()
     {
-        var id = $"sample-{Guid.NewGuid():N}";
-        var request = new HttpTransferRequest(
-            id,
-            "https://speed.hetzner.de/1MB.bin",
-            TransferType.Download,
-            $"{id}.bin"
-        );
-        await TransferManager.Queue(request);
-        status = $"Queued {id}";
+        try
+        {
+            var id = $"dl-{Guid.NewGuid():N}";
+            var filename = Path.GetFileName(new Uri(downloadUrl).LocalPath);
+            if (string.IsNullOrEmpty(filename))
+                filename = $"{id}.bin";
+
+            var request = new HttpTransferRequest(
+                id,
+                downloadUrl,
+                TransferType.Download,
+                filename
+            );
+            await TransferManager.Queue(request);
+            status = $"Queued download {id}";
+            await Refresh();
+        }
+        catch (Exception ex)
+        {
+            status = $"Error queuing download: {ex.Message}";
+        }
+    }
+
+    async Task OnUploadFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            uploadStatus = $"Reading {file.Name} ({FormatBytes(file.Size)})...";
+
+            // Read browser-selected file into the WASM virtual filesystem so the
+            // transfer manager can pick it up via LocalFilePath.
+            var tempPath = $"/tmp/{Guid.NewGuid():N}-{file.Name}";
+            Directory.CreateDirectory("/tmp");
+            await using (var src = file.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024))
+            await using (var dst = File.Create(tempPath))
+            {
+                await src.CopyToAsync(dst);
+            }
+
+            var id = $"up-{Guid.NewGuid():N}";
+            var request = new HttpTransferRequest(
+                id,
+                uploadUrl,
+                TransferType.UploadRaw,
+                tempPath,
+                Headers: new Dictionary<string, string>
+                {
+                    ["Content-Type"] = file.ContentType ?? "application/octet-stream"
+                }
+            );
+            await TransferManager.Queue(request);
+            uploadStatus = $"Queued upload {id} ({file.Name})";
+            await Refresh();
+        }
+        catch (Exception ex)
+        {
+            uploadStatus = $"Upload failed: {ex.Message}";
+        }
+    }
+
+    async Task Cancel(string identifier)
+    {
+        await TransferManager.Cancel(identifier);
+        status = $"Cancelled {identifier}";
         await Refresh();
     }
 
@@ -81,13 +216,42 @@ else
         await Refresh();
     }
 
-    static string FormatProgress(HttpTransfer t)
+    async Task SaveDownload(string identifier)
     {
-        if (t.BytesToTransfer is long total && total > 0)
+        try
         {
-            var pct = (double)t.BytesTransferred / total;
-            return pct.ToString("P0");
+            // GetDownloadBytes is a Blazor-specific helper on the concrete manager
+            // that reads the completed payload from IndexedDB.
+            if (TransferManager is BlazorTransferManager blazorMgr)
+            {
+                var bytes = await blazorMgr.GetDownloadBytes(identifier);
+                if (bytes == null)
+                {
+                    status = $"No bytes available yet for {identifier}";
+                    return;
+                }
+
+                var base64 = Convert.ToBase64String(bytes);
+                var filename = $"{identifier}.bin";
+                await JS.InvokeVoidAsync("sampleDownload.saveBase64", base64, filename, "application/octet-stream");
+                status = $"Saved {filename} ({FormatBytes(bytes.LongLength)})";
+            }
         }
-        return $"{t.BytesTransferred} bytes";
+        catch (Exception ex)
+        {
+            status = $"Save failed: {ex.Message}";
+        }
     }
+
+    static string FormatBytes(long? bytes)
+    {
+        if (bytes == null) return "-";
+        double b = bytes.Value;
+        string[] units = { "B", "KB", "MB", "GB" };
+        int u = 0;
+        while (b >= 1024 && u < units.Length - 1) { b /= 1024; u++; }
+        return $"{b:0.##} {units[u]}";
+    }
+
+    public void Dispose() => updateSub?.Dispose();
 }

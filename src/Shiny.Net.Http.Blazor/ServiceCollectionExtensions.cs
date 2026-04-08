@@ -27,6 +27,10 @@ public static class ServiceCollectionExtensions
         var options = new BlazorHttpTransferOptions();
         configure?.Invoke(options);
 
+        services.AddBattery();
+        services.AddConnectivity();
+        services.AddLocalStorageRepository();
+
         services.AddSingleton(options);
         services.AddShinyService<BlazorHttpTransferManager>();
         services.AddShinyService(typeof(TDelegate));

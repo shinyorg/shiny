@@ -1,15 +1,12 @@
 namespace Shiny.BluetoothLE;
 
 
-public class AdvertisementData : IAdvertisementData
+public class AdvertisementData(JsScanResult sr) : IAdvertisementData
 {
-    readonly JsScanResult sr;
-    public AdvertisementData(JsScanResult sr) => this.sr = sr;
-
-    public string? LocalName => this.sr.DeviceName;
+    public string? LocalName => sr.DeviceName;
     public bool? IsConnectable => null;
     public AdvertisementServiceData[]? ServiceData => null;
     public ManufacturerData? ManufacturerData => null;
-    public string[]? ServiceUuids => this.sr.ServiceUuids;
-    public int? TxPower => this.sr.TxPower == 0 ? null : this.sr.TxPower;
+    public string[]? ServiceUuids => sr.ServiceUuids;
+    public int? TxPower => sr.TxPower == 0 ? null : sr.TxPower;
 }

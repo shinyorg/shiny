@@ -8,24 +8,16 @@ using Microsoft.JSInterop;
 namespace Shiny.Locations.Blazor;
 
 
-public class GpsManager : IGpsManager, IAsyncDisposable
+public class GpsManager(
+    IJSRuntime jsRuntime, 
+    IServiceProvider services, 
+    ILogger<GpsManager> logger
+) : IGpsManager, IAsyncDisposable
 {
-    readonly IJSRuntime jsRuntime;
-    readonly IServiceProvider services;
-    readonly ILogger logger;
     readonly Subject<GpsReading> readingSubj = new();
 
     IJSObjectReference? module;
     DotNetObjectReference<GpsManager>? selfRef;
-
-
-    public GpsManager(IJSRuntime jsRuntime, IServiceProvider services, ILogger<GpsManager> logger)
-    {
-        this.jsRuntime = jsRuntime;
-        this.services = services;
-        this.logger = logger;
-    }
-
 
     public GpsRequest? CurrentListener { get; private set; }
 
@@ -37,7 +29,7 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     {
         if (request.BackgroundMode != GpsBackgroundMode.None)
         {
-            this.logger.LogWarning("Background GPS is not supported on Blazor WebAssembly. Request will be treated as foreground only.");
+            logger.LogWarning("Background GPS is not supported on Blazor WebAssembly. Request will be treated as foreground only.");
         }
 
         var mod = await this.GetModule().ConfigureAwait(false);
@@ -63,7 +55,7 @@ public class GpsManager : IGpsManager, IAsyncDisposable
             return;
 
         if (request.BackgroundMode != GpsBackgroundMode.None)
-            this.logger.LogWarning("Background GPS is not supported on Blazor WebAssembly. Listener will only run while the page is active.");
+            logger.LogWarning("Background GPS is not supported on Blazor WebAssembly. Listener will only run while the page is active.");
 
         var mod = await this.GetModule().ConfigureAwait(false);
         this.selfRef ??= DotNetObjectReference.Create(this);
@@ -92,20 +84,20 @@ public class GpsManager : IGpsManager, IAsyncDisposable
     {
         var reading = ToReading(pos);
         this.readingSubj.OnNext(reading);
-        await this.services
-            .RunDelegates<IGpsDelegate>(x => x.OnReading(reading), this.logger)
+        await services
+            .RunDelegates<IGpsDelegate>(x => x.OnReading(reading), logger)
             .ConfigureAwait(false);
     }
 
 
     [JSInvokable]
     public void OnError(string error)
-        => this.logger.LogWarning("GPS listener error: {Error}", error);
+        => logger.LogWarning("GPS listener error: {Error}", error);
 
 
     async Task<IJSObjectReference> GetModule()
     {
-        this.module ??= await this.jsRuntime
+        this.module ??= await jsRuntime
             .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Locations.Blazor/gps.js")
             .ConfigureAwait(false);
 

@@ -9,6 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\Shiny.Support.Storage.Blazor\Shiny.Support.Storage.Blazor.csproj" />
     </ItemGroup>
 
     <ItemGroup>

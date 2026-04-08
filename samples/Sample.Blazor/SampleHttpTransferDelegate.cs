@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Shiny.Net.Http;
 
 namespace Sample.Blazor;

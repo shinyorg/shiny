@@ -42,10 +42,24 @@ Do NOT use this skill for BLE hosting/peripheral mode (advertising, GATT server)
 
 ## Library Overview
 
-- **NuGet Package**: `Shiny.BluetoothLE`
+- **NuGet Package**: `Shiny.BluetoothLE` (Android, iOS/macOS, Windows), `Shiny.BluetoothLE.Linux` (Linux via BlueZ), `Shiny.BluetoothLE.Blazor` (Blazor WebAssembly via Web Bluetooth API)
 - **Primary Namespace**: `Shiny.BluetoothLE`
 - **Managed Scan Namespace**: `Shiny.BluetoothLE.Managed`
-- **Platforms**: Android, iOS/macOS (Apple), Windows, WebAssembly
+- **Platforms**: Android, iOS/macOS (Apple), Windows, Linux (BlueZ), WebAssembly (Web Bluetooth)
+
+### Blazor WebAssembly / Web Bluetooth caveats
+
+The Blazor implementation is built on the browser's Web Bluetooth API and inherits its limitations:
+
+- **User-gesture gated.** Scans must be kicked off from a click handler. The browser shows a native chooser and Shiny only sees the peripheral(s) the user explicitly selects — there is no ambient/background scanning and no manufacturer data.
+- **HTTPS or `http://localhost` required.** The API is unavailable on plain `http://`.
+- **No background operation.** Scanning and connections stop when the tab is backgrounded or closed.
+- **Browser support is Chromium-only and requires enabling in some cases.** When generating setup instructions or troubleshooting guidance, note the following:
+    - **Chrome / Edge / Brave / Opera (desktop)**: enabled by default on Windows, macOS, Linux, ChromeOS. Fallback: `chrome://flags/#enable-web-bluetooth` (or `edge://flags`, etc.) → *Enabled* → restart. Linux also needs `experimental-web-platform-features` on and BlueZ 5.43+.
+    - **Chrome / Edge (Android)**: Android 6.0+. OS location services must be on for the chooser prompt to appear.
+    - **Samsung Internet**: enable `internet://flags` → *Web Bluetooth*.
+    - **Safari (macOS / iOS / iPadOS)**: not supported. On iOS/iPadOS suggest third-party WKWebView-based browsers *Bluefy* or *WebBLE*. Stock macOS Safari has no workaround.
+    - **Firefox**: not supported on any platform.
 
 ## Setup
 

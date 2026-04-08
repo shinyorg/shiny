@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -19,32 +18,18 @@ namespace Shiny.Net.Http.Blazor;
 /// Background Sync API. Transfers continue running while the tab is closed
 /// (where the browser supports background sync).
 /// </summary>
-public class HttpTransferManager : IHttpTransferManager, IShinyComponentStartup, IAsyncDisposable
+public class HttpTransferManager(
+    IJSRuntime jsRuntime,
+    IServiceProvider services,
+    BlazorHttpTransferOptions options,
+    ILogger<HttpTransferManager> logger
+) : IHttpTransferManager, IShinyComponentStartup, IAsyncDisposable
 {
-    readonly IJSRuntime jsRuntime;
-    readonly IServiceProvider services;
-    readonly BlazorHttpTransferOptions options;
-    readonly ILogger logger;
-
     readonly Subject<HttpTransferResult> resultSubj = new();
 
     IJSObjectReference? module;
     DotNetObjectReference<HttpTransferManager>? selfRef;
     bool initialized;
-
-
-    public HttpTransferManager(
-        IJSRuntime jsRuntime,
-        IServiceProvider services,
-        BlazorHttpTransferOptions options,
-        ILogger<HttpTransferManager> logger
-    )
-    {
-        this.jsRuntime = jsRuntime;
-        this.services = services;
-        this.options = options;
-        this.logger = logger;
-    }
 
 
     public void ComponentStart()
@@ -59,7 +44,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyComponentStartup,
     {
         if (this.module == null)
         {
-            this.module = await this.jsRuntime
+            this.module = await jsRuntime
                 .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Net.Http.Blazor/http-transfer.js")
                 .ConfigureAwait(false);
         }
@@ -68,7 +53,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyComponentStartup,
         {
             this.selfRef ??= DotNetObjectReference.Create(this);
             this.initialized = await this.module
-                .InvokeAsync<bool>("init", this.options.ServiceWorkerPath, this.selfRef)
+                .InvokeAsync<bool>("init", options.ServiceWorkerPath, this.selfRef)
                 .ConfigureAwait(false);
 
             if (!this.initialized)
@@ -182,7 +167,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyComponentStartup,
             }
             catch (Exception ex)
             {
-                this.logger.LogWarning(ex, "Failed to read transfer count");
+                logger.LogWarning(ex, "Failed to read transfer count");
             }
         }
 
@@ -238,13 +223,13 @@ public class HttpTransferManager : IHttpTransferManager, IShinyComponentStartup,
                 return;
 
             var request = ToRequest(entry);
-            await this.services
-                .RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(request), this.logger)
+            await services
+                .RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(request), logger)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error firing OnCompleted for {Identifier}", identifier);
+            logger.LogError(ex, "Error firing OnCompleted for {Identifier}", identifier);
         }
     }
 
@@ -267,13 +252,13 @@ public class HttpTransferManager : IHttpTransferManager, IShinyComponentStartup,
                 return;
 
             var request = ToRequest(entry);
-            await this.services
-                .RunDelegates<IHttpTransferDelegate>(d => d.OnError(request, statusCode, ex), this.logger)
+            await services
+                .RunDelegates<IHttpTransferDelegate>(d => d.OnError(request, statusCode, ex), logger)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error firing OnError for {Identifier}", identifier);
+            logger.LogError(ex, "Error firing OnError for {Identifier}", identifier);
         }
     }
 
@@ -382,11 +367,7 @@ public class HttpTransferManager : IHttpTransferManager, IShinyComponentStartup,
 }
 
 
-public class HttpTransferException : Exception
+public class HttpTransferException(string message, int statusCode) : Exception(message)
 {
-    public HttpTransferException(string message, int statusCode) : base(message)
-    {
-        this.StatusCode = statusCode;
-    }
-    public int StatusCode { get; }
+    public int StatusCode => statusCode;
 }

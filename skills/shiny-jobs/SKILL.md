@@ -97,7 +97,7 @@ No additional manifest setup is required. Shiny.Jobs uses AndroidX WorkManager u
 
 On the base .NET TFM there is no native OS scheduler — Shiny runs an in-process managed `JobManager` on a recurring timer (default 30s; configurable via the static `JobManager.Interval` property, minimum 15s, maximum 5 minutes). Jobs only execute while the host process is alive.
 
-You must register an `IBattery` and `IConnectivity` implementation before resolving the job manager. A default JSON filesystem repository is registered automatically and stores entries under `{LocalApplicationData}/Shiny` using the same `{EntityName}_{Id}.shiny` convention as iOS/Android.
+There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` directly on all plain .NET targets (Blazor WASM included). You must register an `IBattery` and `IConnectivity` implementation before resolving the job manager; `AddJobs()` (called by `AddJob`) auto-registers the default JSON filesystem repository, `IKeyValueStoreFactory`, and `IObjectStoreBinder` so the `JobManager` can be constructed without pulling in a platform infrastructure layer.
 
 ```csharp
 using Shiny;

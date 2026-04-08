@@ -38,7 +38,6 @@
     <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
-        <Project Path="src/Shiny.Jobs.Blazor/Shiny.Jobs.Blazor.csproj" />
         <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />
         <Project Path="src/Shiny.Support.DeviceMonitoring.Blazor/Shiny.Support.DeviceMonitoring.Blazor.csproj" />
         <Project Path="src/Shiny.Support.Storage.Blazor/Shiny.Support.Storage.Blazor.csproj" />

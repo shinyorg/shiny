@@ -9,6 +9,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <ProjectReference Include="..\Shiny.Support.DeviceMonitoring.Blazor\Shiny.Support.DeviceMonitoring.Blazor.csproj" />
+        <ProjectReference Include="..\Shiny.Support.Storage.Blazor\Shiny.Support.Storage.Blazor.csproj" />
     </ItemGroup>
 
     <ItemGroup>

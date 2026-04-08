@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton(options);
         services.AddShinyService<PushManager>();
+        services.AddLocalStorageKeyValueStore();
         return services;
     }
 

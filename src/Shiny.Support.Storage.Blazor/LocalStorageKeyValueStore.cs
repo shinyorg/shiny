@@ -26,7 +26,7 @@ public class LocalStorageKeyValueStore : IKeyValueStore
     }
 
 
-    public string Alias => "localstorage";
+    public string Alias => "settings";
     public bool IsReadOnly => false;
 
 

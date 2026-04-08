@@ -9,21 +9,15 @@ using Microsoft.JSInterop;
 namespace Shiny.BluetoothLE;
 
 
-public class BleManager : IBleManager, IAsyncDisposable
+public class BleManager(IJSRuntime jsRuntime) : IBleManager, IAsyncDisposable
 {
-    readonly IJSRuntime jsRuntime;
     IJSObjectReference? jsModule;
     readonly Dictionary<string, Peripheral> peripherals = new();
-
-    public BleManager(IJSRuntime jsRuntime)
-    {
-        this.jsRuntime = jsRuntime;
-    }
 
 
     async Task<IJSObjectReference> GetModule()
     {
-        this.jsModule ??= await this.jsRuntime
+        this.jsModule ??= await jsRuntime
             .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.BluetoothLE.Blazor/ble.js")
             .ConfigureAwait(false);
 
