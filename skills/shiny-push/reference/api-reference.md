@@ -239,11 +239,14 @@ Implement this to create a custom push provider that bridges between the native 
 ```csharp
 public interface IPushProvider
 {
-    // Android signature:
+    // Android signature (FCM token):
     Task<string> Register(string nativeToken);
 
-    // iOS signature:
+    // iOS signature (APNs device token):
     Task<string> Register(NSData nativeToken);
+
+    // Windows signature (WNS channel URI):
+    Task<string> Register(string nativeToken);
 
     Task UnRegister();
 }

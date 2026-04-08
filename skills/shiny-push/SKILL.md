@@ -53,7 +53,7 @@ Use this skill when the user needs to:
 | **NuGet (Azure NH)** | `Shiny.Push.AzureNotificationHubs` |
 | **Primary Namespace** | `Shiny.Push` |
 | **Config Namespace** | `Shiny` (extension methods on `IServiceCollection`) |
-| **Platforms** | iOS (APNs), Android (FCM), WebAssembly (experimental) |
+| **Platforms** | iOS (APNs), Android (FCM), Windows (WNS), WebAssembly (experimental) |
 
 ## Setup
 
@@ -83,6 +83,8 @@ builder.Services.AddPush<MyPushDelegate>();
 ```
 
 ### Azure Notification Hubs
+
+Supports iOS (APNs), Android (FCM v1), and Windows (WNS) via a single registration call.
 
 ```csharp
 using Shiny;
