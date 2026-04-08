@@ -31,13 +31,16 @@ body:
   - type: checkboxes
     id: operatingsystems
     attributes:
-      label: What operating system(s) are effected?
+      label: What operating system(s) are effected?  Please make sure the platform is supported for the library you are filing against.  Check https://shinylib.net for supported platforms.
       description: You may select more than one
       options:
       - label: iOS
       - label: Mac Catalyst
+      - label: MacOS
       - label: Android
       - label: Windows
+      - label: Blazor
+      - label: Linux
   - type: textarea
     validations:
       required: true

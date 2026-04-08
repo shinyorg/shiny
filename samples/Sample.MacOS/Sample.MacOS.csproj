@@ -8,7 +8,9 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-        <ApplicationTitle>Shiny Sample</ApplicationTitle>
+        
+        <!--the application title will be the exe name, debuggers will try to launch on the assembly name-->
+        <ApplicationTitle>Sample.MacOS</ApplicationTitle>
         <ApplicationId>org.shiny.sample</ApplicationId>
     </PropertyGroup>
     <ItemGroup>

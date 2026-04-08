@@ -6,9 +6,8 @@
                   x:Class="Sample.MacOS.AppShell"
                   Title="Shiny Sample">
 
-    <ShellContent
-        Title="Home"
-        Route="main"
-        ContentTemplate="{DataTemplate pages:MainPage}" />
+    <ShellContent Title="Home"
+                  Route="main"
+                  ContentTemplate="{DataTemplate pages:MainPage}" />
 
 </shiny:ShinyShell>
