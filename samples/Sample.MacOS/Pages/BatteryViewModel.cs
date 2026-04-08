@@ -1,9 +1,9 @@
-using Shiny.Power;
+using Shiny.Infrastructure;
 
 namespace Sample.MacOS.Pages.Battery;
 
 [ShellMap<BatteryPage>("battery")]
-public partial class BatteryViewModel(Shiny.Power.IBattery battery) : ObservableObject, IPageLifecycleAware
+public partial class BatteryViewModel(Shiny.Power.IBattery battery, IMainThread mainThread) : ObservableObject, IPageLifecycleAware
 {
     IDisposable? sub;
 
@@ -14,7 +14,7 @@ public partial class BatteryViewModel(Shiny.Power.IBattery battery) : Observable
     {
         this.sub = battery
             .WhenChanged()
-            .Subscribe(b => MainThread.BeginInvokeOnMainThread(() =>
+            .Subscribe(b => mainThread.InvokeOnMainThreadAsync(() =>
             {
                 this.Status = b.Status.ToString();
                 this.Level = b.Level;

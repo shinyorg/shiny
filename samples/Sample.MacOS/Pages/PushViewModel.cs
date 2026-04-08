@@ -3,7 +3,7 @@ using Shiny.Push;
 namespace Sample.MacOS.Pages.Push;
 
 [ShellMap<PushPage>("push")]
-public partial class PushViewModel(IPushManager pushManager) : ObservableObject
+public partial class PushViewModel(IPushManager pushManager, IDialogs dialogs) : ObservableObject
 {
     [ObservableProperty] string status = "Unknown";
     [ObservableProperty] string? registrationToken;
@@ -30,7 +30,7 @@ public partial class PushViewModel(IPushManager pushManager) : ObservableObject
         }
         catch (Exception ex)
         {
-            await App.Current!.Windows[0].Page!.DisplayAlert("Error", ex.Message, "OK");
+            await dialogs.Alert("Error", ex.ToString(), "OK");
         }
     }
 

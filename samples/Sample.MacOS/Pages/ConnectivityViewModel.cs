@@ -1,9 +1,12 @@
-using Shiny.Net;
+using Shiny.Infrastructure;
 
 namespace Sample.MacOS.Pages.Connectivity;
 
 [ShellMap<ConnectivityPage>("connectivity")]
-public partial class ConnectivityViewModel(Shiny.Net.IConnectivity connectivity) : ObservableObject, IPageLifecycleAware
+public partial class ConnectivityViewModel(
+    Shiny.Net.IConnectivity connectivity,
+    IMainThread mainThread
+) : ObservableObject, IPageLifecycleAware
 {
     IDisposable? sub;
 
@@ -14,7 +17,7 @@ public partial class ConnectivityViewModel(Shiny.Net.IConnectivity connectivity)
     {
         this.sub = connectivity
             .WhenChanged()
-            .Subscribe(c => MainThread.BeginInvokeOnMainThread(() =>
+            .Subscribe(c => mainThread.InvokeOnMainThreadAsync(() =>
             {
                 this.Access = c.Access.ToString();
                 this.ConnectionTypes = c.ConnectionTypes.ToString();

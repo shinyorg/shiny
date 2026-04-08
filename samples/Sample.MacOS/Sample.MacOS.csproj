@@ -28,4 +28,36 @@
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <MauiXaml Update="Pages\BatteryPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Pages\PushPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Pages\NotificationsPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Pages\ConnectivityPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Pages\BatteryPage.xaml.cs">
+        <DependentUpon>BatteryPage.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Pages\PushPage.xaml.cs">
+        <DependentUpon>PushPage.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Pages\NotificationsPage.xaml.cs">
+        <DependentUpon>NotificationsPage.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Pages\ConnectivityPage.xaml.cs">
+        <DependentUpon>ConnectivityPage.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>
