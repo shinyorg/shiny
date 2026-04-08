@@ -105,9 +105,9 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
     {
         var nativeToken = rawToken.ToPushTokenString();
 #endif
-#if ANDROID
+#if ANDROID || WINDOWS
     public async Task<string> Register(string nativeToken)
-    { 
+    {
 #endif
         this.InstallationId ??= Guid.NewGuid().ToString().Replace("-", "");
         
@@ -164,6 +164,8 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
             Platform = NotificationPlatform.Apns
 #elif ANDROID
             Platform = NotificationPlatform.FcmV1
+#elif WINDOWS
+            Platform = NotificationPlatform.Wns
 #endif
         };
     }

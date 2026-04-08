@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework);$(BaseTargetFramework)-ios;$(BaseTargetFramework)-maccatalyst;$(BaseTargetFramework)-android</TargetFrameworks>
+        <TargetFrameworks Condition="'$(WindowsTarget)' != ''">$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
         <Description>Shiny Push Integration - Microsoft Azure Notification Hubs</Description>
     </PropertyGroup>
 

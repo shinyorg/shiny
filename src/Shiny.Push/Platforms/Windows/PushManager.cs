@@ -12,17 +12,19 @@ public class PushManager : NotifyPropertyChanged, IPushManager
 {
     readonly IServiceProvider services;
     readonly ILogger logger;
+    readonly IPushProvider? provider;
     PushNotificationChannel? channel;
 
 
-    public PushManager(IServiceProvider services, ILogger<PushManager> logger)
+    public PushManager(IServiceProvider services, ILogger<PushManager> logger, IPushProvider? provider = null)
     {
         this.services = services;
         this.logger = logger;
+        this.provider = provider;
     }
 
 
-    public IPushTagSupport? Tags => null;
+    public IPushTagSupport? Tags => this.provider as IPushTagSupport;
 
 
     string? regToken;
@@ -64,15 +66,20 @@ public class PushManager : NotifyPropertyChanged, IPushManager
         this.channel.PushNotificationReceived -= this.OnPushReceived;
         this.channel.PushNotificationReceived += this.OnPushReceived;
 
-        var newToken = this.channel.Uri;
-        if (this.RegistrationToken != newToken)
+        var nativeToken = this.channel.Uri;
+        var regToken = nativeToken;
+
+        if (this.provider != null)
+            regToken = await this.provider.Register(nativeToken).ConfigureAwait(false);
+
+        if (this.RegistrationToken != regToken)
         {
-            this.NativeRegistrationToken = newToken;
-            this.RegistrationToken = newToken;
+            this.NativeRegistrationToken = nativeToken;
+            this.RegistrationToken = regToken;
 
             await this.services
                 .RunDelegates<IPushDelegate>(
-                    x => x.OnNewToken(newToken),
+                    x => x.OnNewToken(regToken),
                     this.logger
                 )
                 .ConfigureAwait(false);
@@ -91,6 +98,9 @@ public class PushManager : NotifyPropertyChanged, IPushManager
         this.channel.PushNotificationReceived -= this.OnPushReceived;
         this.channel.Close();
         this.channel = null;
+
+        if (this.provider != null)
+            await this.provider.UnRegister().ConfigureAwait(false);
 
         this.RegistrationToken = null;
         this.NativeRegistrationToken = null;

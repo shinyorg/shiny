@@ -33,6 +33,18 @@ public interface IPushProvider
     /// Unregisters from the push provider
     /// </summary>
     Task UnRegister();
+#elif WINDOWS
+    /// <summary>
+    /// Registers the native push channel URI with the push provider
+    /// </summary>
+    /// <param name="nativeToken">The WNS channel URI</param>
+    /// <returns>The provider-specific registration token</returns>
+    Task<string> Register(string nativeToken);
+
+    /// <summary>
+    /// Unregisters from the push provider
+    /// </summary>
+    Task UnRegister();
 #endif
 }
 
