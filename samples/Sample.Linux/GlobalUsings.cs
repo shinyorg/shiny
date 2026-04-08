@@ -5,3 +5,8 @@ global using CommunityToolkit.Mvvm.Input;
 global using Shiny;
 global using Shiny.BluetoothLE;
 global using Shiny.Net.Http;
+global using Shiny.Notifications;
+global using Shiny.Jobs;
+global using Shiny.Maui.TableView;
+global using Sample.Shared.Maui.Pages;
+global using Sample.Shared.Maui.Delegates;

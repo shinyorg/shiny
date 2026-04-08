@@ -8,64 +8,18 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-        
+
         <!--the application title will be the exe name, debuggers will try to launch on the assembly name-->
         <ApplicationTitle>Sample.MacOS</ApplicationTitle>
         <ApplicationId>org.shiny.sample</ApplicationId>
     </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Platform.Maui.MacOS" />
         <PackageReference Include="Platform.Maui.MacOS.Essentials" />
-        <PackageReference Include="CommunityToolkit.Mvvm" />
-        <PackageReference Include="Microsoft.Maui.Controls" />
-        <PackageReference Include="Shiny.Maui.TableView"/>
-        <PackageReference Include="Shiny.Maui.Shell"/>
     </ItemGroup>
+
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <MauiXaml Update="Pages\BatteryPage.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-      <MauiXaml Update="Pages\PushPage.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-      <MauiXaml Update="Pages\NotificationsPage.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-      <MauiXaml Update="Pages\ConnectivityPage.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-      <MauiXaml Update="Pages\HttpTransfersPage.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Update="Pages\BatteryPage.xaml.cs">
-        <DependentUpon>BatteryPage.xaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Pages\PushPage.xaml.cs">
-        <DependentUpon>PushPage.xaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Pages\NotificationsPage.xaml.cs">
-        <DependentUpon>NotificationsPage.xaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Pages\ConnectivityPage.xaml.cs">
-        <DependentUpon>ConnectivityPage.xaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Pages\HttpTransfersPage.xaml.cs">
-        <DependentUpon>HttpTransfersPage.xaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+        <ProjectReference Include="..\Sample.Shared.Maui\Sample.Shared.Maui.csproj" />
     </ItemGroup>
 </Project>

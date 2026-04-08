@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Settings"
+             x:Class="Sample.Shared.Maui.Pages.Settings.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Settings">
+    <tv:TableView>
+        <tv:TableRoot>
+            <tv:TableSection Title="Connectivity">
+                <tv:LabelCell Title="Network" ValueText="{Binding NetworkAccess}" />
+                <tv:LabelCell Title="Type" ValueText="{Binding ConnectionTypes}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Battery">
+                <tv:LabelCell Title="Level" ValueText="{Binding BatteryLevel, StringFormat='{0:P0}'}" />
+                <tv:LabelCell Title="State" ValueText="{Binding BatteryState}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Platform">
+                <tv:LabelCell Title="Info" ValueText="{Binding Platform}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Key/Value Store">
+                <tv:EntryCell Title="Key" ValueText="{Binding StoreKey, Mode=TwoWay}" Placeholder="Enter key" />
+                <tv:EntryCell Title="Value" ValueText="{Binding StoreValue, Mode=TwoWay}" Placeholder="Enter value" />
+                <tv:CommandCell Title="Set" Command="{Binding SetValueCommand}" ShowArrow="False" />
+                <tv:CommandCell Title="Get" Command="{Binding GetValueCommand}" ShowArrow="False" />
+                <tv:CommandCell Title="Remove" Command="{Binding RemoveValueCommand}" ShowArrow="False" />
+                <tv:LabelCell Title="Result" ValueText="{Binding StoreResult}" />
+            </tv:TableSection>
+        </tv:TableRoot>
+    </tv:TableView>
+</ContentPage>

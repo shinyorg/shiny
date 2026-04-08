@@ -1,7 +1,8 @@
 using Platform.Maui.Linux.Gtk4.Essentials.Hosting;
 using Platform.Maui.Linux.Gtk4.Hosting;
-using Sample.Linux.Delegates;
-using Shiny.Jobs;
+using Sample.Maui;
+using Sample.Shared.Maui;
+using Sample.Shared.Maui.Delegates;
 
 namespace Sample.Linux;
 
@@ -13,25 +14,19 @@ public static class MauiProgram
         builder
             .UseMauiAppLinuxGtk4<App>()
             .AddLinuxGtk4Essentials()
-            .UseShinyShell(x => x.AddGeneratedMaps())
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            });
+            .UseSampleShiny();
 
-        builder.Services.AddBluetoothLE();
-        builder.Services.AddBluetoothLeHosting();
-        builder.Services.AddBattery();
-        builder.Services.AddConnectivity();
-        builder.Services.AddNotifications();
-
-        builder.Services.AddJob(
-            typeof(SampleJob),
-            identifier: "SampleJob",
-            runInForeground: true
-        );
-        builder.Services.AddHttpTransfers<SampleHttpTransferDelegate>();
+        // Linux-specific registrations — the cross-platform Shiny packages do not
+        // expose these on plain net10.0, so the .Linux packages wire them here.
+        var s = builder.Services;
+        s.AddBluetoothLE();
+        s.AddBluetoothLeHosting();
+        s.AddNotifications<SampleNotificationDelegate>();
+        s.AddBattery();
+        s.AddConnectivity();
+        
+        s.AddDefaultRepository();
+        s.AddStandardHttpTransfers<SampleHttpTransferDelegate>();
 
         return builder.Build();
     }

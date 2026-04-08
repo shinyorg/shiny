@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.HttpTransfers"
+             x:Class="Sample.Shared.Maui.Pages.HttpTransfers.HttpTransferUploadPage"
+             x:DataType="vm:HttpTransferUploadViewModel"
+             Title="New Upload">
+    <tv:TableView>
+        <tv:TableRoot>
+            <tv:TableSection Title="Upload">
+                <tv:EntryCell Title="Identifier" ValueText="{Binding Identifier, Mode=TwoWay}" />
+                <tv:EntryCell Title="URI" ValueText="{Binding Uri, Mode=TwoWay}" Placeholder="https://example.com/upload" />
+                <tv:LabelCell Title="Selected File" ValueText="{Binding SelectedFileName}" Description="Tap 'Pick File' to choose" />
+                <tv:CommandCell Title="Pick File" Command="{Binding PickFileCommand}" ShowArrow="False" />
+                <tv:TextPickerCell Title="Transfer Type" ItemsSource="{Binding TransferTypes}" SelectedIndex="{Binding SelectedTransferTypeIndex, Mode=TwoWay}" />
+                <tv:EntryCell Title="File Form Data Name" ValueText="{Binding FileFormDataName, Mode=TwoWay}" Placeholder="file" />
+                <tv:EntryCell Title="HTTP Method" ValueText="{Binding HttpMethod, Mode=TwoWay}" Placeholder="POST" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Options">
+                <tv:SwitchCell Title="Use Metered Connection" On="{Binding UseMeteredConnection, Mode=TwoWay}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Custom Headers">
+                <tv:EntryCell Title="Key" ValueText="{Binding HeaderKey, Mode=TwoWay}" Placeholder="Header name" />
+                <tv:EntryCell Title="Value" ValueText="{Binding HeaderValue, Mode=TwoWay}" Placeholder="Header value" />
+                <tv:ButtonCell Title="Add Header" Command="{Binding AddHeaderCommand}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Headers" ItemsSource="{Binding Headers}">
+                <tv:TableSection.ItemTemplate>
+                    <DataTemplate x:DataType="vm:HeaderViewModel">
+                        <tv:CommandCell Title="{Binding Key}" ValueText="{Binding Value}"
+                                        Command="{Binding BindingContext.RemoveHeaderCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                        CommandParameter="{Binding .}" ShowArrow="False" />
+                    </DataTemplate>
+                </tv:TableSection.ItemTemplate>
+            </tv:TableSection>
+
+            <tv:TableSection Title="HTTP Content">
+                <tv:TextPickerCell Title="Content Type" ItemsSource="{Binding ContentTypes}" SelectedIndex="{Binding SelectedContentTypeIndex, Mode=TwoWay}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="JSON Content" IsVisible="{Binding IsJsonVisible}">
+                <tv:EntryCell Title="JSON Body" ValueText="{Binding JsonBody, Mode=TwoWay}" Placeholder="JSON content" />
+                <tv:EntryCell Title="Content Form Data Name" ValueText="{Binding ContentFormDataName, Mode=TwoWay}" Placeholder="Optional" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Form Data" IsVisible="{Binding IsFormDataVisible}">
+                <tv:EntryCell Title="Key" ValueText="{Binding FormDataKey, Mode=TwoWay}" Placeholder="Form data key" />
+                <tv:EntryCell Title="Value" ValueText="{Binding FormDataValue, Mode=TwoWay}" Placeholder="Form data value" />
+                <tv:ButtonCell Title="Add Form Data" Command="{Binding AddFormDataCommand}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Form Data Pairs" IsVisible="{Binding IsFormDataVisible}" ItemsSource="{Binding FormDataPairs}">
+                <tv:TableSection.ItemTemplate>
+                    <DataTemplate x:DataType="vm:HeaderViewModel">
+                        <tv:CommandCell Title="{Binding Key}" ValueText="{Binding Value}"
+                                        Command="{Binding BindingContext.RemoveFormDataCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                        CommandParameter="{Binding .}" ShowArrow="False" />
+                    </DataTemplate>
+                </tv:TableSection.ItemTemplate>
+            </tv:TableSection>
+
+            <tv:TableSection>
+                <tv:ButtonCell Title="Queue Upload" Command="{Binding QueueCommand}" />
+                <tv:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </tv:TableSection>
+        </tv:TableRoot>
+    </tv:TableView>
+</ContentPage>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<shiny:ShinyShell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:pages="clr-namespace:Sample.Shared.Maui.Pages"
+                  xmlns:shiny="clr-namespace:Shiny;assembly=Shiny.Maui.Shell"
+                  x:Class="Sample.Maui.AppShell"
+                  Title="Shiny Sample">
+
+    <ShellContent Title="Home"
+                  Route="main"
+                  ContentTemplate="{DataTemplate pages:MainPage}" />
+
+</shiny:ShinyShell>

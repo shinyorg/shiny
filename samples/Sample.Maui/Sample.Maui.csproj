@@ -23,14 +23,7 @@
         <WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
     </PropertyGroup>
 
-    <ItemGroup>
-        <MauiIcon Include="Resources\AppIcon\appicon.png" ForegroundFile="Resources\AppIcon\appiconfg.png" Color="#512BD4"/>
-        <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#512BD4" BaseSize="128,128"/>
 
-        <MauiImage Include="Resources\Images\*"/>
-        <MauiFont Include="Resources\Fonts\*"/>
-        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls"/>
@@ -40,10 +33,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
@@ -52,6 +43,7 @@
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
+        <ProjectReference Include="..\Sample.Shared.Maui\Sample.Shared.Maui.csproj" />
     </ItemGroup>
 
 </Project>

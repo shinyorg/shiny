@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Locations"
+             x:Class="Sample.Shared.Maui.Pages.Locations.GpsPage"
+             x:DataType="vm:GpsViewModel"
+             Title="GPS">
+    <tv:TableView>
+        <tv:TableRoot>
+            <tv:TableSection Title="Configuration">
+                <tv:TextPickerCell Title="Background Mode"
+                                   ItemsSource="{Binding BackgroundModes}"
+                                   SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay}" />
+                <tv:SwitchCell Title="Precise Accuracy" On="{Binding RequestPreciseAccuracy, Mode=TwoWay}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Platform Options">
+                <tv:TextPickerCell Title="Activity Type"
+                                   ItemsSource="{Binding ActivityTypes}"
+                                   SelectedIndex="{Binding SelectedActivityTypeIndex, Mode=TwoWay}" />
+                <tv:SwitchCell Title="Background Indicator" On="{Binding ShowsBackgroundLocationIndicator, Mode=TwoWay}" />
+                <tv:SwitchCell Title="Auto Pause Updates" On="{Binding PausesLocationUpdatesAutomatically, Mode=TwoWay}" />
+                <tv:TextPickerCell Title="GPS Priority"
+                                   ItemsSource="{Binding GpsPriorities}"
+                                   SelectedIndex="{Binding SelectedGpsPriorityIndex, Mode=TwoWay}" />
+                <tv:SwitchCell Title="Wait for Accurate Location" On="{Binding WaitForAccurateLocation, Mode=TwoWay}" />
+                <tv:SwitchCell Title="Stop Service With Task" On="{Binding StopForegroundServiceWithTask, Mode=TwoWay}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Actions">
+                <tv:ButtonCell Title="{Binding ListenText}" Command="{Binding ToggleListenerCommand}" />
+                <tv:ButtonCell Title="Get Current Position" Command="{Binding GetCurrentPositionCommand}" />
+                <tv:ButtonCell Title="Check Permission" Command="{Binding CheckPermissionCommand}" />
+                <tv:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Current Reading">
+                <tv:LabelCell Title="Latitude" ValueText="{Binding Latitude, StringFormat='{0:F6}'}" />
+                <tv:LabelCell Title="Longitude" ValueText="{Binding Longitude, StringFormat='{0:F6}'}" />
+                <tv:LabelCell Title="Altitude" ValueText="{Binding Altitude, StringFormat='{0:F1}m'}" />
+                <tv:LabelCell Title="Speed" ValueText="{Binding Speed, StringFormat='{0:F1} m/s'}" />
+                <tv:LabelCell Title="Heading" ValueText="{Binding Heading, StringFormat='{0:F1}\u00B0'}" />
+                <tv:LabelCell Title="Position Accuracy" ValueText="{Binding PositionAccuracy, StringFormat='{0:F1}m'}" />
+                <tv:LabelCell Title="Heading Accuracy" ValueText="{Binding HeadingAccuracy, StringFormat='{0:F1}\u00B0'}" />
+                <tv:LabelCell Title="Speed Accuracy" ValueText="{Binding SpeedAccuracy, StringFormat='{0:F1} m/s'}" />
+                <tv:LabelCell Title="Timestamp" ValueText="{Binding Timestamp}" />
+                <tv:LabelCell Title="Floor" ValueText="{Binding Floor}" />
+                <tv:LabelCell Title="Stationary" ValueText="{Binding IsStationary}" />
+            </tv:TableSection>
+        </tv:TableRoot>
+    </tv:TableView>
+</ContentPage>

@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     /// before resolving services. A default JSON filesystem repository is
     /// registered automatically under {LocalApplicationData}/Shiny.
     /// </summary>
-    public static IServiceCollection AddHttpTransfers<TDelegate>(this IServiceCollection services)
+    public static IServiceCollection AddStandardHttpTransfers<TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
         services.AddShinyService<HttpTransferManager>();

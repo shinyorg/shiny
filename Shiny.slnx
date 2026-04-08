@@ -1,4 +1,10 @@
 ﻿<Solution>
+    <Folder Name="/MAUISamples/">
+        <Project Path="samples/Sample.Shared.Maui/Sample.Shared.Maui.csproj" />
+        <Project Path="samples\Sample.Linux\Sample.Linux.csproj" />
+        <Project Path="samples\Sample.MacOS\Sample.MacOS.csproj" />
+        <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
+    </Folder>
     <Folder Name="/Solution Items/">
         <File Path=".editorconfig" />
         <File Path=".github\CODE_OF_CONDUCT.md" />
@@ -46,14 +52,9 @@
         <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
     </Folder>
     <Folder Name="/Linux/">
-        <Project Path="samples\Sample.Linux\Sample.Linux.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj" />
         <Project Path="src\Shiny.Support.DeviceMonitoring.Linux\Shiny.Support.DeviceMonitoring.Linux.csproj" />
         <Project Path="src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
-    </Folder>
-    <Folder Name="/Samples/">
-        <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
-        <Project Path="samples\Sample.MacOS\Sample.MacOS.csproj" />
     </Folder>
 </Solution>

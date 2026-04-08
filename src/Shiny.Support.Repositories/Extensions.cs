@@ -14,7 +14,7 @@ namespace Shiny;
 
 public static class RepositoryExtensions
 {
-#if PLATFORM
+#if IOS || MACCATALYST || ANDROID || WINDOWS
     /// <summary>
     /// Registers the default JSON filesystem repository, stored in the platform's
     /// application data directory via <see cref="IPlatform"/>.

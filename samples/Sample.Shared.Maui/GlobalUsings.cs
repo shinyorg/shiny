@@ -1,0 +1,16 @@
+global using System.Collections.ObjectModel;
+global using System.Reactive.Linq;
+global using CommunityToolkit.Mvvm.ComponentModel;
+global using CommunityToolkit.Mvvm.Input;
+global using Microsoft.Maui;
+global using Microsoft.Maui.Controls;
+global using Microsoft.Maui.Devices;
+global using Shiny;
+global using Shiny.BluetoothLE;
+global using Shiny.Jobs;
+global using Shiny.Locations;
+global using Shiny.Net.Http;
+global using Shiny.Stores;
+global using Shiny.Maui.TableView;
+global using Sample.Shared.Maui.Delegates;
+global using Sample.Shared.Maui.Pages;

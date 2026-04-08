@@ -3,8 +3,10 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
         <MsftExtensionVersion>10.0.0</MsftExtensionVersion>
+        <AvaloniaVersion>12.0.0-rc1</AvaloniaVersion>
     </PropertyGroup>
     <ItemGroup>
+        <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)"/>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
         <PackageVersion Include="Shiny.Maui.Shell" Version="3.2.1-beta-0002"/>
         <PackageVersion Include="Shiny.Maui.TableView" Version="1.1.1"/>
