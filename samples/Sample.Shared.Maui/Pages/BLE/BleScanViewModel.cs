@@ -58,10 +58,22 @@ public partial class BleScanViewModel(
             ? "Scanning (all)"
             : $"Scanning (filter: {string.Join(", ", config.ServiceUuids)})";
 
+        // Buffer scan hits and coalesce per-peripheral so the UI thread isn't flooded —
+        // macOS (and other platforms) can emit many advertisements per second per device.
         this.scanSub = bleManager
             .Scan(config)
+            .Buffer(TimeSpan.FromMilliseconds(250))
+            .Where(batch => batch.Count > 0)
             .Subscribe(
-                result => mainThread.BeginInvokeOnMainThread(() => this.OnScanResult(result)),
+                // TODO: this need to be actually pushed on the macOS thread
+                batch => mainThread.BeginInvokeOnMainThread(() =>
+                {
+                    var latest = new Dictionary<string, ScanResult>(batch.Count);
+                    foreach (var r in batch)
+                        latest[r.Peripheral.Uuid] = r;
+                    foreach (var r in latest.Values)
+                        this.OnScanResult(r);
+                }),
                 ex => mainThread.BeginInvokeOnMainThread(() =>
                 {
                     this.Status = $"Scan error: {ex.Message}";

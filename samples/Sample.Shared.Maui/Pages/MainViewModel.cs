@@ -7,6 +7,20 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
 
     static List<FeatureItem> BuildFeatureList()
     {
+        // On macOS (Sample.MacOS uses Platform.Maui.MacOS — an AppKit host), only a
+        // limited subset of Shiny services are actually functional today. Most others
+        // either aren't registered (HTTP Transfers) or the underlying platform bits
+        // don't surface through this MAUI host yet. Keep the menu honest.
+        if (OperatingSystem.IsMacOS())
+        {
+            return new List<FeatureItem>
+            {
+                new("BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
+                new("Battery", "Observe battery level & state", "battery"),
+                new("Connectivity", "Observe network connectivity", "connectivity")
+            };
+        }
+
         var list = new List<FeatureItem>
         {
             new("BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
