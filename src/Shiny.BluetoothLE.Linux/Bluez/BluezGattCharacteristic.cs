@@ -98,7 +98,7 @@ internal class BluezGattCharacteristic
         );
 
         // empty options dict
-        writer.WriteDictionary(new Dictionary<string, Variant>());
+        writer.WriteDictionary(new Dictionary<string, VariantValue>());
 
         var msg = writer.CreateMessage();
         return this.connection.CallMethodAsync(
@@ -124,9 +124,9 @@ internal class BluezGattCharacteristic
         );
 
         writer.WriteArray(value);
-        writer.WriteDictionary(new Dictionary<string, Variant>
+        writer.WriteDictionary(new Dictionary<string, VariantValue>
         {
-            ["type"] = new Variant(withResponse ? "request" : "command")
+            ["type"] = VariantValue.String(withResponse ? "request" : "command")
         });
 
         var msg = writer.CreateMessage();

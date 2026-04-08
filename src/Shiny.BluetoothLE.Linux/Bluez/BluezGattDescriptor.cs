@@ -51,7 +51,7 @@ internal class BluezGattDescriptor
             signature: "a{sv}"
         );
 
-        writer.WriteDictionary(new Dictionary<string, Variant>());
+        writer.WriteDictionary(new Dictionary<string, VariantValue>());
 
         var msg = writer.CreateMessage();
         return this.connection.CallMethodAsync(
@@ -77,7 +77,7 @@ internal class BluezGattDescriptor
         );
 
         writer.WriteArray(value);
-        writer.WriteDictionary(new Dictionary<string, Variant>());
+        writer.WriteDictionary(new Dictionary<string, VariantValue>());
 
         var msg = writer.CreateMessage();
         await this.connection.CallMethodAsync(msg).ConfigureAwait(false);

@@ -188,7 +188,7 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
             writer.WriteArray(actions.ToArray());
 
             // hints: a{sv}
-            var hints = new Dictionary<string, Variant>();
+            var hints = new Dictionary<string, VariantValue>();
             var urgency = channel.Importance switch
             {
                 ChannelImportance.Critical => (byte)2,
@@ -196,9 +196,9 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
                 ChannelImportance.Normal => (byte)1,
                 _ => (byte)0
             };
-            hints["urgency"] = new Variant(urgency);
+            hints["urgency"] = VariantValue.Byte(urgency);
             if (channel.Sound == ChannelSound.None)
-                hints["suppress-sound"] = new Variant(true);
+                hints["suppress-sound"] = VariantValue.Bool(true);
             writer.WriteDictionary(hints);
 
             writer.WriteInt32(-1); // expire_timeout (-1 = default)

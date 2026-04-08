@@ -57,9 +57,9 @@ internal class BluezAdapter
             signature: "a{sv}"
         );
 
-        writer.WriteDictionary(new Dictionary<string, Variant>
+        writer.WriteDictionary(new Dictionary<string, VariantValue>
         {
-            ["Transport"] = new Variant(transport)
+            ["Transport"] = VariantValue.String(transport)
         });
 
         var msg = writer.CreateMessage();
