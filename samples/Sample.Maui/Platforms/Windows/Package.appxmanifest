@@ -38,6 +38,13 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
+    <!-- Shiny.Net.Http (background transfers) + Shiny.Push (WNS) -->
+    <Capability Name="internetClient" />
+    <Capability Name="internetClientServer" />
+    <!-- Shiny.BluetoothLE + Shiny.BluetoothLE.Hosting -->
+    <DeviceCapability Name="bluetooth" />
+    <!-- Shiny.Locations (GPS / Geofencing) -->
+    <DeviceCapability Name="location" />
   </Capabilities>
 
 </Package>
