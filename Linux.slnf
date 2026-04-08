@@ -1,0 +1,35 @@
+﻿{
+  "solution": {
+    "path": "Shiny.slnx",
+    "projects": [
+      "samples\\Sample.Blazor\\Sample.Blazor.csproj",
+      "samples\\Sample.Shared.Maui\\Sample.Shared.Maui.csproj",
+      "src\\Shiny.BluetoothLE.Blazor\\Shiny.BluetoothLE.Blazor.csproj",
+      "src\\Shiny.BluetoothLE.Common\\Shiny.BluetoothLE.Common.csproj",
+      "src\\Shiny.BluetoothLE.Hosting.Linux\\Shiny.BluetoothLE.Hosting.Linux.csproj",
+      "src\\Shiny.BluetoothLE.Hosting\\Shiny.BluetoothLE.Hosting.csproj",
+      "src\\Shiny.BluetoothLE.Linux\\Shiny.BluetoothLE.Linux.csproj",
+      "src\\Shiny.BluetoothLE\\Shiny.BluetoothLE.csproj",
+      "src\\Shiny.Core\\Shiny.Core.csproj",
+      "src\\Shiny.Extensions.Configuration\\Shiny.Extensions.Configuration.csproj",
+      "src\\Shiny.Hosting.Maui\\Shiny.Hosting.Maui.csproj",
+      "src\\Shiny.Hosting.Native\\Shiny.Hosting.Native.csproj",
+      "src\\Shiny.Jobs\\Shiny.Jobs.csproj",
+      "src\\Shiny.Locations.Blazor\\Shiny.Locations.Blazor.csproj",
+      "src\\Shiny.Locations\\Shiny.Locations.csproj",
+      "src\\Shiny.Net.Http.Blazor\\Shiny.Net.Http.Blazor.csproj",
+      "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
+      "src\\Shiny.Notifications.Linux\\Shiny.Notifications.Linux.csproj",
+      "src\\Shiny.Notifications\\Shiny.Notifications.csproj",
+      "src\\Shiny.Push.AzureNotificationHubs\\Shiny.Push.AzureNotificationHubs.csproj",
+      "src\\Shiny.Push.Blazor\\Shiny.Push.Blazor.csproj",
+      "src\\Shiny.Push\\Shiny.Push.csproj",
+      "src\\Shiny.Support.DeviceMonitoring.Blazor\\Shiny.Support.DeviceMonitoring.Blazor.csproj",
+      "src\\Shiny.Support.DeviceMonitoring.Linux\\Shiny.Support.DeviceMonitoring.Linux.csproj",
+      "src\\Shiny.Support.DeviceMonitoring\\Shiny.Support.DeviceMonitoring.csproj",
+      "src\\Shiny.Support.Locations\\Shiny.Support.Locations.csproj",
+      "src\\Shiny.Support.Repositories\\Shiny.Support.Repositories.csproj",
+      "src\\Shiny.Support.Storage.Blazor\\Shiny.Support.Storage.Blazor.csproj"
+    ]
+  }
+}

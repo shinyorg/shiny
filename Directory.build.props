@@ -1,6 +1,7 @@
 ﻿<Project>
     <PropertyGroup>
         <BaseTargetFramework>net10.0</BaseTargetFramework>
+        <MauiVersion>10.0.51</MauiVersion>
         
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
@@ -18,8 +19,7 @@
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <MauiVersion>10.0.51</MauiVersion>
-
+        
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
