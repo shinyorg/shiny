@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#if PLATFORM
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
 using Shiny.Hosting;
@@ -41,3 +42,4 @@ public static class ShinyExtensions
         return builder;
     }
 }
+#endif
