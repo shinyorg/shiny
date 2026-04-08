@@ -17,7 +17,7 @@ public static class ShinyRegistrations
 
         var s = builder.Services;
 
-#if MACOS
+#if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
         s.AddBattery();
         s.AddConnectivity();
 #endif

@@ -30,8 +30,7 @@ public class BatteryImpl : IBattery
             if (remain == null || full == null)
                 return -1;
 
-            var value = (int)(remain.Value / (double)full.Value * 100);
-            return value;
+            return remain.Value / (double)full.Value;
         }
     }
 

@@ -33,7 +33,7 @@ public class SecureKeyValueStore : IKeyValueStore
             return null;
 
         var provider = new DataProtectionProvider();
-        var buffer = provider.UnprotectAsync(data.AsBuffer()).GetResults();
+        var buffer = provider.UnprotectAsync(data.AsBuffer()).AsTask().GetAwaiter().GetResult();
         var value = Encoding.UTF8.GetString(buffer.ToArray());
         return value;
     }
@@ -48,7 +48,7 @@ public class SecureKeyValueStore : IKeyValueStore
 
         // LOCAL=user and LOCAL=machine do not require enterprise auth capability
         var provider = new DataProtectionProvider("LOCAL=user");
-        var buffer = provider.ProtectAsync(bytes.AsBuffer()).GetResults();
+        var buffer = provider.ProtectAsync(bytes.AsBuffer()).AsTask().GetAwaiter().GetResult();
         this.settingsStore.Set(key, buffer.ToArray());
     }
 }

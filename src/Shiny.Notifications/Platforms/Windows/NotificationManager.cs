@@ -20,8 +20,30 @@ public class NotificationManager : INotificationManager
     readonly IKeyValueStore settings;
     readonly ILogger logger;
 
+    string? aumid;
     ToastNotifier? notifier;
-    ToastNotifier Notifier => this.notifier ??= ToastNotificationManager.CreateToastNotifier();
+    ToastNotifier Notifier
+    {
+        get
+        {
+            if (this.notifier == null)
+            {
+                try
+                {
+                    _ = Windows.Storage.ApplicationData.Current.LocalSettings;
+                    this.notifier = ToastNotificationManager.CreateToastNotifier();
+                }
+                catch (InvalidOperationException)
+                {
+                    // Unpackaged app – no package identity, so CreateToastNotifier()
+                    // would throw. Fall back to the AUMID-based overload.
+                    this.aumid = AppDomain.CurrentDomain.FriendlyName;
+                    this.notifier = ToastNotificationManager.CreateToastNotifier(this.aumid);
+                }
+            }
+            return this.notifier;
+        }
+    }
 
 
     public NotificationManager(
@@ -186,9 +208,10 @@ public class NotificationManager : INotificationManager
             if (scheduled != null)
                 this.Notifier.RemoveFromSchedule(scheduled);
 
-            ToastNotificationManager
-                .History
-                .Remove(tag, "shiny");
+            if (this.aumid != null)
+                ToastNotificationManager.History.Remove(tag, "shiny", this.aumid);
+            else
+                ToastNotificationManager.History.Remove(tag, "shiny");
         }
         catch (Exception ex)
         {
@@ -212,7 +235,10 @@ public class NotificationManager : INotificationManager
 
             if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
             {
-                ToastNotificationManager.History.Clear();
+                if (this.aumid != null)
+                    ToastNotificationManager.History.Clear(this.aumid);
+                else
+                    ToastNotificationManager.History.Clear();
             }
         }
         catch (Exception ex)
