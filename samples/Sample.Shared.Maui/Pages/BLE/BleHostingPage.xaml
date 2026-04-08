@@ -5,10 +5,50 @@
              x:Class="Sample.Shared.Maui.Pages.BLE.BleHostingPage"
              x:DataType="vm:BleHostingViewModel"
              Title="BLE Hosting">
-    <VerticalStackLayout Padding="16" Spacing="12">
-        <Button Text="{Binding AdvertiseText}" Command="{Binding ToggleAdvertisingCommand}" />
-        <Label Text="{Binding Status}" FontSize="16" />
-        <Label Text="{Binding SubscriberCount, StringFormat='Subscribers: {0}'}" />
-        <Button Text="Send Notification" Command="{Binding SendNotificationCommand}" IsEnabled="{Binding IsAdvertising}" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="{Binding Status}" FontSize="16" FontAttributes="Bold" />
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Access" FontAttributes="Bold" />
+                    <Label Text="{Binding AdvertisingAccess, StringFormat='Advertising: {0}'}" />
+                    <Label Text="{Binding GattAccess, StringFormat='GATT: {0}'}" />
+                    <Button Text="Check Access" Command="{Binding CheckAccessCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="GATT Server" FontAttributes="Bold" />
+                    <Entry Text="{Binding LocalName}" Placeholder="Local Name" />
+                    <Button Text="{Binding AdvertiseText}" Command="{Binding ToggleAdvertisingCommand}" />
+                    <Label Text="{Binding SubscriberCount, StringFormat='Subscribers: {0}'}" />
+                    <Label Text="{Binding ReadRequestCount, StringFormat='Reads served: {0}'}" />
+                    <Label Text="{Binding LastWriteValue, StringFormat='Last write: {0}'}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Notifications" FontAttributes="Bold" />
+                    <Entry Text="{Binding NotifyPayload}" Placeholder="Payload" />
+                    <Button Text="Send Notification" Command="{Binding SendNotificationCommand}" IsEnabled="{Binding IsAdvertising}" />
+                    <Button Text="{Binding AutoNotifyText}" Command="{Binding ToggleAutoNotifyCommand}" IsEnabled="{Binding IsAdvertising}" />
+                    <Label Text="{Binding NotificationsSent, StringFormat='Sent: {0}'}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="iBeacon" FontAttributes="Bold" />
+                    <Entry Text="{Binding BeaconMajor}" Placeholder="Major" Keyboard="Numeric" />
+                    <Entry Text="{Binding BeaconMinor}" Placeholder="Minor" Keyboard="Numeric" />
+                    <Button Text="{Binding BeaconText}" Command="{Binding ToggleBeaconCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

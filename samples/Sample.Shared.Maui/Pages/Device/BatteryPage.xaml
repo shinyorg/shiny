@@ -5,13 +5,31 @@
              x:Class="Sample.Shared.Maui.Pages.Device.BatteryPage"
              x:DataType="vm:BatteryViewModel"
              Title="Battery">
-    <VerticalStackLayout Padding="16" Spacing="12">
-        <Label Text="Status" FontAttributes="Bold" />
-        <Label Text="{Binding Status}" />
+    <Grid Padding="16" RowSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+        <Label Grid.Row="0" Text="Status" FontAttributes="Bold" />
+        <Label Grid.Row="1" Text="{Binding Status}" />
 
-        <Label Text="Level" FontAttributes="Bold" />
-        <Label Text="{Binding Level, StringFormat='{0:P0}'}" />
+        <Label Grid.Row="2" Text="{Binding Level, StringFormat='Level: {0:P0}'}" FontAttributes="Bold" />
+        <ProgressBar Grid.Row="3" Progress="{Binding Level}" />
 
-        <ProgressBar Progress="{Binding Level}" />
-    </VerticalStackLayout>
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0" Text="History" FontAttributes="Bold" VerticalOptions="Center" />
+            <Button Grid.Column="1" Text="Clear" Command="{Binding ClearHistoryCommand}" />
+        </Grid>
+
+        <CollectionView Grid.Row="5" ItemsSource="{Binding History}">
+            <CollectionView.EmptyView>
+                <Label Text="No changes yet" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:BatteryHistoryEntry">
+                    <Grid Padding="8,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding Timestamp, StringFormat='{0:HH:mm:ss}'}" TextColor="Gray" />
+                        <Label Grid.Column="1" Text="{Binding Status}" />
+                        <Label Grid.Column="2" Text="{Binding Level, StringFormat='{0:P0}'}" FontAttributes="Bold" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

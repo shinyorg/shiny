@@ -23,4 +23,16 @@ public partial class PushViewModel(IPushManager pushManager) : ObservableObject
         this.Status = "Unregistered";
         this.Token = string.Empty;
     }
+
+    [RelayCommand]
+    async Task CopyToken()
+    {
+        if (string.IsNullOrWhiteSpace(this.Token))
+        {
+            this.Status = "No token to copy";
+            return;
+        }
+        await Clipboard.Default.SetTextAsync(this.Token);
+        this.Status = "Token copied to clipboard";
+    }
 }

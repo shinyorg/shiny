@@ -16,19 +16,17 @@ public static class ShinyRegistrations
             });
 
         var s = builder.Services;
-        
-        // // HttpTransfers is available on every target the shared lib builds for
-        // if (OperatingSystem.IsLinux())
-        // {
-        //     s.AddDefaultRepository();
-        //     s.AddStandardHttpTransfers<SampleHttpTransferDelegate>();
-        // }
+
 #if MACOS
         s.AddBattery();
         s.AddConnectivity();
-        s.AddDefaultRepository();
-        
-        s.AddStandardHttpTransfers<SampleHttpTransferDelegate>();
+#endif
+
+#if IOS || ANDROID || MACCATALYST || WINDOWS
+        // HttpTransfers has platform-specific implementations for iOS/MacCatalyst, Android, and Windows.
+        // macOS is unsupported by Shiny.Net.Http; Linux uses AddStandardHttpTransfers from the Linux head.
+        // AddHttpTransfers already wires the default repository.
+        s.AddHttpTransfers<SampleHttpTransferDelegate>();
 #endif
 #if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
         // BLE central, BLE hosting and local notifications are wired the same way on

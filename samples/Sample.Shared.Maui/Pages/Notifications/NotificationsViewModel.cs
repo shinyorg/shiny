@@ -29,7 +29,26 @@ public partial class NotificationsViewModel(
         }
     } = [];
 
-    public List<string> NotificationTypes { get; } = ["Immediate", "Scheduled", "Geofence", "Repeating"];
+    public enum TriggerKind { Immediate, Scheduled, Geofence, Repeating }
+
+    static readonly List<(string Label, TriggerKind Kind)> SupportedTriggers = BuildSupportedTriggers();
+
+    static List<(string Label, TriggerKind Kind)> BuildSupportedTriggers()
+    {
+        var list = new List<(string, TriggerKind)>
+        {
+            ("Immediate", TriggerKind.Immediate),
+            ("Scheduled", TriggerKind.Scheduled)
+        };
+#if IOS || ANDROID
+        // Geofence triggers require Shiny.Locations and only Apple/Android notification managers handle them
+        list.Add(("Geofence", TriggerKind.Geofence));
+#endif
+        list.Add(("Repeating", TriggerKind.Repeating));
+        return list;
+    }
+
+    public List<string> NotificationTypes { get; } = SupportedTriggers.Select(x => x.Label).ToList();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsScheduled))]
@@ -37,9 +56,14 @@ public partial class NotificationsViewModel(
     [NotifyPropertyChangedFor(nameof(IsRepeating))]
     int selectedTypeIndex;
 
-    public bool IsScheduled => this.SelectedTypeIndex == 1;
-    public bool IsGeofence => this.SelectedTypeIndex == 2;
-    public bool IsRepeating => this.SelectedTypeIndex == 3;
+    TriggerKind CurrentTrigger =>
+        this.SelectedTypeIndex >= 0 && this.SelectedTypeIndex < SupportedTriggers.Count
+            ? SupportedTriggers[this.SelectedTypeIndex].Kind
+            : TriggerKind.Immediate;
+
+    public bool IsScheduled => this.CurrentTrigger == TriggerKind.Scheduled;
+    public bool IsGeofence => this.CurrentTrigger == TriggerKind.Geofence;
+    public bool IsRepeating => this.CurrentTrigger == TriggerKind.Repeating;
 
     [ObservableProperty] DateTime scheduleDate = DateTime.Today.AddDays(1);
     [ObservableProperty] TimeSpan scheduleTime = new(9, 0, 0);
@@ -160,9 +184,9 @@ public partial class NotificationsViewModel(
         if (!string.IsNullOrWhiteSpace(this.Thread))
             notification.Thread = this.Thread;
 
-        switch (this.SelectedTypeIndex)
+        switch (this.CurrentTrigger)
         {
-            case 1:
+            case TriggerKind.Scheduled:
                 notification.ScheduleDate = new DateTimeOffset(
                     this.ScheduleDate.Year, this.ScheduleDate.Month, this.ScheduleDate.Day,
                     this.ScheduleTime.Hours, this.ScheduleTime.Minutes, this.ScheduleTime.Seconds,
@@ -170,7 +194,7 @@ public partial class NotificationsViewModel(
                 );
                 break;
 
-            case 2:
+            case TriggerKind.Geofence:
                 if (!double.TryParse(this.GeoLatitude, out var lat) || !double.TryParse(this.GeoLongitude, out var lng))
                 {
                     this.Status = "Enter valid latitude and longitude";
@@ -189,7 +213,7 @@ public partial class NotificationsViewModel(
                 };
                 break;
 
-            case 3:
+            case TriggerKind.Repeating:
                 var trigger = new IntervalTrigger();
                 if (this.SelectedRepeatModeIndex == 0)
                 {

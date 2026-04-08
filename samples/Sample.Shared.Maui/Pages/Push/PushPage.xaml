@@ -11,7 +11,8 @@
             <Button Text="UnRegister" Command="{Binding UnRegisterCommand}" />
             <Label Text="{Binding Status}" FontSize="14" />
             <Label Text="Token:" FontAttributes="Bold" />
-            <Label Text="{Binding Token}" FontSize="12" IsTextSelectionEnabled="True" />
+            <Label Text="{Binding Token}" FontSize="12" LineBreakMode="CharacterWrap" />
+            <Button Text="Copy Token" Command="{Binding CopyTokenCommand}" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

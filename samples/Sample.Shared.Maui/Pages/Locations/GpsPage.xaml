@@ -15,12 +15,15 @@
                 <tv:SwitchCell Title="Precise Accuracy" On="{Binding RequestPreciseAccuracy, Mode=TwoWay}" />
             </tv:TableSection>
 
-            <tv:TableSection Title="Platform Options">
+            <tv:TableSection Title="iOS Options" IsVisible="{Binding IsIos}">
                 <tv:TextPickerCell Title="Activity Type"
                                    ItemsSource="{Binding ActivityTypes}"
                                    SelectedIndex="{Binding SelectedActivityTypeIndex, Mode=TwoWay}" />
                 <tv:SwitchCell Title="Background Indicator" On="{Binding ShowsBackgroundLocationIndicator, Mode=TwoWay}" />
                 <tv:SwitchCell Title="Auto Pause Updates" On="{Binding PausesLocationUpdatesAutomatically, Mode=TwoWay}" />
+            </tv:TableSection>
+
+            <tv:TableSection Title="Android Options" IsVisible="{Binding IsAndroid}">
                 <tv:TextPickerCell Title="GPS Priority"
                                    ItemsSource="{Binding GpsPriorities}"
                                    SelectedIndex="{Binding SelectedGpsPriorityIndex, Mode=TwoWay}" />

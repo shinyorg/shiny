@@ -5,11 +5,31 @@
              x:Class="Sample.Shared.Maui.Pages.Device.ConnectivityPage"
              x:DataType="vm:ConnectivityViewModel"
              Title="Connectivity">
-    <VerticalStackLayout Padding="16" Spacing="12">
-        <Label Text="Access" FontAttributes="Bold" />
-        <Label Text="{Binding Access}" />
+    <Grid Padding="16" RowSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+        <Label Grid.Row="0" Text="Access" FontAttributes="Bold" />
+        <Label Grid.Row="1" Text="{Binding Access}" />
 
-        <Label Text="Connection Types" FontAttributes="Bold" />
-        <Label Text="{Binding ConnectionTypes}" />
-    </VerticalStackLayout>
+        <Label Grid.Row="2" Text="Connection Types" FontAttributes="Bold" />
+        <Label Grid.Row="3" Text="{Binding ConnectionTypes}" />
+
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0" Text="History" FontAttributes="Bold" VerticalOptions="Center" />
+            <Button Grid.Column="1" Text="Clear" Command="{Binding ClearHistoryCommand}" />
+        </Grid>
+
+        <CollectionView Grid.Row="5" ItemsSource="{Binding History}">
+            <CollectionView.EmptyView>
+                <Label Text="No changes yet" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ConnectivityHistoryEntry">
+                    <Grid Padding="8,6" ColumnDefinitions="Auto,*,*" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding Timestamp, StringFormat='{0:HH:mm:ss}'}" TextColor="Gray" />
+                        <Label Grid.Column="1" Text="{Binding Access}" />
+                        <Label Grid.Column="2" Text="{Binding ConnectionTypes}" FontAttributes="Bold" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

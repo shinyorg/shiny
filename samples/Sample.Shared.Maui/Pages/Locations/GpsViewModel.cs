@@ -12,19 +12,21 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
     [ObservableProperty] int selectedModeIndex;
     [ObservableProperty] bool requestPreciseAccuracy;
 
-#if IOS
+    // iOS options (always defined so XAML compiled bindings resolve on every platform;
+    // visibility is gated at runtime with IsIos / IsAndroid)
     public List<string> ActivityTypes { get; } = ["Other", "Fitness", "Airborne", "Automotive Nav", "Other Nav"];
     [ObservableProperty] int selectedActivityTypeIndex;
     [ObservableProperty] bool showsBackgroundLocationIndicator = true;
     [ObservableProperty] bool pausesLocationUpdatesAutomatically;
-#endif
 
-#if ANDROID
+    // Android options
     public List<string> GpsPriorities { get; } = ["Balanced", "High Accuracy", "Low Power", "Passive"];
     [ObservableProperty] int selectedGpsPriorityIndex;
     [ObservableProperty] bool waitForAccurateLocation;
     [ObservableProperty] bool stopForegroundServiceWithTask;
-#endif
+
+    public bool IsIos => Microsoft.Maui.Devices.DeviceInfo.Platform == DevicePlatform.iOS;
+    public bool IsAndroid => Microsoft.Maui.Devices.DeviceInfo.Platform == DevicePlatform.Android;
 
     // State
     [ObservableProperty]
