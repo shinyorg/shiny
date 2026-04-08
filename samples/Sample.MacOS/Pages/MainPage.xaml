@@ -24,5 +24,8 @@
         <Button Text="Connectivity"
                 Command="{Binding NavigateCommand}"
                 CommandParameter="connectivity" />
+        <Button Text="HTTP Transfers"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="httptransfers" />
     </VerticalStackLayout>
 </ContentPage>

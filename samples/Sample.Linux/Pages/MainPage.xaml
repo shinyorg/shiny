@@ -9,5 +9,8 @@
         <Button Text="BLE Scanner"
                 Command="{Binding NavigateCommand}"
                 CommandParameter="blescan" />
+        <Button Text="HTTP Transfers"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="httptransfers" />
     </VerticalStackLayout>
 </ContentPage>

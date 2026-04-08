@@ -4,3 +4,5 @@ global using CommunityToolkit.Mvvm.ComponentModel;
 global using CommunityToolkit.Mvvm.Input;
 global using Shiny;
 global using Shiny.BluetoothLE;
+global using Shiny.Net.Http;
+global using Sample.MacOS.Delegates;

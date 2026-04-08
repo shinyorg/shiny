@@ -25,6 +25,7 @@ public static class MauiProgram
         builder.Services.AddNotifications<SampleNotificationDelegate>();
         builder.Services.AddBattery();
         builder.Services.AddConnectivity();
+        builder.Services.AddHttpTransfers<SampleHttpTransferDelegate>();
 
         return builder.Build();
     }

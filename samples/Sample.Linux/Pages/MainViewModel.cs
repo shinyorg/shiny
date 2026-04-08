@@ -9,7 +9,8 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         new("BLE Hosting", "Host a BLE GATT server and advertise it", "blehosting"),
         new("Battery", "View battery state via sysfs", "battery"),
         new("Connectivity", "View network state via NetworkInformation", "connectivity"),
-        new("Notifications", "Send freedesktop desktop notifications", "notifications")
+        new("Notifications", "Send freedesktop desktop notifications", "notifications"),
+        new("HTTP Transfers", "Resumable background HTTP downloads and uploads", "httptransfers")
     ];
 
     [RelayCommand]

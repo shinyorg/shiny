@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.MacOS.Pages"
+             xmlns:http="clr-namespace:Shiny.Net.Http;assembly=Shiny.Net.Http"
+             x:Class="Sample.MacOS.Pages.HttpTransfersPage"
+             x:DataType="vm:HttpTransfersViewModel"
+             Title="HTTP Transfers">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="Download" FontAttributes="Bold" FontSize="18" />
+            <Label Text="{Binding Status}" TextColor="Gray" />
+
+            <Label Text="URL (presets below exercise the resumable-download path)" />
+            <Entry Text="{Binding DownloadUrl, Mode=TwoWay}" Placeholder="https://..." />
+
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="1 MB" Command="{Binding PresetCommand}" CommandParameter="1" />
+                <Button Text="10 MB" Command="{Binding PresetCommand}" CommandParameter="10" />
+                <Button Text="100 MB" Command="{Binding PresetCommand}" CommandParameter="100" />
+            </HorizontalStackLayout>
+
+            <Button Text="Queue Download" Command="{Binding QueueDownloadCommand}" />
+
+            <BoxView HeightRequest="1" Color="LightGray" />
+
+            <Label Text="Upload" FontAttributes="Bold" FontSize="18" />
+            <Label Text="Target URL (httpbin.org/post echoes uploads)" />
+            <Entry Text="{Binding UploadUrl, Mode=TwoWay}" Placeholder="https://httpbin.org/post" />
+
+            <Label Text="Local file path" />
+            <Entry Text="{Binding UploadFilePath, Mode=TwoWay}" Placeholder="/path/to/file" />
+            <Button Text="Use a generated 64 KB temp file" Command="{Binding GenerateTempFileCommand}" />
+
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="Queue Raw Upload" Command="{Binding QueueUploadRawCommand}" />
+                <Button Text="Queue Multipart Upload" Command="{Binding QueueUploadMultipartCommand}" />
+            </HorizontalStackLayout>
+
+            <BoxView HeightRequest="1" Color="LightGray" />
+
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="{Binding Transfers.Count, StringFormat='Active: {0}'}" FontAttributes="Bold" VerticalOptions="Center" />
+                <Button Text="Cancel All" Command="{Binding CancelAllCommand}" TextColor="Red" />
+            </HorizontalStackLayout>
+
+            <CollectionView ItemsSource="{Binding Transfers}">
+                <CollectionView.EmptyView>
+                    <Label Text="No transfers - queue a download or upload above." HorizontalOptions="Center" TextColor="Gray" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="http:HttpTransferObject">
+                        <Border Padding="8" Margin="0,4" Stroke="LightGray" StrokeThickness="1">
+                            <VerticalStackLayout Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding Type}" FontAttributes="Bold" />
+                                    <Label Grid.Column="1" Text="{Binding Status}" />
+                                </Grid>
+                                <Label Text="{Binding Identifier}" FontSize="11" TextColor="Gray" />
+                                <Label Text="{Binding Uri}" FontSize="11" TextColor="Gray" LineBreakMode="TailTruncation" />
+                                <ProgressBar Progress="{Binding PercentComplete}" IsVisible="{Binding IsDeterministic}" />
+                                <Grid ColumnDefinitions="*,*,Auto">
+                                    <Label Text="{Binding BytesTransferred, StringFormat='{0:N0} B'}" FontSize="11" />
+                                    <Label Grid.Column="1" Text="{Binding BytesPerSecond, StringFormat='{0:N0} B/s'}" FontSize="11" />
+                                    <Label Grid.Column="2" Text="{Binding EstimatedTimeRemaining, StringFormat='ETA {0:hh\\:mm\\:ss}'}" FontSize="11" />
+                                </Grid>
+                                <Button Text="Cancel"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HttpTransfersViewModel}}, Path=CancelCommand}"
+                                        CommandParameter="{Binding Identifier}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

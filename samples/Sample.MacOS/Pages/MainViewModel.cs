@@ -10,7 +10,8 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         new("Push Notifications", "Register for and receive APNs push", "push"),
         new("Local Notifications", "Schedule and send local notifications", "notifications"),
         new("Battery", "Monitor battery level and charging state", "battery"),
-        new("Connectivity", "Monitor network connectivity", "connectivity")
+        new("Connectivity", "Monitor network connectivity", "connectivity"),
+        new("HTTP Transfers", "Resumable background HTTP downloads and uploads", "httptransfers")
     ];
 
     [RelayCommand]
