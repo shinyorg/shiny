@@ -3,10 +3,8 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
         <MsftExtensionVersion>10.0.0</MsftExtensionVersion>
-        <AvaloniaVersion>12.0.0-rc1</AvaloniaVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)"/>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
         <PackageVersion Include="Shiny.Maui.Shell" Version="3.2.1"/>
         <PackageVersion Include="Shiny.Maui.TableView" Version="1.1.1"/>
@@ -21,7 +19,7 @@
     <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
         <PackageVersion Include="Microsoft.Maui.Core" Version="10.0.51"/>
-        <PackageVersion Include="Shiny.Reflector" Version="1.7.1"/>
+        <PackageVersion Include="Shiny.Reflector" Version="1.7.2"/>
         <PackageVersion Include="System.Reactive" Version="6.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MsftExtensionVersion)"/>
