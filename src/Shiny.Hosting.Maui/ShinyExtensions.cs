@@ -15,6 +15,25 @@ public static class ShinyExtensions
         builder.Services.AddSingleton<IMauiInitializeService, ShinyMauiInitializationService>();
         builder.Services.AddShinyCoreServices();
 
+#if WINDOWS
+        // Capture the WinUI 3 UI dispatcher so Shiny.Core can marshal work to the
+        // main thread without taking a WinUI/WindowsAppSDK dependency at the Core layer.
+        // UseShiny() is invoked from MauiProgram.CreateMauiApp, which runs inside
+        // MauiWinUIApplication.OnLaunched on the UI thread - so GetForCurrentThread()
+        // returns the correct dispatcher.
+        var dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        if (dispatcherQueue != null)
+        {
+            WindowsPlatform.MainThreadHandler = action =>
+            {
+                if (dispatcherQueue.HasThreadAccess)
+                    action();
+                else
+                    dispatcherQueue.TryEnqueue(() => action());
+            };
+        }
+#endif
+
         builder.ConfigureLifecycleEvents(events =>
         {
 #if ANDROID
