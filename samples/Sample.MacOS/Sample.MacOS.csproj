@@ -12,6 +12,7 @@
         <!--the application title will be the exe name, debuggers will try to launch on the assembly name-->
         <ApplicationTitle>Sample.MacOS</ApplicationTitle>
         <ApplicationId>org.shiny.sample</ApplicationId>
+        <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     </PropertyGroup>
 
     <ItemGroup>
