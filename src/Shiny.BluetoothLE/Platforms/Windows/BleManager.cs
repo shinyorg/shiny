@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Windows.Devices.Bluetooth;
@@ -20,6 +19,9 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     readonly IServiceProvider services;
     readonly ILogger logger;
     BluetoothLEAdvertisementWatcher? watcher;
+    readonly object scanSyncLock = new();
+    int scanGeneration;
+    int activeScanGeneration;
 
 
     public BleManager(IServiceProvider services, ILogger<IBleManager> logger)
@@ -89,7 +91,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         })
         .Select(_ => this.CreateScanner(scanConfig))
         .Switch()
-        .Select(args => Observable.FromAsync(async ct =>
+        .SelectMany(args => Observable.FromAsync(async ct =>
         {
             var peripheral = this.GetOrCreatePeripheral(args.BluetoothAddress);
             if (peripheral == null)
@@ -105,60 +107,114 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             var adData = new AdvertisementData(args);
             return new ScanResult(peripheral, args.RawSignalStrengthInDBm, adData);
         }))
-        .Switch()
         .Where(x => x != null)
         .Select(x => x!);
 
 
     public void StopScan()
     {
-        this.watcher?.Stop();
-        this.watcher = null;
-        this.IsScanning = false;
+        BluetoothLEAdvertisementWatcher? watcherToStop = null;
+
+        lock (this.scanSyncLock)
+        {
+            watcherToStop = this.watcher;
+            this.watcher = null;
+            this.activeScanGeneration = 0;
+            this.IsScanning = false;
+        }
+
+        watcherToStop?.Stop();
     }
 
 
     IObservable<BluetoothLEAdvertisementReceivedEventArgs> CreateScanner(ScanConfig? config)
         => Observable.Create<BluetoothLEAdvertisementReceivedEventArgs>(ob =>
         {
-            if (this.IsScanning)
-                throw new InvalidOperationException("There is already an active scan");
+            BluetoothLEAdvertisementWatcher watcher;
+            int generation;
 
-            this.Clear();
-            config ??= new ScanConfig();
+            lock (this.scanSyncLock)
+            {
+                if (this.IsScanning)
+                    throw new InvalidOperationException("There is already an active scan");
 
-            this.watcher = new BluetoothLEAdvertisementWatcher();
+                this.Clear();
+                config ??= new ScanConfig();
+
+                watcher = new BluetoothLEAdvertisementWatcher();
+                this.watcher = watcher;
+                this.IsScanning = true;
+                generation = unchecked(++this.scanGeneration);
+                this.activeScanGeneration = generation;
+            }
 
             if (config.ServiceUuids.Length > 0)
             {
                 foreach (var serviceUuid in config.ServiceUuids)
-                    this.watcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(Utils.ToUuidType(serviceUuid));
+                    watcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(Utils.ToUuidType(serviceUuid));
             }
 
-            this.watcher.ScanningMode = BluetoothLEScanningMode.Active;
-
+            watcher.ScanningMode = BluetoothLEScanningMode.Active;
+            watcher.SignalStrengthFilter.InRangeThresholdInDBm = -80;
+            watcher.SignalStrengthFilter.OutOfRangeThresholdInDBm = -90;
+            watcher.SignalStrengthFilter.OutOfRangeTimeout = TimeSpan.FromSeconds(2);
+            watcher.SignalStrengthFilter.SamplingInterval = TimeSpan.FromMilliseconds(500);
             var handler = new TypedEventHandler<BluetoothLEAdvertisementWatcher, BluetoothLEAdvertisementReceivedEventArgs>(
-                (sender, args) => ob.OnNext(args)
+                (sender, args) =>
+                {
+                    lock (this.scanSyncLock)
+                    {
+                        if (!ReferenceEquals(this.watcher, sender) || this.activeScanGeneration != generation || !this.IsScanning)
+                            return;
+                    }
+
+                    ob.OnNext(args);
+                }
             );
 
             var stoppedHandler = new TypedEventHandler<BluetoothLEAdvertisementWatcher, BluetoothLEAdvertisementWatcherStoppedEventArgs>(
                 (sender, args) =>
                 {
-                    if (args.Error != BluetoothError.Success)
+                    var isActiveScan = false;
+                    lock (this.scanSyncLock)
+                    {
+                        if (ReferenceEquals(this.watcher, sender) && this.activeScanGeneration == generation)
+                        {
+                            this.watcher = null;
+                            this.activeScanGeneration = 0;
+                            this.IsScanning = false;
+                            isActiveScan = true;
+                        }
+                    }
+
+                    if (isActiveScan && args.Error != BluetoothError.Success)
                         ob.OnError(new BleException($"Scan stopped with error: {args.Error}"));
                 }
             );
 
-            this.watcher.Received += handler;
-            this.watcher.Stopped += stoppedHandler;
-            this.watcher.Start();
-            this.IsScanning = true;
+            watcher.Received += handler;
+            watcher.Stopped += stoppedHandler;
+            watcher.Start();
 
             return () =>
             {
-                this.watcher.Received -= handler;
-                this.watcher.Stopped -= stoppedHandler;
-                this.StopScan();
+                watcher.Received -= handler;
+                watcher.Stopped -= stoppedHandler;
+
+                var shouldStop = false;
+                lock (this.scanSyncLock)
+                {
+                    if (ReferenceEquals(this.watcher, watcher) && this.activeScanGeneration == generation)
+                    {
+                        this.watcher = null;
+                        this.activeScanGeneration = 0;
+                        this.IsScanning = false;
+                        shouldStop = true;
+                    }
+                }
+
+                if (shouldStop)
+                    watcher.Stop();
             };
         });
 
@@ -243,3 +299,4 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         .ToList()
         .ForEach(x => this.peripherals.TryRemove(x.Key, out _));
 }
+

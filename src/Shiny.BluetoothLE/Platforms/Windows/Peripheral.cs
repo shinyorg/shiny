@@ -20,6 +20,9 @@ public partial class Peripheral : IPeripheral
     readonly Subject<BleException> connFailedSubj = new();
     readonly Subject<Unit> servicesChangedSubj = new();
     readonly HashSet<GattDeviceService> trackedServices = new();
+    readonly object connectSync = new();
+    bool connectInProgress;
+    bool pendingDisconnectedCleanup;
 
 
     public Peripheral(BleManager manager, BluetoothLEDevice device, ILogger<IPeripheral> logger)
@@ -78,6 +81,7 @@ public partial class Peripheral : IPeripheral
 
         try
         {
+            this.StartConnectAttempt();
             this.connSubj.OnNext(ConnectionState.Connecting);
 
             // Windows BLE connections are implicit - they occur when you access GATT services
@@ -96,12 +100,13 @@ public partial class Peripheral : IPeripheral
                     throw new BleException($"Failed to connect: {result.Status}");
             })
             .Subscribe(
-                _ => { },
+                _ => this.FinishConnectAttempt(),
                 ex =>
                 {
                     this.logger.LogWarning(ex, "Failed to connect to peripheral");
                     this.connFailedSubj.OnNext(new BleException(ex.Message, ex));
                     this.connSubj.OnNext(ConnectionState.Disconnected);
+                    this.FinishConnectAttempt();
                 }
             );
         }
@@ -109,6 +114,7 @@ public partial class Peripheral : IPeripheral
         {
             this.connFailedSubj.OnNext(new BleException(ex.Message, ex));
             this.connSubj.OnNext(ConnectionState.Disconnected);
+            this.FinishConnectAttempt();
         }
     }
 
@@ -164,8 +170,13 @@ public partial class Peripheral : IPeripheral
 
         if (state == ConnectionState.Disconnected)
         {
-            this.ReleaseNativeResources();
-            this.manager.RemovePeripheral(this);
+            if (this.ShouldDelayDisconnectedCleanup())
+            {
+            }
+            else
+            {
+                this.CleanupDisconnectedPeripheral();
+            }
         }
 
         this.connSubj.OnNext(state);
@@ -227,5 +238,53 @@ public partial class Peripheral : IPeripheral
             this.Native.Dispose();
             this.Native = null;
         }
+    }
+
+
+    void StartConnectAttempt()
+    {
+        lock (this.connectSync)
+        {
+            this.connectInProgress = true;
+            this.pendingDisconnectedCleanup = false;
+        }
+    }
+
+
+    void FinishConnectAttempt()
+    {
+        var shouldCleanup = false;
+
+        lock (this.connectSync)
+        {
+            shouldCleanup = this.pendingDisconnectedCleanup;
+            this.connectInProgress = false;
+            this.pendingDisconnectedCleanup = false;
+        }
+
+        if (shouldCleanup)
+        {
+            this.CleanupDisconnectedPeripheral();
+        }
+    }
+
+
+    bool ShouldDelayDisconnectedCleanup()
+    {
+        lock (this.connectSync)
+        {
+            if (!this.connectInProgress)
+                return false;
+
+            this.pendingDisconnectedCleanup = true;
+            return true;
+        }
+    }
+
+
+    void CleanupDisconnectedPeripheral()
+    {
+        this.ReleaseNativeResources();
+        this.manager.RemovePeripheral(this);
     }
 }
