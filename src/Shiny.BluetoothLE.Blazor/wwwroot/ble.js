@@ -2,19 +2,34 @@ var devices = {};
 var dotNetRef;
 var scan;
 
-export function requestAccess() {
-    return new Promise((resolve, reject) => {
-        if (navigator.bluetooth === undefined) {
-            resolve('notsupported');
+export async function requestAccess() {
+    if (navigator.bluetooth === undefined) {
+        return 'notsupported';
+    }
+
+    try {
+        var available = await navigator.bluetooth.getAvailability();
+        if (!available) {
+            return 'notsupported';
         }
-        else {
-            navigator
-                .permissions
-                .query({ name: 'bluetooth' })
-                .then(result => resolve(result.state))
-                .catch(() => resolve('notsupported'));
-        }
-    });
+    }
+    catch (e) {
+        // getAvailability not supported in all browsers, fall through
+    }
+
+    if (!navigator.bluetooth.requestLEScan) {
+        return 'notsupported';
+    }
+
+    try {
+        var result = await navigator.permissions.query({ name: 'bluetooth' });
+        return result.state;
+    }
+    catch (e) {
+        // Permissions API for bluetooth not supported in most browsers
+        // If navigator.bluetooth exists and requestLEScan is available, treat as granted
+        return 'granted';
+    }
 }
 
 export async function startScan(callbackRef) {

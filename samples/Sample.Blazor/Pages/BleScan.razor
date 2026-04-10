@@ -8,45 +8,56 @@
 <h3>BLE Scanner</h3>
 
 <div class="alert alert-secondary">
-    <strong>Web Bluetooth required.</strong> This page uses the browser's Web Bluetooth API, which is experimental and disabled by default in most browsers. The page must also be served over HTTPS (or <code>http://localhost</code>).
+    <strong>Web Bluetooth Scanning API required.</strong> This page uses the experimental <code>requestLEScan</code> API, which is only available in certain browsers. The page must also be served over HTTPS (or <code>http://localhost</code>).
     <button class="btn btn-sm btn-link p-0 ms-2" @onclick="() => showBrowserHelp = !showBrowserHelp">
-        @(showBrowserHelp ? "Hide" : "How do I enable it?")
+        @(showBrowserHelp ? "Hide" : "Browser support")
     </button>
     @if (showBrowserHelp)
     {
         <hr />
+        <h6>Supported</h6>
         <dl class="mb-0">
-            <dt>Chrome / Edge / Brave / Opera (desktop)</dt>
+            <dt>Google Chrome (desktop &amp; Android)</dt>
             <dd>
-                Enabled by default on Windows, macOS, Linux and ChromeOS. If scanning fails, check
-                <code>chrome://flags/#enable-web-bluetooth</code> (or <code>edge://flags</code>, <code>brave://flags</code>, <code>opera://flags</code>) and make sure <em>Web Bluetooth</em> is set to <em>Enabled</em>, then restart the browser.
-                Linux also requires the <code>experimental-web-platform-features</code> flag enabled and BlueZ 5.43+.
+                Enable <code>chrome://flags/#enable-experimental-web-platform-features</code>, then restart the browser.
+                On Linux, BlueZ 5.43+ is also required.
             </dd>
 
-            <dt>Chrome / Edge (Android)</dt>
+            <dt>Brave (desktop)</dt>
             <dd>
-                Supported from Android 6.0+. No flag needed on recent versions; on older builds enable <code>chrome://flags/#enable-experimental-web-platform-features</code>. Location services must be turned on at the OS level for the scan prompt to appear.
+                Enable <code>brave://flags/#enable-experimental-web-platform-features</code>, then restart the browser.
             </dd>
 
-            <dt>Safari (macOS / iOS / iPadOS)</dt>
+            <dt>Opera (desktop)</dt>
             <dd>
-                Apple does not ship Web Bluetooth in Safari. On iOS/iPadOS, install <a href="https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055" target="_blank" rel="noopener">Bluefy</a> or <a href="https://apps.apple.com/app/webble/id1193531073" target="_blank" rel="noopener">WebBLE</a> — third-party browsers that implement Web Bluetooth on top of WKWebView. There is no supported option in stock Safari on macOS.
+                Enable <code>opera://flags/#enable-experimental-web-platform-features</code>, then restart the browser.
+            </dd>
+        </dl>
+        <hr />
+        <h6>Not Supported</h6>
+        <dl class="mb-0">
+            <dt>Microsoft Edge</dt>
+            <dd>
+                Edge supports basic Web Bluetooth (<code>requestDevice</code>) but does <strong>not</strong> support the <code>requestLEScan</code> scanning API, even with experimental flags enabled.
             </dd>
 
             <dt>Firefox (all platforms)</dt>
             <dd>
-                Not supported. Mozilla has not implemented Web Bluetooth and there is no flag to turn it on. Use a Chromium-based browser instead.
+                Mozilla has not implemented Web Bluetooth. There is no flag to enable it.
+            </dd>
+
+            <dt>Safari (macOS / iOS / iPadOS)</dt>
+            <dd>
+                Apple does not ship Web Bluetooth in Safari. Third-party browsers like
+                <a href="https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055" target="_blank" rel="noopener">Bluefy</a>
+                support <code>requestDevice</code> but not <code>requestLEScan</code>.
             </dd>
 
             <dt>Samsung Internet</dt>
             <dd>
-                Supported. Open <code>internet://flags</code> and enable <em>Web Bluetooth</em>, then restart the browser.
+                Supports basic Web Bluetooth but not the scanning API.
             </dd>
         </dl>
-        <hr />
-        <small class="text-muted">
-            Web Bluetooth is user-gesture gated: the browser shows a native chooser when you click <em>Start Scan</em>, and Shiny only sees the peripheral(s) the user picks in that prompt. Background scanning, passive advertisements, and manufacturer data are not exposed by the browser API.
-        </small>
     }
 </div>
 
