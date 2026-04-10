@@ -13,51 +13,34 @@ using Foundation;
 namespace Shiny.Push;
 
 
-public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushProvider, IPushTagSupport
+public class AzureNotificationHubsPushProvider(
+    AzureNotificationConfig config,
+    IServiceProvider services,
+    ILogger<AzureNotificationHubsPushProvider> logger
+) : NotifyPropertyChanged, IPushProvider, IPushTagSupport
 {
-    readonly AzureNotificationConfig config;
-    readonly IServiceProvider services;
-    readonly ILogger logger;
-    readonly NotificationHubClient client;
+    readonly NotificationHubClient client = new(config.ListenerConnectionString, config.HubName);
 
 
-    public AzureNotificationHubsPushProvider(
-        AzureNotificationConfig config,
-        IServiceProvider services,
-        ILogger<AzureNotificationHubsPushProvider> logger
-    )
-    {
-        this.config = config;
-        this.services = services;
-        this.logger = logger;
-        this.client = new NotificationHubClient(
-            config.ListenerConnectionString,
-            config.HubName
-        );
-    }
 
-
-    string? nativeToken;
     public string? NativeToken
     {
-        get => this.nativeToken;
-        set => this.Set(ref this.nativeToken, value);
+        get;
+        set => this.Set(ref field, value);
     }
 
 
-    string? installationId;
     public string? InstallationId
     {
-        get => this.installationId;
-        set => this.Set(ref this.installationId, value);
+        get;
+        set => this.Set(ref field, value);
     }
 
 
-    string[]? registeredTags;
     public string[]? RegisteredTags
     {
-        get => this.registeredTags;
-        set => this.Set(ref this.registeredTags, value);
+        get;
+        set => this.Set(ref field, value);
     }
 
 
@@ -100,7 +83,7 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
     }
 
 
-#if APPLE
+#if IOS || MACCATALYST
     public async Task<string> Register(NSData rawToken)
     {
         var nativeToken = rawToken.ToPushTokenString();
@@ -119,7 +102,7 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
 
         // this is to ensure that azure has enough time to propogate the installation ID
         await Task
-            .Delay(this.config.AzureAuthenticationWaitTimeMs)
+            .Delay(config.AzureAuthenticationWaitTimeMs)
             .ConfigureAwait(false);
 
         return this.InstallationId;
@@ -151,8 +134,8 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
     protected Installation GetInstallation(string nativeRegToken)
     {
         DateTime? date = null;
-        if (this.config.ExpirationTime != null)
-            date = DateTime.Now.Add(this.config.ExpirationTime.Value);
+        if (config.ExpirationTime != null)
+            date = DateTime.Now.Add(config.ExpirationTime.Value);
 
         return new Installation
         {
@@ -174,7 +157,7 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
     protected async Task Update(string nativeRegToken, CancellationToken cancelToken = default)
     {
         var install = this.GetInstallation(nativeRegToken);
-        this.logger.LogInformation($"ANH Token: {this.InstallationId}");
+        logger.LogInformation($"ANH Token: {this.InstallationId}");
 
         await this.RunInstallEvents(install).ConfigureAwait(false);
         await this.client
@@ -185,22 +168,22 @@ public class AzureNotificationHubsPushProvider : NotifyPropertyChanged, IPushPro
     
     protected async Task RunInstallEvents(Installation installation)
     {
-        if (this.config.BeforeSendInstallation != null)
+        if (config.BeforeSendInstallation != null)
         {
             try
             {
-                await this.config
+                await config
                     .BeforeSendInstallation(installation)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Failed to run AzureNotificationConfig.BeforeSendInstallation");
+                logger.LogError(ex, "Failed to run AzureNotificationConfig.BeforeSendInstallation");
             }
         }
 
-        await this.services
-            .RunDelegates<IPushInstallationEvent>(x => x.OnBeforeSend(installation), this.logger)
+        await services
+            .RunDelegates<IPushInstallationEvent>(x => x.OnBeforeSend(installation), logger)
             .ConfigureAwait(false);
     }
 }

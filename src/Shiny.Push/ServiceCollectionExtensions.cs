@@ -1,5 +1,4 @@
 ﻿using Shiny.Push;
-//using Shiny.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 #if ANDROID
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -29,7 +28,7 @@ public static class ServiceCollectionExtensions
 
 
     /// <summary>
-    /// 
+    /// Add push notifications with delegate
     /// </summary>
     /// <typeparam name="TDelegate"></typeparam>
     /// <param name="services"></param>

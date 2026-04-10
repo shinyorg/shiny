@@ -23,6 +23,10 @@
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
+        <AndroidTarget>$(BaseTargetFramework)-android</AndroidTarget>
+        <IosTarget>$(BaseTargetFramework)-android</IosTarget>
+        <MacCatalystTarget>$(BaseTargetFramework)-maccatalyst</MacCatalystTarget>
+        <MacOsTarget>$(BaseTargetFramework)-macos</MacOsTarget>
         <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">$(BaseTargetFramework)-windows10.0.19041.0</WindowsTarget>
     </PropertyGroup>
 
