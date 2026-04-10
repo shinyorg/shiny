@@ -1,5 +1,4 @@
-﻿#if PLATFORM
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
@@ -114,6 +113,24 @@ public static class GpsServiceCollectionExtensions
 
         return services;
     }
+    #else
+    
+    /// <summary>
+    /// This is a blank AddGps - you won't see this documentation if you've got a proper target that is supported
+    /// </summary>
+    /// <param name="services"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IServiceCollection AddGps<T>(this IServiceCollection services) where T : class, IGpsDelegate
+        => services;
+
+    /// <summary>
+    /// This is a blank AddGps - you won't see this documentation if you've got a proper target that is supported
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="delegateType"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddGps(this IServiceCollection services, Type? delegateType = null)
+        => services;
     #endif
 }
-#endif

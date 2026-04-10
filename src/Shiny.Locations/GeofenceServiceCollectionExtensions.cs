@@ -1,17 +1,17 @@
-﻿#if PLATFORM
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny;
 using Shiny.Locations;
 #if ANDROID
 using Android.App;
 using Android.Gms.Common;
 #endif
 
-namespace Shiny;
 
 
 public static class GeofenceServiceCollectionExtensions
 {
+#if PLATFORM
     /// <summary>
     ///
     /// </summary>
@@ -92,5 +92,24 @@ public static class GeofenceServiceCollectionExtensions
         services.AddShinyService<GpsGeofenceManagerImpl>();
         return services;
     }
-}
+#else
+    /// <summary>
+    /// This is a blank AddGeofencing - you won't see this documentation if you've got a proper target that is supported
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="delegateType"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
+        => services;
+    
+    /// <summary>
+    /// This is a blank AddGeofencing - you won't see this documentation if you've got a proper target that is supported
+    /// </summary>
+    /// <param name="services"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IServiceCollection AddGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+        => services;
+
 #endif
+}
