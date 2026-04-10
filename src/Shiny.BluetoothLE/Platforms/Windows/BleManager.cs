@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Windows.Devices.Bluetooth;
@@ -16,12 +18,15 @@ namespace Shiny.BluetoothLE;
 
 public partial class BleManager : IBleManager, IShinyStartupTask
 {
+    static readonly TimeSpan ScanRestartCooldown = TimeSpan.FromMilliseconds(350);
     readonly IServiceProvider services;
     readonly ILogger logger;
     BluetoothLEAdvertisementWatcher? watcher;
     readonly object scanSyncLock = new();
+    readonly ConcurrentDictionary<ulong, byte> pendingPeripheralResolves = new();
     int scanGeneration;
     int activeScanGeneration;
+    DateTimeOffset lastScanStoppedAtUtc = DateTimeOffset.MinValue;
 
 
     public BleManager(IServiceProvider services, ILogger<IBleManager> logger)
@@ -96,9 +101,19 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             var peripheral = this.GetOrCreatePeripheral(args.BluetoothAddress);
             if (peripheral == null)
             {
-                var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
-                if (btDevice != null)
-                    peripheral = this.GetPeripheral(btDevice);
+                if (!this.pendingPeripheralResolves.TryAdd(args.BluetoothAddress, 0))
+                    return null;
+
+                try
+                {
+                    var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
+                    if (btDevice != null)
+                        peripheral = this.GetPeripheral(btDevice);
+                }
+                finally
+                {
+                    this.pendingPeripheralResolves.TryRemove(args.BluetoothAddress, out _);
+                }
             }
 
             if (peripheral == null)
@@ -121,6 +136,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             this.watcher = null;
             this.activeScanGeneration = 0;
             this.IsScanning = false;
+            this.lastScanStoppedAtUtc = DateTimeOffset.UtcNow;
         }
 
         watcherToStop?.Stop();
@@ -132,6 +148,8 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         {
             BluetoothLEAdvertisementWatcher watcher;
             int generation;
+            DateTimeOffset startNotBeforeUtc;
+            var startCts = new CancellationTokenSource();
 
             lock (this.scanSyncLock)
             {
@@ -146,6 +164,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
                 this.IsScanning = true;
                 generation = unchecked(++this.scanGeneration);
                 this.activeScanGeneration = generation;
+                startNotBeforeUtc = this.lastScanStoppedAtUtc + ScanRestartCooldown;
             }
 
             if (config.ServiceUuids.Length > 0)
@@ -183,6 +202,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
                             this.watcher = null;
                             this.activeScanGeneration = 0;
                             this.IsScanning = false;
+                            this.lastScanStoppedAtUtc = DateTimeOffset.UtcNow;
                             isActiveScan = true;
                         }
                     }
@@ -194,10 +214,35 @@ public partial class BleManager : IBleManager, IShinyStartupTask
 
             watcher.Received += handler;
             watcher.Stopped += stoppedHandler;
-            watcher.Start();
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var delay = startNotBeforeUtc - DateTimeOffset.UtcNow;
+                    if (delay > TimeSpan.Zero)
+                        await Task.Delay(delay, startCts.Token).ConfigureAwait(false);
+
+                    lock (this.scanSyncLock)
+                    {
+                        if (!ReferenceEquals(this.watcher, watcher) || this.activeScanGeneration != generation || !this.IsScanning)
+                            return;
+                    }
+
+                    watcher.Start();
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    ob.OnError(ex);
+                }
+            }, startCts.Token);
 
             return () =>
             {
+                startCts.Cancel();
+                startCts.Dispose();
                 watcher.Received -= handler;
                 watcher.Stopped -= stoppedHandler;
 
@@ -209,6 +254,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
                         this.watcher = null;
                         this.activeScanGeneration = 0;
                         this.IsScanning = false;
+                        this.lastScanStoppedAtUtc = DateTimeOffset.UtcNow;
                         shouldStop = true;
                     }
                 }
