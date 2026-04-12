@@ -15,23 +15,19 @@ using Windows.Foundation;
 namespace Shiny.BluetoothLE;
 
 
-public partial class BleManager : IBleManager, IShinyStartupTask
+public partial class BleManager(
+    IServiceProvider services, 
+    ILogger<IBleManager> logger,
+    ILogger<IPeripheral> peripheralLogger
+) : IBleManager, IShinyStartupTask
 {
-    readonly IServiceProvider services;
-    readonly ILogger logger;
     BluetoothLEAdvertisementWatcher? watcher;
 
-
-    public BleManager(IServiceProvider services, ILogger<IBleManager> logger)
-    {
-        this.services = services;
-        this.logger = logger;
-    }
 
 
     public void Start()
     {
-        var delegates = this.services.GetServices<IBleDelegate>().ToList();
+        var delegates = services.GetServices<IBleDelegate>().ToList();
         if (delegates.Count == 0)
             return;
 
@@ -43,13 +39,13 @@ public partial class BleManager : IBleManager, IShinyStartupTask
                     var handler = new TypedEventHandler<Radio, object>((sender, args) =>
                     {
                         var status = sender.GetAccessStatus();
-                        delegates.RunDelegates(x => x.OnAdapterStateChanged(status), this.logger);
+                        delegates.RunDelegates(x => x.OnAdapterStateChanged(status), logger);
                     });
                     radio!.StateChanged += handler;
                 },
                 ex =>
                 {
-                    this.logger.LogError(ex, "Could not monitor radio");
+                    logger.LogError(ex, "Could not monitor radio");
                 }
             );
     }
@@ -84,14 +80,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => this.CreateScanner(scanConfig)
         .Select(args => Observable.FromAsync(async ct =>
         {
-            var peripheral = this.GetOrCreatePeripheral(args.BluetoothAddress);
-            if (peripheral == null)
-            {
-                var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
-                if (btDevice != null)
-                    peripheral = this.GetPeripheral(btDevice);
-            }
-
+            var peripheral = await this.GetOrCreatePeripheral(args.BluetoothAddress).ConfigureAwait(false);
             if (peripheral == null)
                 return null;
 
@@ -201,26 +190,36 @@ public partial class BleManager : IBleManager, IShinyStartupTask
 
     Peripheral? GetOrCreatePeripheral(ulong bluetoothAddress)
     {
-        this.peripherals.TryGetValue(bluetoothAddress, out var peripheral);
+        // if (peripheral == null)
+        // {
+        //     var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
+        //     if (btDevice != null)
+        //         peripheral = this.GetPeripheral(btDevice);
+        // }
+        
+        this.peripherals.GetOrAdd(bluetoothAddress, _ =>
+        {
+            
+        });
         return peripheral;
     }
 
 
-    Peripheral GetPeripheral(BluetoothLEDevice native)
-    {
-        var peripheral = this.peripherals.GetOrAdd(
-            native.BluetoothAddress,
-            _ => new Peripheral(this, native, this.services.GetRequiredService<ILogger<IPeripheral>>())
-        );
-        return peripheral;
-    }
+    // Peripheral GetPeripheral(BluetoothLEDevice native)
+    // {
+    //     var peripheral = this.peripherals.GetOrAdd(
+    //         native.BluetoothAddress,
+    //         _ => new Peripheral(this, native, services.GetRequiredService<ILogger<IPeripheral>>())
+    //     );
+    //     return peripheral;
+    // }
 
 
     internal void FirePeripheralStateChanged(Peripheral peripheral)
     {
-        this.services.RunDelegates<IBleDelegate>(
+        services.RunDelegates<IBleDelegate>(
             x => x.OnPeripheralStateChanged(peripheral),
-            this.logger
+            logger
         );
     }
 
