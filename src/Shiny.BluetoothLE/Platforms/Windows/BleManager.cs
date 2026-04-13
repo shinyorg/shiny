@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,10 +82,33 @@ public partial class BleManager : IBleManager, IShinyStartupTask
 
 
     public IPeripheral? GetKnownPeripheral(string peripheralUuid)
-        => this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
+    {
+        var peripheral = this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
+
+        if (peripheral != null && !IsReusablePeripheral(peripheral))
+        {
+            this.logger.LogDebug(
+                "WIN-PERIPHERAL-KNOWN-EVICT: peripheral={PeripheralId}, reason={Reason}",
+                DescribePeripheral(peripheral),
+                !peripheral.CanReuse ? "not_reusable" : "disconnected_requires_fresh_native"
+            );
+            if (this.peripherals.TryGetValue(peripheral.BluetoothAddress, out var current) && ReferenceEquals(current, peripheral))
+            {
+                peripheral.DisposeForManagerRemoval();
+                this.peripherals.TryRemove(peripheral.BluetoothAddress, out _);
+            }
+            return null;
+        }
+
+        return peripheral;
+    }
 
 
     public IObservable<AccessState> RequestAccess() => this.GetRadio().Select(x => x.GetAccessStatus());
+
+
+    static bool IsReusablePeripheral(Peripheral peripheral)
+        => peripheral.CanReuse && peripheral.Status == ConnectionState.Connected;
 
 
     public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => this.RequestAccess()
@@ -98,28 +121,39 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         .Switch()
         .SelectMany(args => Observable.FromAsync(async ct =>
         {
-            var peripheral = this.GetOrCreatePeripheral(args.BluetoothAddress);
-            if (peripheral == null)
-            {
-                if (!this.pendingPeripheralResolves.TryAdd(args.BluetoothAddress, 0))
-                    return null;
+            this.logger.LogDebug(
+                "WIN-SCAN-RECEIVED: address={BluetoothAddress}, rssi={Rssi}, localName={LocalName}",
+                args.BluetoothAddress,
+                args.RawSignalStrengthInDBm,
+                args.Advertisement.LocalName
+            );
 
-                try
-                {
-                    var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
-                    if (btDevice != null)
-                        peripheral = this.GetPeripheral(btDevice);
-                }
-                finally
-                {
-                    this.pendingPeripheralResolves.TryRemove(args.BluetoothAddress, out _);
-                }
+            Peripheral? peripheral = null;
+            if (!this.pendingPeripheralResolves.TryAdd(args.BluetoothAddress, 0))
+                return null;
+
+            try
+            {
+                var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
+                if (btDevice != null)
+                    peripheral = this.GetPeripheral(btDevice, preferReplacement: true);
+            }
+            finally
+            {
+                this.pendingPeripheralResolves.TryRemove(args.BluetoothAddress, out _);
             }
 
+            peripheral ??= this.GetOrCreatePeripheral(args.BluetoothAddress);
             if (peripheral == null)
                 return null;
 
             var adData = new AdvertisementData(args);
+            this.logger.LogDebug(
+                "WIN-SCAN-RESULT: address={BluetoothAddress}, peripheral={PeripheralId}, canReuse={CanReuse}",
+                args.BluetoothAddress,
+                DescribePeripheral(peripheral),
+                peripheral.CanReuse
+            );
             return new ScanResult(peripheral, args.RawSignalStrengthInDBm, adData);
         }))
         .Where(x => x != null)
@@ -311,15 +345,69 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     Peripheral? GetOrCreatePeripheral(ulong bluetoothAddress)
     {
         this.peripherals.TryGetValue(bluetoothAddress, out var peripheral);
+        if (peripheral != null && !IsReusablePeripheral(peripheral))
+        {
+            this.logger.LogDebug(
+                "WIN-PERIPHERAL-CACHE-EVICT: address={BluetoothAddress}, peripheral={PeripheralId}, reason={Reason}",
+                bluetoothAddress,
+                DescribePeripheral(peripheral),
+                !peripheral.CanReuse ? "not_reusable" : "disconnected_requires_fresh_native"
+            );
+            if (this.peripherals.TryGetValue(bluetoothAddress, out var current) && ReferenceEquals(current, peripheral))
+            {
+                peripheral.DisposeForManagerRemoval();
+                this.peripherals.TryRemove(bluetoothAddress, out _);
+            }
+            return null;
+        }
+
+        if (peripheral != null)
+        {
+            this.logger.LogDebug(
+                "WIN-PERIPHERAL-CACHE-HIT: address={BluetoothAddress}, peripheral={PeripheralId}, canReuse={CanReuse}",
+                bluetoothAddress,
+                DescribePeripheral(peripheral),
+                peripheral.CanReuse
+            );
+        }
+
         return peripheral;
     }
 
 
-    Peripheral GetPeripheral(BluetoothLEDevice native)
+    Peripheral GetPeripheral(BluetoothLEDevice native, bool preferReplacement = false)
     {
-        var peripheral = this.peripherals.GetOrAdd(
+        var created = false;
+        var peripheral = this.peripherals.AddOrUpdate(
             native.BluetoothAddress,
-            _ => new Peripheral(this, native, this.services.GetRequiredService<ILogger<IPeripheral>>())
+            _ =>
+            {
+                created = true;
+                return new Peripheral(this, native, this.services.GetRequiredService<ILogger<IPeripheral>>());
+            },
+            (_, existing) =>
+            {
+                if (!preferReplacement && IsReusablePeripheral(existing))
+                    return existing;
+
+                created = true;
+                this.logger.LogDebug(
+                    "WIN-PERIPHERAL-CACHE-REPLACE: address={BluetoothAddress}, oldPeripheral={OldPeripheralId}, reason={Reason}",
+                    native.BluetoothAddress,
+                    DescribePeripheral(existing),
+                    !existing.CanReuse ? "not_reusable" : "disconnected_requires_fresh_native"
+                );
+                existing.DisposeForManagerRemoval();
+                return new Peripheral(this, native, this.services.GetRequiredService<ILogger<IPeripheral>>());
+            }
+        );
+
+        this.logger.LogDebug(
+            "WIN-PERIPHERAL-RESOLVE: address={BluetoothAddress}, nativeId={NativeId}, peripheral={PeripheralId}, created={Created}",
+            native.BluetoothAddress,
+            native.DeviceId,
+            DescribePeripheral(peripheral),
+            created
         );
         return peripheral;
     }
@@ -336,13 +424,37 @@ public partial class BleManager : IBleManager, IShinyStartupTask
 
     internal void RemovePeripheral(Peripheral peripheral)
     {
-        this.peripherals.TryRemove(peripheral.BluetoothAddress, out _);
+        this.logger.LogDebug(
+            "WIN-PERIPHERAL-REMOVE: address={BluetoothAddress}, peripheral={PeripheralId}",
+            peripheral.BluetoothAddress,
+            DescribePeripheral(peripheral)
+        );
+
+        if (this.peripherals.TryGetValue(peripheral.BluetoothAddress, out var current) && ReferenceEquals(current, peripheral))
+            this.peripherals.TryRemove(peripheral.BluetoothAddress, out _);
     }
 
 
     void Clear() => this.peripherals
-        .Where(x => x.Value.Status != ConnectionState.Connected)
+        .Where(x => !IsReusablePeripheral(x.Value))
         .ToList()
-        .ForEach(x => this.peripherals.TryRemove(x.Key, out _));
-}
+        .ForEach(x =>
+        {
+            this.logger.LogDebug(
+                "WIN-PERIPHERAL-CLEAR: address={BluetoothAddress}, peripheral={PeripheralId}, status={Status}",
+                x.Key,
+                DescribePeripheral(x.Value),
+                x.Value.Status
+            );
 
+            if (this.peripherals.TryGetValue(x.Key, out var current) && ReferenceEquals(current, x.Value))
+            {
+                x.Value.DisposeForManagerRemoval();
+                this.peripherals.TryRemove(x.Key, out _);
+            }
+        });
+
+
+static string DescribePeripheral(Peripheral peripheral)
+        => $"{peripheral.Uuid}|{peripheral.Name ?? "<no-name>"}|#{peripheral.GetHashCode()}";
+}
