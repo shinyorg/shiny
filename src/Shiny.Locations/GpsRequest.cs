@@ -34,6 +34,6 @@ public record GpsRequest(
 )
 {
     public static GpsRequest Foreground => new(GpsBackgroundMode.None, false);
-    public static GpsRequest Background => new(GpsBackgroundMode.None, false);
+    public static GpsRequest Background => new(GpsBackgroundMode.Standard, false);
     public static GpsRequest Realtime(bool requestPreciseAccuracy) => new(GpsBackgroundMode.Realtime, requestPreciseAccuracy);
 }

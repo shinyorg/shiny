@@ -153,12 +153,12 @@ public class GpsManager(
             new DispatchQueue("shinygps"), 
             async update =>
             {
-                if (update.Location == null)
+                if (update.Location == null || this.updater == null)
                     return;
 
                 var epochTimestamp = Convert.ToInt64(update.Location.Timestamp.SecondsSince1970);
                 var timestamp = DateTimeOffset.FromUnixTimeSeconds(epochTimestamp);
-                    
+
                 // update.Location.Floor.Level
                 var reading = new GpsReading(
                     update.Location.Coordinate.FromNative(),
@@ -190,17 +190,17 @@ public class GpsManager(
     
     public Task StopListener()
     {
-        this.CurrentSettings = null;
-        
         this.updater?.Invalidate();
         this.updater = null;
-        
-        this.session?.Invalidate();
-        this.session = null;
-        
+
         this.bgSession?.Invalidate();
         this.bgSession = null;
-        
+
+        this.session?.Invalidate();
+        this.session = null;
+
+        this.CurrentSettings = null;
+
         return Task.CompletedTask;
     }
     

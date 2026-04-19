@@ -32,10 +32,13 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
 
     internal async void LocationsUpdated(CLLocation[] locations)
     {
+        if (this.CurrentSettings == null)
+            return;
+
         var reading = locations.Last().FromNative();
         await this.services
             .RunDelegates<IGpsDelegate>(
-                x => x.OnReading(reading), 
+                x => x.OnReading(reading),
                 this.logger
             )
             .ConfigureAwait(false);
@@ -151,13 +154,12 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         if (this.CurrentSettings == null)
             return Task.CompletedTask;
 
-        this.locationManager.AllowsBackgroundLocationUpdates = false;
-
         if (this.CurrentSettings.UseSignificantLocationChanges)
             this.locationManager.StopMonitoringSignificantLocationChanges();
         else
             this.locationManager.StopUpdatingLocation();
 
+        this.locationManager.AllowsBackgroundLocationUpdates = false;
         this.CurrentSettings = null;
         return Task.CompletedTask;
     }

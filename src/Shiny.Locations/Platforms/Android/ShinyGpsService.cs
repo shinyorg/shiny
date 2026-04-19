@@ -13,7 +13,8 @@ namespace Shiny.Locations;
 )]
 public class ShinyGpsService : ShinyAndroidForegroundService<IGpsManager, IGpsDelegate>
 {
-    public static bool IsStarted { get; private set; }
+    static volatile bool isStarted;
+    public static bool IsStarted => isStarted;
     protected override ForegroundService StartForegroundServiceType => ForegroundService.TypeLocation;
 
 
@@ -29,10 +30,10 @@ public class ShinyGpsService : ShinyAndroidForegroundService<IGpsManager, IGpsDe
             )
             .DisposedBy(this.DestroyWith!);
 
-        IsStarted = true;
+        isStarted = true;
     }
 
 
-    protected override void OnStop() => IsStarted = false;
+    protected override void OnStop() => isStarted = false;
     public override IBinder? OnBind(Intent? intent) => null;
 }
