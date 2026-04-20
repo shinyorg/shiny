@@ -11,7 +11,9 @@ public record AppleGpsRequest(
     bool ShowsBackgroundLocationIndicator = true,
     bool PausesLocationUpdatesAutomatically = false,
     bool UseSignificantLocationChanges = false,
-    CLActivityType ActivityType = CLActivityType.Other
+    CLActivityType ActivityType = CLActivityType.Other,
+    int StationaryMetersThreshold = 10,
+    int StationarySecondsThreshold = 30
 ) : GpsRequest(
     BackgroundMode,
     RequestPreciseAccuracy,

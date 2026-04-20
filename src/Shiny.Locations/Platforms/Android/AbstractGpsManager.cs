@@ -23,7 +23,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         this.logger = logger;
         this.Callback = new ShinyLocationCallback
         {
-            OnReading = x => this.readingSubj.OnNext(x.FromNative())
+            OnReading = x => this.readingSubj.OnNext(x)
         };
     }
 
@@ -189,6 +189,9 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         request ??= new();
         if (request is not AndroidGpsRequest android)
             android = new AndroidGpsRequest(request.BackgroundMode);
+
+        this.Callback.StationaryMetersThreshold = android.StationaryMetersThreshold;
+        this.Callback.StationarySecondsThreshold = android.StationarySecondsThreshold;
 
         if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
             this.Platform.StartService(typeof(ShinyGpsService), android.StopForegroundServiceWithTask);

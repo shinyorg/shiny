@@ -19,14 +19,16 @@ namespace Shiny.Locations;
 public record AndroidGpsRequest(
     GpsBackgroundMode BackgroundMode = GpsBackgroundMode.None,
     GpsPriority GpsPriority = GpsPriority.Balanced,
-    
+
     // TODO: classic location settings vs fused
     double DistanceFilterMeters = 0,
     int IntervalMillis = 1000,
     bool WaitForAccurateLocation = false,
     bool StopForegroundServiceWithTask = false,
     bool RequestPreciseAccuracy = false,
-    bool AutoRestart = true
+    bool AutoRestart = true,
+    int StationaryMetersThreshold = 10,
+    int StationarySecondsThreshold = 30
 ) : GpsRequest(
     BackgroundMode,
     RequestPreciseAccuracy,

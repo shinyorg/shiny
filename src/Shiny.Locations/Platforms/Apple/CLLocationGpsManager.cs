@@ -14,6 +14,7 @@ namespace Shiny.Locations;
 public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
     readonly Subject<GpsReading> readingSubj = new();
+    readonly StationaryDetector stationaryDetector = new();
     readonly IServiceProvider services;
     readonly CLLocationManager locationManager;
     readonly ILogger logger;
@@ -36,6 +37,14 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
             return;
 
         var reading = locations.Last().FromNative();
+        var isStationary = this.stationaryDetector.Detect(
+            reading,
+            this.CurrentSettings.StationaryMetersThreshold,
+            this.CurrentSettings.StationarySecondsThreshold
+        );
+        if (isStationary)
+            reading = reading with { IsStationary = true };
+
         await this.services
             .RunDelegates<IGpsDelegate>(
                 x => x.OnReading(reading),

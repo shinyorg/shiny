@@ -19,8 +19,6 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
         {
             await this.semaphore.WaitAsync().ConfigureAwait(false);
             entered = true;
-            if (this.DetectStationary)
-                this.DetectIfStationary(reading);
 
             var fireReading = true;
             this.MostRecentReading = reading;
@@ -68,58 +66,6 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     }
 
     
-    DateTimeOffset? lastMovement;
-    
-    internal void DetectIfStationary(GpsReading reading)
-    {
-        this.lastMovement ??= reading.Timestamp;
-
-        if (this.MostRecentReading != null)
-        {
-            var distance = reading.Position.GetDistanceTo(this.lastReading.Position);
-            if (distance.TotalMeters < StationaryMetersThreshold)
-            {
-                var time = reading.Timestamp - this.lastMovement;
-                if (time.Value.TotalSeconds >= StationarySecondsThreshold)
-                {
-                    if (this.IsStationary)
-                    {
-                        logger.LogDebug("Still stationary");
-                    }
-                    else
-                    {
-                        this.IsStationary = true;
-                        logger.LogDebug("Stationary Detected");
-                    }
-                }
-                else
-                {
-                    logger.LogDebug("Stationary Detected, but insufficient time has past: " + time);
-                }
-            }
-            else
-            {
-                logger.LogDebug("Stationary Threshold Not Reached - {Meters}m", distance.TotalMeters);
-                this.lastMovement = reading.Timestamp;
-                if (this.IsStationary)
-                {
-                    this.IsStationary = false;
-                    logger.LogDebug("Stationary Changed to In-Motion");
-                }
-                else
-                {
-                    logger.LogDebug("Still in-motion");
-                }
-            }
-        }
-    }
-    
-    
-    protected int StationaryMetersThreshold { get; set; } = 10;
-    protected int StationarySecondsThreshold { get; set; } = 30;
-    protected bool DetectStationary { get; set; }
-    
-
     GpsReading? lastReading;
     /// <summary>
     /// This is the last GPS reading before OnReading is raised
@@ -128,17 +74,6 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     {
         get => this.lastReading;
         set => this.Set(ref this.lastReading, value);
-    }
-
-
-    bool isStationary;
-    /// <summary>
-    /// Will look at all 
-    /// </summary>
-    public bool IsStationary
-    {
-        get => this.isStationary;
-        private set => this.Set(ref this.isStationary, value);
     }
     
 
