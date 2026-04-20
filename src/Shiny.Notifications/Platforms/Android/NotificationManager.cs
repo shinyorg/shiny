@@ -98,7 +98,7 @@ public partial class NotificationManager : INotificationManager,
 
     public Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             var status = this.platform.GetCurrentPermissionStatus(P.PostNotifications);
             if (status != AccessState.Available)
@@ -114,7 +114,7 @@ public partial class NotificationManager : INotificationManager,
             if (fineLocation != AccessState.Available)
                 return Task.FromResult(AccessState.Denied);
 
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            if (OperatingSystem.IsAndroidVersionAtLeast(29))
             {
                 var bgLocation = this.platform.GetCurrentPermissionStatus(P.AccessBackgroundLocation);
                 if (bgLocation != AccessState.Available)
@@ -122,7 +122,7 @@ public partial class NotificationManager : INotificationManager,
             }
         }
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31) && flags.HasFlag(AccessRequestFlags.TimeSensitivity))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31) && flags.HasFlag(AccessRequestFlags.TimeSensitivity))
         {
             if (!this.manager.Alarms.CanScheduleExactAlarms())
                 return Task.FromResult(AccessState.Restricted);
@@ -136,7 +136,7 @@ public partial class NotificationManager : INotificationManager,
     {
         var list = new List<string>();
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
             list.Add(P.PostNotifications); // required
 
         if (access.HasFlag(AccessRequestFlags.LocationAware))
@@ -153,7 +153,7 @@ public partial class NotificationManager : INotificationManager,
                 if (!result.IsGranted(P.AccessFineLocation))
                     return AccessState.Denied;
 
-                if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+                if (OperatingSystem.IsAndroidVersionAtLeast(29))
                 {
                     var bgResult = await this.platform.RequestAccess(P.AccessBackgroundLocation).ToTask();
                     if (bgResult != AccessState.Available)
@@ -167,7 +167,7 @@ public partial class NotificationManager : INotificationManager,
 
         // SCHEDULE_EXACT_ALARM is a special app-op permission, not a runtime permission
         // It must be checked via AlarmManager.CanScheduleExactAlarms() and granted via Settings
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31) && access.HasFlag(AccessRequestFlags.TimeSensitivity))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31) && access.HasFlag(AccessRequestFlags.TimeSensitivity))
         {
             if (!this.manager.Alarms.CanScheduleExactAlarms())
             {

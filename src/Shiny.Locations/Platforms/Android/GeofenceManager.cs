@@ -100,7 +100,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                 return AccessState.Denied;
 
             var bg = AccessState.Available;
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            if (OperatingSystem.IsAndroidVersionAtLeast(29))
             {
                 bg = this.platform.GetCurrentPermissionStatus(P.AccessBackgroundLocation);
                 if (bg == AccessState.Denied)
@@ -121,7 +121,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         if (result.IsSuccess())
         {
             status = AccessState.Available;
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(29))
+            if (OperatingSystem.IsAndroidVersionAtLeast(29))
                 status = await this.platform.RequestAccess(P.AccessBackgroundLocation);
         }
 

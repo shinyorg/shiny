@@ -100,7 +100,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
         if (android.Description != null)
             native.Description = android.Description;
 
-        if (android.AllowBubbles != null && OperatingSystemShim.IsAndroidVersionAtLeast(26))
+        if (android.AllowBubbles != null && OperatingSystem.IsAndroidVersionAtLeast(26))
             native.SetAllowBubbles(android.AllowBubbles.Value!);
 
         if (android.ShowBadge != null)
@@ -116,7 +116,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
             native.LockscreenVisibility = android.LockscreenVisibility.Value;
 
 #if !MONOANDROID
-        if (android.Blockable != null && OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (android.Blockable != null && OperatingSystem.IsAndroidVersionAtLeast(33))
             native.Blockable = android.Blockable.Value;
 #endif
 

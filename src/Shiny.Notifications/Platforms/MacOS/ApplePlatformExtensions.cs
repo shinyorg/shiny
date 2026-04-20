@@ -24,7 +24,7 @@ public static class ApplePlatformExtensions
         };
 
 
-        if (OperatingSystemShim.IsAppleVersionAtleast(16))
+        if (OperatingSystem.IsMacOSVersionAtLeast(16))
         {
             if (native.Content?.RelevanceScore > 0)
                 shiny.RelevanceScore = native.Content!.RelevanceScore!;

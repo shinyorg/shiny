@@ -184,7 +184,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             if (apple.Subtitle != null)
                 content.Subtitle = apple.Subtitle;
             
-            if (OperatingSystemShim.IsAppleVersionAtleast(16))
+            if ((OperatingSystem.IsIOSVersionAtLeast(16) || OperatingSystem.IsMacCatalystVersionAtLeast(16)))
             {
                 content.FilterCriteria = apple.FilterCriteria;
                 content.RelevanceScore = apple.RelevanceScore;
@@ -200,7 +200,7 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
 
     protected virtual void ApplyChannel(Notification notification, Channel channel, UNMutableNotificationContent native)
     {
-        if (OperatingSystemShim.IsAppleVersionAtleast(15))
+        if ((OperatingSystem.IsIOSVersionAtLeast(15) || OperatingSystem.IsMacCatalystVersionAtLeast(15)))
         {
             native.InterruptionLevel = channel.Importance switch
             {
@@ -256,14 +256,13 @@ public class NotificationManager : INotificationManager, IIosLifecycle.INotifica
             {
                 case ChannelImportance.Critical:
                 case ChannelImportance.High:
-                    var is12 = OperatingSystemShim.IsAppleVersionAtleast(12);
+                    var is12 = (OperatingSystem.IsIOSVersionAtLeast(12) || OperatingSystem.IsMacCatalystVersionAtLeast(12));
                     native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
                         ? UNNotificationSound.DefaultCriticalSound
                         : UNNotificationSound.Default;
                     break;
 
                 case ChannelImportance.Normal:
-                    OperatingSystemShim.IsMacCatalystVersionAtLeast(12);
                     native.Sound = UNNotificationSound.Default;
                     break;
 

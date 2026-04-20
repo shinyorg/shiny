@@ -223,7 +223,7 @@ public partial class Peripheral
             if (!this.Gatt!.WriteCharacteristic(ch))
                 throw new BleException("Failed to write to characteristic: " + characteristicUuid);
 #else
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
             {
                 this.Gatt!.WriteCharacteristic(ch, data, (int)ch.WriteType);
             }

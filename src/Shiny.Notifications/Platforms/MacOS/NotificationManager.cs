@@ -187,7 +187,7 @@ public class NotificationManager : INotificationManager, IMacLifecycle.INotifica
             if (apple.Subtitle != null)
                 content.Subtitle = apple.Subtitle;
 
-            if (OperatingSystemShim.IsAppleVersionAtleast(16))
+            if (OperatingSystem.IsMacOSVersionAtLeast(16))
             {
                 content.FilterCriteria = apple.FilterCriteria;
                 content.RelevanceScore = apple.RelevanceScore;
@@ -203,7 +203,7 @@ public class NotificationManager : INotificationManager, IMacLifecycle.INotifica
 
     protected virtual void ApplyChannel(Notification notification, Channel channel, UNMutableNotificationContent native)
     {
-        if (OperatingSystemShim.IsAppleVersionAtleast(15))
+        if (OperatingSystem.IsMacOSVersionAtLeast(15))
         {
             native.InterruptionLevel = channel.Importance switch
             {

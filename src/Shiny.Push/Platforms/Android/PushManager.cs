@@ -109,7 +109,7 @@ public class PushManager : NotifyPropertyChanged,
 
     public Task<AccessState> GetCurrentAccess()
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             var status = this.platform.GetCurrentPermissionStatus(Manifest.Permission.PostNotifications);
             return Task.FromResult(status);
@@ -124,7 +124,7 @@ public class PushManager : NotifyPropertyChanged,
         try
         {
             // TODO: verify google signed in
-            if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
             {
                 var access = await this.platform
                     .RequestAccess(Manifest.Permission.PostNotifications)

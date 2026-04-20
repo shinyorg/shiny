@@ -5,7 +5,7 @@
 //{
 //    public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
 //    {
-//        if (!OperatingSystemShim.IsAndroidVersionAtLeast(23))
+//        if (!OperatingSystem.IsAndroidVersionAtLeast(23))
 //            throw new InvalidOperationException("L2Cap requires Android API Level 23+");
 
 //        var socket = secure

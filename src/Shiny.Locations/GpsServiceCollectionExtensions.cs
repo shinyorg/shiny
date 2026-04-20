@@ -35,7 +35,7 @@ public static class GpsServiceCollectionExtensions
         if (delegateType != null)
             services.AddShinyService(delegateType);
         
-        if (!forceUseOldCLManager && (OperatingSystemShim.IsIOSVersionAtLeast(18) || OperatingSystemShim.IsMacCatalystVersionAtLeast(18)))
+        if (!forceUseOldCLManager && (OperatingSystem.IsIOSVersionAtLeast(18) || OperatingSystem.IsMacCatalystVersionAtLeast(18)))
         {
             services.AddShinyService<GpsManager>();    
         }

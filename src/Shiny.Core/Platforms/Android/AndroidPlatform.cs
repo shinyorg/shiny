@@ -107,7 +107,7 @@ public partial class AndroidPlatform : IPlatform,
 
     public async Task<AccessState> RequestForegroundServicePermissions()
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             var results = await this.RequestPermissions(
                 Manifest.Permission.ForegroundService,
@@ -121,7 +121,7 @@ public partial class AndroidPlatform : IPlatform,
 
             return AccessState.Restricted; // no post_notifications
         }
-        else if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        else if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
             var results = await this.RequestPermissions(Manifest.Permission.ForegroundService);
             if (results.IsSuccess())
@@ -143,7 +143,7 @@ public partial class AndroidPlatform : IPlatform,
         intent.SetAction(ActionServiceStart);
         intent.PutExtra(IntentActionStopWithTask, stopWithTask);
 
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
             this.AppContext.StartForegroundService(intent);
         else
             this.AppContext.StartService(intent);

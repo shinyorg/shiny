@@ -57,7 +57,7 @@ public partial class AndroidPlatform
 
     public PendingIntentFlags GetPendingIntentFlags(PendingIntentFlags flags)
     {
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
+        if (OperatingSystem.IsAndroidVersionAtLeast(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
             flags |= PendingIntentFlags.Mutable;
 
         return flags;
@@ -76,7 +76,7 @@ public partial class AndroidPlatform
             filter.AddAction(e);
 
 #if ANDROID34_0_OR_GREATER
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(34))
+        if (OperatingSystem.IsAndroidVersionAtLeast(34))
         {
             var flags = exported ? ReceiverFlags.Exported : ReceiverFlags.NotExported;
             this.AppContext.RegisterReceiver(receiver, filter, flags);

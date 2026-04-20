@@ -69,7 +69,7 @@ public partial class Peripheral
         if (!this.Gatt!.WriteDescriptor(descriptor))
             throw new InvalidOperationException("Could not writte descriptor: " + descriptor.Uuid);
 #else
-        if (OperatingSystemShim.IsAndroidVersionAtLeast(33))
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             this.Gatt!.WriteDescriptor(descriptor, data);
         }

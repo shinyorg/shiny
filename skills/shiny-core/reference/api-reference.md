@@ -1069,20 +1069,6 @@ public static partial class ConfigurationBuilderExtensions
 
 ## Utility Types
 
-### OperatingSystemShim
-
-```csharp
-namespace System;
-
-public static class OperatingSystemShim
-{
-    public static bool IsAndroidVersionAtLeast(int apiLevel);
-    public static bool IsAppleVersionAtleast(int osMajor, int osMinor = 0);
-    public static bool IsIOSVersionAtLeast(int osMajor, int osMinor = 0);
-    public static bool IsMacCatalystVersionAtLeast(int osMajor, int osMinor = 0);
-}
-```
-
 ### IAndroidForegroundServiceDelegate (Android)
 
 ```csharp
