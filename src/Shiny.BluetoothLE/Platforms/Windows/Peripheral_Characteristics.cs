@@ -57,6 +57,7 @@ public partial class Peripheral
 
 
     readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
+    readonly Dictionary<string, IDisposable> notifierConnections = new();
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
         this.AssertConnection();
@@ -65,7 +66,7 @@ public partial class Peripheral
 
         if (!this.notifiers.ContainsKey(key))
         {
-            var obs = this.WhenConnected()
+            var connectable = this.WhenConnected()
                 .Select(_ => Observable.FromAsync(ct => this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct)))
                 .Switch()
                 .Select(ch => Observable.Create<BleCharacteristicResult>(ob =>
@@ -125,10 +126,10 @@ public partial class Peripheral
                     };
                 }))
                 .Switch()
-                .Publish()
-                .RefCount();
+                .Publish();
 
-            this.notifiers.Add(key, obs);
+            this.notifierConnections[key] = connectable.Connect();
+            this.notifiers[key] = connectable;
         }
         return this.notifiers[key];
     }
@@ -182,7 +183,14 @@ public partial class Peripheral
     });
 
 
-    protected void ClearNotifications() => this.notifiers.Clear();
+    protected void ClearNotifications()
+    {
+        foreach (var conn in this.notifierConnections.Values)
+            conn.Dispose();
+
+        this.notifierConnections.Clear();
+        this.notifiers.Clear();
+    }
 
 
     protected static BleCharacteristicInfo ToCharInfo(GattCharacteristic ch, bool? isNotifying = null) => new(
