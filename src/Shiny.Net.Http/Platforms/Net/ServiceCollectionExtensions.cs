@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddShinyService<HttpTransferManager>();
         services.AddShinyService(typeof(TDelegate));
         services.AddDefaultRepository();
+        services.AddJsonContext(ShinyHttpJsonContext.Default);
         services.AddSingleton<HttpTransferMonitor>();
         services.AddSingleton<HttpTransferProcess>();
         return services;

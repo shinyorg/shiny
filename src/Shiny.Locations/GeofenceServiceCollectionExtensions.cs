@@ -22,6 +22,7 @@ public static class GeofenceServiceCollectionExtensions
     {
         services.AddShinyService(delegateType);
         services.AddDefaultRepository();
+        services.AddJsonContext(ShinyLocationsJsonContext.Default);
 
 #if ANDROID
         if (!services.HasService<IGeofenceManager>())

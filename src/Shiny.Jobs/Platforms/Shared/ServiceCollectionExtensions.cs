@@ -52,6 +52,7 @@ public static class ServiceCollectionExtensions
         if (!services.HasService<IJobManager>())
         {
             services.AddDefaultRepository();
+            services.AddJsonContext(ShinyJobsJsonContext.Default);
             services.AddShinyService<JobLifecycleTask>();
             services.AddShinyService<JobManager>();
         }

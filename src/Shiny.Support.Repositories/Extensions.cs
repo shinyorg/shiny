@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
-using Shiny.Stores.Impl;
 using Shiny.Support.Repositories;
 using Shiny.Support.Repositories.Impl;
 
@@ -34,11 +34,6 @@ public static class RepositoryExtensions
     /// (Linux, macOS server, Blazor, etc.). Entities are serialized to disk
     /// using the same <c>{EntityName}_{Id}.shiny</c> convention as on iOS/Android.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="rootDirectory">
-    /// Directory in which to store repository files. Defaults to
-    /// <c>{LocalApplicationData}/Shiny</c>. Created if it does not already exist.
-    /// </param>
     public static IServiceCollection AddDefaultRepository(this IServiceCollection services, DirectoryInfo? rootDirectory = null)
     {
         var dir = rootDirectory ?? new DirectoryInfo(Path.Combine(
@@ -46,7 +41,6 @@ public static class RepositoryExtensions
             "Shiny"
         ));
 
-        services.TryAddSingleton<ISerializer, DefaultSerializer>();
         services.TryAddSingleton<IRepository>(sp => new FileSystemRepository(
             dir,
             sp.GetRequiredService<ISerializer>(),
@@ -62,7 +56,7 @@ public static class RepositoryExtensions
 
     public static IObservable<int> CreateCountWatcher<T>(this IRepository repository) where T : IRepositoryEntity
     {
-        var count = repository.GetList<T>().Count;
+        var count = repository.GetAll<T>().Count;
 
         return repository
             .WhenActionOccurs()

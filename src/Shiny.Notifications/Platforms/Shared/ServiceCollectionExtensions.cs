@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddShinyService<NotificationManager>();
 
         services.AddDefaultRepository();
+        services.AddJsonContext(ShinyNotificationsJsonContext.Default);
         if (!services.HasService<IChannelManager>())
             services.AddShinyService<ChannelManager>();
 
@@ -60,6 +61,7 @@ public static class ServiceCollectionExtensions
         services.AddShinyService<NotificationManager>();
 
         services.AddDefaultRepository();
+        services.AddJsonContext(ShinyNotificationsJsonContext.Default);
         if (!services.HasService<IChannelManager>())
             services.AddShinyService<ChannelManager>();
 
@@ -97,6 +99,7 @@ public static class ServiceCollectionExtensions
         services.AddShinyService<NotificationManager>();
 
         services.AddDefaultRepository();
+        services.AddJsonContext(ShinyNotificationsJsonContext.Default);
         if (!services.HasService<IChannelManager>())
             services.AddShinyService<ChannelManager>();
 
@@ -124,6 +127,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddShinyService<NotificationManager>();
         services.AddDefaultRepository();
+        services.AddJsonContext(ShinyNotificationsJsonContext.Default);
 
         if (!services.HasService<IChannelManager>())
             services.AddShinyService<ChannelManager>();

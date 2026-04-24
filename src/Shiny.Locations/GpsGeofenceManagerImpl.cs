@@ -39,7 +39,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     {
         try 
         { 
-            var restore = this.repository.GetList<GeofenceRegion>();
+            var restore = this.repository.GetAll<GeofenceRegion>();
             if (restore.Any())
                 await this.TryStartGps();
         }
@@ -58,7 +58,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
 
     public IList<GeofenceRegion> GetMonitorRegions()
-        => this.repository.GetList<GeofenceRegion>();
+        => this.repository.GetAll<GeofenceRegion>().ToList();
 
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
@@ -96,7 +96,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     public async Task StopMonitoring(string identifier)
     {
         this.repository.Remove<GeofenceRegion>(identifier);
-        var geofences = this.repository.GetList<GeofenceRegion>();
+        var geofences = this.repository.GetAll<GeofenceRegion>();
 
         if (geofences.Count == 0)
             await this.gpsManager!.StopListener();

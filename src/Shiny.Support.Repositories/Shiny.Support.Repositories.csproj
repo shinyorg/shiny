@@ -9,6 +9,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
         
         <Description>Shiny Internal Repository Library</Description>
+        <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
     <ItemGroup>

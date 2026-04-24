@@ -56,5 +56,5 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
 
     public Channel? Get(string channelId) => this.repository.Get<Channel>(channelId);
-    public IList<Channel> GetAll() => this.repository.GetList<Channel>().ToList();
+    public IList<Channel> GetAll() => this.repository.GetAll<Channel>().ToList();
 }

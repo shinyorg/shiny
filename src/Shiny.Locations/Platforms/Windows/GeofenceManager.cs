@@ -35,7 +35,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     {
         try
         {
-            var regions = this.repository.GetList<GeofenceRegion>();
+            var regions = this.repository.GetAll<GeofenceRegion>();
             if (regions.Count == 0)
                 return;
 
@@ -78,7 +78,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
 
     public IList<GeofenceRegion> GetMonitorRegions()
-        => this.repository.GetList<GeofenceRegion>();
+        => this.repository.GetAll<GeofenceRegion>().ToList();
 
 
     public async Task StartMonitoring(GeofenceRegion region)
@@ -86,7 +86,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         this.AddNativeGeofence(region);
         this.repository.Set(region);
 
-        var regions = this.repository.GetList<GeofenceRegion>();
+        var regions = this.repository.GetAll<GeofenceRegion>();
         if (regions.Count == 1)
             GeofenceMonitor.Current.GeofenceStateChanged += this.OnGeofenceStateChanged;
     }
@@ -97,7 +97,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         this.repository.Remove<GeofenceRegion>(identifier);
         this.RemoveNativeGeofence(identifier);
 
-        var regions = this.repository.GetList<GeofenceRegion>();
+        var regions = this.repository.GetAll<GeofenceRegion>();
         if (regions.Count == 0)
             GeofenceMonitor.Current.GeofenceStateChanged -= this.OnGeofenceStateChanged;
 
@@ -109,7 +109,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     {
         GeofenceMonitor.Current.GeofenceStateChanged -= this.OnGeofenceStateChanged;
 
-        var regions = this.repository.GetList<GeofenceRegion>();
+        var regions = this.repository.GetAll<GeofenceRegion>();
         foreach (var region in regions)
             this.RemoveNativeGeofence(region.Identifier);
 
