@@ -428,6 +428,69 @@ public class AzureBlobStorageUploadRequest(string localFilePath)
 
 ---
 
+## AWS S3 Storage Helper
+
+### AwsS3UploadRequest
+
+Fluent builder for constructing `HttpTransferRequest` objects targeting AWS S3. Uses AWS Signature V4 signing with `UNSIGNED-PAYLOAD` — no AWS SDK required.
+
+```csharp
+public class AwsS3UploadRequest(string localFilePath)
+{
+    public string LocalFilePath { get; }
+    public string? Identifier { get; set; }
+    public bool UseMeteredConnection { get; set; }
+    public Dictionary<string, string> Headers { get; }
+
+    public string? BucketName { get; set; }
+    public string? Region { get; set; }
+    public string? ObjectKey { get; set; }
+    public string? CustomUri { get; set; }
+    public string? PresignedUrl { get; set; }
+    public string? AccessKeyId { get; set; }
+    public string? SecretAccessKey { get; set; }
+    public string? SessionToken { get; set; }
+    public string? ContentType { get; set; }
+    public string? StorageClass { get; set; }
+
+    // Set bucket and region — URI becomes https://{bucket}.s3.{region}.amazonaws.com/{key}
+    public AwsS3UploadRequest WithBucket(string bucketName, string region);
+
+    // Set the S3 object key (defaults to local filename)
+    public AwsS3UploadRequest WithObjectKey(string objectKey);
+
+    // Use a custom endpoint URL (e.g. S3-compatible services like MinIO)
+    public AwsS3UploadRequest WithCustomUri(string uri);
+
+    // Authenticate via presigned URL (no signing needed)
+    public AwsS3UploadRequest WithPresignedUrl(string presignedUrl);
+
+    // Authenticate via IAM credentials with AWS Signature V4
+    public AwsS3UploadRequest WithCredentials(
+        string accessKeyId,
+        string secretAccessKey,
+        string? sessionToken = null
+    );
+
+    // Allow metered connections
+    public AwsS3UploadRequest WithMeteredConnection();
+
+    // Add a custom header
+    public AwsS3UploadRequest WithHeader(string key, string value);
+
+    // Set the Content-Type header (defaults to application/octet-stream)
+    public AwsS3UploadRequest WithContentType(string contentType);
+
+    // Set the x-amz-storage-class header (e.g. STANDARD_IA, GLACIER)
+    public AwsS3UploadRequest WithStorageClass(string storageClass);
+
+    // Build the final HttpTransferRequest (uses PUT, UploadRaw, sets AWS auth headers)
+    public HttpTransferRequest Build();
+}
+```
+
+---
+
 ## Extension Methods
 
 ### HttpTransferExtensions
@@ -656,6 +719,30 @@ await transferManager.Queue(request);
 var request = new AzureBlobStorageUploadRequest("/path/to/file.zip")
     .WithBlobContainer("myaccount", "my-container")
     .WithSharedKeyAuthorization("mySharedKey")
+    .Build();
+
+await transferManager.Queue(request);
+```
+
+### Upload to AWS S3 with Presigned URL
+
+```csharp
+var request = new AwsS3UploadRequest("/path/to/file.zip")
+    .WithPresignedUrl("https://my-bucket.s3.us-east-1.amazonaws.com/file.zip?X-Amz-Algorithm=...")
+    .Build();
+
+await transferManager.Queue(request);
+```
+
+### Upload to AWS S3 with IAM Credentials
+
+```csharp
+var request = new AwsS3UploadRequest("/path/to/file.zip")
+    .WithBucket("my-bucket", "us-east-1")
+    .WithObjectKey("uploads/file.zip")
+    .WithCredentials(accessKeyId, secretAccessKey, sessionToken)
+    .WithContentType("application/zip")
+    .WithStorageClass("STANDARD_IA")
     .Build();
 
 await transferManager.Queue(request);

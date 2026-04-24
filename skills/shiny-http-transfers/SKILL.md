@@ -16,6 +16,9 @@ triggers:
   - HttpTransferMonitor
   - Shiny.Net.Http
   - azure blob upload
+  - aws s3 upload
+  - s3 upload
+  - AwsS3UploadRequest
   - multipart upload
   - download file
   - upload file
@@ -35,6 +38,7 @@ Use this skill when the user needs to:
 - Queue background transfers that survive app suspension
 - Handle transfer errors with automatic retry logic
 - Upload files to Azure Blob Storage
+- Upload files to AWS S3
 - Build a UI that tracks active transfers with progress reporting
 - Perform multipart or raw file uploads
 - Download files with progress tracking and estimated time remaining
@@ -179,6 +183,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 - Use `TransferHttpContent.FromJson(obj)` to attach a JSON body to an upload.
 - Use `TransferHttpContent.FromFormData(...)` to attach form-encoded data.
 - Use `AzureBlobStorageUploadRequest` for Azure Blob Storage uploads -- call `.WithBlobContainer(tenant, container)` or `.WithCustomUri(uri)`, configure auth via `.WithSasToken()` or `.WithSharedKeyAuthorization()`, then call `.Build()` to get an `HttpTransferRequest`.
+- Use `AwsS3UploadRequest` for AWS S3 uploads -- call `.WithBucket(bucket, region)`, configure auth via `.WithPresignedUrl()` or `.WithCredentials(accessKeyId, secretAccessKey)`, optionally set `.WithObjectKey()`, `.WithContentType()`, `.WithStorageClass()`, then call `.Build()` to get an `HttpTransferRequest`. Uses AWS Signature V4 signing with `UNSIGNED-PAYLOAD` -- no AWS SDK required.
 - Use `AppleHttpTransferRequest` (inherits `HttpTransferRequest`) when Apple-specific options are needed (e.g., `AllowsConstrainedNetworkAccess`, `AllowsCellularAccess`, `AssumesHttp3Capable`).
 
 ### Foreground (Non-Background) Transfers
