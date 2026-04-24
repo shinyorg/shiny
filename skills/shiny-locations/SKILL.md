@@ -1,6 +1,6 @@
 ---
 name: shiny-locations
-description: GPS tracking and geofence monitoring for .NET MAUI, iOS, and Android using Shiny.Locations
+description: GPS tracking, geofence monitoring, and motion activity recognition for .NET MAUI, iOS, and Android using Shiny.Locations
 auto_invoke: true
 triggers:
   - gps
@@ -24,11 +24,24 @@ triggers:
   - IGeofenceManager
   - AddGps
   - AddGeofencing
+  - motion activity
+  - activity recognition
+  - walking
+  - running
+  - cycling
+  - automotive
+  - stationary
+  - IMotionActivityManager
+  - IMotionActivityDelegate
+  - MotionActivityReading
+  - MotionActivityType
+  - MotionActivityConfidence
+  - AddMotionActivity
 ---
 
 # Shiny Locations
 
-GPS tracking and geofence monitoring for .NET MAUI, iOS, and Android applications with full foreground and background support.
+GPS tracking, geofence monitoring, and motion activity recognition for .NET MAUI, iOS, and Android applications with full foreground and background support.
 
 ## When to Use This Skill
 
@@ -41,6 +54,8 @@ Use this skill when the user needs to:
 - Get a single current position reading
 - Implement background location tracking delegates
 - Detect stationary vs. in-motion state
+- Recognize motion activity (walking, running, cycling, automotive, stationary)
+- Implement motion activity delegates for background activity processing
 
 ## Library Overview
 
@@ -95,6 +110,20 @@ services.AddGeofencing<MyGeofenceDelegate>();
 services.AddGpsDirectGeofencing<MyGeofenceDelegate>();
 ```
 
+### Motion Activity Registration
+
+Register motion activity recognition in `MauiProgram.cs`:
+
+```csharp
+// Motion activity without a background delegate
+services.AddMotionActivity();
+
+// Motion activity with a background delegate
+services.AddMotionActivity<MyMotionActivityDelegate>();
+```
+
+> **Platform support:** Motion activity is supported on iOS (CMMotionActivityManager) and Android (Google Play Services Activity Recognition). On Android, Google Play Services must be available — the registration silently no-ops if unavailable. Other platforms (Windows, Blazor) are no-ops.
+
 ## Code Generation Instructions
 
 When generating code for Shiny.Locations:
@@ -107,11 +136,13 @@ When generating code for Shiny.Locations:
 3. **Inject `IGpsManager` or `IGeofenceManager`** via constructor injection. Never instantiate managers directly.
 4. **Implement `IGpsDelegate`** for background GPS processing, or subclass the abstract `GpsDelegate` base class for built-in filtering by distance/time and stationary detection.
 5. **Implement `IGeofenceDelegate`** for geofence enter/exit events.
+6. **Implement `IMotionActivityDelegate`** for background motion activity processing. The delegate receives `MotionActivityReading` with `Activity` (MotionActivityType), `Confidence` (MotionActivityConfidence), and `Timestamp`.
 6. **Use `Position` record** with `(latitude, longitude)` -- latitude range is -90 to 90, longitude range is -180 to 180.
 7. **Use `Distance` factory methods** -- `Distance.FromMeters()`, `Distance.FromKilometers()`, `Distance.FromMiles()`. Never construct `Distance` directly with kilometers unless intentional.
 8. **Use extension methods** for convenience: `GetCurrentPosition()`, `GetLastReadingOrCurrentPosition()`, `IsListening()`, `IsPositionInside()`, `IsInsideRegion()`.
-9. **Use `WhenReading()` for UI bindings** (observable stream). Use delegates for background processing.
+9. **Use `WhenReading()` for UI bindings** (observable stream). Use delegates for background processing. This applies to both `IGpsManager` and `IMotionActivityManager`.
 10. **For `GeofenceRegion`**, always provide a unique `Identifier` string. The `SingleUse` parameter removes the region after the first trigger.
+11. **Inject `IMotionActivityManager`** via constructor injection for motion activity features. Call `RequestAccess()` before `StartListener()`, and use `WhenReading()` for foreground observation or register `IMotionActivityDelegate` for background processing.
 
 ## Conventions
 
@@ -131,6 +162,8 @@ When generating code for Shiny.Locations:
 - Dispose of `IObservable` subscriptions from `WhenReading()` when the view/page is no longer active.
 - On iOS, configure `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription` in `Info.plist`.
 - On Android, configure `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, and `ACCESS_BACKGROUND_LOCATION` permissions in `AndroidManifest.xml`.
+- On iOS, add `NSMotionUsageDescription` to `Info.plist` when using motion activity recognition.
+- On Android, motion activity recognition requires `com.google.android.gms.permission.ACTIVITY_RECOGNITION` permission and Google Play Services.
 
 ## Reference Files
 

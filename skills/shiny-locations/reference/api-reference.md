@@ -62,6 +62,35 @@ public enum GpsBackgroundMode
 }
 ```
 
+### MotionActivityType
+
+```csharp
+namespace Shiny.Locations;
+
+public enum MotionActivityType
+{
+    Unknown = 0,
+    Stationary = 1,
+    Walking = 2,
+    Running = 3,
+    Cycling = 4,
+    Automotive = 5
+}
+```
+
+### MotionActivityConfidence
+
+```csharp
+namespace Shiny.Locations;
+
+public enum MotionActivityConfidence
+{
+    Low,
+    Medium,
+    High
+}
+```
+
 ---
 
 ## Records
@@ -167,6 +196,18 @@ public record GeofenceRegion(
 ) : IRepositoryEntity;
 ```
 
+### MotionActivityReading
+
+```csharp
+namespace Shiny.Locations;
+
+public record MotionActivityReading(
+    MotionActivityType Activity,
+    MotionActivityConfidence Confidence,
+    DateTimeOffset Timestamp
+);
+```
+
 ### LocationPermissionResult
 
 ```csharp
@@ -264,6 +305,48 @@ public interface IGeofenceDelegate
 {
     /// Fired when the geofence region status has changed
     Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region);
+}
+```
+
+### IMotionActivityManager
+
+```csharp
+namespace Shiny.Locations;
+
+public interface IMotionActivityManager
+{
+    /// If the manager is currently listening for activity changes
+    bool IsListening { get; }
+
+    /// Get the current access state for motion activity recognition
+    AccessState GetCurrentStatus();
+
+    /// Request access to motion activity recognition
+    Task<AccessState> RequestAccess();
+
+    /// Gets the last known motion activity reading, or queries the platform for the current one
+    IObservable<MotionActivityReading?> GetLastReading();
+
+    /// Hook to activity change events (foreground). Use delegates for background.
+    IObservable<MotionActivityReading> WhenReading();
+
+    /// Start listening for motion activity changes
+    Task StartListener();
+
+    /// Stop listening for motion activity changes
+    Task StopListener();
+}
+```
+
+### IMotionActivityDelegate
+
+```csharp
+namespace Shiny.Locations;
+
+public interface IMotionActivityDelegate
+{
+    /// Fired when a motion activity reading is received
+    Task OnReading(MotionActivityReading reading);
 }
 ```
 
@@ -397,6 +480,24 @@ services.AddGpsDirectGeofencing<MyGeofenceDelegate>();
 // Non-generic version
 services.AddGpsDirectGeofencing(typeof(MyGeofenceDelegate));
 ```
+
+### Motion Activity Registration
+
+```csharp
+// Motion activity without a background delegate
+services.AddMotionActivity();
+
+// Motion activity with a background delegate
+services.AddMotionActivity<MyMotionActivityDelegate>();
+
+// Non-generic version
+services.AddMotionActivity(typeof(MyMotionActivityDelegate));
+```
+
+**Platform notes:**
+- **iOS/macOS:** Uses `CMMotionActivityManager`. Requires `NSMotionUsageDescription` in `Info.plist`.
+- **Android:** Uses Google Play Services Activity Recognition API. Requires `com.google.android.gms.permission.ACTIVITY_RECOGNITION`. Registration silently no-ops if Google Play Services is unavailable.
+- **Other platforms:** Registration is a no-op.
 
 ---
 
@@ -560,6 +661,77 @@ bool? isInside = await gpsManager.IsInsideRegion(
     toronto,
     Distance.FromKilometers(1)
 );
+```
+
+### Motion Activity Recognition
+
+```csharp
+public class MyViewModel
+{
+    readonly IMotionActivityManager activityManager;
+
+    public MyViewModel(IMotionActivityManager activityManager)
+    {
+        this.activityManager = activityManager;
+    }
+
+    public async Task StartTracking()
+    {
+        var access = await this.activityManager.RequestAccess();
+        if (access != AccessState.Available)
+        {
+            // Handle denied/restricted
+            return;
+        }
+
+        await this.activityManager.StartListener();
+    }
+
+    public void ObserveActivity(CompositeDisposable disposable)
+    {
+        this.activityManager
+            .WhenReading()
+            .Subscribe(reading =>
+            {
+                var activity = reading.Activity;     // Walking, Running, Cycling, etc.
+                var confidence = reading.Confidence;  // Low, Medium, High
+                var timestamp = reading.Timestamp;
+            })
+            .DisposeWith(disposable);
+    }
+
+    public async Task StopTracking()
+    {
+        await this.activityManager.StopListener();
+    }
+}
+```
+
+### Motion Activity Background Delegate
+
+```csharp
+public class MyMotionActivityDelegate : IMotionActivityDelegate
+{
+    readonly ILogger<MyMotionActivityDelegate> logger;
+
+    public MyMotionActivityDelegate(ILogger<MyMotionActivityDelegate> logger)
+    {
+        this.logger = logger;
+    }
+
+    public Task OnReading(MotionActivityReading reading)
+    {
+        this.logger.LogInformation(
+            "Motion Activity: {Activity}, Confidence={Confidence}",
+            reading.Activity,
+            reading.Confidence
+        );
+        return Task.CompletedTask;
+    }
+}
+
+// Registration
+services.AddMotionActivity<MyMotionActivityDelegate>();
 ```
 
 ### Background GPS with Realtime Mode
