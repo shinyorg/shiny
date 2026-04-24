@@ -6,8 +6,8 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Shiny.Maui.Shell" Version="3.2.1"/>
-        <PackageVersion Include="Shiny.Maui.TableView" Version="1.1.1"/>
+        <PackageVersion Include="Shiny.Maui.Shell" Version="5.0.0"/>
+        <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0034"/>
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>

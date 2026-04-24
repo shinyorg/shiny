@@ -98,7 +98,7 @@ public partial class BleScanViewModel(
             return;
 
         this.StopScan();
-        await navigator.NavigateTo("bleperipheral", ("PeripheralUuid", peripheral.Uuid));
+        await navigator.NavigateTo("bleperipheral", true, ("PeripheralUuid", peripheral.Uuid));
     }
 
     ScanConfig? BuildScanConfig()
