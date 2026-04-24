@@ -51,7 +51,7 @@ public class HttpTransferMonitor(
 
                 case HttpTransferState.Error:
                     if (removeErrors)
-                        toRemove.Remove(item);
+                        toRemove.Add(item);
                     break;
             }
         }

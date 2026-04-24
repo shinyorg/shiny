@@ -47,6 +47,10 @@ public class ShinySubject<T> : ISubject<T>
         lock (this.observers)
             this.observers.Add(observer);
 
-        return Disposable.Create(() => this.observers.Remove(observer));
+        return Disposable.Create(() =>
+        {
+            lock (this.observers)
+                this.observers.Remove(observer);
+        });
     }
 }

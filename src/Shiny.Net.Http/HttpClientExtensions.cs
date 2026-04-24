@@ -27,7 +27,7 @@ public static class HttpClientExtensions
         var totalBytesXfer = 0L;
         var totalSince = 0L;
 
-        var stop = new Stopwatch();
+        var stop = Stopwatch.StartNew();
 
         using var progress = new ProgressStreamContent(
             stream,
@@ -81,8 +81,7 @@ public static class HttpClientExtensions
         foreach (var header in headers)
             request.Headers.TryAddWithoutValidation(header.Name, header.Value);
 
-        stop.Start();
-        var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+        var response = await httpClient.SendAsync(request, ct).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     })
     .Subscribe(
@@ -117,6 +116,7 @@ public static class HttpClientExtensions
         using var dest = File.Create(toFilePath);
 
         var contentLength = response.Content.Headers.ContentLength;
+        var hasReportedCompletion = false;
         var totalBytesXfer = 0L;
         var totalSince = 0L;
         var bytesRead = 0;
@@ -131,9 +131,10 @@ public static class HttpClientExtensions
             totalSince += bytesRead;
             totalBytesXfer += bytesRead;
 
-            if (totalBytesXfer == contentLength)
+            if (contentLength != null && totalBytesXfer == contentLength)
             {
                 // completed
+                hasReportedCompletion = true;
                 stop.Stop();
                 ob.OnNext(new TransferProgress(
                     0,
@@ -153,6 +154,12 @@ public static class HttpClientExtensions
                 totalSince = 0;
                 stop.Restart();
             }
+        }
+
+        if (!hasReportedCompletion && totalBytesXfer > 0)
+        {
+            stop.Stop();
+            ob.OnNext(new TransferProgress(0, totalBytesXfer, totalBytesXfer));
         }
     })
     .Subscribe(

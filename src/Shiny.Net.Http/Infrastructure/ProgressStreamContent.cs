@@ -35,17 +35,13 @@ public class ProgressStreamContent : HttpContent
         return Task.Run(() =>
         {
             var buffer = new byte[this.bufferSize];
+            var read = this.content.Read(buffer, 0, buffer.Length);
 
-            using (this.content)
+            while (read > 0)
             {
-                var read = this.content.Read(buffer, 0, buffer.Length);
-
-                while (read > 0)
-                {
-                    stream.Write(buffer, 0, read);
-                    this.packetSent.Invoke(read);
-                    read = this.content.Read(buffer, 0, buffer.Length);
-                }
+                stream.Write(buffer, 0, read);
+                this.packetSent.Invoke(read);
+                read = this.content.Read(buffer, 0, buffer.Length);
             }
         });
     }

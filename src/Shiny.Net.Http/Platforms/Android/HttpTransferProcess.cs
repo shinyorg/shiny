@@ -48,7 +48,7 @@ public class HttpTransferProcess
         _ = Task.Run(async () =>
         {
             this.logger.LogInformation("Starting Transfer Loop Wait");
-            var cancelSrc = new CancellationTokenSource();
+            using var cancelSrc = new CancellationTokenSource();
 
             using var sub = this.repository
                 .WhenActionOccurs()
@@ -142,7 +142,7 @@ public class HttpTransferProcess
 
     async Task RunTransfer(HttpTransfer transfer, CancellationToken cancelToken)
     {
-        var cancelSrc = new CancellationTokenSource();
+        using var cancelSrc = new CancellationTokenSource();
         using var _ = cancelToken.Register(() => cancelSrc.Cancel());
 
         using var repoSub = this.repository
@@ -170,6 +170,9 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
 
+            repoSub.Dispose(); // dispose before removal so cancellation isn't triggered
+            this.repository.Remove(transfer);
+
             progressSubj.OnNext(new(
                 transfer.Request,
                 HttpTransferState.Completed,
@@ -180,14 +183,12 @@ public class HttpTransferProcess
                 ),
                 null
             ));
-            repoSub.Dispose(); // dispose of this so cancellation isn't run
-
-            this.repository.Remove(transfer);
         }
         catch (HttpRequestException ex)
         {
+            repoSub.Dispose(); // dispose before removal so cancellation isn't triggered
             this.repository.Remove(transfer);
-            
+
             this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
             await this.delegates
                 .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), this.logger)
@@ -199,7 +200,6 @@ public class HttpTransferProcess
                 TransferProgress.Empty,
                 ex
             ));
-            repoSub.Dispose(); // dispose of this so cancellation isn't run
         }
         catch (IOException ex) when (ex.InnerException is Java.Net.SocketException)
         {
@@ -216,17 +216,19 @@ public class HttpTransferProcess
         catch (Exception ex)
         {
             // should always retry unless server fails
-            this.PauseTransfer(transfer, "Error with transfer - " + ex, ex);
+            this.PauseTransfer(transfer, "Error with transfer - " + ex, ex, isNetworkError: false);
         }
     }
 
 
-    void PauseTransfer(HttpTransfer transfer, string reason, Exception exception)
+    void PauseTransfer(HttpTransfer transfer, string reason, Exception exception, bool isNetworkError = true)
     {
         this.logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
         this.repository.Set(transfer with
         {
-            Status = HttpTransferState.PausedByNoNetwork
+            Status = isNetworkError
+                ? HttpTransferState.PausedByNoNetwork
+                : HttpTransferState.Paused
         });
     }
 
