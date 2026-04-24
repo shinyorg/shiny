@@ -65,11 +65,12 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     {
         if (this.Gatt == null)
             return;
-        
+
         try
         {
             this.RequiresServiceDiscovery = true;
-            this.Gatt?.Close();
+            this.Gatt.Disconnect();
+            this.Gatt.Close();
             this.Gatt = null;
         }
         catch (Exception ex)
@@ -155,6 +156,16 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         {
             this.RequiresServiceDiscovery = true;
             this.ClearNotifications();
+
+            try
+            {
+                gatt?.Close();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Error closing GATT on disconnect");
+            }
+            this.Gatt = null;
         }
         this.connSubj.OnNext(newState.ToStatus());
     }

@@ -26,9 +26,9 @@ public partial class Peripheral
     }
     
 
-    Subject<Unit>? serviceDiscoverySubj;
+    Subject<GattStatus>? serviceDiscoverySubj;
     public override void OnServicesDiscovered(BluetoothGatt? gatt, GattStatus status)
-        => this.serviceDiscoverySubj?.OnNext(Unit.Default);
+        => this.serviceDiscoverySubj?.OnNext(status);
 
 
     protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices() =>
@@ -46,7 +46,10 @@ public partial class Peripheral
             if (!this.Gatt!.DiscoverServices())
                 throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
 
-            await task.ConfigureAwait(false);
+            var status = await task.ConfigureAwait(false);
+            if (status != GattStatus.Success)
+                throw new BleException("Service discovery failed with status: " + status);
+
             this.RequiresServiceDiscovery = false;
 
             return this.Gatt.Services!.ToList();
