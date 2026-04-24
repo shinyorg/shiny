@@ -29,6 +29,7 @@ public partial class Peripheral : IPeripheral
     readonly object connectSync = new();
     CancellationTokenSource? connectAttemptCts;
     CancellationTokenSource? delayedCleanupCts;
+    IDisposable? connectSub;
     bool connectInProgress;
     bool pendingDisconnectedCleanup;
     int connectAttemptId;
@@ -53,19 +54,8 @@ public partial class Peripheral : IPeripheral
     public string? Name => this.Native?.Name;
     internal bool CanReuse => this.Native != null;
 
-    public int Mtu
-    {
-        get
-        {
-            if (this.Native == null || this.Status != ConnectionState.Connected)
-                return -1;
-
-            // Windows doesn't expose MTU directly on BluetoothLEDevice
-            // Default BLE MTU is 23, but negotiated MTU may be higher
-            // The actual MTU is determined per-session when writing characteristics
-            return -1;
-        }
-    }
+    // Windows doesn't expose negotiated MTU - return default usable payload (23 - 3 ATT header)
+    public int Mtu => 20;
 
 
     public ConnectionState Status
@@ -122,7 +112,8 @@ public partial class Peripheral : IPeripheral
 
             // Windows BLE connections are implicit - they occur when you access GATT services
             // Calling GetGattServicesAsync forces the connection
-            Observable.FromAsync(async ct =>
+            this.connectSub?.Dispose();
+            this.connectSub = Observable.FromAsync(async ct =>
             {
                 if (this.Native == null)
                     throw new BleException("Device is disposed");
@@ -199,6 +190,8 @@ public partial class Peripheral : IPeripheral
             return;
 
         this.connSubj.OnNext(ConnectionState.Disconnecting);
+        this.connectSub?.Dispose();
+        this.connectSub = null;
         this.CancelDelayedCleanup();
         this.CancelConnectAttempt();
         this.ReleaseNativeResources();
@@ -298,6 +291,8 @@ public partial class Peripheral : IPeripheral
             this.trackedServices.Count,
             this.Native != null
         );
+        this.connectSub?.Dispose();
+        this.connectSub = null;
         this.ClearNotifications();
 
         List<GattDeviceService> services;

@@ -94,6 +94,10 @@ public partial class Peripheral
                             {
                                 ob.OnError(task.Exception!.InnerException ?? task.Exception);
                             }
+                            else if (task.Result != GattCommunicationStatus.Success)
+                            {
+                                ob.OnError(new BleException($"Failed to enable notifications: {task.Result}"));
+                            }
                             else
                             {
                                 this.charSubChangedSubj.OnNext(notifyingInfo);
@@ -108,9 +112,10 @@ public partial class Peripheral
                         {
                             ch.WriteClientCharacteristicConfigurationDescriptorAsync(
                                 GattClientCharacteristicConfigurationDescriptorValue.None
-                            ).AsTask().ContinueWith(_ =>
+                            ).AsTask().ContinueWith(task =>
                             {
-                                this.charSubChangedSubj.OnNext(notifyingOffInfo);
+                                if (!task.IsFaulted && task.Result == GattCommunicationStatus.Success)
+                                    this.charSubChangedSubj.OnNext(notifyingOffInfo);
                             });
                         }
                         catch

@@ -36,6 +36,9 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     }
 
 
+    Radio? monitoredRadio;
+    TypedEventHandler<Radio, object>? radioStateHandler;
+
     public void Start()
     {
         var delegates = this.services.GetServices<IBleDelegate>().ToList();
@@ -47,12 +50,17 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             .Subscribe(
                 radio =>
                 {
-                    var handler = new TypedEventHandler<Radio, object>((sender, args) =>
+                    // Unhook previous radio handler to prevent duplicates
+                    if (this.monitoredRadio != null && this.radioStateHandler != null)
+                        this.monitoredRadio.StateChanged -= this.radioStateHandler;
+
+                    this.radioStateHandler = new TypedEventHandler<Radio, object>((sender, args) =>
                     {
                         var status = sender.GetAccessStatus();
                         delegates.RunDelegates(x => x.OnAdapterStateChanged(status), this.logger);
                     });
-                    radio!.StateChanged += handler;
+                    this.monitoredRadio = radio;
+                    radio!.StateChanged += this.radioStateHandler;
                 },
                 ex =>
                 {
