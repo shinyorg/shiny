@@ -55,6 +55,9 @@ public partial class Peripheral
 
     Subject<BleCharacteristicInfo>? charSubSubj;
     Dictionary<string, IObservable<BleCharacteristicResult>>? notifiers;
+
+    protected void ClearNotifiers() => this.notifiers?.Clear();
+
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
         this.AssertConnection();

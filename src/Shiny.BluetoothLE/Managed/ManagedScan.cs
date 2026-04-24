@@ -59,7 +59,8 @@ public class ManagedScan(IBleManager bleManager) : IDisposable, IManagedScan
         this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
         this.disposer = new();
         this.list.Clear();
-        
+        this.IsScanning = true;
+
         bleManager
             .Scan(this.ScanConfig)
             .Buffer(this.BufferTimeSpan)
@@ -70,8 +71,6 @@ public class ManagedScan(IBleManager bleManager) : IDisposable, IManagedScan
                 this.actionSubj.OnError
             )
             .DisposedBy(this.disposer);
-
-        this.IsScanning = true;
 
         if (clearTime != null)
         {

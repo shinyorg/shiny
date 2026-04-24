@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -66,27 +67,31 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         var arc = config?.AutoConnect ?? true;
         if (arc)
         {
+            var skipFirst = true;
             this.autoReconnectSub = this
                 .WhenDisconnected()
-                .Skip(1)
-                .Subscribe(_ => this.DoConnect());
+                .Subscribe(_ =>
+                {
+                    if (skipFirst)
+                        skipFirst = false;
+                    else
+                        this.DoConnect();
+                });
         }
         this.DoConnect();
     }
 
 
-    public IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
+    public IObservable<int> ReadRssi() => this.operations.QueueToObservable(async ct =>
     {
-        var sub = this.rssiSubj.Subscribe(x =>
-        {
-            if (x.Exception == null)
-                ob.OnNext(x.Rssi);
-            else
-                ob.OnError(x.Exception);
-        });
+        var task = this.rssiSubj.Take(1).ToTask(ct);
         this.Native.ReadRSSI();
 
-        return sub;
+        var result = await task.ConfigureAwait(false);
+        if (result.Exception != null)
+            throw result.Exception;
+
+        return result.Rssi;
     });
 
 
@@ -111,7 +116,12 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
 
     readonly Subject<ConnectionState> connSubj = new();
     internal void ReceiveStateChange(ConnectionState connStatus)
-        => this.connSubj.OnNext(connStatus);
+    {
+        if (connStatus == ConnectionState.Disconnected)
+            this.ClearNotifiers();
+
+        this.connSubj.OnNext(connStatus);
+    }
 
 
     readonly Subject<BleException> connFailedSubj = new();

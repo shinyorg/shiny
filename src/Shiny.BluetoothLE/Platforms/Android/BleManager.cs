@@ -286,12 +286,12 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         if (OperatingSystem.IsAndroidVersionAtLeast(26))
             builder.SetLegacy(false);
         
+        this.IsScanning = true;
         this.Native.Adapter!.BluetoothLeScanner!.StartScan(
             scanFilters,
             builder.Build(),
             this
         );
-        this.IsScanning = true;
     }
 
 

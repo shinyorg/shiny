@@ -16,6 +16,9 @@ namespace Shiny.BluetoothLE;
 public partial class Peripheral
 {
     readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
+
+    protected void ClearNotifiers() => this.notifiers.Clear();
+
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true)
     {
         this.AssertConnnection();

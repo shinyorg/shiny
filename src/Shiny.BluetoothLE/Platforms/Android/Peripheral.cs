@@ -95,7 +95,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
             this.Gatt = this.Native.ConnectGatt(
                 this.platform.AppContext,
-                config?.AutoConnect ?? true,
+                cfg.AutoConnect,
                 this,
                 BluetoothTransports.Le
             );
@@ -156,6 +156,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         {
             this.RequiresServiceDiscovery = true;
             this.ClearNotifications();
+            this.ClearNotifiers();
 
             try
             {

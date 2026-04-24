@@ -261,6 +261,7 @@ public static class CharacteristicExtensions
 
     static IObservable<int> StandardIntObservable(IPeripheral peripheral, (string ServiceUuid, string CharacteristicUuid) uuid) => peripheral
         .ReadCharacteristic(uuid.ServiceUuid, uuid.CharacteristicUuid)
+        .Where(x => x.Data != null && x.Data.Length > 0)
         .Select(x => (int)x.Data[0]);
 }
 

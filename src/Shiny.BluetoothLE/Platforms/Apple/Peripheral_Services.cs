@@ -47,25 +47,20 @@ public partial class Peripheral
         .Select(this.FromNative);
 
 
-    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => Observable.Create<IReadOnlyList<BleServiceInfo>>(ob =>
+    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => this.operations.QueueToObservable(async ct =>
     {
         this.AssertConnnection();
 
         this.serviceDiscoverySubj ??= new();
-        var disp = this.serviceDiscoverySubj.Subscribe(x =>
-        {
-            if (x != null)
-            {
-                ob.OnError(new InvalidOperationException(x.LocalizedDescription));
-            }
-            else if (this.Native.Services != null)
-            {
-                ob.Respond(this.Native.Services.Select(this.FromNative).ToList());
-            }
-        });
+        var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
         this.Native.DiscoverServices();
 
-        return () => disp?.Dispose();
+        var result = await task.ConfigureAwait(false);
+        if (result != null)
+            throw new InvalidOperationException(result.LocalizedDescription);
+
+        return (IReadOnlyList<BleServiceInfo>)(this.Native.Services?.Select(this.FromNative).ToList()
+            ?? new List<BleServiceInfo>());
     });
 
 

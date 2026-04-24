@@ -129,6 +129,7 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
         this.Clear();
         scanConfig ??= new ScanConfig();
 
+        this.IsScanning = true;
         if (scanConfig.ServiceUuids == null || scanConfig.ServiceUuids.Length == 0)
         {
             this.Manager.ScanForPeripherals(
@@ -141,7 +142,6 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
             var uuids = scanConfig.ServiceUuids.Select(CBUUID.FromString).ToArray();
             this.Manager.ScanForPeripherals(uuids, peripheralScanningOptions);
         }
-        this.IsScanning = true;
         var sub = this.ScanResultReceived
             .Subscribe(
                 ob.OnNext,
