@@ -48,6 +48,7 @@ public static class ShinyRegistrations
         // implementation for iOS and Android today.
         s.AddGps<SampleGpsDelegate>();
         s.AddGeofencing<SampleGeofenceDelegate>();
+        s.AddMotionActivity<SampleMotionActivityDelegate>();
 #endif
 
 #if !MACOS && !WINDOWS

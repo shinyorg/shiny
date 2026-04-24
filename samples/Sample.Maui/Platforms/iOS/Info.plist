@@ -36,6 +36,8 @@
     <string>This app needs location access to demonstrate GPS features</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>This app needs background location for geofencing</string>
+    <key>NSMotionUsageDescription</key>
+    <string>This app uses motion activity recognition to detect walking, running, driving, and other activities</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>bluetooth-central</string>
