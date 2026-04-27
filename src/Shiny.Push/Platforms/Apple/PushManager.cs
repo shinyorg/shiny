@@ -27,6 +27,7 @@ public class PushManager(
 {
     static readonly NSString apsKey = new("aps");
     static readonly NSString alertKey = new("alert");
+    readonly SemaphoreSlim semaphore = new(1, 1);
     TaskCompletionSource<NSData>? tokenSource;
     
     public IPushTagSupport? Tags => provider as IPushTagSupport;
@@ -69,16 +70,20 @@ public class PushManager(
         if (this.RegistrationToken.IsEmpty())
             return;
 
-        this.RequestAccess()
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        this.RequestAccess(cts.Token)
             .ContinueWith(x =>
             {
-                if (x.Exception != null)
+                if (x.IsCanceled)
+                {
+                    logger.LogWarning("Push auto-start timed out - ensure AppDelegate push hooks are wired");
+                }
+                else if (x.Exception != null)
                 {
                     logger.LogWarning(x.Exception, "Failed to auto start push");
                 }
                 else if (x.Result.Status != AccessState.Available)
                 {
-                    // TODO: unregister delegate
                     logger.LogInformation("User has removed push notification access - " + x.Result.Status);
                 }
                 else
@@ -111,31 +116,39 @@ public class PushManager(
         if (AppleExtensions.IsSimulator)
             return new PushAccessState(AccessState.NotSupported, null);
 
-        var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(options);
-        if (!result.Item1)
-            return PushAccessState.Denied; // or just restricted?
-
-        var deviceToken = await this.RequestRawToken(cancelToken).ConfigureAwait(false);
-        var nativeToken = deviceToken.ToPushTokenString();
-        var regToken = nativeToken;
-
-        if (provider != null)
-            regToken = await provider.Register(deviceToken);
-
-        if (regToken != null && this.RegistrationToken != regToken)
+        await this.semaphore.WaitAsync(cancelToken).ConfigureAwait(false);
+        try
         {
-            await services
-                .RunDelegates<IPushDelegate>(
-                    x => x.OnNewToken(regToken),
-                    logger
-                )
-                .ConfigureAwait(false);
+            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(options);
+            if (!result.Item1)
+                return PushAccessState.Denied; // or just restricted?
+
+            var deviceToken = await this.RequestRawToken(cancelToken).ConfigureAwait(false);
+            var nativeToken = deviceToken.ToPushTokenString();
+            var regToken = nativeToken;
+
+            if (provider != null)
+                regToken = await provider.Register(deviceToken);
+
+            if (regToken != null && this.RegistrationToken != regToken)
+            {
+                await services
+                    .RunDelegates<IPushDelegate>(
+                        x => x.OnNewToken(regToken),
+                        logger
+                    )
+                    .ConfigureAwait(false);
+            }
+
+            this.NativeRegistrationToken = nativeToken;
+            this.RegistrationToken = regToken;
+
+            return new PushAccessState(AccessState.Available, this.RegistrationToken);
         }
-
-        this.NativeRegistrationToken = nativeToken;
-        this.RegistrationToken = regToken;
-
-        return new PushAccessState(AccessState.Available, this.RegistrationToken);
+        finally
+        {
+            this.semaphore.Release();
+        }
     }
 
 
@@ -170,7 +183,9 @@ public class PushManager(
     protected async Task<NSData> RequestRawToken(CancellationToken cancelToken)
     {
         this.tokenSource = new();
-        using var cancelSrc = cancelToken.Register(() => this.tokenSource.TrySetCanceled());
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+        timeoutCts.CancelAfter(TimeSpan.FromSeconds(10));
+        using var cancelSrc = timeoutCts.Token.Register(() => this.tokenSource.TrySetCanceled());
 
         await platform
             .InvokeOnMainThreadAsync(
