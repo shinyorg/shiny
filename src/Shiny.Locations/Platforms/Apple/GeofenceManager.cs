@@ -135,45 +135,63 @@ public class GeofenceManager(
         );
         
         // we monitor ALL state changes for RequestState, but we only fire delegates according to flags
+        this.initialFires.Add(region.Identifier);
         mon.AddCondition(condition, region.Identifier);
     }
 
     
     CLMonitor? monitor;
-    async ValueTask<CLMonitor> GetMonitor() => this.monitor ??= await CLMonitor.RequestMonitorAsync(
-        CLMonitorConfiguration.Create(
-            "shinygeofences",
-            DispatchQueue.MainQueue,
-            async (mon, evt) =>
-            {
-                // TODO: prevent initial state firing?
-                var lastEvent = mon.GetMonitoringRecord(evt.Identifier)!.LastEvent;
-                if (lastEvent.State == evt.State)
-                {
-                    logger.LogDebug("Geofence State Matches");
-                    return;
-                }
-                
-                var region = repository.Get<GeofenceRegion>(evt.Identifier);
-                if (region != null)
-                {
-                    switch (evt.State)
+    SemaphoreSlim monitorLock = new(1, 1);
+    HashSet<string> initialFires = new();
+
+    async ValueTask<CLMonitor> GetMonitor()
+    {
+        if (this.monitor != null)
+            return this.monitor;
+
+        await this.monitorLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            this.monitor ??= await CLMonitor.RequestMonitorAsync(
+                CLMonitorConfiguration.Create(
+                    "shinygeofences",
+                    DispatchQueue.MainQueue,
+                    async (mon, evt) =>
                     {
-                        case CLMonitoringState.Satisfied:
-                            if (region.NotifyOnEntry)
-                                await this.FireDelegate(region, evt).ConfigureAwait(false);
-                            
-                            break;
-                        
-                        case CLMonitoringState.Unsatisfied:
-                            if (region.NotifyOnExit)
-                                await this.FireDelegate(region, evt).ConfigureAwait(false);
-                            break;
+                        // CLMonitor fires an initial event when a condition is first added - suppress it
+                        if (this.initialFires.Remove(evt.Identifier))
+                        {
+                            logger.LogDebug("Geofence initial state fire suppressed for {Identifier}", evt.Identifier);
+                            return;
+                        }
+
+                        var region = repository.Get<GeofenceRegion>(evt.Identifier);
+                        if (region != null)
+                        {
+                            switch (evt.State)
+                            {
+                                case CLMonitoringState.Satisfied:
+                                    if (region.NotifyOnEntry)
+                                        await this.FireDelegate(region, evt).ConfigureAwait(false);
+
+                                    break;
+
+                                case CLMonitoringState.Unsatisfied:
+                                    if (region.NotifyOnExit)
+                                        await this.FireDelegate(region, evt).ConfigureAwait(false);
+                                    break;
+                            }
+                        }
                     }
-                }
-            }
-        )
-    );
+                )
+            );
+            return this.monitor;
+        }
+        finally
+        {
+            this.monitorLock.Release();
+        }
+    }
 
 
     async Task FireDelegate(GeofenceRegion region, CLMonitoringEvent evt)
@@ -196,10 +214,19 @@ public class GeofenceManager(
     
     void DestroyMonitor()
     {
-        this.monitor?.Dispose();
-        this.monitor = null;
-        
-        this.session?.Invalidate();
-        this.session = null;
+        this.monitorLock.Wait();
+        try
+        {
+            this.monitor?.Dispose();
+            this.monitor = null;
+            this.initialFires.Clear();
+
+            this.session?.Invalidate();
+            this.session = null;
+        }
+        finally
+        {
+            this.monitorLock.Release();
+        }
     }
 }
