@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Versioning;
@@ -95,11 +96,10 @@ public class GeofenceManager(
     }
     
 
-    public Task StopAllMonitoring()
+    public async Task StopAllMonitoring()
     {
-        this.DestroyMonitor();
+        await this.DestroyMonitor().ConfigureAwait(false);
         repository.Clear<GeofenceRegion>();
-        return Task.CompletedTask;
     }
 
 
@@ -135,14 +135,14 @@ public class GeofenceManager(
         );
         
         // we monitor ALL state changes for RequestState, but we only fire delegates according to flags
-        this.initialFires.Add(region.Identifier);
+        this.initialFires.TryAdd(region.Identifier, 0);
         mon.AddCondition(condition, region.Identifier);
     }
 
     
-    CLMonitor? monitor;
+    volatile CLMonitor? monitor;
     SemaphoreSlim monitorLock = new(1, 1);
-    HashSet<string> initialFires = new();
+    ConcurrentDictionary<string, byte> initialFires = new();
 
     async ValueTask<CLMonitor> GetMonitor()
     {
@@ -159,7 +159,7 @@ public class GeofenceManager(
                     async (mon, evt) =>
                     {
                         // CLMonitor fires an initial event when a condition is first added - suppress it
-                        if (this.initialFires.Remove(evt.Identifier))
+                        if (this.initialFires.TryRemove(evt.Identifier, out _))
                         {
                             logger.LogDebug("Geofence initial state fire suppressed for {Identifier}", evt.Identifier);
                             return;
@@ -212,9 +212,9 @@ public class GeofenceManager(
     }
 
     
-    void DestroyMonitor()
+    async ValueTask DestroyMonitor()
     {
-        this.monitorLock.Wait();
+        await this.monitorLock.WaitAsync().ConfigureAwait(false);
         try
         {
             this.monitor?.Dispose();
