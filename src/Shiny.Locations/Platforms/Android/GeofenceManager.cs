@@ -140,10 +140,10 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     }
 
 
-    public Task StopMonitoring(string identifier)
+    public async Task StopMonitoring(string identifier)
     {
+        await this.client.RemoveGeofencesAsync(new List<string> { identifier }).ConfigureAwait(false);
         this.repository.Remove<GeofenceRegion>(identifier);
-        return this.client.RemoveGeofencesAsync(new List<string> { identifier });
     }
 
 

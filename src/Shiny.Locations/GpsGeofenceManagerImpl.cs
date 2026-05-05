@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
 
+
 namespace Shiny.Locations;
 
 
@@ -103,9 +104,19 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     }
 
 
+    readonly SemaphoreSlim gpsLock = new(1, 1);
+
     protected async Task TryStartGps()
     {
-        if (this.gpsManager.CurrentListener == null)
-            await this.gpsManager.StartListener(defaultRequest).ConfigureAwait(false);
+        await this.gpsLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (this.gpsManager.CurrentListener == null)
+                await this.gpsManager.StartListener(defaultRequest).ConfigureAwait(false);
+        }
+        finally
+        {
+            this.gpsLock.Release();
+        }
     }
 }

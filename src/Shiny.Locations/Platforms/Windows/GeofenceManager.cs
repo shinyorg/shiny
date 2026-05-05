@@ -39,7 +39,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
             if (regions.Count == 0)
                 return;
 
-            GeofenceMonitor.Current.GeofenceStateChanged += this.OnGeofenceStateChanged;
+            this.EnsureEventSubscription();
 
             foreach (var region in regions)
             {
@@ -85,10 +85,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     {
         this.AddNativeGeofence(region);
         this.repository.Set(region);
-
-        var regions = this.repository.GetList<GeofenceRegion>();
-        if (regions.Count == 1)
-            GeofenceMonitor.Current.GeofenceStateChanged += this.OnGeofenceStateChanged;
+        this.EnsureEventSubscription();
     }
 
 
@@ -99,7 +96,10 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
         var regions = this.repository.GetList<GeofenceRegion>();
         if (regions.Count == 0)
+        {
             GeofenceMonitor.Current.GeofenceStateChanged -= this.OnGeofenceStateChanged;
+            this.eventSubscribed = false;
+        }
 
         return Task.CompletedTask;
     }
@@ -108,6 +108,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     public Task StopAllMonitoring()
     {
         GeofenceMonitor.Current.GeofenceStateChanged -= this.OnGeofenceStateChanged;
+        this.eventSubscribed = false;
 
         var regions = this.repository.GetList<GeofenceRegion>();
         foreach (var region in regions)
@@ -133,6 +134,17 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         return region.IsPositionInside(currentPosition)
             ? GeofenceState.Entered
             : GeofenceState.Exited;
+    }
+
+
+    bool eventSubscribed;
+    void EnsureEventSubscription()
+    {
+        if (!this.eventSubscribed)
+        {
+            GeofenceMonitor.Current.GeofenceStateChanged += this.OnGeofenceStateChanged;
+            this.eventSubscribed = true;
+        }
     }
 
 
