@@ -363,9 +363,13 @@ namespace Shiny.Locations;
 
 public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsDelegate
 {
-    // Properties for filtering
+    // Minimum threshold filters (AND when both set, single check if only one set)
     Distance? MinimumDistance { get; set; }
     TimeSpan? MinimumTime { get; set; }
+
+    // Maximum threshold filters (OR - if either is crossed, always fires regardless of minimums)
+    Distance? MaximumDistance { get; set; }
+    TimeSpan? MaximumTime { get; set; }
 
     // Stationary detection configuration
     protected int StationaryMetersThreshold { get; set; }   // default: 10
@@ -381,6 +385,12 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     protected abstract Task OnGpsReading(GpsReading reading);
 }
 ```
+
+**Filtering behavior:**
+
+- **Minimums (AND):** When both `MinimumDistance` and `MinimumTime` are set, *both* thresholds must be met before `OnGpsReading` fires. When only one is set, that single threshold is checked.
+- **Maximums (OR):** When `MaximumDistance` or `MaximumTime` is set, crossing *either* threshold always fires `OnGpsReading`, regardless of whether minimum thresholds are met. This is useful as a safety net to ensure readings are never suppressed for too long.
+- **Priority:** Maximum thresholds are evaluated first. If a maximum fires, minimum checks are skipped entirely.
 
 ### GpsGeofenceDelegate
 
@@ -574,8 +584,14 @@ public class MyGpsDelegate : GpsDelegate
 
     public MyGpsDelegate(ILogger<MyGpsDelegate> logger) : base(logger)
     {
+        // Both minimums must be met (AND) before OnGpsReading fires
         this.MinimumDistance = Distance.FromMeters(100);
         this.MinimumTime = TimeSpan.FromSeconds(30);
+
+        // Safety net: if either maximum is crossed, always fire (OR) regardless of minimums
+        this.MaximumDistance = Distance.FromKilometers(1);
+        this.MaximumTime = TimeSpan.FromMinutes(5);
+
         this.DetectStationary = true;
     }
 

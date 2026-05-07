@@ -134,7 +134,7 @@ When generating code for Shiny.Locations:
    - `new GpsRequest(GpsBackgroundMode.Standard)` for standard background (iOS: significant location changes; Android: 3-4 updates/hour)
    - `GpsRequest.Realtime(true)` for background realtime with precise accuracy (iOS/Android: updates every 1 second)
 3. **Inject `IGpsManager` or `IGeofenceManager`** via constructor injection. Never instantiate managers directly.
-4. **Implement `IGpsDelegate`** for background GPS processing, or subclass the abstract `GpsDelegate` base class for built-in filtering by distance/time and stationary detection.
+4. **Implement `IGpsDelegate`** for background GPS processing, or subclass the abstract `GpsDelegate` base class for built-in filtering by distance/time and stationary detection. The `GpsDelegate` supports minimum filters (`MinimumDistance`, `MinimumTime`) that use AND logic when both are set, and maximum filters (`MaximumDistance`, `MaximumTime`) that use OR logic and always override minimums when crossed.
 5. **Implement `IGeofenceDelegate`** for geofence enter/exit events.
 6. **Implement `IMotionActivityDelegate`** for background motion activity processing. The delegate receives `MotionActivityReading` with `Activity` (MotionActivityType), `Confidence` (MotionActivityConfidence), and `Timestamp`.
 6. **Use `Position` record** with `(latitude, longitude)` -- latitude range is -90 to 90, longitude range is -180 to 180.
@@ -157,7 +157,7 @@ When generating code for Shiny.Locations:
 - Always check `AccessState` before starting GPS or geofence monitoring. Handle `Denied` and `Restricted` states gracefully with user-facing messaging.
 - Prefer `GpsBackgroundMode.Standard` over `Realtime` to conserve battery. Only use `Realtime` when continuous tracking is required.
 - Stop listeners when they are no longer needed (`StopListener()` / `StopAllMonitoring()`).
-- Use the abstract `GpsDelegate` base class instead of implementing `IGpsDelegate` directly. It provides `MinimumDistance`, `MinimumTime` filtering, and stationary detection out of the box.
+- Use the abstract `GpsDelegate` base class instead of implementing `IGpsDelegate` directly. It provides `MinimumDistance`, `MinimumTime` (AND when both set), `MaximumDistance`, `MaximumTime` (OR, overrides minimums) filtering, and stationary detection out of the box.
 - For single position reads, use the `GetCurrentPosition()` extension method which handles starting/stopping the listener automatically.
 - Dispose of `IObservable` subscriptions from `WhenReading()` when the view/page is no longer active.
 - On iOS, configure `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription` in `Info.plist`.

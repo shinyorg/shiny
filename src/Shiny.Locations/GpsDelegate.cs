@@ -29,20 +29,52 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
             }
             else
             {
-                if (this.MinimumDistance != null)
-                {
-                    var dist = this.LastReading.Position.GetDistanceTo(reading.Position);
-                    fireReading = dist >= this.MinimumDistance;
+                var dist = this.LastReading.Position.GetDistanceTo(reading.Position);
+                var timeDiff = reading.Timestamp.Subtract(this.LastReading.Timestamp);
 
-                    this.Logger.DeferDistanceInfo(this.MinimumDistance!.TotalMeters, dist.TotalMeters, fireReading);
+                // Maximums are OR - if either threshold is crossed, always fire
+                var maxFired = false;
+                if (this.MaximumDistance != null && dist >= this.MaximumDistance)
+                {
+                    maxFired = true;
+                    this.Logger.LogDebug("Maximum distance threshold crossed: {Distance}m >= {Max}m", dist.TotalMeters, this.MaximumDistance.TotalMeters);
                 }
 
-                if (!fireReading && this.MinimumTime != null)
+                if (!maxFired && this.MaximumTime != null && timeDiff >= this.MaximumTime)
                 {
-                    var timeDiff = reading.Timestamp.Subtract(this.LastReading.Timestamp);
-                    fireReading = timeDiff >= this.MinimumTime;
+                    maxFired = true;
+                    this.Logger.LogDebug("Maximum time threshold crossed: {TimeDiff} >= {Max}", timeDiff, this.MaximumTime);
+                }
 
-                    this.Logger.DeferTimeInfo(this.MinimumTime!.Value, timeDiff, fireReading);
+                if (maxFired)
+                {
+                    fireReading = true;
+                }
+                else
+                {
+                    // Minimums are AND if both set, single check if only one set
+                    var hasMinDist = this.MinimumDistance != null;
+                    var hasMinTime = this.MinimumTime != null;
+
+                    if (hasMinDist && hasMinTime)
+                    {
+                        var distMet = dist >= this.MinimumDistance;
+                        var timeMet = timeDiff >= this.MinimumTime;
+                        fireReading = distMet && timeMet;
+
+                        this.Logger.DeferDistanceInfo(this.MinimumDistance!.TotalMeters, dist.TotalMeters, distMet);
+                        this.Logger.DeferTimeInfo(this.MinimumTime!.Value, timeDiff, timeMet);
+                    }
+                    else if (hasMinDist)
+                    {
+                        fireReading = dist >= this.MinimumDistance;
+                        this.Logger.DeferDistanceInfo(this.MinimumDistance!.TotalMeters, dist.TotalMeters, fireReading);
+                    }
+                    else if (hasMinTime)
+                    {
+                        fireReading = timeDiff >= this.MinimumTime;
+                        this.Logger.DeferTimeInfo(this.MinimumTime!.Value, timeDiff, fireReading);
+                    }
                 }
             }
 
@@ -102,6 +134,22 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     {
         get => this.minTime;
         set => this.Set(ref this.minTime, value);
+    }
+
+
+    Distance? maxDistance;
+    public Distance? MaximumDistance
+    {
+        get => this.maxDistance;
+        set => this.Set(ref this.maxDistance, value);
+    }
+
+
+    TimeSpan? maxTime;
+    public TimeSpan? MaximumTime
+    {
+        get => this.maxTime;
+        set => this.Set(ref this.maxTime, value);
     }
 
 

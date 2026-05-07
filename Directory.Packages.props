@@ -28,6 +28,9 @@
         <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.2.0"/>
         <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Tmds.DBus.Protocol" Version="0.92.0"/>
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
+        <PackageVersion Include="xunit" Version="2.9.3"/>
+        <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.17.0.2"/>
