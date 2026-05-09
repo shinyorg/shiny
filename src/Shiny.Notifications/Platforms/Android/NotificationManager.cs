@@ -78,7 +78,7 @@ public partial class NotificationManager : INotificationManager,
         }
         if (scope == CancelScope.All || scope == CancelScope.Pending)
         {
-            var notifications = this.repository.GetList<AndroidNotification>();
+            var notifications = this.repository.GetAll<AndroidNotification>();
             foreach (var notification in notifications)
             {
                 await this.CancelInternal(notification).ConfigureAwait(false);
@@ -93,7 +93,7 @@ public partial class NotificationManager : INotificationManager,
 
 
     public Task<IList<Notification>> GetPendingNotifications()
-        => Task.FromResult((IList<Notification>)this.repository.GetList<AndroidNotification>().OfType<Notification>().ToList());
+        => Task.FromResult((IList<Notification>)this.repository.GetAll<AndroidNotification>().OfType<Notification>().ToList());
 
 
     public Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)

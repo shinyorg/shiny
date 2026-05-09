@@ -81,7 +81,7 @@ public abstract class AbstractJobManager : IJobManager
 
 
     public IList<JobInfo> GetJobs()
-        => this.repository.GetList<JobInfo>();
+        => this.repository.GetAll<JobInfo>().ToList();
 
 
     public JobInfo? GetJob(string jobIdentifier)
@@ -101,7 +101,7 @@ public abstract class AbstractJobManager : IJobManager
 
     public virtual void CancelAll()
     {
-        var jobs = this.repository.GetList<JobInfo>();
+        var jobs = this.repository.GetAll<JobInfo>();
         foreach (var job in jobs)
         {
             if (!job.IsSystemJob)
@@ -144,7 +144,7 @@ public abstract class AbstractJobManager : IJobManager
             try
             {
                 this.IsRunning = true;
-                var jobs = this.repository.GetList<JobInfo>();
+                var jobs = this.repository.GetAll<JobInfo>();
                 var tasks = new List<Task<JobRunResult>>();
 
                 if (runSequentially)

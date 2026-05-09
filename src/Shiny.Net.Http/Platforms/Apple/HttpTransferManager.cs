@@ -67,8 +67,8 @@ public partial class HttpTransferManager(
 
     public Task<IList<HttpTransfer>> GetTransfers()
     {
-        var transfers = repository.GetList<HttpTransfer>();
-        return Task.FromResult(transfers);
+        var transfers = repository.GetAll<HttpTransfer>().ToList();
+        return Task.FromResult<IList<HttpTransfer>>(transfers);
     }
 
 
@@ -297,7 +297,7 @@ public partial class HttpTransferManager(
 
     void TryCompleteSession()
     {
-        var transfers = repository.GetList<HttpTransfer>();
+        var transfers = repository.GetAll<HttpTransfer>();
         if (transfers.Count == 0)
         {
             this.completionHandler?.Invoke();

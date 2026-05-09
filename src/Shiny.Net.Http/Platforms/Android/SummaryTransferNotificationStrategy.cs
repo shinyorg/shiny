@@ -30,7 +30,7 @@
 //        var channelId = this.CreateChannel();
 //        var builder = this.CreateBuilder(channelId);
 
-//        var transfers = this.Repository.GetList<HttpTransfer>();
+//        var transfers = this.Repository.GetAll<HttpTransfer>();
 //        var count = transfers.Count;
 //        var bytesToXfer = transfers.Sum(x => x.BytesToTransfer ?? 0);
 //        var bytesXfer = transfers.Sum(x => x.BytesTransferred);

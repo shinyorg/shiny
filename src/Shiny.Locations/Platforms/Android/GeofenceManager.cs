@@ -76,7 +76,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                     }
                 }
             };
-            var regions = this.repository.GetList<GeofenceRegion>();
+            var regions = this.repository.GetAll<GeofenceRegion>();
             foreach (var region in regions)
                 await this.Create(region);
         }
@@ -130,7 +130,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
 
     public IList<GeofenceRegion> GetMonitorRegions()
-        => this.repository.GetList<GeofenceRegion>();
+        => this.repository.GetAll<GeofenceRegion>().ToList();
 
 
     public async Task StartMonitoring(GeofenceRegion region)
@@ -149,7 +149,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     public async Task StopAllMonitoring()
     {
-        var regions = this.repository.GetList<GeofenceRegion>();
+        var regions = this.repository.GetAll<GeofenceRegion>();
         var regionIds = regions.Select(x => x.Identifier).ToArray();
         if (regionIds.Any())
             await this.client.RemoveGeofencesAsync(regionIds).ConfigureAwait(false);

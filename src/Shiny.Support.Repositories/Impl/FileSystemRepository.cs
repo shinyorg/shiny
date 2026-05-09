@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Shiny.Stores;
 
@@ -61,15 +60,10 @@ public class FileSystemRepository : IRepository
     }
 
 
-    public IList<TEntity> GetList<TEntity>(Expression<Func<TEntity, bool>>? expression = null) where TEntity : IRepositoryEntity
+    public IReadOnlyList<TEntity> GetAll<TEntity>() where TEntity : IRepositoryEntity
     {
         var result = new List<TEntity>();
-        this.InTransaction<TEntity>(list =>
-            result.AddRange(list
-                .Values
-                .WhereIf(expression)
-            )
-        );
+        this.InTransaction<TEntity>(list => result.AddRange(list.Values));
         return result;
     }
 
@@ -180,7 +174,7 @@ public class FileSystemRepository : IRepository
     {
         var path = this.GetPath<TEntity>(entity.Identifier);
         var update = File.Exists(path);
-        var value = this.serializer.Serialize(entity!);
+        var value = this.serializer.Serialize(entity);
 
         File.WriteAllText(path, value);
         return update;
@@ -191,7 +185,7 @@ public class FileSystemRepository : IRepository
     readonly Dictionary<string, object> memory = new();
     void InTransaction<TEntity>(Action<Dictionary<string, TEntity>> action) where TEntity : IRepositoryEntity
     {
-        var en = typeof(TEntity).Name; // TODO: this may NOT be enough going forward
+        var en = typeof(TEntity).Name;
 
         lock (this.syncLock)
         {
@@ -222,9 +216,18 @@ public class FileSystemRepository : IRepository
 
         foreach (var file in files)
         {
-            var text = File.ReadAllText(file.FullName);
-            var entity = this.serializer.Deserialize<TEntity>(text);
-            dict.Add(entity.Identifier, entity);
+            try
+            {
+                var text = File.ReadAllText(file.FullName);
+                var entity = this.serializer.Deserialize<TEntity>(text);
+                if (entity != null)
+                    dict.Add(entity.Identifier, entity);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Failed to deserialize {Path}, deleting corrupt file", file.FullName);
+                file.Delete();
+            }
         }
         return dict;
     }

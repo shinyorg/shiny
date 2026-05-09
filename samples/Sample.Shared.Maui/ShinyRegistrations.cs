@@ -1,5 +1,3 @@
-using Microsoft.Maui.Hosting;
-
 namespace Sample.Shared.Maui;
 
 public static class ShinyRegistrations
@@ -7,7 +5,7 @@ public static class ShinyRegistrations
     public static MauiAppBuilder UseSampleShiny(this MauiAppBuilder builder)
     {
         builder
-            .UseShinyTableView()
+            .UseShinyControls()
             .UseShinyShell(x => x.AddGeneratedMaps())
             .ConfigureFonts(fonts =>
             {

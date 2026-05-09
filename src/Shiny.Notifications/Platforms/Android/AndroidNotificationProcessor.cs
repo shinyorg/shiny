@@ -78,10 +78,9 @@ public class AndroidNotificationProcessor
     public void ProcessPending()
     {
         // fire any missed/pending alarms?
-        var missed = this.repository.GetList<AndroidNotification>(
-            x => x.ScheduleDate != null &&
-            x.ScheduleDate < DateTime.UtcNow
-        );
+        var missed = this.repository.GetAll<AndroidNotification>()
+            .Where(x => x.ScheduleDate != null && x.ScheduleDate < DateTime.UtcNow)
+            .ToList();
 
         foreach (var notification in missed)
         {

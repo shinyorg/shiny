@@ -105,7 +105,7 @@ public class NotificationManager : INotificationManager
 
     public Task<IList<Notification>> GetPendingNotifications()
     {
-        IList<Notification> list = this.repository.GetList<Notification>();
+        var list = this.repository.GetAll<Notification>().ToList();
         return Task.FromResult(list);
     }
 

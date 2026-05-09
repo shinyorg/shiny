@@ -58,7 +58,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
 
     public Channel? Get(string channelId) => this.repository.Get<AppleChannel>(channelId);
-    public IList<Channel> GetAll() => this.repository.GetList<AppleChannel>().OfType<Channel>().ToList();
+    public IList<Channel> GetAll() => this.repository.GetAll<AppleChannel>().OfType<Channel>().ToList();
 
 
     public void Remove(string channelId)
@@ -72,7 +72,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
     protected void RebuildNativeCategories()
     {
-        var list = this.repository.GetList<AppleChannel>();
+        var list = this.repository.GetAll<AppleChannel>();
         var categories = new List<UNNotificationCategory>();
 
         foreach (var channel in list)

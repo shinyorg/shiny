@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddBattery();
         services.AddConnectivity();
         services.AddLocalStorageRepository();
+        services.AddJsonContext(ShinyHttpJsonContext.Default);
 
         services.AddSingleton(options);
         services.AddShinyService<BlazorHttpTransferManager>();

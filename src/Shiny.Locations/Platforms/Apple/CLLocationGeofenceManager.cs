@@ -83,7 +83,7 @@ public class CLLocationGeofenceManager : IGeofenceManager
         => this.locationManager.RequestAccess(true);
 
     public IList<GeofenceRegion> GetMonitorRegions()
-        => this.repository.GetList<GeofenceRegion>();
+        => this.repository.GetAll<GeofenceRegion>().ToList();
 
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)

@@ -66,7 +66,7 @@ public class HttpTransferProcess
             //var semaphore = new SemaphoreSlim(1, 2);
             try
             {
-                var transfers = this.repository.GetList<HttpTransfer>();
+                var transfers = this.repository.GetAll<HttpTransfer>();
                 while (!cancelSrc.IsCancellationRequested && transfers.Count > 0)
                 {
                     this.logger.LogDebug("Starting Loop");
@@ -115,7 +115,7 @@ public class HttpTransferProcess
                         this.logger.LogDebug("Internet Unavailable - Waiting for next pass");
                     }
 
-                    transfers = this.repository.GetList<HttpTransfer>();
+                    transfers = this.repository.GetAll<HttpTransfer>();
                     if (transfers.Count > 0)
                     {
                         // TODO: configurable
