@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Android;
@@ -128,7 +127,7 @@ public class PushManager : NotifyPropertyChanged,
             {
                 var access = await this.platform
                     .RequestAccess(Manifest.Permission.PostNotifications)
-                    .ToTask(cancelToken);
+                    .WaitAsync(cancelToken);
 
                 if (access != AccessState.Available)
                     return PushAccessState.Denied;

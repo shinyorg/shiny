@@ -164,15 +164,10 @@ public partial class AndroidPlatform : IPlatform,
             this.AppContext.PackageName
         );
 
-    public IObservable<AccessState> RequestAccess(string androidPermission)
+    public async Task<AccessState> RequestAccess(string androidPermission)
     {
-        var subject = new ShinySubject<AccessState>();
-        this.RequestPermissions(new[] { androidPermission }).Subscribe(x =>
-        {
-            subject.OnNext(x.IsSuccess() ? AccessState.Available : AccessState.Denied);
-            subject.OnCompleted();
-        });
-        return subject;
+        var result = await this.RequestPermissions(androidPermission).ToTask().ConfigureAwait(false);
+        return result.IsSuccess() ? AccessState.Available : AccessState.Denied;
     }
 
 

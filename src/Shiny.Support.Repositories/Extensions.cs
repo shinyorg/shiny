@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -57,32 +56,37 @@ public static class RepositoryExtensions
     public static IObservable<int> CreateCountWatcher<T>(this IRepository repository) where T : IRepositoryEntity
     {
         var count = repository.GetAll<T>().Count;
+        var subject = new ShinySubject<int>();
 
-        return repository
-            .WhenActionOccurs()
-            .Where(x =>
-                x.EntityType == typeof(T) &&
-                x.Action != RepositoryAction.Update
-            )
-            .Select(x =>
+        repository.WhenActionOccurs().Subscribe(x =>
+        {
+            if (x.EntityType != typeof(T) || x.Action == RepositoryAction.Update)
+                return;
+
+            count = x.Action switch
             {
-                switch (x.Action)
-                {
-                    case RepositoryAction.Add:
-                        count++;
-                        break;
+                RepositoryAction.Add   => count + 1,
+                RepositoryAction.Remove => count - 1,
+                RepositoryAction.Clear  => 0,
+                _                       => count
+            };
+            subject.OnNext(count);
+        });
 
-                    case RepositoryAction.Remove:
-                        count--;
-                        break;
+        return new CurrentValueObservable<int>(() => count, subject);
+    }
+}
 
-                    case RepositoryAction.Clear:
-                        count = 0;
-                        break;
-                }
 
-                return count;
-            })
-            .StartWith(count);
+/// <summary>
+/// An IObservable that emits the current value immediately on subscription,
+/// then forwards subsequent values from the inner source.
+/// </summary>
+internal sealed class CurrentValueObservable<T>(Func<T> getCurrent, IObservable<T> source) : IObservable<T>
+{
+    public IDisposable Subscribe(IObserver<T> observer)
+    {
+        observer.OnNext(getCurrent());
+        return source.Subscribe(observer);
     }
 }

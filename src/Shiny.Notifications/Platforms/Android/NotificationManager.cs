@@ -155,7 +155,7 @@ public partial class NotificationManager : INotificationManager,
 
                 if (OperatingSystem.IsAndroidVersionAtLeast(29))
                 {
-                    var bgResult = await this.platform.RequestAccess(P.AccessBackgroundLocation).ToTask();
+                    var bgResult = await this.platform.RequestAccess(P.AccessBackgroundLocation);
                     if (bgResult != AccessState.Available)
                         return AccessState.Denied;
                 }
