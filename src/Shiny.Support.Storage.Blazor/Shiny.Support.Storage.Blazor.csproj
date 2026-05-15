@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 

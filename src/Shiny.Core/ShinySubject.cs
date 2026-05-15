@@ -1,28 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using Microsoft.Extensions.Logging;
 
 namespace Shiny;
 
 
-public class ShinySubject<T> : ISubject<T>
+internal class ShinySubject<T> : IObservable<T>
 {
     readonly HashSet<IObserver<T>> observers = new();
 
-    public ShinySubject(ILogger? logger = null) => this.Logger = logger;
-    public ILogger? Logger { get; set; }
-    
 
-    public void OnCompleted() => this.Pub(x => x.OnCompleted(), "OnCompleted error on observer");
-    public void OnError(Exception error) => this.Pub(x => x.OnError(error), "OnError error on observer");
-    public void OnNext(T value) => this.Pub(x => x.OnNext(value), "OnNext error on observer"); 
+    public void OnCompleted() => this.Pub(x => x.OnCompleted());
+    public void OnError(Exception error) => this.Pub(x => x.OnError(error));
+    public void OnNext(T value) => this.Pub(x => x.OnNext(value));
 
 
-    protected virtual void Pub(Action<IObserver<T>> action, string errorDescription)
+    void Pub(Action<IObserver<T>> action)
     {
         List<IObserver<T>> copy;
         lock (this.observers)
@@ -30,14 +23,8 @@ public class ShinySubject<T> : ISubject<T>
 
         foreach (var observer in copy)
         {
-            try
-            {
-                action(observer);
-            }
-            catch (Exception ex)
-            {
-                this.Logger?.LogWarning(ex, errorDescription);
-            }
+            try { action(observer); }
+            catch { }
         }
     }
 
@@ -47,7 +34,7 @@ public class ShinySubject<T> : ISubject<T>
         lock (this.observers)
             this.observers.Add(observer);
 
-        return Disposable.Create(() =>
+        return new ActionDisposable(() =>
         {
             lock (this.observers)
                 this.observers.Remove(observer);

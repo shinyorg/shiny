@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Support.Rx\Shiny.Support.Rx.csproj" />
         <ProjectReference Include="..\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
         <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
     </ItemGroup>

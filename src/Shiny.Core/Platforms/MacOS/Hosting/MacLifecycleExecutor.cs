@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using AppKit;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -18,7 +17,7 @@ public class MacLifecycleExecutor : IShinyStartupTask, IDisposable
     readonly IEnumerable<IMacLifecycle.IContinueActivity> activityHandlers;
     readonly IEnumerable<IMacLifecycle.IRemoteNotifications> remoteHandlers;
     readonly IEnumerable<IMacLifecycle.INotificationHandler> notificationHandlers;
-    readonly CompositeDisposable disposer = new();
+    readonly DisposableCollection disposer = new();
 
 
     public MacLifecycleExecutor(

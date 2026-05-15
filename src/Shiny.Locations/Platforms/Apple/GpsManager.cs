@@ -196,9 +196,6 @@ public class GpsManager(
         this.bgSession?.Invalidate();
         this.bgSession = null;
 
-        this.session?.Invalidate();
-        this.session = null;
-
         this.CurrentSettings = null;
 
         return Task.CompletedTask;

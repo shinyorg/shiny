@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -35,7 +33,7 @@ public abstract class ShinyAndroidForegroundService : Service
     protected virtual ForegroundService StartForegroundServiceType => ForegroundService.TypeNone;
     protected T GetService<T>() => Host.GetService<T>()!;
     protected IEnumerable<T> GetServices<T>() => Host.ServiceProvider.GetServices<T>();
-    protected CompositeDisposable? DestroyWith { get; private set; }
+    protected DisposableCollection? DestroyWith { get; private set; }
     protected NotificationManagerCompat? NotificationManager { get; private set; }
     protected bool StopWithTask { get; private set; }
 
@@ -84,7 +82,7 @@ public abstract class ShinyAndroidForegroundService : Service
     protected virtual void Start(Intent? intent)
     {
         this.NotificationManager = NotificationManagerCompat.From(this.Platform.AppContext);
-        this.DestroyWith = new CompositeDisposable();
+        this.DestroyWith = new DisposableCollection();
 
         this.EnsureChannel();
         this.Builder = this.CreateNotificationBuilder();

@@ -163,7 +163,7 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         if (this.CurrentSettings == null)
             return Task.CompletedTask;
 
-        if (this.CurrentSettings.UseSignificantLocationChanges)
+        if (this.CurrentSettings.BackgroundMode == GpsBackgroundMode.Standard)
             this.locationManager.StopMonitoringSignificantLocationChanges();
         else
             this.locationManager.StopUpdatingLocation();

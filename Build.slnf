@@ -4,6 +4,7 @@
         "projects": [
             "src\\Shiny.Core\\Shiny.Core.csproj",
             "src\\Shiny.Support.Repositories\\Shiny.Support.Repositories.csproj",
+            "src\\Shiny.Support.Rx\\Shiny.Support.Rx.csproj",
             "src\\Shiny.Support.Storage.Blazor\\Shiny.Support.Storage.Blazor.csproj",
             "src\\Shiny.Support.DeviceMonitoring\\Shiny.Support.DeviceMonitoring.csproj",
             "src\\Shiny.Support.DeviceMonitoring.Blazor\\Shiny.Support.DeviceMonitoring.Blazor.csproj",

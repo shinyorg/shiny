@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +14,8 @@ namespace Shiny.Jobs;
 
 public abstract class AbstractJobManager : IJobManager
 {
-    readonly Subject<JobRunResult> jobFinished = new();
-    readonly Subject<JobInfo> jobStarted = new();
+    readonly ShinySubject<JobRunResult> jobFinished = new();
+    readonly ShinySubject<JobInfo> jobStarted = new();
     readonly IRepository repository;
     readonly IObjectStoreBinder storeBinder;
     readonly IServiceProvider container;

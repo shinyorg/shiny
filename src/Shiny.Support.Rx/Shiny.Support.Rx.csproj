@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>$(TargetFrameworks);$(BaseTargetFramework)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
@@ -7,20 +6,13 @@
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
-        
-        <Description>Shiny BluetoothLE Hosting - Advertising and GATT server functionality</Description>
-        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+
+        <Description>Shiny Rx helper extensions built on System.Reactive</Description>
+        <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="System.Reactive" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj"/>
-        <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj"/>
-    </ItemGroup>
-
-    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.build.targets"/>
-
-    <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">
-        <Compile Include="Platforms\Apple\**\*.cs"/>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 </Project>

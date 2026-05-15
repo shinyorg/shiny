@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reactive.Subjects;
+using System;
 using Android.App;
 using Android.OS;
 
@@ -18,7 +17,7 @@ public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityL
     }
 
 
-    public Subject<ActivityChanged> ActivitySubject { get; } = new();
+    public ShinySubject<ActivityChanged> ActivitySubject { get; } = new();
     readonly WeakReference<Activity?> current = new(null);
 
 
@@ -29,7 +28,7 @@ public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityL
     }
 
 
-    void Fire(Activity activity, ActivityState state, Bundle? bundle = null) 
+    void Fire(Activity activity, ActivityState state, Bundle? bundle = null)
         => this.ActivitySubject.OnNext(new ActivityChanged(activity, state, bundle));
 
 
@@ -63,7 +62,7 @@ public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityL
     public void OnActivityStopped(Activity activity) => this.Fire(activity, ActivityState.Stopped);
 
 
-    protected override void Dispose(bool disposing) 
+    protected override void Dispose(bool disposing)
     {
         this.application.UnregisterActivityLifecycleCallbacks(this);
         base.Dispose(disposing);
