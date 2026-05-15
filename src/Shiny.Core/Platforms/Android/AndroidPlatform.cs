@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -25,10 +26,9 @@ public partial class AndroidPlatform : IPlatform,
     const string PermissionsKey = nameof(PermissionsKey);
     int requestCode;
     readonly List<string> requestedPermissions;
+    readonly ConcurrentDictionary<int, TaskCompletionSource<PermissionRequestResult>> pendingPermissions = new();
 
     static AndroidActivityLifecycle activityLifecycle; // this should never change once installed on the platform
-    readonly ShinySubject<PermissionRequestResult> permissionSubject = new();
-    readonly ShinySubject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
     readonly SettingsKeyValueStore store;
 
     public AndroidPlatform()
@@ -61,10 +61,12 @@ public partial class AndroidPlatform : IPlatform,
 
     // lifecycle hooks
     public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
-        => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResults));
+    {
+        if (this.pendingPermissions.TryRemove(requestCode, out var tcs))
+            tcs.TrySetResult(new PermissionRequestResult(requestCode, permissions, grantResults));
+    }
 
-    public void Handle(Activity activity, int requestCode, Result resultCode, Intent data)
-        => this.activityResultSubject.OnNext((requestCode, resultCode, data));
+    public void Handle(Activity activity, int requestCode, Result resultCode, Intent data) { }
 
 
     public Application AppContext { get; }
@@ -74,7 +76,12 @@ public partial class AndroidPlatform : IPlatform,
 
 
     public Activity? CurrentActivity => activityLifecycle.Activity;
-    public IObservable<ActivityChanged> WhenActivityChanged() => activityLifecycle.ActivitySubject;
+
+    public IObservable<ActivityChanged> WhenActivityChanged()
+        => new ActivityEventObservable(activityLifecycle);
+
+    public IObservable<ActivityChanged> WhenActivityStatusChanged()
+        => new ActivityStatusObservable(activityLifecycle, this.CurrentActivity);
 
 
     readonly Handler handler = new Handler(Looper.MainLooper);
@@ -87,21 +94,6 @@ public partial class AndroidPlatform : IPlatform,
     }
 
 
-    public IObservable<ActivityChanged> WhenActivityStatusChanged()
-    {
-        var subject = new ShinySubject<ActivityChanged>();
-        if (this.CurrentActivity != null)
-            subject.OnNext(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
-
-        activityLifecycle.ActivitySubject.Subscribe(x =>
-        {
-            subject.OnNext(x);
-            subject.OnCompleted();
-        });
-        return subject;
-    }
-
-
     public async Task<AccessState> RequestForegroundServicePermissions()
     {
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
@@ -109,7 +101,7 @@ public partial class AndroidPlatform : IPlatform,
             var results = await this.RequestPermissions(
                 Manifest.Permission.ForegroundService,
                 Manifest.Permission.PostNotifications
-            ).ToTask();
+            );
             if (results.IsSuccess())
                 return AccessState.Available;
 
@@ -120,7 +112,7 @@ public partial class AndroidPlatform : IPlatform,
         }
         else if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
-            var results = await this.RequestPermissions(Manifest.Permission.ForegroundService).ToTask();
+            var results = await this.RequestPermissions(Manifest.Permission.ForegroundService);
             if (results.IsSuccess())
                 return AccessState.Available;
 
@@ -166,45 +158,36 @@ public partial class AndroidPlatform : IPlatform,
 
     public async Task<AccessState> RequestAccess(string androidPermission)
     {
-        var result = await this.RequestPermissions(androidPermission).ToTask().ConfigureAwait(false);
+        var result = await this.RequestPermissions(androidPermission).ConfigureAwait(false);
         return result.IsSuccess() ? AccessState.Available : AccessState.Denied;
     }
 
 
-    public IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions)
-    {
-        var subject = new ShinySubject<PermissionRequestResult>();
+    public Task<PermissionRequestResult> RequestPermissions(params string[] androidPermissions)
+        => this.RequestPermissions(CancellationToken.None, androidPermissions);
 
+
+    public async Task<PermissionRequestResult> RequestPermissions(CancellationToken cancellationToken, params string[] androidPermissions)
+    {
         var allGood = androidPermissions.All(p => ContextCompat.CheckSelfPermission(this.AppContext, p) == Permission.Granted);
         if (allGood)
         {
             var grants = Enumerable.Repeat(Permission.Granted, androidPermissions.Length).ToArray();
-            subject.OnNext(new PermissionRequestResult(0, androidPermissions, grants));
-            subject.OnCompleted();
-            return subject;
+            return new PermissionRequestResult(0, androidPermissions, grants);
         }
 
         this.SetRequestedPermissions(androidPermissions);
         var current = Interlocked.Increment(ref this.requestCode);
 
-        IDisposable? permSub = null;
-        IDisposable? actSub = null;
-        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var tcs = new TaskCompletionSource<PermissionRequestResult>();
+        this.pendingPermissions[current] = tcs;
 
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(TimeSpan.FromSeconds(5));
         cts.Token.Register(() =>
         {
-            actSub?.Dispose();
-            permSub?.Dispose();
-            subject.OnError(new TimeoutException("A current activity was not detected to be able to request permissions"));
-        });
-
-        permSub = this.permissionSubject.Subscribe(x =>
-        {
-            if (x.RequestCode != current) return;
-            cts.Cancel();
-            permSub?.Dispose();
-            subject.OnNext(x);
-            subject.OnCompleted();
+            if (this.pendingPermissions.TryRemove(current, out var t))
+                t.TrySetException(new TimeoutException("A current activity was not detected to be able to request permissions"));
         });
 
         if (this.CurrentActivity != null)
@@ -213,15 +196,18 @@ public partial class AndroidPlatform : IPlatform,
         }
         else
         {
-            actSub = activityLifecycle.ActivitySubject.Subscribe(x =>
+            EventHandler<ActivityChanged>? actHandler = null;
+            actHandler = (_, x) =>
             {
-                actSub?.Dispose();
+                activityLifecycle.ActivityChanged -= actHandler;
                 ActivityCompat.RequestPermissions(x.Activity, androidPermissions, current);
-            });
+            };
+            activityLifecycle.ActivityChanged += actHandler;
         }
 
-        return subject;
+        return await tcs.Task.ConfigureAwait(false);
     }
+
 
     void SetRequestedPermissions(string[] androidPermissions)
     {
@@ -247,6 +233,38 @@ public partial class AndroidPlatform : IPlatform,
                 androidPermission,
                 StringComparer.InvariantCultureIgnoreCase
             );
+        }
+    }
+
+
+    sealed class ActivityEventObservable(AndroidActivityLifecycle lifecycle) : IObservable<ActivityChanged>
+    {
+        public IDisposable Subscribe(IObserver<ActivityChanged> observer)
+        {
+            EventHandler<ActivityChanged> handler = (_, e) => observer.OnNext(e);
+            lifecycle.ActivityChanged += handler;
+            return new ActionDisposable(() => lifecycle.ActivityChanged -= handler);
+        }
+    }
+
+
+    sealed class ActivityStatusObservable(AndroidActivityLifecycle lifecycle, Activity? current) : IObservable<ActivityChanged>
+    {
+        public IDisposable Subscribe(IObserver<ActivityChanged> observer)
+        {
+            if (current != null)
+                observer.OnNext(new ActivityChanged(current, ActivityState.Created, null));
+
+            EventHandler<ActivityChanged>? handler = null;
+            handler = (_, e) =>
+            {
+                lifecycle.ActivityChanged -= handler;
+                observer.OnNext(e);
+                observer.OnCompleted();
+            };
+            lifecycle.ActivityChanged += handler;
+
+            return new ActionDisposable(() => lifecycle.ActivityChanged -= handler);
         }
     }
 }

@@ -1,5 +1,4 @@
 @page "/gps"
-@using System.Reactive.Linq
 @using Shiny.Locations
 @implements IAsyncDisposable
 @inject IGpsManager GpsService
@@ -44,18 +43,20 @@
     AccessState access = AccessState.Unknown;
     bool isListening;
     string? error;
-    IDisposable? sub;
 
     protected override void OnInitialized()
     {
-        sub = GpsService
-            .WhenReading()
-            .Subscribe(r => InvokeAsync(() =>
-            {
-                reading = r;
-                error = null;
-                StateHasChanged();
-            }));
+        GpsService.GpsReadingReceived += OnGpsReading;
+    }
+
+    void OnGpsReading(object? sender, GpsReading r)
+    {
+        InvokeAsync(() =>
+        {
+            reading = r;
+            error = null;
+            StateHasChanged();
+        });
     }
 
     async Task GetLast()
@@ -108,7 +109,7 @@
 
     public async ValueTask DisposeAsync()
     {
-        sub?.Dispose();
+        GpsService.GpsReadingReceived -= OnGpsReading;
         if (isListening)
             await GpsService.StopListener();
     }

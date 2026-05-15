@@ -42,8 +42,7 @@ public class MotionActivityManager(
             return AccessState.Available;
 
         var result = await platform
-            .RequestPermissions(Android.Manifest.Permission.ActivityRecognition)
-            .ToTask();
+            .RequestPermissions(Android.Manifest.Permission.ActivityRecognition);
 
         return result.IsGranted(Android.Manifest.Permission.ActivityRecognition)
             ? AccessState.Available

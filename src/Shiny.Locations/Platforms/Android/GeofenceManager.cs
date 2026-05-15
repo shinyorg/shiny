@@ -115,7 +115,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     public async Task<AccessState> RequestAccess()
     {
         var status = AccessState.Denied;
-        var result = await this.platform.RequestPermissions(P.AccessCoarseLocation, P.AccessFineLocation).ToTask();
+        var result = await this.platform.RequestPermissions(P.AccessCoarseLocation, P.AccessFineLocation);
         if (result.IsSuccess())
         {
             status = AccessState.Available;

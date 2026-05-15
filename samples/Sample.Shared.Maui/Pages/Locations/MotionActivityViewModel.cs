@@ -1,11 +1,9 @@
-using System.Reactive.Threading.Tasks;
-
 namespace Sample.Shared.Maui.Pages.Locations;
 
 [ShellMap<MotionActivityPage>("motionactivity")]
 public partial class MotionActivityViewModel(IMotionActivityManager manager) : ObservableObject, IDisposable
 {
-    IDisposable? activitySub;
+    EventHandler<MotionActivityReading>? activityHandler;
 
     // State
     [ObservableProperty]
@@ -33,8 +31,11 @@ public partial class MotionActivityViewModel(IMotionActivityManager manager) : O
     {
         if (this.IsListening)
         {
-            this.activitySub?.Dispose();
-            this.activitySub = null;
+            if (this.activityHandler != null)
+            {
+                manager.MotionActivityReadingReceived -= this.activityHandler;
+                this.activityHandler = null;
+            }
             await manager.StopListener();
             this.IsListening = false;
             this.Status = "Listener stopped";
@@ -51,9 +52,8 @@ public partial class MotionActivityViewModel(IMotionActivityManager manager) : O
         await manager.StartListener();
         this.IsListening = true;
         this.Status = "Listening...";
-        this.activitySub = manager
-            .WhenReading()
-            .Subscribe(reading => MainThread.BeginInvokeOnMainThread(() => this.SetReading(reading)));
+        this.activityHandler = (_, reading) => MainThread.BeginInvokeOnMainThread(() => this.SetReading(reading));
+        manager.MotionActivityReadingReceived += this.activityHandler;
     }
 
     [RelayCommand]
@@ -62,7 +62,7 @@ public partial class MotionActivityViewModel(IMotionActivityManager manager) : O
         try
         {
             this.Status = "Getting last reading...";
-            var reading = await manager.GetLastReading().ToTask();
+            var reading = await manager.GetLastReading();
             if (reading == null)
             {
                 this.Status = "No reading available";
@@ -86,5 +86,12 @@ public partial class MotionActivityViewModel(IMotionActivityManager manager) : O
         this.Status = $"Permission: {state}";
     }
 
-    public void Dispose() => this.activitySub?.Dispose();
+    public void Dispose()
+    {
+        if (this.activityHandler != null)
+        {
+            manager.MotionActivityReadingReceived -= this.activityHandler;
+            this.activityHandler = null;
+        }
+    }
 }

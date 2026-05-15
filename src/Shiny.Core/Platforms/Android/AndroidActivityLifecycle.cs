@@ -17,7 +17,7 @@ public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityL
     }
 
 
-    public ShinySubject<ActivityChanged> ActivitySubject { get; } = new();
+    public event EventHandler<ActivityChanged>? ActivityChanged;
     readonly WeakReference<Activity?> current = new(null);
 
 
@@ -29,7 +29,7 @@ public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityL
 
 
     void Fire(Activity activity, ActivityState state, Bundle? bundle = null)
-        => this.ActivitySubject.OnNext(new ActivityChanged(activity, state, bundle));
+        => this.ActivityChanged?.Invoke(this, new ActivityChanged(activity, state, bundle));
 
 
     public void OnActivityCreated(Activity activity, Bundle? savedInstanceState)

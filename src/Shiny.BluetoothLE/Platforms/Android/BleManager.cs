@@ -170,8 +170,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             return AccessState.NotSetup;
 
         var results = await this.platform
-            .RequestPermissions(versionPermissions)
-            .ToTask(ct)
+            .RequestPermissions(ct, versionPermissions)
             .ConfigureAwait(false);
 
         return results.IsSuccess()

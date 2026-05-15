@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -152,7 +153,7 @@ public partial class AndroidPlatform
         );
 
 
-    public IObservable<PermissionRequestResult> RequestFilteredPermissions(params AndroidPermission[] androidPermissions)
+    public Task<PermissionRequestResult> RequestFilteredPermissions(params AndroidPermission[] androidPermissions)
     {
         var list = new List<string>();
         foreach (var p in androidPermissions)

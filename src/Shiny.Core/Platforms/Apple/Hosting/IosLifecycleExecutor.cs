@@ -42,22 +42,19 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
 
     public void Start()
     {
-        UIApplication
+        this.disposer.Add(UIApplication
             .Notifications
             .ObserveDidFinishLaunching((_, args) =>
                 this.Execute(this.finishLaunchingHandlers, handler => handler.Handle(args))
-            )
-            .DisposedBy(this.disposer);
+            ));
 
-        UIApplication
+        this.disposer.Add(UIApplication
             .Notifications
-            .ObserveWillEnterForeground((_, _) => this.Execute(this.appHandlers, x => x.OnForeground()))
-            .DisposedBy(this.disposer);
+            .ObserveWillEnterForeground((_, _) => this.Execute(this.appHandlers, x => x.OnForeground())));
 
-        UIApplication
+        this.disposer.Add(UIApplication
             .Notifications
-            .ObserveDidEnterBackground((_, _) => this.Execute(this.appHandlers, x => x.OnBackground()))
-            .DisposedBy(this.disposer);
+            .ObserveDidEnterBackground((_, _) => this.Execute(this.appHandlers, x => x.OnBackground())));
 
 
         if (this.notificationHandlers != null && this.notificationHandlers.Any())

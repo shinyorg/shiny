@@ -1,11 +1,9 @@
-using System.Reactive.Threading.Tasks;
-
 namespace Sample.Shared.Maui.Pages.Locations;
 
 [ShellMap<GpsPage>("gps")]
 public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, IDisposable
 {
-    IDisposable? gpsSub;
+    EventHandler<GpsReading>? gpsHandler;
 
     // Configuration
     public List<string> BackgroundModes { get; } = ["Foreground", "Standard", "Realtime"];
@@ -114,8 +112,11 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
     {
         if (this.IsListening)
         {
-            this.gpsSub?.Dispose();
-            this.gpsSub = null;
+            if (this.gpsHandler != null)
+            {
+                gpsManager.GpsReadingReceived -= this.gpsHandler;
+                this.gpsHandler = null;
+            }
             await gpsManager.StopListener();
             this.IsListening = false;
             this.Status = "Listener stopped";
@@ -133,9 +134,8 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
         await gpsManager.StartListener(request);
         this.IsListening = true;
         this.Status = "Listening...";
-        this.gpsSub = gpsManager
-            .WhenReading()
-            .Subscribe(reading => MainThread.BeginInvokeOnMainThread(() => this.SetReading(reading)));
+        this.gpsHandler = (_, reading) => MainThread.BeginInvokeOnMainThread(() => this.SetReading(reading));
+        gpsManager.GpsReadingReceived += this.gpsHandler;
     }
 
     [RelayCommand]
@@ -144,8 +144,9 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
         try
         {
             this.Status = "Getting position...";
-            var reading = await gpsManager.GetCurrentPosition().ToTask();
-            this.SetReading(reading);
+            var reading = await gpsManager.GetCurrentPosition();
+            if (reading != null)
+                this.SetReading(reading);
             this.Status = "Position received";
         }
         catch (Exception ex)
@@ -162,5 +163,12 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
         this.Status = $"Permission: {state}";
     }
 
-    public void Dispose() => this.gpsSub?.Dispose();
+    public void Dispose()
+    {
+        if (this.gpsHandler != null)
+        {
+            gpsManager.GpsReadingReceived -= this.gpsHandler;
+            this.gpsHandler = null;
+        }
+    }
 }

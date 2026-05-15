@@ -1,6 +1,5 @@
 using System;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
@@ -9,17 +8,17 @@ namespace Shiny.Locations.Blazor;
 
 
 public class GpsManager(
-    IJSRuntime jsRuntime, 
-    IServiceProvider services, 
+    IJSRuntime jsRuntime,
+    IServiceProvider services,
     ILogger<GpsManager> logger
 ) : IGpsManager, IAsyncDisposable
 {
-    readonly Subject<GpsReading> readingSubj = new();
-
     IJSObjectReference? module;
     DotNetObjectReference<GpsManager>? selfRef;
 
     public GpsRequest? CurrentListener { get; private set; }
+
+    public event EventHandler<GpsReading>? GpsReadingReceived;
 
 
     public AccessState GetCurrentStatus(GpsRequest request) => AccessState.Unknown;
@@ -38,15 +37,16 @@ public class GpsManager(
     }
 
 
-    public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async () =>
+    public async Task<GpsReading?> GetLastReading(TimeSpan? timeout = null)
     {
+        using var cts = timeout.HasValue
+            ? new CancellationTokenSource(timeout.Value)
+            : new CancellationTokenSource();
+
         var mod = await this.GetModule().ConfigureAwait(false);
-        var pos = await mod.InvokeAsync<GeoPosition?>("getCurrent").ConfigureAwait(false);
+        var pos = await mod.InvokeAsync<GeoPosition?>("getCurrent", cts.Token).ConfigureAwait(false);
         return pos == null ? null : ToReading(pos);
-    });
-
-
-    public IObservable<GpsReading> WhenReading() => this.readingSubj;
+    }
 
 
     public async Task StartListener(GpsRequest request)
@@ -83,7 +83,7 @@ public class GpsManager(
     public async Task OnReading(GeoPosition pos)
     {
         var reading = ToReading(pos);
-        this.readingSubj.OnNext(reading);
+        this.GpsReadingReceived?.Invoke(this, reading);
         await services
             .RunDelegates<IGpsDelegate>(x => x.OnReading(reading), logger)
             .ConfigureAwait(false);

@@ -124,7 +124,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     {
         var permissionSet = this.GetPermissionSet(request);
         var status = AccessState.Denied;
-        var result = await this.Platform.RequestPermissions(permissionSet.ToArray()).ToTask();
+        var result = await this.Platform.RequestPermissions(permissionSet.ToArray());
 
         if (result.IsGranted(P.AccessCoarseLocation))
         {

@@ -142,7 +142,7 @@ public partial class NotificationManager : INotificationManager,
 
         if (list.Count > 0)
         {
-            var result = await this.platform.RequestPermissions(list.ToArray()).ToTask();
+            var result = await this.platform.RequestPermissions(list.ToArray());
             if (list.Contains(P.PostNotifications) && !result.IsGranted(P.PostNotifications))
                 return AccessState.Denied;
 
