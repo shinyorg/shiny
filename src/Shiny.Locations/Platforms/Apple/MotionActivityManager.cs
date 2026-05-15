@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using CoreMotion;
 using Foundation;
@@ -16,7 +14,6 @@ public class MotionActivityManager(
 ) : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
 {
     readonly CMMotionActivityManager activityManager = new();
-    readonly Subject<MotionActivityReading> readingSubj = new();
 
     bool isListening;
     public bool IsListening
@@ -72,13 +69,13 @@ public class MotionActivityManager(
 
     MotionActivityReading? lastReading;
 
-    public IObservable<MotionActivityReading?> GetLastReading() => Observable.FromAsync<MotionActivityReading?>(async _ =>
+    public Task<MotionActivityReading?> GetLastReading()
     {
         if (this.lastReading != null)
-            return this.lastReading;
+            return Task.FromResult<MotionActivityReading?>(this.lastReading);
 
         if (!CMMotionActivityManager.IsActivityAvailable)
-            return null;
+            return Task.FromResult<MotionActivityReading?>(null);
 
         var tcs = new TaskCompletionSource<MotionActivityReading?>();
         this.activityManager.QueryActivity(
@@ -98,10 +95,11 @@ public class MotionActivityManager(
                 }
             }
         );
-        return await tcs.Task.ConfigureAwait(false);
-    });
+        return tcs.Task;
+    }
 
-    public IObservable<MotionActivityReading> WhenReading() => this.readingSubj;
+
+    public event EventHandler<MotionActivityReading>? MotionActivityReadingReceived;
 
 
     public Task StartListener()
@@ -121,7 +119,7 @@ public class MotionActivityManager(
 
                 var reading = ToReading(activity);
                 this.lastReading = reading;
-                this.readingSubj.OnNext(reading);
+                this.MotionActivityReadingReceived?.Invoke(this, reading);
 
                 services
                     .RunDelegates<IMotionActivityDelegate>(

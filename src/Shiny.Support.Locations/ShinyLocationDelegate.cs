@@ -1,7 +1,5 @@
-﻿#if APPLE
+#if APPLE
 using System;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using CoreLocation;
 using Shiny.Locations;
 
@@ -10,7 +8,7 @@ namespace Shiny;
 
 public class ShinyLocationDelegate : CLLocationManagerDelegate
 {
-    readonly Subject<CLAuthorizationStatus> statusSubject = new();
+    public event EventHandler<CLAuthorizationStatus>? AuthorizationStatusChanged;
 
 
     // public override void UpdatedHeading(CLLocationManager manager, CLHeading newHeading)
@@ -18,13 +16,8 @@ public class ShinyLocationDelegate : CLLocationManagerDelegate
     //     newHeading.TrueHeading
     // }
 
-    public IObservable<AccessState> WhenAccessStatusChanged(bool background) => this.statusSubject
-        .Where(x => x != CLAuthorizationStatus.NotDetermined)
-        .Select(x => x.FromNative(background));
-
-
     public override void AuthorizationChanged(CLLocationManager manager, CLAuthorizationStatus status)
-        => this.statusSubject.OnNext(status);
+        => this.AuthorizationStatusChanged?.Invoke(this, status);
 }
 #endif
 /*

@@ -24,12 +24,12 @@ public interface IMotionActivityManager
     /// <summary>
     /// Gets the last known motion activity reading, or queries the platform for the current one
     /// </summary>
-    IObservable<MotionActivityReading?> GetLastReading();
+    Task<MotionActivityReading?> GetLastReading();
 
     /// <summary>
-    /// Hook to activity change events - useful for front ends.  If you need background operations, register the delegate
+    /// Hook to activity change events - useful for front ends. If you need background operations, register the delegate.
     /// </summary>
-    IObservable<MotionActivityReading> WhenReading();
+    event EventHandler<MotionActivityReading> MotionActivityReadingReceived;
 
     /// <summary>
     /// Start listening for motion activity changes

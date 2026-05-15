@@ -1,5 +1,4 @@
 using System;
-using System.Reactive.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CoreFoundation;
@@ -12,15 +11,15 @@ namespace Shiny.Locations;
 [SupportedOSPlatform("ios18.0")]
 [SupportedOSPlatform("maccatalyst18.0")]
 public class GpsManager(
-    IServiceProvider services, 
+    IServiceProvider services,
     ILogger<IGpsManager> logger
 ) : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
     CLBackgroundActivitySession? bgSession;
     CLServiceSession? session;
     CLLocationUpdater? updater;
-    
-    
+
+
     public AppleGpsRequest? CurrentSettings
     {
         get;
@@ -61,16 +60,16 @@ public class GpsManager(
         var access = this.GetCurrentStatus(request);
         if (this.session != null && access != AccessState.Unknown)
             return access;
-        
+
         var requirement = request.BackgroundMode == GpsBackgroundMode.None
             ? CLServiceSessionAuthorizationRequirement.WhenInUse
             : CLServiceSessionAuthorizationRequirement.Always;
-        
+
         var tcs = new TaskCompletionSource<AccessState>();
-        var fullAccuracy = request.RequestPreciseAccuracy 
+        var fullAccuracy = request.RequestPreciseAccuracy
             ? "shinygps"
             : String.Empty;
-        
+
         this.session ??= CLServiceSession.CreateSession(
             requirement,
             fullAccuracy,
@@ -80,7 +79,7 @@ public class GpsManager(
                 var currentAccess = AccessState.Unknown;
                 if (diag.AuthorizationRequestInProgress)
                     return;
-                
+
                 if (request.BackgroundMode != GpsBackgroundMode.None)
                 {
                     if (!diag.AlwaysAuthorizationDenied)
@@ -91,14 +90,14 @@ public class GpsManager(
                     }
                     else if (!diag.AuthorizationRestricted)
                         currentAccess = AccessState.Restricted;
-                    
+
                     else
                         currentAccess = AccessState.Denied;
                 }
                 else
                 {
-                    currentAccess = diag.AuthorizationDenied 
-                        ? AccessState.Denied 
+                    currentAccess = diag.AuthorizationDenied
+                        ? AccessState.Denied
                         : AccessState.Available;
                 }
 
@@ -106,12 +105,12 @@ public class GpsManager(
             }
         );
 
-        return await tcs.Task.ConfigureAwait(false);    
+        return await tcs.Task.ConfigureAwait(false);
     }
 
 
     GpsReading? lastReading;
-    public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(_ =>
+    public Task<GpsReading?> GetLastReading(TimeSpan? timeout = null)
     {
         if (this.lastReading != null)
             return Task.FromResult<GpsReading?>(this.lastReading);
@@ -121,11 +120,10 @@ public class GpsManager(
             return Task.FromResult<GpsReading?>(locationManager.Location.FromNative());
 
         return Task.FromResult<GpsReading?>(null);
-    });
+    }
 
 
-    readonly ShinySubject<GpsReading> readSubject = new();
-    public IObservable<GpsReading> WhenReading() => this.readSubject;
+    public event EventHandler<GpsReading>? GpsReadingReceived;
 
 
     public async Task StartListener(GpsRequest request)
@@ -145,12 +143,12 @@ public class GpsManager(
             CLActivityType.OtherNavigation => CLLiveUpdateConfiguration.OtherNavigation,
             _ => CLLiveUpdateConfiguration.Default
         };
-        
+
         //https://developer.apple.com/videos/play/wwdc2023/10180/
         //https://developer.apple.com/documentation/corelocation/supporting-live-updates-in-swiftui-and-mac-catalyst-apps
         this.updater = CLLocationUpdater.CreateLiveUpdates(
             modernActivityType,
-            new DispatchQueue("shinygps"), 
+            new DispatchQueue("shinygps"),
             async update =>
             {
                 if (update.Location == null || this.updater == null)
@@ -173,7 +171,7 @@ public class GpsManager(
                     update.Stationary
                 );
                 this.lastReading = reading;
-                this.readSubject.OnNext(reading);
+                this.GpsReadingReceived?.Invoke(this, reading);
 
                 await services
                     .RunDelegates<IGpsDelegate>(
@@ -187,7 +185,7 @@ public class GpsManager(
         this.CurrentSettings = appleRequest;
     }
 
-    
+
     public Task StopListener()
     {
         this.updater?.Invalidate();
@@ -200,7 +198,7 @@ public class GpsManager(
 
         return Task.CompletedTask;
     }
-    
+
 
     public async void Start()
     {

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using CoreFoundation;
@@ -41,12 +38,12 @@ public class CLLocationGeofenceManager : IGeofenceManager
     }
 
 
-    readonly Subject<(CLCircularRegion Region, CLRegionState State)> regionSubj = new();
+    TaskCompletionSource<(CLCircularRegion Region, CLRegionState State)>? regionStateTcs;
 
     internal void OnStateDetermined(CLRegionState state, CLRegion region)
     {
         if (region is CLCircularRegion native)
-            this.regionSubj.OnNext((native, state));
+            this.regionStateTcs?.TrySetResult((native, state));
     }
 
 
@@ -88,22 +85,23 @@ public class CLLocationGeofenceManager : IGeofenceManager
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
     {
-        var task = this.regionSubj
-            .Where(x => region.Equals(x.Region))
-            .Take(1)
-            .Select(x => x.State.FromNative())
-            .Timeout(TimeSpan.FromSeconds(20))
-            .ToTask(cancelToken);
+        this.regionStateTcs = new TaskCompletionSource<(CLCircularRegion, CLRegionState)>();
+
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+        cts.CancelAfter(TimeSpan.FromSeconds(20));
+        cts.Token.Register(() => this.regionStateTcs.TrySetException(
+            new TimeoutException("Could not retrieve latest GPS coordinates to be able to determine geofence current state")
+        ));
 
         this.locationManager.RequestState(region.ToNative());
         try
         {
-            var result = await task.ConfigureAwait(false);
-            return result;
+            var result = await this.regionStateTcs.Task.ConfigureAwait(false);
+            return result.State.FromNative();
         }
-        catch (TimeoutException ex)
+        finally
         {
-            throw new TimeoutException("Could not retrieve latest GPS coordinates to be able to determine geofence current state", ex);
+            this.regionStateTcs = null;
         }
     }
 

@@ -1,6 +1,5 @@
 using System;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Windows.Devices.Geolocation;
@@ -8,15 +7,15 @@ using Windows.Devices.Geolocation;
 namespace Shiny.Locations;
 
 
-public class GpsManager(        
+public class GpsManager(
     IServiceProvider services,
     ILogger<IGpsManager> logger
 ) : IGpsManager
 {
-    readonly Subject<GpsReading> readSubject = new();
     Geolocator? geolocator;
 
 
+    public event EventHandler<GpsReading>? GpsReadingReceived;
     public GpsRequest? CurrentListener { get; private set; }
 
 
@@ -37,15 +36,16 @@ public class GpsManager(
     }
 
 
-    public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async ct =>
+    public async Task<GpsReading?> GetLastReading(TimeSpan? timeout = null)
     {
+        using var cts = timeout.HasValue
+            ? new CancellationTokenSource(timeout.Value)
+            : new CancellationTokenSource();
+
         var loc = new Geolocator();
-        var position = await loc.GetGeopositionAsync().AsTask(ct).ConfigureAwait(false);
+        var position = await loc.GetGeopositionAsync().AsTask(cts.Token).ConfigureAwait(false);
         return ToReading(position);
-    });
-
-
-    public IObservable<GpsReading> WhenReading() => this.readSubject;
+    }
 
 
     public async Task StartListener(GpsRequest request)
@@ -87,7 +87,7 @@ public class GpsManager(
             var reading = ToReading(args.Position);
             if (reading != null)
             {
-                this.readSubject.OnNext(reading);
+                this.GpsReadingReceived?.Invoke(this, reading);
                 await services
                     .RunDelegates<IGpsDelegate>(x => x.OnReading(reading), logger)
                     .ConfigureAwait(false);

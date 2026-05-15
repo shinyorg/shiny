@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using CoreLocation;
 using Foundation;
@@ -13,7 +11,6 @@ namespace Shiny.Locations;
 
 public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
-    readonly Subject<GpsReading> readingSubj = new();
     readonly StationaryDetector stationaryDetector = new();
     readonly IServiceProvider services;
     readonly CLLocationManager locationManager;
@@ -29,6 +26,9 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
             Delegate = new GpsManagerDelegate(this)
         };
     }
+
+
+    public event EventHandler<GpsReading>? GpsReadingReceived;
 
 
     internal async void LocationsUpdated(CLLocation[] locations)
@@ -52,7 +52,7 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
             )
             .ConfigureAwait(false);
 
-        this.readingSubj.OnNext(reading);
+        this.GpsReadingReceived?.Invoke(this, reading);
     }
 
     internal void OnFailed(NSError error) {}
@@ -85,13 +85,10 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
     }
 
 
-    public IObservable<GpsReading> WhenReading() => this.readingSubj;
-
-
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
         var status = await this.locationManager.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
-        
+
         if (
             status == AccessState.Available &&
             request.RequestPreciseAccuracy &&
@@ -100,8 +97,8 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         )
         {
             await this.locationManager.RequestTemporaryFullAccuracyAuthorizationAsync("shinygps");
-            
-            status = this.locationManager.AccuracyAuthorization == CLAccuracyAuthorization.ReducedAccuracy 
+
+            status = this.locationManager.AccuracyAuthorization == CLAccuracyAuthorization.ReducedAccuracy
                 ? AccessState.Restricted
                 : AccessState.Available;
         }
@@ -140,13 +137,13 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
     public GpsRequest? CurrentListener => this.currentSettings;
 
 
-    public IObservable<GpsReading?> GetLastReading() => Observable.FromAsync<GpsReading?>(async ct =>
+    public Task<GpsReading?> GetLastReading(TimeSpan? timeout = null)
     {
         if (this.locationManager.Location == null)
-            return null;
+            return Task.FromResult<GpsReading?>(null);
 
-        return this.locationManager.Location.FromNative();
-    });
+        return Task.FromResult<GpsReading?>(this.locationManager.Location.FromNative());
+    }
 
 
     public async Task StartListener(GpsRequest request)
@@ -196,7 +193,7 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         // this.locationManager.AccuracyAuthorization
         // if (this.locationManager.StopUpdatingHeading();
         // this.locationManager.StartUpdatingHeading();
-        
+
         var appleRequest = request.ToApple();
         this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
         this.locationManager.ActivityType = appleRequest.ActivityType;
@@ -206,15 +203,14 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
             case GpsBackgroundMode.None:
                 this.locationManager.StartUpdatingLocation();
                 break;
-            
+
             case GpsBackgroundMode.Standard:
                 this.locationManager.AllowsBackgroundLocationUpdates = true;
                 this.locationManager.ShowsBackgroundLocationIndicator = appleRequest.ShowsBackgroundLocationIndicator;
                 this.locationManager.StartMonitoringSignificantLocationChanges();
                 break;
-            
+
             case GpsBackgroundMode.Realtime:
-                
                 this.locationManager.AllowsBackgroundLocationUpdates = true;
                 this.locationManager.ShowsBackgroundLocationIndicator = appleRequest.ShowsBackgroundLocationIndicator;
                 this.locationManager.StartUpdatingLocation();

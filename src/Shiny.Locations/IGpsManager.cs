@@ -28,14 +28,14 @@ public interface IGpsManager
     /// Gets the last reading - will also try to get access if you have not used RequestAccess, if access is not granted, this will throw an exception
     /// </summary>
     /// <returns></returns>
-    IObservable<GpsReading?> GetLastReading();
+    Task<GpsReading?> GetLastReading(TimeSpan? timeout = null);
 
 
     /// <summary>
     /// Hook to the GPS events - useful for front ends ONLY.  If you need background operations, register the delegate
     /// </summary>
     /// <returns></returns>
-    IObservable<GpsReading> WhenReading();
+    event EventHandler<GpsReading> GpsReadingReceived;
 
 
     /// <summary>

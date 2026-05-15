@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -26,7 +24,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     public GpsGeofenceManagerImpl(
         ILogger<GpsGeofenceManagerImpl> logger,
-        IRepository repository, 
+        IRepository repository,
         IGpsManager gpsManager
     )
     {
@@ -38,13 +36,13 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     public async void Start()
     {
-        try 
-        { 
+        try
+        {
             var restore = this.repository.GetAll<GeofenceRegion>();
             if (restore.Any())
                 await this.TryStartGps();
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             this.logger.LogWarning(ex, "Failed to start gps geofencing");
         }
@@ -64,10 +62,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
     {
-        var reading = await this.gpsManager!
-            .GetLastReading()
-            .Timeout(TimeSpan.FromSeconds(10))
-            .ToTask();
+        var reading = await this.gpsManager.GetLastReading(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
 
         if (reading == null)
             return GeofenceState.Unknown;

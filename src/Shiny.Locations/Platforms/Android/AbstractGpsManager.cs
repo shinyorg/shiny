@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using P = Android.Manifest.Permission;
@@ -12,20 +10,21 @@ namespace Shiny.Locations;
 
 public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
-    readonly Subject<GpsReading> readingSubj;
     readonly ILogger logger;
 
 
     protected AbstractGpsManager(AndroidPlatform platform, ILogger logger)
     {
-        this.readingSubj = new();
         this.Platform = platform;
         this.logger = logger;
         this.Callback = new ShinyLocationCallback
         {
-            OnReading = x => this.readingSubj.OnNext(x)
+            OnReading = x => this.GpsReadingReceived?.Invoke(this, x)
         };
     }
+
+
+    public event EventHandler<GpsReading>? GpsReadingReceived;
 
 
     public virtual async void Start()
@@ -92,7 +91,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     {
         // var realtime = request.BackgroundMode == GpsBackgroundMode.Realtime;
         var permissionSet = new List<string> { P.AccessCoarseLocation };
-        
+
         if (request.RequestPreciseAccuracy)
             permissionSet.Add(P.AccessFineLocation);
 
@@ -110,7 +109,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
                     permissionSet.Add(P.ForegroundService);
                 else if (OperatingSystem.IsAndroidVersionAtLeast(29))
                     permissionSet.Add(P.AccessBackgroundLocation);
-      
+
                 if (OperatingSystem.IsAndroidVersionAtLeast(33))
                     permissionSet.Add(P.PostNotifications);
 
@@ -139,7 +138,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
             if (permissionSet.Contains(P.AccessBackgroundLocation))
             {
                 // bg permission must be requested independently from others
-                var bgResult = await this.Platform.RequestAccess(P.AccessBackgroundLocation).ToTask();
+                var bgResult = await this.Platform.RequestAccess(P.AccessBackgroundLocation);
                 if (bgResult != AccessState.Available)
                     status = AccessState.Denied;
             }
@@ -151,10 +150,6 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
         //if (this.Platform.GetSystemService<LocationManager>(Context.LocationService)!.IsLocationEnabled)
         return status;
     }
-
-
-    public virtual IObservable<GpsReading> WhenReading()
-        => this.readingSubj;
 
 
     public virtual async Task StartListener(GpsRequest request)
@@ -179,7 +174,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     }
 
 
-    public abstract IObservable<GpsReading?> GetLastReading();
+    public abstract Task<GpsReading?> GetLastReading(TimeSpan? timeout = null);
     protected abstract Task RequestLocationUpdates(AndroidGpsRequest request);
     protected abstract Task RemoveLocationUpdates();
 

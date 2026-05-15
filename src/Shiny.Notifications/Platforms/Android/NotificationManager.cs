@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
@@ -179,12 +177,17 @@ public partial class NotificationManager : INotificationManager,
                 this.platform.AppContext.StartActivity(intent);
 
                 // wait for the user to return from settings
-                await this.platform
-                    .WhenActivityStatusChanged()
-                    .Where(x => x.State == ActivityState.Resumed)
-                    .Take(1)
-                    .ToTask()
-                    .ConfigureAwait(false);
+                var tcs = new TaskCompletionSource();
+                IDisposable? sub = null;
+                sub = this.platform.WhenActivityChanged().Subscribe(x =>
+                {
+                    if (x.State == ActivityState.Resumed)
+                    {
+                        sub?.Dispose();
+                        tcs.TrySetResult();
+                    }
+                });
+                await tcs.Task.ConfigureAwait(false);
 
                 if (!this.manager.Alarms.CanScheduleExactAlarms())
                     return AccessState.Restricted;

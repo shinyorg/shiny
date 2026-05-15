@@ -1,10 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using Android.App;
 using Android.Gms.Location;
 using Microsoft.Extensions.Logging;

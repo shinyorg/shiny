@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Gms.Location;
@@ -20,7 +17,6 @@ public class MotionActivityManager(
     public const string ReceiverName = "com.shiny.locations." + nameof(MotionActivityBroadcastReceiver);
     public const string IntentAction = ReceiverName + ".INTENT_ACTION";
 
-    readonly Subject<MotionActivityReading> readingSubj = new();
     PendingIntent? pendingIntent;
 
     bool isListening;
@@ -57,10 +53,11 @@ public class MotionActivityManager(
 
     MotionActivityReading? lastReading;
 
-    public IObservable<MotionActivityReading?> GetLastReading()
-        => Observable.Return(this.lastReading);
+    public Task<MotionActivityReading?> GetLastReading()
+        => Task.FromResult(this.lastReading);
 
-    public IObservable<MotionActivityReading> WhenReading() => this.readingSubj;
+
+    public event EventHandler<MotionActivityReading>? MotionActivityReadingReceived;
 
 
     public async Task StartListener()
@@ -116,7 +113,7 @@ public class MotionActivityManager(
                 );
 
                 this.lastReading = reading;
-                this.readingSubj.OnNext(reading);
+                this.MotionActivityReadingReceived?.Invoke(this, reading);
 
                 await services
                     .RunDelegates<IMotionActivityDelegate>(

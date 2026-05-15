@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,76 +7,43 @@ namespace Shiny.Locations;
 
 public static class Extensions
 {
-    ///// <summary>
-    ///// This method will start the GPS with realtime and close on disposable (or when the app backgrounds)
-    ///// </summary>
-    ///// <param name="gpsManager"></param>
-    ///// <returns></returns>
-    //public static IObservable<GpsReading> StartAndReceive(this IGpsManager gpsManager) => Observable.Create<GpsReading>(ob =>
-    //{
-    //    var composite = new CompositeDisposable();
-    //    var platform = ShinyHost.Resolve<IPlatform>();
-    //    gpsManager
-    //        .WhenReading()
-    //        .Subscribe(
-    //            ob.OnNext,
-    //            ob.OnError
-    //        )
-    //        .DisposedBy(composite);
-
-    //    platform
-    //        .WhenStateChanged()
-    //        .Where(x => x == PlatformState.Background)
-    //        .Subscribe(_ => ob.Respond(null))
-    //        .DisposedBy(composite);
-
-    //    gpsManager
-    //        .StartListener(GpsRequest.Foreground)
-    //        .ContinueWith(x =>
-    //        {
-    //            if (x.IsFaulted)
-    //                ob.OnError(x.Exception);
-    //        });
-
-    //    return () =>
-    //    {
-    //        composite.Dispose();
-    //        gpsManager.StopListener();
-    //    };
-    //});
-
-
-
     /// <summary>
-    /// Requests a single GPS reading by starting the listener and stopping once a reading is received
-    /// Requests a single GPS reading - This will start & stop the gps listener if wasn't running already
+    /// Requests a single GPS reading by starting the listener and stopping once a reading is received.
+    /// This will start and stop the GPS listener if it wasn't already running.
     /// </summary>
     /// <param name="gpsManager"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static IObservable<GpsReading> GetCurrentPosition(this IGpsManager gpsManager) => Observable.FromAsync(async ct =>
+    public static async Task<GpsReading?> GetCurrentPosition(this IGpsManager gpsManager, CancellationToken cancellationToken = default)
     {
         var iStarted = false;
         try
         {
-            await currentLocSemaphore
-                .WaitAsync(ct)
-                .ConfigureAwait(false);
+            await currentLocSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
 
-            var task = gpsManager
-                .WhenReading()
-                .Take(1)
-                .ToTask(ct);
+            var tcs = new TaskCompletionSource<GpsReading?>();
+
+            EventHandler<GpsReading> handler = null!;
+            handler = (_, reading) =>
+            {
+                gpsManager.GpsReadingReceived -= handler;
+                tcs.TrySetResult(reading);
+            };
+            gpsManager.GpsReadingReceived += handler;
+
+            cancellationToken.Register(() =>
+            {
+                gpsManager.GpsReadingReceived -= handler;
+                tcs.TrySetCanceled(cancellationToken);
+            });
 
             if (!gpsManager.IsListening())
             {
                 iStarted = true;
-                await gpsManager
-                    .StartListener(GpsRequest.Foreground)
-                    .ConfigureAwait(false);
+                await gpsManager.StartListener(GpsRequest.Foreground).ConfigureAwait(false);
             }
-            var reading = await task.ConfigureAwait(false);
 
-            return reading;
+            return await tcs.Task.ConfigureAwait(false);
         }
         finally
         {
@@ -88,28 +52,29 @@ public static class Extensions
 
             currentLocSemaphore.Release();
         }
-    });
+    }
     static readonly SemaphoreSlim currentLocSemaphore = new SemaphoreSlim(1, 1);
 
 
     /// <summary>
-    /// Gets the last reading (can be filtered out by maxAgeOfLastReading) otherwise request the current reading
+    /// Gets the last reading (can be filtered out by maxAgeOfLastReading) otherwise requests the current reading.
     /// </summary>
     /// <param name="gpsManager"></param>
     /// <param name="maxAgeOfLastReading"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static IObservable<GpsReading> GetLastReadingOrCurrentPosition(this IGpsManager gpsManager, DateTime? maxAgeOfLastReading = null) => Observable.FromAsync<GpsReading>(async ct =>
+    public static async Task<GpsReading?> GetLastReadingOrCurrentPosition(this IGpsManager gpsManager, DateTime? maxAgeOfLastReading = null, CancellationToken cancellationToken = default)
     {
-        var reading = await gpsManager.GetLastReading().ToTask(ct);
+        var reading = await gpsManager.GetLastReading().ConfigureAwait(false);
         if (reading == null || (maxAgeOfLastReading != null && reading.Timestamp < maxAgeOfLastReading.Value))
-            reading = await gpsManager.GetCurrentPosition().ToTask(ct);
+            reading = await gpsManager.GetCurrentPosition(cancellationToken).ConfigureAwait(false);
 
         return reading;
-    });
+    }
 
 
     /// <summary>
-    /// Returns true if there is a current GPS listener configuration running
+    /// Returns true if there is a current GPS listener configuration running.
     /// </summary>
     /// <param name="manager"></param>
     /// <returns></returns>
@@ -132,16 +97,19 @@ public static class Extensions
 
 
     /// <summary>
-    ///
+    /// Returns null if current position could not be determined - else returns true if in region, false otherwise.
     /// </summary>
     /// <param name="gpsManager"></param>
     /// <param name="center"></param>
     /// <param name="radius"></param>
     /// <param name="cancelToken"></param>
-    /// <returns>Returns null if current position could not be determined - else returns true if in region, false otherwise</returns>
+    /// <returns></returns>
     public static async Task<bool?> IsInsideRegion(this IGpsManager gpsManager, Position center, Distance radius, CancellationToken cancelToken = default)
     {
-        var result = await gpsManager.GetCurrentPosition().ToTask(cancelToken);
+        var result = await gpsManager.GetCurrentPosition(cancelToken).ConfigureAwait(false);
+        if (result == null)
+            return null;
+
         var inside = result.Position.GetDistanceTo(center) < radius;
         return inside;
     }

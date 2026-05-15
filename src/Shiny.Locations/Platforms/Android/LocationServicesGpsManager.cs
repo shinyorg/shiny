@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reactive.Linq;
+using System;
 using System.Threading.Tasks;
 using Android.Locations;
 using Android.OS;
@@ -16,7 +15,7 @@ public class LocationServicesGpsManager : AbstractGpsManager
         => this.client = platform.GetSystemService<LocationManager>(AContext.LocationService);
 
 
-    public override IObservable<GpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
+    public override Task<GpsReading?> GetLastReading(TimeSpan? timeout = null)
     {
         var criteria = new Criteria
         {
@@ -33,8 +32,8 @@ public class LocationServicesGpsManager : AbstractGpsManager
         //criteria.BearingAccuracy = Accuracy.Coarse;
         //criteria.VerticalAccuracy = Accuracy.Coarse
         var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, true));
-        return location?.FromNative();
-    });
+        return Task.FromResult(location?.FromNative());
+    }
 
 
     protected override Task RequestLocationUpdates(AndroidGpsRequest request)
@@ -47,7 +46,7 @@ public class LocationServicesGpsManager : AbstractGpsManager
         };
 
         this.client.RequestLocationUpdates(
-            1000, 
+            1000,
             (float)request.DistanceFilterMeters,
             criteria,
             this.Callback,

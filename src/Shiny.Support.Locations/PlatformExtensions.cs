@@ -1,7 +1,5 @@
-﻿#if APPLE
+#if APPLE
 using System;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreLocation;
 
@@ -10,10 +8,6 @@ namespace Shiny.Locations;
 
 public static class LocationExtensions
 {
-    public static IObservable<AccessState> WhenAccessStatusChanged(this CLLocationManager locationManager, bool background)
-        => ((ShinyLocationDelegate)locationManager.Delegate).WhenAccessStatusChanged(background);
-
-
     public static AccessState FromNative(this CLAuthorizationStatus status, bool background) => status switch
     {
         CLAuthorizationStatus.Denied => AccessState.Denied,
@@ -69,7 +63,7 @@ public static class LocationExtensions
         };
         return lm.RequestAccess(background);
     }
-    
+
 
     public static async Task<AccessState> RequestAccess(this CLLocationManager locationManager, bool background)
     {
@@ -78,34 +72,38 @@ public static class LocationExtensions
             return status;
 
         locationManager.Delegate ??= new ShinyLocationDelegate();
-        if (locationManager.Delegate is not ShinyLocationDelegate)
-            throw new NotSupportedException("You cannot call this method with non-ShinyLocationDleegate");
-        
-        var task = locationManager
-            .WhenAccessStatusChanged(false)
-            .Where(x => x != AccessState.Unknown)
-            .Take(1)
-            .ToTask();
-        
-        // locationManager.AccuracyAuthorization 
+        if (locationManager.Delegate is not ShinyLocationDelegate shinyDelegate)
+            throw new NotSupportedException("You cannot call this method with non-ShinyLocationDelegate");
+
+        // locationManager.AccuracyAuthorization
         // locationManager.RequestTemporaryFullAccuracyAuthorizationAsync()
-        locationManager.RequestWhenInUseAuthorization();
-        status = await task.ConfigureAwait(false);
+        status = await WaitForAuthorization(shinyDelegate, false, locationManager.RequestWhenInUseAuthorization).ConfigureAwait(false);
 
         if (status == AccessState.Available && background)
-        {
-            task = locationManager
-                .WhenAccessStatusChanged(true)
-                // .StartWith()
-                .Take(1)
-                .ToTask();
-            
-            locationManager.RequestAlwaysAuthorization();
-            status = await task.ConfigureAwait(false);
-        }
+            status = await WaitForAuthorization(shinyDelegate, true, locationManager.RequestAlwaysAuthorization).ConfigureAwait(false);
 
         return status;
     }
-    
+
+
+    static Task<AccessState> WaitForAuthorization(ShinyLocationDelegate shinyDelegate, bool background, Action requestAction)
+    {
+        var tcs = new TaskCompletionSource<AccessState>();
+
+        EventHandler<CLAuthorizationStatus>? handler = null;
+        handler = (_, authStatus) =>
+        {
+            if (authStatus == CLAuthorizationStatus.NotDetermined)
+                return;
+
+            shinyDelegate.AuthorizationStatusChanged -= handler;
+            tcs.TrySetResult(authStatus.FromNative(background));
+        };
+
+        shinyDelegate.AuthorizationStatusChanged += handler;
+        requestAction();
+
+        return tcs.Task;
+    }
 }
 #endif

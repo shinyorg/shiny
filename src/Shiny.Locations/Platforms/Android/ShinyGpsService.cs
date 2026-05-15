@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -20,20 +20,26 @@ public class ShinyGpsService : ShinyAndroidForegroundService<IGpsManager, IGpsDe
 
     protected override void OnStart(Intent? intent)
     {
-        this.Service!
-            .WhenReading()
-            .SubscribeAsync(
-                reading => this.Delegates!.RunDelegates(
-                    x => x.OnReading(reading),
-                    this.Logger
-                )
-            )
-            .DisposedBy(this.DestroyWith!);
-
+        this.Service!.GpsReadingReceived += this.OnGpsReading;
         isStarted = true;
     }
 
 
-    protected override void OnStop() => isStarted = false;
+    async void OnGpsReading(object? sender, GpsReading reading)
+    {
+        await this.Delegates!
+            .RunDelegates(x => x.OnReading(reading), this.Logger)
+            .ConfigureAwait(false);
+    }
+
+
+    protected override void OnStop()
+    {
+        if (this.Service != null)
+            this.Service.GpsReadingReceived -= this.OnGpsReading;
+
+        isStarted = false;
+    }
+
     public override IBinder? OnBind(Intent? intent) => null;
 }

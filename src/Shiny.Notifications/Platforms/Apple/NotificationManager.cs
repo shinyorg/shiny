@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using UserNotifications;

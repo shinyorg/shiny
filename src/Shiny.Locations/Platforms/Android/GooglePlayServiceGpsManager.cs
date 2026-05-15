@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reactive.Linq;
+using System;
 using System.Threading.Tasks;
 using Android.Gms.Location;
 using Android.OS;
@@ -9,13 +8,13 @@ namespace Shiny.Locations;
 
 
 public class GooglePlayServiceGpsManager(
-    AndroidPlatform platform, 
+    AndroidPlatform platform,
     ILogger<GooglePlayServiceGpsManager> logger
 ) : AbstractGpsManager(platform, logger)
 {
     IFusedLocationProviderClient? listenerClient;
 
-    public override IObservable<GpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
+    public override async Task<GpsReading?> GetLastReading(TimeSpan? timeout = null)
     {
         var location = await LocationServices
             .GetFusedLocationProviderClient(this.Platform.AppContext)
@@ -23,7 +22,7 @@ public class GooglePlayServiceGpsManager(
             .ConfigureAwait(false);
 
         return location?.FromNative();
-    });
+    }
 
 
     protected override Task RequestLocationUpdates(AndroidGpsRequest request)
