@@ -19,6 +19,7 @@ public class HttpTransferMonitor(
     ILogger<HttpTransferMonitor> logger
 ) : IDisposable
 {
+    readonly SemaphoreSlim startLock = new(1, 1);
     IDisposable? repoSub;
     IDisposable? updateSub;
 
@@ -66,8 +67,16 @@ public class HttpTransferMonitor(
         SynchronizationContext? syncContext = null
     )
     {
-        if (this.repoSub != null)
-            throw new InvalidOperationException("Already running monitor");
+        await this.startLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (this.repoSub != null)
+                throw new InvalidOperationException("Already running monitor");
+        }
+        finally
+        {
+            this.startLock.Release();
+        }
 
         this.transfers.Clear();
 

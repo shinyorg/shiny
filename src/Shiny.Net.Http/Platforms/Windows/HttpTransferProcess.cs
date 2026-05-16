@@ -44,7 +44,7 @@ public class HttpTransferProcess
         _ = Task.Run(async () =>
         {
             this.logger.LogInformation("Starting Transfer Loop");
-            var cancelSrc = new CancellationTokenSource();
+            using var cancelSrc = new CancellationTokenSource();
 
             EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> clearHandler = null!;
             clearHandler = (_, x) =>
@@ -122,7 +122,7 @@ public class HttpTransferProcess
 
     async Task RunTransfer(HttpTransfer transfer, CancellationToken cancelToken)
     {
-        var cancelSrc = new CancellationTokenSource();
+        using var cancelSrc = new CancellationTokenSource();
         using var _ = cancelToken.Register(() => cancelSrc.Cancel());
 
         EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> removeHandler = null!;

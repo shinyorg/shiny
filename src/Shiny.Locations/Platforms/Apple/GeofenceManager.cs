@@ -52,10 +52,13 @@ public class GeofenceManager(
             return this.CurrentStatus;
         
         var tcs = new TaskCompletionSource<AccessState>();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        cts.Token.Register(() => tcs.TrySetException(new TimeoutException("Geofence authorization request timed out")));
+
         this.session ??= CLServiceSession.CreateSession(
             CLServiceSessionAuthorizationRequirement.Always,
             String.Empty,
-            DispatchQueue.MainQueue, 
+            DispatchQueue.MainQueue,
             diag =>
             {
                 if (diag.AuthorizationRequestInProgress)
@@ -65,7 +68,7 @@ public class GeofenceManager(
                     this.CurrentStatus = AccessState.Denied;
                 else
                     this.CurrentStatus = AccessState.Available;
-                
+
                 tcs.TrySetResult(this.CurrentStatus);
             }
         );

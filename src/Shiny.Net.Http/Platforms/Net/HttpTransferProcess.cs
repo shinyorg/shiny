@@ -48,7 +48,7 @@ public class HttpTransferProcess
         _ = Task.Run(async () =>
         {
             this.logger.LogInformation("Starting Transfer Loop");
-            var cancelSrc = new CancellationTokenSource();
+            using var cancelSrc = new CancellationTokenSource();
 
             EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> clearHandler = null!;
             clearHandler = (_, x) =>
@@ -62,11 +62,6 @@ public class HttpTransferProcess
             };
             this.repository.ActionOccurred += clearHandler;
             using var clearSub = new RepoSub(() => this.repository.ActionOccurred -= clearHandler);
-
-            // bump the loop whenever connectivity changes so paused transfers wake up immediately
-            using var connSub = this.connectivity
-                .WhenChanged()
-                .Subscribe(_ => this.connectivityChanged.Set());
 
             try
             {
@@ -133,20 +128,13 @@ public class HttpTransferProcess
     }
 
 
-    readonly AsyncManualResetEvent connectivityChanged = new();
-    async Task WaitForNextPass(CancellationToken cancelToken)
-    {
-        // wake on connectivity change OR after a 10s polling interval
-        var delayTask = Task.Delay(10000, cancelToken);
-        var connTask = this.connectivityChanged.WaitAsync(cancelToken);
-        await Task.WhenAny(delayTask, connTask).ConfigureAwait(false);
-        this.connectivityChanged.Reset();
-    }
+    Task WaitForNextPass(CancellationToken cancelToken)
+        => Task.Delay(10000, cancelToken);
 
 
     async Task RunTransfer(HttpTransfer transfer, CancellationToken cancelToken)
     {
-        var cancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+        using var cancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
         EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> removeHandler = null!;
         removeHandler = (_, x) =>
@@ -390,32 +378,4 @@ public class HttpTransferProcess
     }
 
 
-    sealed class AsyncManualResetEvent
-    {
-        TaskCompletionSource<bool> tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        public Task WaitAsync(CancellationToken ct)
-        {
-            var t = this.tcs.Task;
-            if (!ct.CanBeCanceled)
-                return t;
-
-            return Task.WhenAny(t, Task.Delay(Timeout.Infinite, ct));
-        }
-
-        public void Set() => this.tcs.TrySetResult(true);
-
-        public void Reset()
-        {
-            while (true)
-            {
-                var current = this.tcs;
-                if (!current.Task.IsCompleted)
-                    return;
-                var fresh = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-                if (Interlocked.CompareExchange(ref this.tcs, fresh, current) == current)
-                    return;
-            }
-        }
-    }
 }

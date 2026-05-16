@@ -13,10 +13,19 @@ public class HttpTransferManager(
     AndroidPlatform platform,
     ILogger<HttpTransferManager> logger,
     IRepository repository
-) : IHttpTransferManager, IShinyStartupTask
+) : IHttpTransferManager, IShinyStartupTask, IDisposable
 {
+    bool subscribed;
+
     public void Start()
     {
+        if (!this.subscribed)
+        {
+            HttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
+            repository.ActionOccurred += this.OnRepoAction;
+            this.subscribed = true;
+        }
+
         try
         {
             if (HttpTransferService.IsStarted)
@@ -30,9 +39,16 @@ public class HttpTransferManager(
         {
             logger.LogError(ex, "Failed to auto-start HTTP Transfer Manager");
         }
+    }
 
-        HttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
-        repository.ActionOccurred += this.OnRepoAction;
+    public void Dispose()
+    {
+        if (this.subscribed)
+        {
+            HttpTransferProcess.ProgressOccurred -= this.OnProcessProgress;
+            repository.ActionOccurred -= this.OnRepoAction;
+            this.subscribed = false;
+        }
     }
 
     void OnProcessProgress(object? sender, HttpTransferResult result)

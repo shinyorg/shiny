@@ -10,6 +10,7 @@ public class PerTransferNotificationStrategy : AbstractTransferNotificationStrat
 {
     static int CurrentNotificationId = 9999;
     readonly Dictionary<string, (int NotificationId, NotificationCompat.Builder Builder)> notificationCfg = new();
+    EventHandler<HttpTransferResult>? updateHandler;
 
     public PerTransferNotificationStrategy(
         IHttpTransferManager manager,
@@ -28,7 +29,7 @@ public class PerTransferNotificationStrategy : AbstractTransferNotificationStrat
     {
         var channelId = this.CreateChannel();
 
-        this.Manager.UpdateReceived += (_, transfer) =>
+        this.updateHandler = (_, transfer) =>
         {
             if (!this.notificationCfg.ContainsKey(transfer.Request.Identifier))
             {
@@ -50,6 +51,16 @@ public class PerTransferNotificationStrategy : AbstractTransferNotificationStrat
                 this.notificationCfg.Remove(transfer.Request.Identifier);
             }
         };
+        this.Manager.UpdateReceived += this.updateHandler;
+    }
+
+    public void Stop()
+    {
+        if (this.updateHandler != null)
+        {
+            this.Manager.UpdateReceived -= this.updateHandler;
+            this.updateHandler = null;
+        }
     }
 
 

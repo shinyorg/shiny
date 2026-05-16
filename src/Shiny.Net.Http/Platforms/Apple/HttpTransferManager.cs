@@ -30,10 +30,15 @@ public partial class HttpTransferManager(
     public event EventHandler<int>? CountChanged;
     public event EventHandler<HttpTransferResult>? UpdateReceived;
 
+    bool subscribed;
 
     public async void Start()
     {
-        repository.ActionOccurred += this.OnRepoAction;
+        if (!this.subscribed)
+        {
+            repository.ActionOccurred += this.OnRepoAction;
+            this.subscribed = true;
+        }
 
         try
         {
@@ -52,6 +57,16 @@ public partial class HttpTransferManager(
         if (x.EntityType != typeof(HttpTransfer) || x.Action == RepositoryAction.Update)
             return;
         this.CountChanged?.Invoke(this, repository.GetAll<HttpTransfer>().Count);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && this.subscribed)
+        {
+            repository.ActionOccurred -= this.OnRepoAction;
+            this.subscribed = false;
+        }
+        base.Dispose(disposing);
     }
 
 

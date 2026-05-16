@@ -38,12 +38,12 @@ public class CLLocationGeofenceManager : IGeofenceManager
     }
 
 
-    TaskCompletionSource<(CLCircularRegion Region, CLRegionState State)>? regionStateTcs;
+    readonly System.Collections.Concurrent.ConcurrentDictionary<string, TaskCompletionSource<(CLCircularRegion Region, CLRegionState State)>> regionStateTcs = new();
 
     internal void OnStateDetermined(CLRegionState state, CLRegion region)
     {
-        if (region is CLCircularRegion native)
-            this.regionStateTcs?.TrySetResult((native, state));
+        if (region is CLCircularRegion native && this.regionStateTcs.TryGetValue(native.Identifier, out var tcs))
+            tcs.TrySetResult((native, state));
     }
 
 
@@ -85,23 +85,24 @@ public class CLLocationGeofenceManager : IGeofenceManager
 
     public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
     {
-        this.regionStateTcs = new TaskCompletionSource<(CLCircularRegion, CLRegionState)>();
+        var tcs = new TaskCompletionSource<(CLCircularRegion, CLRegionState)>();
+        this.regionStateTcs[region.Identifier] = tcs;
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
         cts.CancelAfter(TimeSpan.FromSeconds(20));
-        cts.Token.Register(() => this.regionStateTcs.TrySetException(
+        cts.Token.Register(() => tcs.TrySetException(
             new TimeoutException("Could not retrieve latest GPS coordinates to be able to determine geofence current state")
         ));
 
         this.locationManager.RequestState(region.ToNative());
         try
         {
-            var result = await this.regionStateTcs.Task.ConfigureAwait(false);
-            return result.State.FromNative();
+            var result = await tcs.Task.ConfigureAwait(false);
+            return result.Item2.FromNative();
         }
         finally
         {
-            this.regionStateTcs = null;
+            this.regionStateTcs.TryRemove(region.Identifier, out _);
         }
     }
 

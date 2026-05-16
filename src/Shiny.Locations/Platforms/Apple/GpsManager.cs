@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Versioning;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
@@ -66,6 +67,9 @@ public class GpsManager(
             : CLServiceSessionAuthorizationRequirement.Always;
 
         var tcs = new TaskCompletionSource<AccessState>();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        cts.Token.Register(() => tcs.TrySetException(new TimeoutException("GPS authorization request timed out")));
+
         var fullAccuracy = request.RequestPreciseAccuracy
             ? "shinygps"
             : String.Empty;
