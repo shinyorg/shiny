@@ -6,8 +6,8 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Shiny.Maui.Shell" Version="5.0.0"/>
-        <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0034"/>
+        <PackageVersion Include="Shiny.Maui.Shell" Version="6.0.3"/>
+        <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0077"/>
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>
@@ -18,7 +18,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
-        <PackageVersion Include="Microsoft.Maui.Core" Version="10.0.51"/>
+        <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
         <PackageVersion Include="Shiny.Reflector" Version="1.7.2"/>
         <PackageVersion Include="System.Reactive" Version="6.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>

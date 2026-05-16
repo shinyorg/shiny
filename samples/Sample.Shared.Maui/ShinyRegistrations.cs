@@ -52,7 +52,7 @@ public static class ShinyRegistrations
 #if !MACOS && !WINDOWS
         // Jobs: iOS, Android, and MacCatalyst.
         // MacOS and Windows samples do not exercise the jobs subsystem.
-        s.AddJob<SampleJob>(new JobRegistration("SampleJob", typeof(SampleJob), RunOnForeground: true));
+        // s.AddJob<SampleJob>(new JobRegistration("SampleJob", typeof(SampleJob), RunOnForeground: true));
 #endif
 
         return builder;
