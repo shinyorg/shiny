@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 namespace Shiny.BluetoothLE;
 
 
-public static class PeripheralExtensions
+public static partial class Extensions
 {
     /// <summary>
     /// Quick access method for checking if device is connected instead of looking at Status enum
@@ -32,16 +32,16 @@ public static class PeripheralExtensions
         }
 
         var comp = new CompositeDisposable();
-        peripheral
+        comp.Add(peripheral
             .WhenConnected()
             .Take(1)
             .Subscribe(_ => ob.Respond(peripheral))
-            .DisposedBy(comp);
+        );
 
-        peripheral
+        comp.Add(peripheral
             .WhenConnectionFailed()
             .Subscribe(ob.OnError)
-            .DisposedBy(comp);
+        );
 
         peripheral.Connect(config);
 

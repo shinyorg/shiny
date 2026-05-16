@@ -25,13 +25,13 @@ public interface IJobManager
     /// <summary>
     /// Fires just as a job is about to start
     /// </summary>
-    IObservable<JobInfo> JobStarted { get; }
+    event EventHandler<JobInfo> JobStarted;
 
 
     /// <summary>
     /// Fires as each job finishes
     /// </summary>
-    IObservable<JobRunResult> JobFinished { get; }
+    event EventHandler<JobRunResult> JobFinished;
 
 
     /// <summary>

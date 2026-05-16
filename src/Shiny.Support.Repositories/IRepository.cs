@@ -56,7 +56,7 @@ public interface IRepository
     void Update<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// An observable for watching events within the repository
+    /// Fires when an action occurs within the repository
     /// </summary>
-    IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs();
+    event EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> ActionOccurred;
 }

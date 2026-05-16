@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
@@ -35,7 +32,12 @@ public class HttpTransferManager(
         {
             logger.LogError(ex, "Failed to auto-start HTTP Transfer Manager");
         }
+
+        HttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
     }
+
+    void OnProcessProgress(object? sender, HttpTransferResult result)
+        => this.UpdateReceived?.Invoke(this, result);
 
 
     public Task<IList<HttpTransfer>> GetTransfers()
@@ -86,7 +88,6 @@ public class HttpTransferManager(
         {
             repository.Remove(transfer);
 
-            // best-effort cleanup of any partial download file
             if (transfer.Request.Type == TransferType.Download)
             {
                 try
@@ -100,7 +101,7 @@ public class HttpTransferManager(
                 }
             }
 
-            this.resultSubj.OnNext(new(
+            this.UpdateReceived?.Invoke(this, new(
                 transfer.Request,
                 HttpTransferState.Canceled,
                 TransferProgress.Empty,
@@ -137,21 +138,8 @@ public class HttpTransferManager(
 
     public IObservable<int> WatchCount() => repository.CreateCountWatcher<HttpTransfer>();
 
-    readonly Subject<HttpTransferResult> resultSubj = new();
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => Observable.Create<HttpTransferResult>(ob =>
-    {
-        var disposer = new CompositeDisposable();
-        this.resultSubj
-            .Subscribe(ob.OnNext)
-            .DisposedBy(disposer);
-
-        HttpTransferProcess
-            .WhenProgress()
-            .Subscribe(ob.OnNext)
-            .DisposedBy(disposer);
-
-        return disposer;
-    });
+    public event EventHandler<HttpTransferResult>? UpdateReceived;
+    public IObservable<HttpTransferResult> WhenUpdateReceived() => new HttpTransferUpdateObservable(this);
 
 
     void TryStartProcess()

@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,16 +31,13 @@ public class HttpTransferProcess
     {
         this.logger = logger;
         this.repository = repository;
-        this.connectivity = connectivity;        
+        this.connectivity = connectivity;
         this.delegates = delegates;
-
-        progressSubj.Logger = logger;
     }
 
 
-    static readonly ShinySubject<HttpTransferResult> progressSubj = new();
-    public static IObservable<HttpTransferResult> WhenProgress() => progressSubj;
-    
+    public static event EventHandler<HttpTransferResult>? ProgressOccurred;
+
 
     public void Run(Action onComplete)
     {
@@ -50,20 +46,19 @@ public class HttpTransferProcess
             this.logger.LogInformation("Starting Transfer Loop Wait");
             using var cancelSrc = new CancellationTokenSource();
 
-            using var sub = this.repository
-                .WhenActionOccurs()
-                .Where(x =>
-                    x.EntityType == typeof(HttpTransfer) &&
-                    x.Action == RepositoryAction.Clear
-                )
-                .Take(1)
-                .Subscribe(_ =>
+            EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> clearHandler = null!;
+            clearHandler = (_, x) =>
+            {
+                if (x.EntityType == typeof(HttpTransfer) && x.Action == RepositoryAction.Clear)
                 {
+                    this.repository.ActionOccurred -= clearHandler;
                     this.logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
                     cancelSrc.Cancel();
-                });
+                }
+            };
+            this.repository.ActionOccurred += clearHandler;
+            using var sub = new RepoSub(() => this.repository.ActionOccurred -= clearHandler);
 
-            //var semaphore = new SemaphoreSlim(1, 2);
             try
             {
                 var transfers = this.repository.GetAll<HttpTransfer>();
@@ -77,7 +72,6 @@ public class HttpTransferProcess
 
                         foreach (var transfer in transfers)
                         {
-                            //var stillExists = this.repository.Exists<HttpTransfer>(transfer.Identifier);
                             if (cancelSrc.IsCancellationRequested)
                             {
                                 this.logger.LogDebug("Transfer Loop cancelled");
@@ -88,21 +82,8 @@ public class HttpTransferProcess
                             }
                             else if (transfer.Request.UseMeteredConnection || full)
                             {
-                                //this.logger.LogDebug("Checking Queue");
-                                //await semaphore.WaitAsync(cancelSrc.Token);
-
-                                //if (!cancelSrc.IsCancellationRequested)
-                                //{
                                 this.logger.LogInformation($"Transfer {transfer.Identifier} starting");
                                 await this.RunTransfer(transfer, cancelSrc.Token).ConfigureAwait(false);
-
-                                //this.RunTransfer(transfer, cancelSrc.Token)
-                                //    .ContinueWith(_ =>
-                                //    {
-                                //        semaphore.Release();
-                                //        this.logger.LogDebug("Releasing Semaphore");
-                                //    });
-                                //}
                             }
                             else
                             {
@@ -118,7 +99,6 @@ public class HttpTransferProcess
                     transfers = this.repository.GetAll<HttpTransfer>();
                     if (transfers.Count > 0)
                     {
-                        // TODO: configurable
                         this.logger.LogDebug("Waiting for loop pass");
                         await Task
                             .Delay(10000, cancelSrc.Token)
@@ -135,29 +115,30 @@ public class HttpTransferProcess
                 this.logger.LogError(ex, "Error in transfer loop");
             }
             this.logger.LogDebug("Shutting down HTTP transfer service");
-            onComplete(); // shutdown service
+            onComplete();
         });
     }
-    
+
 
     async Task RunTransfer(HttpTransfer transfer, CancellationToken cancelToken)
     {
         using var cancelSrc = new CancellationTokenSource();
         using var _ = cancelToken.Register(() => cancelSrc.Cancel());
 
-        using var repoSub = this.repository
-            .WhenActionOccurs()
-            .Where(x =>
-                x.EntityType == typeof(HttpTransfer) &&
+        EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> removeHandler = null!;
+        removeHandler = (_, x) =>
+        {
+            if (x.EntityType == typeof(HttpTransfer) &&
                 x.Action == RepositoryAction.Remove &&
-                transfer.Identifier.Equals(x.Entity!.Identifier)
-            )
-            .Take(1)
-            .Subscribe(_ =>
+                transfer.Identifier.Equals(x.Entity!.Identifier))
             {
+                this.repository.ActionOccurred -= removeHandler;
                 this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
                 cancelSrc?.Cancel();
-            });
+            }
+        };
+        this.repository.ActionOccurred += removeHandler;
+        using var repoSub = new RepoSub(() => this.repository.ActionOccurred -= removeHandler);
 
         try
         {
@@ -170,10 +151,10 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
 
-            repoSub.Dispose(); // dispose before removal so cancellation isn't triggered
+            repoSub.Dispose();
             this.repository.Remove(transfer);
 
-            progressSubj.OnNext(new(
+            ProgressOccurred?.Invoke(null, new(
                 transfer.Request,
                 HttpTransferState.Completed,
                 new TransferProgress(
@@ -186,7 +167,7 @@ public class HttpTransferProcess
         }
         catch (HttpRequestException ex)
         {
-            repoSub.Dispose(); // dispose before removal so cancellation isn't triggered
+            repoSub.Dispose();
             this.repository.Remove(transfer);
 
             this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
@@ -194,7 +175,7 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), this.logger)
                 .ConfigureAwait(false);
 
-            progressSubj.OnNext(new(
+            ProgressOccurred?.Invoke(null, new(
                 transfer!.Request,
                 HttpTransferState.Error,
                 TransferProgress.Empty,
@@ -215,7 +196,6 @@ public class HttpTransferProcess
         }
         catch (Exception ex)
         {
-            // should always retry unless server fails
             this.PauseTransfer(transfer, "Error with transfer - " + ex, ex, isNetworkError: false);
         }
     }
@@ -233,24 +213,44 @@ public class HttpTransferProcess
     }
 
 
+    void PublishProgress(HttpTransfer transfer, TransferProgress x, CancellationToken cancelToken)
+    {
+        if (cancelToken.IsCancellationRequested)
+            return;
+
+        this.repository.Set(transfer with
+        {
+            Status = HttpTransferState.InProgress,
+            BytesToTransfer = x.BytesToTransfer,
+            BytesTransferred = x.BytesTransferred
+        });
+
+        ProgressOccurred?.Invoke(null, new HttpTransferResult(
+            transfer.Request,
+            HttpTransferState.InProgress,
+            x,
+            null
+        ));
+    }
+
+
     async Task DoRequest(HttpTransfer transfer, CancellationToken cancelToken)
     {
         var request = transfer.Request;
-        var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray() ?? Array.Empty<(string Key, string Value)>();
+        var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray();
 
         HttpMethod? httpMethod = null;
         if (request.HttpMethod != null)
             httpMethod = new HttpMethod(request.HttpMethod);
 
         HttpContent? bodyContent = null;
-        var c = transfer.Request.HttpContent;
+        var c = request.HttpContent;
         if (c != null)
-        {
             bodyContent = new StringContent(c.Content, Encoding.UTF8, c.ContentType);
-        }
-        
-        var obs = request.Type.IsUpload()
-            ? this.httpClient.Upload(
+
+        if (request.Type.IsUpload())
+        {
+            await this.httpClient.Upload(
                 request.Uri,
                 request.LocalFilePath,
                 request.Type == TransferType.UploadMultipart,
@@ -258,45 +258,23 @@ public class HttpTransferProcess
                 bodyContent,
                 request.HttpContent?.ContentFormDataName ?? "value",
                 request.FileFormDataName,
-                headers
-            )
-            : this.httpClient.Download(
+                headers,
+                x => this.PublishProgress(transfer, x, cancelToken),
+                cancelToken
+            ).ConfigureAwait(false);
+        }
+        else
+        {
+            await this.httpClient.Download(
                 request.Uri,
                 request.LocalFilePath,
                 8192,
                 httpMethod,
                 bodyContent,
-                headers
-            );
-
-        var tcs = new TaskCompletionSource<object>();
-        using var _ = cancelToken.Register(() => tcs.TrySetCanceled());
-
-        using var sub = obs.Subscribe(
-            x =>
-            {
-                if (!cancelToken.IsCancellationRequested)
-                {
-                    this.repository.Set(transfer with
-                    {
-                        Status = HttpTransferState.InProgress,
-                        BytesToTransfer = x.BytesToTransfer,
-                        BytesTransferred = x.BytesTransferred
-                    });
-
-                    var result = new HttpTransferResult(
-                        request,
-                        HttpTransferState.InProgress,
-                        x,
-                        null
-                    );
-                    progressSubj.OnNext(result);
-                }
-            },
-            ex => tcs.TrySetException(ex),
-            () => tcs.TrySetResult(null!)
-        );
-
-        await tcs.Task.ConfigureAwait(false);
+                headers,
+                x => this.PublishProgress(transfer, x, cancelToken),
+                cancelToken
+            ).ConfigureAwait(false);
+        }
     }
 }

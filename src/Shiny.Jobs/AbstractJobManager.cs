@@ -14,8 +14,6 @@ namespace Shiny.Jobs;
 
 public abstract class AbstractJobManager : IJobManager
 {
-    readonly ShinySubject<JobRunResult> jobFinished = new();
-    readonly ShinySubject<JobInfo> jobStarted = new();
     readonly IRepository repository;
     readonly IObjectStoreBinder storeBinder;
     readonly IServiceProvider container;
@@ -120,8 +118,8 @@ public abstract class AbstractJobManager : IJobManager
 
     public bool IsRunning { get; protected set; }
     public TimeSpan? MinimumAllowedPeriodicTime { get; }
-    public IObservable<JobInfo> JobStarted => this.jobStarted;
-    public IObservable<JobRunResult> JobFinished => this.jobFinished;
+    public event EventHandler<JobInfo>? JobStarted;
+    public event EventHandler<JobRunResult>? JobFinished;
 
 
     public void Register(JobInfo jobInfo)
@@ -184,7 +182,7 @@ public abstract class AbstractJobManager : IJobManager
 
     protected async Task<JobRunResult> RunJob(JobInfo job, CancellationToken cancelToken)
     {
-        this.jobStarted.OnNext(job);
+        this.JobStarted?.Invoke(this, job);
         var result = default(JobRunResult);
         IJob? jobDelegate = null;
 
@@ -214,7 +212,7 @@ public abstract class AbstractJobManager : IJobManager
                 this.storeBinder.UnBind(npc);
         }
 
-        this.jobFinished.OnNext(result);
+        this.JobFinished?.Invoke(this, result);
         return result;
     }
 

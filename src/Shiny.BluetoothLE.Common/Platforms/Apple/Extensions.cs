@@ -95,7 +95,7 @@ public static class Extensions
         }
 
         var comp = new CompositeDisposable();
-        stream
+        comp.Add(stream
             .WhenEvent()
             .Where(x => x == NSStreamEvent.HasBytesAvailable)
             .Subscribe(_ =>
@@ -104,7 +104,7 @@ public static class Extensions
                 if (read > 0)
                     ob.OnNext(buffer);
             })
-            .DisposedBy(comp);
+        );
 
         stream
             .WhenEvent()

@@ -5,8 +5,8 @@ namespace Sample.Shared.Maui.Pages.Jobs;
 [ShellMap<JobsPage>("jobs")]
 public partial class JobsViewModel(IJobManager jobManager, IMainThread mainThread) : ObservableObject, IPageLifecycleAware
 {
-    IDisposable? startedSub;
-    IDisposable? finishedSub;
+    EventHandler<JobInfo>? startedHandler;
+    EventHandler<JobRunResult>? finishedHandler;
 
     [ObservableProperty] string status = string.Empty;
     [ObservableProperty] bool isRunning;
@@ -19,35 +19,39 @@ public partial class JobsViewModel(IJobManager jobManager, IMainThread mainThrea
         this.LoadJobs();
         this.IsRunning = jobManager.IsRunning;
 
-        this.startedSub = jobManager
-            .JobStarted
-            .Subscribe(info => mainThread.InvokeOnMainThreadAsync(() =>
-            {
-                this.IsRunning = true;
-                this.Status = $"Started: {info.Identifier}";
-                this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, info.Identifier, "Started", null));
-                this.Trim();
-            }));
+        this.startedHandler = (_, info) => mainThread.InvokeOnMainThreadAsync(() =>
+        {
+            this.IsRunning = true;
+            this.Status = $"Started: {info.Identifier}";
+            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, info.Identifier, "Started", null));
+            this.Trim();
+        });
+        jobManager.JobStarted += this.startedHandler;
 
-        this.finishedSub = jobManager
-            .JobFinished
-            .Subscribe(result => mainThread.InvokeOnMainThreadAsync(() =>
-            {
-                this.IsRunning = jobManager.IsRunning;
-                var id = result.Job?.Identifier ?? "(unknown)";
-                var outcome = result.Success ? "Success" : "Failed";
-                this.Status = $"{outcome}: {id}";
-                this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, id, outcome, result.Exception?.Message));
-                this.Trim();
-            }));
+        this.finishedHandler = (_, result) => mainThread.InvokeOnMainThreadAsync(() =>
+        {
+            this.IsRunning = jobManager.IsRunning;
+            var id = result.Job?.Identifier ?? "(unknown)";
+            var outcome = result.Success ? "Success" : "Failed";
+            this.Status = $"{outcome}: {id}";
+            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, id, outcome, result.Exception?.Message));
+            this.Trim();
+        });
+        jobManager.JobFinished += this.finishedHandler;
     }
 
     public void OnDisappearing()
     {
-        this.startedSub?.Dispose();
-        this.finishedSub?.Dispose();
-        this.startedSub = null;
-        this.finishedSub = null;
+        if (this.startedHandler != null)
+        {
+            jobManager.JobStarted -= this.startedHandler;
+            this.startedHandler = null;
+        }
+        if (this.finishedHandler != null)
+        {
+            jobManager.JobFinished -= this.finishedHandler;
+            this.finishedHandler = null;
+        }
         this.RunLog.Clear();
     }
 

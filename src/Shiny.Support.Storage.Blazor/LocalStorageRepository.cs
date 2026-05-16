@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Subjects;
 using Microsoft.JSInterop;
 using Shiny.Stores;
 using Shiny.Support.Repositories;
@@ -14,7 +13,6 @@ public class LocalStorageRepository : IRepository
 
     readonly IJSInProcessRuntime js;
     readonly ISerializer serializer;
-    readonly Subject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj = new();
 
 
     public LocalStorageRepository(IJSRuntime jsRuntime, ISerializer serializer)
@@ -24,7 +22,7 @@ public class LocalStorageRepository : IRepository
     }
 
 
-    public IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs() => this.repoSubj;
+    public event EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)>? ActionOccurred;
 
 
     public bool Exists<TEntity>(string identifier) where TEntity : IRepositoryEntity
@@ -68,7 +66,7 @@ public class LocalStorageRepository : IRepository
         this.js.InvokeVoid("shinyLocalStorage.setItem", key, this.serializer.Serialize(entity));
 
         var action = exists ? RepositoryAction.Update : RepositoryAction.Add;
-        this.repoSubj.OnNext((action, typeof(TEntity), entity));
+        this.ActionOccurred?.Invoke(this,(action, typeof(TEntity), entity));
         return exists;
     }
 
@@ -80,7 +78,7 @@ public class LocalStorageRepository : IRepository
             throw new RepositoryException($"{typeof(TEntity).FullName} already has a record with identifier '{entity.Identifier}'");
 
         this.js.InvokeVoid("shinyLocalStorage.setItem", key, this.serializer.Serialize(entity));
-        this.repoSubj.OnNext((RepositoryAction.Add, typeof(TEntity), entity));
+        this.ActionOccurred?.Invoke(this,(RepositoryAction.Add, typeof(TEntity), entity));
     }
 
 
@@ -91,7 +89,7 @@ public class LocalStorageRepository : IRepository
             throw new RepositoryException($"{typeof(TEntity).FullName} - no record exists with identifier '{entity.Identifier}'");
 
         this.js.InvokeVoid("shinyLocalStorage.setItem", key, this.serializer.Serialize(entity));
-        this.repoSubj.OnNext((RepositoryAction.Update, typeof(TEntity), entity));
+        this.ActionOccurred?.Invoke(this,(RepositoryAction.Update, typeof(TEntity), entity));
     }
 
 
@@ -102,7 +100,7 @@ public class LocalStorageRepository : IRepository
         var removed = this.js.Invoke<bool>("shinyLocalStorage.removeItem", key);
 
         if (removed && entity != null)
-            this.repoSubj.OnNext((RepositoryAction.Remove, typeof(TEntity), entity));
+            this.ActionOccurred?.Invoke(this,(RepositoryAction.Remove, typeof(TEntity), entity));
 
         return removed;
     }
@@ -111,7 +109,7 @@ public class LocalStorageRepository : IRepository
     public void Clear<TEntity>() where TEntity : IRepositoryEntity
     {
         this.js.Invoke<int>("shinyLocalStorage.removeKeys", GetTypePrefix<TEntity>());
-        this.repoSubj.OnNext((RepositoryAction.Clear, typeof(TEntity), default));
+        this.ActionOccurred?.Invoke(this,(RepositoryAction.Clear, typeof(TEntity), default));
     }
 
 

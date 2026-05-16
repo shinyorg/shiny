@@ -77,11 +77,35 @@ public partial class AndroidPlatform : IPlatform,
 
     public Activity? CurrentActivity => activityLifecycle.Activity;
 
-    public IObservable<ActivityChanged> WhenActivityChanged()
-        => new ActivityEventObservable(activityLifecycle);
+    public event EventHandler<ActivityChanged> ActivityChanged
+    {
+        add => activityLifecycle.ActivityChanged += value;
+        remove => activityLifecycle.ActivityChanged -= value;
+    }
 
-    public IObservable<ActivityChanged> WhenActivityStatusChanged()
-        => new ActivityStatusObservable(activityLifecycle, this.CurrentActivity);
+    public Task<ActivityChanged> WaitForActivity(ActivityState state = ActivityState.Resumed, CancellationToken cancellationToken = default)
+    {
+
+        var tcs = new TaskCompletionSource<ActivityChanged>();
+        EventHandler<ActivityChanged>? handler = null;
+        handler = (_, e) =>
+        {
+            if (e.State != state)
+                return;
+            activityLifecycle.ActivityChanged -= handler;
+            tcs.TrySetResult(e);
+        };
+        activityLifecycle.ActivityChanged += handler;
+
+        if (cancellationToken.CanBeCanceled)
+            cancellationToken.Register(() =>
+            {
+                activityLifecycle.ActivityChanged -= handler;
+                tcs.TrySetCanceled(cancellationToken);
+            });
+
+        return tcs.Task;
+    }
 
 
     readonly Handler handler = new Handler(Looper.MainLooper);
@@ -237,34 +261,4 @@ public partial class AndroidPlatform : IPlatform,
     }
 
 
-    sealed class ActivityEventObservable(AndroidActivityLifecycle lifecycle) : IObservable<ActivityChanged>
-    {
-        public IDisposable Subscribe(IObserver<ActivityChanged> observer)
-        {
-            EventHandler<ActivityChanged> handler = (_, e) => observer.OnNext(e);
-            lifecycle.ActivityChanged += handler;
-            return new ActionDisposable(() => lifecycle.ActivityChanged -= handler);
-        }
-    }
-
-
-    sealed class ActivityStatusObservable(AndroidActivityLifecycle lifecycle, Activity? current) : IObservable<ActivityChanged>
-    {
-        public IDisposable Subscribe(IObserver<ActivityChanged> observer)
-        {
-            if (current != null)
-                observer.OnNext(new ActivityChanged(current, ActivityState.Created, null));
-
-            EventHandler<ActivityChanged>? handler = null;
-            handler = (_, e) =>
-            {
-                lifecycle.ActivityChanged -= handler;
-                observer.OnNext(e);
-                observer.OnCompleted();
-            };
-            lifecycle.ActivityChanged += handler;
-
-            return new ActionDisposable(() => lifecycle.ActivityChanged -= handler);
-        }
-    }
 }

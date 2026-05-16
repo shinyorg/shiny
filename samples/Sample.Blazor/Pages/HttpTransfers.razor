@@ -1,5 +1,4 @@
 @page "/httptransfers"
-@using System.Reactive.Linq
 @using Microsoft.AspNetCore.Components.Forms
 @using Shiny.Net.Http
 @using BlazorTransferManager = Shiny.Net.Http.Blazor.HttpTransferManager
@@ -109,7 +108,6 @@ else
 
 @code {
     IList<HttpTransfer> transfers = new List<HttpTransfer>();
-    IDisposable? updateSub;
     string? status;
     string downloadUrl = "https://speed.hetzner.de/1MB.bin";
     string uploadUrl = "https://httpbin.org/post";
@@ -118,18 +116,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        // Live-refresh the table whenever the manager reports a state change.
-        // Throttle so rapid progress pings don't overwhelm the render loop.
-        updateSub = TransferManager
-            .WhenUpdateReceived()
-            .Sample(TimeSpan.FromMilliseconds(500))
-            .Subscribe(async _ =>
-            {
-                eventCount++;
-                await InvokeAsync(Refresh);
-            });
-
+        TransferManager.UpdateReceived += this.OnTransferUpdate;
         await Refresh();
+    }
+
+    async void OnTransferUpdate(object? sender, HttpTransferResult _)
+    {
+        eventCount++;
+        await InvokeAsync(Refresh);
     }
 
     async Task Refresh()
@@ -253,5 +247,5 @@ else
         return $"{b:0.##} {units[u]}";
     }
 
-    public void Dispose() => updateSub?.Dispose();
+    public void Dispose() => TransferManager.UpdateReceived -= this.OnTransferUpdate;
 }

@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Shiny.Collections;
 using Shiny.Support.Repositories;
@@ -16,18 +14,19 @@ namespace Shiny.Net.Http;
 /// This class is used to monitor a list of transfers within your user interface
 /// </summary>
 public class HttpTransferMonitor(
-    IHttpTransferManager manager, 
+    IHttpTransferManager manager,
     IRepository repository,
     ILogger<HttpTransferMonitor> logger
 ) : IDisposable
 {
-    CompositeDisposable? disposable;
+    IDisposable? repoSub;
+    IDisposable? updateSub;
 
 
     readonly BindingList<HttpTransferObject> transfers = new();
     public INotifyReadOnlyCollection<HttpTransferObject> Transfers => this.transfers;
 
-    public bool IsStarted => this.disposable != null;
+    public bool IsStarted => this.repoSub != null || this.updateSub != null;
 
 
     public void Clear(bool removeFinished, bool removeCancelled, bool removeErrors)
@@ -64,15 +63,14 @@ public class HttpTransferMonitor(
         bool removeFinished = true,
         bool removeErrors = true,
         bool removeCancelled = true,
-        IScheduler? scheduler = null
+        SynchronizationContext? syncContext = null
     )
     {
-        if (this.disposable != null)
+        if (this.repoSub != null)
             throw new InvalidOperationException("Already running monitor");
 
-        this.disposable = new();
         this.transfers.Clear();
-        
+
         var current = (await manager.GetTransfers())
             .Select(x =>
             {
@@ -89,14 +87,15 @@ public class HttpTransferMonitor(
                 ));
                 return obj;
             });
-        
+
         this.transfers.AddRange(current);
 
-        repository
-            .WhenActionOccurs()
-            .ObserveOnIf(scheduler)
-            .Where(x => x.EntityType == typeof(HttpTransfer))
-            .Subscribe(x =>
+        EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoHandler = (_, x) =>
+        {
+            if (x.EntityType != typeof(HttpTransfer))
+                return;
+
+            void process()
             {
                 if (x.Action == RepositoryAction.Clear)
                 {
@@ -113,24 +112,28 @@ public class HttpTransferMonitor(
                         case RepositoryAction.Add:
                             this.transfers.Add(new HttpTransferObject(e.Request));
                             break;
-                        
+
                         case RepositoryAction.Remove:
                             var vm = this.transfers.FirstOrDefault(y => y.Identifier.Equals(e.Identifier));
                             if (vm != null)
                                 this.transfers.Remove(vm);
-                            
                             break;
                     }
                 }
-            })
-            .DisposedBy(this.disposable);
+            }
 
-        manager
-            .WhenUpdateReceived()
-            .ObserveOnIf(scheduler)
-            .Subscribe(x =>
+            if (syncContext != null)
+                syncContext.Post(_ => process(), null);
+            else
+                process();
+        };
+        repository.ActionOccurred += repoHandler;
+        this.repoSub = new RepoSub(() => repository.ActionOccurred -= repoHandler);
+
+        EventHandler<HttpTransferResult> updateHandler = (_, x) =>
+        {
+            void process()
             {
-                // sync lock the collection?
                 var item = this.transfers.FirstOrDefault(y => y.Identifier.Equals(x.Request.Identifier));
                 if (item == null)
                 {
@@ -157,19 +160,25 @@ public class HttpTransferMonitor(
                         if (removeErrors)
                             this.transfers.Remove(item);
                         break;
-
-                    default:
-                        break;
                 }
-            })
-            .DisposedBy(this.disposable);
+            }
+
+            if (syncContext != null)
+                syncContext.Post(_ => process(), null);
+            else
+                process();
+        };
+        manager.UpdateReceived += updateHandler;
+        this.updateSub = new RepoSub(() => manager.UpdateReceived -= updateHandler);
     }
 
 
     public void Stop()
     {
-        this.disposable?.Dispose();
-        this.disposable = null;
+        this.repoSub?.Dispose();
+        this.updateSub?.Dispose();
+        this.repoSub = null;
+        this.updateSub = null;
     }
 
     public void Dispose() => this.Stop();

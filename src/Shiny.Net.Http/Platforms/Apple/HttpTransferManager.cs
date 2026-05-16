@@ -26,7 +26,9 @@ public partial class HttpTransferManager(
     IIosLifecycle.IHandleEventsForBackgroundUrl
 {
     Action? completionHandler;
-    readonly ShinySubject<HttpTransferResult> transferSubj = new(logger);
+
+    public event EventHandler<HttpTransferResult>? UpdateReceived;
+    public IObservable<HttpTransferResult> WhenUpdateReceived() => new HttpTransferUpdateObservable(this);
 
 
     public async void Start()
@@ -62,8 +64,6 @@ public partial class HttpTransferManager(
         }
     }
 
-
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => this.transferSubj;
 
     public Task<IList<HttpTransfer>> GetTransfers()
     {
@@ -162,7 +162,7 @@ public partial class HttpTransferManager(
                 logger
             );
 
-        this.transferSubj.OnNext(new(
+        this.UpdateReceived?.Invoke(this, new(
             ht.Request,
             HttpTransferState.Error,
             TransferProgress.Empty,
@@ -177,7 +177,7 @@ public partial class HttpTransferManager(
         logger.LogInformation($"Transfer {ht.Identifier} was canceled");
         this.Remove(ht);
 
-        this.transferSubj.OnNext(new(
+        this.UpdateReceived?.Invoke(this, new(
             ht.Request,
             HttpTransferState.Canceled,
             TransferProgress.Empty,
@@ -192,7 +192,7 @@ public partial class HttpTransferManager(
         this.Remove(ht);
         await services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), logger);
 
-        this.transferSubj.OnNext(new(
+        this.UpdateReceived?.Invoke(this, new(
             ht.Request,
             HttpTransferState.Completed,
             TransferProgress.Empty,

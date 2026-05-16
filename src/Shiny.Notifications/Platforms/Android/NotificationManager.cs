@@ -177,17 +177,7 @@ public partial class NotificationManager : INotificationManager,
                 this.platform.AppContext.StartActivity(intent);
 
                 // wait for the user to return from settings
-                var tcs = new TaskCompletionSource();
-                IDisposable? sub = null;
-                sub = this.platform.WhenActivityChanged().Subscribe(x =>
-                {
-                    if (x.State == ActivityState.Resumed)
-                    {
-                        sub?.Dispose();
-                        tcs.TrySetResult();
-                    }
-                });
-                await tcs.Task.ConfigureAwait(false);
+                await this.platform.WaitForActivity(ActivityState.Resumed).ConfigureAwait(false);
 
                 if (!this.manager.Alarms.CanScheduleExactAlarms())
                     return AccessState.Restricted;

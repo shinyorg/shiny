@@ -33,7 +33,7 @@ public partial class HttpTransferManager
             {
                 repository.Update(ht);
                 var bps = (int)(task.Progress?.Throughput ?? 0);
-                this.transferSubj.OnNext(new(
+                this.UpdateReceived?.Invoke(this, new(
                     ht.Request,
                     ht.Status,
                     new(bps, totalBytesExpectedToSend, totalBytesSent),
@@ -72,7 +72,7 @@ public partial class HttpTransferManager
                 repository.Update(ht);
                 var bps = (int)(downloadTask.Progress?.Throughput ?? 0);
 
-                this.transferSubj.OnNext(new(
+                this.UpdateReceived?.Invoke(this, new(
                     ht.Request,
                     ht.Status,
                     new(bps, totalBytesExpectedToWrite, totalBytesWritten),
@@ -179,7 +179,7 @@ public partial class HttpTransferManager
                 ht = ht with { Status = HttpTransferState.Paused };
                 repository.Update(ht);
 
-                this.transferSubj.OnNext(new(
+                this.UpdateReceived?.Invoke(this, new(
                     ht.Request,
                     ht.Status,
                     TransferProgress.Empty,

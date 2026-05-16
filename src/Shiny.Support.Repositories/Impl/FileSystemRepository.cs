@@ -12,7 +12,6 @@ public class FileSystemRepository : IRepository
     readonly ISerializer serializer;
     readonly ILogger logger;
     readonly DirectoryInfo rootDir;
-    readonly ShinySubject<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoSubj;
 
 
     public FileSystemRepository(
@@ -27,12 +26,10 @@ public class FileSystemRepository : IRepository
 
         if (!this.rootDir.Exists)
             this.rootDir.Create();
-
-        this.repoSubj = new(this.logger);
     }
 
 
-    public IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs() => this.repoSubj;
+    public event EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)>? ActionOccurred;
 
     public bool Exists<TEntity>(string identifier) where TEntity : IRepositoryEntity
     {
@@ -79,7 +76,7 @@ public class FileSystemRepository : IRepository
             list.Add(entity.Identifier, entity);
             this.logger.Change(RepositoryAction.Add, typeof(TEntity).Name, entity.Identifier);
         });
-        this.repoSubj.OnNext((RepositoryAction.Add, typeof(TEntity), entity));
+        this.ActionOccurred?.Invoke(this, (RepositoryAction.Add, typeof(TEntity), entity));
     }
 
 
@@ -94,7 +91,7 @@ public class FileSystemRepository : IRepository
             list[entity.Identifier] = entity;
             this.logger.Change(RepositoryAction.Update, typeof(TEntity).Name, entity.Identifier);
         });
-        this.repoSubj.OnNext((RepositoryAction.Update, typeof(TEntity), entity));
+        this.ActionOccurred?.Invoke(this, (RepositoryAction.Update, typeof(TEntity), entity));
     }
 
 
@@ -111,7 +108,7 @@ public class FileSystemRepository : IRepository
             action = update ? RepositoryAction.Update : RepositoryAction.Add;
             this.logger.Change(action, typeof(TEntity).Name, entity.Identifier);
         });
-        this.repoSubj.OnNext((action, typeof(TEntity), entity));
+        this.ActionOccurred?.Invoke(this, (action, typeof(TEntity), entity));
         return update;
     }
 
@@ -136,7 +133,7 @@ public class FileSystemRepository : IRepository
         });
 
         if (removed && entity != null)
-            this.repoSubj.OnNext((RepositoryAction.Remove, typeof(TEntity), entity));
+            this.ActionOccurred?.Invoke(this, (RepositoryAction.Remove, typeof(TEntity), entity));
 
         return removed;
     }
@@ -155,7 +152,7 @@ public class FileSystemRepository : IRepository
 
             this.logger.Change(RepositoryAction.Clear, typeof(TEntity).Name, String.Empty);
         });
-        this.repoSubj.OnNext((RepositoryAction.Clear, typeof(TEntity), default));
+        this.ActionOccurred?.Invoke(this, (RepositoryAction.Clear, typeof(TEntity), default));
     }
 
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Shiny.BluetoothLE;
 
 
-public static class AsyncExtensions
+public static partial class Extensions
 {
     /// <summary>
     /// Requests access/permission

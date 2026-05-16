@@ -40,9 +40,7 @@
     <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
     <Project Path="src\Shiny.Push\Shiny.Push.csproj" />
     <Project Path="src\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
-    <Project Path="src\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
     <Project Path="src\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
-    <Project Path="src\Shiny.Support.Rx\Shiny.Support.Rx.csproj" />
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
         <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />

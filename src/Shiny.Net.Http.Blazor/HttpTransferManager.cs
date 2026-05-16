@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -25,7 +23,8 @@ public class HttpTransferManager(
     ILogger<HttpTransferManager> logger
 ) : IHttpTransferManager, IShinyComponentStartup, IAsyncDisposable
 {
-    readonly Subject<HttpTransferResult> resultSubj = new();
+    public event EventHandler<HttpTransferResult>? UpdateReceived;
+    public IObservable<HttpTransferResult> WhenUpdateReceived() => new HttpTransferUpdateObservable(this);
 
     IJSObjectReference? module;
     DotNetObjectReference<HttpTransferManager>? selfRef;
@@ -156,28 +155,7 @@ public class HttpTransferManager(
     }
 
 
-    public IObservable<int> WatchCount() => Observable.Create<int>(async ob =>
-    {
-        async Task Pump()
-        {
-            try
-            {
-                var list = await this.GetTransfers().ConfigureAwait(false);
-                ob.OnNext(list.Count);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Failed to read transfer count");
-            }
-        }
-
-        await Pump().ConfigureAwait(false);
-        return this.resultSubj
-            .Subscribe(async _ => await Pump().ConfigureAwait(false));
-    });
-
-
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => this.resultSubj;
+    public IObservable<int> WatchCount() => new BlazorTransferCountObservable(this, logger);
 
 
     /// <summary>
@@ -196,7 +174,7 @@ public class HttpTransferManager(
     public Task OnStatusChanged(string identifier, string status)
     {
         var mapped = MapStatus(status);
-        this.resultSubj.OnNext(new HttpTransferResult(
+        this.UpdateReceived?.Invoke(this, new HttpTransferResult(
             new HttpTransferRequest(identifier, "", TransferType.Download, ""),
             mapped,
             TransferProgress.Empty,
@@ -211,7 +189,7 @@ public class HttpTransferManager(
     {
         try
         {
-            this.resultSubj.OnNext(new HttpTransferResult(
+            this.UpdateReceived?.Invoke(this, new HttpTransferResult(
                 new HttpTransferRequest(identifier, "", TransferType.Download, ""),
                 HttpTransferState.Completed,
                 TransferProgress.Empty,
@@ -240,7 +218,7 @@ public class HttpTransferManager(
         try
         {
             var ex = new HttpTransferException(message, statusCode);
-            this.resultSubj.OnNext(new HttpTransferResult(
+            this.UpdateReceived?.Invoke(this, new HttpTransferResult(
                 new HttpTransferRequest(identifier, "", TransferType.Download, ""),
                 HttpTransferState.Error,
                 TransferProgress.Empty,
@@ -370,4 +348,39 @@ public class HttpTransferManager(
 public class HttpTransferException(string message, int statusCode) : Exception(message)
 {
     public int StatusCode => statusCode;
+}
+
+
+internal sealed class BlazorTransferCountObservable(
+    Shiny.Net.Http.Blazor.HttpTransferManager manager,
+    ILogger logger
+) : IObservable<int>
+{
+    public IDisposable Subscribe(IObserver<int> observer)
+    {
+        // Fire the initial count async; subsequent counts re-fire on every update event.
+        _ = PumpAsync(observer);
+
+        EventHandler<HttpTransferResult> handler = async (_, _) => await PumpAsync(observer).ConfigureAwait(false);
+        manager.UpdateReceived += handler;
+        return new Unsubscriber(() => manager.UpdateReceived -= handler);
+    }
+
+    async Task PumpAsync(IObserver<int> observer)
+    {
+        try
+        {
+            var list = await manager.GetTransfers().ConfigureAwait(false);
+            observer.OnNext(list.Count);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to read transfer count");
+        }
+    }
+
+    sealed class Unsubscriber(Action dispose) : IDisposable
+    {
+        public void Dispose() => dispose();
+    }
 }

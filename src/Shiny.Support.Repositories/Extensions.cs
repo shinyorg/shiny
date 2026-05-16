@@ -55,38 +55,41 @@ public static class RepositoryExtensions
 
     public static IObservable<int> CreateCountWatcher<T>(this IRepository repository) where T : IRepositoryEntity
     {
-        var count = repository.GetAll<T>().Count;
-        var subject = new ShinySubject<int>();
+        var initialCount = repository.GetAll<T>().Count;
+        return new RepositoryCountObservable<T>(repository, initialCount);
+    }
+}
 
-        repository.WhenActionOccurs().Subscribe(x =>
+
+internal sealed class RepositoryCountObservable<T>(IRepository repository, int initialCount) : IObservable<int>
+    where T : IRepositoryEntity
+{
+    public IDisposable Subscribe(IObserver<int> observer)
+    {
+        var count = initialCount;
+        observer.OnNext(count);
+
+        EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> handler = (_, x) =>
         {
             if (x.EntityType != typeof(T) || x.Action == RepositoryAction.Update)
                 return;
 
             count = x.Action switch
             {
-                RepositoryAction.Add   => count + 1,
+                RepositoryAction.Add    => count + 1,
                 RepositoryAction.Remove => count - 1,
                 RepositoryAction.Clear  => 0,
                 _                       => count
             };
-            subject.OnNext(count);
-        });
+            observer.OnNext(count);
+        };
 
-        return new CurrentValueObservable<int>(() => count, subject);
+        repository.ActionOccurred += handler;
+        return new Unsubscriber(() => repository.ActionOccurred -= handler);
     }
-}
 
-
-/// <summary>
-/// An IObservable that emits the current value immediately on subscription,
-/// then forwards subsequent values from the inner source.
-/// </summary>
-internal sealed class CurrentValueObservable<T>(Func<T> getCurrent, IObservable<T> source) : IObservable<T>
-{
-    public IDisposable Subscribe(IObserver<T> observer)
+    sealed class Unsubscriber(Action dispose) : IDisposable
     {
-        observer.OnNext(getCurrent());
-        return source.Subscribe(observer);
+        public void Dispose() => dispose();
     }
 }

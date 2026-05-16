@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Support.Locations\Shiny.Support.Locations.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
     </ItemGroup>
 

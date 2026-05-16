@@ -61,22 +61,23 @@ public class ManagedScan(IBleManager bleManager) : IDisposable, IManagedScan
         this.list.Clear();
         this.IsScanning = true;
 
+        // TODO
         bleManager
             .Scan(this.ScanConfig)
             .Buffer(this.BufferTimeSpan)
             .Where(x => x?.Any() ?? false)
-            .ObserveOnIf(this.Scheduler)
+            // .ObserveOnIf(this.Scheduler)
             .Subscribe(
                 scanResults => this.OnScanResults(scanResults, predicate),
                 this.actionSubj.OnError
-            )
-            .DisposedBy(this.disposer);
+            );
+            // .DisposedBy(this.disposer);
 
         if (clearTime != null)
         {
             Observable
                 .Interval(TimeSpan.FromSeconds(10))
-                .ObserveOnIf(this.Scheduler)
+                // .ObserveOnIf(this.Scheduler)
                 .Subscribe(
                     _ => this.OnCleanup(clearTime.Value),
                     ex =>

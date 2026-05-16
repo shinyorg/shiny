@@ -10,7 +10,7 @@ using System.Text;
 namespace Shiny.BluetoothLE;
 
 
-public static class CharacteristicExtensions
+public static partial class Extensions
 {
     /// <summary>
     /// Requests all services and characteristics from a peripheral.  Should only be used for niche cases or debugging.

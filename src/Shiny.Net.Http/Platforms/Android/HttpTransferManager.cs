@@ -1,11 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Support.Repositories;
@@ -34,7 +30,12 @@ public class HttpTransferManager(
         {
             logger.LogError(ex, "Failed to auto-start HTTP Transfer Manager");
         }
+
+        HttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
     }
+
+    void OnProcessProgress(object? sender, HttpTransferResult result)
+        => this.UpdateReceived?.Invoke(this, result);
 
 
     public Task<IList<HttpTransfer>> GetTransfers()
@@ -47,14 +48,13 @@ public class HttpTransferManager(
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         request.AssertValid();
-        // this will trigger over to the job if it is running
         long? contentLength = null;
         if (request.Type.IsUpload())
         {
             var file = new FileInfo(request.LocalFilePath);
             if (!file.Exists)
                 throw new InvalidOperationException("File to be uploaded does not exist");
-            
+
             contentLength = file.Length;
         }
         else
@@ -63,7 +63,6 @@ public class HttpTransferManager(
             if (!Directory.Exists(dir))
                 throw new InvalidOperationException("Download directory does not exist");
         }
-        
 
         var transfer = new HttpTransfer(
             request,
@@ -81,13 +80,12 @@ public class HttpTransferManager(
 
     public Task Cancel(string identifier)
     {
-        // this will trigger over to the foreground service which will shut itself down if there are no other transfers
         var transfer = repository.Get<HttpTransfer>(identifier);
         if (transfer != null)
         {
             repository.Remove(transfer);
 
-            this.resultSubj.OnNext(new(
+            this.UpdateReceived?.Invoke(this, new(
                 transfer.Request,
                 HttpTransferState.Canceled,
                 TransferProgress.Empty,
@@ -100,7 +98,6 @@ public class HttpTransferManager(
 
     public Task CancelAll()
     {
-        // this will trigger over to the foreground service which will shut itself down
         repository.Clear<HttpTransfer>();
         return Task.CompletedTask;
     }
@@ -108,21 +105,8 @@ public class HttpTransferManager(
 
     public IObservable<int> WatchCount() => repository.CreateCountWatcher<HttpTransfer>();
 
-    readonly Subject<HttpTransferResult> resultSubj = new();
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => Observable.Create<HttpTransferResult>(ob =>
-    {
-        var disposer = new CompositeDisposable();
-        this.resultSubj
-            .Subscribe(ob.OnNext)
-            .DisposedBy(disposer);
-
-        HttpTransferProcess
-            .WhenProgress()
-            .Subscribe(ob.OnNext)
-            .DisposedBy(disposer);
-
-        return disposer;
-    });
+    public event EventHandler<HttpTransferResult>? UpdateReceived;
+    public IObservable<HttpTransferResult> WhenUpdateReceived() => new HttpTransferUpdateObservable(this);
 
 
     void TryStartService()

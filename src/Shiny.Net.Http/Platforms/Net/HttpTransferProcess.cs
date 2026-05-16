@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,12 +37,10 @@ public class HttpTransferProcess
         this.connectivity = connectivity;
         this.delegates = delegates;
 
-        progressSubj.Logger = logger;
     }
 
 
-    static readonly ShinySubject<HttpTransferResult> progressSubj = new();
-    public static IObservable<HttpTransferResult> WhenProgress() => progressSubj;
+    public static event EventHandler<HttpTransferResult>? ProgressOccurred;
 
 
     public void Run(Action onComplete)
@@ -53,18 +50,18 @@ public class HttpTransferProcess
             this.logger.LogInformation("Starting Transfer Loop");
             var cancelSrc = new CancellationTokenSource();
 
-            using var clearSub = this.repository
-                .WhenActionOccurs()
-                .Where(x =>
-                    x.EntityType == typeof(HttpTransfer) &&
-                    x.Action == RepositoryAction.Clear
-                )
-                .Take(1)
-                .Subscribe(_ =>
+            EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> clearHandler = null!;
+            clearHandler = (_, x) =>
+            {
+                if (x.EntityType == typeof(HttpTransfer) && x.Action == RepositoryAction.Clear)
                 {
+                    this.repository.ActionOccurred -= clearHandler;
                     this.logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
                     cancelSrc.Cancel();
-                });
+                }
+            };
+            this.repository.ActionOccurred += clearHandler;
+            using var clearSub = new RepoSub(() => this.repository.ActionOccurred -= clearHandler);
 
             // bump the loop whenever connectivity changes so paused transfers wake up immediately
             using var connSub = this.connectivity
@@ -151,19 +148,20 @@ public class HttpTransferProcess
     {
         var cancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
-        using var repoSub = this.repository
-            .WhenActionOccurs()
-            .Where(x =>
-                x.EntityType == typeof(HttpTransfer) &&
+        EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> removeHandler = null!;
+        removeHandler = (_, x) =>
+        {
+            if (x.EntityType == typeof(HttpTransfer) &&
                 x.Action == RepositoryAction.Remove &&
-                transfer.Identifier.Equals(x.Entity!.Identifier)
-            )
-            .Take(1)
-            .Subscribe(_ =>
+                transfer.Identifier.Equals(x.Entity!.Identifier))
             {
+                this.repository.ActionOccurred -= removeHandler;
                 this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
                 cancelSrc.Cancel();
-            });
+            }
+        };
+        this.repository.ActionOccurred += removeHandler;
+        using var repoSub = new RepoSub(() => this.repository.ActionOccurred -= removeHandler);
 
         try
         {
@@ -176,7 +174,7 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
 
-            progressSubj.OnNext(new(
+            ProgressOccurred?.Invoke(null, new(
                 transfer.Request,
                 HttpTransferState.Completed,
                 new TransferProgress(
@@ -197,7 +195,7 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), this.logger)
                 .ConfigureAwait(false);
 
-            progressSubj.OnNext(new(
+            ProgressOccurred?.Invoke(null, new(
                 transfer!.Request,
                 HttpTransferState.Error,
                 TransferProgress.Empty,
@@ -249,7 +247,7 @@ public class HttpTransferProcess
     {
         // uploads are NOT resumable - if a previous attempt left partial state, restart from zero
         var request = transfer.Request;
-        var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray() ?? Array.Empty<(string Key, string Value)>();
+        var headers = request.Headers?.Select(x => (x.Key, x.Value)).ToArray();
 
         HttpMethod? httpMethod = null;
         if (request.HttpMethod != null)
@@ -260,7 +258,7 @@ public class HttpTransferProcess
         if (c != null)
             bodyContent = new StringContent(c.Content, Encoding.UTF8, c.ContentType);
 
-        var obs = this.httpClient.Upload(
+        await this.httpClient.Upload(
             request.Uri,
             request.LocalFilePath,
             request.Type == TransferType.UploadMultipart,
@@ -268,10 +266,10 @@ public class HttpTransferProcess
             bodyContent,
             request.HttpContent?.ContentFormDataName ?? "value",
             request.FileFormDataName,
-            headers
-        );
-
-        await this.PumpProgress(transfer, obs, cancelToken).ConfigureAwait(false);
+            headers,
+            x => this.PublishProgress(transfer, x),
+            cancelToken
+        ).ConfigureAwait(false);
     }
 
 
@@ -371,25 +369,6 @@ public class HttpTransferProcess
     }
 
 
-    async Task PumpProgress(HttpTransfer transfer, IObservable<TransferProgress> obs, CancellationToken cancelToken)
-    {
-        var tcs = new TaskCompletionSource<object>();
-        using var _ = cancelToken.Register(() => tcs.TrySetCanceled());
-
-        using var sub = obs.Subscribe(
-            x =>
-            {
-                if (!cancelToken.IsCancellationRequested)
-                    this.PublishProgress(transfer, x);
-            },
-            ex => tcs.TrySetException(ex),
-            () => tcs.TrySetResult(null!)
-        );
-
-        await tcs.Task.ConfigureAwait(false);
-    }
-
-
     void PublishProgress(HttpTransfer transfer, TransferProgress progress)
     {
         if (this.repository.Exists<HttpTransfer>(transfer.Identifier))
@@ -402,7 +381,7 @@ public class HttpTransferProcess
             });
         }
 
-        progressSubj.OnNext(new HttpTransferResult(
+        ProgressOccurred?.Invoke(null, new HttpTransferResult(
             transfer.Request,
             HttpTransferState.InProgress,
             progress,
