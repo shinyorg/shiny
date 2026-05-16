@@ -1,5 +1,4 @@
 @page "/connectivity"
-@using System.Reactive.Linq
 @using Shiny.Net
 @implements IDisposable
 @inject IConnectivity ConnectivityService
@@ -29,20 +28,22 @@
     NetworkAccess access;
     ConnectionTypes types;
     DateTime? lastChange;
-    IDisposable? sub;
 
     protected override void OnInitialized()
     {
         Refresh();
-        sub = ConnectivityService
-            .WhenChanged()
-            .Subscribe(c => InvokeAsync(() =>
-            {
-                access = c.Access;
-                types = c.ConnectionTypes;
-                lastChange = DateTime.Now;
-                StateHasChanged();
-            }));
+        ConnectivityService.Changed += OnChanged;
+    }
+
+    void OnChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            access = ConnectivityService.Access;
+            types = ConnectivityService.ConnectionTypes;
+            lastChange = DateTime.Now;
+            StateHasChanged();
+        });
     }
 
     void Refresh()
@@ -51,5 +52,5 @@
         types = ConnectivityService.ConnectionTypes;
     }
 
-    public void Dispose() => sub?.Dispose();
+    public void Dispose() => ConnectivityService.Changed -= OnChanged;
 }

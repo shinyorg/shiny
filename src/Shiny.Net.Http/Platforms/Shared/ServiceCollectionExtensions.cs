@@ -1,4 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Shiny;
+using Shiny.Hosting;
 using Shiny.Net.Http;
 
 namespace Shiny;

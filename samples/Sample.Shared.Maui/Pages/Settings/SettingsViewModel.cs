@@ -4,11 +4,8 @@ using Shiny.Power;
 namespace Sample.Shared.Maui.Pages.Settings;
 
 [ShellMap<SettingsPage>("settings")]
-public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shiny.Power.IBattery battery, IKeyValueStore store) : ObservableObject, IPageLifecycleAware, IDisposable
+public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shiny.Power.IBattery battery, IKeyValueStore store) : ObservableObject, IPageLifecycleAware
 {
-    IDisposable? connSub;
-    IDisposable? batterySub;
-
     [ObservableProperty] string networkAccess = string.Empty;
     [ObservableProperty] string connectionTypes = string.Empty;
     [ObservableProperty] double batteryLevel;
@@ -24,22 +21,21 @@ public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shi
         this.UpdateBattery();
         this.Platform = $"{Microsoft.Maui.Devices.DeviceInfo.Platform} {Microsoft.Maui.Devices.DeviceInfo.VersionString} ({Microsoft.Maui.Devices.DeviceInfo.Manufacturer} {Microsoft.Maui.Devices.DeviceInfo.Model})";
 
-        this.connSub = connectivity
-            .WhenChanged()
-            .Subscribe(_ => MainThread.BeginInvokeOnMainThread(this.UpdateConnectivity));
-
-        this.batterySub = battery
-            .WhenChanged()
-            .Subscribe(_ => MainThread.BeginInvokeOnMainThread(this.UpdateBattery));
+        connectivity.Changed += this.OnConnectivityChanged;
+        battery.Changed += this.OnBatteryChanged;
     }
 
     public void OnDisappearing()
     {
-        this.connSub?.Dispose();
-        this.connSub = null;
-        this.batterySub?.Dispose();
-        this.batterySub = null;
+        connectivity.Changed -= this.OnConnectivityChanged;
+        battery.Changed -= this.OnBatteryChanged;
     }
+
+    void OnConnectivityChanged(object? sender, EventArgs e)
+        => MainThread.BeginInvokeOnMainThread(this.UpdateConnectivity);
+
+    void OnBatteryChanged(object? sender, EventArgs e)
+        => MainThread.BeginInvokeOnMainThread(this.UpdateBattery);
 
     void UpdateConnectivity()
     {
@@ -75,11 +71,5 @@ public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shi
         if (string.IsNullOrWhiteSpace(this.StoreKey)) return;
         var removed = store.Remove(this.StoreKey);
         this.StoreResult = removed ? $"Removed '{this.StoreKey}'" : $"'{this.StoreKey}' not found";
-    }
-
-    public void Dispose()
-    {
-        this.connSub?.Dispose();
-        this.batterySub?.Dispose();
     }
 }

@@ -1,5 +1,6 @@
-using Shiny.Push;
+﻿using Shiny.Push;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Hosting;
 #if ANDROID
 using Microsoft.Extensions.DependencyInjection.Extensions;
 #endif

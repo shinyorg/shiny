@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Hosting;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 

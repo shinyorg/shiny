@@ -1,5 +1,4 @@
 @page "/battery"
-@using System.Reactive.Linq
 @using Shiny.Power
 @implements IDisposable
 @inject IBattery BatteryService
@@ -30,20 +29,22 @@
     double level;
     BatteryState status;
     DateTime? lastChange;
-    IDisposable? sub;
 
     protected override void OnInitialized()
     {
         Refresh();
-        sub = BatteryService
-            .WhenChanged()
-            .Subscribe(b => InvokeAsync(() =>
-            {
-                level = b.Level;
-                status = b.Status;
-                lastChange = DateTime.Now;
-                StateHasChanged();
-            }));
+        BatteryService.Changed += OnChanged;
+    }
+
+    void OnChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            level = BatteryService.Level;
+            status = BatteryService.Status;
+            lastChange = DateTime.Now;
+            StateHasChanged();
+        });
     }
 
     void Refresh()
@@ -52,5 +53,5 @@
         status = BatteryService.Status;
     }
 
-    public void Dispose() => sub?.Dispose();
+    public void Dispose() => BatteryService.Changed -= OnChanged;
 }

@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Hosting;
 using Shiny.Notifications;
 
 namespace Shiny;

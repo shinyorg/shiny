@@ -5,8 +5,6 @@ namespace Sample.Shared.Maui.Pages.Device;
 [ShellMap<BatteryPage>("battery")]
 public partial class BatteryViewModel(Shiny.Power.IBattery battery, IMainThread mainThread) : ObservableObject, IPageLifecycleAware
 {
-    IDisposable? sub;
-
     [ObservableProperty] string status = "Unknown";
     [ObservableProperty] double level;
 
@@ -14,26 +12,27 @@ public partial class BatteryViewModel(Shiny.Power.IBattery battery, IMainThread 
 
     public void OnAppearing()
     {
-        // Seed with the current state so the page isn't blank until the first change
         this.Status = battery.Status.ToString();
         this.Level = battery.Level;
         this.AddHistory(battery.Status.ToString(), battery.Level);
 
-        this.sub = battery
-            .WhenChanged()
-            .Subscribe(b => mainThread.InvokeOnMainThreadAsync(() =>
-            {
-                this.Status = b.Status.ToString();
-                this.Level = b.Level;
-                this.AddHistory(b.Status.ToString(), b.Level);
-            }));
+        battery.Changed += this.OnChanged;
     }
 
     public void OnDisappearing()
     {
-        this.sub?.Dispose();
-        this.sub = null;
+        battery.Changed -= this.OnChanged;
         this.History.Clear();
+    }
+
+    void OnChanged(object? sender, EventArgs e)
+    {
+        mainThread.InvokeOnMainThreadAsync(() =>
+        {
+            this.Status = battery.Status.ToString();
+            this.Level = battery.Level;
+            this.AddHistory(battery.Status.ToString(), battery.Level);
+        });
     }
 
     [RelayCommand]

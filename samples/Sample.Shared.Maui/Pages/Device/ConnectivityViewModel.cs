@@ -8,8 +8,6 @@ public partial class ConnectivityViewModel(
     IMainThread mainThread
 ) : ObservableObject, IPageLifecycleAware
 {
-    IDisposable? sub;
-
     [ObservableProperty] string access = "Unknown";
     [ObservableProperty] string connectionTypes = "Unknown";
 
@@ -17,28 +15,29 @@ public partial class ConnectivityViewModel(
 
     public void OnAppearing()
     {
-        // Seed with the current state so the page isn't blank until the first change
         this.Access = connectivity.Access.ToString();
         this.ConnectionTypes = connectivity.ConnectionTypes.ToString();
         this.AddHistory(this.Access, this.ConnectionTypes);
 
-        this.sub = connectivity
-            .WhenChanged()
-            .Subscribe(c => mainThread.InvokeOnMainThreadAsync(() =>
-            {
-                var access = c.Access.ToString();
-                var types = c.ConnectionTypes.ToString();
-                this.Access = access;
-                this.ConnectionTypes = types;
-                this.AddHistory(access, types);
-            }));
+        connectivity.Changed += this.OnChanged;
     }
 
     public void OnDisappearing()
     {
-        this.sub?.Dispose();
-        this.sub = null;
+        connectivity.Changed -= this.OnChanged;
         this.History.Clear();
+    }
+
+    void OnChanged(object? sender, EventArgs e)
+    {
+        mainThread.InvokeOnMainThreadAsync(() =>
+        {
+            var access = connectivity.Access.ToString();
+            var types = connectivity.ConnectionTypes.ToString();
+            this.Access = access;
+            this.ConnectionTypes = types;
+            this.AddHistory(access, types);
+        });
     }
 
     [RelayCommand]

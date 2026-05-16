@@ -22,27 +22,19 @@ public class NotificationManager(
     IKeyValueStore settings
 ) : INotificationManager, IIosLifecycle.INotificationHandler
 {
-    readonly Lazy<IEnumerable<INotificationDelegate>> delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
-    readonly IosConfiguration configuration = configuration;
-    readonly IPlatform platform = platform;
-    readonly ILogger logger = logger;
-    readonly IChannelManager channelManager = channelManager;
-    readonly IKeyValueStore settings = settings;
+    public void AddChannel(Channel channel) => channelManager.Add(channel);
+    public void RemoveChannel(string channelId) => channelManager.Remove(channelId);
+    public void ClearChannels() => channelManager.Clear();
+    public Channel? GetChannel(string channelId) => channelManager.Get(channelId);
+    public IList<Channel> GetChannels() => channelManager.GetAll();
 
 
-    public void AddChannel(Channel channel) => this.channelManager.Add(channel);
-    public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
-    public void ClearChannels() => this.channelManager.Clear();
-    public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
-
-
-    public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
+    public Task<int> GetBadge() => platform.InvokeOnMainThreadAsync<int>(() =>
         (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
     );
 
 
-    public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(() =>
+    public Task SetBadge(int? badge) => platform.InvokeOnMainThreadAsync(() =>
         UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0
     );
 
@@ -66,7 +58,7 @@ public class NotificationManager(
         var tcs = new TaskCompletionSource<AccessState>();
 
         UNUserNotificationCenter.Current.RequestAuthorization(
-            this.configuration.UNAuthorizationOptions,
+            configuration.UNAuthorizationOptions,
             (approved, error) =>
             {
                 if (error != null)
@@ -88,7 +80,7 @@ public class NotificationManager(
         => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-    public Task<IList<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
+    public Task<IList<Notification>> GetPendingNotifications() => platform.InvokeTaskOnMainThread(async () =>
     {
         var requests = await UNUserNotificationCenter
             .Current
@@ -100,17 +92,17 @@ public class NotificationManager(
     });
 
 
-    public Task Send(Notification notification) => this.platform.InvokeTaskOnMainThread(async () =>
+    public Task Send(Notification notification) => platform.InvokeTaskOnMainThread(async () =>
     {
         notification.AssertValid();
 
         if (notification.Id == 0)
-            notification.Id = this.settings.IncrementValue("NotificationId");
+            notification.Id = settings.IncrementValue("NotificationId");
 
         var channel = Channel.Default;
         if (!notification.Channel.IsEmpty())
         {
-            channel = this.channelManager.Get(notification.Channel!);
+            channel = channelManager.Get(notification.Channel!);
             if (channel == null)
                 throw new InvalidOperationException($"{notification.Channel} does not exist");
         }
@@ -130,7 +122,7 @@ public class NotificationManager(
     });
 
 
-    public Task Cancel(CancelScope scope) => this.platform.InvokeOnMainThreadAsync(() =>
+    public Task Cancel(CancelScope scope) => platform.InvokeOnMainThreadAsync(() =>
     {
         if (scope == CancelScope.All || scope == CancelScope.Pending)
             UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
@@ -140,7 +132,7 @@ public class NotificationManager(
     });
 
 
-    public Task Cancel(int notificationId) => this.platform.InvokeOnMainThreadAsync(() =>
+    public Task Cancel(int notificationId) => platform.InvokeOnMainThreadAsync(() =>
     {
         var ids = new[] { notificationId.ToString() };
 
@@ -201,7 +193,7 @@ public class NotificationManager(
 
         native.CategoryIdentifier = channel.Identifier;
         var useCriticalSound =
-            this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
+            configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
             channel.Importance == ChannelImportance.Critical &&
             UIDevice.CurrentDevice.CheckSystemVersion(12, 0);
 
@@ -245,7 +237,7 @@ public class NotificationManager(
                 case ChannelImportance.Critical:
                 case ChannelImportance.High:
                     var is12 = (OperatingSystem.IsIOSVersionAtLeast(12) || OperatingSystem.IsMacCatalystVersionAtLeast(12));
-                    native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
+                    native.Sound = configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
                         ? UNNotificationSound.DefaultCriticalSound
                         : UNNotificationSound.Default;
                     break;
@@ -332,12 +324,11 @@ public class NotificationManager(
         if (t == null || t is not UNPushNotificationTrigger)
         {
             var shiny = response.FromNative();
-            await this.delegates
-                .Value
-                .RunDelegates(x => x.OnEntry(shiny), this.logger)
+            await services
+                .RunDelegates<INotificationDelegate>(x => x.OnEntry(shiny), logger)
                 .ConfigureAwait(false);
 
-            this.platform.InvokeOnMainThread(() =>
+            platform.InvokeOnMainThread(() =>
                 completionHandler.Invoke()
             );
         }
@@ -349,8 +340,8 @@ public class NotificationManager(
         var t = notification?.Request?.Trigger;
         if (t == null || t is not UNPushNotificationTrigger)
         {
-            this.platform.InvokeOnMainThread(() =>
-                completionHandler.Invoke(this.configuration.PresentationOptions)
+            platform.InvokeOnMainThread(() =>
+                completionHandler.Invoke(configuration.PresentationOptions)
             );
         }
     }
