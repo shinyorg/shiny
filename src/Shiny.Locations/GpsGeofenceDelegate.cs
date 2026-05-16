@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Shiny.Locations;
 
 
-public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
+public class GpsGeofenceDelegate : IGpsDelegate
 {
     readonly IGeofenceManager geofenceManager;
     readonly IGeofenceDelegate geofenceDelegate;
@@ -48,7 +48,6 @@ public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
     protected virtual void SetState(string geofenceId, GeofenceState state)
     {
         this.CurrentStates[geofenceId] = state;
-        this.RaisePropertyChanged(nameof(this.CurrentStates));
     }
 }
 

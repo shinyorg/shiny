@@ -5,8 +5,6 @@
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="System.Reactive" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
     </ItemGroup>
 </Project>

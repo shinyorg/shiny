@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Locations;
 
 
-public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsDelegate
+public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
 {
     readonly SemaphoreSlim semaphore = new(1);
     protected ILogger Logger => logger;
@@ -105,9 +105,9 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     public GpsReading? LastReading
     {
         get => this.lastReading;
-        set => this.Set(ref this.lastReading, value);
+        set => this.lastReading = value;
     }
-    
+
 
     GpsReading? mostRecentReading;
     /// <summary>
@@ -117,7 +117,7 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     public GpsReading? MostRecentReading
     {
         get => this.mostRecentReading;
-        set => this.Set(ref this.mostRecentReading, value);
+        set => this.mostRecentReading = value;
     }
     
     
@@ -125,7 +125,7 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     public Distance? MinimumDistance
     {
         get => this.minDistance;
-        set => this.Set(ref this.minDistance, value);
+        set => this.minDistance = value;
     }
 
 
@@ -133,7 +133,7 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     public TimeSpan? MinimumTime
     {
         get => this.minTime;
-        set => this.Set(ref this.minTime, value);
+        set => this.minTime = value;
     }
 
 
@@ -141,7 +141,7 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     public Distance? MaximumDistance
     {
         get => this.maxDistance;
-        set => this.Set(ref this.maxDistance, value);
+        set => this.maxDistance = value;
     }
 
 
@@ -149,7 +149,7 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
     public TimeSpan? MaximumTime
     {
         get => this.maxTime;
-        set => this.Set(ref this.maxTime, value);
+        set => this.maxTime = value;
     }
 
 

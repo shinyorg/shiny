@@ -7,13 +7,13 @@ using Firebase.Messaging;
 namespace Shiny.Push;
 
 
-public class FirebasePushProvider : NotifyPropertyChanged, IPushProvider, IPushTagSupport
+public class FirebasePushProvider : IPushProvider, IPushTagSupport
 {
     string[]? registeredTags;
     public string[]? RegisteredTags
     {
         get => this.registeredTags;
-        set => this.Set(ref this.registeredTags, value);
+        set => this.registeredTags = value;
     }
 
 

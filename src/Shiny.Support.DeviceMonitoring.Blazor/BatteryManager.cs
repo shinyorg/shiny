@@ -1,7 +1,4 @@
 using System;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Shiny.Power;
@@ -12,7 +9,6 @@ namespace Shiny.Infrastructure;
 public class BatteryManager : IBattery, IAsyncDisposable
 {
     readonly IJSRuntime jsRuntime;
-    readonly Subject<Unit> changeSubj = new();
     IJSObjectReference? module;
     DotNetObjectReference<BatteryManager>? objRef;
 
@@ -31,6 +27,13 @@ public class BatteryManager : IBattery, IAsyncDisposable
 
         return this.module;
     }
+
+
+    public event EventHandler? Changed;
+
+
+    [JSInvokable]
+    public void OnChange() => this.Changed?.Invoke(this, EventArgs.Empty);
 
 
     public BatteryState Status
@@ -58,49 +61,26 @@ public class BatteryManager : IBattery, IAsyncDisposable
     }
 
 
-    public IObservable<IBattery> WhenChanged() => Observable.Create<IBattery>(ob =>
+    public async Task StartAsync()
     {
-        var sub = this.changeSubj.Subscribe(_ => ob.OnNext(this));
-
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                var mod = await this.GetModule().ConfigureAwait(false);
-                this.objRef = DotNetObjectReference.Create(this);
-                await mod.InvokeVoidAsync("startListener", this.objRef).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                ob.OnError(ex);
-            }
-        });
-
-        return () =>
-        {
-            sub.Dispose();
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    var mod = await this.GetModule().ConfigureAwait(false);
-                    await mod.InvokeVoidAsync("stopListener").ConfigureAwait(false);
-                    this.objRef?.Dispose();
-                    this.objRef = null;
-                }
-                catch { }
-            });
-        };
-    });
-
-
-    [JSInvokable]
-    public void OnChange() => this.changeSubj.OnNext(Unit.Default);
+        var mod = await this.GetModule().ConfigureAwait(false);
+        this.objRef = DotNetObjectReference.Create(this);
+        await mod.InvokeVoidAsync("startListener", this.objRef).ConfigureAwait(false);
+    }
 
 
     public async ValueTask DisposeAsync()
     {
+        if (this.module != null)
+        {
+            try
+            {
+                await this.module.InvokeVoidAsync("stopListener").ConfigureAwait(false);
+            }
+            catch { }
+        }
         this.objRef?.Dispose();
+        this.objRef = null;
         if (this.module != null)
         {
             await this.module.DisposeAsync().ConfigureAwait(false);

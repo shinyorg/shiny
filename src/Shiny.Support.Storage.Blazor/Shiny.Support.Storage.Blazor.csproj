@@ -8,11 +8,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 

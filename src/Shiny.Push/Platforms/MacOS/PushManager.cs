@@ -21,7 +21,6 @@ public class PushManager(
     ILogger<PushManager> logger,
     IPushProvider? provider = null
 ) :
-    NotifyPropertyChanged,
     IApplePushManager,
     IMacLifecycle.IOnFinishedLaunching,
     IMacLifecycle.IRemoteNotifications,
@@ -43,8 +42,11 @@ public class PushManager(
         get => this.registrationToken;
         set
         {
-            if (this.Set(ref this.registrationToken, value))
+            if (this.registrationToken != value)
+            {
+                this.registrationToken = value;
                 store.SetOrRemove(Key(nameof(RegistrationToken)), value);
+            }
         }
     }
 
@@ -55,8 +57,11 @@ public class PushManager(
         get => this.nativeToken;
         set
         {
-            if (this.Set(ref this.nativeToken, value))
+            if (this.nativeToken != value)
+            {
+                this.nativeToken = value;
                 store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
+            }
         }
     }
 

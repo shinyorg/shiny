@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
 using System.Net.NetworkInformation;
-using System.Reactive.Linq;
+using System.Threading;
+using Shiny.Net;
+
 
 namespace Shiny.Net;
 
@@ -12,6 +14,53 @@ namespace Shiny.Net;
 /// </summary>
 public class ConnectivityImpl : IConnectivity
 {
+    NetworkAddressChangedEventHandler? addrHandler;
+    NetworkAvailabilityChangedEventHandler? availHandler;
+    int subscriberCount;
+
+
+    event EventHandler? changed;
+    public event EventHandler? Changed
+    {
+        add
+        {
+            this.changed += value;
+            if (Interlocked.Increment(ref this.subscriberCount) == 1)
+                this.StartListening();
+        }
+        remove
+        {
+            this.changed -= value;
+            if (Interlocked.Decrement(ref this.subscriberCount) == 0)
+                this.StopListening();
+        }
+    }
+
+
+    void StartListening()
+    {
+        this.addrHandler = (_, _) => this.changed?.Invoke(this, EventArgs.Empty);
+        this.availHandler = (_, _) => this.changed?.Invoke(this, EventArgs.Empty);
+        NetworkChange.NetworkAddressChanged += this.addrHandler;
+        NetworkChange.NetworkAvailabilityChanged += this.availHandler;
+    }
+
+
+    void StopListening()
+    {
+        if (this.addrHandler != null)
+        {
+            NetworkChange.NetworkAddressChanged -= this.addrHandler;
+            this.addrHandler = null;
+        }
+        if (this.availHandler != null)
+        {
+            NetworkChange.NetworkAvailabilityChanged -= this.availHandler;
+            this.availHandler = null;
+        }
+    }
+
+
     public ConnectionTypes ConnectionTypes
     {
         get
@@ -50,9 +99,6 @@ public class ConnectivityImpl : IConnectivity
             if (!NetworkInterface.GetIsNetworkAvailable())
                 return NetworkAccess.None;
 
-            // Anything routable beyond loopback counts as Local at minimum. We can't cheaply
-            // verify Internet reachability without making a request, so we report Internet
-            // when at least one interface is up and non-loopback (matches typical desktop UX).
             var anyUp = NetworkInterface
                 .GetAllNetworkInterfaces()
                 .Any(n =>
@@ -62,20 +108,4 @@ public class ConnectivityImpl : IConnectivity
             return anyUp ? NetworkAccess.Internet : NetworkAccess.Local;
         }
     }
-
-
-    public IObservable<IConnectivity> WhenChanged() => Observable.Create<IConnectivity>(ob =>
-    {
-        NetworkAddressChangedEventHandler addrHandler = (_, _) => ob.OnNext(this);
-        NetworkAvailabilityChangedEventHandler availHandler = (_, _) => ob.OnNext(this);
-
-        NetworkChange.NetworkAddressChanged += addrHandler;
-        NetworkChange.NetworkAvailabilityChanged += availHandler;
-
-        return () =>
-        {
-            NetworkChange.NetworkAddressChanged -= addrHandler;
-            NetworkChange.NetworkAvailabilityChanged -= availHandler;
-        };
-    });
 }

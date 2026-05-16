@@ -11,7 +11,7 @@ namespace Shiny.Locations;
 public class MotionActivityManager(
     IServiceProvider services,
     ILogger<MotionActivityManager> logger
-) : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
+) : IMotionActivityManager, IShinyStartupTask
 {
     readonly CMMotionActivityManager activityManager = new();
 
@@ -19,7 +19,7 @@ public class MotionActivityManager(
     public bool IsListening
     {
         get => this.isListening;
-        private set => this.Set(ref this.isListening, value);
+        private set => this.isListening = value;
     }
 
 

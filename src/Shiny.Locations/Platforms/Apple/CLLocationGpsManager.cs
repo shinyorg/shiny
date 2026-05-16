@@ -10,7 +10,7 @@ using UIKit;
 namespace Shiny.Locations;
 
 
-public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
+public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
 {
     const string CurrentSettingsKey = "Shiny.Locations.GpsManager.CurrentSettings";
 
@@ -126,17 +126,9 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
         get => this.currentSettings;
         set
         {
+            this.currentSettings = value;
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
-            if (bg != GpsBackgroundMode.None)
-            {
-                this.Set(ref this.currentSettings, value);
-            }
-            else
-            {
-                this.Set(ref this.currentSettings, null);
-                this.currentSettings = value;
-            }
-            this.store.SetOrRemove(CurrentSettingsKey, value);
+            this.store.SetOrRemove(CurrentSettingsKey, bg != GpsBackgroundMode.None ? value : null);
         }
     }
 

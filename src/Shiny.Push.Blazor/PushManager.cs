@@ -15,7 +15,7 @@ public class PushManager(
     IServiceProvider services,
     IKeyValueStore store,
     ILogger<PushManager> logger
-) : NotifyPropertyChanged, IPushManager, IAsyncDisposable
+) : IPushManager, IAsyncDisposable
 {
     IJSObjectReference? module;
     DotNetObjectReference<PushManager>? selfRef;
@@ -31,8 +31,11 @@ public class PushManager(
         get => this.registrationToken;
         set
         {
-            if (this.Set(ref this.registrationToken, value))
+            if (this.registrationToken != value)
+            {
+                this.registrationToken = value;
                 store.SetOrRemove(Key(nameof(RegistrationToken)), value);
+            }
         }
     }
 
@@ -43,8 +46,11 @@ public class PushManager(
         get => this.nativeToken;
         set
         {
-            if (this.Set(ref this.nativeToken, value))
+            if (this.nativeToken != value)
+            {
+                this.nativeToken = value;
                 store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
+            }
         }
     }
 

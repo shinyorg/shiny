@@ -12,7 +12,7 @@ public class MotionActivityManager(
     AndroidPlatform platform,
     IServiceProvider services,
     ILogger<MotionActivityManager> logger
-) : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
+) : IMotionActivityManager, IShinyStartupTask
 {
     public const string ReceiverName = "com.shiny.locations." + nameof(MotionActivityBroadcastReceiver);
     public const string IntentAction = ReceiverName + ".INTENT_ACTION";
@@ -23,7 +23,7 @@ public class MotionActivityManager(
     public bool IsListening
     {
         get => this.isListening;
-        private set => this.Set(ref this.isListening, value);
+        private set => this.isListening = value;
     }
 
 

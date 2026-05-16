@@ -24,7 +24,7 @@ public class PushManager(
     IKeyValueStore store,
     ILogger<PushManager> logger,
     IPushProvider? pushProvider = null
-) : NotifyPropertyChanged, IPushManager, IShinyStartupTask, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent
+) : IPushManager, IShinyStartupTask, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent
 {
     readonly AndroidPlatform platform = platform;
     readonly FirebaseConfig config = config;
@@ -90,8 +90,11 @@ public class PushManager(
         get => this.regToken;
         set
         {
-            if (this.Set(ref this.regToken, value))
+            if (this.regToken != value)
+            {
+                this.regToken = value;
                 this.store.SetOrRemove(Key(nameof(RegistrationToken)), value);
+            }
         }
     }
 
@@ -101,8 +104,11 @@ public class PushManager(
         get => this.nativeToken;
         set
         {
-            if (this.Set(ref this.nativeToken, value))
+            if (this.nativeToken != value)
+            {
+                this.nativeToken = value;
                 this.store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
+            }
         }
     }
 

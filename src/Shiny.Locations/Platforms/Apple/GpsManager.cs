@@ -16,7 +16,7 @@ public class GpsManager(
     IServiceProvider services,
     IKeyValueStore store,
     ILogger<IGpsManager> logger
-) : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
+) : IGpsManager, IShinyStartupTask
 {
     const string CurrentSettingsKey = "Shiny.Locations.GpsManager.CurrentSettings";
 
@@ -31,18 +31,9 @@ public class GpsManager(
         get => this.currentSettings;
         set
         {
+            this.currentSettings = value;
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
-            if (bg != GpsBackgroundMode.None)
-            {
-                this.Set(ref this.currentSettings, value);
-            }
-            else
-            {
-                // don't remember across sessions
-                this.Set(ref this.currentSettings, null);
-                this.currentSettings = value;
-            }
-            store.SetOrRemove(CurrentSettingsKey, value);
+            store.SetOrRemove(CurrentSettingsKey, bg != GpsBackgroundMode.None ? value : null);
         }
     }
 

@@ -19,7 +19,7 @@ public class AzureNotificationHubsPushProvider(
     IServiceProvider services,
     IKeyValueStore store,
     ILogger<AzureNotificationHubsPushProvider> logger
-) : NotifyPropertyChanged, IPushProvider, IPushTagSupport
+) : IPushProvider, IPushTagSupport
 {
     readonly NotificationHubClient client = new(config.ListenerConnectionString, config.HubName);
 
@@ -32,8 +32,11 @@ public class AzureNotificationHubsPushProvider(
         get => this.nativeToken;
         set
         {
-            if (this.Set(ref this.nativeToken, value))
+            if (this.nativeToken != value)
+            {
+                this.nativeToken = value;
                 store.SetOrRemove(Key(nameof(NativeToken)), value);
+            }
         }
     }
 
@@ -44,8 +47,11 @@ public class AzureNotificationHubsPushProvider(
         get => this.installationId;
         set
         {
-            if (this.Set(ref this.installationId, value))
+            if (this.installationId != value)
+            {
+                this.installationId = value;
                 store.SetOrRemove(Key(nameof(InstallationId)), value);
+            }
         }
     }
 
@@ -56,8 +62,11 @@ public class AzureNotificationHubsPushProvider(
         get => this.registeredTags;
         set
         {
-            if (this.Set(ref this.registeredTags, value))
+            if (this.registeredTags != value)
+            {
+                this.registeredTags = value;
                 store.SetOrRemove(Key(nameof(RegisteredTags)), value);
+            }
         }
     }
 

@@ -8,7 +8,7 @@ using P = Android.Manifest.Permission;
 namespace Shiny.Locations;
 
 
-public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
+public abstract class AbstractGpsManager : IGpsManager, IShinyStartupTask
 {
     readonly ILogger logger;
 
@@ -53,19 +53,7 @@ public abstract class AbstractGpsManager : NotifyPropertyChanged, IGpsManager, I
     public AndroidGpsRequest? CurrentSettings
     {
         get => this.currentSettings;
-        set
-        {
-            var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
-            if (bg != GpsBackgroundMode.None)
-            {
-                this.Set(ref this.currentSettings, value);
-            }
-            else
-            {
-                this.Set(ref this.currentSettings, null); // don't track across app restarts
-                this.currentSettings = value;
-            }
-        }
+        set => this.currentSettings = value;
     }
 
 
