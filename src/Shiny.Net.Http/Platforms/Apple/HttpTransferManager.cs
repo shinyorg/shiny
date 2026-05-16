@@ -27,12 +27,14 @@ public partial class HttpTransferManager(
 {
     Action? completionHandler;
 
+    public event EventHandler<int>? CountChanged;
     public event EventHandler<HttpTransferResult>? UpdateReceived;
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => new HttpTransferUpdateObservable(this);
 
 
     public async void Start()
     {
+        repository.ActionOccurred += this.OnRepoAction;
+
         try
         {
             var tasks = await this.Session.GetAllTasksAsync();
@@ -43,6 +45,13 @@ public partial class HttpTransferManager(
         {
             logger.LogError(ex, "Error auto-starting HTTP Transfers");
         }
+    }
+
+    void OnRepoAction(object? sender, (RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity) x)
+    {
+        if (x.EntityType != typeof(HttpTransfer) || x.Action == RepositoryAction.Update)
+            return;
+        this.CountChanged?.Invoke(this, repository.GetAll<HttpTransfer>().Count);
     }
 
 
@@ -128,7 +137,6 @@ public partial class HttpTransferManager(
     }
 
 
-    public IObservable<int> WatchCount() => repository.CreateCountWatcher<HttpTransfer>();
 
 
     public bool Handle(string sessionIdentifier, Action incomingCompletionHandler)

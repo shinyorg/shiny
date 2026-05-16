@@ -31,17 +31,12 @@ public interface IHttpTransferManager
     Task CancelAll();
 
     /// <summary>
-    /// Returns an observable that emits the current transfer count when it changes
+    /// Raised whenever the number of active transfers changes
     /// </summary>
-    IObservable<int> WatchCount();
+    event EventHandler<int> CountChanged;
 
     /// <summary>
     /// Raised whenever a transfer emits a progress or completion update
     /// </summary>
     event EventHandler<HttpTransferResult> UpdateReceived;
-
-    /// <summary>
-    /// Returns an observable that emits transfer progress and completion updates
-    /// </summary>
-    IObservable<HttpTransferResult> WhenUpdateReceived();
 }

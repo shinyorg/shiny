@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shiny.Net.Http;
 
@@ -30,9 +32,39 @@ public static class HttpTransferExtensions
 
 
     /// <summary>
-    /// Monitors a specific transfer — completes when the transfer finishes, errors on failure.
-    /// Unlike WhenUpdateReceived, this observable terminates.
+    /// Waits for a specific transfer to complete or fail.
+    /// The returned task completes when the transfer reaches Completed or Error state.
     /// </summary>
-    public static IObservable<HttpTransferResult> WatchTransfer(this IHttpTransferManager manager, string identifier)
-        => new WatchTransferObservable(manager, identifier);
+    public static Task<HttpTransferResult> WatchTransfer(this IHttpTransferManager manager, string identifier, CancellationToken cancellationToken = default)
+    {
+        var tcs = new TaskCompletionSource<HttpTransferResult>();
+
+        EventHandler<HttpTransferResult> handler = null!;
+        handler = (_, result) =>
+        {
+            if (!result.Request.Identifier.Equals(identifier, StringComparison.InvariantCultureIgnoreCase))
+                return;
+
+            if (result.Exception != null)
+            {
+                manager.UpdateReceived -= handler;
+                tcs.TrySetException(result.Exception);
+            }
+            else if (result.Status == HttpTransferState.Completed || result.Status == HttpTransferState.Canceled)
+            {
+                manager.UpdateReceived -= handler;
+                tcs.TrySetResult(result);
+            }
+        };
+        manager.UpdateReceived += handler;
+
+        if (cancellationToken.CanBeCanceled)
+            cancellationToken.Register(() =>
+            {
+                manager.UpdateReceived -= handler;
+                tcs.TrySetCanceled(cancellationToken);
+            });
+
+        return tcs.Task;
+    }
 }

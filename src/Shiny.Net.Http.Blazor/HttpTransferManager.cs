@@ -23,8 +23,8 @@ public class HttpTransferManager(
     ILogger<HttpTransferManager> logger
 ) : IHttpTransferManager, IShinyComponentStartup, IAsyncDisposable
 {
+    public event EventHandler<int>? CountChanged;
     public event EventHandler<HttpTransferResult>? UpdateReceived;
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => new HttpTransferUpdateObservable(this);
 
     IJSObjectReference? module;
     DotNetObjectReference<HttpTransferManager>? selfRef;
@@ -137,6 +137,7 @@ public class HttpTransferManager(
             HttpTransferState.Pending,
             DateTimeOffset.UtcNow
         );
+        await this.FireCountChanged().ConfigureAwait(false);
         return transfer;
     }
 
@@ -145,6 +146,7 @@ public class HttpTransferManager(
     {
         var mod = await this.EnsureInit().ConfigureAwait(false);
         await mod.InvokeVoidAsync("remove", identifier).ConfigureAwait(false);
+        await this.FireCountChanged().ConfigureAwait(false);
     }
 
 
@@ -152,10 +154,24 @@ public class HttpTransferManager(
     {
         var mod = await this.EnsureInit().ConfigureAwait(false);
         await mod.InvokeVoidAsync("clear").ConfigureAwait(false);
+        await this.FireCountChanged().ConfigureAwait(false);
     }
 
 
-    public IObservable<int> WatchCount() => new BlazorTransferCountObservable(this, logger);
+    async Task FireCountChanged()
+    {
+        try
+        {
+            var list = await this.GetTransfers().ConfigureAwait(false);
+            this.CountChanged?.Invoke(this, list.Count);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to read transfer count for CountChanged");
+        }
+    }
+
+
 
 
     /// <summary>
@@ -195,6 +211,7 @@ public class HttpTransferManager(
                 TransferProgress.Empty,
                 null
             ));
+            await this.FireCountChanged().ConfigureAwait(false);
 
             var entry = await this.GetEntry(identifier).ConfigureAwait(false);
             if (entry == null)
@@ -224,6 +241,7 @@ public class HttpTransferManager(
                 TransferProgress.Empty,
                 ex
             ));
+            await this.FireCountChanged().ConfigureAwait(false);
 
             var entry = await this.GetEntry(identifier).ConfigureAwait(false);
             if (entry == null)
@@ -351,36 +369,3 @@ public class HttpTransferException(string message, int statusCode) : Exception(m
 }
 
 
-internal sealed class BlazorTransferCountObservable(
-    Shiny.Net.Http.Blazor.HttpTransferManager manager,
-    ILogger logger
-) : IObservable<int>
-{
-    public IDisposable Subscribe(IObserver<int> observer)
-    {
-        // Fire the initial count async; subsequent counts re-fire on every update event.
-        _ = PumpAsync(observer);
-
-        EventHandler<HttpTransferResult> handler = async (_, _) => await PumpAsync(observer).ConfigureAwait(false);
-        manager.UpdateReceived += handler;
-        return new Unsubscriber(() => manager.UpdateReceived -= handler);
-    }
-
-    async Task PumpAsync(IObserver<int> observer)
-    {
-        try
-        {
-            var list = await manager.GetTransfers().ConfigureAwait(false);
-            observer.OnNext(list.Count);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to read transfer count");
-        }
-    }
-
-    sealed class Unsubscriber(Action dispose) : IDisposable
-    {
-        public void Dispose() => dispose();
-    }
-}

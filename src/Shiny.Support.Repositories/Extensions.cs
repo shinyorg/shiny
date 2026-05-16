@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -36,7 +34,7 @@ public static class RepositoryExtensions
     public static IServiceCollection AddDefaultRepository(this IServiceCollection services, DirectoryInfo? rootDirectory = null)
     {
         var dir = rootDirectory ?? new DirectoryInfo(Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
             "Shiny"
         ));
 
@@ -51,45 +49,4 @@ public static class RepositoryExtensions
 
     public static bool Remove<T>(this IRepository repository, T item) where T : IRepositoryEntity
         => repository.Remove<T>(item.Identifier);
-
-
-    public static IObservable<int> CreateCountWatcher<T>(this IRepository repository) where T : IRepositoryEntity
-    {
-        var initialCount = repository.GetAll<T>().Count;
-        return new RepositoryCountObservable<T>(repository, initialCount);
-    }
-}
-
-
-internal sealed class RepositoryCountObservable<T>(IRepository repository, int initialCount) : IObservable<int>
-    where T : IRepositoryEntity
-{
-    public IDisposable Subscribe(IObserver<int> observer)
-    {
-        var count = initialCount;
-        observer.OnNext(count);
-
-        EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> handler = (_, x) =>
-        {
-            if (x.EntityType != typeof(T) || x.Action == RepositoryAction.Update)
-                return;
-
-            count = x.Action switch
-            {
-                RepositoryAction.Add    => count + 1,
-                RepositoryAction.Remove => count - 1,
-                RepositoryAction.Clear  => 0,
-                _                       => count
-            };
-            observer.OnNext(count);
-        };
-
-        repository.ActionOccurred += handler;
-        return new Unsubscriber(() => repository.ActionOccurred -= handler);
-    }
-
-    sealed class Unsubscriber(Action dispose) : IDisposable
-    {
-        public void Dispose() => dispose();
-    }
 }

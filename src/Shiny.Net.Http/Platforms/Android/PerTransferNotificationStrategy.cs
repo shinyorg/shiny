@@ -28,30 +28,28 @@ public class PerTransferNotificationStrategy : AbstractTransferNotificationStrat
     {
         var channelId = this.CreateChannel();
 
-        this.Manager
-            .WhenUpdateReceived()
-            .Subscribe(transfer =>
+        this.Manager.UpdateReceived += (_, transfer) =>
+        {
+            if (!this.notificationCfg.ContainsKey(transfer.Request.Identifier))
             {
-                if (!this.notificationCfg.ContainsKey(transfer.Request.Identifier))
-                {
-                    var id = ++CurrentNotificationId;
-                    this.Logger.LogDebug($"Starting new notification '{id}' for transfer '{transfer.Request.Identifier}'");
-                    var builder = this.CreateBuilder(channelId);
-                    this.notificationCfg.Add(transfer.Request.Identifier, (id, builder));
-                }
+                var id = ++CurrentNotificationId;
+                this.Logger.LogDebug($"Starting new notification '{id}' for transfer '{transfer.Request.Identifier}'");
+                var builder = this.CreateBuilder(channelId);
+                this.notificationCfg.Add(transfer.Request.Identifier, (id, builder));
+            }
 
-                var settings = this.notificationCfg[transfer.Request.Identifier];
-                if (transfer.Status == HttpTransferState.InProgress)
-                {
-                    this.Customize(settings.Builder, transfer);
-                    this.NotificationManager.Notify(settings.NotificationId, settings.Builder.Build());
-                }
-                else
-                {
-                    this.NotificationManager.Cancel(settings.NotificationId);
-                    this.notificationCfg.Remove(transfer.Request.Identifier);
-                }
-            });
+            var settings = this.notificationCfg[transfer.Request.Identifier];
+            if (transfer.Status == HttpTransferState.InProgress)
+            {
+                this.Customize(settings.Builder, transfer);
+                this.NotificationManager.Notify(settings.NotificationId, settings.Builder.Build());
+            }
+            else
+            {
+                this.NotificationManager.Cancel(settings.NotificationId);
+                this.notificationCfg.Remove(transfer.Request.Identifier);
+            }
+        };
     }
 
 

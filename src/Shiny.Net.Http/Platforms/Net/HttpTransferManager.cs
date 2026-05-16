@@ -34,10 +34,18 @@ public class HttpTransferManager(
         }
 
         HttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
+        repository.ActionOccurred += this.OnRepoAction;
     }
 
     void OnProcessProgress(object? sender, HttpTransferResult result)
         => this.UpdateReceived?.Invoke(this, result);
+
+    void OnRepoAction(object? sender, (RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity) x)
+    {
+        if (x.EntityType != typeof(HttpTransfer) || x.Action == RepositoryAction.Update)
+            return;
+        this.CountChanged?.Invoke(this, repository.GetAll<HttpTransfer>().Count);
+    }
 
 
     public Task<IList<HttpTransfer>> GetTransfers()
@@ -136,10 +144,8 @@ public class HttpTransferManager(
     }
 
 
-    public IObservable<int> WatchCount() => repository.CreateCountWatcher<HttpTransfer>();
-
+    public event EventHandler<int>? CountChanged;
     public event EventHandler<HttpTransferResult>? UpdateReceived;
-    public IObservable<HttpTransferResult> WhenUpdateReceived() => new HttpTransferUpdateObservable(this);
 
 
     void TryStartProcess()
