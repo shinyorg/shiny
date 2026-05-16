@@ -1,29 +1,16 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Timer = System.Timers.Timer;
 using Microsoft.Extensions.Logging;
 using Shiny.Net;
 using Shiny.Power;
-using Shiny.Stores;
-using Shiny.Support.Repositories;
 
 namespace Shiny.Jobs;
 
 
-/// <summary>
-/// Managed, in-process JobManager for plain .NET targets (Linux, macOS server,
-/// Blazor Server, console, etc). Jobs run only while the host process is alive —
-/// there is no OS-level scheduling. Foreground jobs are executed on a recurring
-/// <see cref="Interval"/> timer subject to the standard InternetAccess / battery /
-/// charging constraints.
-/// </summary>
-public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposable
+public class JobManager : AbstractJobManager, IDisposable
 {
-    static readonly List<JobInfo> registeredJobs = new();
-    internal static void AddJob(JobInfo jobInfo) => registeredJobs.Add(jobInfo);
-
-
     static TimeSpan interval = TimeSpan.FromSeconds(30);
     public static TimeSpan Interval
     {
@@ -49,17 +36,10 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
 
     public JobManager(
         IServiceProvider container,
-        IRepository repository,
-        IObjectStoreBinder storeBinder,
         ILogger<IJobManager> logger,
         IBattery battery,
         IConnectivity connectivity
-    ) : base(
-        container,
-        repository,
-        storeBinder,
-        logger
-    )
+    ) : base(container, logger)
     {
         this.battery = battery;
         this.connectivity = connectivity;
@@ -71,36 +51,9 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
 
     public void ComponentStart()
     {
-        try
-        {
-            // clear stale system jobs (types moved/deleted) and previously-registered system jobs
-            // before re-registering them below
-            var jobs = this.GetJobs();
-            foreach (var job in jobs)
-            {
-                if (job.JobType == null)
-                {
-                    this.Log.LogInformation("Job Type for '{Identifier}' cannot be found and has been removed", job.Identifier);
-                    this.Cancel(job.Identifier);
-                }
-                else if (job.IsSystemJob)
-                {
-                    this.Log.LogDebug("Clearing System Job '{Identifier}' - will be re-registered", job.Identifier);
-                    this.Cancel(job.Identifier);
-                }
-            }
-
-            foreach (var job in registeredJobs)
-            {
-                var jobNew = job with { IsSystemJob = true };
-                this.Register(jobNew);
-                this.Log.LogDebug("Registered System Job '{Identifier}' of Type '{JobType}'", job.Identifier, job.JobType);
-            }
-        }
-        catch (Exception ex)
-        {
-            this.Log.LogError(ex, "Failed to run job startup");
-        }
+        var jobs = ServiceCollectionExtensions.GetRegisteredJobs();
+        this.AddRegistrations(jobs);
+        this.Log.LogDebug("Registered {Count} job(s)", jobs.Count);
 
         this.RunForegroundJobs();
     }
@@ -108,10 +61,6 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
 
     public override Task<AccessState> RequestAccess()
         => Task.FromResult(AccessState.Available);
-
-    // no OS scheduler on plain .NET - jobs only run while the process is alive
-    protected override void RegisterNative(JobInfo jobInfo) { }
-    protected override void CancelNative(JobInfo jobInfo) { }
 
 
     async void RunForegroundJobs()
@@ -122,24 +71,24 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
 
         this.Log.LogDebug("Starting foreground jobs");
 
-        var jobs = this.GetJobs();
-        foreach (var job in jobs)
-        {
-            if (!this.CanRun(job))
-                continue;
+        var jobs = this.GetJobs()
+            .Where(kvp => this.CanRun(kvp.Value))
+            .ToList();
 
+        foreach (var (type, reg) in jobs)
+        {
             try
             {
-                this.Log.LogDebug("Job '{Identifier}' Foreground Started", job.Identifier);
+                this.Log.LogDebug("Job '{Identifier}' Foreground Started", reg.Identifier);
                 await this
-                    .RunJobAsTask(job.Identifier)
+                    .RunJob(type, reg, default)
                     .ConfigureAwait(false);
 
-                this.Log.LogDebug("Job '{Identifier}' Foreground Finished Successfully", job.Identifier);
+                this.Log.LogDebug("Job '{Identifier}' Foreground Finished Successfully", reg.Identifier);
             }
             catch (Exception ex)
             {
-                this.Log.LogWarning(ex, "Job '{Identifier}' Foreground Error", job.Identifier);
+                this.Log.LogWarning(ex, "Job '{Identifier}' Foreground Error", reg.Identifier);
             }
         }
 
@@ -154,26 +103,26 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
     }
 
 
-    bool CanRun(JobInfo job)
+    bool CanRun(JobRegistration reg)
     {
-        if (!job.RunOnForeground)
+        if (!reg.RunOnForeground)
             return false;
 
-        if (job.BatteryNotLow && this.battery.Level <= 20 && !this.battery.IsPluggedIn())
+        if (reg.BatteryNotLow && this.battery.Level <= 20 && !this.battery.IsPluggedIn())
         {
-            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient power level", job.Identifier);
-            return false;
-        }
-
-        if (!this.HasReqInternet(job))
-        {
-            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient internet requirement", job.Identifier);
+            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient power level", reg.Identifier);
             return false;
         }
 
-        if (job.DeviceCharging && !this.battery.IsPluggedIn())
+        if (!this.HasReqInternet(reg))
         {
-            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient charge status", job.Identifier);
+            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient internet requirement", reg.Identifier);
+            return false;
+        }
+
+        if (reg.DeviceCharging && !this.battery.IsPluggedIn())
+        {
+            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient charge status", reg.Identifier);
             return false;
         }
 
@@ -181,7 +130,7 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IDisposabl
     }
 
 
-    bool HasReqInternet(JobInfo job) => job.RequiredInternetAccess switch
+    bool HasReqInternet(JobRegistration reg) => reg.RequiredInternetAccess switch
     {
         InternetAccess.Any => this.connectivity.IsInternetAvailable(true),
         InternetAccess.Unmetered => this.connectivity.IsInternetAvailable(false),

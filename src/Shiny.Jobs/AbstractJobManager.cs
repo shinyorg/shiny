@@ -1,42 +1,25 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
-using Shiny.Support.Repositories;
 
 namespace Shiny.Jobs;
 
 
-public abstract class AbstractJobManager : IJobManager
+public abstract class AbstractJobManager(
+    IServiceProvider container,
+    ILogger logger
+) : IJobManager
 {
-    readonly IRepository repository;
-    readonly IObjectStoreBinder storeBinder;
-    readonly IServiceProvider container;
+    protected ILogger Log => logger;
+    readonly Dictionary<Type, JobRegistration> registrations = new();
 
+    public bool IsRunning { get; private set; }
 
-    protected AbstractJobManager(
-        IServiceProvider container,
-        IRepository repository,
-        IObjectStoreBinder storeBinder,
-        ILogger<IJobManager> logger
-    )
-    {
-        this.container = container;
-        this.repository = repository;
-        this.storeBinder = storeBinder;
-        this.Log = logger;
-    }
-
-
-    protected ILogger<IJobManager> Log { get; }
     public abstract Task<AccessState> RequestAccess();
-    protected abstract void RegisterNative(JobInfo jobInfo);
-    protected abstract void CancelNative(JobInfo jobInfo);
 
 
     public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
@@ -54,85 +37,23 @@ public abstract class AbstractJobManager : IJobManager
     }
 
 
-    public virtual async Task<JobRunResult> Run(string jobName, CancellationToken cancelToken)
+    public IReadOnlyDictionary<Type, JobRegistration> GetJobs() => this.registrations;
+
+
+    internal void AddRegistrations(IEnumerable<JobRegistration> regs)
     {
-        JobRunResult result;
-        JobInfo? actual = null;
-        try
-        {
-            var job = this.repository.Get<JobInfo>(jobName);
+        foreach (var reg in regs)
+            this.registrations[reg.JobType] = reg;
+    }
 
-            if (job == null)
-                throw new ArgumentException("No job found named " + jobName);
-
-            result = await this.RunJob(job, cancelToken).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            this.Log.LogError(ex, "Error running job " + jobName);
-            result = new JobRunResult(actual, ex);
-        }
-
-        return result;
+    internal void AddRegistrations(IReadOnlyDictionary<Type, JobRegistration> regs)
+    {
+        foreach (var (type, reg) in regs)
+            this.registrations[type] = reg;
     }
 
 
-    public IList<JobInfo> GetJobs()
-        => this.repository.GetAll<JobInfo>().ToList();
-
-
-    public JobInfo? GetJob(string jobIdentifier)
-        => this.repository.Get<JobInfo>(jobIdentifier);
-
-
-    public void Cancel(string jobIdentifier)
-    {
-        var job = this.repository.Get<JobInfo>(jobIdentifier);
-        if (job != null)
-        {
-            this.CancelNative(job);
-            this.repository.Remove<JobInfo>(jobIdentifier);
-        }
-    }
-
-
-    public virtual void CancelAll()
-    {
-        var jobs = this.repository.GetAll<JobInfo>();
-        foreach (var job in jobs)
-        {
-            if (!job.IsSystemJob)
-            {
-                this.CancelJob(job);
-            }
-        }
-    }
-
-
-    void CancelJob(JobInfo job)
-    {
-        this.CancelNative(job);
-        this.repository.Remove<JobInfo>(job.Identifier);
-    }
-
-
-    public bool IsRunning { get; protected set; }
-    public TimeSpan? MinimumAllowedPeriodicTime { get; }
-    public event EventHandler<JobInfo>? JobStarted;
-    public event EventHandler<JobRunResult>? JobFinished;
-
-
-    public void Register(JobInfo jobInfo)
-    {
-        if (jobInfo.JobType == null)
-            throw new ArgumentException("JobType is null");
-
-        this.RegisterNative(jobInfo);
-        this.repository.Set(jobInfo);
-    }
-
-
-    public async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken, bool runSequentially)
+    public async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false)
     {
         var list = new List<JobRunResult>();
 
@@ -141,29 +62,24 @@ public abstract class AbstractJobManager : IJobManager
             try
             {
                 this.IsRunning = true;
-                var jobs = this.repository.GetAll<JobInfo>();
-                var tasks = new List<Task<JobRunResult>>();
 
                 if (runSequentially)
                 {
-                    foreach (var job in jobs)
+                    foreach (var (type, reg) in this.registrations)
                     {
                         var result = await this
-                            .RunJob(job, cancelToken)
+                            .RunJob(type, reg, cancelToken)
                             .ConfigureAwait(false);
                         list.Add(result);
                     }
                 }
                 else
                 {
-                    foreach (var job in jobs)
-                    {
-                        tasks.Add(this.RunJob(job, cancelToken));
-                    }
+                    var tasks = this.registrations
+                        .Select(kvp => this.RunJob(kvp.Key, kvp.Value, cancelToken))
+                        .ToList();
 
-                    await Task
-                        .WhenAll(tasks)
-                        .ConfigureAwait(false);
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                     list.AddRange(tasks.Select(x => x.Result));
                 }
             }
@@ -180,61 +96,94 @@ public abstract class AbstractJobManager : IJobManager
     }
 
 
-    protected async Task<JobRunResult> RunJob(JobInfo job, CancellationToken cancelToken)
+    internal async Task<JobRunResult> RunJob(Type jobType, JobRegistration reg, CancellationToken cancelToken)
     {
-        this.JobStarted?.Invoke(this, job);
-        var result = default(JobRunResult);
-        IJob? jobDelegate = null;
-
         try
         {
-            this.LogJob(JobState.Start, job);
-
-            jobDelegate = (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, job.JobType);
-            if (jobDelegate is INotifyPropertyChanged npc)
-                this.storeBinder.Bind(npc);
-
-            await jobDelegate
-                .Run(job, cancelToken)
-                .ConfigureAwait(false);
-
-            this.LogJob(JobState.Finish, job);
-            result = new JobRunResult(job, null);
+            this.LogJob(JobState.Start, jobType, reg);
+            var job = (IJob)container.GetRequiredService(jobType);
+            await job.Run(cancelToken).ConfigureAwait(false);
+            this.LogJob(JobState.Finish, jobType, reg);
+            return new JobRunResult(reg, null);
         }
         catch (Exception ex)
         {
-            this.LogJob(JobState.Error, job, ex);
-            result = new JobRunResult(job, ex);
+            this.LogJob(JobState.Error, jobType, reg, ex);
+            return new JobRunResult(reg, ex);
         }
-        finally
-        {
-            if (jobDelegate is INotifyPropertyChanged npc)
-                this.storeBinder.UnBind(npc);
-        }
+    }
 
-        this.JobFinished?.Invoke(this, result);
-        return result;
+    // Overload for callers that pass only JobRegistration (e.g. ShinyJobWorker)
+    internal Task<JobRunResult> RunJob(JobRegistration reg, CancellationToken cancelToken)
+        => this.RunJob(reg.JobType, reg, cancelToken);
+
+
+    internal Task RunJobAsTask(string identifier)
+    {
+        var kvp = this.registrations.FirstOrDefault(x =>
+            x.Value.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase) ||
+            x.Key.FullName == identifier
+        );
+        if (kvp.Key == null)
+            throw new InvalidOperationException($"Job '{identifier}' is not registered");
+
+        return this.RunJob(kvp.Key, kvp.Value, CancellationToken.None);
     }
 
 
-    protected virtual void LogJob(
-        JobState state,
-        JobInfo job,
-        Exception? exception = null
-    )
+    /// <summary>
+    /// Gets all registrations matching a background task category identifier
+    /// </summary>
+    internal IList<JobRegistration> GetJobsByCategory(string categoryId)
+    {
+        return categoryId switch
+        {
+            "com.shiny.job" => this.registrations.Values
+                .Where(x => !x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.None)
+                .ToList(),
+
+            "com.shiny.jobpower" => this.registrations.Values
+                .Where(x => x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.None)
+                .ToList(),
+
+            "com.shiny.jobnet" => this.registrations.Values
+                .Where(x => !x.DeviceCharging && x.RequiredInternetAccess != InternetAccess.None)
+                .ToList(),
+
+            "com.shiny.jobpowernet" => this.registrations.Values
+                .Where(x => x.DeviceCharging && x.RequiredInternetAccess != InternetAccess.None)
+                .ToList(),
+
+            _ => new List<JobRegistration>()
+        };
+    }
+
+
+    internal static string GetCategoryId(bool extPower, bool network)
+    {
+        var id = "com.shiny.job";
+        if (extPower)
+            id += "power";
+        if (network)
+            id += "net";
+        return id;
+    }
+
+
+    protected virtual void LogJob(JobState state, Type jobType, JobRegistration reg, Exception? exception = null)
     {
         if (exception == null)
-            this.Log.LogInformation(state == JobState.Finish ? "Job Success" : $"Job {state}", ("JobName", job.Identifier));
+            this.Log.LogInformation(state == JobState.Finish ? "Job '{JobName}' succeeded" : "Job '{JobName}' {State}", reg.Identifier, state);
         else
-            this.Log.LogError(exception, "Error running job " + job.Identifier);
+            this.Log.LogError(exception, "Error running job '{JobName}'", reg.Identifier);
     }
 
 
     protected virtual void LogTask(JobState state, string taskName, Exception? exception = null)
     {
         if (exception == null)
-            this.Log.LogInformation(state == JobState.Finish ? "Task Success" : $"Task {state}", ("TaskName", taskName));
+            this.Log.LogInformation(state == JobState.Finish ? "Task '{TaskName}' succeeded" : "Task '{TaskName}' {State}", taskName, state);
         else
-            this.Log.LogError(exception, "Task failed - " + taskName);
+            this.Log.LogError(exception, "Task '{TaskName}' failed", taskName);
     }
 }

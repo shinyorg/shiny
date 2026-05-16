@@ -21,7 +21,7 @@ public class HttpTransferManager(
     IServiceProvider services,
     BlazorHttpTransferOptions options,
     ILogger<HttpTransferManager> logger
-) : IHttpTransferManager, IShinyComponentStartup, IAsyncDisposable
+) : IHttpTransferManager, IAsyncDisposable
 {
     public event EventHandler<int>? CountChanged;
     public event EventHandler<HttpTransferResult>? UpdateReceived;
@@ -31,12 +31,12 @@ public class HttpTransferManager(
     bool initialized;
 
 
-    public void ComponentStart()
-    {
-        // best-effort: warm up the SW registration on startup so the message
-        // channel is wired immediately when the user later resolves the manager.
-        _ = this.EnsureInit();
-    }
+    // public void ComponentStart()
+    // {
+    //     // best-effort: warm up the SW registration on startup so the message
+    //     // channel is wired immediately when the user later resolves the manager.
+    //     _ = this.EnsureInit();
+    // }
 
 
     async Task<IJSObjectReference> EnsureInit()

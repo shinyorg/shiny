@@ -1,26 +1,29 @@
-﻿#if PLATFORM
+#if PLATFORM
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using Microsoft.Extensions.Logging;
+using Timer = System.Timers.Timer;
 using Shiny.Net;
 using Shiny.Power;
 
 namespace Shiny.Jobs.Infrastructure;
 
 
-public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
+public class JobLifecycleTask(
+    ILogger<JobLifecycleTask> logger,
+    IJobManager jobManager,
+    JobRegistrar registrar,
+    IBattery battery,
+    IConnectivity connectivity
+) : ShinyLifecycleTask, IDisposable
 {
-    static readonly List<JobInfo> registeredJobs = new();
-    public static void AddJob(JobInfo jobInfo) => registeredJobs.Add(jobInfo);
+    readonly Timer timer = new();
 
-
-    static TimeSpan interval = TimeSpan.FromSeconds(30);
     public static TimeSpan Interval
     {
-        get => interval;
+        get;
         set
         {
             if (value.TotalSeconds < 15)
@@ -29,113 +32,72 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
             if (value.TotalMinutes > 5)
                 throw new ArgumentException("Job foreground timer intervals cannot be greater than 5 minutes");
 
-            interval = value;
+            field = value;
         }
-    }
-
-
-    readonly ILogger logger;
-    readonly IBattery battery;
-    readonly IConnectivity connectivity;
-    readonly IJobManager jobManager;
-    readonly Timer timer;
-
-
-    public JobLifecycleTask(
-        ILogger<JobLifecycleTask> logger,
-        IJobManager jobManager,
-        IBattery battery,
-        IConnectivity connectivity
-    )
-    {
-        this.logger = logger;
-        this.jobManager = jobManager;
-        this.battery = battery;
-        this.connectivity = connectivity;
-
-        this.timer = new Timer();
-        this.timer.Elapsed += (sender, args) => this.RunJobs();
-    }
+    } = TimeSpan.FromMinutes(1);
 
 
     public override void Start()
     {
         base.Start();
+        this.timer.Elapsed += (_, _) => _ = this.RunJobs();
 
         try
         {
-            // clear all system level jobs and jobs missing Type (type moved or deleted)
-            var jobs = this.jobManager.GetJobs();
-            foreach (var job in jobs)
-            {
-                if (job.JobType == null)
-                {
-                    this.logger.LogInformation($"Job Type for '{job.Identifier}' cannot be found and has been removed");
-                    this.jobManager.Cancel(job.Identifier);
-                }
-                else if (job.IsSystemJob)
-                {
-                    this.logger.LogDebug($"Clearing System Job '{job.Identifier}' - If being registered, job manager will bring it back in a moment");
-                    this.jobManager.Cancel(job.Identifier);
-                }
-            }
+            if (jobManager is AbstractJobManager abstractManager)
+                abstractManager.AddRegistrations(registrar.Jobs);
 
-            foreach (var job in registeredJobs)
-            {
-                var jobNew = job with { IsSystemJob = true };
+            logger.LogDebug("Registered {Count} job(s)", registrar.Jobs.Count);
 
-                // will fail if permissions or setup is wrong - that's what we want
-                // we won't crash out, we'll just log a full error
-                this.jobManager.Register(jobNew);
-
-                this.logger.LogDebug($"Registered System Job '{job.Identifier}' of Type '{job.JobType}'");
-            }
+#if ANDROID
+            ((Shiny.Jobs.JobManager)jobManager).RegisterNativeCategories();
+#elif IOS || MACCATALYST
+            foreach (var (_, reg) in registrar.Jobs)
+                ((Shiny.Jobs.JobManager)jobManager).ScheduleNative(reg);
+#endif
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Failed to run job startup");
+            logger.LogError(ex, "Failed to run job startup");
         }
 
-        // kick off initial timer
-        // foregorund jobs can run regardless of background permission settings
-        this.RunJobs();
+        _ = this.RunJobs();
     }
 
 
     async Task RunJobs()
     {
         this.timer.Stop();
-        this.logger.LogDebug("Starting foreground jobs");
-        
-        var jobs = this.jobManager
+        logger.LogDebug("Starting foreground jobs");
+
+        var jobs = jobManager
             .GetJobs()
-            .Where(this.CanRun)
+            .Where(kvp => this.CanRun(kvp.Key, kvp.Value))
             .ToList();
 
-        foreach (var job in jobs)
+        foreach (var (type, reg) in jobs)
         {
             try
             {
-                this.logger.LogDebug($"Job '{job.Identifier}' Foreground Started");
-                await this.jobManager
-                    .RunJobAsTask(job.Identifier)
-                    .ConfigureAwait(false);
+                logger.LogDebug("Job '{Identifier}' Foreground Started", reg.Identifier);
 
-                this.logger.LogDebug($"Job '{job.Identifier}' Foreground Finished Successfully");
+                if (jobManager is AbstractJobManager abstractManager)
+                    await abstractManager.RunJob(type, reg, CancellationToken.None).ConfigureAwait(false);
+
+                logger.LogDebug("Job '{Identifier}' Foreground Finished Successfully", reg.Identifier);
             }
             catch (Exception ex)
             {
-                this.logger.LogWarning(ex, $"Job '{job.Identifier}' Foreground Error");
+                logger.LogWarning(ex, "Job '{Identifier}' Foreground Error", reg.Identifier);
             }
         }
 
-        this.logger.LogDebug("Foreground jobs finished");
+        logger.LogDebug("Foreground jobs finished");
 
-        // always restart timer even if going to the BG - will allow things like GPS to keep spinning the foreground jobs
         if (!this.disposed)
         {
             this.timer.Interval = Interval.TotalMilliseconds;
-            this.logger.LogDebug("Foreground Timer Restarting - Interval: " + Interval);
+            logger.LogDebug("Foreground Timer Restarting - Interval: {Interval}", Interval);
             this.timer.Start();
         }
     }
@@ -148,66 +110,64 @@ public class JobLifecycleTask : ShinyLifecycleTask, IDisposable
 
         if (backgrounding)
         {
-            this.logger.LogDebug("App moving to background - timer will likely be trimmed");
+            logger.LogDebug("App moving to background - timer will likely be trimmed");
         }
         else
         {
+            logger.LogDebug("App foreground - starting foreground timer");
             this.timer.Stop();
-            this.logger.LogDebug("App foreground - starting foreground timer");
             this.timer.Interval = Interval.TotalMilliseconds;
             this.timer.Start();
         }
     }
 
 
-    bool CanRun(JobInfo job)
+    bool CanRun(Type jobType, JobRegistration reg)
     {
-        if (!job.RunOnForeground)
+        if (!reg.RunOnForeground)
             return false;
 
-        if (!this.HasPowerLevel(job))
+        if (!this.HasPowerLevel(reg))
         {
-            this.logger.LogDebug($"Job '{job.Identifier}' won't run because of insufficient power level");
+            logger.LogDebug("Job '{Type}' won't run because of insufficient power level", jobType);
             return false;
         }
-        if (!this.HasReqInternet(job))
+        if (!this.HasReqInternet(reg))
         {
-            this.logger.LogDebug($"Job '{job.Identifier}' won't run because of insufficient internet requirement");
+            logger.LogDebug("Job '{Type}' won't run because of insufficient internet requirement", jobType);
             return false;
         }
-        if (!this.HasChargeStatus(job))
+        if (!this.HasChargeStatus(reg))
         {
-            this.logger.LogDebug($"Job '{job.Identifier}' won't run because of insufficient charge status");
+            logger.LogDebug("Job '{Type}' won't run because of insufficient charge status", jobType);
             return false;
         }
         return true;
     }
 
 
-    bool HasPowerLevel(JobInfo job)
+    bool HasPowerLevel(JobRegistration reg)
     {
-        if (!job.BatteryNotLow)
+        if (!reg.BatteryNotLow)
             return true;
-
-        return this.battery.Level > 20 || this.battery.IsPluggedIn();
+        return battery.Level > 20 || battery.IsPluggedIn();
     }
 
 
-    bool HasReqInternet(JobInfo job) => job.RequiredInternetAccess switch
+    bool HasReqInternet(JobRegistration reg) => reg.RequiredInternetAccess switch
     {
-        InternetAccess.Any => this.connectivity.IsInternetAvailable(true),
-        InternetAccess.Unmetered => this.connectivity.IsInternetAvailable(false),
+        InternetAccess.Any => connectivity.IsInternetAvailable(true),
+        InternetAccess.Unmetered => connectivity.IsInternetAvailable(false),
         InternetAccess.None => true,
         _ => false
     };
 
 
-    bool HasChargeStatus(JobInfo job)
+    bool HasChargeStatus(JobRegistration reg)
     {
-        if (!job.DeviceCharging)
+        if (!reg.DeviceCharging)
             return true;
-
-        return this.battery.IsPluggedIn();
+        return battery.IsPluggedIn();
     }
 
 

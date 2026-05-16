@@ -8,8 +8,6 @@
     <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,*" Padding="16" RowSpacing="8">
         <HorizontalStackLayout Grid.Row="0" Spacing="8">
             <Button Text="Run All" Command="{Binding RunAllCommand}" />
-            <Button Text="Cancel All" Command="{Binding CancelAllCommand}" />
-            <ActivityIndicator IsRunning="{Binding IsRunning}" IsVisible="{Binding IsRunning}" VerticalOptions="Center" />
         </HorizontalStackLayout>
 
         <Label Grid.Row="1" Text="{Binding Status}" FontAttributes="Italic" />
@@ -22,14 +20,12 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:JobItemViewModel">
                     <Border Padding="8" Margin="0,4" StrokeThickness="1" Stroke="Gray">
-                        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
                             <Label Grid.Row="0" Grid.Column="0" Text="{Binding Identifier}" FontAttributes="Bold" />
                             <Label Grid.Row="1" Grid.Column="0" Text="{Binding JobType}" FontSize="12" TextColor="Gray" />
                             <Label Grid.Row="2" Grid.Column="0" Text="{Binding Requirements}" FontSize="12" />
                             <Button Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Text="Run"
                                     Command="{Binding RunCommand}" CommandParameter="{Binding Identifier}" />
-                            <Button Grid.Row="0" Grid.RowSpan="3" Grid.Column="2" Text="Cancel"
-                                    Command="{Binding CancelCommand}" CommandParameter="{Binding Identifier}" />
                         </Grid>
                     </Border>
                 </DataTemplate>

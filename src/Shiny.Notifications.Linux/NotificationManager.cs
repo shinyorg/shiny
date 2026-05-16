@@ -11,12 +11,12 @@ using Tmds.DBus.Protocol;
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager, IShinyComponentStartup, IAsyncDisposable
+public class NotificationManager(
+    IServiceProvider services,
+    IChannelManager channelManager,
+    ILogger<NotificationManager> logger
+) : INotificationManager, IAsyncDisposable
 {
-    readonly IServiceProvider services;
-    readonly IChannelManager channelManager;
-    readonly ILogger logger;
-
     // In-memory persistence. Linux desktop notifications via freedesktop don't have a concept
     // of persistent scheduled notifications anyway — they live for the duration of the process.
     readonly ConcurrentDictionary<int, Notification> pending = new();
@@ -28,31 +28,18 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
     Connection? connection;
     Timer? scheduler;
 
-
-    public NotificationManager(
-        IServiceProvider services,
-        IChannelManager channelManager,
-        ILogger<NotificationManager> logger
-    )
-    {
-        this.services = services;
-        this.channelManager = channelManager;
-        this.logger = logger;
-    }
+    // public void ComponentStart()
+    // {
+    //     _ = this.EnsureConnectionAsync();
+    //     this.scheduler = new Timer(_ => _ = this.RunScheduledAsync(), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
+    // }
 
 
-    public void ComponentStart()
-    {
-        _ = this.EnsureConnectionAsync();
-        this.scheduler = new Timer(_ => _ = this.RunScheduledAsync(), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
-    }
-
-
-    public void AddChannel(Channel channel) => this.channelManager.Add(channel);
-    public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
-    public void ClearChannels() => this.channelManager.Clear();
-    public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
+    public void AddChannel(Channel channel) => channelManager.Add(channel);
+    public void RemoveChannel(string channelId) => channelManager.Remove(channelId);
+    public void ClearChannels() => channelManager.Clear();
+    public Channel? GetChannel(string channelId) => channelManager.Get(channelId);
+    public IList<Channel> GetChannels() => channelManager.GetAll();
 
 
     public async Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)
@@ -73,7 +60,7 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
         }
         catch (Exception ex)
         {
-            this.logger.LogWarning(ex, "freedesktop notifications daemon not reachable");
+            logger.LogWarning(ex, "freedesktop notifications daemon not reachable");
             return AccessState.NotSupported;
         }
     }
@@ -107,7 +94,7 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
         var channel = Channel.Default;
         if (!notification.Channel.IsEmpty())
         {
-            channel = this.channelManager.Get(notification.Channel!)
+            channel = channelManager.Get(notification.Channel!)
                 ?? throw new InvalidOperationException($"Channel '{notification.Channel}' does not exist");
         }
 
@@ -214,11 +201,11 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
             ).ConfigureAwait(false);
 
             this.nativeToShinyId[nativeId] = notification.Id;
-            this.logger.LogDebug("Sent notification {ShinyId} as freedesktop id {NativeId}", notification.Id, nativeId);
+            logger.LogDebug("Sent notification {ShinyId} as freedesktop id {NativeId}", notification.Id, nativeId);
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Failed to send notification {Id}", notification.Id);
+            logger.LogError(ex, "Failed to send notification {Id}", notification.Id);
         }
     }
 
@@ -242,7 +229,7 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
         }
         catch (Exception ex)
         {
-            this.logger.LogWarning(ex, "Failed to close native notification {NativeId}", nativeId);
+            logger.LogWarning(ex, "Failed to close native notification {NativeId}", nativeId);
         }
     }
 
@@ -265,7 +252,7 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
                 var channel = Channel.Default;
                 if (!n.Channel.IsEmpty())
                 {
-                    var ch = this.channelManager.Get(n.Channel!);
+                    var ch = channelManager.Get(n.Channel!);
                     if (ch != null) channel = ch;
                 }
 
@@ -284,7 +271,7 @@ public class NotificationManager : INotificationManager, IShinyComponentStartup,
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Scheduled notifications run failed");
+            logger.LogError(ex, "Scheduled notifications run failed");
         }
     }
 }

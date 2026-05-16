@@ -1,7 +1,5 @@
 ﻿using System;
 using Android.Content;
-using Shiny.Reflection;
-
 namespace Shiny.Stores;
 
 

@@ -1,82 +1,37 @@
-using Shiny.Infrastructure;
-
 namespace Sample.Shared.Maui.Pages.Jobs;
 
 [ShellMap<JobsPage>("jobs")]
-public partial class JobsViewModel(IJobManager jobManager, IMainThread mainThread) : ObservableObject, IPageLifecycleAware
+public partial class JobsViewModel(IJobManager jobManager) : ObservableObject, IPageLifecycleAware
 {
-    EventHandler<JobInfo>? startedHandler;
-    EventHandler<JobRunResult>? finishedHandler;
-
     [ObservableProperty] string status = string.Empty;
-    [ObservableProperty] bool isRunning;
 
     public ObservableCollection<JobItemViewModel> Jobs { get; } = new();
     public ObservableCollection<JobRunEntry> RunLog { get; } = new();
 
-    public void OnAppearing()
-    {
-        this.LoadJobs();
-        this.IsRunning = jobManager.IsRunning;
-
-        this.startedHandler = (_, info) => mainThread.InvokeOnMainThreadAsync(() =>
-        {
-            this.IsRunning = true;
-            this.Status = $"Started: {info.Identifier}";
-            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, info.Identifier, "Started", null));
-            this.Trim();
-        });
-        jobManager.JobStarted += this.startedHandler;
-
-        this.finishedHandler = (_, result) => mainThread.InvokeOnMainThreadAsync(() =>
-        {
-            this.IsRunning = jobManager.IsRunning;
-            var id = result.Job?.Identifier ?? "(unknown)";
-            var outcome = result.Success ? "Success" : "Failed";
-            this.Status = $"{outcome}: {id}";
-            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, id, outcome, result.Exception?.Message));
-            this.Trim();
-        });
-        jobManager.JobFinished += this.finishedHandler;
-    }
-
-    public void OnDisappearing()
-    {
-        if (this.startedHandler != null)
-        {
-            jobManager.JobStarted -= this.startedHandler;
-            this.startedHandler = null;
-        }
-        if (this.finishedHandler != null)
-        {
-            jobManager.JobFinished -= this.finishedHandler;
-            this.finishedHandler = null;
-        }
-        this.RunLog.Clear();
-    }
+    public void OnAppearing() => this.LoadJobs();
+    public void OnDisappearing() => this.RunLog.Clear();
 
     void LoadJobs()
     {
         this.Jobs.Clear();
-        foreach (var job in jobManager.GetJobs())
+        foreach (var (type, reg) in jobManager.GetJobs())
         {
             this.Jobs.Add(new JobItemViewModel(this)
             {
-                Identifier = job.Identifier,
-                JobType = job.JobType?.Name ?? "(dynamic)",
-                Requirements = FormatRequirements(job),
-                IsSystemJob = job.IsSystemJob
+                Identifier = reg.Identifier,
+                JobType = type.Name,
+                Requirements = FormatRequirements(reg)
             });
         }
     }
 
-    static string FormatRequirements(JobInfo job)
+    static string FormatRequirements(JobRegistration reg)
     {
         var parts = new List<string>();
-        if (job.RunOnForeground) parts.Add("Foreground");
-        if (job.DeviceCharging) parts.Add("Charging");
-        if (job.BatteryNotLow) parts.Add("Battery OK");
-        if (job.RequiredInternetAccess != InternetAccess.None) parts.Add($"Net: {job.RequiredInternetAccess}");
+        if (reg.RunOnForeground) parts.Add("Foreground");
+        if (reg.DeviceCharging) parts.Add("Charging");
+        if (reg.BatteryNotLow) parts.Add("Battery OK");
+        if (reg.RequiredInternetAccess != InternetAccess.None) parts.Add($"Net: {reg.RequiredInternetAccess}");
         return parts.Count == 0 ? "No requirements" : string.Join(" · ", parts);
     }
 
@@ -84,15 +39,20 @@ public partial class JobsViewModel(IJobManager jobManager, IMainThread mainThrea
     async Task RunAll()
     {
         this.Status = "Running all jobs...";
-        var access = await jobManager.RequestAccess();
-        if (access != AccessState.Available)
-        {
-            this.Status = $"Access: {access}";
-            return;
-        }
-
         var results = await jobManager.RunAll();
-        this.Status = $"Completed {results.Count()} jobs";
+        var list = results.ToList();
+        var failed = list.Count(x => !x.Success);
+        this.Status = failed == 0
+            ? $"Completed {list.Count} job(s)"
+            : $"Completed {list.Count} job(s), {failed} failed";
+
+        foreach (var result in list)
+        {
+            var id = result.Job?.Identifier ?? "(unknown)";
+            var outcome = result.Success ? "Success" : "Failed";
+            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, id, outcome, result.Exception?.Message));
+        }
+        Trim();
     }
 
     [RelayCommand]
@@ -102,35 +62,18 @@ public partial class JobsViewModel(IJobManager jobManager, IMainThread mainThrea
             return;
 
         this.Status = $"Running {jobIdentifier}...";
-        var access = await jobManager.RequestAccess();
-        if (access != AccessState.Available)
+        try
         {
-            this.Status = $"Access: {access}";
-            return;
+            await jobManager.RunJobAsTask(jobIdentifier);
+            this.Status = $"{jobIdentifier}: success";
+            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, jobIdentifier, "Success", null));
         }
-
-        var result = await jobManager.Run(jobIdentifier);
-        this.Status = result.Success
-            ? $"{jobIdentifier}: success"
-            : $"{jobIdentifier}: {result.Exception?.Message}";
-    }
-
-    [RelayCommand]
-    void CancelJob(string jobIdentifier)
-    {
-        if (string.IsNullOrWhiteSpace(jobIdentifier))
-            return;
-        jobManager.Cancel(jobIdentifier);
-        this.Status = $"Cancelled {jobIdentifier}";
-        this.LoadJobs();
-    }
-
-    [RelayCommand]
-    void CancelAll()
-    {
-        jobManager.CancelAll();
-        this.Status = "All jobs cancelled";
-        this.LoadJobs();
+        catch (Exception ex)
+        {
+            this.Status = $"{jobIdentifier}: {ex.Message}";
+            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, jobIdentifier, "Failed", ex.Message));
+        }
+        Trim();
     }
 
     [RelayCommand]
@@ -151,10 +94,8 @@ public partial class JobItemViewModel : ObservableObject
     [ObservableProperty] string identifier = string.Empty;
     [ObservableProperty] string jobType = string.Empty;
     [ObservableProperty] string requirements = string.Empty;
-    [ObservableProperty] bool isSystemJob;
 
     public IRelayCommand<string> RunCommand => this.parent.RunJobCommand;
-    public IRelayCommand<string> CancelCommand => this.parent.CancelJobCommand;
 }
 
 public record JobRunEntry(DateTime Timestamp, string Identifier, string Outcome, string? Error);

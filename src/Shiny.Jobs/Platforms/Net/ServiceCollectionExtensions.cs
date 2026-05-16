@@ -1,64 +1,62 @@
+#if !PLATFORM
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
-using Shiny.Stores;
-using Shiny.Stores.Impl;
 
 namespace Shiny;
 
 
+public class JobBuilder
+{
+    public string? Id { get; set; }
+    public bool Foreground { get; set; }
+    public InternetAccess Network { get; set; } = InternetAccess.None;
+    public bool Charging { get; set; }
+    public bool BatteryOk { get; set; }
+}
+
+
 public static class ServiceCollectionExtensions
 {
+    static readonly List<JobRegistration> registeredJobs = new();
+
+
     /// <summary>
-    /// Register a job on the in-process Shiny JobManager for plain .NET targets.
+    /// Register a job with optional fluent configuration for plain .NET targets.
     /// </summary>
-    public static IServiceCollection AddJob(this IServiceCollection services, JobInfo jobInfo)
+    public static IServiceCollection AddJob<TJob>(this IServiceCollection services, Action<JobBuilder>? configure = null)
+        where TJob : class, IJob
     {
-        JobManager.AddJob(jobInfo);
+        var builder = new JobBuilder();
+        configure?.Invoke(builder);
+        var reg = new JobRegistration(
+            builder.Id ?? typeof(TJob).FullName!,
+            typeof(TJob),
+            builder.Foreground,
+            builder.Network,
+            builder.Charging,
+            builder.BatteryOk
+        );
+        registeredJobs.Add(reg);
+        services.AddShinyService<TJob>();
         return services.AddJobs();
     }
 
 
     /// <summary>
-    /// Registers a job on the in-process Shiny JobManager for plain .NET targets.
-    /// </summary>
-    public static IServiceCollection AddJob(
-        this IServiceCollection services,
-        Type jobType,
-        string? identifier = null,
-        InternetAccess requiredNetwork = InternetAccess.None,
-        bool runInForeground = false,
-        params (string Key, string Value)[] parameters
-    )
-        => services.AddJob(new JobInfo(
-            identifier ?? jobType.FullName!,
-            jobType,
-            runInForeground,
-            Parameters: parameters?.ToDictionary(x => x.Key, x => x.Value),
-            RequiredInternetAccess: requiredNetwork
-        ));
-
-
-    /// <summary>
     /// Registers the in-process Shiny JobManager for plain .NET targets.
-    /// Jobs only run while the host process is alive — there is no OS-level
-    /// scheduler. You must register an <see cref="Shiny.Net.IConnectivity"/>
-    /// and <see cref="Shiny.Power.IBattery"/> implementation (e.g. via
-    /// Shiny.Support.DeviceMonitoring.Linux) before resolving the job manager.
-    /// A default JSON filesystem repository is registered automatically.
+    /// Jobs only run while the host process is alive.
     /// </summary>
     public static IServiceCollection AddJobs(this IServiceCollection services)
     {
         if (!services.HasService<IJobManager>())
-        {
-            services.AddDefaultRepository();
-            services.AddJsonContext(ShinyJobsJsonContext.Default);
-            services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
-            services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
             services.AddShinyService<JobManager>();
-        }
+
         return services;
     }
+
+
+    internal static IReadOnlyList<JobRegistration> GetRegisteredJobs() => registeredJobs;
 }
+#endif

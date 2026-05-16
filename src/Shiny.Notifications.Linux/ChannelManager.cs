@@ -7,28 +7,20 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Notifications;
 
 
-public class ChannelManager : IChannelManager, IShinyComponentStartup
+public class ChannelManager(ILogger<ChannelManager> logger) : IChannelManager
 {
     readonly ConcurrentDictionary<string, Channel> channels = new();
-    readonly ILogger<ChannelManager> logger;
-
-
-    public ChannelManager(ILogger<ChannelManager> logger)
-    {
-        this.logger = logger;
-    }
-
 
     public void ComponentStart()
     {
         try
         {
             this.Add(Channel.Default);
-            this.logger.LogDebug("Linux channel manager initialized");
+            logger.LogDebug("Linux channel manager initialized");
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Failed to create default channel");
+            logger.LogError(ex, "Failed to create default channel");
         }
     }
 

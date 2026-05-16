@@ -1,11 +1,11 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using AndroidX.Work;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
-using Shiny.Support.Repositories;
 using P = Android.Manifest.Permission;
 
 namespace Shiny.Jobs;
@@ -19,16 +19,8 @@ public class JobManager : AbstractJobManager
     public JobManager(
         AndroidPlatform platform,
         IServiceProvider container,
-        IRepository repository,
-        IObjectStoreBinder storeBinder,
         ILogger<IJobManager> logger
-    )
-    : base(
-        container,
-        repository,
-        storeBinder,
-        logger
-    )
+    ) : base(container, logger)
     {
         this.platform = platform;
     }
@@ -39,15 +31,6 @@ public class JobManager : AbstractJobManager
 
     public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
     {
-        //https://stackoverflow.com/questions/53297982/how-to-run-workmanager-immediately
-        //https://developer.android.com/reference/androidx/work/ListenableWorker#setForegroundAsync(androidx.work.ForegroundInfo)
-        //https://medium.com/androiddevelopers/use-workmanager-for-immediate-background-execution-a57db502603d
-        /*
-OneTimeWorkRequestBuilder<T>().apply {
-    setInputData(inputData) 
- setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-}.build()
-         */
         if (!this.platform.IsInManifest(P.WakeLock))
         {
             base.RunTask(taskName, task);
@@ -65,7 +48,7 @@ OneTimeWorkRequestBuilder<T>().apply {
                 }
                 catch (Exception ex)
                 {
-                    this.Log.LogError(ex, "Error running task - " + taskName);
+                    this.Log.LogError(ex, "Error running task - {TaskName}", taskName);
                 }
                 finally
                 {
@@ -74,47 +57,61 @@ OneTimeWorkRequestBuilder<T>().apply {
             }
             catch (Exception ex)
             {
-                this.Log.LogError(ex, "Error setting up task - " + taskName);
+                this.Log.LogError(ex, "Error setting up task - {TaskName}", taskName);
             }
         }
     }
 
 
-    protected override void RegisterNative(JobInfo jobInfo)
+    /// <summary>
+    /// Registers category-based periodic workers matching the iOS BGTask pattern.
+    /// Called once at startup after all jobs have been added.
+    /// </summary>
+    internal void RegisterNativeCategories()
     {
-        this.CancelNative(jobInfo);
+        // Cancel all existing Shiny work first
+        this.Instance.CancelAllWorkByTag("com.shiny.job");
 
-        //WorkManager.Initialize(this.context.AppContext, new Configuration())
-        var constraints = new Constraints.Builder()
-            .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
-            .SetRequiresCharging(jobInfo.DeviceCharging)
-            .SetRequiredNetworkType(ToNative(jobInfo.RequiredInternetAccess))
-            .Build();
+        var categories = new[]
+        {
+            (Id: GetCategoryId(false, false), Charging: false, Network: InternetAccess.None),
+            (Id: GetCategoryId(true, false), Charging: true, Network: InternetAccess.None),
+            (Id: GetCategoryId(false, true), Charging: false, Network: InternetAccess.Any),
+            (Id: GetCategoryId(true, true), Charging: true, Network: InternetAccess.Any),
+        };
 
-        var data = new Data.Builder();
-        data.PutString(ShinyJobWorker.ShinyJobIdentifier, jobInfo.Identifier);
+        foreach (var cat in categories)
+        {
+            var jobs = this.GetJobsByCategory(cat.Id);
+            if (jobs.Count == 0)
+                continue;
 
-        var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15))
-            .SetConstraints(constraints)
-            .SetInputData(data.Build())
-            .Build();
+            var constraints = new Constraints.Builder()
+                .SetRequiresCharging(cat.Charging)
+                .SetRequiredNetworkType(ToNative(cat.Network))
+                .Build();
 
-        this.Instance.EnqueueUniquePeriodicWork(
-            jobInfo.Identifier,
-            ExistingPeriodicWorkPolicy.Replace!,
-            request
-        );
-    }
+            var data = new Data.Builder();
+            data.PutString(ShinyJobWorker.ShinyCategoryIdentifier, cat.Id);
 
+            var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15))
+                .SetConstraints(constraints)
+                .SetInputData(data.Build())
+                .AddTag("com.shiny.job")
+                .Build();
 
-    protected override void CancelNative(JobInfo jobInfo)
-        => this.Instance.CancelUniqueWork(jobInfo.Identifier);
+            this.Instance.EnqueueUniquePeriodicWork(
+                cat.Id,
+                ExistingPeriodicWorkPolicy.Replace!,
+                request
+            );
 
-
-    public override void CancelAll()
-    {
-        base.CancelAll();
-        this.Instance.CancelAllWork();
+            this.Log.LogDebug(
+                "Registered Android Worker category '{Category}' with {Count} job(s)",
+                cat.Id,
+                jobs.Count
+            );
+        }
     }
 
 

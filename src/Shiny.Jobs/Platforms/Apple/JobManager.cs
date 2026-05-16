@@ -1,39 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Shiny.Support.Repositories;
 using BackgroundTasks;
 using UIKit;
-using Shiny.Stores;
 
 namespace Shiny.Jobs;
 
 
-public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStartupTask
+public class JobManager(
+    IServiceProvider container,
+    ILogger<IJobManager> logger
+) : AbstractJobManager(container, logger), IShinyStartupTask
 {
     const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
     bool registeredSuccessfully = false;
 
-
-    public JobManager(
-        IServiceProvider container,
-        IRepository repository,
-        IObjectStoreBinder storeBinder,
-        ILogger<IJobManager> logger
-    ) : base(
-        container,
-        repository,
-        storeBinder,
-        logger
-    )
-    {
-    }
-
-
-    // jobstartuptask can run before this startup, we use this to force the constructor to happen first
     public void Start() {}
     public void ComponentStart()
     {
@@ -44,10 +26,10 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStar
 
         try
         {
-            this.Register(this.GetIdentifier(false, false));
-            this.Register(this.GetIdentifier(true, false));
-            this.Register(this.GetIdentifier(false, true));
-            this.Register(this.GetIdentifier(true, true));
+            this.RegisterBgTask(GetCategoryId(false, false));
+            this.RegisterBgTask(GetCategoryId(true, false));
+            this.RegisterBgTask(GetCategoryId(false, true));
+            this.RegisterBgTask(GetCategoryId(true, true));
             this.registeredSuccessfully = true;
         }
         catch (Exception ex)
@@ -102,29 +84,7 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStar
     }
 
 
-    protected override void CancelNative(JobInfo jobInfo) { }
-
-    protected override void RegisterNative(JobInfo jobInfo)
-    {
-#if IOS
-        if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
-            return;
-#endif
-
-        var identifier = this.GetIdentifier(
-            jobInfo.DeviceCharging,
-            jobInfo.RequiredInternetAccess == InternetAccess.Any
-        );
-        var request = new BGProcessingTaskRequest(identifier);
-        request.RequiresExternalPower = jobInfo.DeviceCharging;
-        request.RequiresNetworkConnectivity = jobInfo.RequiredInternetAccess == InternetAccess.Any;
-
-        if (!BGTaskScheduler.Shared.Submit(request, out var e))
-            throw new InvalidOperationException(e.LocalizedDescription.ToString());
-    }
-
-
-    void Register(string identifier)
+    void RegisterBgTask(string identifier)
     {
         BGTaskScheduler.Shared.Register(
             identifier,
@@ -132,65 +92,12 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStar
             async task =>
             {
                 using var cancelSrc = new CancellationTokenSource();
-
                 task.ExpirationHandler = cancelSrc.Cancel;
 
-                var jobs = this.GetJobs();
-                List<JobInfo>? jobList = null;
-
-                switch (task.Identifier)
+                var jobs = this.GetJobsByCategory(task.Identifier);
+                foreach (var job in jobs)
                 {
-                    case "com.shiny.job":
-                        jobList = jobs
-                            .Where(x =>
-                                !x.DeviceCharging &&
-                                x.RequiredInternetAccess == InternetAccess.None
-                            )
-                            .ToList();
-                        break;
-
-                    case "com.shiny.jobpower":
-                        jobList = jobs
-                            .Where(x =>
-                                x.DeviceCharging &&
-                                x.RequiredInternetAccess == InternetAccess.None
-                            )
-                            .ToList();
-                        break;
-
-                    case "com.shiny.jobnet":
-                        jobList = jobs
-                            .Where(x =>
-                                !x.DeviceCharging &&
-                                (
-                                    x.RequiredInternetAccess == InternetAccess.Any ||
-                                    x.RequiredInternetAccess == InternetAccess.Unmetered
-                                )
-                            )
-                            .ToList();
-                        break;
-
-                    case "com.shiny.jobpowernet":
-                        jobList = jobs
-                            .Where(x =>
-                                (
-                                    x.DeviceCharging &&
-                                    (
-                                        x.RequiredInternetAccess == InternetAccess.Any ||
-                                        x.RequiredInternetAccess == InternetAccess.Unmetered
-                                    )
-                                )
-                                && x.DeviceCharging
-                            )
-                            .ToList();
-                        break;
-                }
-                if (jobList != null)
-                {
-                    foreach (var job in jobList)
-                    {
-                        await this.Run(job.Identifier, cancelSrc.Token);
-                    }
+                    await this.RunJob(job, cancelSrc.Token);
                 }
                 task.SetTaskCompleted(true);
             }
@@ -198,19 +105,22 @@ public class JobManager : AbstractJobManager, IShinyComponentStartup, IShinyStar
     }
 
 
-    string GetIdentifier(bool extPower, bool network)
+    internal void ScheduleNative(JobRegistration reg)
     {
-        //"com.shiny.job"
-        //"com.shiny.jobpower"
-        //"com.shiny.jobnet"
-        //"com.shiny.jobpowernet"
-        var id = "com.shiny.job";
-        if (extPower)
-            id += "power";
+#if IOS
+        if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
+            return;
+#endif
 
-        if (network)
-            id += "net";
+        var identifier = GetCategoryId(
+            reg.DeviceCharging,
+            reg.RequiredInternetAccess != InternetAccess.None
+        );
+        var request = new BGProcessingTaskRequest(identifier);
+        request.RequiresExternalPower = reg.DeviceCharging;
+        request.RequiresNetworkConnectivity = reg.RequiredInternetAccess != InternetAccess.None;
 
-        return id;
+        if (!BGTaskScheduler.Shared.Submit(request, out var e))
+            throw new InvalidOperationException(e.LocalizedDescription.ToString());
     }
 }

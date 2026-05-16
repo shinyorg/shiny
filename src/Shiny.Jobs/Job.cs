@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -6,60 +6,42 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Jobs;
 
 
-public abstract class Job : NotifyPropertyChanged, IJob
+public abstract class Job : IJob
 {
     protected ILogger Logger { get; }
     protected Job(ILogger logger) => this.Logger = logger;
 
 
-    public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
+    public async Task Run(CancellationToken cancelToken)
     {
         var fireJob = true;
-        this.JobInfo = jobInfo;
- 
+
         if (this.MinimumTime != null && this.LastRunTime != null)
         {
             var timeDiff = DateTimeOffset.UtcNow.Subtract(this.LastRunTime.Value);
             fireJob = timeDiff >= this.MinimumTime;
-            this.Logger.LogDebug($"Time Difference: {timeDiff} - Firing Job: {fireJob}");
+            this.Logger.LogDebug("Time Difference: {TimeDiff} - Firing Job: {FireJob}", timeDiff, fireJob);
         }
 
         if (fireJob)
         {
             this.Logger.LogDebug("Running Job");
-            await this.Run(cancelToken).ConfigureAwait(false);
-
-            // if the job errors, we will keep trying
+            await this.RunJob(cancelToken).ConfigureAwait(false);
             this.LastRunTime = DateTimeOffset.UtcNow;
         }
     }
 
 
-    protected abstract Task Run(CancellationToken cancelToken);
-    protected JobInfo JobInfo { get; private set; }
+    protected abstract Task RunJob(CancellationToken cancelToken);
 
     /// <summary>
-    /// Last runtime of this job.  Null if never run before.
-    /// This value will persist between runs, it is not recommended that you set this yourself
+    /// Last runtime of this job. Null if never run before.
+    /// Persists in memory for the singleton lifetime.
     /// </summary>
-    DateTimeOffset? lastRunTime;
-    public DateTimeOffset? LastRunTime
-    {
-        get => this.lastRunTime;
-        set => this.Set(ref this.lastRunTime, value);
-    }
-
+    public DateTimeOffset? LastRunTime { get; set; }
 
     /// <summary>
-    /// Sets a minimum time between this job firing
-    /// CAREFUL: jobs tend to NOT run when the users phone is not in use
-    /// This value will persist between runs
+    /// Sets a minimum time between this job firing.
     /// </summary>
-    TimeSpan? minTime;
-    public TimeSpan? MinimumTime
-    {
-        get => this.minTime;
-        set => this.Set(ref this.minTime, value);
-    }
+    public TimeSpan? MinimumTime { get; set; }
 }
-

@@ -13,7 +13,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Support.DeviceMonitoring\Shiny.Support.DeviceMonitoring.csproj" />
-        <ProjectReference Include="..\Shiny.Support.Repositories\Shiny.Support.Repositories.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('android'))">
@@ -25,6 +24,10 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx.Android" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Platforms\Shared\" />
     </ItemGroup>
 
 </Project>
