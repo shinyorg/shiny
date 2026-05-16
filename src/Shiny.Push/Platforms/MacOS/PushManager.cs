@@ -7,6 +7,7 @@ using AppKit;
 using Foundation;
 using UserNotifications;
 using Shiny.Hosting;
+using Shiny.Stores;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +17,7 @@ namespace Shiny.Push;
 public class PushManager(
     IServiceProvider services,
     IPlatform platform,
+    IKeyValueStore store,
     ILogger<PushManager> logger,
     IPushProvider? provider = null
 ) :
@@ -30,22 +32,32 @@ public class PushManager(
     readonly SemaphoreSlim semaphore = new(1, 1);
     TaskCompletionSource<NSData>? tokenSource;
 
+    static string Key(string prop) => $"Shiny.Push.PushManager.{prop}";
+
     public IPushTagSupport? Tags => provider as IPushTagSupport;
 
 
-    string? registrationToken;
+    string? registrationToken = store.Get<string>(Key(nameof(RegistrationToken)));
     public string? RegistrationToken
     {
         get => this.registrationToken;
-        set => this.Set(ref this.registrationToken, value);
+        set
+        {
+            if (this.Set(ref this.registrationToken, value))
+                store.SetOrRemove(Key(nameof(RegistrationToken)), value);
+        }
     }
 
 
-    string? nativeToken;
+    string? nativeToken = store.Get<string>(Key(nameof(NativeRegistrationToken)));
     public string? NativeRegistrationToken
     {
         get => this.nativeToken;
-        set => this.Set(ref this.nativeToken, value);
+        set
+        {
+            if (this.Set(ref this.nativeToken, value))
+                store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
+        }
     }
 
 

@@ -32,7 +32,8 @@ public sealed class JobRegistrar(IServiceCollection services)
             registration?.BatteryNotLow ?? false
         );
         this.registrations[typeof(TJob)] = reg;
-        services.AddShinyService<TJob>();
+        services.AddSingleton<TJob>();
+        services.AddSingleton<IJob>(sp => sp.GetRequiredService<TJob>());
         return this;
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using Microsoft.JSInterop;
 using Shiny.Stores;
 
@@ -10,22 +9,13 @@ namespace Shiny.Storage.Blazor;
 /// Requires <c>_content/Shiny.Support.Storage.Blazor/shiny-storage.js</c> to be loaded
 /// via a &lt;script&gt; tag in the host index.html before Shiny services are used.
 /// </summary>
-public class LocalStorageKeyValueStore : IKeyValueStore
+public class LocalStorageKeyValueStore(IJSRuntime jsRuntime, ISerializer serializer) : IKeyValueStore
 {
-    const string KeyPrefix = "shiny:kvs:";
-
-    readonly IJSInProcessRuntime js;
-    readonly ISerializer serializer;
-
-
-    public LocalStorageKeyValueStore(IJSRuntime jsRuntime, ISerializer serializer)
-    {
-        this.js = (IJSInProcessRuntime)jsRuntime;
-        this.serializer = serializer;
-    }
+    const string KeyPrefix = "shiny:kvs:settings:";
+    readonly IJSInProcessRuntime js = (IJSInProcessRuntime)jsRuntime;
+    readonly ISerializer serializer = serializer;
 
 
-    public string Alias => "settings";
     public bool IsReadOnly => false;
 
 
@@ -33,19 +23,19 @@ public class LocalStorageKeyValueStore : IKeyValueStore
         => this.js.Invoke<bool>("shinyLocalStorage.containsKey", this.Format(key));
 
 
-    public object? Get(Type type, string key)
+    public T? Get<T>(string key)
     {
         var json = this.js.Invoke<string?>("shinyLocalStorage.getItem", this.Format(key));
         if (json == null)
-            return type.GetDefaultValue();
+            return default;
 
-        return this.serializer.Deserialize(type, json);
+        return this.serializer.Deserialize<T>(json);
     }
 
 
-    public void Set(string key, object value)
+    public void Set<T>(string key, T value)
     {
-        var json = this.serializer.Serialize(value);
+        var json = this.serializer.Serialize<T>(value);
         this.js.InvokeVoid("shinyLocalStorage.setItem", this.Format(key), json);
     }
 
@@ -55,8 +45,8 @@ public class LocalStorageKeyValueStore : IKeyValueStore
 
 
     public void Clear()
-        => this.js.Invoke<int>("shinyLocalStorage.removeKeys", $"{KeyPrefix}{this.Alias}:");
+        => this.js.Invoke<int>("shinyLocalStorage.removeKeys", KeyPrefix);
 
 
-    string Format(string key) => $"{KeyPrefix}{this.Alias}:{key}";
+    string Format(string key) => $"{KeyPrefix}{key}";
 }

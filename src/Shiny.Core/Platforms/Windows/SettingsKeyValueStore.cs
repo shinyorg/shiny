@@ -8,17 +8,11 @@ using Windows.Storage;
 namespace Shiny.Stores;
 
 
-public class SettingsKeyValueStore : IKeyValueStore
+public class SettingsKeyValueStore(ISerializer serializer) : IKeyValueStore
 {
     public string? ContainerName { get; set; }
-    readonly ISerializer serializer;
 
 
-    public SettingsKeyValueStore(ISerializer serializer)
-        => this.serializer = serializer;
-
-
-    public string Alias => "settings";
     public bool IsReadOnly => false;
 
     public void Clear()
@@ -44,16 +38,16 @@ public class SettingsKeyValueStore : IKeyValueStore
         return this.fileValues!.ContainsKey(key);
     }
 
-    public object? Get(Type type, string key)
+    public T? Get<T>(string key)
     {
         if (!this.Contains(key))
-            return null;
+            return default;
 
         var value = this.IsPackaged
             ? (string)this.Container.Values[key]
             : this.fileValues![key];
 
-        return this.serializer.Deserialize(type, value);
+        return serializer.Deserialize<T>(value);
     }
 
     public bool Remove(string key)
@@ -68,9 +62,9 @@ public class SettingsKeyValueStore : IKeyValueStore
         return removed;
     }
 
-    public void Set(string key, object value)
+    public void Set<T>(string key, T value)
     {
-        var s = this.serializer.Serialize(value);
+        var s = serializer.Serialize<T>(value);
         if (this.IsPackaged)
         {
             if (this.Container.Values.ContainsKey(key))

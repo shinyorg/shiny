@@ -16,7 +16,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services)
     {
         if (!services.HasImplementation<BleManager>())
-            services.AddShinyService<BleManager>();
+        {
+            services.AddSingleton<BleManager>();
+            services.AddSingleton<IBleManager>(sp => sp.GetRequiredService<BleManager>());
+        }
 
         services.TryAddSingleton<IOperationQueue, SemaphoreOperationQueue>();
         return services;

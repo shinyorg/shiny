@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Locations;
@@ -20,7 +20,8 @@ public static class GeofenceServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
     {
-        services.AddShinyService(delegateType);
+        services.AddSingleton(delegateType);
+        services.AddSingleton(typeof(IGeofenceDelegate), sp => sp.GetRequiredService(delegateType));
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyLocationsJsonContext.Default);
 
@@ -34,25 +35,31 @@ public static class GeofenceServiceCollectionExtensions
             if (resultCode == ConnectionResult.ServiceMissing)
                 return services.AddGpsDirectGeofencing(delegateType);
 
-            
-            services.AddShinyService<GeofenceManager>();
+            services.AddSingleton<GeofenceManager>();
+            services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManager>());
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GeofenceManager>());
         }
 #elif APPLE
         if (!services.HasService<IGeofenceManager>())
         {
             if (OperatingSystem.IsIOSVersionAtLeast(18) || OperatingSystem.IsMacCatalystVersionAtLeast(18))
             {
-                services.AddShinyService<GeofenceManager>();
+                services.AddSingleton<GeofenceManager>();
+                services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManager>());
+                services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GeofenceManager>());
             }
             else
             {
-                services.AddShinyService<CLLocationGeofenceManager>();
+                services.AddSingleton<CLLocationGeofenceManager>();
+                services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<CLLocationGeofenceManager>());
             }
         }
 #elif WINDOWS
         if (!services.HasService<IGeofenceManager>())
         {
-            services.AddShinyService<GeofenceManager>();
+            services.AddSingleton<GeofenceManager>();
+            services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManager>());
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GeofenceManager>());
         }
 #endif
         return services;
@@ -89,8 +96,11 @@ public static class GeofenceServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
     {
-        services.AddShinyService(delegateType);
-        services.AddShinyService<GpsGeofenceManagerImpl>();
+        services.AddSingleton(delegateType);
+        services.AddSingleton(typeof(IGeofenceDelegate), sp => sp.GetRequiredService(delegateType));
+        services.AddSingleton<GpsGeofenceManagerImpl>();
+        services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GpsGeofenceManagerImpl>());
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GpsGeofenceManagerImpl>());
         return services;
     }
 #else
@@ -102,7 +112,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
         => services;
-    
+
     /// <summary>
     /// This is a blank AddGeofencing - you won't see this documentation if you've got a proper target that is supported
     /// </summary>

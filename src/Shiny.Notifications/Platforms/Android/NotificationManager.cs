@@ -14,40 +14,25 @@ using P = Android.Manifest.Permission;
 namespace Shiny.Notifications;
 
 
-public partial class NotificationManager : INotificationManager,
-                                           IAndroidLifecycle.IOnActivityOnCreate,
-                                           IAndroidLifecycle.IOnActivityNewIntent
+public partial class NotificationManager(
+    IServiceProvider services,
+    AndroidPlatform platform,
+    AndroidNotificationManager manager,
+    IRepository repository,
+    IChannelManager channelManager,
+    IGeofenceManager geofenceManager,
+    IKeyValueStore settings,
+    ILogger<NotificationManager> logger
+) : INotificationManager, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent
 {
-    readonly Lazy<AndroidNotificationProcessor> processor;
-    readonly AndroidPlatform platform;
-    readonly AndroidNotificationManager manager;
-    readonly IChannelManager channelManager;
-    readonly IRepository repository;
-    readonly IGeofenceManager geofenceManager;
-    readonly IKeyValueStore settings;
-    readonly ILogger logger;
-
-
-    public NotificationManager(
-        IServiceProvider services,
-        AndroidPlatform platform,
-        AndroidNotificationManager manager,
-        IRepository repository,
-        IChannelManager channelManager,
-        IGeofenceManager geofenceManager,
-        IKeyValueStoreFactory keystore,
-        ILogger<NotificationManager> logger
-    )
-    {
-        this.processor = services.GetLazyService<AndroidNotificationProcessor>();
-        this.platform = platform;
-        this.manager = manager;
-        this.repository = repository;
-        this.channelManager = channelManager;
-        this.geofenceManager = geofenceManager;
-        this.settings = keystore.DefaultStore;
-        this.logger = logger;
-    }
+    readonly Lazy<AndroidNotificationProcessor> processor = services.GetLazyService<AndroidNotificationProcessor>();
+    readonly AndroidPlatform platform = platform;
+    readonly AndroidNotificationManager manager = manager;
+    readonly IRepository repository = repository;
+    readonly IChannelManager channelManager = channelManager;
+    readonly IGeofenceManager geofenceManager = geofenceManager;
+    readonly IKeyValueStore settings = settings;
+    readonly ILogger logger = logger;
 
 
     public void AddChannel(Channel channel) => this.channelManager.Add(channel);

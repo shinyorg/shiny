@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Shiny.Stores;
 
 namespace Shiny;
@@ -6,102 +6,61 @@ namespace Shiny;
 
 public static class StoreExtensions
 {
-    static readonly object syncLock = new object();
+    static readonly object syncLock = new();
 
 
     /// <summary>
-    /// If obj is null or equivalent to the default for the object type
+    /// Gets a value, returning defaultValue if the key is absent
     /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    public static bool IsNullOrDefault(this object? obj)
+    public static T Get<T>(this IKeyValueStore store, string key, T defaultValue)
     {
-        if (obj == null)
-            return true;
-
-        var type = obj.GetType();
-        if (type.IsValueType)
-        {
-            var defaultVal = type.GetDefaultValue();
-            return defaultVal?.Equals(obj) ?? false;
-        }
-        return false;
+        var value = store.Get<T>(key);
+        return value is null ? defaultValue : value;
     }
 
 
     /// <summary>
-    /// If the value is null or default for the type, it will remove the key from the store - otherwise it will store it
+    /// If value is null or default for the type, removes the key; otherwise stores the value
     /// </summary>
-    /// <param name="store"></param>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    public static void SetOrRemove(this IKeyValueStore store, string key, object? value)
+    public static void SetOrRemove<T>(this IKeyValueStore store, string key, T? value)
     {
-        if (value.IsNullOrDefault())
+        if (value is null || value.Equals(default(T)))
             store.Remove(key);
         else
-            store.Set(key, value!);
+            store.Set(key, value);
     }
 
 
     /// <summary>
-    /// Gets a generic object from the store
+    /// Thread-safe incrementing counter stored at the given key
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="store"></param>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public static T Get<T>(this IKeyValueStore store, string key, T defaultValue = default)
-    {
-        if (!store.Contains(key))
-            return defaultValue;
-
-        return (T)store.Get(typeof(T), key);
-    }
-
-
-    /// <summary>
-    /// Thread safetied setting value incrementor
-    /// </summary>
-    /// <param name="store"></param>
-    /// <returns></returns>
     public static int IncrementValue(this IKeyValueStore store, string key = "NextId")
     {
-        var id = 0;
-
         lock (syncLock)
         {
-            id = store.Get<int>(key);
-            id++;
+            var id = store.Get<int>(key) + 1;
             store.Set(key, id);
+            return id;
         }
-        return id;
     }
 
 
     /// <summary>
-    /// Gets a required value from settings
+    /// Gets a required value; throws if the key is not set
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="store"></param>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public static T GetRequired<T>(this IKeyValueStore store, string key)
     {
-        if (!store.Contains(key))
+        var value = store.Get<T>(key);
+        if (value is null)
             throw new ArgumentException($"Store key '{key}' is not set");
 
-        return store.Get<T>(key)!;
+        return value;
     }
 
 
-
     /// <summary>
-    /// This will only set the value if the setting is not currently set.  Will not fire Changed event
+    /// Sets the value only if the key is not already present. Returns true if the value was set.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
     public static bool SetDefault<T>(this IKeyValueStore store, string key, T value)
     {
         if (store.Contains(key))

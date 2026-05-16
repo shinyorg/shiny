@@ -1,49 +1,38 @@
-﻿using System;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
-using System.Linq;
 using Windows.Security.Cryptography.DataProtection;
 
 namespace Shiny.Stores;
 
 
-public class SecureKeyValueStore : IKeyValueStore
+public class SecureKeyValueStore(ISerializer serializer) : IKeyValueStore
 {
-    readonly SettingsKeyValueStore settingsStore;
-    readonly ISerializer serializer;
+    readonly SettingsKeyValueStore settingsStore = new(serializer) { ContainerName = "ShinySecure" };
 
 
-    public SecureKeyValueStore(ISerializer serializer)
-    {
-        this.serializer = serializer;
-        this.settingsStore = new SettingsKeyValueStore(serializer) { ContainerName = "ShinySecure" };
-    }
-
-
-    public string Alias => "secure";
     public bool IsReadOnly => false;
     public void Clear() => this.settingsStore.Clear();
     public bool Contains(string key) => this.settingsStore.Contains(key);
-    public object? Get(Type type, string key)
+    public bool Remove(string key) => this.settingsStore.Remove(key);
+
+
+    public T? Get<T>(string key)
     {
-        // ITERATE THROUGH ALL VALUES AND UNENCRYPT to mem dictionary?
         var data = this.settingsStore.Get<byte[]>(key);
         if (data == null)
-            return null;
+            return default;
 
         var provider = new DataProtectionProvider();
         var buffer = provider.UnprotectAsync(data.AsBuffer()).AsTask().GetAwaiter().GetResult();
-        var value = Encoding.UTF8.GetString(buffer.ToArray());
-        return value;
+        var json = Encoding.UTF8.GetString(buffer.ToArray());
+        return serializer.Deserialize<T>(json);
     }
-    public bool Remove(string key) => this.settingsStore.Remove(key);
-    public void Set(string key, object value) => this.DoSet(key, value);
 
 
-    void DoSet(string key, object value)
+    public void Set<T>(string key, T value)
     {
-        var data = this.serializer.Serialize(value);
-        var bytes = Encoding.UTF8.GetBytes(data);
+        var json = serializer.Serialize<T>(value);
+        var bytes = Encoding.UTF8.GetBytes(json);
 
         // LOCAL=user and LOCAL=machine do not require enterprise auth capability
         var provider = new DataProtectionProvider("LOCAL=user");

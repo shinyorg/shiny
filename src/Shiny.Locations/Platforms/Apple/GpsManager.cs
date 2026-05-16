@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 
 namespace Shiny.Locations;
 
@@ -13,30 +14,35 @@ namespace Shiny.Locations;
 [SupportedOSPlatform("maccatalyst18.0")]
 public class GpsManager(
     IServiceProvider services,
+    IKeyValueStore store,
     ILogger<IGpsManager> logger
 ) : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
+    const string CurrentSettingsKey = "Shiny.Locations.GpsManager.CurrentSettings";
+
     CLBackgroundActivitySession? bgSession;
     CLServiceSession? session;
     CLLocationUpdater? updater;
 
 
+    AppleGpsRequest? currentSettings = store.Get<AppleGpsRequest>(CurrentSettingsKey);
     public AppleGpsRequest? CurrentSettings
     {
-        get;
+        get => this.currentSettings;
         set
         {
             var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
             if (bg != GpsBackgroundMode.None)
             {
-                this.Set(ref field, value);
+                this.Set(ref this.currentSettings, value);
             }
             else
             {
                 // don't remember across sessions
-                this.Set(ref field, null);
-                field = value;
+                this.Set(ref this.currentSettings, null);
+                this.currentSettings = value;
             }
+            store.SetOrRemove(CurrentSettingsKey, value);
         }
     }
 

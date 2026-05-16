@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 #if APPLE
 using Foundation;
 #endif
@@ -16,31 +17,48 @@ namespace Shiny.Push;
 public class AzureNotificationHubsPushProvider(
     AzureNotificationConfig config,
     IServiceProvider services,
+    IKeyValueStore store,
     ILogger<AzureNotificationHubsPushProvider> logger
 ) : NotifyPropertyChanged, IPushProvider, IPushTagSupport
 {
     readonly NotificationHubClient client = new(config.ListenerConnectionString, config.HubName);
 
+    static string Key(string prop) => $"Shiny.Push.AzureNotificationHubsPushProvider.{prop}";
 
 
+    string? nativeToken = store.Get<string>(Key(nameof(NativeToken)));
     public string? NativeToken
     {
-        get;
-        set => this.Set(ref field, value);
+        get => this.nativeToken;
+        set
+        {
+            if (this.Set(ref this.nativeToken, value))
+                store.SetOrRemove(Key(nameof(NativeToken)), value);
+        }
     }
 
 
+    string? installationId = store.Get<string>(Key(nameof(InstallationId)));
     public string? InstallationId
     {
-        get;
-        set => this.Set(ref field, value);
+        get => this.installationId;
+        set
+        {
+            if (this.Set(ref this.installationId, value))
+                store.SetOrRemove(Key(nameof(InstallationId)), value);
+        }
     }
 
 
+    string[]? registeredTags = store.Get<string[]>(Key(nameof(RegisteredTags)));
     public string[]? RegisteredTags
     {
-        get;
-        set => this.Set(ref field, value);
+        get => this.registeredTags;
+        set
+        {
+            if (this.Set(ref this.registeredTags, value))
+                store.SetOrRemove(Key(nameof(RegisteredTags)), value);
+        }
     }
 
 

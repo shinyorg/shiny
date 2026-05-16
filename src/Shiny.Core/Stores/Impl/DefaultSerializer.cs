@@ -23,36 +23,33 @@ public class DefaultSerializer : ISerializer
         => this.options.TypeInfoResolverChain.Add(context);
 
 
-    public T Deserialize<T>(string value) => (T)this.Deserialize(typeof(T), value);
-
-    public object Deserialize(Type objectType, string value)
+    public T Deserialize<T>(string value)
     {
-        var typeInfo = this.GetRequiredTypeInfo(objectType);
-        var result = JsonSerializer.Deserialize(value, typeInfo);
-        return result!;
+        var typeInfo = this.GetRequiredTypeInfo<T>();
+        return (T)JsonSerializer.Deserialize(value, typeInfo)!;
     }
 
 
-    public string Serialize(object value)
+    public string Serialize<T>(T value)
     {
-        var typeInfo = this.GetRequiredTypeInfo(value.GetType());
+        var typeInfo = this.GetRequiredTypeInfo<T>();
         return JsonSerializer.Serialize(value, typeInfo);
     }
 
 
-    JsonTypeInfo GetRequiredTypeInfo(Type type)
+    JsonTypeInfo GetRequiredTypeInfo<T>()
     {
         JsonTypeInfo? typeInfo = null;
         try
         {
-            typeInfo = this.options.GetTypeInfo(type);
+            typeInfo = this.options.GetTypeInfo(typeof(T));
         }
         catch (InvalidOperationException) { }
 
         if (typeInfo == null)
         {
             throw new InvalidOperationException(
-                $"No JsonTypeInfo registered for type '{type.FullName}'. " +
+                $"No JsonTypeInfo registered for type '{typeof(T).FullName}'. " +
                 $"Register a JsonSerializerContext containing this type via services.AddJsonContext(...)."
             );
         }

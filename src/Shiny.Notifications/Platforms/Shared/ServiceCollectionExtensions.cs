@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Notifications;
@@ -12,9 +12,6 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers notification manager with Shiny
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configuration"></param>
-    /// <returns></returns>
     public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, IosConfiguration? configuration = null) where TDelegate : INotificationDelegate
         => services.AddNotifications(typeof(TDelegate), configuration);
 
@@ -22,22 +19,26 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers notification manager with Shiny
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="delegateType"></param>
-    /// <param name="configuration"></param>
-    /// <returns></returns>
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, IosConfiguration? configuration = null)
     {
         services.AddSingleton(configuration ?? new());
-        services.AddShinyService<NotificationManager>();
+        services.AddSingleton<NotificationManager>();
+        services.AddSingleton<INotificationManager>(sp => sp.GetRequiredService<NotificationManager>());
+        services.AddSingleton<IIosLifecycle.INotificationHandler>(sp => sp.GetRequiredService<NotificationManager>());
 
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyNotificationsJsonContext.Default);
         if (!services.HasService<IChannelManager>())
-            services.AddShinyService<ChannelManager>();
+        {
+            services.AddSingleton<ChannelManager>();
+            services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
+        }
 
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(INotificationDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         return services;
     }
@@ -58,15 +59,24 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null, MacConfiguration? configuration = null)
     {
         services.AddSingleton(configuration ?? new());
-        services.AddShinyService<NotificationManager>();
+        services.AddSingleton<NotificationManager>();
+        services.AddSingleton<INotificationManager>(sp => sp.GetRequiredService<NotificationManager>());
+        services.AddSingleton<IMacLifecycle.INotificationHandler>(sp => sp.GetRequiredService<NotificationManager>());
 
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyNotificationsJsonContext.Default);
         if (!services.HasService<IChannelManager>())
-            services.AddShinyService<ChannelManager>();
+        {
+            services.AddSingleton<ChannelManager>();
+            services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
+            services.AddSingleton<IShinyComponentStartup>(sp => sp.GetRequiredService<ChannelManager>());
+        }
 
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(INotificationDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         return services;
     }
@@ -77,9 +87,6 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers notification manager with Shiny
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
     public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services) where TDelegate : INotificationDelegate
         => services.AddNotifications(typeof(TDelegate));
 
@@ -87,24 +94,30 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers notification manager with Shiny
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="delegateType"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null)
     {
         services.AddGeofencing<NotificationGeofenceDelegate>();
         services.TryAddSingleton<AndroidNotificationProcessor>();
         services.TryAddSingleton<AndroidNotificationManager>();
-        services.AddShinyService<NotificationManager>();
+        services.AddSingleton<NotificationManager>();
+        services.AddSingleton<INotificationManager>(sp => sp.GetRequiredService<NotificationManager>());
+        services.AddSingleton<IAndroidLifecycle.IOnActivityOnCreate>(sp => sp.GetRequiredService<NotificationManager>());
+        services.AddSingleton<IAndroidLifecycle.IOnActivityNewIntent>(sp => sp.GetRequiredService<NotificationManager>());
 
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyNotificationsJsonContext.Default);
         if (!services.HasService<IChannelManager>())
-            services.AddShinyService<ChannelManager>();
+        {
+            services.AddSingleton<ChannelManager>();
+            services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
+            services.AddSingleton<IShinyComponentStartup>(sp => sp.GetRequiredService<ChannelManager>());
+        }
 
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(INotificationDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         return services;
     }
@@ -125,15 +138,23 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null)
     {
-        services.AddShinyService<NotificationManager>();
+        services.AddSingleton<NotificationManager>();
+        services.AddSingleton<INotificationManager>(sp => sp.GetRequiredService<NotificationManager>());
+
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyNotificationsJsonContext.Default);
-
         if (!services.HasService<IChannelManager>())
-            services.AddShinyService<ChannelManager>();
+        {
+            services.AddSingleton<ChannelManager>();
+            services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
+            services.AddSingleton<IShinyComponentStartup>(sp => sp.GetRequiredService<ChannelManager>());
+        }
 
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(INotificationDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         return services;
     }

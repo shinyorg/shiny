@@ -33,8 +33,11 @@ public static class ServiceCollectionExtensions
         services.AddJsonContext(ShinyHttpJsonContext.Default);
 
         services.AddSingleton(options);
-        services.AddShinyService<BlazorHttpTransferManager>();
-        services.AddShinyService(typeof(TDelegate));
+        services.AddSingleton<BlazorHttpTransferManager>();
+        services.AddSingleton<IHttpTransferManager>(sp => sp.GetRequiredService<BlazorHttpTransferManager>());
+
+        services.AddSingleton<TDelegate>();
+        services.AddSingleton<IHttpTransferDelegate>(sp => sp.GetRequiredService<TDelegate>());
         return services;
     }
 }

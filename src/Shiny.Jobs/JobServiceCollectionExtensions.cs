@@ -23,13 +23,27 @@ public static class ServiceCollectionExtensions
         if (!services.HasService<IJobManager>())
         {
             services.AddSingleton(new JobRegistrar(services));
-            services.AddShinyService<JobLifecycleTask>();
-            services.AddShinyService<JobManager>();
+
+            services.AddSingleton<JobLifecycleTask>();
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<JobLifecycleTask>());
+#if ANDROID
+            services.AddSingleton<IAndroidLifecycle.IApplicationLifecycle>(sp => sp.GetRequiredService<JobLifecycleTask>());
+#elif IOS || MACCATALYST
+            services.AddSingleton<IIosLifecycle.IApplicationLifecycle>(sp => sp.GetRequiredService<JobLifecycleTask>());
+#elif MACOS
+            services.AddSingleton<IMacLifecycle.IApplicationLifecycle>(sp => sp.GetRequiredService<JobLifecycleTask>());
+#endif
+
+            services.AddSingleton<JobManager>();
+            services.AddSingleton<IJobManager>(sp => sp.GetRequiredService<JobManager>());
+#if IOS || MACCATALYST
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<JobManager>());
+#endif
         }
 
         var registrar = (JobRegistrar)services.Single(x => x.ImplementationInstance is JobRegistrar).ImplementationInstance!;
         registrar.Register<TJob>(registration);
-            
+
         return services;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Shiny.Net.Http;
 
 namespace Shiny;
@@ -11,12 +11,19 @@ public static class ServiceCollectionExtensions
     {
         services.AddConnectivity();
 
-        services.AddShinyService<HttpTransferManager>();
-        services.AddShinyService(typeof(TDelegate));
+        services.AddSingleton<HttpTransferManager>();
+        services.AddSingleton<IHttpTransferManager>(sp => sp.GetRequiredService<HttpTransferManager>());
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<HttpTransferManager>());
+#if IOS || MACCATALYST
+        services.AddSingleton<IIosLifecycle.IHandleEventsForBackgroundUrl>(sp => sp.GetRequiredService<HttpTransferManager>());
+#endif
+
+        services.AddSingleton<TDelegate>();
+        services.AddSingleton<IHttpTransferDelegate>(sp => sp.GetRequiredService<TDelegate>());
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyHttpJsonContext.Default);
         services.AddSingleton<HttpTransferMonitor>();
-        
+
 #if ANDROID || WINDOWS
         services.AddSingleton<HttpTransferProcess>();
 #endif

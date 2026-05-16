@@ -25,8 +25,7 @@ public static class ServiceCollectionExtensions
 
 
     /// <summary>
-    /// Registers an <see cref="IKeyValueStore"/> backed by the browser's localStorage along
-    /// with the <see cref="IKeyValueStoreFactory"/> and <see cref="IObjectStoreBinder"/>.
+    /// Registers an <see cref="IKeyValueStore"/> backed by the browser's localStorage.
     /// Consumers must include
     /// <c>&lt;script src="_content/Shiny.Support.Storage.Blazor/shiny-storage.js"&gt;&lt;/script&gt;</c>
     /// in their index.html before blazor.webassembly.js.
@@ -34,9 +33,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddLocalStorageKeyValueStore(this IServiceCollection services)
     {
         services.TryAddSingleton<ISerializer, DefaultSerializer>();
-        services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
-        services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
-        services.AddSingleton<IKeyValueStore, LocalStorageKeyValueStore>();
+        services.AddKeyedSingleton<IKeyValueStore, LocalStorageKeyValueStore>(StoreKeys.Default);
+        services.TryAddSingleton<IKeyValueStore>(
+            sp => sp.GetRequiredKeyedService<IKeyValueStore>(StoreKeys.Default)
+        );
         return services;
     }
 }

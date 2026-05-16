@@ -19,8 +19,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddStandardHttpTransfers<TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
-        services.AddShinyService<HttpTransferManager>();
-        services.AddShinyService(typeof(TDelegate));
+        services.AddSingleton<HttpTransferManager>();
+        services.AddSingleton<IHttpTransferManager>(sp => sp.GetRequiredService<HttpTransferManager>());
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<HttpTransferManager>());
+
+        services.AddSingleton<TDelegate>();
+        services.AddSingleton<IHttpTransferDelegate>(sp => sp.GetRequiredService<TDelegate>());
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyHttpJsonContext.Default);
         services.AddSingleton<HttpTransferMonitor>();

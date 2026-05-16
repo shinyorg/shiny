@@ -13,32 +13,21 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager, IIosLifecycle.INotificationHandler
+public class NotificationManager(
+    IosConfiguration configuration,
+    IServiceProvider services,
+    ILogger<NotificationManager> logger,
+    IPlatform platform,
+    IChannelManager channelManager,
+    IKeyValueStore settings
+) : INotificationManager, IIosLifecycle.INotificationHandler
 {
-    readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
-    readonly IosConfiguration configuration;
-    readonly IPlatform platform;
-    readonly ILogger logger;
-    readonly IChannelManager channelManager;
-    readonly IKeyValueStore settings;
-
-
-    public NotificationManager(
-        IosConfiguration configuration,
-        IServiceProvider services,
-        ILogger<NotificationManager> logger,
-        IPlatform platform,
-        IChannelManager channelManager,
-        IKeyValueStoreFactory keystore
-    )
-    {
-        this.configuration = configuration;
-        this.delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
-        this.logger = logger;
-        this.platform = platform;
-        this.channelManager = channelManager;
-        this.settings = keystore.DefaultStore;
-    }
+    readonly Lazy<IEnumerable<INotificationDelegate>> delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
+    readonly IosConfiguration configuration = configuration;
+    readonly IPlatform platform = platform;
+    readonly ILogger logger = logger;
+    readonly IChannelManager channelManager = channelManager;
+    readonly IKeyValueStore settings = settings;
 
 
     public void AddChannel(Channel channel) => this.channelManager.Add(channel);

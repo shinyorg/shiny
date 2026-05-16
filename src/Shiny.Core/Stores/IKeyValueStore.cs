@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace Shiny.Stores;
 
 
@@ -9,20 +7,13 @@ namespace Shiny.Stores;
 public interface IKeyValueStore
 {
     /// <summary>
-    /// Gets the unique alias identifying this store
-    /// </summary>
-    string Alias { get; }
-
-    /// <summary>
     /// Gets whether this store is read-only
     /// </summary>
     bool IsReadOnly { get; }
 
     /// <summary>
-    /// Removes a value by key
+    /// Removes a value by key. Returns true if the key existed.
     /// </summary>
-    /// <param name="key">The key to remove</param>
-    /// <returns>True if the key was found and removed</returns>
     bool Remove(string key);
 
     /// <summary>
@@ -33,22 +24,15 @@ public interface IKeyValueStore
     /// <summary>
     /// Checks whether the store contains a value for the specified key
     /// </summary>
-    /// <param name="key">The key to check</param>
-    /// <returns>True if the key exists</returns>
     bool Contains(string key);
 
     /// <summary>
-    /// Gets a value by type and key
+    /// Gets a value by key. Returns default(T) if not found.
     /// </summary>
-    /// <param name="type">The expected type of the value</param>
-    /// <param name="key">The key to retrieve</param>
-    /// <returns>The stored value, or null if not found</returns>
-    object? Get(Type type, string key);
+    T? Get<T>(string key);
 
     /// <summary>
     /// Sets a value for the specified key
     /// </summary>
-    /// <param name="key">The key to store</param>
-    /// <param name="value">The value to store</param>
-    void Set(string key, object value);
+    void Set<T>(string key, T value);
 }

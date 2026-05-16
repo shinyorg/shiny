@@ -1,4 +1,4 @@
-﻿#if PLATFORM
+#if PLATFORM
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Hosting;
@@ -13,33 +13,51 @@ public static class ShinyInfrastructureExtensions
     /// <summary>
     /// This is called by Shiny hosting - You should NOT be calling this yourself
     /// </summary>
-    /// <param name="services"></param>
-    /// <returns></returns>
     public static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
     {
         services.TryAddSingleton<ISerializer, DefaultSerializer>();
-        services.TryAddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
-        services.TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+
 #if ANDROID
-        services.AddShinyService<AndroidPlatform>();
-        services.AddShinyService<AndroidLifecycleExecutor>();
-        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        services.AddSingleton<AndroidPlatform>();
+        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<AndroidPlatform>());
+        services.AddSingleton<IAndroidLifecycle.IOnActivityRequestPermissionsResult>(sp => sp.GetRequiredService<AndroidPlatform>());
+        services.AddSingleton<IAndroidLifecycle.IOnActivityResult>(sp => sp.GetRequiredService<AndroidPlatform>());
+
+        services.AddSingleton<AndroidLifecycleExecutor>();
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<AndroidLifecycleExecutor>());
+
+        services.AddKeyedSingleton<IKeyValueStore, SettingsKeyValueStore>(StoreKeys.Default);
+        services.AddKeyedSingleton<IKeyValueStore, SecureKeyValueStore>(StoreKeys.Secure);
 #elif IOS || MACCATALYST
-        services.AddShinyService<IosPlatform>();
-        services.AddShinyService<IosLifecycleExecutor>();
-        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        services.AddSingleton<IosPlatform>();
+        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<IosPlatform>());
+
+        services.AddSingleton<IosLifecycleExecutor>();
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<IosLifecycleExecutor>());
+
+        services.AddKeyedSingleton<IKeyValueStore, SettingsKeyValueStore>(StoreKeys.Default);
+        services.AddKeyedSingleton<IKeyValueStore, SecureKeyValueStore>(StoreKeys.Secure);
 #elif MACOS
-        services.AddShinyService<MacPlatform>();
-        services.AddShinyService<MacLifecycleExecutor>();
-        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        services.AddSingleton<MacPlatform>();
+        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<MacPlatform>());
+
+        services.AddSingleton<MacLifecycleExecutor>();
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<MacLifecycleExecutor>());
+
+        services.AddKeyedSingleton<IKeyValueStore, SettingsKeyValueStore>(StoreKeys.Default);
+        services.AddKeyedSingleton<IKeyValueStore, SecureKeyValueStore>(StoreKeys.Secure);
 #elif WINDOWS
-        services.AddShinyService<WindowsPlatform>();
-        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        services.AddSingleton<WindowsPlatform>();
+        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<WindowsPlatform>());
+
+        services.AddKeyedSingleton<IKeyValueStore, SettingsKeyValueStore>(StoreKeys.Default);
+        services.AddKeyedSingleton<IKeyValueStore, SecureKeyValueStore>(StoreKeys.Secure);
 #endif
+        // Unkeyed default — inject plain IKeyValueStore to get the "settings" store
+        services.TryAddSingleton<IKeyValueStore>(
+            sp => sp.GetRequiredKeyedService<IKeyValueStore>(StoreKeys.Default)
+        );
+
         return services;
     }
 }

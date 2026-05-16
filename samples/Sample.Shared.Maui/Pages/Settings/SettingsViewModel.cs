@@ -65,7 +65,7 @@ public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shi
     void GetValue()
     {
         if (string.IsNullOrWhiteSpace(this.StoreKey)) return;
-        var value = store.Get(typeof(string), this.StoreKey);
+        var value = store.Get<string>(this.StoreKey);
         this.StoreResult = value != null ? $"'{this.StoreKey}' = '{value}'" : $"'{this.StoreKey}' not found";
     }
 

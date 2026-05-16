@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Shiny.Push;
 
 namespace Shiny;
@@ -10,7 +10,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddPush();
         services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
-        services.AddShinyService<AzureNotificationHubsPushProvider>();
+        services.AddSingleton<AzureNotificationHubsPushProvider>();
+        services.AddSingleton<IPushProvider>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
+        services.AddSingleton<IPushTagSupport>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
         return services;
     }
 
@@ -18,7 +20,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services, string listenerConnectionString, string hubName)
         where TPushDelegate : class, IPushDelegate
     {
-        services.AddShinyService<TPushDelegate>();
+        services.AddSingleton<TPushDelegate>();
+        services.AddSingleton<IPushDelegate>(sp => sp.GetRequiredService<TPushDelegate>());
         services.AddPushAzureNotificationHubs(listenerConnectionString, hubName);
         return services;
     }
@@ -29,7 +32,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddPush(firebaseConfig);
         services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
-        services.AddShinyService<AzureNotificationHubsPushProvider>();
+        services.AddSingleton<AzureNotificationHubsPushProvider>();
+        services.AddSingleton<IPushProvider>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
+        services.AddSingleton<IPushTagSupport>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
         return services;
     }
 
@@ -39,7 +44,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddPush<TPushDelegate>(firebaseConfig);
         services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
-        services.AddShinyService<AzureNotificationHubsPushProvider>();
+        services.AddSingleton<AzureNotificationHubsPushProvider>();
+        services.AddSingleton<IPushProvider>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
+        services.AddSingleton<IPushTagSupport>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
         return services;
     }
 #endif

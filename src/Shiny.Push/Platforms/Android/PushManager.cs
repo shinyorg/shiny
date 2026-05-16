@@ -12,37 +12,32 @@ using Firebase;
 using Firebase.Messaging;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
+using Shiny.Stores;
 
 namespace Shiny.Push;
 
 
-public class PushManager : NotifyPropertyChanged,
-                           IPushManager,
-                           IShinyStartupTask,
-                           IAndroidLifecycle.IOnActivityOnCreate,
-                           IAndroidLifecycle.IOnActivityNewIntent
+public class PushManager(
+    AndroidPlatform platform,
+    FirebaseConfig config,
+    IServiceProvider services,
+    IKeyValueStore store,
+    ILogger<PushManager> logger,
+    IPushProvider? pushProvider = null
+) : NotifyPropertyChanged, IPushManager, IShinyStartupTask, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent
 {
-    readonly AndroidPlatform platform;
-    readonly IServiceProvider services;
-    readonly FirebaseConfig config;
-    readonly ILogger logger;
-    readonly IPushProvider provider;
+    readonly AndroidPlatform platform = platform;
+    readonly FirebaseConfig config = config;
+    readonly IServiceProvider services = services;
+    readonly IKeyValueStore store = store;
+    readonly ILogger logger = logger;
+    readonly IPushProvider provider = pushProvider ?? new FirebasePushProvider();
     bool registrationRequest = false;
 
-    public PushManager(
-        AndroidPlatform platform,
-        FirebaseConfig config,
-        IServiceProvider services,
-        ILogger<PushManager> logger,
-        IPushProvider? provider = null
-    )
-    {
-        this.platform = platform;
-        this.config = config;
-        this.services = services;
-        this.logger = logger;
-        this.provider = provider ?? new FirebasePushProvider();
-    }
+    static string Key(string prop) => $"Shiny.Push.PushManager.{prop}";
+
+    string? regToken = store.Get<string>(Key(nameof(RegistrationToken)));
+    string? nativeToken = store.Get<string>(Key(nameof(NativeRegistrationToken)));
 
 
     public async void Start()
@@ -90,19 +85,25 @@ public class PushManager : NotifyPropertyChanged,
 
     public IPushTagSupport? Tags => (this.provider as IPushTagSupport);
 
-    string? regToken;
     public string? RegistrationToken
     {
         get => this.regToken;
-        set => this.Set(ref this.regToken, value);
+        set
+        {
+            if (this.Set(ref this.regToken, value))
+                this.store.SetOrRemove(Key(nameof(RegistrationToken)), value);
+        }
     }
 
 
-    string? nativeToken;
     public string? NativeRegistrationToken
     {
         get => this.nativeToken;
-        set => this.Set(ref this.nativeToken, value);
+        set
+        {
+            if (this.Set(ref this.nativeToken, value))
+                this.store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
+        }
     }
 
 

@@ -13,7 +13,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBluetoothLeHosting(this IServiceCollection services)
     {
         if (!services.Any(x => x.ServiceType == typeof(IBleHostingManager)))
-            services.AddShinyService<BleHostingManager>();
+        {
+            services.AddSingleton<BleHostingManager>();
+            services.AddSingleton<IBleHostingManager>(sp => sp.GetRequiredService<BleHostingManager>());
+        }
 
         return services;
     }

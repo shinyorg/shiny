@@ -3,43 +3,51 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 using Windows.Networking.PushNotifications;
 
 namespace Shiny.Push;
 
 
-public class PushManager : NotifyPropertyChanged, IPushManager
+public class PushManager(
+    IServiceProvider services,
+    IKeyValueStore store,
+    ILogger<PushManager> logger,
+    IPushProvider? provider = null
+) : NotifyPropertyChanged, IPushManager
 {
-    readonly IServiceProvider services;
-    readonly ILogger logger;
-    readonly IPushProvider? provider;
+    readonly IServiceProvider services = services;
+    readonly IKeyValueStore store = store;
+    readonly ILogger logger = logger;
+    readonly IPushProvider? provider = provider;
     PushNotificationChannel? channel;
 
-
-    public PushManager(IServiceProvider services, ILogger<PushManager> logger, IPushProvider? provider = null)
-    {
-        this.services = services;
-        this.logger = logger;
-        this.provider = provider;
-    }
-
+    static string Key(string prop) => $"Shiny.Push.PushManager.{prop}";
 
     public IPushTagSupport? Tags => this.provider as IPushTagSupport;
 
 
-    string? regToken;
+    string? regToken = store.Get<string>(Key(nameof(RegistrationToken)));
     public string? RegistrationToken
     {
         get => this.regToken;
-        set => this.Set(ref this.regToken, value);
+        set
+        {
+            if (this.Set(ref this.regToken, value))
+                this.store.SetOrRemove(Key(nameof(RegistrationToken)), value);
+        }
     }
 
 
-    string? nativeToken;
+    string? nativeToken = store.Get<string>(Key(nameof(NativeRegistrationToken)));
     public string? NativeRegistrationToken
     {
         get => this.nativeToken;
-        set => this.Set(ref this.nativeToken, value);
+        set
+        {
+            if (this.Set(ref this.nativeToken, value))
+                this.store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
+        }
     }
 
 

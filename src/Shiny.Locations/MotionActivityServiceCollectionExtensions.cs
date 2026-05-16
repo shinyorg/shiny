@@ -29,9 +29,14 @@ public static class MotionActivityServiceCollectionExtensions
     public static IServiceCollection AddMotionActivity(this IServiceCollection services, Type? delegateType = null)
     {
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(IMotionActivityDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
-        services.AddShinyService<MotionActivityManager>();
+        services.AddSingleton<MotionActivityManager>();
+        services.AddSingleton<IMotionActivityManager>(sp => sp.GetRequiredService<MotionActivityManager>());
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<MotionActivityManager>());
         return services;
     }
 
@@ -53,14 +58,21 @@ public static class MotionActivityServiceCollectionExtensions
     public static IServiceCollection AddMotionActivity(this IServiceCollection services, Type? delegateType = null)
     {
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(IMotionActivityDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         var resultCode = GoogleApiAvailability
             .Instance
             .IsGooglePlayServicesAvailable(Application.Context);
 
         if (resultCode == ConnectionResult.Success)
-            services.AddShinyService<MotionActivityManager>();
+        {
+            services.AddSingleton<MotionActivityManager>();
+            services.AddSingleton<IMotionActivityManager>(sp => sp.GetRequiredService<MotionActivityManager>());
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<MotionActivityManager>());
+        }
 
         return services;
     }

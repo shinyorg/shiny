@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
@@ -16,32 +16,31 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    /// <typeparam name="T">The IGpsDelegate to call</typeparam>
-    /// <param name="services">The servicecollection to configure</param>
-    /// <param name="forceUseOldCLManager">Force Shiny to use the old CLLocationManager implementation - features are not guaranteed to work on iOS 18+</param>
-    /// <returns></returns>
     public static IServiceCollection AddGps<T>(this IServiceCollection services, bool forceUseOldCLManager = false) where T : class, IGpsDelegate
         => services.AddGps(typeof(T));
-    
+
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    /// <param name="delegateType">The IGpsDelegate to call</param>
-    /// <param name="services">The servicecollection to configure</param>
-    /// <param name="forceUseOldCLManager">Force Shiny to use the old CLLocationManager implementation - features are not guaranteed to work on iOS 18+</param>
-    /// <returns></returns>
     public static IServiceCollection AddGps(this IServiceCollection services, Type? delegateType = null, bool forceUseOldCLManager = false)
     {
         if (delegateType != null)
-            services.AddShinyService(delegateType);
-        
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(IGpsDelegate), sp => sp.GetRequiredService(delegateType));
+        }
+
         if (!forceUseOldCLManager && (OperatingSystem.IsIOSVersionAtLeast(18) || OperatingSystem.IsMacCatalystVersionAtLeast(18)))
         {
-            services.AddShinyService<GpsManager>();    
+            services.AddSingleton<GpsManager>();
+            services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<GpsManager>());
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GpsManager>());
         }
         else
         {
-            services.AddShinyService<CLLocationGpsManager>();
+            services.AddSingleton<CLLocationGpsManager>();
+            services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<CLLocationGpsManager>());
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<CLLocationGpsManager>());
         }
 
         return services;
@@ -51,24 +50,22 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This registers GPS services with the Shiny container - Windows supports foreground GPS only (no background)
     /// </summary>
-    /// <typeparam name="T">The IGpsDelegate to call</typeparam>
-    /// <param name="services">The servicecollection to configure</param>
-    /// <returns></returns>
     public static IServiceCollection AddGps<T>(this IServiceCollection services) where T : class, IGpsDelegate
         => services.AddGps(typeof(T));
 
     /// <summary>
     /// This registers GPS services with the Shiny container - Windows supports foreground GPS only (no background)
     /// </summary>
-    /// <param name="services">The servicecollection to configure</param>
-    /// <param name="delegateType">The IGpsDelegate to call</param>
-    /// <returns></returns>
     public static IServiceCollection AddGps(this IServiceCollection services, Type? delegateType = null)
     {
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(IGpsDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
-        services.AddShinyService<GpsManager>();
+        services.AddSingleton<GpsManager>();
+        services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<GpsManager>());
         return services;
     }
 
@@ -76,28 +73,25 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    /// <typeparam name="T">The IGpsDelegate to call</typeparam>
-    /// <param name="services">The servicecollection to configure</param>
-    /// <param name="forceLocationApi">This bypasses fusedlocationprovider and goes to the deprecated (and fallback) location API - features are not guaranteed to work</param>
-    /// <returns></returns>
     public static IServiceCollection AddGps<T>(this IServiceCollection services, bool forceLocationApi = false) where T : class, IGpsDelegate
         => services.AddGps(typeof(T), forceLocationApi);
 
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    /// <param name="delegateType">The IGpsDelegate to call</param>
-    /// <param name="services">The servicecollection to configure</param>
-    /// <param name="forceLocationApi">This bypasses fusedlocationprovider and goes to the deprecated (and fallback) location API - features are not guaranteed to work</param>
-    /// <returns></returns>
     public static IServiceCollection AddGps(this IServiceCollection services, Type? delegateType = null, bool forceLocationApi = false)
     {
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(IGpsDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         if (forceLocationApi)
         {
-            services.AddShinyService<LocationServicesGpsManager>();
+            services.AddSingleton<LocationServicesGpsManager>();
+            services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<LocationServicesGpsManager>());
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<LocationServicesGpsManager>());
         }
         else
         {
@@ -106,30 +100,32 @@ public static class GpsServiceCollectionExtensions
                 .IsGooglePlayServicesAvailable(Application.Context);
 
             if (resultCode == ConnectionResult.Success)
-                services.AddShinyService<GooglePlayServiceGpsManager>();
+            {
+                services.AddSingleton<GooglePlayServiceGpsManager>();
+                services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<GooglePlayServiceGpsManager>());
+                services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GooglePlayServiceGpsManager>());
+            }
             else
-                services.AddShinyService<LocationServicesGpsManager>();
+            {
+                services.AddSingleton<LocationServicesGpsManager>();
+                services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<LocationServicesGpsManager>());
+                services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<LocationServicesGpsManager>());
+            }
         }
 
         return services;
     }
     #else
-    
+
     /// <summary>
     /// This is a blank AddGps - you won't see this documentation if you've got a proper target that is supported
     /// </summary>
-    /// <param name="services"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
     public static IServiceCollection AddGps<T>(this IServiceCollection services) where T : class, IGpsDelegate
         => services;
 
     /// <summary>
     /// This is a blank AddGps - you won't see this documentation if you've got a proper target that is supported
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="delegateType"></param>
-    /// <returns></returns>
     public static IServiceCollection AddGps(this IServiceCollection services, Type? delegateType = null)
         => services;
     #endif

@@ -20,13 +20,20 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null)
     {
-        services.AddShinyService<NotificationManager>();
+        services.AddSingleton<NotificationManager>();
+        services.AddSingleton<INotificationManager>(sp => sp.GetRequiredService<NotificationManager>());
 
         if (!services.HasService<IChannelManager>())
-            services.AddShinyService<ChannelManager>();
+        {
+            services.AddSingleton<ChannelManager>();
+            services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
+        }
 
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(INotificationDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         return services;
     }

@@ -12,13 +12,19 @@ using Windows.UI.Notifications;
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager
+public class NotificationManager(
+    IServiceProvider services,
+    IChannelManager channelManager,
+    IRepository repository,
+    IKeyValueStore settings,
+    ILogger<NotificationManager> logger
+) : INotificationManager
 {
-    readonly IServiceProvider services;
-    readonly IChannelManager channelManager;
-    readonly IRepository repository;
-    readonly IKeyValueStore settings;
-    readonly ILogger logger;
+    readonly IServiceProvider services = services;
+    readonly IChannelManager channelManager = channelManager;
+    readonly IRepository repository = repository;
+    readonly IKeyValueStore settings = settings;
+    readonly ILogger logger = logger;
 
     string? aumid;
     ToastNotifier? notifier;
@@ -43,22 +49,6 @@ public class NotificationManager : INotificationManager
             }
             return this.notifier;
         }
-    }
-
-
-    public NotificationManager(
-        IServiceProvider services,
-        IChannelManager channelManager,
-        IRepository repository,
-        IKeyValueStoreFactory keystore,
-        ILogger<NotificationManager> logger
-    )
-    {
-        this.services = services;
-        this.channelManager = channelManager;
-        this.repository = repository;
-        this.settings = keystore.DefaultStore;
-        this.logger = logger;
     }
 
 

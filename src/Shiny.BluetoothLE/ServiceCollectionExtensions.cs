@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.BluetoothLE;
@@ -28,10 +28,19 @@ public static class ServiceCollectionExtensions
     {
 #endif
         if (!services.HasImplementation<BleManager>())
-            services.AddShinyService<BleManager>();
+        {
+            services.AddSingleton<BleManager>();
+            services.AddSingleton<IBleManager>(sp => sp.GetRequiredService<BleManager>());
+#if ANDROID || WINDOWS
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<BleManager>());
+#endif
+        }
 
         if (delegateType != null)
-            services.AddShinyService(delegateType);
+        {
+            services.AddSingleton(delegateType);
+            services.AddSingleton(typeof(IBleDelegate), sp => sp.GetRequiredService(delegateType));
+        }
 
         services.TryAddSingleton<IOperationQueue, SemaphoreOperationQueue>();
         return services;

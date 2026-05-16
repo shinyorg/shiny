@@ -16,7 +16,8 @@ public static class ServiceCollectionExtensions
     /// </remarks>
     public static IServiceCollection AddGps(this IServiceCollection services)
     {
-        services.AddShinyService<GpsManager>();
+        services.AddSingleton<GpsManager>();
+        services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<GpsManager>());
         return services;
     }
 
@@ -28,7 +29,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGps<TDelegate>(this IServiceCollection services)
         where TDelegate : class, IGpsDelegate
     {
-        services.AddShinyService<TDelegate>();
+        services.AddSingleton<TDelegate>();
+        services.AddSingleton<IGpsDelegate>(sp => sp.GetRequiredService<TDelegate>());
         return services.AddGps();
     }
 }

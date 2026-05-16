@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using Shiny.Stores;
 
 namespace Shiny.Push.Blazor;
 
@@ -12,26 +13,39 @@ public class PushManager(
     IJSRuntime jsRuntime,
     WebPushOptions options,
     IServiceProvider services,
+    IKeyValueStore store,
     ILogger<PushManager> logger
 ) : NotifyPropertyChanged, IPushManager, IAsyncDisposable
 {
     IJSObjectReference? module;
     DotNetObjectReference<PushManager>? selfRef;
 
+    static string Key(string prop) => $"Shiny.Push.Blazor.PushManager.{prop}";
+
     public IPushTagSupport? Tags => null;
 
 
+    string? registrationToken = store.Get<string>(Key(nameof(RegistrationToken)));
     public string? RegistrationToken
     {
-        get;
-        set => this.Set(ref field, value);
+        get => this.registrationToken;
+        set
+        {
+            if (this.Set(ref this.registrationToken, value))
+                store.SetOrRemove(Key(nameof(RegistrationToken)), value);
+        }
     }
 
 
+    string? nativeToken = store.Get<string>(Key(nameof(NativeRegistrationToken)));
     public string? NativeRegistrationToken
     {
-        get;
-        set => this.Set(ref field, value);
+        get => this.nativeToken;
+        set
+        {
+            if (this.Set(ref this.nativeToken, value))
+                store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
+        }
     }
 
 

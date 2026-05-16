@@ -39,7 +39,8 @@ public static class ServiceCollectionExtensions
             builder.BatteryOk
         );
         registeredJobs.Add(reg);
-        services.AddShinyService<TJob>();
+        services.AddSingleton<TJob>();
+        services.AddSingleton<IJob>(sp => sp.GetRequiredService<TJob>());
         return services.AddJobs();
     }
 
@@ -51,7 +52,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddJobs(this IServiceCollection services)
     {
         if (!services.HasService<IJobManager>())
-            services.AddShinyService<JobManager>();
+        {
+            services.AddSingleton<JobManager>();
+            services.AddSingleton<IJobManager>(sp => sp.GetRequiredService<JobManager>());
+        }
 
         return services;
     }

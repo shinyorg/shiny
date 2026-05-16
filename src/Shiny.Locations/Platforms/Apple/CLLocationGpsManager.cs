@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CoreLocation;
 using Foundation;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 using UIKit;
 
 namespace Shiny.Locations;
@@ -11,20 +12,25 @@ namespace Shiny.Locations;
 
 public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
 {
+    const string CurrentSettingsKey = "Shiny.Locations.GpsManager.CurrentSettings";
+
     readonly StationaryDetector stationaryDetector = new();
     readonly IServiceProvider services;
     readonly CLLocationManager locationManager;
     readonly ILogger logger;
+    readonly IKeyValueStore store;
 
 
-    public CLLocationGpsManager(IServiceProvider services, ILogger<IGpsManager> logger)
+    public CLLocationGpsManager(IServiceProvider services, IKeyValueStore store, ILogger<IGpsManager> logger)
     {
         this.services = services;
+        this.store = store;
         this.logger = logger;
         this.locationManager = new CLLocationManager
         {
             Delegate = new GpsManagerDelegate(this)
         };
+        this.currentSettings = store.Get<AppleGpsRequest>(CurrentSettingsKey);
     }
 
 
@@ -130,6 +136,7 @@ public class CLLocationGpsManager : NotifyPropertyChanged, IGpsManager, IShinySt
                 this.Set(ref this.currentSettings, null);
                 this.currentSettings = value;
             }
+            this.store.SetOrRemove(CurrentSettingsKey, value);
         }
     }
 

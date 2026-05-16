@@ -13,7 +13,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush(this IServiceCollection services, WebPushOptions options)
     {
         services.AddSingleton(options);
-        services.AddShinyService<PushManager>();
+        services.AddSingleton<PushManager>();
+        services.AddSingleton<IPushManager>(sp => sp.GetRequiredService<PushManager>());
         services.AddLocalStorageKeyValueStore();
         return services;
     }
@@ -25,7 +26,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, WebPushOptions options)
         where TDelegate : class, IPushDelegate
     {
-        services.AddShinyService<TDelegate>();
+        services.AddSingleton<TDelegate>();
+        services.AddSingleton<IPushDelegate>(sp => sp.GetRequiredService<TDelegate>());
         return services.AddPush(options);
     }
 }
