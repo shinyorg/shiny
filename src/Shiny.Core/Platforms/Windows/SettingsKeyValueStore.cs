@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Windows.Storage;
 
 namespace Shiny.Stores;
@@ -143,7 +144,7 @@ public class SettingsKeyValueStore : IKeyValueStore
             try
             {
                 var json = File.ReadAllText(this.filePath);
-                this.fileValues = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new Dictionary<string, string>();
+                this.fileValues = JsonSerializer.Deserialize(json, SettingsJsonContext.Default.DictionaryStringString) ?? new Dictionary<string, string>();
             }
             catch
             {
@@ -160,6 +161,10 @@ public class SettingsKeyValueStore : IKeyValueStore
     {
         if (this.filePath == null || this.fileValues == null)
             return;
-        File.WriteAllText(this.filePath, JsonSerializer.Serialize(this.fileValues));
+        File.WriteAllText(this.filePath, JsonSerializer.Serialize(this.fileValues, SettingsJsonContext.Default.DictionaryStringString));
     }
 }
+
+
+[JsonSerializable(typeof(Dictionary<string, string>))]
+sealed partial class SettingsJsonContext : JsonSerializerContext { }
