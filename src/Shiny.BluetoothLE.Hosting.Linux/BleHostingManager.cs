@@ -31,7 +31,6 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     public AccessState AdvertisingAccessStatus { get; private set; } = AccessState.Unknown;
     public AccessState GattAccessStatus { get; private set; } = AccessState.Unknown;
     public bool IsAdvertising => this.advertising;
-    public bool IsRegisteredServicesAttached { get; private set; }
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
 
 
@@ -100,23 +99,6 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     {
         this.services.Clear();
         // TODO: call GattManager1.UnregisterApplication
-    }
-
-
-    public Task AttachRegisteredServices()
-    {
-        // The shared BleHostingManager (in the multi-target package) drives this via reflection on
-        // BleGattCharacteristic-derived DI registrations. The Linux variant intentionally does not
-        // hook into IShinyStartupTask — call AddService manually until the GATT export path is wired.
-        this.IsRegisteredServicesAttached = false;
-        return Task.CompletedTask;
-    }
-
-
-    public void DetachRegisteredServices()
-    {
-        this.IsRegisteredServicesAttached = false;
-        this.ClearServices();
     }
 
 

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,17 +15,6 @@ public static partial class Extensions
         ob.OnCompleted();
     }
     
-    /// <summary>
-    /// Adds a disposable to a collection and returns it for fluent chaining.
-    /// Works with DisposableCollection and CompositeDisposable (both implement ICollection&lt;IDisposable&gt;).
-    /// </summary>
-    public static T DisposedBy<T>(this T @this, ICollection<IDisposable> collection) where T : IDisposable
-    {
-        collection.Add(@this);
-        return @this;
-    }
-
-
     /// <summary>
     /// Converts an IObservable to a Task, completing on the first value or error
     /// </summary>

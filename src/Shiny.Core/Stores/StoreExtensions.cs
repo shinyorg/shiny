@@ -22,8 +22,8 @@ public static class StoreExtensions
         var type = obj.GetType();
         if (type.IsValueType)
         {
-            var result = Activator.CreateInstance(type).Equals(obj);
-            return result;
+            var defaultVal = type.GetDefaultValue();
+            return defaultVal?.Equals(obj) ?? false;
         }
         return false;
     }

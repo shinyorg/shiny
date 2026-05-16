@@ -76,21 +76,6 @@ public interface IBleHostingManager
     void ClearServices();
 
     /// <summary>
-    /// Gets whether DI-registered GATT services are currently attached
-    /// </summary>
-    bool IsRegisteredServicesAttached { get; }
-
-    /// <summary>
-    /// Attaches all GATT services registered via dependency injection
-    /// </summary>
-    Task AttachRegisteredServices();
-
-    /// <summary>
-    /// Detaches all DI-registered GATT services
-    /// </summary>
-    void DetachRegisteredServices();
-
-    /// <summary>
     /// Gets the list of active GATT services
     /// </summary>
     IReadOnlyList<IGattService> Services { get; }

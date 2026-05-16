@@ -11,11 +11,7 @@ public class DefaultSerializer : ISerializer
     readonly JsonSerializerOptions options = new()
     {
         PropertyNameCaseInsensitive = true,
-        WriteIndented = true,
-        Converters =
-        {
-            new TypeJsonConverter()
-        }
+        WriteIndented = true
     };
 
 
