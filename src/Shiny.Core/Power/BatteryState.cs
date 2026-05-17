@@ -1,4 +1,7 @@
 
+/// <summary>
+/// Describes the current charging state of the device battery.
+/// </summary>
 public enum BatteryState
 {
     /// <summary>

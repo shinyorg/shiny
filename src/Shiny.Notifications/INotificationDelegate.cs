@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace Shiny.Notifications;
 
 
+/// <summary>
+/// Application-supplied delegate that receives notification interaction callbacks. Register a single implementation with the Shiny host.
+/// </summary>
 public interface INotificationDelegate
 {
     ///// <summary>
@@ -13,8 +16,8 @@ public interface INotificationDelegate
     //Task OnSent(Notification notification);
 
     /// <summary>
-    /// This will fire when the user taps on a notification (or responds using a command)
+    /// Invoked when the user taps a notification or responds via an action (including text reply input).
     /// </summary>
-    /// <param name="response"></param>
+    /// <param name="response">The interaction response containing the originating notification, the action identifier, and any reply text.</param>
     Task OnEntry(NotificationResponse response);
 }

@@ -1,49 +1,54 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Shiny.BluetoothLE;
 
 
+/// <summary>
+/// Central manager for discovering, connecting to, and tracking BLE peripherals.
+/// </summary>
 public interface IBleManager
 {
     /// <summary>
-    /// Gets current access state
+    /// Gets the current BLE adapter access state without prompting the user.
     /// </summary>
     AccessState CurrentAccess { get; }
 
     /// <summary>
-    /// Requests necessary permissions to ensure bluetooth LE can be used
+    /// Requests the runtime permissions and adapter access required to use BluetoothLE.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An observable that emits the resulting access state.</returns>
     IObservable<AccessState> RequestAccess();
 
     /// <summary>
-    /// Get a known peripheral from the last scanresult
+    /// Returns a previously seen peripheral by its identifier, or null if it has not been observed in this session.
     /// </summary>
-    /// <param name="peripheralUuid">Peripheral identifier.</param>
+    /// <param name="peripheralUuid">The platform-specific peripheral identifier.</param>
+    /// <returns>The known peripheral instance, or null when not found.</returns>
     IPeripheral? GetKnownPeripheral(string peripheralUuid);
 
     /// <summary>
-    /// Get current scanning status
+    /// Gets a value indicating whether a scan is currently active.
     /// </summary>
     bool IsScanning { get; }
 
     /// <summary>
-    /// Stop any current scan - use this if you didn't keep a disposable endpoint for Scan()
+    /// Stops the current scan. Use this only when the original scan subscription is no longer reachable.
     /// </summary>
     void StopScan();
 
     /// <summary>
-    /// Gets a list of connected peripherals by your app
+    /// Gets the peripherals this app currently has a live connection with.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The currently connected peripherals.</returns>
     IEnumerable<IPeripheral> GetConnectedPeripherals();
 
     /// <summary>
-    /// Start scanning for BluetoothLE peripherals
-    /// WARNING: only one scan can be active at a time.  Use IsScanning to check for active scanning
+    /// Starts scanning for advertising BluetoothLE peripherals. Only one scan can be active at a time;
+    /// dispose the returned subscription to stop scanning.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="scanConfig">Optional filter and platform-specific scan options.</param>
+    /// <returns>An observable that emits each advertisement received during the scan.</returns>
     IObservable<ScanResult> Scan(ScanConfig? scanConfig = null);
 }
 

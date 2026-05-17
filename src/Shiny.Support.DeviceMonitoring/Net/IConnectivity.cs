@@ -9,9 +9,9 @@ namespace Shiny.Net;
 public interface IConnectivity
 {
     /// <summary>
-    /// Returns an observable that emits connectivity state changes
+    /// Returns an observable that emits whenever <see cref="ConnectionTypes"/> or
+    /// <see cref="Access"/> changes. The same instance is emitted, with updated property values.
     /// </summary>
-    /// <returns>An observable of connectivity state</returns>
     IObservable<IConnectivity> WhenChanged();
 
     /// <summary>

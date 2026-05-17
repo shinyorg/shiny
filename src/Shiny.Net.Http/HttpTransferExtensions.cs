@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 namespace Shiny.Net.Http;
 
 
+/// <summary>
+/// Convenience extensions for working with HTTP transfers.
+/// </summary>
 public static class HttpTransferExtensions
 {
     /// <summary>
-    /// Asserts that an HttpTransferRequest is valid
+    /// Throws if the given <see cref="HttpTransferRequest"/> is missing an identifier
+    /// or, for uploads, the local file does not exist.
     /// </summary>
+    /// <param name="request">The request to validate.</param>
     public static void AssertValid(this HttpTransferRequest request)
     {
         if (request.Identifier.IsEmpty())
@@ -25,16 +30,19 @@ public static class HttpTransferExtensions
 
 
     /// <summary>
-    /// Is the transfer type an upload?
+    /// Returns true if the transfer type represents an upload (multipart or raw).
     /// </summary>
+    /// <param name="type">The transfer type to test.</param>
     public static bool IsUpload(this TransferType type)
         => type != TransferType.Download;
 
 
     /// <summary>
-    /// Waits for a specific transfer to complete or fail.
-    /// The returned task completes when the transfer reaches Completed or Error state.
+    /// Waits for a specific transfer to reach a terminal state and returns the final result.
     /// </summary>
+    /// <param name="manager">The transfer manager to subscribe to.</param>
+    /// <param name="identifier">The identifier of the transfer to watch.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
     public static Task<HttpTransferResult> WatchTransfer(this IHttpTransferManager manager, string identifier, CancellationToken cancellationToken = default)
     {
         var tcs = new TaskCompletionSource<HttpTransferResult>();

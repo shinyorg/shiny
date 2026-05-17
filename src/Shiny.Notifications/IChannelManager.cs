@@ -1,43 +1,44 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Shiny.Notifications;
 
 
+/// <summary>
+/// Manages the persisted registry of notification channels independent of the notification manager.
+/// </summary>
 public interface IChannelManager
 {
     /// <summary>
-    /// Add a new channel
+    /// Registers a new notification channel.
     /// </summary>
-    /// <param name="channel"></param>
-    /// <returns></returns>
+    /// <param name="channel">The channel definition to add.</param>
     void Add(Channel channel);
 
 
     /// <summary>
-    /// Remove a specific channel - any pending notifications on this channel will have the channel removed from them
+    /// Removes a specific channel by identifier. Any pending notifications referencing this channel will have their channel reference cleared.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="channelId">The identifier of the channel to remove.</param>
     void Remove(string channelId);
 
 
     /// <summary>
-    /// Removes all channels - this will remove all channels from all notifications
+    /// Removes all registered channels and clears the channel reference from any pending notifications.
     /// </summary>
-    /// <returns></returns>
     void Clear();
 
 
     /// <summary>
-    /// 
+    /// Retrieves a channel by its identifier.
     /// </summary>
-    /// <param name="channelId"></param>
-    /// <returns></returns>
+    /// <param name="channelId">The identifier of the channel.</param>
+    /// <returns>The matching channel, or null if no channel with that identifier exists.</returns>
     Channel? Get(string channelId);
 
 
     /// <summary>
-    /// Gets list of channels
+    /// Returns the list of all currently registered notification channels.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A list of registered channels.</returns>
     IList<Channel> GetAll();
 }

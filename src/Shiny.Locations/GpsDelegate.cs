@@ -6,12 +6,24 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Locations;
 
 
+/// <summary>
+/// Base class for GPS delegates that filters incoming readings by configurable minimum and maximum distance and time thresholds before invoking <see cref="OnGpsReading"/>.
+/// </summary>
+/// <param name="logger">Logger used for diagnostic output.</param>
 public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
 {
     readonly SemaphoreSlim semaphore = new(1);
+
+    /// <summary>
+    /// The logger supplied to the delegate.
+    /// </summary>
     protected ILogger Logger => logger;
 
 
+    /// <summary>
+    /// Receives readings from the GPS manager, applies the configured filters, and forwards qualifying readings to <see cref="OnGpsReading"/>.
+    /// </summary>
+    /// <param name="reading">The incoming GPS reading.</param>
     public async Task OnReading(GpsReading reading)
     {
         var entered = false;
@@ -100,7 +112,7 @@ public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
     
     GpsReading? lastReading;
     /// <summary>
-    /// This is the last GPS reading before OnReading is raised
+    /// The most recent reading that passed the filters and was forwarded to <see cref="OnGpsReading"/>.
     /// </summary>
     public GpsReading? LastReading
     {
@@ -111,17 +123,19 @@ public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
 
     GpsReading? mostRecentReading;
     /// <summary>
-    /// This is the most recent reading from the GPS outside of the filters
-    /// If you are gettings this as of OnReading, it will be the current incoming reading
+    /// The most recent reading received from the GPS regardless of filtering. During <see cref="OnGpsReading"/> this is the incoming reading.
     /// </summary>
     public GpsReading? MostRecentReading
     {
         get => this.mostRecentReading;
         set => this.mostRecentReading = value;
     }
-    
-    
+
+
     Distance? minDistance;
+    /// <summary>
+    /// The minimum distance the device must move from <see cref="LastReading"/> before <see cref="OnGpsReading"/> is invoked. Null disables the filter.
+    /// </summary>
     public Distance? MinimumDistance
     {
         get => this.minDistance;
@@ -130,6 +144,9 @@ public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
 
 
     TimeSpan? minTime;
+    /// <summary>
+    /// The minimum time that must elapse since <see cref="LastReading"/> before <see cref="OnGpsReading"/> is invoked. Null disables the filter.
+    /// </summary>
     public TimeSpan? MinimumTime
     {
         get => this.minTime;
@@ -138,6 +155,9 @@ public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
 
 
     Distance? maxDistance;
+    /// <summary>
+    /// If set, <see cref="OnGpsReading"/> is always invoked once the device has moved at least this distance since <see cref="LastReading"/>, bypassing the minimum filters.
+    /// </summary>
     public Distance? MaximumDistance
     {
         get => this.maxDistance;
@@ -146,6 +166,9 @@ public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
 
 
     TimeSpan? maxTime;
+    /// <summary>
+    /// If set, <see cref="OnGpsReading"/> is always invoked once this much time has elapsed since <see cref="LastReading"/>, bypassing the minimum filters.
+    /// </summary>
     public TimeSpan? MaximumTime
     {
         get => this.maxTime;
@@ -153,5 +176,9 @@ public abstract class GpsDelegate(ILogger logger) : IGpsDelegate
     }
 
 
+    /// <summary>
+    /// Invoked for each GPS reading that passes the configured filters.
+    /// </summary>
+    /// <param name="reading">The filtered GPS reading.</param>
     protected abstract Task OnGpsReading(GpsReading reading);
 }

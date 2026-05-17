@@ -8,8 +8,26 @@ using System.Threading.Tasks;
 namespace Shiny.Net.Http;
 
 
+/// <summary>
+/// In-process (non-background) upload and download helpers built on <see cref="HttpClient"/>
+/// that emit <see cref="TransferProgress"/> updates.
+/// </summary>
 public static class HttpClientExtensions
 {
+    /// <summary>
+    /// Uploads a local file to the given URI, reporting progress as bytes are sent.
+    /// </summary>
+    /// <param name="httpClient">The HTTP client to send with.</param>
+    /// <param name="uri">The destination URI.</param>
+    /// <param name="filePath">Path to the local file to upload.</param>
+    /// <param name="sendAsMultipart">When true, wraps the body in multipart/form-data.</param>
+    /// <param name="httpMethod">Optional HTTP method; defaults to POST.</param>
+    /// <param name="bodyContent">Optional additional content for the request body.</param>
+    /// <param name="contenFormDataName">Form field name for body content when multipart.</param>
+    /// <param name="fileFormDataName">Form field name for the file when multipart.</param>
+    /// <param name="headers">Optional headers to attach to the request.</param>
+    /// <param name="onProgress">Optional callback invoked with progress updates.</param>
+    /// <param name="cancellationToken">Token used to cancel the upload.</param>
     public static async Task Upload(
         this HttpClient httpClient,
         string uri,
@@ -77,6 +95,18 @@ public static class HttpClientExtensions
     }
 
 
+    /// <summary>
+    /// Downloads a remote resource to a local file, reporting progress as bytes are received.
+    /// </summary>
+    /// <param name="httpClient">The HTTP client to send with.</param>
+    /// <param name="uri">The source URI.</param>
+    /// <param name="toFilePath">The destination file path.</param>
+    /// <param name="bufferSize">Read buffer size in bytes.</param>
+    /// <param name="httpMethod">Optional HTTP method; defaults to GET.</param>
+    /// <param name="bodyContent">Optional request body content.</param>
+    /// <param name="headers">Optional headers to attach to the request.</param>
+    /// <param name="onProgress">Optional callback invoked with progress updates.</param>
+    /// <param name="cancellationToken">Token used to cancel the download.</param>
     public static async Task Download(
         this HttpClient httpClient,
         string uri,

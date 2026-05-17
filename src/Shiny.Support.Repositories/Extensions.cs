@@ -9,6 +9,9 @@ using Shiny.Support.Repositories.Impl;
 namespace Shiny;
 
 
+/// <summary>
+/// Service registration and convenience extensions for <see cref="IRepository"/>.
+/// </summary>
 public static class RepositoryExtensions
 {
 #if IOS || MACCATALYST || ANDROID || WINDOWS
@@ -47,6 +50,9 @@ public static class RepositoryExtensions
     }
 #endif
 
+    /// <summary>
+    /// Removes the given entity from the repository by its identifier.
+    /// </summary>
     public static bool Remove<T>(this IRepository repository, T item) where T : IRepositoryEntity
         => repository.Remove<T>(item.Identifier);
 }

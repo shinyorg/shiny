@@ -1,13 +1,16 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace Shiny.Locations;
 
 
+/// <summary>
+/// Background listener invoked by the GPS manager whenever a new reading is received.
+/// </summary>
 public interface IGpsDelegate
 {
     /// <summary>
-    /// This is fired when the gps reading has changed.
+    /// Invoked by the GPS manager when a new reading is available.
     /// </summary>
-    /// <param name="reading">The gps reading.</param>
+    /// <param name="reading">The latest GPS reading.</param>
     Task OnReading(GpsReading reading);
 }

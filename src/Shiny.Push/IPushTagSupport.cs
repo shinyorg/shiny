@@ -1,41 +1,40 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace Shiny.Push;
 
 
+/// <summary>
+/// Optional push provider capability for managing tags associated with the current registration (e.g. Azure Notification Hubs tags).
+/// </summary>
 public interface IPushTagSupport : IPushProvider
 {
     /// <summary>
-    /// This will clear all current tags and set the new array
+    /// Replaces all currently registered tags with the supplied set.
     /// </summary>
-    /// <param name="tags"></param>
-    /// <returns></returns>
+    /// <param name="tags">The new tag set, or null/empty to clear.</param>
     Task SetTags(params string[]? tags);
 
     /// <summary>
-    /// Adds a tag to the current registered set of tags
+    /// Adds a single tag to the currently registered set.
     /// </summary>
-    /// <param name="tag"></param>
-    /// <returns></returns>
+    /// <param name="tag">The tag to add.</param>
     Task AddTag(string tag);
 
     /// <summary>
-    /// Remove a tag to the current registered set of tags
+    /// Removes a single tag from the currently registered set.
     /// </summary>
-    /// <param name="tag"></param>
-    /// <returns></returns>
+    /// <param name="tag">The tag to remove.</param>
     Task RemoveTag(string tag);
 
 
     /// <summary>
-    /// Clears all registered tags
+    /// Clears all registered tags for the current registration.
     /// </summary>
-    /// <returns></returns>
     Task ClearTags();
 
 
     /// <summary>
-    /// Current set of registered tagsw
+    /// The set of tags currently registered with the provider, or null if none.
     /// </summary>
     string[]? RegisteredTags { get; }
 }

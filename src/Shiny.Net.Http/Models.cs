@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -7,6 +7,16 @@ using Shiny.Support.Repositories;
 namespace Shiny.Net.Http;
 
 
+/// <summary>
+/// Describes a queued background HTTP upload or download.
+/// </summary>
+/// <param name="Identifier">Unique identifier for the transfer.</param>
+/// <param name="Uri">The remote endpoint URI.</param>
+/// <param name="Type">Indicates whether this is an upload (multipart/raw) or a download.</param>
+/// <param name="LocalFilePath">Path to the local file to upload or to write a download into.</param>
+/// <param name="UseMeteredConnection">When true, the platform may run the transfer over a metered (e.g. cellular) connection.</param>
+/// <param name="HttpContent">Optional additional content (form fields, JSON body) sent with the request.</param>
+/// <param name="Headers">Optional HTTP headers to include with the request.</param>
 public record HttpTransferRequest(
     string Identifier,
     string Uri,
@@ -17,12 +27,23 @@ public record HttpTransferRequest(
     IDictionary<string, string>? Headers = null
 )
 {
+    /// <summary>
+    /// Optional HTTP method override. Defaults to GET for downloads and POST for uploads.
+    /// </summary>
     public string? HttpMethod { get; set; }
+
+    /// <summary>
+    /// Form field name to use for the file part when sending as multipart. Defaults to "file".
+    /// </summary>
     public string FileFormDataName { get; set; } = "file";
 
     //public void SetAuthHeader(string authType, string authValue)
     //    this.Headers.Add("Authentication", $"{authType} {authValue}");
 
+    /// <summary>
+    /// Returns the resolved <see cref="System.Net.Http.HttpMethod"/> for this request,
+    /// falling back to GET for downloads and POST for uploads.
+    /// </summary>
     public HttpMethod GetHttpMethod()
     {
         var defMethod = this.Type == TransferType.Download ? "GET" : "POST";
@@ -32,13 +53,27 @@ public record HttpTransferRequest(
     }
 }
 
+/// <summary>
+/// Identifies the kind of HTTP transfer.
+/// </summary>
 public enum TransferType
 {
+    /// <summary>Upload sent as multipart/form-data.</summary>
     UploadMultipart,
+    /// <summary>Upload sent as a raw request body.</summary>
     UploadRaw,
+    /// <summary>Download from a remote endpoint into a local file.</summary>
     Download
 }
 
+/// <summary>
+/// Persistent record of a queued or in-flight HTTP transfer.
+/// </summary>
+/// <param name="Request">The original transfer request.</param>
+/// <param name="BytesToTransfer">Total bytes expected for the transfer, when known.</param>
+/// <param name="BytesTransferred">Bytes transferred so far.</param>
+/// <param name="Status">The current state of the transfer.</param>
+/// <param name="CreatedAt">Timestamp when the transfer was queued.</param>
 public record HttpTransfer(
     HttpTransferRequest Request,
     long? BytesToTransfer,
@@ -47,9 +82,17 @@ public record HttpTransfer(
     DateTimeOffset CreatedAt
 ) : IRepositoryEntity
 {
-    public string Identifier => this.Request.Identifier;    
+    /// <inheritdoc />
+    public string Identifier => this.Request.Identifier;
 };
 
+/// <summary>
+/// A snapshot emitted whenever a transfer's progress or status changes.
+/// </summary>
+/// <param name="Request">The transfer request this update relates to.</param>
+/// <param name="Status">The current transfer state.</param>
+/// <param name="Progress">Current progress information.</param>
+/// <param name="Exception">Exception, if the transfer is in an error state.</param>
 public record HttpTransferResult(
     HttpTransferRequest Request,
     HttpTransferState Status,
@@ -57,20 +100,40 @@ public record HttpTransferResult(
     Exception? Exception
 )
 {
+    /// <summary>
+    /// Gets a value indicating whether the total transfer size is known.
+    /// </summary>
     public bool IsDeterministic => this.Progress.BytesToTransfer != null;
 };
 
 
-public record TransferProgress(    
+/// <summary>
+/// Represents the progress of an in-flight HTTP transfer.
+/// </summary>
+/// <param name="BytesPerSecond">Estimated current throughput in bytes per second.</param>
+/// <param name="BytesToTransfer">Total bytes expected, or null when unknown.</param>
+/// <param name="BytesTransferred">Bytes transferred so far.</param>
+public record TransferProgress(
     long BytesPerSecond,
     long? BytesToTransfer,
     long BytesTransferred
 )
 {
+    /// <summary>
+    /// Gets an empty progress instance (zero bytes, zero throughput).
+    /// </summary>
     public static TransferProgress Empty { get; } = new(0, 0, 0);
+
+    /// <summary>
+    /// Gets a value indicating whether the total transfer size is known.
+    /// </summary>
     public bool IsDeterministic => this.BytesToTransfer != null;
 
     double? percentComplete;
+
+    /// <summary>
+    /// Gets the percent complete as a value between 0.0 and 1.0, or -1 when not deterministic.
+    /// </summary>
     public double PercentComplete
     {
         get
@@ -95,6 +158,10 @@ public record TransferProgress(
 
 
     TimeSpan? estimate;
+
+    /// <summary>
+    /// Gets the estimated time remaining based on current throughput, or <see cref="TimeSpan.Zero"/> when unknown.
+    /// </summary>
     public TimeSpan EstimatedTimeRemaining
     {
         get
@@ -118,20 +185,27 @@ public record TransferProgress(
 
 
 /// <summary>
-/// How to send POST/PUT args to a transfer request
+/// Body content attached to an upload transfer request.
 /// </summary>
-/// <param name="Content">You actual string content</param>
-/// <param name="ContentType">The content type</param>
-/// <param name="Encoding">Defaults to utf-8, should be the webname of the encodings</param>
-/// <param name="ContentName">This is to match binding names for things like json binding - the name should be small & simple (no spaces or weird characters) to prevent screwing up protocol</param>
+/// <param name="Content">The literal string content to send.</param>
+/// <param name="ContentType">The MIME content type. Defaults to text/plain.</param>
+/// <param name="Encoding">The character encoding webname. Defaults to utf-8.</param>
 public record TransferHttpContent(
     string Content,
     string ContentType = "text/plain",
     string Encoding = "utf-8"
 )
 {
+    /// <summary>
+    /// Optional form-data field name when the parent request is sent as multipart.
+    /// </summary>
     public string? ContentFormDataName { get; set; }
 
+    /// <summary>
+    /// Creates a JSON-encoded <see cref="TransferHttpContent"/> from an object.
+    /// </summary>
+    /// <param name="obj">The object to serialize.</param>
+    /// <param name="jsonOptions">Optional serializer options.</param>
     public static TransferHttpContent FromJson(object obj, JsonSerializerOptions? jsonOptions = null)
     {
         var json = JsonSerializer.Serialize(obj, jsonOptions);
@@ -142,6 +216,10 @@ public record TransferHttpContent(
         );
     }
 
+    /// <summary>
+    /// Creates a URL-encoded form data <see cref="TransferHttpContent"/> from key/value pairs.
+    /// </summary>
+    /// <param name="formValues">The form fields to send.</param>
     public static TransferHttpContent FromFormData(params (string Key,string Value)[] formValues)
     {
         var list = new List<KeyValuePair<string, string>>();
@@ -152,6 +230,10 @@ public record TransferHttpContent(
     }
 
 
+    /// <summary>
+    /// Creates a URL-encoded form data <see cref="TransferHttpContent"/> from a dictionary.
+    /// </summary>
+    /// <param name="dictionary">The form fields to send.</param>
     public static TransferHttpContent FromFormData(IDictionary<string, string> dictionary)
     {
         var list = new List<KeyValuePair<string, string>>();
@@ -176,15 +258,27 @@ public record TransferHttpContent(
 }
 
 
+/// <summary>
+/// Lifecycle state of an HTTP transfer.
+/// </summary>
 public enum HttpTransferState
 {
+    /// <summary>The state could not be determined.</summary>
     Unknown,
+    /// <summary>The transfer is queued but has not begun.</summary>
     Pending,
+    /// <summary>The transfer is paused.</summary>
     Paused,
+    /// <summary>The transfer is paused because no network is available.</summary>
     PausedByNoNetwork,
+    /// <summary>The transfer is paused because only a metered connection is available and that is disallowed.</summary>
     PausedByCostedNetwork,
+    /// <summary>The transfer is actively running.</summary>
     InProgress,
+    /// <summary>The transfer ended in an error.</summary>
     Error,
+    /// <summary>The transfer was cancelled.</summary>
     Canceled,
+    /// <summary>The transfer completed successfully.</summary>
     Completed
 }

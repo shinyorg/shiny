@@ -10,30 +10,56 @@ namespace Shiny.Net.Http;
 
 
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+/// <summary>
+/// Fluent builder that produces a signed <see cref="HttpTransferRequest"/> for uploading
+/// a local file to AWS S3 using PutObject (presigned URL or IAM credentials).
+/// </summary>
 public class AwsS3UploadRequest(string localFilePath)
 {
+    /// <summary>Gets the path of the local file to upload.</summary>
     public string LocalFilePath => localFilePath;
+
+    /// <summary>Optional transfer identifier. A GUID is generated if not provided.</summary>
     public string? Identifier { get; set; }
+
+    /// <summary>Allow the transfer to run on a metered (e.g. cellular) connection.</summary>
     public bool UseMeteredConnection { get; set; }
+
+    /// <summary>Additional HTTP headers attached to the upload request.</summary>
     public Dictionary<string, string> Headers { get; } = new();
 
+    /// <summary>The destination S3 bucket name.</summary>
     public string? BucketName { get; set; }
+
+    /// <summary>The AWS region for the destination bucket.</summary>
     public string? Region { get; set; }
+
+    /// <summary>Object key within the bucket. Defaults to the local file name.</summary>
     public string? ObjectKey { get; set; }
+
+    /// <summary>Optional custom endpoint URI (for S3-compatible services).</summary>
     public string? CustomUri { get; set; }
 
-    // Presigned URL auth
+    /// <summary>When set, the upload uses this presigned PUT URL instead of credentials.</summary>
     public string? PresignedUrl { get; set; }
 
-    // IAM credentials auth
+    /// <summary>IAM access key id used to sign the request.</summary>
     public string? AccessKeyId { get; set; }
+
+    /// <summary>IAM secret access key used to sign the request.</summary>
     public string? SecretAccessKey { get; set; }
+
+    /// <summary>Optional STS session token for temporary credentials.</summary>
     public string? SessionToken { get; set; }
 
+    /// <summary>HTTP Content-Type header value. Defaults to application/octet-stream.</summary>
     public string? ContentType { get; set; }
+
+    /// <summary>Optional S3 storage class (e.g. STANDARD_IA, GLACIER).</summary>
     public string? StorageClass { get; set; }
 
 
+    /// <summary>Sets the destination bucket and region.</summary>
     public AwsS3UploadRequest WithBucket(string bucketName, string region)
     {
         this.BucketName = bucketName;
@@ -42,6 +68,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Sets the object key (path within the bucket).</summary>
     public AwsS3UploadRequest WithObjectKey(string objectKey)
     {
         this.ObjectKey = objectKey;
@@ -49,6 +76,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Uses a custom endpoint URI in place of the standard amazonaws.com host.</summary>
     public AwsS3UploadRequest WithCustomUri(string uri)
     {
         this.CustomUri = uri;
@@ -56,6 +84,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Authenticates the upload using a presigned PUT URL.</summary>
     public AwsS3UploadRequest WithPresignedUrl(string presignedUrl)
     {
         this.PresignedUrl = presignedUrl;
@@ -63,6 +92,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Authenticates the upload using IAM credentials and AWS Signature V4.</summary>
     public AwsS3UploadRequest WithCredentials(string accessKeyId, string secretAccessKey, string? sessionToken = null)
     {
         this.AccessKeyId = accessKeyId;
@@ -72,6 +102,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Allows the transfer to run over a metered connection.</summary>
     public AwsS3UploadRequest WithMeteredConnection()
     {
         this.UseMeteredConnection = true;
@@ -79,6 +110,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Adds a custom HTTP header to the upload request.</summary>
     public AwsS3UploadRequest WithHeader(string key, string value)
     {
         this.Headers.Add(key, value);
@@ -86,6 +118,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Sets the Content-Type header for the upload.</summary>
     public AwsS3UploadRequest WithContentType(string contentType)
     {
         this.ContentType = contentType;
@@ -93,6 +126,7 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>Sets the S3 storage class header for the upload.</summary>
     public AwsS3UploadRequest WithStorageClass(string storageClass)
     {
         this.StorageClass = storageClass;
@@ -100,6 +134,10 @@ public class AwsS3UploadRequest(string localFilePath)
     }
 
 
+    /// <summary>
+    /// Builds an <see cref="HttpTransferRequest"/> that uploads the local file to S3.
+    /// Either a presigned URL or IAM credentials must be configured first.
+    /// </summary>
     public HttpTransferRequest Build()
     {
         this.Identifier ??= Guid.NewGuid().ToString();

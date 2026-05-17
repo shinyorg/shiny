@@ -6,12 +6,28 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Jobs;
 
 
+/// <summary>
+/// Convenience base class for <see cref="IJob"/> implementations that adds optional
+/// minimum-interval throttling between runs.
+/// </summary>
 public abstract class Job : IJob
 {
+    /// <summary>
+    /// Logger available to derived jobs.
+    /// </summary>
     protected ILogger Logger { get; }
+
+    /// <summary>
+    /// Creates a new instance of the job.
+    /// </summary>
+    /// <param name="logger">The logger to use.</param>
     protected Job(ILogger logger) => this.Logger = logger;
 
 
+    /// <summary>
+    /// Runs the job, respecting <see cref="MinimumTime"/> if set.
+    /// </summary>
+    /// <param name="cancelToken">Token used to signal cancellation.</param>
     public async Task Run(CancellationToken cancelToken)
     {
         var fireJob = true;
@@ -32,6 +48,10 @@ public abstract class Job : IJob
     }
 
 
+    /// <summary>
+    /// Implements the actual work performed by the job.
+    /// </summary>
+    /// <param name="cancelToken">Token used to signal cancellation.</param>
     protected abstract Task RunJob(CancellationToken cancelToken);
 
     /// <summary>

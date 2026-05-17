@@ -9,19 +9,34 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Jobs;
 
 
+/// <summary>
+/// Platform-agnostic base implementation of <see cref="IJobManager"/> that handles
+/// registration storage, batch execution, and logging.
+/// </summary>
 public abstract class AbstractJobManager(
     IServiceProvider container,
     ILogger logger
 ) : IJobManager
 {
+    /// <summary>
+    /// Logger available to derived implementations.
+    /// </summary>
     protected ILogger Log => logger;
     readonly Dictionary<Type, JobRegistration> registrations = new();
 
+    /// <summary>
+    /// Gets a value indicating whether a job batch is currently running.
+    /// </summary>
     public bool IsRunning { get; private set; }
 
+    /// <summary>
+    /// Requests the platform permissions required to schedule background jobs.
+    /// </summary>
+    /// <returns>The resulting access state.</returns>
     public abstract Task<AccessState> RequestAccess();
 
 
+    /// <inheritdoc />
     public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
     {
         try
@@ -37,6 +52,7 @@ public abstract class AbstractJobManager(
     }
 
 
+    /// <inheritdoc />
     public IReadOnlyDictionary<Type, JobRegistration> GetJobs() => this.registrations;
 
 
@@ -53,6 +69,7 @@ public abstract class AbstractJobManager(
     }
 
 
+    /// <inheritdoc />
     public async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false)
     {
         var list = new List<JobRunResult>();
@@ -170,6 +187,13 @@ public abstract class AbstractJobManager(
     }
 
 
+    /// <summary>
+    /// Logs the lifecycle state of a job run. Override to customize logging.
+    /// </summary>
+    /// <param name="state">The current lifecycle state.</param>
+    /// <param name="jobType">The CLR type of the job.</param>
+    /// <param name="reg">The registration for the job.</param>
+    /// <param name="exception">The exception, if any.</param>
     protected virtual void LogJob(JobState state, Type jobType, JobRegistration reg, Exception? exception = null)
     {
         if (exception == null)
@@ -179,6 +203,12 @@ public abstract class AbstractJobManager(
     }
 
 
+    /// <summary>
+    /// Logs the lifecycle state of an ad-hoc task run. Override to customize logging.
+    /// </summary>
+    /// <param name="state">The current lifecycle state.</param>
+    /// <param name="taskName">The task name.</param>
+    /// <param name="exception">The exception, if any.</param>
     protected virtual void LogTask(JobState state, string taskName, Exception? exception = null)
     {
         if (exception == null)

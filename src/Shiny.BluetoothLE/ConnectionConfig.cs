@@ -1,12 +1,13 @@
-﻿namespace Shiny.BluetoothLE;
+namespace Shiny.BluetoothLE;
 
 
+/// <summary>
+/// Options applied when connecting to a peripheral.
+/// </summary>
+/// <param name="AutoConnect">
+/// On Android, when true the OS will automatically (re)connect once the peripheral comes back into range or after a disconnect;
+/// setting false speeds up the initial connection but disables auto-reconnect. On iOS, controls whether reconnection is attempted automatically.
+/// </param>
 public record ConnectionConfig(
-    /// <summary>
-    /// Android: Setting this to false will disable auto (re)connect when the peripheral
-    /// is in range or when you disconnect.  However, it will speed up initial
-    /// connections signficantly (defaults to true)
-    /// iOS: Controls whether or not to reconnect automatically
-    /// </summary>
     bool AutoConnect = true
 );

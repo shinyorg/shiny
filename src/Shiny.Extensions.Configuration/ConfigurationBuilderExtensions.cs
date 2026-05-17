@@ -6,18 +6,21 @@ using Shiny.Extensions.Configuration.Infrastructure;
 namespace Microsoft.Extensions.Configuration;
 
 
+/// <summary>
+/// Extensions that add Shiny configuration sources (platform bundles, platform preferences, remote)
+/// to an <see cref="IConfigurationBuilder"/>.
+/// </summary>
 public static partial class ConfigurationBuilderExtensions
 {
     #if APPLE || ANDROID
-    
+
     /// <summary>
-    /// Adds a JSON configuration file from the platform-specific bundle or assets.
+    /// Adds a JSON configuration file from the platform's app bundle (iOS) or asset folder (Android).
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="environment"></param>
-    /// <param name="optional"></param>
-    /// <param name="addPlatformSpecific"></param>
-    /// <returns></returns>
+    /// <param name="builder">The configuration builder.</param>
+    /// <param name="environment">Optional environment name appended to the file name (e.g. <c>appsettings.Production.json</c>).</param>
+    /// <param name="optional">When true, the configuration file is optional.</param>
+    /// <param name="addPlatformSpecific">Also include a platform-specific override file when found.</param>
     public static IConfigurationBuilder AddJsonPlatformBundle(this IConfigurationBuilder builder, string? environment = null, bool optional = true, bool addPlatformSpecific = true)
     {
 #if APPLE
@@ -30,10 +33,10 @@ public static partial class ConfigurationBuilderExtensions
 
 
     /// <summary>
-    /// Adds platform-specific preferences to the configuration pipeline.
+    /// Adds the platform's native preferences store (iOS NSUserDefaults or Android SharedPreferences)
+    /// as a configuration source.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
+    /// <param name="builder">The configuration builder.</param>
     public static IConfigurationBuilder AddPlatformPreferences(this IConfigurationBuilder builder)
     {
 #if APPLE
@@ -44,16 +47,14 @@ public static partial class ConfigurationBuilderExtensions
         return builder;
     }
 
-    
+
     /// <summary>
-    /// Adds remote configuration to the configuration pipeline
+    /// Adds a remote configuration source whose payload is cached to the platform's local app data folder.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="configurationUri"></param>
-    /// <param name="configurationFileName"></param>
-    /// <param name="getData"></param>
-    /// <param name="services"></param>
-    /// <returns></returns>
+    /// <param name="builder">The configuration builder.</param>
+    /// <param name="configurationUri">The remote endpoint URI.</param>
+    /// <param name="configurationFileName">Local file name used for the cached payload.</param>
+    /// <param name="getData">Optional override that produces the configuration payload (e.g. for custom auth).</param>
     public static IConfigurationBuilder AddRemote(
         this IConfigurationBuilder builder,
         string configurationUri,
@@ -80,11 +81,10 @@ public static partial class ConfigurationBuilderExtensions
     #endif
 
     /// <summary>
-    /// Gets the remote configuration provider from the configuration root.
+    /// Returns the registered <see cref="IRemoteConfigurationProvider"/> from the configuration root.
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="configuration">The configuration root to inspect.</param>
+    /// <exception cref="InvalidOperationException">Thrown if no remote configuration provider is registered.</exception>
     public static IRemoteConfigurationProvider GetRemoteConfigurationProvider(this IConfigurationRoot configuration)
         => configuration
             .Providers
@@ -94,15 +94,14 @@ public static partial class ConfigurationBuilderExtensions
     
     
     /// <summary>
-    /// Adds remote configuration to the configuration pipeline
+    /// Adds a remote configuration source whose payload is cached at the given file path.
     /// </summary>
-    /// <param name="builder">The configuration builder</param>
-    /// <param name="configurationFilePath">The location of where the remote settings should be persisted</param>
-    /// <param name="configurationUri">This allows you to get the configuration URI from the previous remote call & allows you to update the ConfigurationUri if needed</param>
-    /// <param name="getData">If you wish to control how/what data is returned, pass this function</param>
-    /// <param name="waitForRemoteLoad">If you want the network call to be waited until completion before returning</param>
-    /// <param name="services">If presented to the extension method, IRemoteConfigurationProvider is installed to the service container</param>
-    /// <returns>The current configuration builder to allow for chaining</returns>
+    /// <param name="builder">The configuration builder.</param>
+    /// <param name="configurationFilePath">Local file path where the remote settings are persisted.</param>
+    /// <param name="configurationUri">The remote endpoint URI to load from.</param>
+    /// <param name="getData">Optional override that produces the configuration payload (e.g. for custom auth).</param>
+    /// <param name="waitForRemoteLoad">When true, the configuration build waits for the remote call to complete.</param>
+    /// <returns>The same builder, for fluent chaining.</returns>
     public static IConfigurationBuilder AddRemote(
         this IConfigurationBuilder builder, 
         string configurationFilePath, 

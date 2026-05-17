@@ -3,6 +3,9 @@
 
 namespace Shiny
 {
+    /// <summary>
+    /// Describes the runtime access/permission state for a platform service or capability.
+    /// </summary>
     public enum AccessState
     {
         /// <summary>

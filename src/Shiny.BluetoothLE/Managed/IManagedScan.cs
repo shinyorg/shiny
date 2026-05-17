@@ -8,13 +8,20 @@ namespace Shiny.BluetoothLE.Managed;
 
 
 /// <summary>
-/// Represents the type of change in the managed scan peripheral list
+/// The kind of change applied to the managed scan's peripheral list.
 /// </summary>
 public enum ManagedScanListAction
 {
+    /// <summary>A new peripheral was added to the list.</summary>
     Add,
+
+    /// <summary>An existing peripheral's advertisement was refreshed.</summary>
     Update,
+
+    /// <summary>A peripheral was removed (typically because it has not been seen for the configured clear time).</summary>
     Remove,
+
+    /// <summary>The entire list was cleared (usually at the start of a new scan).</summary>
     Clear
 }
 

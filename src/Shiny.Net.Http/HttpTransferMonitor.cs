@@ -11,7 +11,8 @@ namespace Shiny.Net.Http;
 
 
 /// <summary>
-/// This class is used to monitor a list of transfers within your user interface
+/// Helper for binding the current set of HTTP transfers to a user interface,
+/// surfacing add/remove/progress changes via an observable collection.
 /// </summary>
 public class HttpTransferMonitor(
     IHttpTransferManager manager,
@@ -25,11 +26,24 @@ public class HttpTransferMonitor(
 
 
     readonly BindingList<HttpTransferObject> transfers = new();
+
+    /// <summary>
+    /// Observable collection of transfers, suitable for binding to UI controls.
+    /// </summary>
     public INotifyReadOnlyCollection<HttpTransferObject> Transfers => this.transfers;
 
+    /// <summary>
+    /// Gets a value indicating whether the monitor is currently subscribed for updates.
+    /// </summary>
     public bool IsStarted => this.repoSub != null || this.updateSub != null;
 
 
+    /// <summary>
+    /// Removes entries in terminal states from the bound collection.
+    /// </summary>
+    /// <param name="removeFinished">Remove completed transfers.</param>
+    /// <param name="removeCancelled">Remove cancelled transfers.</param>
+    /// <param name="removeErrors">Remove transfers in an error state.</param>
     public void Clear(bool removeFinished, bool removeCancelled, bool removeErrors)
     {
         var list = this.transfers.ToList();
@@ -60,6 +74,13 @@ public class HttpTransferMonitor(
     }
 
 
+    /// <summary>
+    /// Starts monitoring and seeds the collection with currently pending transfers.
+    /// </summary>
+    /// <param name="removeFinished">Auto-remove transfers from the collection on completion.</param>
+    /// <param name="removeErrors">Auto-remove transfers from the collection when they error.</param>
+    /// <param name="removeCancelled">Auto-remove transfers from the collection when cancelled.</param>
+    /// <param name="syncContext">Optional UI synchronization context for marshalling updates.</param>
     public async Task Start(
         bool removeFinished = true,
         bool removeErrors = true,
@@ -182,6 +203,9 @@ public class HttpTransferMonitor(
     }
 
 
+    /// <summary>
+    /// Stops monitoring and detaches event handlers.
+    /// </summary>
     public void Stop()
     {
         this.repoSub?.Dispose();
@@ -190,22 +214,38 @@ public class HttpTransferMonitor(
         this.updateSub = null;
     }
 
+    /// <inheritdoc />
     public void Dispose() => this.Stop();
 }
 
 
+/// <summary>
+/// Observable view-model representing a single HTTP transfer for UI binding.
+/// </summary>
 public class HttpTransferObject : NotifyPropertyChanged
 {
+    /// <summary>
+    /// Creates a new view-model for the given request.
+    /// </summary>
+    /// <param name="request">The transfer request being represented.</param>
     public HttpTransferObject(HttpTransferRequest request)
         => this.Request = request;
 
+    /// <summary>Gets the underlying transfer request.</summary>
     public HttpTransferRequest Request { get; }
+
+    /// <summary>Gets the transfer identifier.</summary>
     public string Identifier => this.Request.Identifier;
+
+    /// <summary>Gets the request URI.</summary>
     public string Uri => this.Request.Uri;
+
+    /// <summary>Gets the transfer type.</summary>
     public TransferType Type => this.Request.Type;
 
 
     double percent;
+    /// <summary>Gets the percent complete (0.0–1.0), or -1 when not deterministic.</summary>
     public double PercentComplete
     {
         get => this.percent;
@@ -214,6 +254,7 @@ public class HttpTransferObject : NotifyPropertyChanged
 
 
     long bps;
+    /// <summary>Gets the current throughput in bytes per second.</summary>
     public long BytesPerSecond
     {
         get => this.bps;
@@ -222,6 +263,7 @@ public class HttpTransferObject : NotifyPropertyChanged
 
 
     bool deterministic;
+    /// <summary>Gets a value indicating whether the total transfer size is known.</summary>
     public bool IsDeterministic
     {
         get => this.deterministic;
@@ -230,6 +272,7 @@ public class HttpTransferObject : NotifyPropertyChanged
 
 
     long? toTransfer;
+    /// <summary>Gets the total bytes to transfer, when known.</summary>
     public long? BytesToTransfer
     {
         get => this.toTransfer;
@@ -238,6 +281,7 @@ public class HttpTransferObject : NotifyPropertyChanged
 
 
     long bytesXfer;
+    /// <summary>Gets the number of bytes transferred so far.</summary>
     public long BytesTransferred
     {
         get => this.bytesXfer;
@@ -246,6 +290,7 @@ public class HttpTransferObject : NotifyPropertyChanged
 
 
     TimeSpan timeRemaining;
+    /// <summary>Gets the estimated time remaining based on current throughput.</summary>
     public TimeSpan EstimatedTimeRemaining
     {
         get => this.timeRemaining;
@@ -254,6 +299,7 @@ public class HttpTransferObject : NotifyPropertyChanged
 
 
     HttpTransferState status = HttpTransferState.Pending;
+    /// <summary>Gets the current transfer state.</summary>
     public HttpTransferState Status
     {
         get => this.status;

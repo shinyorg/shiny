@@ -4,59 +4,85 @@ using System.Collections.Generic;
 namespace Shiny.Support.Repositories;
 
 
+/// <summary>
+/// Describes the kind of mutation that occurred in an <see cref="IRepository"/>.
+/// </summary>
 public enum RepositoryAction
 {
+    /// <summary>An entity was removed.</summary>
     Remove,
+    /// <summary>A new entity was added.</summary>
     Add,
+    /// <summary>An existing entity was updated.</summary>
     Update,
+    /// <summary>All entities of a given type were cleared.</summary>
     Clear
 }
 
 
+/// <summary>
+/// Stores and retrieves entities keyed by string identifier, partitioned by entity type.
+/// </summary>
 public interface IRepository
 {
     /// <summary>
-    /// Returns true if a given identifier/type value is found in storage
+    /// Returns true if an entity of the given type with the specified identifier exists in storage.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to query.</typeparam>
+    /// <param name="identifier">The unique identifier of the entity.</param>
     bool Exists<TEntity>(string identifier) where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Returns a specific entity by its key value
+    /// Gets the entity with the specified identifier, or null if it does not exist.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to retrieve.</typeparam>
+    /// <param name="identifier">The unique identifier of the entity.</param>
     TEntity? Get<TEntity>(string identifier) where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Gets all entities from storage of a given type
+    /// Gets all entities of the specified type from storage.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to retrieve.</typeparam>
     IReadOnlyList<TEntity> GetAll<TEntity>() where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Returns true if updating otherwise false if new
+    /// Inserts or updates the entity. Returns true if an existing entity was updated, false if a new entity was inserted.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to store.</typeparam>
+    /// <param name="entity">The entity to store.</param>
     bool Set<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Removes an entity from storage - if the entity exists, returns true, otherwise false
+    /// Removes the entity with the specified identifier. Returns true if the entity existed and was removed.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to remove.</typeparam>
+    /// <param name="identifier">The unique identifier of the entity.</param>
     bool Remove<TEntity>(string identifier) where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Clears all entities of a given type
+    /// Removes all entities of the specified type from storage.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to clear.</typeparam>
     void Clear<TEntity>() where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Will save entity by its identifier, if the identifier already exists, an error is thrown
+    /// Inserts a new entity. Throws <see cref="RepositoryException"/> if the identifier already exists.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to insert.</typeparam>
+    /// <param name="entity">The entity to insert.</param>
+    /// <exception cref="RepositoryException">Thrown when an entity with the same identifier already exists.</exception>
     void Insert<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Will save entity by its identifier, if the identifier does not exist, an error is thrown
+    /// Updates an existing entity. Throws <see cref="RepositoryException"/> if no entity with the given identifier exists.
     /// </summary>
+    /// <typeparam name="TEntity">The entity type to update.</typeparam>
+    /// <param name="entity">The entity to update.</param>
+    /// <exception cref="RepositoryException">Thrown when no entity with the given identifier exists.</exception>
     void Update<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
 
     /// <summary>
-    /// Fires when an action occurs within the repository
+    /// Fires after any add, update, remove, or clear operation completes against the repository.
     /// </summary>
     event EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> ActionOccurred;
 }

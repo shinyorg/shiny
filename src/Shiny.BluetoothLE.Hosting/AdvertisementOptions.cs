@@ -1,14 +1,12 @@
-﻿namespace Shiny.BluetoothLE.Hosting;
+namespace Shiny.BluetoothLE.Hosting;
 
 
+/// <summary>
+/// Options used when starting BLE advertising from a hosted peripheral.
+/// </summary>
+/// <param name="LocalName">Optional local name included in the advertisement.</param>
+/// <param name="ServiceUuids">GATT service UUIDs to advertise.</param>
 public record AdvertisementOptions(
-    /// <summary>
-    /// Set the local name of the advertisement
-    /// </summary>
     string? LocalName = null,
-
-    /// <summary>
-    /// GATT services to advertise
-    /// </summary>
     params string[] ServiceUuids
 );

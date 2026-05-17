@@ -1,26 +1,22 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
 
 namespace Shiny;
 
 
+/// <summary>
+/// Configuration for the Shiny Azure Notification Hubs push provider.
+/// </summary>
+/// <param name="ListenerConnectionString">The DefaultListenSharedAccessSignature connection string for the hub.</param>
+/// <param name="HubName">The Azure Notification Hub name.</param>
+/// <param name="AzureAuthenticationWaitTimeMs">Delay (ms) after token creation to allow Azure to propagate the install before registering. Increase if you receive InstallationId not found errors.</param>
+/// <param name="ExpirationTime">Optional expiration for the Azure registration; every RequestAccess or tag change extends the expiration forward.</param>
+/// <param name="BeforeSendInstallation">Optional callback invoked just before the installation is sent to ANH, for customizing tags and templates.</param>
 public record AzureNotificationConfig(
     string ListenerConnectionString,
     string HubName,
-
-    /// <summary>
-    /// If you are receiving InstallationId not found - setting this timer higher can sometimes help.  Azure often takes a second a to propagate after token creation
-    /// </summary>
     int AzureAuthenticationWaitTimeMs = 1000,
-
-    /// <summary>
-    /// This will set a specific time to expire your tokens with Azure.  NOTE: that every call to RequestAccess or tag setting, will bump the expiration forward
-    /// </summary>
     TimeSpan? ExpirationTime = null,
-    
-    /// <summary>
-    /// Allows you to configure things like templates & tags before sending to ANH
-    /// </summary>
     Func<Installation, Task>? BeforeSendInstallation = null
 );
