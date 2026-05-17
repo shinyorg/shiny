@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:shiny="http://shiny.net/maui/controls"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Locations"
              x:Class="Sample.Shared.Maui.Pages.Locations.GeofencingPage"
              x:DataType="vm:GeofencingViewModel"
              Title="Geofencing">
-    <tv:TableView>
-        <tv:TableRoot>
-            <tv:TableSection Title="Create Geofence">
-                <tv:EntryCell Title="Latitude" ValueText="{Binding Latitude, Mode=TwoWay}" Keyboard="Numeric" Placeholder="e.g. 37.7749" />
-                <tv:EntryCell Title="Longitude" ValueText="{Binding Longitude, Mode=TwoWay}" Keyboard="Numeric" Placeholder="e.g. -122.4194" />
-                <tv:EntryCell Title="Radius (m)" ValueText="{Binding RadiusMeters, Mode=TwoWay}" Keyboard="Numeric" Placeholder="200" />
-                <tv:SwitchCell Title="Notify on Entry" On="{Binding NotifyOnEntry, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Notify on Exit" On="{Binding NotifyOnExit, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Single Use" On="{Binding SingleUse, Mode=TwoWay}" />
-                <tv:CommandCell Title="Use Current Location" Command="{Binding UseCurrentLocationCommand}" ShowArrow="False" />
-                <tv:ButtonCell Title="Add Geofence" Command="{Binding AddGeofenceCommand}" />
-            </tv:TableSection>
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Create Geofence">
+                <shiny:EntryCell Title="Latitude" ValueText="{Binding Latitude, Mode=TwoWay}" Keyboard="Numeric" Placeholder="e.g. 37.7749" />
+                <shiny:EntryCell Title="Longitude" ValueText="{Binding Longitude, Mode=TwoWay}" Keyboard="Numeric" Placeholder="e.g. -122.4194" />
+                <shiny:EntryCell Title="Radius (m)" ValueText="{Binding RadiusMeters, Mode=TwoWay}" Keyboard="Numeric" Placeholder="200" />
+                <shiny:SwitchCell Title="Notify on Entry" On="{Binding NotifyOnEntry, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Notify on Exit" On="{Binding NotifyOnExit, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Single Use" On="{Binding SingleUse, Mode=TwoWay}" />
+                <shiny:CommandCell Title="Use Current Location" Command="{Binding UseCurrentLocationCommand}" ShowArrow="False" />
+                <shiny:ButtonCell Title="Add Geofence" Command="{Binding AddGeofenceCommand}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Actions">
-                <tv:ButtonCell Title="Remove All" Command="{Binding RemoveAllCommand}" ButtonTextColor="Red" />
-                <tv:LabelCell Title="Status" ValueText="{Binding Status}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Actions">
+                <shiny:ButtonCell Title="Remove All" Command="{Binding RemoveAllCommand}" ButtonTextColor="Red" />
+                <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Monitored Regions" ItemsSource="{Binding Regions}">
-                <tv:TableSection.ItemTemplate>
+            <shiny:TableSection Title="Monitored Regions" ItemsSource="{Binding Regions}">
+                <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:GeofenceRegionViewModel">
-                        <tv:LabelCell Title="{Binding Identifier}" ValueText="{Binding CurrentState}" Description="{Binding Position}" />
+                        <shiny:LabelCell Title="{Binding Identifier}" ValueText="{Binding CurrentState}" Description="{Binding Position}" />
                     </DataTemplate>
-                </tv:TableSection.ItemTemplate>
-            </tv:TableSection>
-        </tv:TableRoot>
-    </tv:TableView>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
 </ContentPage>

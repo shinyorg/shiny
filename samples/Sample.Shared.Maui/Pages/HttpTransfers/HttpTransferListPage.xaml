@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:shiny="http://shiny.net/maui/controls"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.HttpTransfers"
              xmlns:http="clr-namespace:Shiny.Net.Http;assembly=Shiny.Net.Http"
              x:Class="Sample.Shared.Maui.Pages.HttpTransfers.HttpTransferListPage"
              x:DataType="vm:HttpTransferListViewModel"
              Title="HTTP Transfers">
-    <tv:TableView>
-        <tv:TableRoot>
-            <tv:TableSection Title="Create">
-                <tv:CommandCell Title="New Download" Command="{Binding GoToDownloadCommand}" />
-                <tv:CommandCell Title="New Upload" Command="{Binding GoToUploadCommand}" />
-                <tv:CommandCell Title="Azure Blob Upload" Command="{Binding GoToAzureBlobCommand}" />
-            </tv:TableSection>
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Create">
+                <shiny:CommandCell Title="New Download" Command="{Binding GoToDownloadCommand}" />
+                <shiny:CommandCell Title="New Upload" Command="{Binding GoToUploadCommand}" />
+                <shiny:CommandCell Title="Azure Blob Upload" Command="{Binding GoToAzureBlobCommand}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Manage">
-                <tv:ButtonCell Title="Cancel All" Command="{Binding CancelAllCommand}" ButtonTextColor="Red" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Manage">
+                <shiny:ButtonCell Title="Cancel All" Command="{Binding CancelAllCommand}" ButtonTextColor="Red" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Transfers" ItemsSource="{Binding Transfers}">
-                <tv:TableSection.ItemTemplate>
+            <shiny:TableSection Title="Transfers" ItemsSource="{Binding Transfers}">
+                <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="http:HttpTransferObject">
-                        <tv:CustomCell>
-                            <tv:CustomCell.CustomContent>
+                        <shiny:CustomCell>
+                            <shiny:CustomCell.CustomContent>
                                 <VerticalStackLayout Padding="8" Spacing="4">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <Label Text="{Binding Identifier}" FontAttributes="Bold" />
@@ -37,11 +37,11 @@
                                         <Label Grid.Column="2" Text="{Binding EstimatedTimeRemaining, StringFormat='{0:hh\\:mm\\:ss}'}" FontSize="12" />
                                     </Grid>
                                 </VerticalStackLayout>
-                            </tv:CustomCell.CustomContent>
-                        </tv:CustomCell>
+                            </shiny:CustomCell.CustomContent>
+                        </shiny:CustomCell>
                     </DataTemplate>
-                </tv:TableSection.ItemTemplate>
-            </tv:TableSection>
-        </tv:TableRoot>
-    </tv:TableView>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
 </ContentPage>

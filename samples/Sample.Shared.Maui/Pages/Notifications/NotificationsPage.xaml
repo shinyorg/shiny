@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:shiny="http://shiny.net/maui/controls"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Notifications"
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              x:Class="Sample.Shared.Maui.Pages.Notifications.NotificationsPage"
              x:DataType="vm:NotificationsViewModel"
              Title="Notifications">
-    <tv:TableView>
-        <tv:TableRoot>
-            <tv:TableSection Title="Access">
-                <tv:CommandCell Title="Request Access" Command="{Binding RequestAccessCommand}" ShowArrow="False" />
-                <tv:CommandCell Title="Manage Channels" Command="{Binding GoToChannelsCommand}" />
-                <tv:LabelCell Title="Status" ValueText="{Binding Status}" />
-            </tv:TableSection>
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Access">
+                <shiny:CommandCell Title="Request Access" Command="{Binding RequestAccessCommand}" ShowArrow="False" />
+                <shiny:CommandCell Title="Manage Channels" Command="{Binding GoToChannelsCommand}" />
+                <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Create Notification">
-                <tv:EntryCell Title="Title" ValueText="{Binding NotifTitle, Mode=TwoWay}" Placeholder="Notification title" />
-                <tv:EntryCell Title="Message" ValueText="{Binding NotifMessage, Mode=TwoWay}" Placeholder="Required" />
-                <tv:EntryCell Title="Thread" ValueText="{Binding Thread, Mode=TwoWay}" Placeholder="Group / Thread" />
-                <tv:TextPickerCell Title="Channel" ItemsSource="{Binding ChannelNames}" SelectedIndex="{Binding SelectedChannelIndex, Mode=TwoWay}" />
-                <tv:TextPickerCell Title="Type" ItemsSource="{Binding NotificationTypes}" SelectedIndex="{Binding SelectedTypeIndex, Mode=TwoWay}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Create Notification">
+                <shiny:EntryCell Title="Title" ValueText="{Binding NotifTitle, Mode=TwoWay}" Placeholder="Notification title" />
+                <shiny:EntryCell Title="Message" ValueText="{Binding NotifMessage, Mode=TwoWay}" Placeholder="Required" />
+                <shiny:EntryCell Title="Thread" ValueText="{Binding Thread, Mode=TwoWay}" Placeholder="Group / Thread" />
+                <shiny:TextPickerCell Title="Channel" ItemsSource="{Binding ChannelNames}" SelectedIndex="{Binding SelectedChannelIndex, Mode=TwoWay}" />
+                <shiny:TextPickerCell Title="Type" ItemsSource="{Binding NotificationTypes}" SelectedIndex="{Binding SelectedTypeIndex, Mode=TwoWay}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Schedule" IsVisible="{Binding IsScheduled}">
-                <tv:DatePickerCell Title="Date" Date="{Binding ScheduleDate, Mode=TwoWay}" MinimumDate="{x:Static sys:DateTime.Today}" />
-                <tv:TimePickerCell Title="Time" Time="{Binding ScheduleTime, Mode=TwoWay}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Schedule" IsVisible="{Binding IsScheduled}">
+                <shiny:DatePickerCell Title="Date" Date="{Binding ScheduleDate, Mode=TwoWay}" MinimumDate="{x:Static sys:DateTime.Today}" />
+                <shiny:TimePickerCell Title="Time" Time="{Binding ScheduleTime, Mode=TwoWay}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Geofence Trigger" IsVisible="{Binding IsGeofence}">
-                <tv:EntryCell Title="Latitude" ValueText="{Binding GeoLatitude, Mode=TwoWay}" Keyboard="Numeric" />
-                <tv:EntryCell Title="Longitude" ValueText="{Binding GeoLongitude, Mode=TwoWay}" Keyboard="Numeric" />
-                <tv:EntryCell Title="Radius (m)" ValueText="{Binding GeoRadius, Mode=TwoWay}" Keyboard="Numeric" />
-                <tv:SwitchCell Title="Repeat" On="{Binding GeoRepeat, Mode=TwoWay}" />
-                <tv:CommandCell Title="Use Current Location" Command="{Binding UseCurrentLocationCommand}" ShowArrow="False" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Geofence Trigger" IsVisible="{Binding IsGeofence}">
+                <shiny:EntryCell Title="Latitude" ValueText="{Binding GeoLatitude, Mode=TwoWay}" Keyboard="Numeric" />
+                <shiny:EntryCell Title="Longitude" ValueText="{Binding GeoLongitude, Mode=TwoWay}" Keyboard="Numeric" />
+                <shiny:EntryCell Title="Radius (m)" ValueText="{Binding GeoRadius, Mode=TwoWay}" Keyboard="Numeric" />
+                <shiny:SwitchCell Title="Repeat" On="{Binding GeoRepeat, Mode=TwoWay}" />
+                <shiny:CommandCell Title="Use Current Location" Command="{Binding UseCurrentLocationCommand}" ShowArrow="False" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Repeat Trigger" IsVisible="{Binding IsRepeating}">
-                <tv:TextPickerCell Title="Repeat Mode" ItemsSource="{Binding RepeatModes}" SelectedIndex="{Binding SelectedRepeatModeIndex, Mode=TwoWay}" />
-                <tv:TimePickerCell Title="Time of Day" Time="{Binding RepeatTimeOfDay, Mode=TwoWay}" IsVisible="{Binding IsRepeatTimeOfDay}" />
-                <tv:EntryCell Title="Interval (min)" ValueText="{Binding RepeatIntervalMinutes, Mode=TwoWay}" Keyboard="Numeric" IsVisible="{Binding IsRepeatInterval}" />
-                <tv:TextPickerCell Title="Day of Week" ItemsSource="{Binding DayOfWeekOptions}" SelectedIndex="{Binding SelectedDayOfWeekIndex, Mode=TwoWay}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Repeat Trigger" IsVisible="{Binding IsRepeating}">
+                <shiny:TextPickerCell Title="Repeat Mode" ItemsSource="{Binding RepeatModes}" SelectedIndex="{Binding SelectedRepeatModeIndex, Mode=TwoWay}" />
+                <shiny:TimePickerCell Title="Time of Day" Time="{Binding RepeatTimeOfDay, Mode=TwoWay}" IsVisible="{Binding IsRepeatTimeOfDay}" />
+                <shiny:EntryCell Title="Interval (min)" ValueText="{Binding RepeatIntervalMinutes, Mode=TwoWay}" Keyboard="Numeric" IsVisible="{Binding IsRepeatInterval}" />
+                <shiny:TextPickerCell Title="Day of Week" ItemsSource="{Binding DayOfWeekOptions}" SelectedIndex="{Binding SelectedDayOfWeekIndex, Mode=TwoWay}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Android Options" IsVisible="{Binding IsAndroid}">
-                <tv:SwitchCell Title="Auto Cancel" On="{Binding AndroidAutoCancel, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Ongoing" On="{Binding AndroidOnGoing, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Big Text Style" On="{Binding AndroidUseBigTextStyle, Mode=TwoWay}" />
-                <tv:EntryCell Title="Small Icon" ValueText="{Binding AndroidSmallIcon, Mode=TwoWay}" Placeholder="Resource name" />
-                <tv:EntryCell Title="Category" ValueText="{Binding AndroidCategory, Mode=TwoWay}" />
-                <tv:EntryCell Title="Ticker" ValueText="{Binding AndroidTicker, Mode=TwoWay}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Android Options" IsVisible="{Binding IsAndroid}">
+                <shiny:SwitchCell Title="Auto Cancel" On="{Binding AndroidAutoCancel, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Ongoing" On="{Binding AndroidOnGoing, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Big Text Style" On="{Binding AndroidUseBigTextStyle, Mode=TwoWay}" />
+                <shiny:EntryCell Title="Small Icon" ValueText="{Binding AndroidSmallIcon, Mode=TwoWay}" Placeholder="Resource name" />
+                <shiny:EntryCell Title="Category" ValueText="{Binding AndroidCategory, Mode=TwoWay}" />
+                <shiny:EntryCell Title="Ticker" ValueText="{Binding AndroidTicker, Mode=TwoWay}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="iOS Options" IsVisible="{Binding IsIos}">
-                <tv:EntryCell Title="Subtitle" ValueText="{Binding IosSubtitle, Mode=TwoWay}" />
-                <tv:EntryCell Title="Relevance Score" ValueText="{Binding IosRelevanceScore, Mode=TwoWay}" Keyboard="Numeric" Placeholder="0.0 - 1.0" />
-            </tv:TableSection>
+            <shiny:TableSection Title="iOS Options" IsVisible="{Binding IsIos}">
+                <shiny:EntryCell Title="Subtitle" ValueText="{Binding IosSubtitle, Mode=TwoWay}" />
+                <shiny:EntryCell Title="Relevance Score" ValueText="{Binding IosRelevanceScore, Mode=TwoWay}" Keyboard="Numeric" Placeholder="0.0 - 1.0" />
+            </shiny:TableSection>
 
-            <tv:TableSection>
-                <tv:ButtonCell Title="Send Notification" Command="{Binding SendCommand}" />
-            </tv:TableSection>
+            <shiny:TableSection>
+                <shiny:ButtonCell Title="Send Notification" Command="{Binding SendCommand}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="{Binding PendingCount, StringFormat='Pending ({0})'}">
-                <tv:CommandCell Title="Cancel All" Command="{Binding CancelAllCommand}" ShowArrow="False" />
-            </tv:TableSection>
+            <shiny:TableSection Title="{Binding PendingCount, StringFormat='Pending ({0})'}">
+                <shiny:CommandCell Title="Cancel All" Command="{Binding CancelAllCommand}" ShowArrow="False" />
+            </shiny:TableSection>
 
-            <tv:TableSection ItemsSource="{Binding PendingNotifications}">
-                <tv:TableSection.ItemTemplate>
+            <shiny:TableSection ItemsSource="{Binding PendingNotifications}">
+                <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:PendingNotificationViewModel">
-                        <tv:CommandCell Title="{Binding Title}" ValueText="{Binding TriggerInfo}" Description="{Binding Message}"
+                        <shiny:CommandCell Title="{Binding Title}" ValueText="{Binding TriggerInfo}" Description="{Binding Message}"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}, Path=CancelNotificationCommand}"
                                         CommandParameter="{Binding Id}" ShowArrow="False" />
                     </DataTemplate>
-                </tv:TableSection.ItemTemplate>
-            </tv:TableSection>
-        </tv:TableRoot>
-    </tv:TableView>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
 </ContentPage>

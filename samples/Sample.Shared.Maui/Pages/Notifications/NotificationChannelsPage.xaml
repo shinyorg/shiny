@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:shiny="http://shiny.net/maui/controls"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Notifications"
              x:Class="Sample.Shared.Maui.Pages.Notifications.NotificationChannelsPage"
              x:DataType="vm:NotificationChannelsViewModel"
              Title="Notification Channels">
-    <tv:TableView>
-        <tv:TableRoot>
-            <tv:TableSection Title="Channels" ItemsSource="{Binding Channels}">
-                <tv:TableSection.ItemTemplate>
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Channels" ItemsSource="{Binding Channels}">
+                <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:ChannelItemViewModel">
-                        <tv:CommandCell Title="{Binding Identifier}" ValueText="{Binding Importance}"
+                        <shiny:CommandCell Title="{Binding Identifier}" ValueText="{Binding Importance}"
                                         Description="{Binding ActionCount, StringFormat='{0} actions'}"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotificationChannelsViewModel}}, Path=SelectChannelCommand}"
                                         CommandParameter="{Binding .}" />
                     </DataTemplate>
-                </tv:TableSection.ItemTemplate>
-            </tv:TableSection>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Channel Editor">
-                <tv:CommandCell Title="New Channel" Command="{Binding NewChannelCommand}" ShowArrow="False" />
-                <tv:LabelCell Title="Status" ValueText="{Binding Status}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Channel Editor">
+                <shiny:CommandCell Title="New Channel" Command="{Binding NewChannelCommand}" ShowArrow="False" />
+                <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Channel Details">
-                <tv:EntryCell Title="Identifier" ValueText="{Binding ChannelId, Mode=TwoWay}" Placeholder="Required" IsEnabled="{Binding IsIdentifierEditable}" />
-                <tv:EntryCell Title="Description" ValueText="{Binding ChannelDescription, Mode=TwoWay}" />
-                <tv:TextPickerCell Title="Importance" ItemsSource="{Binding ImportanceOptions}" SelectedIndex="{Binding SelectedImportanceIndex, Mode=TwoWay}" />
-                <tv:TextPickerCell Title="Sound" ItemsSource="{Binding SoundOptions}" SelectedIndex="{Binding SelectedSoundIndex, Mode=TwoWay}" />
-                <tv:EntryCell Title="Custom Sound" ValueText="{Binding CustomSoundPath, Mode=TwoWay}" IsVisible="{Binding IsCustomSound}" Placeholder="Sound file path" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Channel Details">
+                <shiny:EntryCell Title="Identifier" ValueText="{Binding ChannelId, Mode=TwoWay}" Placeholder="Required" IsEnabled="{Binding IsIdentifierEditable}" />
+                <shiny:EntryCell Title="Description" ValueText="{Binding ChannelDescription, Mode=TwoWay}" />
+                <shiny:TextPickerCell Title="Importance" ItemsSource="{Binding ImportanceOptions}" SelectedIndex="{Binding SelectedImportanceIndex, Mode=TwoWay}" />
+                <shiny:TextPickerCell Title="Sound" ItemsSource="{Binding SoundOptions}" SelectedIndex="{Binding SelectedSoundIndex, Mode=TwoWay}" />
+                <shiny:EntryCell Title="Custom Sound" ValueText="{Binding CustomSoundPath, Mode=TwoWay}" IsVisible="{Binding IsCustomSound}" Placeholder="Sound file path" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Android Options" IsVisible="{Binding IsAndroid}">
-                <tv:SwitchCell Title="Blockable" On="{Binding AndroidBlockable, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Allow Bubbles" On="{Binding AndroidAllowBubbles, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Show Badge" On="{Binding AndroidShowBadge, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Enable Lights" On="{Binding AndroidEnableLights, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Enable Vibration" On="{Binding AndroidEnableVibration, Mode=TwoWay}" />
-                <tv:SwitchCell Title="Bypass DnD" On="{Binding AndroidBypassDnd, Mode=TwoWay}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Android Options" IsVisible="{Binding IsAndroid}">
+                <shiny:SwitchCell Title="Blockable" On="{Binding AndroidBlockable, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Allow Bubbles" On="{Binding AndroidAllowBubbles, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Show Badge" On="{Binding AndroidShowBadge, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Enable Lights" On="{Binding AndroidEnableLights, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Enable Vibration" On="{Binding AndroidEnableVibration, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Bypass DnD" On="{Binding AndroidBypassDnd, Mode=TwoWay}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Actions" ItemsSource="{Binding Actions}">
-                <tv:TableSection.ItemTemplate>
+            <shiny:TableSection Title="Actions" ItemsSource="{Binding Actions}">
+                <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:ChannelActionItemViewModel">
-                        <tv:CommandCell Title="{Binding Identifier}" ValueText="{Binding ActionType}" Description="{Binding Title}"
+                        <shiny:CommandCell Title="{Binding Identifier}" ValueText="{Binding ActionType}" Description="{Binding Title}"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotificationChannelsViewModel}}, Path=RemoveActionCommand}"
                                         CommandParameter="{Binding .}" ShowArrow="False" />
                     </DataTemplate>
-                </tv:TableSection.ItemTemplate>
-            </tv:TableSection>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Add Action">
-                <tv:EntryCell Title="Action ID" ValueText="{Binding ActionId, Mode=TwoWay}" Placeholder="Required" />
-                <tv:EntryCell Title="Title" ValueText="{Binding ActionTitle, Mode=TwoWay}" />
-                <tv:TextPickerCell Title="Type" ItemsSource="{Binding ActionTypeOptions}" SelectedIndex="{Binding SelectedActionTypeIndex, Mode=TwoWay}" />
-                <tv:ButtonCell Title="Add Action" Command="{Binding AddActionCommand}" />
-            </tv:TableSection>
+            <shiny:TableSection Title="Add Action">
+                <shiny:EntryCell Title="Action ID" ValueText="{Binding ActionId, Mode=TwoWay}" Placeholder="Required" />
+                <shiny:EntryCell Title="Title" ValueText="{Binding ActionTitle, Mode=TwoWay}" />
+                <shiny:TextPickerCell Title="Type" ItemsSource="{Binding ActionTypeOptions}" SelectedIndex="{Binding SelectedActionTypeIndex, Mode=TwoWay}" />
+                <shiny:ButtonCell Title="Add Action" Command="{Binding AddActionCommand}" />
+            </shiny:TableSection>
 
-            <tv:TableSection>
-                <tv:ButtonCell Title="Save Channel" Command="{Binding SaveChannelCommand}" />
-                <tv:ButtonCell Title="Delete Channel" Command="{Binding DeleteChannelCommand}" IsVisible="{Binding IsEditing}" ButtonTextColor="Red" />
-            </tv:TableSection>
-        </tv:TableRoot>
-    </tv:TableView>
+            <shiny:TableSection>
+                <shiny:ButtonCell Title="Save Channel" Command="{Binding SaveChannelCommand}" />
+                <shiny:ButtonCell Title="Delete Channel" Command="{Binding DeleteChannelCommand}" IsVisible="{Binding IsEditing}" ButtonTextColor="Red" />
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
 </ContentPage>

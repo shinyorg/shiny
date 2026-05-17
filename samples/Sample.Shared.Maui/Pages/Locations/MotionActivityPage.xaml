@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:tv="http://shiny.net/maui/tableview"
+             xmlns:shiny="http://shiny.net/maui/controls"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Locations"
              x:Class="Sample.Shared.Maui.Pages.Locations.MotionActivityPage"
              x:DataType="vm:MotionActivityViewModel"
              Title="Motion Activity">
-    <tv:TableView>
-        <tv:TableRoot>
-            <tv:TableSection Title="Actions">
-                <tv:ButtonCell Title="{Binding ListenText}" Command="{Binding ToggleListenerCommand}" />
-                <tv:ButtonCell Title="Get Last Reading" Command="{Binding GetLastReadingCommand}" />
-                <tv:ButtonCell Title="Check Permission" Command="{Binding CheckPermissionCommand}" />
-                <tv:LabelCell Title="Status" ValueText="{Binding Status}" />
-            </tv:TableSection>
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Actions">
+                <shiny:ButtonCell Title="{Binding ListenText}" Command="{Binding ToggleListenerCommand}" />
+                <shiny:ButtonCell Title="Get Last Reading" Command="{Binding GetLastReadingCommand}" />
+                <shiny:ButtonCell Title="Check Permission" Command="{Binding CheckPermissionCommand}" />
+                <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </shiny:TableSection>
 
-            <tv:TableSection Title="Current Reading">
-                <tv:LabelCell Title="Activity" ValueText="{Binding Activity}" />
-                <tv:LabelCell Title="Confidence" ValueText="{Binding Confidence}" />
-                <tv:LabelCell Title="Timestamp" ValueText="{Binding Timestamp}" />
-            </tv:TableSection>
-        </tv:TableRoot>
-    </tv:TableView>
+            <shiny:TableSection Title="Current Reading">
+                <shiny:LabelCell Title="Activity" ValueText="{Binding Activity}" />
+                <shiny:LabelCell Title="Confidence" ValueText="{Binding Confidence}" />
+                <shiny:LabelCell Title="Timestamp" ValueText="{Binding Timestamp}" />
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
 </ContentPage>
