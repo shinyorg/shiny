@@ -10,7 +10,7 @@ namespace Shiny.Power;
 public class BatteryImpl : IBattery
 {
     readonly AndroidPlatform platform;
-    BroadcastReceiver? receiver;
+    ActionBroadcastReceiver? receiver;
     int subscriberCount;
 
     public BatteryImpl(AndroidPlatform platform) => this.platform = platform;
