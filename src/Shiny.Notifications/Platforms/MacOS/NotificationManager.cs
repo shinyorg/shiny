@@ -7,6 +7,7 @@ using Foundation;
 using UserNotifications;
 using Shiny.Hosting;
 using Shiny.Stores;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Notifications;
@@ -21,7 +22,7 @@ public class NotificationManager(
     IKeyValueStore settings
 ) : INotificationManager, IMacLifecycle.INotificationHandler
 {
-    readonly Lazy<IEnumerable<INotificationDelegate>> delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
+    readonly Lazy<IEnumerable<INotificationDelegate>> delegates = new(() => services.GetRequiredService<IEnumerable<INotificationDelegate>>());
     readonly MacConfiguration configuration = configuration;
     readonly IPlatform platform = platform;
     readonly ILogger logger = logger;

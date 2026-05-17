@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<NotificationManager>();
         services.AddSingleton<INotificationManager>(sp => sp.GetRequiredService<NotificationManager>());
+        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<NotificationManager>());
 
         if (!services.HasService<IChannelManager>())
         {

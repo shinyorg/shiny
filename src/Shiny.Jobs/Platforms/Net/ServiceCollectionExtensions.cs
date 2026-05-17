@@ -55,6 +55,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<JobManager>();
             services.AddSingleton<IJobManager>(sp => sp.GetRequiredService<JobManager>());
+            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<JobManager>());
         }
 
         return services;

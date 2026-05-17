@@ -9,7 +9,7 @@ using Shiny.Power;
 namespace Shiny.Jobs;
 
 
-public class JobManager : AbstractJobManager, IDisposable
+public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
 {
     static TimeSpan interval = TimeSpan.FromSeconds(30);
     public static TimeSpan Interval
@@ -49,7 +49,7 @@ public class JobManager : AbstractJobManager, IDisposable
     }
 
 
-    public void ComponentStart()
+    public void Start()
     {
         var jobs = ServiceCollectionExtensions.GetRegisteredJobs();
         this.AddRegistrations(jobs);

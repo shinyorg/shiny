@@ -9,10 +9,12 @@ using UserNotifications;
 namespace Shiny.Notifications;
 
 
-public class ChannelManager : IChannelManager, IShinyComponentStartup
+public class ChannelManager : IChannelManager
 {
     readonly IRepository repository;
     readonly ILogger<ChannelManager> logger;
+    readonly object readyLock = new();
+    bool ready;
 
 
     public ChannelManager(IRepository repository, ILogger<ChannelManager> logger)
@@ -22,23 +24,32 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     }
 
 
-    public void ComponentStart()
+    void EnsureReady()
     {
-        this.logger.LogInformation("Starting macOS channel manager");
-        try
+        if (this.ready)
+            return;
+
+        lock (this.readyLock)
         {
-            this.Add(Channel.Default);
-            this.logger.LogDebug("Channel manager initialized successfully");
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError("Failed to create default channel", ex);
+            if (this.ready)
+                return;
+            this.ready = true;
+            try
+            {
+                this.Add(Channel.Default);
+                this.logger.LogDebug("Channel manager initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to create default channel");
+            }
         }
     }
 
 
     public void Add(Channel channel)
     {
+        this.EnsureReady();
         channel.AssertValid();
         var apple = channel.TryToNative<AppleChannel>();
         this.repository.Set(apple);
@@ -48,17 +59,29 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
     public void Clear()
     {
+        this.EnsureReady();
         this.repository.Clear<AppleChannel>();
         this.Add(Channel.Default);
     }
 
 
-    public Channel? Get(string channelId) => this.repository.Get<AppleChannel>(channelId);
-    public IList<Channel> GetAll() => this.repository.GetAll<AppleChannel>().OfType<Channel>().ToList();
+    public Channel? Get(string channelId)
+    {
+        this.EnsureReady();
+        return this.repository.Get<AppleChannel>(channelId);
+    }
+
+
+    public IList<Channel> GetAll()
+    {
+        this.EnsureReady();
+        return this.repository.GetAll<AppleChannel>().OfType<Channel>().ToList();
+    }
 
 
     public void Remove(string channelId)
     {
+        this.EnsureReady();
         this.AssertChannelRemove(channelId);
 
         this.repository.Remove<AppleChannel>(channelId);

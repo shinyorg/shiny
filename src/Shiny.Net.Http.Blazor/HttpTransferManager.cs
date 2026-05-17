@@ -31,14 +31,6 @@ public class HttpTransferManager(
     bool initialized;
 
 
-    // public void ComponentStart()
-    // {
-    //     // best-effort: warm up the SW registration on startup so the message
-    //     // channel is wired immediately when the user later resolves the manager.
-    //     _ = this.EnsureInit();
-    // }
-
-
     async Task<IJSObjectReference> EnsureInit()
     {
         if (this.module == null)

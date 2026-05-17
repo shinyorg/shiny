@@ -11,26 +11,36 @@ namespace Shiny.Notifications;
 
 public class ChannelManager(IRepository repository, ILogger<ChannelManager> logger) : IChannelManager
 {
+    readonly object readyLock = new();
+    bool ready;
 
-    public void ComponentStart()
+
+    void EnsureReady()
     {
-        logger.LogInformation("Starting iOS channel manager");
-        try
+        if (this.ready)
+            return;
+
+        lock (this.readyLock)
         {
-            // watch - this is a controlled scenario where not everything needs to go async
-            // this also ensures the default channel is present before any services start running
-            this.Add(Channel.Default);
-            logger.LogDebug("Channel manager initialized successfully");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Failed to create default channel", ex);
+            if (this.ready)
+                return;
+            this.ready = true;
+            try
+            {
+                this.Add(Channel.Default);
+                logger.LogDebug("Channel manager initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to create default channel");
+            }
         }
     }
 
 
     public void Add(Channel channel)
     {
+        this.EnsureReady();
         channel.AssertValid();
         var apple = channel.TryToNative<AppleChannel>();
         repository.Set(apple);
@@ -40,6 +50,7 @@ public class ChannelManager(IRepository repository, ILogger<ChannelManager> logg
 
     public void Clear()
     {
+        this.EnsureReady();
         repository.Clear<AppleChannel>();
 
         // there must always be a default
@@ -47,12 +58,23 @@ public class ChannelManager(IRepository repository, ILogger<ChannelManager> logg
     }
 
 
-    public Channel? Get(string channelId) => repository.Get<AppleChannel>(channelId);
-    public IList<Channel> GetAll() => repository.GetAll<AppleChannel>().OfType<Channel>().ToList();
+    public Channel? Get(string channelId)
+    {
+        this.EnsureReady();
+        return repository.Get<AppleChannel>(channelId);
+    }
+
+
+    public IList<Channel> GetAll()
+    {
+        this.EnsureReady();
+        return repository.GetAll<AppleChannel>().OfType<Channel>().ToList();
+    }
 
 
     public void Remove(string channelId)
     {
+        this.EnsureReady();
         this.AssertChannelRemove(channelId);
 
         repository.Remove<AppleChannel>(channelId);

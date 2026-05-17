@@ -10,23 +10,36 @@ namespace Shiny.Notifications;
 public class ChannelManager(ILogger<ChannelManager> logger) : IChannelManager
 {
     readonly ConcurrentDictionary<string, Channel> channels = new();
+    readonly object readyLock = new();
+    bool ready;
 
-    public void ComponentStart()
+
+    void EnsureReady()
     {
-        try
+        if (this.ready)
+            return;
+
+        lock (this.readyLock)
         {
-            this.Add(Channel.Default);
-            logger.LogDebug("Linux channel manager initialized");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create default channel");
+            if (this.ready)
+                return;
+            this.ready = true;
+            try
+            {
+                this.Add(Channel.Default);
+                logger.LogDebug("Linux channel manager initialized");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to create default channel");
+            }
         }
     }
 
 
     public void Add(Channel channel)
     {
+        this.EnsureReady();
         channel.AssertValid();
         this.channels[channel.Identifier] = channel;
     }
@@ -34,6 +47,7 @@ public class ChannelManager(ILogger<ChannelManager> logger) : IChannelManager
 
     public void Remove(string channelId)
     {
+        this.EnsureReady();
         if (channelId == null)
             throw new ArgumentNullException(nameof(channelId));
         if (channelId.Equals(Channel.Default.Identifier))
@@ -45,13 +59,22 @@ public class ChannelManager(ILogger<ChannelManager> logger) : IChannelManager
 
     public void Clear()
     {
+        this.EnsureReady();
         this.channels.Clear();
         this.Add(Channel.Default);
     }
 
 
     public Channel? Get(string channelId)
-        => this.channels.TryGetValue(channelId, out var c) ? c : null;
+    {
+        this.EnsureReady();
+        return this.channels.TryGetValue(channelId, out var c) ? c : null;
+    }
 
-    public IList<Channel> GetAll() => this.channels.Values.ToList();
+
+    public IList<Channel> GetAll()
+    {
+        this.EnsureReady();
+        return this.channels.Values.ToList();
+    }
 }

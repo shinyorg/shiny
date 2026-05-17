@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Locations;
@@ -25,7 +26,7 @@ public partial class NotificationManager(
     ILogger<NotificationManager> logger
 ) : INotificationManager, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent
 {
-    readonly Lazy<AndroidNotificationProcessor> processor = services.GetLazyService<AndroidNotificationProcessor>();
+    readonly Lazy<AndroidNotificationProcessor> processor = new(() => services.GetRequiredService<AndroidNotificationProcessor>());
     readonly AndroidPlatform platform = platform;
     readonly AndroidNotificationManager manager = manager;
     readonly IRepository repository = repository;

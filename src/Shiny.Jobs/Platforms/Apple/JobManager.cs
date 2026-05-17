@@ -16,8 +16,7 @@ public class JobManager(
     const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
     bool registeredSuccessfully = false;
 
-    public void Start() {}
-    public void ComponentStart()
+    public void Start()
     {
 #if IOS
         if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)

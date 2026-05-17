@@ -11,12 +11,14 @@ using Shiny.Support.Repositories;
 namespace Shiny.Notifications;
 
 
-public class ChannelManager : IChannelManager, IShinyComponentStartup
+public class ChannelManager : IChannelManager
 {
     readonly IRepository repository;
     readonly AndroidPlatform platform;
     readonly ILogger logger;
     readonly Android.App.NotificationManager nativeManager;
+    readonly object readyLock = new();
+    bool ready;
 
 
     public ChannelManager(
@@ -32,23 +34,32 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     }
 
 
-    public void ComponentStart()
+    void EnsureReady()
     {
-        this.logger.LogInformation("Initializing channel manager");
-        try
+        if (this.ready)
+            return;
+
+        lock (this.readyLock)
         {
-            this.Add(Channel.Default);
-            this.logger.LogInformation("Default notification channel created");
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "Failed to create default channel");
+            if (this.ready)
+                return;
+            this.ready = true;
+            try
+            {
+                this.Add(Channel.Default);
+                this.logger.LogInformation("Default notification channel created");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to create default channel");
+            }
         }
     }
 
 
     public void Add(Channel channel)
     {
+        this.EnsureReady();
         channel.AssertValid();
         var android = channel.TryToNative<AndroidChannel>();
 
@@ -130,6 +141,7 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
 
     public void Clear()
     {
+        this.EnsureReady();
         var channels = this.GetAll();
         foreach (var channel in channels)
             this.nativeManager.DeleteNotificationChannel(channel.Identifier);
@@ -139,10 +151,23 @@ public class ChannelManager : IChannelManager, IShinyComponentStartup
     }
 
 
-    public Channel? Get(string channelId) => this.repository.Get<AndroidChannel>(channelId);
-    public IList<Channel> GetAll() => this.repository.GetAll<AndroidChannel>().OfType<Channel>().ToList();
+    public Channel? Get(string channelId)
+    {
+        this.EnsureReady();
+        return this.repository.Get<AndroidChannel>(channelId);
+    }
+
+
+    public IList<Channel> GetAll()
+    {
+        this.EnsureReady();
+        return this.repository.GetAll<AndroidChannel>().OfType<Channel>().ToList();
+    }
+
+
     public void Remove(string channelId)
     {
+        this.EnsureReady();
         this.AssertChannelRemove(channelId);
 
         this.nativeManager.DeleteNotificationChannel(channelId);

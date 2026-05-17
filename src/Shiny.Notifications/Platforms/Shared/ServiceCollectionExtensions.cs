@@ -70,7 +70,6 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<ChannelManager>();
             services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
-            services.AddSingleton<IShinyComponentStartup>(sp => sp.GetRequiredService<ChannelManager>());
         }
 
         if (delegateType != null)
@@ -111,7 +110,6 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<ChannelManager>();
             services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
-            services.AddSingleton<IShinyComponentStartup>(sp => sp.GetRequiredService<ChannelManager>());
         }
 
         if (delegateType != null)
@@ -148,7 +146,6 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<ChannelManager>();
             services.AddSingleton<IChannelManager>(sp => sp.GetRequiredService<ChannelManager>());
-            services.AddSingleton<IShinyComponentStartup>(sp => sp.GetRequiredService<ChannelManager>());
         }
 
         if (delegateType != null)

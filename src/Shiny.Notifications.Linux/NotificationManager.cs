@@ -15,7 +15,7 @@ public class NotificationManager(
     IServiceProvider services,
     IChannelManager channelManager,
     ILogger<NotificationManager> logger
-) : INotificationManager, IAsyncDisposable
+) : INotificationManager, IShinyStartupTask, IAsyncDisposable
 {
     // In-memory persistence. Linux desktop notifications via freedesktop don't have a concept
     // of persistent scheduled notifications anyway — they live for the duration of the process.
@@ -28,11 +28,11 @@ public class NotificationManager(
     Connection? connection;
     Timer? scheduler;
 
-    // public void ComponentStart()
-    // {
-    //     _ = this.EnsureConnectionAsync();
-    //     this.scheduler = new Timer(_ => _ = this.RunScheduledAsync(), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
-    // }
+    public void Start()
+    {
+        _ = this.EnsureConnectionAsync();
+        this.scheduler = new Timer(_ => _ = this.RunScheduledAsync(), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
+    }
 
 
     public void AddChannel(Channel channel) => channelManager.Add(channel);
