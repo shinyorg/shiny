@@ -27,22 +27,15 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
       with:
           fetch-depth: 0
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
-          dotnet-version: '10.0.201'
-
-#    - uses: AdoptOpenJDK/install-jdk@v1
-#      with:
-#        version: '13'
-#        architecture: x64
-
-    - name: Add .NET Workloads
-      run: dotnet workload install maui-ios maui-android maui-maccatalyst maui-windows macos wasm-tools
+          dotnet-version: '10.0.300'
+          workloads: maui-ios maui-android maui-maccatalyst maui-windows macos wasm-tools
 
     - name: Build
       run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true
