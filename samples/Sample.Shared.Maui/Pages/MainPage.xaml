@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:tv="http://shiny.net/maui/tableview"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages"
+             xmlns:shiny="http://shiny.net/maui/controls"
              x:Class="Sample.Shared.Maui.Pages.MainPage"
              x:DataType="vm:MainViewModel"
              Title="Shiny Sample">
-    <tv:TableView>
-        <tv:TableRoot>
-            <tv:TableSection Title="Features" ItemsSource="{Binding Features}">
-                <tv:TableSection.ItemTemplate>
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Features" ItemsSource="{Binding Features}">
+                <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:FeatureItem">
-                        <tv:CommandCell Title="{Binding Title}" 
-                                        Description="{Binding Description}"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=NavigateCommand}"
-                                        CommandParameter="{Binding Route}" />
+                        <shiny:CommandCell Title="{Binding Title}" 
+                                           Description="{Binding Description}"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=NavigateCommand}"
+                                           CommandParameter="{Binding Route}" />
                     </DataTemplate>
-                </tv:TableSection.ItemTemplate>
-            </tv:TableSection>
-        </tv:TableRoot>
-    </tv:TableView>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
 </ContentPage>
