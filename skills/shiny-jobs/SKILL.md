@@ -103,7 +103,7 @@ There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` 
 using Shiny;
 using Shiny.Jobs;
 
-// Linux / console — battery + connectivity come from Shiny.Support.DeviceMonitoring.Linux
+// Linux / console — battery + connectivity come from Shiny.Core.Linux
 services.AddConnectivity();
 services.AddBattery();
 

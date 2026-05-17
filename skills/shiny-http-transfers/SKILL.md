@@ -116,7 +116,7 @@ public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
 
 On these targets `AddHttpTransfers<TDelegate>()` registers a managed `HttpTransferManager` backed by an `HttpClient` loop. The loop is driven by `IConnectivity` and wakes immediately on connectivity changes. Downloads resume after network interruption via HTTP Range requests (`Range: bytes=N-`, `FileMode.Append` when the server responds with `206 Partial Content`); uploads always restart from scratch.
 
-You must register an `IConnectivity` implementation yourself (e.g. `AddConnectivity()` from `Shiny.Support.DeviceMonitoring.Linux` or `Shiny.Support.DeviceMonitoring.Blazor`). A default JSON filesystem repository is registered automatically and persists transfer state to `{LocalApplicationData}/Shiny` across process restarts.
+You must register an `IConnectivity` implementation yourself (e.g. `AddConnectivity()` from `Shiny.Core.Linux` or `Shiny.Core.Blazor`). A default JSON filesystem repository is registered automatically and persists transfer state to `{LocalApplicationData}/Shiny` across process restarts.
 
 Cancelled downloads clean up any partial file on disk so a subsequent re-queue starts fresh.
 

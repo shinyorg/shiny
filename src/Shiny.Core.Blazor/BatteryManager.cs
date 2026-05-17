@@ -1,19 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
-using Shiny.Net;
+using Shiny.Power;
 
 namespace Shiny.Infrastructure;
 
 
-public class ConnectivityManager : IConnectivity, IAsyncDisposable
+public class BatteryManager : IBattery, IAsyncDisposable
 {
     readonly IJSRuntime jsRuntime;
     IJSObjectReference? module;
-    DotNetObjectReference<ConnectivityManager>? objRef;
+    DotNetObjectReference<BatteryManager>? objRef;
 
 
-    public ConnectivityManager(IJSRuntime jsRuntime)
+    public BatteryManager(IJSRuntime jsRuntime)
     {
         this.jsRuntime = jsRuntime;
     }
@@ -22,7 +22,7 @@ public class ConnectivityManager : IConnectivity, IAsyncDisposable
     async Task<IJSObjectReference> GetModule()
     {
         this.module ??= await this.jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Support.DeviceMonitoring.Blazor/connectivity.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Core.Blazor/battery.js")
             .ConfigureAwait(false);
 
         return this.module;
@@ -36,37 +36,27 @@ public class ConnectivityManager : IConnectivity, IAsyncDisposable
     public void OnChange() => this.Changed?.Invoke(this, EventArgs.Empty);
 
 
-    public ConnectionTypes ConnectionTypes
+    public BatteryState Status
     {
         get
         {
             if (this.module == null)
-                return ConnectionTypes.Unknown;
+                return BatteryState.Unknown;
 
-            var type = ((IJSInProcessObjectReference)this.module).Invoke<string>("getConnType");
-            return type switch
-            {
-                "bluetooth" => ConnectionTypes.Bluetooth,
-                "ethernet" => ConnectionTypes.Wired,
-                "cellular" => ConnectionTypes.Cellular,
-                "wifi" => ConnectionTypes.Wifi,
-                "wimax" => ConnectionTypes.Wifi,
-                "none" => ConnectionTypes.None,
-                _ => ConnectionTypes.Unknown
-            };
+            var charging = ((IJSInProcessObjectReference)this.module).Invoke<bool>("isCharging");
+            return charging ? BatteryState.Charging : BatteryState.Discharging;
         }
     }
 
 
-    public NetworkAccess Access
+    public double Level
     {
         get
         {
             if (this.module == null)
-                return NetworkAccess.Unknown;
+                return 1.0;
 
-            var online = ((IJSInProcessObjectReference)this.module).Invoke<bool>("isConnected");
-            return online ? NetworkAccess.Internet : NetworkAccess.None;
+            return ((IJSInProcessObjectReference)this.module).Invoke<double>("getLevel");
         }
     }
 

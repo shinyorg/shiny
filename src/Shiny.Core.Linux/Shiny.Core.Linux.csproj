@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
-        <Description>Shiny Device Monitoring (Battery, Connectivity) for Linux via sysfs and NetworkInformation</Description>
+        <Description>Shiny Core support for Linux - Battery and Connectivity via sysfs and NetworkInformation</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
     <ItemGroup>

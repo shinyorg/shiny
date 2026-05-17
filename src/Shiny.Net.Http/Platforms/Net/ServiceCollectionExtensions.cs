@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     /// restart). Use this on Linux, macOS server, Blazor, and other plain .NET targets.
     ///
     /// You must register an <see cref="Shiny.Net.IConnectivity"/> implementation
-    /// (e.g. Shiny.Support.DeviceMonitoring.Linux or Shiny.Support.DeviceMonitoring.Blazor)
+    /// (e.g. Shiny.Core.Linux or Shiny.Core.Blazor)
     /// before resolving services. A default JSON filesystem repository is
     /// registered automatically under {LocalApplicationData}/Shiny.
     /// </summary>

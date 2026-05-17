@@ -42,8 +42,7 @@
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
         <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />
-        <Project Path="src/Shiny.Support.DeviceMonitoring.Blazor/Shiny.Support.DeviceMonitoring.Blazor.csproj" />
-        <Project Path="src/Shiny.Support.Storage.Blazor/Shiny.Support.Storage.Blazor.csproj" />
+        <Project Path="src/Shiny.Core.Blazor/Shiny.Core.Blazor.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
         <Project Path="src/Shiny.Locations.Blazor/Shiny.Locations.Blazor.csproj" />
         <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
@@ -51,7 +50,7 @@
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj" />
-        <Project Path="src\Shiny.Support.DeviceMonitoring.Linux\Shiny.Support.DeviceMonitoring.Linux.csproj" />
+        <Project Path="src\Shiny.Core.Linux\Shiny.Core.Linux.csproj" />
         <Project Path="src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
     </Folder>
 </Solution>

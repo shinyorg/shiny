@@ -9,7 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
-        <ProjectReference Include="..\Shiny.Support.Storage.Blazor\Shiny.Support.Storage.Blazor.csproj" />
+        <ProjectReference Include="..\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj" />
     </ItemGroup>
 
     <ItemGroup>

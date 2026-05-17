@@ -18,7 +18,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj"/>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj"/>
-        <ProjectReference Include="..\..\src\Shiny.Support.DeviceMonitoring.Linux\Shiny.Support.DeviceMonitoring.Linux.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Core.Linux\Shiny.Core.Linux.csproj"/>
         <ProjectReference Include="..\..\src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj"/>
         <ProjectReference Include="..\Sample.Shared.Maui\Sample.Shared.Maui.csproj"/>
     </ItemGroup>

@@ -6,7 +6,7 @@ namespace Shiny.Storage.Blazor;
 
 /// <summary>
 /// IKeyValueStore implementation backed by the browser's window.localStorage.
-/// Requires <c>_content/Shiny.Support.Storage.Blazor/shiny-storage.js</c> to be loaded
+/// Requires <c>_content/Shiny.Core.Blazor/shiny-storage.js</c> to be loaded
 /// via a &lt;script&gt; tag in the host index.html before Shiny services are used.
 /// </summary>
 public class LocalStorageKeyValueStore(IJSRuntime jsRuntime, ISerializer serializer) : IKeyValueStore

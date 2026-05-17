@@ -3,11 +3,8 @@
         "path": "Shiny.slnx",
         "projects": [
             "src\\Shiny.Core\\Shiny.Core.csproj",
-            "src\\Shiny.Support.Rx\\Shiny.Support.Rx.csproj",
-            "src\\Shiny.Support.Storage.Blazor\\Shiny.Support.Storage.Blazor.csproj",
-            "src\\Shiny.Support.DeviceMonitoring.Blazor\\Shiny.Support.DeviceMonitoring.Blazor.csproj",
-            "src\\Shiny.Support.DeviceMonitoring.Linux\\Shiny.Support.DeviceMonitoring.Linux.csproj",
-            "src\\Shiny.Support.Locations\\Shiny.Support.Locations.csproj",
+            "src\\Shiny.Core.Blazor\\Shiny.Core.Blazor.csproj",
+            "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj",
             "src\\Shiny.Hosting.Maui\\Shiny.Hosting.Maui.csproj",
             "src\\Shiny.Hosting.Native\\Shiny.Hosting.Native.csproj",
             "src\\Shiny.Extensions.Configuration\\Shiny.Extensions.Configuration.csproj",

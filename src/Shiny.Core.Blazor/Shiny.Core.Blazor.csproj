@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
-        <Description>Shiny Support Library for connectivity and battery for Blazor PWA</Description>
+        <Description>Shiny Core support for Blazor PWA - connectivity, battery, and browser localStorage-backed IRepository / IKeyValueStore</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
 
