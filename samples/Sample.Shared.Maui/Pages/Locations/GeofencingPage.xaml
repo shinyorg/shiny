@@ -9,6 +9,7 @@
     <shiny:TableView>
         <shiny:TableRoot>
             <shiny:TableSection Title="Create Geofence">
+                <shiny:EntryCell Title="Identifier" ValueText="{Binding Identifier, Mode=TwoWay}" Placeholder="auto-generated if blank" />
                 <shiny:EntryCell Title="Latitude" ValueText="{Binding Latitude, Mode=TwoWay}" Keyboard="Numeric" Placeholder="e.g. 37.7749" />
                 <shiny:EntryCell Title="Longitude" ValueText="{Binding Longitude, Mode=TwoWay}" Keyboard="Numeric" Placeholder="e.g. -122.4194" />
                 <shiny:EntryCell Title="Radius (m)" ValueText="{Binding RadiusMeters, Mode=TwoWay}" Keyboard="Numeric" Placeholder="200" />
@@ -24,10 +25,12 @@
                 <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
             </shiny:TableSection>
 
-            <shiny:TableSection Title="Monitored Regions" ItemsSource="{Binding Regions}">
+            <shiny:TableSection Title="Monitored Regions (tap to remove)" ItemsSource="{Binding Regions}">
                 <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:GeofenceRegionViewModel">
-                        <shiny:LabelCell Title="{Binding Identifier}" ValueText="{Binding CurrentState}" Description="{Binding Position}" />
+                        <shiny:CommandCell Title="{Binding Identifier}" ValueText="{Binding CurrentState}" Description="{Binding Position}"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GeofencingViewModel}}, Path=RemoveGeofenceCommand}"
+                                           CommandParameter="{Binding Identifier}" ShowArrow="False" />
                     </DataTemplate>
                 </shiny:TableSection.ItemTemplate>
             </shiny:TableSection>
