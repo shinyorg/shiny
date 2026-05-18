@@ -23,6 +23,11 @@
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup Condition="$(TargetFramework.Contains('maccatalyst')) AND Exists('$(MSBuildProjectDirectory)\Platforms\MacCatalyst')">
+        <Compile Remove="Platforms\iOS\**\*.cs" />
+        <Compile Include="Platforms\MacCatalyst\**\*.cs" />
+    </ItemGroup>
+
     <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\MacOS\**\*.cs" />
