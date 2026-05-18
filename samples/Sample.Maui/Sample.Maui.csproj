@@ -24,22 +24,37 @@
         <WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
     </PropertyGroup>
     
-    <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
-        <key>com.apple.security.app-sandbox</key>
-        <true/>
-        <key>com.apple.security.network.client</key>
-        <true/>
-        <key>com.apple.security.network.server</key>
-        <true/>
-        <key>com.apple.security.device.bluetooth</key>
-        <true/>
-        <key>com.apple.security.personal-information.location</key>
-        <true/>
-    </PropertyGroup>
-    
-    <PropertyGroup>
-        
-    </PropertyGroup>
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+        <CustomEntitlements Include="com.apple.security.app-sandbox" 
+                            Type="Boolean" 
+                            Value="true" 
+                            Visible="false" />
+
+        <CustomEntitlements Include="com.apple.security.network.client"
+                            Type="Boolean"
+                            Value="true"
+                            Visible="false" />
+
+        <CustomEntitlements Include="com.apple.security.network.server"
+                            Type="Boolean"
+                            Value="true"
+                            Visible="false" />
+
+        <CustomEntitlements Include="com.apple.security.device.bluetooth"
+                            Type="Boolean"
+                            Value="true"
+                            Visible="false" />
+
+        <CustomEntitlements Include="com.apple.security.personal-information.location"
+                            Type="Boolean"
+                            Value="true"
+                            Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('-maccatalyst'))">
+        <CustomEntitlements Include="aps-environment" Type="string" Value="development" Condition="'$(Configuration)' == 'Debug'" Visible="false" />
+        <CustomEntitlements Include="aps-environment" Type="string" Value="production" Condition="'$(Configuration)' == 'Release'" Visible="false" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls"/>
