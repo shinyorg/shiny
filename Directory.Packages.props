@@ -19,6 +19,7 @@
     <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
         <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
+        <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
         <PackageVersion Include="Shiny.Reflector" Version="1.7.2"/>
         <PackageVersion Include="System.Reactive" Version="6.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>

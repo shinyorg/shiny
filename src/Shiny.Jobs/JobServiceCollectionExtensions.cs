@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
 
             services.AddSingleton<JobManager>();
             services.AddSingleton<IJobManager>(sp => sp.GetRequiredService<JobManager>());
-#if IOS || MACCATALYST
+#if IOS || MACCATALYST || ANDROID || WINDOWS
             services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<JobManager>());
 #endif
         }

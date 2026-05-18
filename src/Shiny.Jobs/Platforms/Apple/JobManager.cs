@@ -30,6 +30,9 @@ public class JobManager(
             this.RegisterBgTask(GetCategoryId(false, true));
             this.RegisterBgTask(GetCategoryId(true, true));
             this.registeredSuccessfully = true;
+
+            foreach (var (_, reg) in this.GetJobs())
+                this.ScheduleNative(reg);
         }
         catch (Exception ex)
         {
@@ -104,7 +107,7 @@ public class JobManager(
     }
 
 
-    internal void ScheduleNative(JobRegistration reg)
+    void ScheduleNative(JobRegistration reg)
     {
 #if IOS
         if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)

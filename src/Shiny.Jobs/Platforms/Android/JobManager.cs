@@ -11,7 +11,7 @@ using P = Android.Manifest.Permission;
 namespace Shiny.Jobs;
 
 
-public class JobManager : AbstractJobManager
+public class JobManager : AbstractJobManager, IShinyStartupTask
 {
     readonly AndroidPlatform platform;
 
@@ -24,6 +24,9 @@ public class JobManager : AbstractJobManager
     {
         this.platform = platform;
     }
+
+
+    public void Start() => this.RegisterNativeCategories();
 
 
     public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);

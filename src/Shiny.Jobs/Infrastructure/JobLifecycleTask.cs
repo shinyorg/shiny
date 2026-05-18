@@ -48,13 +48,6 @@ public class JobLifecycleTask(
                 abstractManager.AddRegistrations(registrar.Jobs);
 
             logger.LogDebug("Registered {Count} job(s)", registrar.Jobs.Count);
-
-#if ANDROID
-            ((Shiny.Jobs.JobManager)jobManager).RegisterNativeCategories();
-#elif IOS || MACCATALYST
-            foreach (var (_, reg) in registrar.Jobs)
-                ((Shiny.Jobs.JobManager)jobManager).ScheduleNative(reg);
-#endif
         }
         catch (Exception ex)
         {

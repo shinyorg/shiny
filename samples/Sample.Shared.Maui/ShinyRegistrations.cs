@@ -49,9 +49,9 @@ public static class ShinyRegistrations
         s.AddMotionActivity<SampleMotionActivityDelegate>();
 #endif
 
-#if !MACOS && !WINDOWS
-        // Jobs: iOS, Android, and MacCatalyst.
-        // MacOS and Windows samples do not exercise the jobs subsystem.
+#if !MACOS
+        // Jobs: iOS, Android, MacCatalyst, and Windows (in-proc COM-activated).
+        // MacOS does not expose a background-task scheduler we wrap today.
         s.AddJob<SampleJob>(new JobRegistration("SampleJob", typeof(SampleJob), RunOnForeground: true));
 #endif
 
