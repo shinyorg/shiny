@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>$(TargetFrameworks);$(BaseTargetFramework)</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <!--<TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>-->
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
@@ -27,10 +27,6 @@
 
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
         <PackageReference Include="Microsoft.WindowsAppSDK" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Platforms\Shared\" />
     </ItemGroup>
 
 </Project>
