@@ -11,8 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Platform.Maui.Linux.Gtk4"/>
-        <PackageReference Include="Platform.Maui.Linux.Gtk4.Essentials"/>
+        <PackageReference Include="Microsoft.Maui.Platforms.Linux.Gtk4"/>
+        <PackageReference Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials"/>
     </ItemGroup>
 
     <ItemGroup>

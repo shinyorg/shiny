@@ -6,21 +6,20 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Shiny.Maui.Shell" Version="6.0.3"/>
+        <PackageVersion Include="Shiny.Maui.Shell" Version="6.1.0"/>
         <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0077"/>
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Platform.Maui.MacOS" Version="0.3.0"/>
-        <PackageVersion Include="Platform.Maui.MacOS.Essentials" Version="0.3.0"/>
-        <PackageVersion Include="Platform.Maui.Linux.Gtk4" Version="0.6.0"/>
-        <PackageVersion Include="Platform.Maui.Linux.Gtk4.Essentials" Version="0.6.0"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS" Version="0.1.0-preview.9.26258.5"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS.Essentials" Version="0.1.0-preview.9.26258.5"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4" Version="0.1.0-preview.9.26258.5"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials" Version="0.1.0-preview.9.26258.5"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
         <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
         <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
-        <PackageVersion Include="Shiny.Reflector" Version="1.7.2"/>
         <PackageVersion Include="System.Reactive" Version="6.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MsftExtensionVersion)"/>

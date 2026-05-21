@@ -16,8 +16,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Platform.Maui.MacOS" />
-        <PackageReference Include="Platform.Maui.MacOS.Essentials" />
+        <PackageReference Include="Microsoft.Maui.Platforms.MacOS" />
+        <PackageReference Include="Microsoft.Maui.Platforms.MacOS.Essentials" />
     </ItemGroup>
 
     <ItemGroup>
