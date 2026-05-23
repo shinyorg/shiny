@@ -1,4 +1,4 @@
-using Platform.Maui.Linux.Gtk4.Platform;
+using Microsoft.Maui.Platforms.Linux.Gtk4.Platform;
 
 namespace Sample.Linux;
 

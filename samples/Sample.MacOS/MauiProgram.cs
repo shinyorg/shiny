@@ -1,5 +1,5 @@
-using Microsoft.Maui.Essentials.MacOS;
-using Microsoft.Maui.Platform.MacOS.Hosting;
+using Microsoft.Maui.Platforms.MacOS.Essentials;
+using Microsoft.Maui.Platforms.MacOS.Hosting;
 using Sample.Maui;
 using Sample.Shared.Maui;
 

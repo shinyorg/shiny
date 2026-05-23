@@ -1,8 +1,7 @@
-using Platform.Maui.Linux.Gtk4.Essentials.Hosting;
-using Platform.Maui.Linux.Gtk4.Hosting;
+using Microsoft.Maui.Platforms.Linux.Gtk4.Essentials.Hosting;
+using Microsoft.Maui.Platforms.Linux.Gtk4.Hosting;
 using Sample.Maui;
 using Sample.Shared.Maui;
-using Sample.Shared.Maui.Delegates;
 
 namespace Sample.Linux;
 
