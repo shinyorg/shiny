@@ -222,7 +222,7 @@ public class GeofenceManager(
         // by iOS for a geofence event, the prior process's instance can still be considered "open"
         // and RequestMonitor throws NSInternalInconsistencyException. A short retry usually clears it.
         const int maxAttempts = 3;
-        for (var attempt = 1; ; attempt++)
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
             try
             {
@@ -231,17 +231,23 @@ public class GeofenceManager(
                 // CLMonitor re-attaches to OS-persisted conditions and fires their current state
                 // immediately on cold start. Prime initialFires so the event handler suppresses those
                 // first fires - only state CHANGES after this point should reach delegates.
-                foreach (var id in mon.MonitoredIdentifiers ?? [])
-                    this.initialFires.TryAdd(id, 0);
+                // MonitoredIdentifiers must be touched on the queue CLMonitor was configured with (MainQueue)
+                // or CoreLocation will native-crash the process.
+                await platform.InvokeOnMainThreadAsync(() =>
+                {
+                    foreach (var id in mon.MonitoredIdentifiers ?? [])
+                        this.initialFires.TryAdd(id, 0);
+                }).ConfigureAwait(false);
 
                 return mon;
             }
-            catch (ObjCException ex) when (attempt < maxAttempts && ex.Reason?.Contains("already in use") == true)
+            catch (Exception ex) when (attempt < maxAttempts)
             {
-                logger.LogWarning(ex, "CLMonitor \"shinygeofences\" reported already-in-use (attempt {Attempt}/{Max}) - retrying", attempt, maxAttempts);
+                logger.LogWarning(ex, "CLMonitor.RequestMonitor failed (attempt {Attempt}/{Max}) - retrying", attempt, maxAttempts);
                 await Task.Delay(TimeSpan.FromMilliseconds(250 * attempt)).ConfigureAwait(false);
             }
         }
+        throw new InvalidOperationException($"Failed to acquire CLMonitor after {maxAttempts} attempts");
     }
 
 
