@@ -61,6 +61,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm"/>
         <PackageReference Include="Shiny.Maui.Controls" />
         <PackageReference Include="Shiny.Maui.Shell"/>
+        <PackageReference Include="Microsoft.Maui.DevFlow.Agent" Condition="'$(Configuration)' == 'Debug'" />
     </ItemGroup>
 
     <ItemGroup>

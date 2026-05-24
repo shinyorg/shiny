@@ -35,7 +35,7 @@ public class GeofenceManager(
 
                 var mon = await this.GetMonitor().ConfigureAwait(false);
                 if (mon != null)
-                    this.Reconcile(mon, regions);
+                    await platform.InvokeOnMainThreadAsync(() => this.Reconcile(mon, regions)).ConfigureAwait(false);
             }
         }
         catch (Exception ex)
@@ -45,6 +45,7 @@ public class GeofenceManager(
     }
 
 
+    // Must be invoked on the dispatch queue the CLMonitor was configured with (MainQueue).
     void Reconcile(CLMonitor mon, IReadOnlyList<GeofenceRegion> regions)
     {
         var iosIds = new HashSet<string>(mon.MonitoredIdentifiers ?? []);
@@ -85,14 +86,22 @@ public class GeofenceManager(
             DispatchQueue.MainQueue,
             diag =>
             {
-                if (diag.AuthorizationRequestInProgress)
-                    return;
+                // Callback runs on MainQueue as an Action; an unhandled throw here would terminate the app.
+                try
+                {
+                    if (diag is null || diag.AuthorizationRequestInProgress)
+                        return;
 
-                this.CurrentStatus = (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
-                    ? AccessState.Denied
-                    : AccessState.Available;
+                    this.CurrentStatus = (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
+                        ? AccessState.Denied
+                        : AccessState.Available;
 
-                this.authTcs?.TrySetResult(this.CurrentStatus);
+                    this.authTcs?.TrySetResult(this.CurrentStatus);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error handling CLServiceSession diagnostic");
+                }
             }
         );
     }
@@ -117,20 +126,22 @@ public class GeofenceManager(
     
     public async Task StartMonitoring(GeofenceRegion region)
     {
-        var mon = await this.GetMonitor();
-        this.AddToMonitor(mon, region);
+        // CLMonitor needs an active CLServiceSession to deliver events when the app is backgrounded.
+        this.EnsureSession();
+        var mon = await this.GetMonitor().ConfigureAwait(false);
+        await platform.InvokeOnMainThreadAsync(() => this.AddToMonitor(mon, region)).ConfigureAwait(false);
         repository.Insert(region);
     }
 
-    
+
     public async Task StopMonitoring(string identifier)
     {
         repository.Remove<GeofenceRegion>(identifier);
-        var mon = await this.GetMonitor();
-        mon.RemoveCondition(identifier);
-        
+        var mon = await this.GetMonitor().ConfigureAwait(false);
+        await platform.InvokeOnMainThreadAsync(() => mon.RemoveCondition(identifier)).ConfigureAwait(false);
+
         if (repository.GetAll<GeofenceRegion>().Count == 0)
-            this.DestroyMonitor();
+            await this.DestroyMonitor().ConfigureAwait(false);
     }
     
 
@@ -163,9 +174,14 @@ public class GeofenceManager(
         if (region is { NotifyOnEntry: false, NotifyOnExit: false })
             throw new InvalidOperationException("Region is not set to notify on entry or exit");
 
-        var rec = mon.GetMonitoringRecord(region.Identifier);
-        if (rec != null)
-            throw new InvalidOperationException($"A region with the identifier '{region.Identifier}' already exists");
+        // CLMonitor persists conditions at the OS level keyed by monitor name, so an existing
+        // record here means a prior install/session left an orphan (or the caller is re-adding
+        // with updated parameters). Remove and re-add so the new condition takes effect.
+        if (mon.GetMonitoringRecord(region.Identifier) != null)
+        {
+            logger.LogInformation("Replacing existing geofence condition {Identifier}", region.Identifier);
+            mon.RemoveCondition(region.Identifier);
+        }
 
         var condition = new CLCircularGeographicCondition(
             new CLLocationCoordinate2D(region.Center.Latitude, region.Center.Longitude),
@@ -210,7 +226,15 @@ public class GeofenceManager(
         {
             try
             {
-                return await CLMonitor.RequestMonitorAsync(this.BuildConfiguration()).ConfigureAwait(false);
+                var mon = await CLMonitor.RequestMonitorAsync(this.BuildConfiguration()).ConfigureAwait(false);
+
+                // CLMonitor re-attaches to OS-persisted conditions and fires their current state
+                // immediately on cold start. Prime initialFires so the event handler suppresses those
+                // first fires - only state CHANGES after this point should reach delegates.
+                foreach (var id in mon.MonitoredIdentifiers ?? [])
+                    this.initialFires.TryAdd(id, 0);
+
+                return mon;
             }
             catch (ObjCException ex) when (attempt < maxAttempts && ex.Reason?.Contains("already in use") == true)
             {
@@ -226,29 +250,38 @@ public class GeofenceManager(
         DispatchQueue.MainQueue,
         async (mon, evt) =>
         {
-            // CLMonitor fires an initial event when a condition is first added - suppress it
-            if (this.initialFires.TryRemove(evt.Identifier, out _))
+            // Handler runs on MainQueue as a void-returning delegate; unhandled throws would terminate the app.
+            try
             {
-                logger.LogDebug("Geofence initial state fire suppressed for {Identifier}", evt.Identifier);
-                return;
-            }
-
-            var region = repository.Get<GeofenceRegion>(evt.Identifier);
-            if (region != null)
-            {
-                switch (evt.State)
+                // CLMonitor fires an initial event when a condition is first added (and after cold-start
+                // re-attach) - suppress those. Real state changes after that get through.
+                if (this.initialFires.TryRemove(evt.Identifier, out _))
                 {
-                    case CLMonitoringState.Satisfied:
-                        if (region.NotifyOnEntry)
-                            await this.FireDelegate(region, evt).ConfigureAwait(false);
-
-                        break;
-
-                    case CLMonitoringState.Unsatisfied:
-                        if (region.NotifyOnExit)
-                            await this.FireDelegate(region, evt).ConfigureAwait(false);
-                        break;
+                    logger.LogDebug("Geofence initial state fire suppressed for {Identifier}", evt.Identifier);
+                    return;
                 }
+
+                var region = repository.Get<GeofenceRegion>(evt.Identifier);
+                if (region != null)
+                {
+                    switch (evt.State)
+                    {
+                        case CLMonitoringState.Satisfied:
+                            if (region.NotifyOnEntry)
+                                await this.FireDelegate(region, evt).ConfigureAwait(false);
+
+                            break;
+
+                        case CLMonitoringState.Unsatisfied:
+                            if (region.NotifyOnExit)
+                                await this.FireDelegate(region, evt).ConfigureAwait(false);
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error handling geofence event for {Identifier}", evt?.Identifier);
             }
         }
     );
