@@ -49,17 +49,13 @@ public static class ShinyRegistrations
         s.AddMotionActivity<SampleMotionActivityDelegate>();
 #endif
 
-#if PLATFORM && !MACOS
-        // Jobs: iOS, Android, MacCatalyst, and Windows (in-proc COM-activated).
+#if !(PLATFORM && MACOS)
+        // Jobs: iOS, Android, MacCatalyst, Windows (in-proc COM-activated), and bare .NET (in-proc).
         // MacOS does not expose a background-task scheduler we wrap today.
-        s.AddJob<SampleJob>(new JobRegistration("SampleJob", typeof(SampleJob), RunOnForeground: true));
-#elif !PLATFORM
-        // Bare target (no platform) uses the in-proc .NET JobManager which exposes a fluent builder.
-        s.AddJob<SampleJob>(b =>
-        {
-            b.Id = "SampleJob";
-            b.Foreground = true;
-        });
+        s.AddJob<SampleJob>(r => r
+            .WithIdentifier("SampleJob")
+            .WithForeground()
+        );
 #endif
 
         return builder;

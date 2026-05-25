@@ -13,9 +13,12 @@ public static class ServiceCollectionExtensions
 {
 
     /// <summary>
-    /// Register a singleton job with optional fluent configuration
+    /// Register a singleton job with optional fluent configuration.
     /// </summary>
-    public static IServiceCollection AddJob<TJob>(this IServiceCollection services, JobRegistration? registration = null)
+    /// <example>
+    /// <code>services.AddJob&lt;MyJob&gt;(r =&gt; r.WithIdentifier("MyJob").WithForeground());</code>
+    /// </example>
+    public static IServiceCollection AddJob<TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
         where TJob : class, IJob
     {
         services.AddConnectivity();
@@ -43,7 +46,7 @@ public static class ServiceCollectionExtensions
         }
 
         var registrar = (JobRegistrar)services.Single(x => x.ImplementationInstance is JobRegistrar).ImplementationInstance!;
-        registrar.Register<TJob>(registration);
+        registrar.Register<TJob>(configure);
 
         return services;
     }

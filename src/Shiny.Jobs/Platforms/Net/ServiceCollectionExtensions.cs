@@ -7,16 +7,6 @@ using Shiny.Jobs;
 namespace Shiny;
 
 
-public class JobBuilder
-{
-    public string? Id { get; set; }
-    public bool Foreground { get; set; }
-    public InternetAccess Network { get; set; } = InternetAccess.None;
-    public bool Charging { get; set; }
-    public bool BatteryOk { get; set; }
-}
-
-
 public static class ServiceCollectionExtensions
 {
     static readonly List<JobRegistration> registeredJobs = new();
@@ -25,19 +15,16 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Register a job with optional fluent configuration for plain .NET targets.
     /// </summary>
-    public static IServiceCollection AddJob<TJob>(this IServiceCollection services, Action<JobBuilder>? configure = null)
+    /// <example>
+    /// <code>services.AddJob&lt;MyJob&gt;(r =&gt; r.WithIdentifier("MyJob").WithForeground());</code>
+    /// </example>
+    public static IServiceCollection AddJob<TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
         where TJob : class, IJob
     {
-        var builder = new JobBuilder();
-        configure?.Invoke(builder);
-        var reg = new JobRegistration(
-            builder.Id ?? typeof(TJob).FullName!,
-            typeof(TJob),
-            builder.Foreground,
-            builder.Network,
-            builder.Charging,
-            builder.BatteryOk
-        );
+        var reg = new JobRegistration(typeof(TJob).FullName!, typeof(TJob));
+        if (configure != null)
+            reg = configure(reg);
+
         registeredJobs.Add(reg);
         services.AddSingleton<TJob>();
         services.AddSingleton<IJob>(sp => sp.GetRequiredService<TJob>());
