@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CoreFoundation;
 using Microsoft.Extensions.Logging;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores.Repositories;
 using CoreLocation;
 
 namespace Shiny.Locations;

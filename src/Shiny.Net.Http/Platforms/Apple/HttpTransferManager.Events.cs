@@ -3,7 +3,7 @@ using System.IO;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Security;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores.Repositories;
 
 namespace Shiny.Net.Http;
 

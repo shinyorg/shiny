@@ -5,8 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 #if APPLE
 using Foundation;
 #endif
@@ -17,7 +18,7 @@ namespace Shiny.Push;
 public class AzureNotificationHubsPushProvider(
     AzureNotificationConfig config,
     IServiceProvider services,
-    IKeyValueStore store,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<AzureNotificationHubsPushProvider> logger
 ) : IPushProvider, IPushTagSupport
 {

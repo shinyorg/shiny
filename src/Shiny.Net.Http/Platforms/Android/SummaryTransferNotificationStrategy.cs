@@ -3,7 +3,7 @@
 //using System.Reactive.Linq;
 //using AndroidX.Core.App;
 //using Microsoft.Extensions.Logging;
-//using Shiny.Support.Repositories;
+//using Shiny.Extensions.Stores.Repositories;
 
 //namespace Shiny.Net.Http;
 

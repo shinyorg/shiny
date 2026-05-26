@@ -14,6 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.JSInterop" />
+        <PackageReference Include="Shiny.Extensions.Stores.Web" />
     </ItemGroup>
 
 </Project>

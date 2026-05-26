@@ -6,9 +6,10 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using CoreLocation;
-using Shiny.Hosting;
-using Shiny.Stores;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores;
+using Shiny.Hosting;
 
 namespace Shiny.Notifications;
 
@@ -19,7 +20,7 @@ public class NotificationManager(
     ILogger<NotificationManager> logger,
     IPlatform platform,
     IChannelManager channelManager,
-    IKeyValueStore settings
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings
 ) : INotificationManager, IIosLifecycle.INotificationHandler
 {
     public void AddChannel(Channel channel) => channelManager.Add(channel);

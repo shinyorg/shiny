@@ -8,8 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Locations;
-using Shiny.Stores;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores;
+using Shiny.Extensions.Stores.Repositories;
 using P = Android.Manifest.Permission;
 
 namespace Shiny.Notifications;
@@ -22,7 +22,7 @@ public partial class NotificationManager(
     IRepository repository,
     IChannelManager channelManager,
     IGeofenceManager geofenceManager,
-    IKeyValueStore settings,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings,
     ILogger<NotificationManager> logger
 ) : INotificationManager, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent
 {

@@ -12,9 +12,9 @@ using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.Content;
 using AndroidX.Core.App;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny.Extensions.Stores;
 using Shiny.Hosting;
-using Shiny.Stores;
-using Shiny.Stores.Impl;
 
 namespace Shiny;
 
@@ -29,9 +29,9 @@ public partial class AndroidPlatform : IPlatform,
     readonly ConcurrentDictionary<int, TaskCompletionSource<PermissionRequestResult>> pendingPermissions = new();
 
     static AndroidActivityLifecycle activityLifecycle; // this should never change once installed on the platform
-    readonly SettingsKeyValueStore store;
+    readonly IKeyValueStore store;
 
-    public AndroidPlatform()
+    public AndroidPlatform([FromKeyedServices(StoreKeys.Default)] IKeyValueStore store)
     {
         var app = (Application)Application.Context;
         activityLifecycle ??= new(app);
@@ -42,7 +42,7 @@ public partial class AndroidPlatform : IPlatform,
         if (publicDir != null)
             this.Public = new DirectoryInfo(publicDir.AbsolutePath);
 
-        this.store = new(this, new DefaultSerializer());
+        this.store = store;
         this.requestedPermissions = this.store.Get<List<string>>(PermissionsKey) ?? new List<string>();
     }
 

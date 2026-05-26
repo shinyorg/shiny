@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores.Repositories;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
 using WinGeofenceState = Windows.Devices.Geolocation.Geofencing.GeofenceState;

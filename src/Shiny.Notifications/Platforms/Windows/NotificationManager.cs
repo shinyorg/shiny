@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores;
+using Shiny.Extensions.Stores.Repositories;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 
@@ -16,7 +17,7 @@ public class NotificationManager(
     IServiceProvider services,
     IChannelManager channelManager,
     IRepository repository,
-    IKeyValueStore settings,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings,
     ILogger<NotificationManager> logger
 ) : INotificationManager
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores.Repositories;
 
 namespace Shiny.Notifications;
 

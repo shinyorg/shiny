@@ -3,8 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreLocation;
 using Foundation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 using UIKit;
 
 namespace Shiny.Locations;
@@ -21,7 +22,7 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
     readonly IKeyValueStore store;
 
 
-    public CLLocationGpsManager(IServiceProvider services, IKeyValueStore store, ILogger<IGpsManager> logger)
+    public CLLocationGpsManager(IServiceProvider services, [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store, ILogger<IGpsManager> logger)
     {
         this.services = services;
         this.store = store;

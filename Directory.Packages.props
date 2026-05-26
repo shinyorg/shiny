@@ -8,6 +8,9 @@
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
         <PackageVersion Include="Shiny.Maui.Shell" Version="6.1.0"/>
         <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0077"/>
+        <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="4.0.0-beta-0058"/>
+        <PackageVersion Include="Shiny.Extensions.Stores" Version="4.0.0-beta-0058"/>
+        <PackageVersion Include="Shiny.Extensions.Stores.Web" Version="4.0.0-beta-0058"/>
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>

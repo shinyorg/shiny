@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores.Repositories;
 
 namespace Shiny.Net.Http;
 

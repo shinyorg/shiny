@@ -6,7 +6,7 @@ using AppKit;
 using Foundation;
 using UserNotifications;
 using Shiny.Hosting;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +19,7 @@ public class NotificationManager(
     ILogger<NotificationManager> logger,
     IPlatform platform,
     IChannelManager channelManager,
-    IKeyValueStore settings
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings
 ) : INotificationManager, IMacLifecycle.INotificationHandler
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates = new(() => services.GetRequiredService<IEnumerable<INotificationDelegate>>());

@@ -17,4 +17,4 @@ public record GeofenceRegion(
     bool SingleUse = false,
     bool NotifyOnEntry = true,
     bool NotifyOnExit = true
-) : Shiny.Support.Repositories.IRepositoryEntity;
+) : Shiny.Extensions.Stores.Repositories.IRepositoryEntity;

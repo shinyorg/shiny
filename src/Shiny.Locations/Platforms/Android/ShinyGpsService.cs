@@ -6,7 +6,7 @@ using Android.OS;
 namespace Shiny.Locations;
 
 
-[Service(
+[Android.App.Service(
     Enabled = true,
     Exported = true,
     ForegroundServiceType = ForegroundService.TypeLocation

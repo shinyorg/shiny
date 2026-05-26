@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 
 namespace Shiny.Push.Blazor;
 
@@ -13,7 +14,7 @@ public class PushManager(
     IJSRuntime jsRuntime,
     WebPushOptions options,
     IServiceProvider services,
-    IKeyValueStore store,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<PushManager> logger
 ) : IPushManager, IAsyncDisposable
 {

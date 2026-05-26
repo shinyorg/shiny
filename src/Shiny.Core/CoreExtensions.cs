@@ -10,42 +10,6 @@ namespace Shiny;
 
 public static class CoreExtensions
 {
-     /// <summary>
-    /// Checks if a service collection has a service registered for the specified type
-    /// </summary>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    public static bool HasService<TService>(this IServiceCollection services)
-        => services.HasService(typeof(TService));
-
-    /// <summary>
-    /// Checks if a service collection has a service registered for the specified type
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="serviceType"></param>
-    /// <returns></returns>
-    public static bool HasService(this IServiceCollection services, Type serviceType)
-        => services.Any(x => x.ServiceType == serviceType);
-
-    /// <summary>
-    /// Checks if a service collection has an implementation registered for the specified type
-    /// </summary>
-    /// <typeparam name="TImpl"></typeparam>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    public static bool HasImplementation<TImpl>(this IServiceCollection services)
-        => services.HasImplementation(typeof(TImpl));
-
-    /// <summary>
-    /// Checks if a service collection has an implementation registered for the specified type
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="implementationType"></param>
-    /// <returns></returns>
-    public static bool HasImplementation(this IServiceCollection services, Type implementationType)
-        => services.Any(x => x.ServiceKey == null && x.ImplementationType == implementationType);
-
-
     public static async Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, ILogger logger)
     {
         try

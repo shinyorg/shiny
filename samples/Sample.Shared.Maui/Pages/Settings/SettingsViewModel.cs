@@ -1,10 +1,12 @@
+using Microsoft.Extensions.DependencyInjection;
+using Shiny.Extensions.Stores;
 using Shiny.Net;
 using Shiny.Power;
 
 namespace Sample.Shared.Maui.Pages.Settings;
 
 [ShellMap<SettingsPage>("settings")]
-public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shiny.Power.IBattery battery, IKeyValueStore store) : ObservableObject, IPageLifecycleAware
+public partial class SettingsViewModel(Shiny.Net.IConnectivity connectivity, Shiny.Power.IBattery battery, [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store) : ObservableObject, IPageLifecycleAware
 {
     [ObservableProperty] string networkAccess = string.Empty;
     [ObservableProperty] string connectionTypes = string.Empty;

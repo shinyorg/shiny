@@ -6,7 +6,7 @@ using Android.OS;
 namespace Shiny.Net.Http;
 
 
-[Service(
+[Android.App.Service(
     Enabled = true,
     Exported = true,
     ForegroundServiceType = ForegroundService.TypeDataSync

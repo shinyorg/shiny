@@ -4,7 +4,7 @@ using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
 using Java.Lang;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
 
 namespace Shiny.Notifications;

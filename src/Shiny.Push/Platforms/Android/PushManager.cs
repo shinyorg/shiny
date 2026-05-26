@@ -10,9 +10,10 @@ using Android.OS;
 using Android.Runtime;
 using Firebase;
 using Firebase.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores;
 using Shiny.Hosting;
-using Shiny.Stores;
 
 namespace Shiny.Push;
 
@@ -21,7 +22,7 @@ public class PushManager(
     AndroidPlatform platform,
     FirebaseConfig config,
     IServiceProvider services,
-    IKeyValueStore store,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<PushManager> logger,
     IPushProvider? pushProvider = null
 ) : IPushManager, IShinyStartupTask, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent

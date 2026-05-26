@@ -4,8 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreLocation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 
 namespace Shiny.Locations;
 
@@ -14,7 +15,7 @@ namespace Shiny.Locations;
 [SupportedOSPlatform("maccatalyst18.0")]
 public class GpsManager(
     IServiceProvider services,
-    IKeyValueStore store,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<IGpsManager> logger
 ) : IGpsManager, IShinyStartupTask
 {

@@ -7,7 +7,7 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Hosting;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,7 +17,7 @@ namespace Shiny.Push;
 public class PushManager(
     IServiceProvider services,
     IPlatform platform,
-    IKeyValueStore store,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<PushManager> logger,
     IPushProvider? provider = null
 ) :

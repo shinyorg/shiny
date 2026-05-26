@@ -7,7 +7,7 @@ using Android.App;
 using Android.Gms.Location;
 using Microsoft.Extensions.Logging;
 using P = Android.Manifest.Permission;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores.Repositories;
 
 namespace Shiny.Locations;
 

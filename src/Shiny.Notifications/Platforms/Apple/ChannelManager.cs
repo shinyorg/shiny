@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Shiny.Support.Repositories;
+using Shiny.Extensions.Stores.Repositories;
 using Foundation;
 using UserNotifications;
 

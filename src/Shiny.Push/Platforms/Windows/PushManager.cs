@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Stores;
+using Shiny.Extensions.Stores;
 using Windows.Networking.PushNotifications;
 
 namespace Shiny.Push;
@@ -11,7 +12,7 @@ namespace Shiny.Push;
 
 public class PushManager(
     IServiceProvider services,
-    IKeyValueStore store,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<PushManager> logger,
     IPushProvider? provider = null
 ) : IPushManager
