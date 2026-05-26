@@ -49,24 +49,113 @@ public abstract class ShinyAndroidForegroundService : Service
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
     {
-        this.Logger.LogDebug($"Foreground Service OnStartCommand - Action: {intent?.Action} - Notification ID: {this.NotificationId}");
-        switch (intent?.Action)
+        // Android kills the process with ForegroundServiceDidNotStartInTimeException if
+        // startForeground() isn't called within ~5s of startForegroundService(). Promote
+        // to foreground before any DI lookup or action dispatch that could throw or stall.
+        this.PromoteToForegroundSafely();
+        this.TryFlushPendingLogs();
+
+        try
         {
-            case AndroidPlatform.ActionServiceStart:
-                this.StopWithTask = intent.GetBooleanExtra(AndroidPlatform.IntentActionStopWithTask, false);
-                this.Start(intent);
-                break;
+            this.Logger.LogDebug($"Foreground Service OnStartCommand - Action: {intent?.Action} - Notification ID: {this.NotificationId}");
 
-            case AndroidPlatform.ActionServiceStop:
-                this.Stop();
-                break;
+            // null intent means Android re-created the service after a process kill -
+            // resume as if it were a fresh start so tracking can re-arm itself.
+            switch (intent?.Action ?? AndroidPlatform.ActionServiceStart)
+            {
+                case AndroidPlatform.ActionServiceStart:
+                    this.StopWithTask = intent?.GetBooleanExtra(AndroidPlatform.IntentActionStopWithTask, false) ?? false;
+                    this.Start(intent);
+                    break;
 
-            default:
-                this.Logger.LogDebug($"Invalid Intent Action - {intent?.Action}");
-                break;
+                case AndroidPlatform.ActionServiceStop:
+                    this.Stop();
+                    break;
+
+                default:
+                    this.Logger.LogDebug($"Unknown Intent Action - {intent?.Action}");
+                    break;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            // Already in foreground at this point - swallow so the process survives.
+            try { this.Logger.LogError(ex, "Foreground service OnStartCommand failed"); } catch { }
         }
 
-        return StartCommandResult.Sticky;
+        return StartCommandResult.RedeliverIntent;
+    }
+
+
+    bool isPromoted;
+    void PromoteToForegroundSafely()
+    {
+        if (this.isPromoted)
+            return;
+
+        try
+        {
+            var ctx = this.ApplicationContext!;
+            var nm = NotificationManagerCompat.From(ctx);
+
+            if (nm.GetNotificationChannel(NotificationChannelId) == null)
+            {
+                var channel = new NotificationChannel(NotificationChannelId, NotificationChannelId, NotificationImportance.Default);
+                channel.SetShowBadge(false);
+                nm.CreateNotificationChannel(channel);
+            }
+
+            // Resolve icon without DI: prefer drawable/notification, fall back to app icon.
+            var iconId = ctx.Resources?.GetIdentifier("notification", "drawable", ctx.PackageName) ?? 0;
+            if (iconId <= 0)
+                iconId = ctx.ApplicationInfo?.Icon ?? Android.Resource.Drawable.SymDefAppIcon;
+
+            var placeholder = new NotificationCompat.Builder(ctx, NotificationChannelId)
+                .SetSmallIcon(iconId)
+                .SetForegroundServiceBehavior((int)NotificationForegroundService.Immediate)
+                .SetOngoing(true)
+                .SetOnlyAlertOnce(true)
+                .SetContentTitle("Shiny Service")
+                .SetContentText("Shiny service is continuing to process data in the background")
+                .Build();
+            placeholder.Flags |= NotificationFlags.ForegroundService;
+
+            ServiceCompat.StartForeground(this, this.NotificationId, placeholder, (int)this.StartForegroundServiceType);
+            this.isPromoted = true;
+            this.pendingPromoteLog = ($"{this.GetType().Name} promoted to foreground (id={this.NotificationId}, type={this.StartForegroundServiceType})", null);
+        }
+        catch (System.Exception ex)
+        {
+            // Capture for deferred logging via ILogger once the Host is ready.
+            // The original StartForeground in Start() may still succeed for non-restart paths.
+            this.pendingPromoteLog = ($"{this.GetType().Name} failed to promote to foreground", ex);
+        }
+    }
+
+
+    (string Message, System.Exception? Exception)? pendingPromoteLog;
+    void TryFlushPendingLogs()
+    {
+        if (this.pendingPromoteLog == null)
+            return;
+
+        if (!Shiny.Hosting.Host.IsInitialized)
+            return;
+
+        try
+        {
+            var (msg, ex) = this.pendingPromoteLog.Value;
+            if (ex == null)
+                this.Logger.LogInformation(msg);
+            else
+                this.Logger.LogError(ex, msg);
+
+            this.pendingPromoteLog = null;
+        }
+        catch
+        {
+            // Logger resolution can still fail mid-boot; leave queued for next attempt.
+        }
     }
 
 
@@ -81,6 +170,7 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected virtual void Start(Intent? intent)
     {
+        this.TryFlushPendingLogs();
         this.NotificationManager = NotificationManagerCompat.From(this.Platform.AppContext);
         this.DestroyWith = new DisposableCollection();
 
@@ -91,7 +181,9 @@ public abstract class ShinyAndroidForegroundService : Service
         var notification = this.Builder.Build();
         notification.Flags |= NotificationFlags.ForegroundService;
 
+        // Replace the placeholder posted by PromoteToForegroundSafely with the configured one.
         ServiceCompat.StartForeground(this, this.NotificationId, notification, (int)this.StartForegroundServiceType);
+        this.isPromoted = true;
         this.Logger.LogDebug("Started Foreground Service");
 
         this.OnStart(intent);
@@ -100,11 +192,13 @@ public abstract class ShinyAndroidForegroundService : Service
 
     protected void Stop()
     {
+        this.TryFlushPendingLogs();
         this.Logger.LogDebug($"Calling for foreground service stop.  Notification ID: {this.NotificationId}");
         this.DestroyWith?.Dispose();
         this.DestroyWith = null;
 
         ServiceCompat.StopForeground(this, ServiceCompat.StopForegroundRemove);
+        this.isPromoted = false;
         this.StopSelf();
 
         this.Logger.LogDebug("Foreground service stopped successfully");
