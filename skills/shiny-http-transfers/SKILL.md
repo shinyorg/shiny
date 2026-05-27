@@ -50,7 +50,7 @@ Use this skill when the user needs to:
 | NuGet       | `Shiny.Net.Http`, `Shiny.Net.Http.Blazor`                                               |
 | Namespace   | `Shiny.Net.Http`                                                                        |
 | Platforms   | iOS, Android (native); Windows, Linux, macOS, .NET base (managed loop); Blazor WASM (SW) |
-| DI Setup    | `services.AddHttpTransfers<TDelegate>()` — or `services.AddBlazorHttpTransfers<TDelegate>()` on Blazor |
+| DI Setup    | `services.AddHttpTransfers<TDelegate>()` (iOS/Android/Windows), `services.AddHttpClientTransfers<TDelegate>()` (Linux/macOS/plain .NET), or `services.AddBlazorHttpTransfers<TDelegate>()` (Blazor) |
 
 The registration extension methods live in the `Shiny` namespace and are available on `IServiceCollection`.
 
@@ -112,9 +112,9 @@ public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
 #endif
 ```
 
-### Linux / macOS / Windows / Plain .NET Setup
+### Linux / macOS / Plain .NET Setup
 
-On these targets `AddHttpTransfers<TDelegate>()` registers a managed `HttpTransferManager` backed by an `HttpClient` loop. The loop is driven by `IConnectivity` and wakes immediately on connectivity changes. Downloads resume after network interruption via HTTP Range requests (`Range: bytes=N-`, `FileMode.Append` when the server responds with `206 Partial Content`); uploads always restart from scratch.
+On non-platform .NET hosts (Linux, macOS server, console apps, etc.) call `AddHttpClientTransfers<TDelegate>()` instead of `AddHttpTransfers<TDelegate>()`. It registers `HttpClientHttpTransferManager` backed by an `HttpClient` loop driven by `IConnectivity` that wakes immediately on connectivity changes. Downloads resume after network interruption via HTTP Range requests (`Range: bytes=N-`, `FileMode.Append` when the server responds with `206 Partial Content`); uploads always restart from scratch.
 
 You must register an `IConnectivity` implementation yourself (e.g. `AddConnectivity()` from `Shiny.Core.Linux` or `Shiny.Core.Blazor`). A default JSON filesystem repository is registered automatically and persists transfer state to `{LocalApplicationData}/Shiny` across process restarts.
 

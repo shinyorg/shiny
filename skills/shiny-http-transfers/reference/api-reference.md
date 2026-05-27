@@ -23,10 +23,17 @@ using Shiny;
 ## DI Registration
 
 ```csharp
-public static class ServiceCollectionExtensions
+public static class HttpTransferServiceCollectionExtensions
 {
-    // Registers IHttpTransferManager, the delegate, HttpTransferMonitor, and all platform infrastructure
+    // Platform-aware registration for iOS/Android/Windows.
+    // Registers IHttpTransferManager, the delegate, HttpTransferMonitor, and platform infrastructure.
     public static IServiceCollection AddHttpTransfers<TDelegate>(this IServiceCollection services)
+        where TDelegate : class, IHttpTransferDelegate;
+
+    // Explicit registration for Linux, macOS server, and other plain .NET hosts.
+    // Registers HttpClientHttpTransferManager + HttpClientHttpTransferProcess (managed HttpClient loop).
+    // Requires an IConnectivity implementation to be registered separately.
+    public static IServiceCollection AddHttpClientTransfers<TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate;
 }
 ```
