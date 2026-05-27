@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores.Repositories;
 
-namespace Shiny.Net.Http;
+namespace Shiny.Net.Http.Infrastructure;
 
 
-public class StandardHttpTransferProcess(
-    ILogger<StandardHttpTransferProcess> logger,
+public class HttpClientHttpTransferProcess(
+    ILogger<HttpClientHttpTransferProcess> logger,
     IRepository repository,
     IConnectivity connectivity,
     IEnumerable<IHttpTransferDelegate> delegates

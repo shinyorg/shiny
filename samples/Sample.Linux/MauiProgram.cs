@@ -25,7 +25,7 @@ public static class MauiProgram
         s.AddConnectivity();
         
         s.AddDefaultRepository();
-        s.AddStandardHttpTransfers<SampleHttpTransferDelegate>();
+        s.AddHttpClientTransfers<SampleHttpTransferDelegate>();
 
         return builder.Build();
     }

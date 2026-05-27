@@ -11,7 +11,7 @@ namespace Shiny.Net.Http;
 
 public class HttpTransferManager(
     AndroidHttpTransferProcess process,
-    ILogger<HttpTransferManager> logger,
+    ILogger<HttpClientHttpTransferManager> logger,
     IRepository repository
 ) : IHttpTransferManager, IShinyStartupTask, IDisposable
 {

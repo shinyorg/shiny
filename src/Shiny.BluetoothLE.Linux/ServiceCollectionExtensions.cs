@@ -6,7 +6,7 @@ using Shiny.BluetoothLE.Intrastructure;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class LinuxBleServiceCollectionExtensions
 {
     /// <summary>
     /// Register the IBleManager service for Linux via BlueZ/D-Bus

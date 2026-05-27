@@ -5,7 +5,7 @@ using Shiny.BluetoothLE;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class BlazorBleServiceCollectionExtensions
 {
     /// <summary>
     /// Register the IBleManager service for Blazor WebAssembly via Web Bluetooth API

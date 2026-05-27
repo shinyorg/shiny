@@ -7,7 +7,7 @@ using Shiny.Power;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class BlazorServiceCollectionExtensions
 {
     public static IServiceCollection AddConnectivity(this IServiceCollection services)
     {

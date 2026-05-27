@@ -5,13 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores.Repositories;
+using Shiny.Net.Http.Infrastructure;
 
 namespace Shiny.Net.Http;
 
 
-public class HttpTransferManager(
-    StandardHttpTransferProcess process,
-    ILogger<HttpTransferManager> logger,
+public class HttpClientHttpTransferManager(
+    HttpClientHttpTransferProcess process,
+    ILogger<HttpClientHttpTransferManager> logger,
     IRepository repository
 ) : IHttpTransferManager, IShinyStartupTask, IDisposable
 {
@@ -22,7 +23,7 @@ public class HttpTransferManager(
     {
         if (!this.subscribed)
         {
-            StandardHttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
+            HttpClientHttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
             repository.ActionOccurred += this.OnRepoAction;
             this.subscribed = true;
         }
@@ -46,7 +47,7 @@ public class HttpTransferManager(
     {
         if (this.subscribed)
         {
-            StandardHttpTransferProcess.ProgressOccurred -= this.OnProcessProgress;
+            HttpClientHttpTransferProcess.ProgressOccurred -= this.OnProcessProgress;
             repository.ActionOccurred -= this.OnRepoAction;
             this.subscribed = false;
         }

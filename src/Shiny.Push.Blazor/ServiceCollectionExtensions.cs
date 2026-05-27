@@ -5,7 +5,7 @@ using Shiny.Push.Blazor;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class BlazorPushServiceCollectionExtensions
 {
     /// <summary>
     /// Adds Web Push notification support to a Blazor PWA. Requires a VAPID public key.

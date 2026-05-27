@@ -14,7 +14,7 @@ namespace Shiny.Net.Http;
 
 
 public partial class HttpTransferManager(
-    ILogger<HttpTransferManager> logger,
+    ILogger<HttpClientHttpTransferManager> logger,
     IRepository repository,
     IPlatform platform,
     IServiceProvider services,

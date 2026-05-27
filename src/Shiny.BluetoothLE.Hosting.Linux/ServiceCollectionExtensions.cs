@@ -5,7 +5,7 @@ using Shiny.BluetoothLE.Hosting;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class LinuxBleHostServiceCollectionExtensions
 {
     /// <summary>
     /// Registers the IBleHostingManager service for Linux via BlueZ/D-Bus.

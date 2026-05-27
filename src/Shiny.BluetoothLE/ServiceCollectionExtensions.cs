@@ -7,7 +7,7 @@ using Shiny.BluetoothLE.Intrastructure;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class BleServiceCollectionExtensions
 {
 #if APPLE || ANDROID || WINDOWS
     /// <summary>

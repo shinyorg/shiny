@@ -7,7 +7,7 @@ using Shiny.Net.Http.Blazor;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class BlazorHttpServiceCollectionExtensions
 {
     /// <summary>
     /// Registers the Blazor WASM HTTP transfer manager backed by the Service Worker

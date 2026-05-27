@@ -5,7 +5,7 @@ using Shiny.Notifications;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class NotificationLinuxServiceCollectionExtensions
 {
     /// <summary>
     /// Registers Shiny notifications backed by the freedesktop notifications D-Bus daemon.

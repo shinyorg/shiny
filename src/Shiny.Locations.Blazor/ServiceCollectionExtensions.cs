@@ -5,7 +5,7 @@ using Shiny.Locations.Blazor;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class BlazorGpsServiceCollectionExtensions
 {
     /// <summary>
     /// Adds GPS support for Blazor WebAssembly using the browser Geolocation API.
