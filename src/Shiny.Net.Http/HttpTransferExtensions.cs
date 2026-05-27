@@ -67,11 +67,13 @@ public static class HttpTransferExtensions
         manager.UpdateReceived += handler;
 
         if (cancellationToken.CanBeCanceled)
+        {
             cancellationToken.Register(() =>
             {
                 manager.UpdateReceived -= handler;
                 tcs.TrySetCanceled(cancellationToken);
             });
+        }
 
         return tcs.Task;
     }

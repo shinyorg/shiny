@@ -21,7 +21,7 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
     {
         if (!IsStarted)
         {
-            this.GetService<HttpTransferProcess>().Run(() => this.Stop());
+            this.GetService<AndroidHttpTransferProcess>().Run(() => this.Stop());
             IsStarted = true;
         }
     }

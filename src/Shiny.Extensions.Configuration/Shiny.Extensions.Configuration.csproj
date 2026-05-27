@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-        <TargetFrameworks>$(TargetFrameworks);$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>

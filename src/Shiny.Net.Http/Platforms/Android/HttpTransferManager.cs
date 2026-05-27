@@ -21,7 +21,7 @@ public class HttpTransferManager(
     {
         if (!this.subscribed)
         {
-            HttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
+            AndroidHttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
             repository.ActionOccurred += this.OnRepoAction;
             this.subscribed = true;
         }
@@ -45,7 +45,7 @@ public class HttpTransferManager(
     {
         if (this.subscribed)
         {
-            HttpTransferProcess.ProgressOccurred -= this.OnProcessProgress;
+            AndroidHttpTransferProcess.ProgressOccurred -= this.OnProcessProgress;
             repository.ActionOccurred -= this.OnRepoAction;
             this.subscribed = false;
         }

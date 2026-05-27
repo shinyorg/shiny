@@ -12,28 +12,14 @@ using Shiny.Extensions.Stores.Repositories;
 namespace Shiny.Net.Http;
 
 
-public class HttpTransferProcess
+public class HttpTransferProcess(
+    ILogger<AndroidHttpTransferProcess> logger,
+    IRepository repository,
+    IConnectivity connectivity,
+    IEnumerable<IHttpTransferDelegate> delegates
+)
 {
     readonly HttpClient httpClient = new();
-
-    readonly ILogger logger;
-    readonly IConnectivity connectivity;
-    readonly IRepository repository;
-    readonly IEnumerable<IHttpTransferDelegate> delegates;
-
-
-    public HttpTransferProcess(
-        ILogger<HttpTransferProcess> logger,
-        IRepository repository,
-        IConnectivity connectivity,
-        IEnumerable<IHttpTransferDelegate> delegates
-    )
-    {
-        this.logger = logger;
-        this.repository = repository;
-        this.connectivity = connectivity;
-        this.delegates = delegates;
-    }
 
 
     public static event EventHandler<HttpTransferResult>? ProgressOccurred;
@@ -43,7 +29,7 @@ public class HttpTransferProcess
     {
         _ = Task.Run(async () =>
         {
-            this.logger.LogInformation("Starting Transfer Loop Wait");
+            this.logger.LogInformation("Starting Transfer Loop");
             using var cancelSrc = new CancellationTokenSource();
 
             EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> clearHandler = null!;
@@ -68,7 +54,7 @@ public class HttpTransferProcess
                     if (this.connectivity.IsInternetAvailable())
                     {
                         var full = this.connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
-                        this.logger.LogDebug("Internet Available - Trying Transfer Loop.  WIFI: " + full);
+                        this.logger.LogDebug("Internet Available - WIFI: " + full);
 
                         foreach (var transfer in transfers)
                         {
@@ -114,7 +100,7 @@ public class HttpTransferProcess
             {
                 this.logger.LogError(ex, "Error in transfer loop");
             }
-            this.logger.LogDebug("Shutting down HTTP transfer service");
+            this.logger.LogDebug("Shutting down HTTP transfer process");
             onComplete();
         });
     }
@@ -151,9 +137,6 @@ public class HttpTransferProcess
                 .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
                 .ConfigureAwait(false);
 
-            repoSub.Dispose();
-            this.repository.Remove(transfer);
-
             ProgressOccurred?.Invoke(null, new(
                 transfer.Request,
                 HttpTransferState.Completed,
@@ -164,10 +147,12 @@ public class HttpTransferProcess
                 ),
                 null
             ));
+            repoSub.Dispose();
+
+            this.repository.Remove(transfer);
         }
         catch (HttpRequestException ex)
         {
-            repoSub.Dispose();
             this.repository.Remove(transfer);
 
             this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
@@ -181,14 +166,11 @@ public class HttpTransferProcess
                 TransferProgress.Empty,
                 ex
             ));
+            repoSub.Dispose();
         }
-        catch (IOException ex) when (ex.InnerException is Java.Net.SocketException)
+        catch (IOException ex)
         {
-            this.PauseTransfer(transfer, "Android Network Disconnected", ex);
-        }
-        catch (Java.Net.SocketException ex)
-        {
-            this.PauseTransfer(transfer, "Android Network Disconnected", ex);
+            this.PauseTransfer(transfer, "Network Disconnected", ex);
         }
         catch (OperationCanceledException)
         {
@@ -196,19 +178,17 @@ public class HttpTransferProcess
         }
         catch (Exception ex)
         {
-            this.PauseTransfer(transfer, "Error with transfer - " + ex, ex, isNetworkError: false);
+            this.PauseTransfer(transfer, "Error with transfer - " + ex, ex);
         }
     }
 
 
-    void PauseTransfer(HttpTransfer transfer, string reason, Exception exception, bool isNetworkError = true)
+    void PauseTransfer(HttpTransfer transfer, string reason, Exception exception)
     {
         this.logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
         this.repository.Set(transfer with
         {
-            Status = isNetworkError
-                ? HttpTransferState.PausedByNoNetwork
-                : HttpTransferState.Paused
+            Status = HttpTransferState.PausedByNoNetwork
         });
     }
 

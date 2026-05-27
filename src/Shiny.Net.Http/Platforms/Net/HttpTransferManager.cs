@@ -10,7 +10,7 @@ namespace Shiny.Net.Http;
 
 
 public class HttpTransferManager(
-    HttpTransferProcess process,
+    StandardHttpTransferProcess process,
     ILogger<HttpTransferManager> logger,
     IRepository repository
 ) : IHttpTransferManager, IShinyStartupTask, IDisposable
@@ -22,7 +22,7 @@ public class HttpTransferManager(
     {
         if (!this.subscribed)
         {
-            HttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
+            StandardHttpTransferProcess.ProgressOccurred += this.OnProcessProgress;
             repository.ActionOccurred += this.OnRepoAction;
             this.subscribed = true;
         }
@@ -46,7 +46,7 @@ public class HttpTransferManager(
     {
         if (this.subscribed)
         {
-            HttpTransferProcess.ProgressOccurred -= this.OnProcessProgress;
+            StandardHttpTransferProcess.ProgressOccurred -= this.OnProcessProgress;
             repository.ActionOccurred -= this.OnRepoAction;
             this.subscribed = false;
         }

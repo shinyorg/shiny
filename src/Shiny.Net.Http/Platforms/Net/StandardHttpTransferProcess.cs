@@ -15,30 +15,14 @@ using Shiny.Extensions.Stores.Repositories;
 namespace Shiny.Net.Http;
 
 
-public class HttpTransferProcess
+public class StandardHttpTransferProcess(
+    ILogger<StandardHttpTransferProcess> logger,
+    IRepository repository,
+    IConnectivity connectivity,
+    IEnumerable<IHttpTransferDelegate> delegates
+)
 {
     readonly HttpClient httpClient = new();
-
-    readonly ILogger logger;
-    readonly IConnectivity connectivity;
-    readonly IRepository repository;
-    readonly IEnumerable<IHttpTransferDelegate> delegates;
-
-
-    public HttpTransferProcess(
-        ILogger<HttpTransferProcess> logger,
-        IRepository repository,
-        IConnectivity connectivity,
-        IEnumerable<IHttpTransferDelegate> delegates
-    )
-    {
-        this.logger = logger;
-        this.repository = repository;
-        this.connectivity = connectivity;
-        this.delegates = delegates;
-
-    }
-
 
     public static event EventHandler<HttpTransferResult>? ProgressOccurred;
 
@@ -47,7 +31,7 @@ public class HttpTransferProcess
     {
         _ = Task.Run(async () =>
         {
-            this.logger.LogInformation("Starting Transfer Loop");
+            logger.LogInformation("Starting Transfer Loop");
             using var cancelSrc = new CancellationTokenSource();
 
             EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> clearHandler = null!;
@@ -55,44 +39,44 @@ public class HttpTransferProcess
             {
                 if (x.EntityType == typeof(HttpTransfer) && x.Action == RepositoryAction.Clear)
                 {
-                    this.repository.ActionOccurred -= clearHandler;
-                    this.logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
+                    repository.ActionOccurred -= clearHandler;
+                    logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
                     cancelSrc.Cancel();
                 }
             };
-            this.repository.ActionOccurred += clearHandler;
-            using var clearSub = new RepoSub(() => this.repository.ActionOccurred -= clearHandler);
+            repository.ActionOccurred += clearHandler;
+            using var clearSub = new RepoSub(() => repository.ActionOccurred -= clearHandler);
 
             try
             {
-                var transfers = this.repository.GetAll<HttpTransfer>();
+                var transfers = repository.GetAll<HttpTransfer>();
                 while (!cancelSrc.IsCancellationRequested && transfers.Count > 0)
                 {
-                    this.logger.LogDebug("Starting Loop");
-                    if (this.connectivity.IsInternetAvailable())
+                    logger.LogDebug("Starting Loop");
+                    if (connectivity.IsInternetAvailable())
                     {
-                        var full = this.connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
-                        this.logger.LogDebug("Internet Available - WIFI: " + full);
+                        var full = connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
+                        logger.LogDebug("Internet Available - WIFI: " + full);
 
                         foreach (var transfer in transfers)
                         {
                             if (cancelSrc.IsCancellationRequested)
                             {
-                                this.logger.LogDebug("Transfer Loop cancelled");
+                                logger.LogDebug("Transfer Loop cancelled");
                             }
-                            else if (!this.repository.Exists<HttpTransfer>(transfer.Identifier))
+                            else if (!repository.Exists<HttpTransfer>(transfer.Identifier))
                             {
-                                this.logger.LogDebug($"HTTP Transfer {transfer.Identifier} has been removed");
+                                logger.LogDebug($"HTTP Transfer {transfer.Identifier} has been removed");
                             }
                             else if (transfer.Request.UseMeteredConnection || full)
                             {
-                                this.logger.LogInformation($"Transfer {transfer.Identifier} starting");
+                                logger.LogInformation($"Transfer {transfer.Identifier} starting");
                                 await this.RunTransfer(transfer, cancelSrc.Token).ConfigureAwait(false);
                             }
                             else
                             {
-                                this.logger.LogDebug($"Transfer {transfer.Identifier} is a metered transfer - waiting for WIFI");
-                                this.repository.Set(transfer with
+                                logger.LogDebug($"Transfer {transfer.Identifier} is a metered transfer - waiting for WIFI");
+                                repository.Set(transfer with
                                 {
                                     Status = HttpTransferState.PausedByCostedNetwork
                                 });
@@ -101,28 +85,28 @@ public class HttpTransferProcess
                     }
                     else
                     {
-                        this.logger.LogDebug("Internet Unavailable - Waiting for next pass");
+                        logger.LogDebug("Internet Unavailable - Waiting for next pass");
                     }
 
-                    transfers = this.repository.GetAll<HttpTransfer>();
+                    transfers = repository.GetAll<HttpTransfer>();
                     if (transfers.Count > 0)
                     {
-                        this.logger.LogDebug("Waiting for loop pass");
+                        logger.LogDebug("Waiting for loop pass");
                         await this
                             .WaitForNextPass(cancelSrc.Token)
                             .ConfigureAwait(false);
                     }
                 }
-                this.logger.LogDebug("All transfers complete");
+                logger.LogDebug("All transfers complete");
             }
             catch (TaskCanceledException)
             {
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Error in transfer loop");
+                logger.LogError(ex, "Error in transfer loop");
             }
-            this.logger.LogDebug("Shutting down HTTP transfer process");
+            logger.LogDebug("Shutting down HTTP transfer process");
             onComplete();
         });
     }
@@ -143,13 +127,13 @@ public class HttpTransferProcess
                 x.Action == RepositoryAction.Remove &&
                 transfer.Identifier.Equals(x.Entity!.Identifier))
             {
-                this.repository.ActionOccurred -= removeHandler;
-                this.logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
+                repository.ActionOccurred -= removeHandler;
+                logger.StandardInfo(transfer.Identifier, "Current transfer has been removed");
                 cancelSrc.Cancel();
             }
         };
-        this.repository.ActionOccurred += removeHandler;
-        using var repoSub = new RepoSub(() => this.repository.ActionOccurred -= removeHandler);
+        repository.ActionOccurred += removeHandler;
+        using var repoSub = new RepoSub(() => repository.ActionOccurred -= removeHandler);
 
         try
         {
@@ -157,9 +141,9 @@ public class HttpTransferProcess
                 .DoRequest(transfer, cancelSrc.Token)
                 .ConfigureAwait(false);
 
-            this.logger.LogInformation("Completing Successful Transfer: " + transfer.Identifier);
-            await this.delegates
-                .RunDelegates(x => x.OnCompleted(transfer.Request), this.logger)
+            logger.LogInformation("Completing Successful Transfer: " + transfer.Identifier);
+            await delegates
+                .RunDelegates(x => x.OnCompleted(transfer.Request), logger)
                 .ConfigureAwait(false);
 
             ProgressOccurred?.Invoke(null, new(
@@ -172,15 +156,15 @@ public class HttpTransferProcess
                 ),
                 null
             ));
-            this.repository.Remove(transfer);
+            repository.Remove(transfer);
         }
         catch (HttpRequestException ex)
         {
-            this.repository.Remove(transfer);
+            repository.Remove(transfer);
 
-            this.logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
-            await this.delegates
-                .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), this.logger)
+            logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
+            await delegates
+                .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), logger)
                 .ConfigureAwait(false);
 
             ProgressOccurred?.Invoke(null, new(
@@ -207,10 +191,10 @@ public class HttpTransferProcess
 
     void PauseTransfer(HttpTransfer transfer, string reason, Exception exception)
     {
-        this.logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
-        if (this.repository.Exists<HttpTransfer>(transfer.Identifier))
+        logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
+        if (repository.Exists<HttpTransfer>(transfer.Identifier))
         {
-            this.repository.Set(transfer with
+            repository.Set(transfer with
             {
                 Status = HttpTransferState.PausedByNoNetwork
             });
@@ -287,7 +271,7 @@ public class HttpTransferProcess
         if (startOffset > 0)
         {
             httpReq.Headers.Range = new RangeHeaderValue(startOffset, null);
-            this.logger.StandardInfo(request.Identifier, $"Resuming download from byte {startOffset}");
+            logger.StandardInfo(request.Identifier, $"Resuming download from byte {startOffset}");
         }
 
         using var response = await this.httpClient
@@ -298,7 +282,7 @@ public class HttpTransferProcess
         var append = response.StatusCode == HttpStatusCode.PartialContent && startOffset > 0;
         if (!append && startOffset > 0)
         {
-            this.logger.StandardInfo(request.Identifier, "Server ignored Range header - restarting download");
+            logger.StandardInfo(request.Identifier, "Server ignored Range header - restarting download");
             startOffset = 0;
         }
 
@@ -359,9 +343,9 @@ public class HttpTransferProcess
 
     void PublishProgress(HttpTransfer transfer, TransferProgress progress)
     {
-        if (this.repository.Exists<HttpTransfer>(transfer.Identifier))
+        if (repository.Exists<HttpTransfer>(transfer.Identifier))
         {
-            this.repository.Set(transfer with
+            repository.Set(transfer with
             {
                 Status = HttpTransferState.InProgress,
                 BytesToTransfer = progress.BytesToTransfer,
