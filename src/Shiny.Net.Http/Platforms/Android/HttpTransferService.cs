@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Shiny.Net.Http.Infrastructure;
 
 namespace Shiny.Net.Http;
 
@@ -21,7 +22,7 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
     {
         if (!IsStarted)
         {
-            this.GetService<AndroidHttpTransferProcess>().Run(() => this.Stop());
+            this.GetService<HttpClientHttpTransferProcess>().Run(() => this.Stop());
             IsStarted = true;
         }
     }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE;
 
-public static partial class Extensions
+static class RxExtensions
 {
     /// <summary>
     /// A handy way for replying and completing an observer - common for single valued observables

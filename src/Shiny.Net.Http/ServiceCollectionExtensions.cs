@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Hosting;
 using Shiny.Net.Http;
@@ -9,7 +10,7 @@ namespace Shiny;
 
 public static class HttpTransferServiceCollectionExtensions
 {
-    public static IServiceCollection AddHttpTransfers<TDelegate>(this IServiceCollection services)
+    public static IServiceCollection AddHttpTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
 #if PLATFORM
@@ -21,7 +22,7 @@ public static class HttpTransferServiceCollectionExtensions
 #if IOS || MACCATALYST
         services.AddSingleton<IIosLifecycle.IHandleEventsForBackgroundUrl>(sp => sp.GetRequiredService<HttpTransferManager>());
 #elif ANDROID || WINDOWS
-        services.AddSingleton<AndroidHttpTransferProcess>();
+        services.AddSingleton<HttpClientHttpTransferProcess>();
 #endif
         services.AddSingleton<TDelegate>();
         services.AddSingleton<IHttpTransferDelegate>(sp => sp.GetRequiredService<TDelegate>());
@@ -43,7 +44,7 @@ public static class HttpTransferServiceCollectionExtensions
     /// before resolving services. A default JSON filesystem repository is
     /// registered automatically under {LocalApplicationData}/Shiny.
     /// </summary>
-    public static IServiceCollection AddHttpClientTransfers<TDelegate>(this IServiceCollection services)
+    public static IServiceCollection AddHttpClientTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
         services.AddSingleton<HttpClientHttpTransferManager>();

@@ -178,6 +178,12 @@ public class HttpClientHttpTransferProcess(
         {
             this.PauseTransfer(transfer, "Network Disconnected", ex);
         }
+#if ANDROID
+        catch (Java.Net.SocketException ex)
+        {
+            this.PauseTransfer(transfer, "Network Disconnected", ex);
+        }
+#endif
         catch (OperationCanceledException)
         {
             // transfer has been cancelled or removed - nothing to do
