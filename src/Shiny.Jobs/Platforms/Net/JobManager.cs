@@ -30,6 +30,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
 
     readonly IBattery battery;
     readonly IConnectivity connectivity;
+    readonly JobRegistrar registrar;
     readonly Timer timer;
     bool disposed;
 
@@ -38,11 +39,13 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
         IServiceProvider container,
         ILogger<IJobManager> logger,
         IBattery battery,
-        IConnectivity connectivity
+        IConnectivity connectivity,
+        JobRegistrar registrar
     ) : base(container, logger)
     {
         this.battery = battery;
         this.connectivity = connectivity;
+        this.registrar = registrar;
 
         this.timer = new Timer();
         this.timer.Elapsed += (_, _) => this.RunForegroundJobs();
@@ -51,9 +54,8 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
 
     public void Start()
     {
-        var jobs = ServiceCollectionExtensions.GetRegisteredJobs();
-        this.AddRegistrations(jobs);
-        this.Log.LogDebug("Registered {Count} job(s)", jobs.Count);
+        this.AddRegistrations(this.registrar.Jobs);
+        this.Log.LogDebug("Registered {Count} job(s)", this.registrar.Jobs.Count);
 
         this.RunForegroundJobs();
     }

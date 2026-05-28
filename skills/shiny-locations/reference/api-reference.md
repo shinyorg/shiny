@@ -440,6 +440,26 @@ public static class Extensions
 }
 ```
 
+### IGeofenceManager Extensions
+
+```csharp
+namespace Shiny.Locations;
+
+public static class Extensions
+{
+    /// Starts monitoring a region only if its identifier isn't already monitored.
+    /// When replaceIfExists is true (default), an existing region with the same
+    /// identifier is stopped and restarted so changed position/notification
+    /// settings take effect. Returns true if the region already existed,
+    /// false if it was newly added.
+    static Task<bool> TryStartMonitoring(
+        this IGeofenceManager geofenceManager,
+        GeofenceRegion region,
+        bool replaceIfExists = true
+    );
+}
+```
+
 ### GeofenceRegion Extensions
 
 ```csharp
@@ -655,6 +675,21 @@ if (access == AccessState.Available)
     );
     await geofenceManager.StartMonitoring(region);
 }
+```
+
+### Start Monitoring Idempotently
+
+```csharp
+var region = new GeofenceRegion(
+    "my-office",
+    new Position(43.6532, -79.3832),
+    Distance.FromMeters(200)
+);
+
+// Safe to call repeatedly (e.g. on every app launch) without duplicating or throwing.
+// replaceIfExists: true (default) restarts an existing region so updated
+// position/notification settings take effect.
+bool alreadyExisted = await geofenceManager.TryStartMonitoring(region);
 ```
 
 ### Distance Calculations

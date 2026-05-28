@@ -1,17 +1,16 @@
-#if PLATFORM
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Hosting;
 using Shiny.Jobs;
+#if PLATFORM
 using Shiny.Jobs.Infrastructure;
+#endif
 
 namespace Shiny;
 
 
 public static class ServiceCollectionExtensions
 {
-
     /// <summary>
     /// Register a singleton job with optional fluent configuration.
     /// </summary>
@@ -21,34 +20,36 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddJob<TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
         where TJob : class, IJob
     {
-        services.AddConnectivity();
-        services.AddBattery();
-
-        if (!services.HasService<IJobManager>())
-        {
-            services.AddSingleton(new JobRegistrar(services));
-
-            services.AddSingleton<JobLifecycleTask>();
-            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<JobLifecycleTask>());
-#if ANDROID
-            services.AddSingleton<IAndroidLifecycle.IApplicationLifecycle>(sp => sp.GetRequiredService<JobLifecycleTask>());
-#elif IOS || MACCATALYST
-            services.AddSingleton<IIosLifecycle.IApplicationLifecycle>(sp => sp.GetRequiredService<JobLifecycleTask>());
-#elif MACOS
-            services.AddSingleton<IMacLifecycle.IApplicationLifecycle>(sp => sp.GetRequiredService<JobLifecycleTask>());
-#endif
-
-            services.AddSingleton<JobManager>();
-            services.AddSingleton<IJobManager>(sp => sp.GetRequiredService<JobManager>());
-#if IOS || MACCATALYST || ANDROID || WINDOWS
-            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<JobManager>());
-#endif
-        }
+        services.AddJobs();
 
         var registrar = (JobRegistrar)services.Single(x => x.ImplementationInstance is JobRegistrar).ImplementationInstance!;
         registrar.Register<TJob>(configure);
 
         return services;
     }
-}
+
+
+    /// <summary>
+    /// Registers the Shiny <see cref="IJobManager"/> and its supporting infrastructure. On
+    /// platform targets (iOS/Android/Windows) this hooks the native background scheduler; on
+    /// plain .NET targets it registers an in-process manager that runs jobs while the host is alive.
+    /// </summary>
+    public static IServiceCollection AddJobs(this IServiceCollection services)
+    {
+#if PLATFORM
+        services.AddConnectivity();
+        services.AddBattery();
 #endif
+        if (!services.HasService<IJobManager>())
+        {
+            services.AddSingleton(new JobRegistrar(services));
+#if PLATFORM
+            services.AddSingletonAsImplementedInterfaces<JobLifecycleTask>();
+            services.AddSingletonAsImplementedInterfaces<JobManager>();
+#else
+            services.AddSingletonAsImplementedInterfaces<JobManager>();
+#endif
+        }
+        return services;
+    }
+}

@@ -3,7 +3,7 @@
 namespace Shiny.Notifications;
 
 
-public static class CommonExtensions
+static class CommonExtensions
 {
 
 #if ANDROID

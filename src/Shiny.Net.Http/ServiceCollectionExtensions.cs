@@ -13,22 +13,14 @@ public static class HttpTransferServiceCollectionExtensions
     public static IServiceCollection AddHttpTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
-#if PLATFORM
-        services.AddConnectivity();
-#endif
-        services.AddSingleton<HttpClientHttpTransferManager>();
-        services.AddSingleton<IHttpTransferManager>(sp => sp.GetRequiredService<HttpClientHttpTransferManager>());
-        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<HttpClientHttpTransferManager>());
 #if IOS || MACCATALYST
-        services.AddSingleton<IIosLifecycle.IHandleEventsForBackgroundUrl>(sp => sp.GetRequiredService<HttpTransferManager>());
+        services.AddSingletonAsImplementedInterfaces<HttpTransferManager>();
 #elif ANDROID || WINDOWS
+        services.AddSingletonAsImplementedInterfaces<HttpClientHttpTransferManager>();
         services.AddSingleton<HttpClientHttpTransferProcess>();
 #endif
-        services.AddSingleton<TDelegate>();
-        services.AddSingleton<IHttpTransferDelegate>(sp => sp.GetRequiredService<TDelegate>());
-        services.AddDefaultRepository();
-        services.AddJsonContext(ShinyHttpJsonContext.Default);
-        services.AddSingleton<HttpTransferMonitor>();
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+        AddCore(services);
 
         return services;
     }
@@ -47,16 +39,22 @@ public static class HttpTransferServiceCollectionExtensions
     public static IServiceCollection AddHttpClientTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
-        services.AddSingleton<HttpClientHttpTransferManager>();
-        services.AddSingleton<IHttpTransferManager>(sp => sp.GetRequiredService<HttpClientHttpTransferManager>());
-        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<HttpClientHttpTransferManager>());
+        services.AddSingletonAsImplementedInterfaces<HttpClientHttpTransferManager>();
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+        services.AddSingleton<HttpClientHttpTransferProcess>();
+        
+        AddCore(services);
+        return services;
+    }
 
-        services.AddSingleton<TDelegate>();
-        services.AddSingleton<IHttpTransferDelegate>(sp => sp.GetRequiredService<TDelegate>());
+
+    static void AddCore(IServiceCollection services)
+    {
+#if PLATFORM
+        services.AddConnectivity();
+#endif
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyHttpJsonContext.Default);
-        services.AddSingleton<HttpTransferMonitor>();
-        services.AddSingleton<HttpClientHttpTransferProcess>();
-        return services;
+        services.AddSingleton<HttpTransferMonitor>(); 
     }
 }

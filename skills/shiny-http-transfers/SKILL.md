@@ -27,7 +27,7 @@ triggers:
 
 # Shiny HTTP Transfers
 
-Background HTTP upload and download management. On iOS and Android, backed by native platform transfer APIs (NSURLSession background sessions and WorkManager). On Windows, Linux, macOS, and base .NET, backed by an in-process managed loop using `HttpClient` + `IConnectivity` that wakes on connectivity changes and supports **resumable downloads** via HTTP Range requests (uploads always restart). On Blazor WASM, backed by the Service Worker Background Sync API (IndexedDB queue drained by the SW via `fetch()` while the tab is closed).
+Background HTTP upload and download management. On iOS, backed by native `NSURLSession` background sessions. On Android, Windows, Linux, macOS, and base .NET, backed by an in-process managed loop using `HttpClient` + `IConnectivity` that wakes on connectivity changes and supports **resumable downloads** via HTTP Range requests (uploads always restart); on Android this loop runs inside a foreground service. On Blazor WASM, backed by the Service Worker Background Sync API (IndexedDB queue drained by the SW via `fetch()` while the tab is closed).
 
 ## When to Use This Skill
 
@@ -49,7 +49,7 @@ Use this skill when the user needs to:
 |-------------|-----------------------------------------------------------------------------------------|
 | NuGet       | `Shiny.Net.Http`, `Shiny.Net.Http.Blazor`                                               |
 | Namespace   | `Shiny.Net.Http`                                                                        |
-| Platforms   | iOS, Android (native); Windows, Linux, macOS, .NET base (managed loop); Blazor WASM (SW) |
+| Platforms   | iOS (native NSURLSession); Android, Windows, Linux, macOS, .NET base (managed HttpClient loop); Blazor WASM (Service Worker) |
 | DI Setup    | `services.AddHttpTransfers<TDelegate>()` (iOS/Android/Windows), `services.AddHttpClientTransfers<TDelegate>()` (Linux/macOS/plain .NET), or `services.AddBlazorHttpTransfers<TDelegate>()` (Blazor) |
 
 The registration extension methods live in the `Shiny` namespace and are available on `IServiceCollection`.

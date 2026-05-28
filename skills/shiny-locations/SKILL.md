@@ -141,7 +141,7 @@ When generating code for Shiny.Locations:
 7. **Use `Distance` factory methods** -- `Distance.FromMeters()`, `Distance.FromKilometers()`, `Distance.FromMiles()`. Never construct `Distance` directly with kilometers unless intentional.
 8. **Use extension methods** for convenience: `GetCurrentPosition()`, `GetLastReadingOrCurrentPosition()`, `IsListening()`, `IsPositionInside()`, `IsInsideRegion()`.
 9. **Use `WhenReading()` for UI bindings** (observable stream). Use delegates for background processing. This applies to both `IGpsManager` and `IMotionActivityManager`.
-10. **For `GeofenceRegion`**, always provide a unique `Identifier` string. The `SingleUse` parameter removes the region after the first trigger.
+10. **For `GeofenceRegion`**, always provide a unique `Identifier` string. The `SingleUse` parameter removes the region after the first trigger. To register a region idempotently, use the `TryStartMonitoring(region, replaceIfExists)` extension on `IGeofenceManager` — it only starts monitoring if a region with the same identifier isn't already being monitored, and (when `replaceIfExists` is `true`, the default) stops and restarts an existing region so changed position/notification settings take effect. It returns `true` when the region already existed, `false` when it was newly added.
 11. **Inject `IMotionActivityManager`** via constructor injection for motion activity features. Call `RequestAccess()` before `StartListener()`, and use `WhenReading()` for foreground observation or register `IMotionActivityDelegate` for background processing.
 
 ## Conventions

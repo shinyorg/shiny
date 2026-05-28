@@ -107,7 +107,7 @@ using Shiny.Jobs;
 services.AddConnectivity();
 services.AddBattery();
 
-// Blazor WASM — from Shiny.Support.DeviceMonitoring.Blazor
+// Blazor WASM — from Shiny.Core.Blazor
 // services.AddConnectivity();
 // services.AddBattery();
 // Optionally override the default filesystem repo with browser localStorage:

@@ -1,4 +1,4 @@
-using System.Linq;
+#if PLATFORM
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.BluetoothLE.Hosting;
 
@@ -12,12 +12,10 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddBluetoothLeHosting(this IServiceCollection services)
     {
-        if (!services.Any(x => x.ServiceType == typeof(IBleHostingManager)))
-        {
-            services.AddSingleton<BleHostingManager>();
-            services.AddSingleton<IBleHostingManager>(sp => sp.GetRequiredService<BleHostingManager>());
-        }
 
+        if (!services.HasService<IBleHostingManager>())
+            services.AddSingletonAsImplementedInterfaces<BleHostingManager>(); 
         return services;
     }
 }
+#endif

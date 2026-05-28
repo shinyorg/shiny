@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class PushServiceCollectionExtensions
 {
     /// <summary>
     /// Adds Native Push Notification services without any background handling
@@ -17,25 +17,11 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddPush(this IServiceCollection services)
     {
-#if IOS || MACCATALYST
-        services.AddSingleton<PushManager>();
-        services.AddSingleton<IPushManager>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IApplePushManager>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IIosLifecycle.IOnFinishedLaunching>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IIosLifecycle.IRemoteNotifications>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IIosLifecycle.INotificationHandler>(sp => sp.GetRequiredService<PushManager>());
-#elif MACOS
-        services.AddSingleton<PushManager>();
-        services.AddSingleton<IPushManager>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IApplePushManager>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IMacLifecycle.IOnFinishedLaunching>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IMacLifecycle.IRemoteNotifications>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IMacLifecycle.INotificationHandler>(sp => sp.GetRequiredService<PushManager>());
-#elif ANDROID
+#if PLATFORM
+        services.AddSingletonAsImplementedInterfaces<PushManager>();
+#endif
+#if ANDROID
         services.AddPush(new FirebaseConfig());
-#elif WINDOWS
-        services.AddSingleton<PushManager>();
-        services.AddSingleton<IPushManager>(sp => sp.GetRequiredService<PushManager>());
 #endif
         return services;
     }
@@ -49,8 +35,7 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
     {
-        services.AddSingleton<TDelegate>();
-        services.AddSingleton<IPushDelegate>(sp => sp.GetRequiredService<TDelegate>());
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
         return services.AddPush();
     }
 
@@ -65,11 +50,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush(this IServiceCollection services, FirebaseConfig config)
     {
         services.AddSingleton(config);
-        services.AddSingleton<PushManager>();
-        services.AddSingleton<IPushManager>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IAndroidLifecycle.IOnActivityOnCreate>(sp => sp.GetRequiredService<PushManager>());
-        services.AddSingleton<IAndroidLifecycle.IOnActivityNewIntent>(sp => sp.GetRequiredService<PushManager>());
+        services.AddSingletonAsImplementedInterfaces<PushManager>();
         return services;
     }
 
@@ -84,8 +65,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, FirebaseConfig config)
         where TDelegate : class, IPushDelegate
     {
-        services.AddSingleton<TDelegate>();
-        services.AddSingleton<IPushDelegate>(sp => sp.GetRequiredService<TDelegate>());
+        services.AddPush<TDelegate>();
         services.AddPush(config);
         return services;
     }
