@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny.Jobs;
@@ -70,7 +71,7 @@ public sealed class JobRegistrar(IServiceCollection services)
     /// <typeparam name="TJob">The job type to register.</typeparam>
     /// <param name="configure">Optional fluent configuration; the default registration uses <c>typeof(TJob).FullName</c> as the identifier.</param>
     /// <returns>This registrar, for fluent chaining.</returns>
-    public JobRegistrar Register<TJob>(Func<JobRegistration, JobRegistration>? configure = null) where TJob : class, IJob
+    public JobRegistrar Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TJob>(Func<JobRegistration, JobRegistration>? configure = null) where TJob : class, IJob
     {
         var reg = new JobRegistration(typeof(TJob).FullName!, typeof(TJob));
         if (configure != null)

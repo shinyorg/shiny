@@ -10,7 +10,7 @@ namespace Shiny;
 
 public static class HttpTransferServiceCollectionExtensions
 {
-    public static IServiceCollection AddHttpTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
+    public static IServiceCollection AddHttpTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
 #if IOS || MACCATALYST
@@ -36,7 +36,7 @@ public static class HttpTransferServiceCollectionExtensions
     /// before resolving services. A default JSON filesystem repository is
     /// registered automatically under {LocalApplicationData}/Shiny.
     /// </summary>
-    public static IServiceCollection AddHttpClientTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
+    public static IServiceCollection AddHttpClientTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
         services.AddSingletonAsImplementedInterfaces<HttpClientHttpTransferManager>();

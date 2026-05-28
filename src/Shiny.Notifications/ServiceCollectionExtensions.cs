@@ -1,4 +1,5 @@
 ﻿#if PLATFORM
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Notifications;
 
@@ -24,7 +25,7 @@ public static class NotificationsServiceCollectionExtensions
     /// <summary>
     /// Registers notification manager with Shiny
     /// </summary>
-    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services) where TDelegate : class, INotificationDelegate
+    public static IServiceCollection AddNotifications<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, INotificationDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         return services.AddNotifications();
@@ -34,7 +35,7 @@ public static class NotificationsServiceCollectionExtensions
     /// <summary>
     /// Registers notification manager with Shiny
     /// </summary>
-    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services, IosConfiguration configuration) where TDelegate : class, INotificationDelegate
+    public static IServiceCollection AddNotifications<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, IosConfiguration configuration) where TDelegate : class, INotificationDelegate
     {
         services.AddSingleton(configuration ?? new());
         return services.AddNotifications<TDelegate>();

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Locations;
@@ -72,7 +73,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IGeofenceDelegate
         => services.AddGeofencing(typeof(T));
 
 
@@ -83,7 +84,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+    public static IServiceCollection AddGpsDirectGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IGeofenceDelegate
         => services.AddGpsDirectGeofencing(typeof(T));
 
 
@@ -119,7 +120,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <param name="services"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IServiceCollection AddGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IGeofenceDelegate
         => services;
 
 #endif

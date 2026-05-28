@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.BluetoothLE;
@@ -42,7 +43,7 @@ public static class BleServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="config"></param>
     /// <returns></returns>
-    public static IServiceCollection AddBluetoothLE<TCentralDelegate>(
+    public static IServiceCollection AddBluetoothLE<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TCentralDelegate>(
         this IServiceCollection services,
         AppleBleConfiguration? config = null
     ) where TCentralDelegate : class, IBleDelegate
@@ -57,14 +58,14 @@ public static class BleServiceCollectionExtensions
     /// <typeparam name="TCentralDelegate"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddBluetoothLE<TCentralDelegate>(this IServiceCollection services) where TCentralDelegate : class, IBleDelegate
+    public static IServiceCollection AddBluetoothLE<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TCentralDelegate>(this IServiceCollection services) where TCentralDelegate : class, IBleDelegate
     {
         services.AddBluetoothLE();
-        services.AddSingletonAsImplementedInterfaces<TCentralDelegate>();
+        return services.AddSingletonAsImplementedInterfaces<TCentralDelegate>();
     }
 #endif
 #else
-    public static IServiceCollection AddBluetoothLE<TCentralDelegate>(this IServiceCollection services) where TCentralDelegate : class, IBleDelegate
+    public static IServiceCollection AddBluetoothLE<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TCentralDelegate>(this IServiceCollection services) where TCentralDelegate : class, IBleDelegate
         => services;
 #endif
 }

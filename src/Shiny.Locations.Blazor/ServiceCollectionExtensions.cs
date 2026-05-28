@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations;
 using Shiny.Locations.Blazor;
@@ -26,7 +27,7 @@ public static class BlazorGpsServiceCollectionExtensions
     /// Adds GPS support with a custom <see cref="IGpsDelegate"/>. Note that the delegate
     /// will only be invoked while the Blazor app is running in the foreground.
     /// </summary>
-    public static IServiceCollection AddGps<TDelegate>(this IServiceCollection services)
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IGpsDelegate
     {
         services.AddSingleton<TDelegate>();

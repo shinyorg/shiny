@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Net.Http;
 using BlazorHttpTransferManager = Shiny.Net.Http.Blazor.HttpTransferManager;
@@ -18,7 +19,7 @@ public static class BlazorHttpServiceCollectionExtensions
     /// service worker). The default path is
     /// <c>./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js</c>.
     /// </summary>
-    public static IServiceCollection AddBlazorHttpTransfers<TDelegate>(
+    public static IServiceCollection AddBlazorHttpTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(
         this IServiceCollection services,
         Action<BlazorHttpTransferOptions>? configure = null
     )

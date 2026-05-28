@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Notifications;
 
@@ -10,7 +11,7 @@ public static class NotificationLinuxServiceCollectionExtensions
     /// <summary>
     /// Registers Shiny notifications backed by the freedesktop notifications D-Bus daemon.
     /// </summary>
-    public static IServiceCollection AddNotifications<TDelegate>(this IServiceCollection services)
+    public static IServiceCollection AddNotifications<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services)
         where TDelegate : INotificationDelegate
         => services.AddNotifications(typeof(TDelegate));
 

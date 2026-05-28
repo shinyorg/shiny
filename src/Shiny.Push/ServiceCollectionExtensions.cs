@@ -1,4 +1,5 @@
-﻿using Shiny.Push;
+﻿using System.Diagnostics.CodeAnalysis;
+using Shiny.Push;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
 #if ANDROID
@@ -33,7 +34,7 @@ public static class PushServiceCollectionExtensions
     /// <typeparam name="TDelegate"></typeparam>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
+    public static IServiceCollection AddPush<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         return services.AddPush();
@@ -62,7 +63,7 @@ public static class PushServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="config"></param>
     /// <returns></returns>
-    public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, FirebaseConfig config)
+    public static IServiceCollection AddPush<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, FirebaseConfig config)
         where TDelegate : class, IPushDelegate
     {
         services.AddPush<TDelegate>();

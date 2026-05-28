@@ -42,9 +42,9 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This registers GPS services with the Shiny container - Windows supports foreground GPS only (no background)
     /// </summary>
-    public static IServiceCollection AddGps<TGpsDelegate>(this IServiceCollection services) where TGpsDelegate : class, IGpsDelegate
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TGpsDelegate>(this IServiceCollection services) where TGpsDelegate : class, IGpsDelegate
     {
-        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+        services.AddSingletonAsImplementedInterfaces<TGpsDelegate>();
         services.AddSingletonAsImplementedInterfaces<GpsManager>();
         return services;
     }
@@ -74,7 +74,7 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    public static IServiceCollection AddGps<TDelegate>(this IServiceCollection services, bool forceLocationApi = false) where TDelegate : class, IGpsDelegate
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, bool forceLocationApi = false) where TDelegate : class, IGpsDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         services.AddGps();
@@ -86,7 +86,7 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This is a blank AddGps - you won't see this documentation if you've got a proper target that is supported
     /// </summary>
-    public static IServiceCollection AddGps<TDelegate>(this IServiceCollection services) where TDelegate : class, IGpsDelegate
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGpsDelegate
         => services;
     #endif
 }

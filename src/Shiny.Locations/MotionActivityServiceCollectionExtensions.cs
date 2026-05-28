@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations;
 #if ANDROID
@@ -18,7 +19,7 @@ public static class MotionActivityServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="T">The IMotionActivityDelegate to call</typeparam>
     /// <param name="services">The service collection to configure</param>
-    public static IServiceCollection AddMotionActivity<T>(this IServiceCollection services) where T : class, IMotionActivityDelegate
+    public static IServiceCollection AddMotionActivity<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IMotionActivityDelegate
         => services.AddMotionActivity(typeof(T));
 
     /// <summary>
@@ -47,7 +48,7 @@ public static class MotionActivityServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="T">The IMotionActivityDelegate to call</typeparam>
     /// <param name="services">The service collection to configure</param>
-    public static IServiceCollection AddMotionActivity<T>(this IServiceCollection services) where T : class, IMotionActivityDelegate
+    public static IServiceCollection AddMotionActivity<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IMotionActivityDelegate
         => services.AddMotionActivity(typeof(T));
 
     /// <summary>
@@ -82,7 +83,7 @@ public static class MotionActivityServiceCollectionExtensions
     /// <summary>
     /// Motion activity recognition is not supported on this platform
     /// </summary>
-    public static IServiceCollection AddMotionActivity<T>(this IServiceCollection services) where T : class, IMotionActivityDelegate
+    public static IServiceCollection AddMotionActivity<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IMotionActivityDelegate
         => services;
 
     /// <summary>

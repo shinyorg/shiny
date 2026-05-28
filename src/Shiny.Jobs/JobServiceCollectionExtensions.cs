@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
@@ -17,7 +18,7 @@ public static class ServiceCollectionExtensions
     /// <example>
     /// <code>services.AddJob&lt;MyJob&gt;(r =&gt; r.WithIdentifier("MyJob").WithForeground());</code>
     /// </example>
-    public static IServiceCollection AddJob<TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
+    public static IServiceCollection AddJob<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
         where TJob : class, IJob
     {
         services.AddJobs();

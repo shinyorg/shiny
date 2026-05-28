@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Push;
 using Shiny.Push.Blazor;
@@ -23,7 +24,7 @@ public static class BlazorPushServiceCollectionExtensions
     /// <summary>
     /// Adds Web Push notification support with a custom <see cref="IPushDelegate"/>.
     /// </summary>
-    public static IServiceCollection AddPush<TDelegate>(this IServiceCollection services, WebPushOptions options)
+    public static IServiceCollection AddPush<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services, WebPushOptions options)
         where TDelegate : class, IPushDelegate
     {
         services.AddSingleton<TDelegate>();
