@@ -1,6 +1,7 @@
 ﻿#if PLATFORM
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Notifications;
 
 namespace Shiny;
@@ -13,12 +14,13 @@ public static class NotificationsServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddNotifications(this IServiceCollection services)
     {
-
         services.AddSingletonAsImplementedInterfaces<NotificationManager>();
         services.AddSingletonAsImplementedInterfaces<ChannelManager>();
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyNotificationsJsonContext.Default);
-
+#if IOS || MACCATALYST
+        services.TryAddSingleton(new IosConfiguration());
+#endif
         return services;
     }
     
@@ -46,7 +48,7 @@ public static class NotificationsServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddNotifications(this IServiceCollection services, IosConfiguration configuration)
     {
-        services.AddSingleton(configuration ?? new());
+        services.AddSingleton(configuration);
         return services.AddNotifications();
     }
 #endif
