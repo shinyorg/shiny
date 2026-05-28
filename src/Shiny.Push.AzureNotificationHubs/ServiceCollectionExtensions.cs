@@ -4,15 +4,13 @@ using Shiny.Push;
 namespace Shiny;
 
 
-public static class ServiceCollectionExtensions
+public static class AnhServiceCollectionExtensions
 {
     public static IServiceCollection AddPushAzureNotificationHubs(this IServiceCollection services, string listenerConnectionString, string hubName)
     {
         services.AddPush();
         services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
         services.AddSingleton<AzureNotificationHubsPushProvider>();
-        services.AddSingleton<IPushProvider>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
-        services.AddSingleton<IPushTagSupport>(sp => sp.GetRequiredService<AzureNotificationHubsPushProvider>());
         return services;
     }
 
@@ -21,7 +19,6 @@ public static class ServiceCollectionExtensions
         where TPushDelegate : class, IPushDelegate
     {
         services.AddSingleton<TPushDelegate>();
-        services.AddSingleton<IPushDelegate>(sp => sp.GetRequiredService<TPushDelegate>());
         services.AddPushAzureNotificationHubs(listenerConnectionString, hubName);
         return services;
     }

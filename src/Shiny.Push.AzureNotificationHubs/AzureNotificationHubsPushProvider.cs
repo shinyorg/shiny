@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if PLATFORM
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -215,3 +216,4 @@ public class AzureNotificationHubsPushProvider(
             .ConfigureAwait(false);
     }
 }
+#endif
