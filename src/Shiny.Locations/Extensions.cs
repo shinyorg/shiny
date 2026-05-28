@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,6 +8,39 @@ namespace Shiny.Locations;
 
 public static class Extensions
 {
+    /// <summary>
+    /// Tries to create the geofence region if the identifier does not already exist - returns true if it exists
+    /// </summary>
+    /// <param name="geofenceManager">The geofence manager abstraction</param>
+    /// <param name="region">The geofence region</param>
+    /// <param name="replaceIfExists">This will replace the geofence if the identifier already exists - maybe the position or notification types have changed</param>
+    /// <returns></returns>
+    public static async Task<bool> TryStartMonitoring(
+        this IGeofenceManager geofenceManager, 
+        GeofenceRegion region,
+        bool replaceIfExists = true
+    )
+    {
+        var exists = geofenceManager
+            .GetMonitorRegions()
+            .Any(x => x.Identifier.Equals(region.Identifier, StringComparison.InvariantCultureIgnoreCase));
+
+        if (exists)
+        {
+            if (replaceIfExists)
+            {
+                await geofenceManager.StopMonitoring(region.Identifier);
+                await geofenceManager.StartMonitoring(region);
+            }
+        }
+        else
+        {
+            await geofenceManager.StartMonitoring(region);
+        }
+        return exists;
+    }
+    
+    
     /// <summary>
     /// Requests a single GPS reading by starting the listener and stopping once a reading is received.
     /// This will start and stop the GPS listener if it wasn't already running.
