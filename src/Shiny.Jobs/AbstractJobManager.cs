@@ -36,6 +36,18 @@ public abstract class AbstractJobManager(
     public abstract Task<AccessState> RequestAccess();
 
 
+    public virtual Task<JobRunResult> RunJobAsTask(string jobIdentifier, CancellationToken cancellationToken)
+    {
+        var kvp = this.registrations.FirstOrDefault(x =>
+            x.Value.Identifier.Equals(jobIdentifier, StringComparison.OrdinalIgnoreCase) ||
+            x.Key.FullName == jobIdentifier
+        );
+        if (kvp.Key == null)
+            throw new InvalidOperationException($"Job '{jobIdentifier}' is not registered");
+
+        return this.RunJob(kvp.Key, kvp.Value, cancellationToken);
+    }
+    
     /// <inheritdoc />
     public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
     {
@@ -54,13 +66,7 @@ public abstract class AbstractJobManager(
 
     /// <inheritdoc />
     public IReadOnlyDictionary<Type, JobRegistration> GetJobs() => this.registrations;
-
-
-    internal void AddRegistrations(IEnumerable<JobRegistration> regs)
-    {
-        foreach (var reg in regs)
-            this.registrations[reg.JobType] = reg;
-    }
+    
 
     internal void AddRegistrations(IReadOnlyDictionary<Type, JobRegistration> regs)
     {
@@ -133,20 +139,7 @@ public abstract class AbstractJobManager(
     // Overload for callers that pass only JobRegistration (e.g. ShinyJobWorker)
     internal Task<JobRunResult> RunJob(JobRegistration reg, CancellationToken cancelToken)
         => this.RunJob(reg.JobType, reg, cancelToken);
-
-
-    internal Task RunJobAsTask(string identifier)
-    {
-        var kvp = this.registrations.FirstOrDefault(x =>
-            x.Value.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase) ||
-            x.Key.FullName == identifier
-        );
-        if (kvp.Key == null)
-            throw new InvalidOperationException($"Job '{identifier}' is not registered");
-
-        return this.RunJob(kvp.Key, kvp.Value, CancellationToken.None);
-    }
-
+    
 
     /// <summary>
     /// Gets all registrations matching a background task category identifier

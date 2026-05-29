@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -11,21 +9,12 @@ using P = Android.Manifest.Permission;
 namespace Shiny.Jobs;
 
 
-public class JobManager : AbstractJobManager, IShinyStartupTask
+public class JobManager(
+    AndroidPlatform platform,
+    IServiceProvider container,
+    ILogger<IJobManager> logger
+) : AbstractJobManager(container, logger), IShinyStartupTask
 {
-    readonly AndroidPlatform platform;
-
-
-    public JobManager(
-        AndroidPlatform platform,
-        IServiceProvider container,
-        ILogger<IJobManager> logger
-    ) : base(container, logger)
-    {
-        this.platform = platform;
-    }
-
-
     public void Start() => this.RegisterNativeCategories();
 
 
@@ -34,7 +23,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
 
     public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
     {
-        if (!this.platform.IsInManifest(P.WakeLock))
+        if (!platform.IsInManifest(P.WakeLock))
         {
             base.RunTask(taskName, task);
         }
@@ -42,7 +31,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
         {
             try
             {
-                using var pm = this.platform.GetSystemService<Android.OS.PowerManager>(Context.PowerService);
+                using var pm = platform.GetSystemService<Android.OS.PowerManager>(Context.PowerService);
                 using var wakeLock = pm.NewWakeLock(Android.OS.WakeLockFlags.Partial, "ShinyTask");
                 try
                 {
@@ -118,7 +107,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask
     }
 
 
-    WorkManager Instance => WorkManager.GetInstance(this.platform.AppContext);
+    WorkManager Instance => WorkManager.GetInstance(platform.AppContext);
     static NetworkType ToNative(InternetAccess access) => access switch
     {
         InternetAccess.Any => NetworkType.Connected!,

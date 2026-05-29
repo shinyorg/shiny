@@ -19,6 +19,14 @@ public interface IJobManager
     void RunTask(string taskName, Func<CancellationToken, Task> task);
 
     /// <summary>
+    /// Runs a job on a background task
+    /// </summary>
+    /// <param name="jobIdentifier"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<JobRunResult> RunJobAsTask(string jobIdentifier, CancellationToken cancellationToken = default);
+    
+    /// <summary>
     /// Force-runs all registered jobs and returns the result for each.
     /// </summary>
     /// <param name="cancelToken">Token used to cancel running jobs.</param>

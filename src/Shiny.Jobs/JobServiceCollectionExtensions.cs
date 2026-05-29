@@ -21,22 +21,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddJob<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
         where TJob : class, IJob
     {
-        services.AddJobs();
-
-        var registrar = (JobRegistrar)services.Single(x => x.ImplementationInstance is JobRegistrar).ImplementationInstance!;
-        registrar.Register<TJob>(configure);
-
-        return services;
-    }
-
-
-    /// <summary>
-    /// Registers the Shiny <see cref="IJobManager"/> and its supporting infrastructure. On
-    /// platform targets (iOS/Android/Windows) this hooks the native background scheduler; on
-    /// plain .NET targets it registers an in-process manager that runs jobs while the host is alive.
-    /// </summary>
-    public static IServiceCollection AddJobs(this IServiceCollection services)
-    {
 #if PLATFORM
         services.AddConnectivity();
         services.AddBattery();
@@ -51,6 +35,10 @@ public static class ServiceCollectionExtensions
             services.AddSingletonAsImplementedInterfaces<JobManager>();
 #endif
         }
+
+        var registrar = (JobRegistrar)services.Single(x => x.ImplementationInstance is JobRegistrar).ImplementationInstance!;
+        registrar.Register<TJob>(configure);
+
         return services;
     }
 }

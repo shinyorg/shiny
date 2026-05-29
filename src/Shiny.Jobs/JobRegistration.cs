@@ -78,8 +78,7 @@ public sealed class JobRegistrar(IServiceCollection services)
             reg = configure(reg);
 
         this.registrations[typeof(TJob)] = reg;
-        services.AddSingleton<TJob>();
-        services.AddSingleton<IJob>(sp => sp.GetRequiredService<TJob>());
+        services.AddScopedAsImplementedInterfaces<TJob>();
         return this;
     }
 }
