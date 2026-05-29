@@ -30,7 +30,6 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
 
     readonly IBattery battery;
     readonly IConnectivity connectivity;
-    readonly JobRegistrar registrar;
     readonly Timer timer;
     bool disposed;
 
@@ -41,11 +40,10 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
         IBattery battery,
         IConnectivity connectivity,
         JobRegistrar registrar
-    ) : base(container, logger)
+    ) : base(container, logger, registrar)
     {
         this.battery = battery;
         this.connectivity = connectivity;
-        this.registrar = registrar;
 
         this.timer = new Timer();
         this.timer.Elapsed += (_, _) => this.RunForegroundJobs();
@@ -54,9 +52,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
 
     public void Start()
     {
-        this.AddRegistrations(this.registrar.Jobs);
-        this.Log.LogDebug("Registered {Count} job(s)", this.registrar.Jobs.Count);
-
+        this.Log.LogDebug("Registered {Count} job(s)", this.Registrar.Jobs.Count);
         this.RunForegroundJobs();
     }
 
@@ -81,16 +77,16 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
         {
             try
             {
-                this.Log.LogDebug("Job '{Identifier}' Foreground Started", reg.Identifier);
+                this.Log.LogDebug("Job '{JobType}' Foreground Started", type.FullName);
                 await this
                     .RunJob(type, reg, default)
                     .ConfigureAwait(false);
 
-                this.Log.LogDebug("Job '{Identifier}' Foreground Finished Successfully", reg.Identifier);
+                this.Log.LogDebug("Job '{JobType}' Foreground Finished Successfully", type.FullName);
             }
             catch (Exception ex)
             {
-                this.Log.LogWarning(ex, "Job '{Identifier}' Foreground Error", reg.Identifier);
+                this.Log.LogWarning(ex, "Job '{JobType}' Foreground Error", type.FullName);
             }
         }
 
@@ -112,19 +108,19 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
 
         if (reg.BatteryNotLow && this.battery.Level <= 20 && !this.battery.IsPluggedIn())
         {
-            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient power level", reg.Identifier);
+            this.Log.LogDebug("Job '{JobType}' won't run because of insufficient power level", reg.JobType.FullName);
             return false;
         }
 
         if (!this.HasReqInternet(reg))
         {
-            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient internet requirement", reg.Identifier);
+            this.Log.LogDebug("Job '{JobType}' won't run because of insufficient internet requirement", reg.JobType.FullName);
             return false;
         }
 
         if (reg.DeviceCharging && !this.battery.IsPluggedIn())
         {
-            this.Log.LogDebug("Job '{Identifier}' won't run because of insufficient charge status", reg.Identifier);
+            this.Log.LogDebug("Job '{JobType}' won't run because of insufficient charge status", reg.JobType.FullName);
             return false;
         }
 

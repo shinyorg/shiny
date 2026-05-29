@@ -19,12 +19,16 @@ public interface IJobManager
     void RunTask(string taskName, Func<CancellationToken, Task> task);
 
     /// <summary>
-    /// Runs a job on a background task
+    /// Runs a single registered job by its CLR type.
     /// </summary>
-    /// <param name="jobIdentifier"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<JobRunResult> RunJobAsTask(string jobIdentifier, CancellationToken cancellationToken = default);
+    /// <param name="jobType">The registered <see cref="IJob"/> implementation type.</param>
+    /// <param name="runAsTask">
+    /// When true, wraps the run in platform-specific extended-execution semantics
+    /// (iOS <c>BeginBackgroundTask</c>, Android wake-lock); when false, runs inline.
+    /// </param>
+    /// <param name="cancellationToken">Token used to cancel the running job.</param>
+    /// <returns>The job's execution result.</returns>
+    Task<JobRunResult> RunJob(Type jobType, bool runAsTask = false, CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Force-runs all registered jobs and returns the result for each.

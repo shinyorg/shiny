@@ -8,15 +8,14 @@ namespace Shiny.Jobs;
 
 /// <summary>
 /// Registration record describing a job and the runtime constraints under which it may execute.
+/// The job's CLR type is its unique identifier.
 /// </summary>
-/// <param name="Identifier">Unique identifier for the registration.</param>
 /// <param name="JobType">The CLR type implementing <see cref="IJob"/>.</param>
 /// <param name="RunOnForeground">When true, the job may run while the app is in the foreground.</param>
 /// <param name="RequiredInternetAccess">The internet access required for the job to execute.</param>
 /// <param name="DeviceCharging">When true, the job runs only while charging.</param>
 /// <param name="BatteryNotLow">When true, the job runs only when the device battery is not low.</param>
 public record JobRegistration(
-    string Identifier,
     Type JobType,
     bool RunOnForeground = false,
     InternetAccess RequiredInternetAccess = InternetAccess.None,
@@ -30,10 +29,6 @@ public record JobRegistration(
 /// </summary>
 public static class JobRegistrationExtensions
 {
-    /// <summary>Overrides the registration identifier.</summary>
-    public static JobRegistration WithIdentifier(this JobRegistration reg, string identifier)
-        => reg with { Identifier = identifier };
-
     /// <summary>Allows the job to run while the app is in the foreground.</summary>
     public static JobRegistration WithForeground(this JobRegistration reg, bool value = true)
         => reg with { RunOnForeground = value };
@@ -69,11 +64,11 @@ public sealed class JobRegistrar(IServiceCollection services)
     /// Registers a job of type <typeparamref name="TJob"/> with the service collection and stores its registration.
     /// </summary>
     /// <typeparam name="TJob">The job type to register.</typeparam>
-    /// <param name="configure">Optional fluent configuration; the default registration uses <c>typeof(TJob).FullName</c> as the identifier.</param>
+    /// <param name="configure">Optional fluent configuration.</param>
     /// <returns>This registrar, for fluent chaining.</returns>
     public JobRegistrar Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TJob>(Func<JobRegistration, JobRegistration>? configure = null) where TJob : class, IJob
     {
-        var reg = new JobRegistration(typeof(TJob).FullName!, typeof(TJob));
+        var reg = new JobRegistration(typeof(TJob));
         if (configure != null)
             reg = configure(reg);
 

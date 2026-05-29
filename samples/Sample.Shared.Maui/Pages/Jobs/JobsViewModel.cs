@@ -18,7 +18,7 @@ public partial class JobsViewModel(IJobManager jobManager) : ObservableObject, I
         {
             this.Jobs.Add(new JobItemViewModel(this)
             {
-                Identifier = reg.Identifier,
+                Type = type,
                 JobType = type.Name,
                 Requirements = FormatRequirements(reg)
             });
@@ -48,7 +48,7 @@ public partial class JobsViewModel(IJobManager jobManager) : ObservableObject, I
 
         foreach (var result in list)
         {
-            var id = result.Job?.Identifier ?? "(unknown)";
+            var id = result.Job?.JobType.FullName ?? "(unknown)";
             var outcome = result.Success ? "Success" : "Failed";
             this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, id, outcome, result.Exception?.Message));
         }
@@ -56,22 +56,23 @@ public partial class JobsViewModel(IJobManager jobManager) : ObservableObject, I
     }
 
     [RelayCommand]
-    async Task RunJob(string jobIdentifier)
+    async Task RunJob(Type? jobType)
     {
-        if (string.IsNullOrWhiteSpace(jobIdentifier))
+        if (jobType == null)
             return;
 
-        this.Status = $"Running {jobIdentifier}...";
+        var label = jobType.Name;
+        this.Status = $"Running {label}...";
         try
         {
-            await jobManager.RunJobAsTask(jobIdentifier);
-            this.Status = $"{jobIdentifier}: success";
-            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, jobIdentifier, "Success", null));
+            await jobManager.RunJob(jobType, runAsTask: true);
+            this.Status = $"{label}: success";
+            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, label, "Success", null));
         }
         catch (Exception ex)
         {
-            this.Status = $"{jobIdentifier}: {ex.Message}";
-            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, jobIdentifier, "Failed", ex.Message));
+            this.Status = $"{label}: {ex.Message}";
+            this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, label, "Failed", ex.Message));
         }
         Trim();
     }
@@ -91,11 +92,11 @@ public partial class JobItemViewModel : ObservableObject
     readonly JobsViewModel parent;
     public JobItemViewModel(JobsViewModel parent) => this.parent = parent;
 
-    [ObservableProperty] string identifier = string.Empty;
+    [ObservableProperty] Type? type;
     [ObservableProperty] string jobType = string.Empty;
     [ObservableProperty] string requirements = string.Empty;
 
-    public IRelayCommand<string> RunCommand => this.parent.RunJobCommand;
+    public IRelayCommand<Type?> RunCommand => this.parent.RunJobCommand;
 }
 
 public record JobRunEntry(DateTime Timestamp, string Identifier, string Outcome, string? Error);

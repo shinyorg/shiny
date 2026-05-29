@@ -14,7 +14,6 @@ namespace Shiny.Jobs.Infrastructure;
 public class JobLifecycleTask(
     ILogger<JobLifecycleTask> logger,
     IJobManager jobManager,
-    JobRegistrar registrar,
     IBattery battery,
     IConnectivity connectivity
 ) : ShinyLifecycleTask, IDisposable
@@ -42,18 +41,7 @@ public class JobLifecycleTask(
         base.Start();
         this.timer.Elapsed += (_, _) => _ = this.RunJobs();
 
-        try
-        {
-            if (jobManager is AbstractJobManager abstractManager)
-                abstractManager.AddRegistrations(registrar.Jobs);
-
-            logger.LogDebug("Registered {Count} job(s)", registrar.Jobs.Count);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to run job startup");
-        }
-
+        logger.LogDebug("Registered {Count} job(s)", jobManager.GetJobs().Count);
         _ = this.RunJobs();
     }
 
@@ -72,16 +60,16 @@ public class JobLifecycleTask(
         {
             try
             {
-                logger.LogDebug("Job '{Identifier}' Foreground Started", reg.Identifier);
+                logger.LogDebug("Job '{JobType}' Foreground Started", type.FullName);
 
                 if (jobManager is AbstractJobManager abstractManager)
                     await abstractManager.RunJob(type, reg, CancellationToken.None).ConfigureAwait(false);
 
-                logger.LogDebug("Job '{Identifier}' Foreground Finished Successfully", reg.Identifier);
+                logger.LogDebug("Job '{JobType}' Foreground Finished Successfully", type.FullName);
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Job '{Identifier}' Foreground Error", reg.Identifier);
+                logger.LogWarning(ex, "Job '{JobType}' Foreground Error", type.FullName);
             }
         }
 

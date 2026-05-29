@@ -10,8 +10,9 @@ namespace Shiny.Jobs;
 
 public class JobManager(
     IServiceProvider container,
-    ILogger<IJobManager> logger
-) : AbstractJobManager(container, logger), IShinyStartupTask
+    ILogger<IJobManager> logger,
+    JobRegistrar registrar
+) : AbstractJobManager(container, logger, registrar), IShinyStartupTask
 {
     const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
     bool registeredSuccessfully = false;
@@ -57,6 +58,23 @@ public class JobManager(
         catch (Exception ex)
         {
             this.LogTask(JobState.Error, taskName, ex);
+        }
+        finally
+        {
+            app.EndBackgroundTask(taskId);
+        }
+    }
+
+
+    protected override async Task<JobRunResult> RunAsTask(Type jobType, JobRegistration reg, CancellationToken cancellationToken)
+    {
+        var app = UIApplication.SharedApplication;
+        var taskId = 0;
+        using var cancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        try
+        {
+            taskId = (int)app.BeginBackgroundTask(jobType.FullName, cancelSrc.Cancel);
+            return await this.RunJob(jobType, reg, cancelSrc.Token).ConfigureAwait(false);
         }
         finally
         {

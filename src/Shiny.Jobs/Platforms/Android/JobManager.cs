@@ -12,8 +12,9 @@ namespace Shiny.Jobs;
 public class JobManager(
     AndroidPlatform platform,
     IServiceProvider container,
-    ILogger<IJobManager> logger
-) : AbstractJobManager(container, logger), IShinyStartupTask
+    ILogger<IJobManager> logger,
+    JobRegistrar registrar
+) : AbstractJobManager(container, logger, registrar), IShinyStartupTask
 {
     public void Start() => this.RegisterNativeCategories();
 
@@ -51,6 +52,25 @@ public class JobManager(
             {
                 this.Log.LogError(ex, "Error setting up task - {TaskName}", taskName);
             }
+        }
+    }
+
+
+    protected override async Task<JobRunResult> RunAsTask(Type jobType, JobRegistration reg, CancellationToken cancellationToken)
+    {
+        if (!platform.IsInManifest(P.WakeLock))
+            return await base.RunAsTask(jobType, reg, cancellationToken).ConfigureAwait(false);
+
+        using var pm = platform.GetSystemService<Android.OS.PowerManager>(Context.PowerService);
+        using var wakeLock = pm.NewWakeLock(Android.OS.WakeLockFlags.Partial, "ShinyJob");
+        try
+        {
+            wakeLock.Acquire();
+            return await this.RunJob(jobType, reg, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            wakeLock.Release();
         }
     }
 

@@ -15,14 +15,19 @@ namespace Shiny.Jobs;
 /// </summary>
 public abstract class AbstractJobManager(
     IServiceProvider container,
-    ILogger logger
+    ILogger logger,
+    JobRegistrar registrar
 ) : IJobManager
 {
     /// <summary>
     /// Logger available to derived implementations.
     /// </summary>
     protected ILogger Log => logger;
-    readonly Dictionary<Type, JobRegistration> registrations = new();
+
+    /// <summary>
+    /// The registrar that owns the set of registered jobs.
+    /// </summary>
+    protected JobRegistrar Registrar => registrar;
 
     /// <summary>
     /// Gets a value indicating whether a job batch is currently running.
@@ -36,18 +41,27 @@ public abstract class AbstractJobManager(
     public abstract Task<AccessState> RequestAccess();
 
 
-    public virtual Task<JobRunResult> RunJobAsTask(string jobIdentifier, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public virtual Task<JobRunResult> RunJob(Type jobType, bool runAsTask = false, CancellationToken cancellationToken = default)
     {
-        var kvp = this.registrations.FirstOrDefault(x =>
-            x.Value.Identifier.Equals(jobIdentifier, StringComparison.OrdinalIgnoreCase) ||
-            x.Key.FullName == jobIdentifier
-        );
-        if (kvp.Key == null)
-            throw new InvalidOperationException($"Job '{jobIdentifier}' is not registered");
+        if (!registrar.Jobs.TryGetValue(jobType, out var reg))
+            throw new InvalidOperationException($"Job '{jobType.FullName}' is not registered");
 
-        return this.RunJob(kvp.Key, kvp.Value, cancellationToken);
+        return runAsTask
+            ? this.RunAsTask(jobType, reg, cancellationToken)
+            : this.RunJob(jobType, reg, cancellationToken);
     }
-    
+
+
+    /// <summary>
+    /// Runs a job under platform-specific extended-execution semantics.
+    /// Override on a platform that supports a longer-lived background task
+    /// (e.g. iOS <c>BeginBackgroundTask</c>, Android wake-lock); the default
+    /// implementation simply forwards to <see cref="RunJob(Type, JobRegistration, CancellationToken)"/>.
+    /// </summary>
+    protected virtual Task<JobRunResult> RunAsTask(Type jobType, JobRegistration reg, CancellationToken cancellationToken)
+        => this.RunJob(jobType, reg, cancellationToken);
+
     /// <inheritdoc />
     public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
     {
@@ -65,14 +79,7 @@ public abstract class AbstractJobManager(
 
 
     /// <inheritdoc />
-    public IReadOnlyDictionary<Type, JobRegistration> GetJobs() => this.registrations;
-    
-
-    internal void AddRegistrations(IReadOnlyDictionary<Type, JobRegistration> regs)
-    {
-        foreach (var (type, reg) in regs)
-            this.registrations[type] = reg;
-    }
+    public IReadOnlyDictionary<Type, JobRegistration> GetJobs() => registrar.Jobs;
 
 
     /// <inheritdoc />
@@ -88,7 +95,7 @@ public abstract class AbstractJobManager(
 
                 if (runSequentially)
                 {
-                    foreach (var (type, reg) in this.registrations)
+                    foreach (var (type, reg) in registrar.Jobs)
                     {
                         var result = await this
                             .RunJob(type, reg, cancelToken)
@@ -98,7 +105,7 @@ public abstract class AbstractJobManager(
                 }
                 else
                 {
-                    var tasks = this.registrations
+                    var tasks = registrar.Jobs
                         .Select(kvp => this.RunJob(kvp.Key, kvp.Value, cancelToken))
                         .ToList();
 
@@ -148,19 +155,19 @@ public abstract class AbstractJobManager(
     {
         return categoryId switch
         {
-            "com.shiny.job" => this.registrations.Values
+            "com.shiny.job" => registrar.Jobs.Values
                 .Where(x => !x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.None)
                 .ToList(),
 
-            "com.shiny.jobpower" => this.registrations.Values
+            "com.shiny.jobpower" => registrar.Jobs.Values
                 .Where(x => x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.None)
                 .ToList(),
 
-            "com.shiny.jobnet" => this.registrations.Values
+            "com.shiny.jobnet" => registrar.Jobs.Values
                 .Where(x => !x.DeviceCharging && x.RequiredInternetAccess != InternetAccess.None)
                 .ToList(),
 
-            "com.shiny.jobpowernet" => this.registrations.Values
+            "com.shiny.jobpowernet" => registrar.Jobs.Values
                 .Where(x => x.DeviceCharging && x.RequiredInternetAccess != InternetAccess.None)
                 .ToList(),
 
@@ -190,9 +197,9 @@ public abstract class AbstractJobManager(
     protected virtual void LogJob(JobState state, Type jobType, JobRegistration reg, Exception? exception = null)
     {
         if (exception == null)
-            this.Log.LogInformation(state == JobState.Finish ? "Job '{JobName}' succeeded" : "Job '{JobName}' {State}", reg.Identifier, state);
+            this.Log.LogInformation(state == JobState.Finish ? "Job '{JobName}' succeeded" : "Job '{JobName}' {State}", jobType.FullName, state);
         else
-            this.Log.LogError(exception, "Error running job '{JobName}'", reg.Identifier);
+            this.Log.LogError(exception, "Error running job '{JobName}'", jobType.FullName);
     }
 
 

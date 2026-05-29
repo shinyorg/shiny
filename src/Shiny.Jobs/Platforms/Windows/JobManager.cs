@@ -12,8 +12,9 @@ namespace Shiny.Jobs;
 
 public class JobManager(
     IServiceProvider container,
-    ILogger<IJobManager> logger
-) : AbstractJobManager(container, logger), IShinyStartupTask
+    ILogger<IJobManager> logger,
+    JobRegistrar registrar
+) : AbstractJobManager(container, logger, registrar), IShinyStartupTask
 {
     public void Start() => this.RegisterNativeCategories();
 

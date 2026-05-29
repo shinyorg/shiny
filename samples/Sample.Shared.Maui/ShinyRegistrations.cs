@@ -52,10 +52,7 @@ public static class ShinyRegistrations
 #if !(PLATFORM && MACOS)
         // Jobs: iOS, Android, MacCatalyst, Windows (in-proc COM-activated), and bare .NET (in-proc).
         // MacOS does not expose a background-task scheduler we wrap today.
-        s.AddJob<SampleJob>(r => r
-            .WithIdentifier("SampleJob")
-            .WithForeground()
-        );
+        s.AddJob<SampleJob>(r => r.WithForeground());
 #endif
 
         return builder;
