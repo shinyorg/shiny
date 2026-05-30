@@ -14,16 +14,27 @@ public static class Extensions
     {
         var cts = new CancellationTokenSource();
 
-        var _ = Task.Run(() =>
+        _ = Task.Run(() =>
         {
             var buffer = new byte[8192];
-            var read = 0;
 
-            while (!cts.IsCancellationRequested && read != -1)
+            try
             {
-                read = socket.OutputStream!.Read(buffer, 0, buffer.Length);
-                if (read != -1)
-                    ob.OnNext(buffer);
+                while (!cts.IsCancellationRequested)
+                {
+                    var read = socket.InputStream!.Read(buffer, 0, buffer.Length);
+                    if (read <= 0)
+                        break;
+
+                    var payload = new byte[read];
+                    Array.Copy(buffer, 0, payload, 0, read);
+                    ob.OnNext(payload);
+                }
+                ob.OnCompleted();
+            }
+            catch (Exception ex) when (!cts.IsCancellationRequested)
+            {
+                ob.OnError(ex);
             }
         });
 

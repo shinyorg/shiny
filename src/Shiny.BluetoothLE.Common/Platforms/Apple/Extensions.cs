@@ -85,31 +85,41 @@ public static class Extensions
     public static IObservable<byte[]> ListenForData(this NSInputStream stream) => Observable.Create<byte[]>(ob =>
     {
         var buffer = new byte[8192];
-        var read = 0;
 
-        if (stream.HasBytesAvailable())
+        void Drain()
         {
-            read = (int)stream.Read(buffer, 0, (nuint)buffer.Length);
-            if (read > 0)
-                ob.OnNext(buffer);
+            while (stream.HasBytesAvailable())
+            {
+                var read = (int)stream.Read(buffer, 0, (nuint)buffer.Length);
+                if (read <= 0)
+                    return;
+
+                var payload = new byte[read];
+                Array.Copy(buffer, 0, payload, 0, read);
+                ob.OnNext(payload);
+            }
         }
+
+        Drain();
 
         var comp = new CompositeDisposable();
         comp.Add(stream
             .WhenEvent()
             .Where(x => x == NSStreamEvent.HasBytesAvailable)
-            .Subscribe(_ =>
-            {
-                read = (int)stream.Read(buffer, 0, (nuint)buffer.Length);
-                if (read > 0)
-                    ob.OnNext(buffer);
-            })
+            .Subscribe(_ => Drain())
         );
 
-        stream
+        comp.Add(stream
             .WhenEvent()
             .Where(x => x == NSStreamEvent.ErrorOccurred)
-            .Subscribe(_ => ob.OnError(stream.ToError()));
+            .Subscribe(_ => ob.OnError(stream.ToError()))
+        );
+
+        comp.Add(stream
+            .WhenEvent()
+            .Where(x => x == NSStreamEvent.EndEncountered)
+            .Subscribe(_ => ob.OnCompleted())
+        );
 
         return comp;
     });

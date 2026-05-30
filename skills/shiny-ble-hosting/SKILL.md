@@ -43,6 +43,12 @@ triggers:
   - ble indicate
   - ble read characteristic
   - ble write characteristic
+  - L2CAP
+  - L2Cap
+  - L2CapChannel
+  - L2CapInstance
+  - OpenL2Cap
+  - PSM
 ---
 
 # Shiny.BluetoothLE.Hosting Skill
@@ -63,12 +69,13 @@ Invoke this skill when the user wants to:
 - Configure characteristic properties (read, write, notify, indicate, encryption)
 - React to central subscribe/unsubscribe events
 - Build a MAUI app that acts as a BLE peripheral
+- Publish an L2CAP PSM for centrals to open streaming channels against
 
 ## Library Overview
 
 - **NuGet**: `Shiny.BluetoothLE.Hosting`
 - **Namespaces**: `Shiny.BluetoothLE.Hosting`, `Shiny.BluetoothLE.Hosting.Managed`
-- **Platforms**: iOS, Android (no Windows support for full hosting)
+- **Platforms**: iOS, Mac Catalyst, macOS (CoreBluetooth), Android (no Windows support for full hosting)
 - **Dependencies**: `Shiny.Core`, `Shiny.BluetoothLE.Common`
 
 The library has two usage patterns:
@@ -282,7 +289,68 @@ cb.SetWrite(request =>
 }, WriteOptions.Write);
 ```
 
-### 9. File Organization
+### 9. L2CAP Channels
+
+Publish an L2CAP PSM that centrals can connect to for streaming data without going through GATT. `OpenL2Cap` returns an `L2CapInstance` representing the listener; the `onOpen` callback fires for every accepted central connection. Each `L2CapChannel` is itself an `IDisposable` — dispose it to close that specific central's channel; dispose the `L2CapInstance` to stop accepting new connections and release the PSM.
+
+```csharp
+using System.Reactive.Threading.Tasks;
+using Shiny.BluetoothLE;
+using Shiny.BluetoothLE.Hosting;
+
+var instance = await hostingManager.OpenL2Cap(
+    secure: false,
+    onOpen: channel =>
+    {
+        Console.WriteLine($"Central {channel.Identifier} connected on PSM {channel.Psm}");
+
+        channel.DataReceived.Subscribe(
+            async payload =>
+            {
+                // Echo back
+                await channel.Write(payload).ToTask();
+            },
+            ex => Console.WriteLine($"Channel error: {ex.Message}"),
+            () => channel.Dispose()
+        );
+    }
+);
+
+Console.WriteLine($"Listening on PSM {instance.Psm}");
+
+// Later, when shutting down:
+instance.Dispose();
+```
+
+The platform-assigned PSM is on `instance.Psm` — advertise it to centrals out-of-band (typically through a GATT characteristic exposed by your service).
+
+Platform notes:
+- **iOS / Mac Catalyst / macOS**: `CBPeripheralManager.PublishL2CapChannel(encryptionRequired)`. The `secure` flag maps to encryption-required.
+- **Android**: `BluetoothAdapter.ListenUsing[Insecure]L2capChannel`. Requires API 29+ — throws `InvalidOperationException` on older versions.
+
+#### File Transfer
+
+`L2CapChannelExtensions.SendFile(...)` streams a file over a connected channel with progress metrics (throughput, percent-complete, ETA) matching the `Shiny.Net.Http.TransferProgress` shape. Useful for pushing large blobs to a connected central:
+
+```csharp
+using Shiny.BluetoothLE;
+
+using var instance = await hostingManager.OpenL2Cap(secure: false, onOpen: async channel =>
+{
+    await channel.SendFile(
+        "/path/to/firmware.bin",
+        bufferSize: 4096,
+        onProgress: p => Console.WriteLine(
+            $"{p.PercentComplete:P0} {p.BytesPerSecond / 1024} KB/s ETA {p.EstimatedTimeRemaining}"
+        )
+    );
+    channel.Dispose();
+});
+```
+
+A `Stream` overload is available for non-file sources; pass `totalBytes` to enable percent / ETA computation.
+
+### 10. File Organization
 
 - Managed characteristics: `BleHosting/{Name}Characteristic.cs`
 - Or by feature: `Features/{Feature}/{Name}Characteristic.cs`

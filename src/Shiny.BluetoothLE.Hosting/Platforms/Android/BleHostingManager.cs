@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth.LE;
 using Android.OS;
@@ -11,10 +13,10 @@ using static Android.Manifest;
 namespace Shiny.BluetoothLE.Hosting;
 
 
-public partial class BleHostingManager : IBleHostingManager
+public partial class BleHostingManager(AndroidPlatform platform) : IBleHostingManager
 {
     readonly Dictionary<string, GattService> services = new();
-    readonly GattServerContext context;
+    readonly GattServerContext context = new(platform);
     AdvertisementCallbacks? adCallbacks;
 
 
@@ -175,64 +177,64 @@ public partial class BleHostingManager : IBleHostingManager
     }
 
 
-    //public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
-    //{
-    //    if (!OperatingSystem.IsAndroidVersionAtLeast(26))
-    //        throw new InvalidOperationException("L2Cap hosting is only available on Android API26+");
+    public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
+    {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(29))
+            throw new InvalidOperationException("L2Cap hosting requires Android API 29+");
 
-    //    if (!OperatingSystem.IsAndroidVersionAtLeast(29) && secure)
-    //        throw new InvalidOperationException("Secure L2Cap hosting is only available on Android API29+");
+        (await this.RequestAccess()).Assert();
 
-    //    (await this.RequestAccess()).Assert();
+        var ad = this.context.Platform.GetBluetoothAdapter()
+            ?? throw new InvalidOperationException("No Bluetooth adapter available");
 
-    //    var ct = new CancellationTokenSource();
-    //    var ad = this.context.Platform.GetBluetoothAdapter();
+        var serverSocket = secure
+            ? ad.ListenUsingL2capChannel()
+            : ad.ListenUsingInsecureL2capChannel();
 
-    //    if (ad == null)
-    //        throw new InvalidOperationException("No Bluetooth Adaptor found");
+        var psm = Convert.ToUInt16(serverSocket!.Psm);
+        var cts = new CancellationTokenSource();
 
-    //    var serverSocket = secure
-    //        ? ad.ListenUsingL2capChannel()
-    //        : ad.ListenUsingInsecureL2capChannel();
+        _ = Task.Run(() =>
+        {
+            while (!cts.IsCancellationRequested)
+            {
+                try
+                {
+                    var socket = serverSocket.Accept();
+                    if (socket == null || cts.IsCancellationRequested)
+                    {
+                        socket?.Dispose();
+                        return;
+                    }
 
-    //    var psm = Convert.ToUInt16(serverSocket!.Psm);
+                    onOpen(new L2CapChannel(
+                        psm,
+                        socket.RemoteDevice?.Address ?? string.Empty,
+                        data => System.Reactive.Linq.Observable.FromAsync(ct => socket.OutputStream!.WriteAsync(data, 0, data.Length, ct)),
+                        socket.ListenForData(),
+                        () => socket.Dispose()
+                    ));
+                }
+                catch when (cts.IsCancellationRequested)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error accepting L2Cap connection on PSM {psm}: {ex}");
+                }
+            }
+        });
 
-    //    _ = Task.Run(() =>
-    //    {
-    //        while (!ct.IsCancellationRequested)
-    //        {
-    //            try
-    //            {
-    //                var socket = serverSocket.Accept(30000);
-    //                if (socket != null && !ct.IsCancellationRequested)
-    //                {
-    //                    //socket.MaxReceivePacketSize
-    //                    //socket.MaxTransmitPacketSize
-    //                    onOpen(new L2CapChannel(
-    //                        psm,
-    //                        socket.RemoteDevice!.Address!,
-    //                        data => Observable.FromAsync(ct => socket.InputStream!.WriteAsync(data, 0, data.Length, ct)),
-    //                        socket.ListenForData()
-    //                    ));
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                // error opening connection, but it's fine
-    //                Console.WriteLine("Error opening connection - " + ex.ToString());
-    //            }
-    //        }
-    //    });
-
-    //    return new L2CapInstance(
-    //        psm,
-    //        () =>
-    //        {
-    //            ct.Cancel();
-    //            serverSocket?.Dispose();
-    //        }
-    //    );
-    //}
+        return new L2CapInstance(
+            psm,
+            () =>
+            {
+                cts.Cancel();
+                serverSocket.Dispose();
+            }
+        );
+    }
 
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
     {

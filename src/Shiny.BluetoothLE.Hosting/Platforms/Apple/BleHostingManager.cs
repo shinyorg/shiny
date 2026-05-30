@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using CoreBluetooth;
@@ -85,35 +86,54 @@ public partial class BleHostingManager : IBleHostingManager
 
     public void StopAdvertising() => this.Manager.StopAdvertising();
 
-    //public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
-    //{
-    //    (await this.RequestAccess(false, true)).Assert();
 
-    //    var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
-    //    {
-    //        //args.Channel.InputStream.Status == NSStreamStatus.Open
-    //        var c = args.Channel!;
-    //        c.InputStream.Open();
-    //        c.OutputStream.Open();
+    public async Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
+    {
+        (await this.RequestAccess(false, true)).Assert();
 
-    //        onOpen(new L2CapChannel(
-    //            c.Psm,
-    //            c.Peer.Identifier.ToString(),
-    //            data => Observable.FromAsync(ct => c.OutputStream.WriteAsync(data, 0, data.Length, ct)),
-    //            c.InputStream.ListenForData()
-    //        ));
-    //    });
-    //    this.Manager.DidOpenL2CapChannel += handler;
-    //    var psm = await this.PublishL2Cap(secure);
-    //    return new L2CapInstance(
-    //        psm,
-    //        () =>
-    //        {
-    //            this.Manager.UnpublishL2CapChannel(psm);
-    //            this.Manager.DidOpenL2CapChannel -= handler;
-    //        }
-    //    );
-    //}
+        var handler = new EventHandler<CBPeripheralManagerOpenL2CapChannelEventArgs>((sender, args) =>
+        {
+            if (args.Error != null || args.Channel == null)
+                return;
+
+            var c = args.Channel;
+            c.InputStream.Open();
+            c.OutputStream.Open();
+
+            onOpen(new L2CapChannel(
+                c.Psm,
+                c.Peer.Identifier.ToString(),
+                data => Observable.FromAsync(ct => c.OutputStream.WriteAsync(data, 0, data.Length, ct)),
+                c.InputStream.ListenForData(),
+                () =>
+                {
+                    c.InputStream.Close();
+                    c.OutputStream.Close();
+                }
+            ));
+        });
+        this.Manager.DidOpenL2CapChannel += handler;
+
+        ushort psm;
+        try
+        {
+            psm = await this.PublishL2Cap(secure).ConfigureAwait(false);
+        }
+        catch
+        {
+            this.Manager.DidOpenL2CapChannel -= handler;
+            throw;
+        }
+
+        return new L2CapInstance(
+            psm,
+            () =>
+            {
+                this.Manager.UnpublishL2CapChannel(psm);
+                this.Manager.DidOpenL2CapChannel -= handler;
+            }
+        );
+    }
 
 
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)

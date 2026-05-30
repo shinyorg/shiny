@@ -576,6 +576,42 @@ public interface IGattReliableWriteTransaction : IDisposable
 }
 ```
 
+### ICanL2Cap
+
+Opens an L2CAP Connection-Oriented Channel to a peripheral that has published a PSM.
+
+```csharp
+// Cast check: peripheral is ICanL2Cap
+// Prefer using IsL2CapAvailable() / TryOpenL2CapChannel() instead
+public interface ICanL2Cap : IPeripheral
+{
+    /// <param name="psm">The PSM advertised by the peripheral.</param>
+    /// <param name="secure">
+    /// On Android, when true requests an encrypted/authenticated channel (API 29+).
+    /// On Apple platforms this flag is ignored — security is determined by how the
+    /// peripheral published the channel.
+    /// </param>
+    IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure);
+}
+```
+
+### L2CapChannel (record, namespace `Shiny.BluetoothLE`)
+
+An open L2CAP CoC. Lives in `Shiny.BluetoothLE.Common` so the same type is used by both client and hosting libraries.
+
+```csharp
+public record L2CapChannel(
+    ushort Psm,                                    // PSM the channel was opened on
+    string Identifier,                             // Remote peer identifier (peripheral UUID on Apple, MAC address on Android)
+    Func<byte[], IObservable<Unit>> Write,         // Returns an observable that completes when bytes are queued
+    IObservable<byte[]> DataReceived,              // Hot; completes on remote close, OnError on I/O failure
+    Action? OnDispose = null                       // Optional cleanup invoked by Dispose()
+) : IDisposable
+{
+    public void Dispose();                         // Closes streams / disposes the socket
+}
+```
+
 ---
 
 ## Extension Methods
@@ -777,6 +813,67 @@ public static class Feature_Transactions
     static bool IsReliableTransactionsAvailable(this IPeripheral peripheral);
 }
 ```
+
+### Feature Extensions (L2CAP)
+
+```csharp
+public static class FeatureL2Cap
+{
+    // Returns true when the peripheral's platform supports ICanL2Cap
+    static bool IsL2CapAvailable(this IPeripheral peripheral);
+
+    // Opens an L2CAP channel if supported; emits Empty otherwise
+    static IObservable<L2CapChannel> TryOpenL2CapChannel(this IPeripheral peripheral, ushort psm, bool secure);
+}
+```
+
+### L2CapChannel File Transfer (L2CapChannelExtensions)
+
+Helpers for streaming file content over an open `L2CapChannel`. Progress callbacks emit `TransferProgress` snapshots with throughput / percent-complete / ETA — same shape as `Shiny.Net.Http.TransferProgress`.
+
+```csharp
+public static class L2CapChannelExtensions
+{
+    // Send a file by path. Length is read from the file and used as BytesToTransfer.
+    static Task SendFile(
+        this L2CapChannel channel,
+        string filePath,
+        int bufferSize = 4096,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken cancellationToken = default
+    );
+
+    // Send an arbitrary stream. Pass totalBytes to enable percent-complete and ETA.
+    static Task SendFile(
+        this L2CapChannel channel,
+        Stream source,
+        long? totalBytes = null,
+        int bufferSize = 4096,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken cancellationToken = default
+    );
+}
+```
+
+Progress emission cadence matches the HTTP extension: every ~2 seconds (BPS computed from bytes sent in that window) plus a final emission on completion with `BytesPerSecond = 0` and `BytesTransferred = BytesToTransfer`.
+
+### TransferProgress (record, namespace `Shiny.BluetoothLE`)
+
+```csharp
+public record TransferProgress(
+    long BytesPerSecond,
+    long? BytesToTransfer,        // null when length is unknown
+    long BytesTransferred
+)
+{
+    public static TransferProgress Empty { get; }
+    public bool IsDeterministic { get; }                // BytesToTransfer != null
+    public double PercentComplete { get; }              // 0.0–1.0, or -1 when not deterministic
+    public TimeSpan EstimatedTimeRemaining { get; }     // Zero when unknown
+}
+```
+
+> **Note**: `Shiny.BluetoothLE.TransferProgress` and `Shiny.Net.Http.TransferProgress` are intentionally identical in shape so the two libraries share a mental model. If both packages are referenced in the same compilation, use a file-level `using` or fully-qualified name to disambiguate.
 
 ---
 

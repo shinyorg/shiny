@@ -1,24 +1,44 @@
-﻿//namespace Shiny.BluetoothLE;
+using System;
+using System.Reactive.Linq;
+using Android.Bluetooth;
+
+namespace Shiny.BluetoothLE;
 
 
-//public partial class Peripheral : IL2Cap
-//{
-//    public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
-//    {
-//        if (!OperatingSystem.IsAndroidVersionAtLeast(23))
-//            throw new InvalidOperationException("L2Cap requires Android API Level 23+");
+public partial class Peripheral : ICanL2Cap
+{
+    public IObservable<L2CapChannel> OpenL2CapChannel(ushort psm, bool secure) => Observable.Create<L2CapChannel>(ob =>
+    {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            ob.OnError(new InvalidOperationException("L2Cap requires Android API Level 29+"));
+            return () => { };
+        }
 
-//        var socket = secure
-//            ? this.Native.CreateL2capChannel(psm)
-//            : this.Native.CreateInsecureL2capChannel(psm);
+        BluetoothSocket? socket = null;
+        try
+        {
+            socket = secure
+                ? this.Native.CreateL2capChannel(psm)
+                : this.Native.CreateInsecureL2capChannel(psm);
 
-//        ob.Respond(new L2CapChannel(
-//            psm,
-//            data => Observable.FromAsync(ct => socket.InputStream!.WriteAsync(data, 0, data.Length, ct)),
-//            socket.ListenForData(),
-//            () => socket.Dispose()
-//        ));
+            socket!.Connect();
 
-//        return Disposable.Empty;
-//    });
-//}
+            ob.OnNext(new L2CapChannel(
+                psm,
+                this.Native.Address!,
+                data => Observable.FromAsync(ct => socket.OutputStream!.WriteAsync(data, 0, data.Length, ct)),
+                socket.ListenForData(),
+                () => socket.Dispose()
+            ));
+            ob.OnCompleted();
+        }
+        catch (Exception ex)
+        {
+            socket?.Dispose();
+            ob.OnError(ex);
+        }
+
+        return () => { };
+    });
+}

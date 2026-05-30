@@ -43,6 +43,12 @@ public interface IBleHostingManager
     // Stops BLE advertising
     void StopAdvertising();
 
+    // Publishes an L2CAP PSM and listens for incoming central connections.
+    // Each accepted connection invokes `onOpen` with the opened channel.
+    // Dispose the returned `L2CapInstance` to unpublish the PSM and stop accepting.
+    // - secure: when true, the channel requires encryption/authentication (Android API 29+)
+    Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen);
+
     // Advertises as an iBeacon
     // uuid: the beacon proximity UUID
     // major: the beacon major value
@@ -260,20 +266,24 @@ public record GattResult(
 
 ### L2CapChannel
 
-Represents an L2CAP channel connection.
+An open L2CAP Connection-Oriented Channel. Lives in `Shiny.BluetoothLE.Common` (namespace `Shiny.BluetoothLE`) so the same record is shared with the client/central library.
 
 ```csharp
 public record L2CapChannel(
-    ushort Psm,
-    string Identifier,
-    Func<byte[], IObservable<Unit>> Write,
-    IObservable<byte[]> DataReceived
-);
+    ushort Psm,                                    // PSM the channel was opened on
+    string Identifier,                             // Identifier of the connecting central
+    Func<byte[], IObservable<Unit>> Write,         // Returns an observable that completes when bytes are queued
+    IObservable<byte[]> DataReceived,              // Hot; completes on remote close, OnError on I/O failure
+    Action? OnDispose = null                       // Optional cleanup invoked by Dispose()
+) : IDisposable
+{
+    public void Dispose();                         // Closes streams / disposes the socket
+}
 ```
 
 ### L2CapInstance
 
-Disposable wrapper for an L2CAP listener.
+Disposable handle bound to a listening PSM. Dispose to unpublish the PSM and stop accepting new connections.
 
 ```csharp
 public struct L2CapInstance : IDisposable
@@ -281,6 +291,54 @@ public struct L2CapInstance : IDisposable
     public L2CapInstance(ushort psm, Action onDispose);
     public ushort Psm { get; }
     public void Dispose();
+}
+```
+
+Disposing the instance does **not** close already-open per-central channels — dispose each `L2CapChannel` explicitly if you need to terminate active connections.
+
+### TransferProgress (record, namespace `Shiny.BluetoothLE`)
+
+Used by `L2CapChannelExtensions.SendFile(...)` to report transfer metrics. Intentionally identical in shape to `Shiny.Net.Http.TransferProgress`.
+
+```csharp
+public record TransferProgress(
+    long BytesPerSecond,
+    long? BytesToTransfer,        // null when length is unknown
+    long BytesTransferred
+)
+{
+    public static TransferProgress Empty { get; }
+    public bool IsDeterministic { get; }                // BytesToTransfer != null
+    public double PercentComplete { get; }              // 0.0–1.0, or -1 when not deterministic
+    public TimeSpan EstimatedTimeRemaining { get; }     // Zero when unknown
+}
+```
+
+### L2CapChannel File Transfer (L2CapChannelExtensions)
+
+Helpers for streaming a file over a connected `L2CapChannel`, with progress callbacks emitting `TransferProgress` snapshots roughly every two seconds plus one final emission on completion.
+
+```csharp
+public static class L2CapChannelExtensions
+{
+    // Send a file by path. Length is read from the file and used as BytesToTransfer.
+    static Task SendFile(
+        this L2CapChannel channel,
+        string filePath,
+        int bufferSize = 4096,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken cancellationToken = default
+    );
+
+    // Send an arbitrary stream. Pass totalBytes to enable percent-complete and ETA.
+    static Task SendFile(
+        this L2CapChannel channel,
+        Stream source,
+        long? totalBytes = null,
+        int bufferSize = 4096,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken cancellationToken = default
+    );
 }
 ```
 

@@ -44,7 +44,15 @@ public interface IBleHostingManager
     /// </summary>
     void StopAdvertising();
 
-    //Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen);
+    /// <summary>
+    /// Publishes an L2CAP PSM and listens for incoming central connections.
+    /// Each accepted connection invokes <paramref name="onOpen"/> with the opened channel;
+    /// dispose the returned <see cref="L2CapInstance"/> to unpublish the PSM and stop accepting.
+    /// </summary>
+    /// <param name="secure">When true, the channel requires encryption/authentication (Android API 29+).</param>
+    /// <param name="onOpen">Callback invoked for each accepted central connection.</param>
+    /// <returns>A disposable handle bound to the listening PSM.</returns>
+    Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen);
 
     /// <summary>
     /// Advertises as an iBeacon
