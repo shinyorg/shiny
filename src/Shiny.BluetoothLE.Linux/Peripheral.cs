@@ -14,7 +14,7 @@ using Tmds.DBus.Protocol;
 namespace Shiny.BluetoothLE;
 
 
-public class Peripheral : IPeripheral
+public partial class Peripheral : IPeripheral
 {
     readonly Connection connection;
     readonly BluezDevice device;

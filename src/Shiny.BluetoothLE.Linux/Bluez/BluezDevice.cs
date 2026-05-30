@@ -91,6 +91,34 @@ internal class BluezDevice
     }
 
 
+    public async Task<string> GetAddressTypeAsync(CancellationToken ct = default)
+    {
+        // BlueZ Device1.AddressType is "public" or "random". Older BlueZ may omit the property
+        // for classic-only devices; default to "public" in that case.
+        try
+        {
+            var msg = this.connection.CreateGetPropertyCall(
+                BluezConstants.Service,
+                this.objectPath,
+                BluezConstants.DeviceInterface,
+                "AddressType"
+            );
+            return await this.connection.CallMethodAsync(
+                msg,
+                static (Message reply, object? _) =>
+                {
+                    var reader = reply.GetBodyReader();
+                    return reader.ReadStringVariant()!;
+                }
+            ).ConfigureAwait(false);
+        }
+        catch
+        {
+            return "public";
+        }
+    }
+
+
     public Task<bool> GetConnectedAsync(CancellationToken ct = default)
     {
         var msg = this.connection.CreateGetPropertyCall(

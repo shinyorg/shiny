@@ -16,6 +16,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             return new List<FeatureItem>
             {
                 new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
+                new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"),
                 new("🔋 Battery", "Observe battery level & state", "battery"),
                 new("🌐 Connectivity", "Observe network connectivity", "connectivity")
             };
@@ -32,6 +33,11 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             new("🌐 Connectivity", "Observe network connectivity", "connectivity"),
             new("⚙️ Settings", "Connectivity, battery, key-value store", "settings")
         };
+
+        // L2CAP: implemented on Android (29+), Apple (iOS/MacCatalyst/MacOS), and Linux/BlueZ.
+        // Windows has no Bluetooth.GenericAttributeProfile L2CAP surface in WinRT.
+        if (!OperatingSystem.IsWindows())
+            list.Add(new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"));
 
         // Push: every MAUI-supported OS except Linux (no Shiny.Push Linux impl)
         if (!OperatingSystem.IsLinux())

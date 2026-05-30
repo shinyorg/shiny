@@ -102,4 +102,8 @@ public partial class BleHostingManager : IBleHostingManager
 
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
         => throw new NotSupportedException("iBeacon advertising is not supported on Windows");
+
+
+    public Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
+        => throw new NotSupportedException("L2CAP hosting is not supported on Windows");
 }

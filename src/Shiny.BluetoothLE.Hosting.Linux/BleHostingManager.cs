@@ -123,6 +123,83 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
         => throw new NotSupportedException("iBeacon advertising is not supported on Linux/BlueZ.");
 
 
+    public Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
+    {
+        // L2CAP CoC is independent of BlueZ's GATT/advertising surface — it goes straight
+        // to the kernel via AF_BLUETOOTH sockets, so this works even though our GATT server
+        // and advertising hooks are still stubs.
+        var (listener, psm) = L2CapSocket.Listen(secure);
+        var cts = new CancellationTokenSource();
+
+        _ = Task.Run(() =>
+        {
+            while (!cts.IsCancellationRequested)
+            {
+                L2CapSocket.L2CapHandle? client = null;
+                string? peer = null;
+                try
+                {
+                    var accepted = L2CapSocket.Accept(listener);
+                    if (accepted == null || cts.IsCancellationRequested)
+                    {
+                        accepted?.Client.Dispose();
+                        return;
+                    }
+                    (client, peer) = (accepted.Value.Client, accepted.Value.PeerAddress);
+                }
+                catch (Exception ex) when (!cts.IsCancellationRequested)
+                {
+                    this.logger.LogWarning(ex, "L2CAP accept failed on PSM {Psm}", psm);
+                    continue;
+                }
+
+                var connectionCts = new CancellationTokenSource();
+                var rxSubj = new System.Reactive.Subjects.Subject<byte[]>();
+                var connected = client!;
+
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        while (!connectionCts.IsCancellationRequested)
+                        {
+                            var frame = connected.Receive();
+                            if (frame == null) break;
+                            rxSubj.OnNext(frame);
+                        }
+                        rxSubj.OnCompleted();
+                    }
+                    catch (Exception ex)
+                    {
+                        rxSubj.OnError(ex);
+                    }
+                });
+
+                onOpen(new L2CapChannel(
+                    psm,
+                    peer!,
+                    data => System.Reactive.Linq.Observable.FromAsync(ct => connected.SendAsync(data, ct)),
+                    rxSubj,
+                    () =>
+                    {
+                        connectionCts.Cancel();
+                        connected.Dispose();
+                    }
+                ));
+            }
+        });
+
+        return Task.FromResult(new L2CapInstance(
+            psm,
+            () =>
+            {
+                cts.Cancel();
+                listener.Dispose();
+            }
+        ));
+    }
+
+
     async Task EnsureConnectionAsync(CancellationToken ct = default)
     {
         if (this.connection != null) return;

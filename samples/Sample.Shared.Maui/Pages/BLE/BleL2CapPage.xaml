@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.BLE"
+             x:Class="Sample.Shared.Maui.Pages.BLE.BleL2CapPage"
+             x:DataType="vm:BleL2CapViewModel"
+             Title="L2CAP">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="{Binding Status}" FontSize="16" FontAttributes="Bold" />
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Host (peripheral side)" FontAttributes="Bold" />
+                    <CheckBox IsChecked="{Binding HostSecure}" />
+                    <Label Text="Secure (BT_SECURITY_MEDIUM / encrypted)" FontSize="11" />
+                    <Button Text="{Binding HostButtonText}" Command="{Binding ToggleHostCommand}" />
+                    <Label Text="{Binding HostPsm, StringFormat='Listening PSM: {0}'}" />
+                    <Label Text="{Binding HostConnectionsDisplay, StringFormat='Open connections: {0}'}" />
+                    <Label Text="{Binding HostBytesReceived, StringFormat='Bytes received: {0}'}" />
+                    <Label Text="{Binding HostLastPeer, StringFormat='Last peer: {0}'}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Connect (central side)" FontAttributes="Bold" />
+                    <Entry Text="{Binding PeerUuid}" Placeholder="Peer UUID / MAC" />
+                    <Entry Text="{Binding PeerPsm}" Placeholder="PSM (decimal)" Keyboard="Numeric" />
+                    <CheckBox IsChecked="{Binding ClientSecure}" />
+                    <Label Text="Secure" FontSize="11" />
+                    <Button Text="{Binding ClientButtonText}" Command="{Binding ToggleClientCommand}" />
+                    <Entry Text="{Binding SendPayload}" Placeholder="Payload to send" />
+                    <Button Text="Send" Command="{Binding SendCommand}" IsEnabled="{Binding IsConnected}" />
+                    <Label Text="{Binding ClientBytesSentDisplay, StringFormat='Bytes sent: {0}'}" />
+                    <Label Text="{Binding ClientBytesReceivedDisplay, StringFormat='Bytes received: {0}'}" />
+                    <Label Text="{Binding LastReceived, StringFormat='Last received: {0}'}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -3,6 +3,7 @@
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
         <Description>Shiny BluetoothLE Plugin for Linux via BlueZ/D-Bus</Description>
         <RootNamespace>Shiny.BluetoothLE</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
