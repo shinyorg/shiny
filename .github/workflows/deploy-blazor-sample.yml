@@ -1,0 +1,65 @@
+name: Deploy Blazor Sample
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - v5
+    paths:
+      - 'samples/Sample.Blazor/**'
+      - 'src/**/*.Blazor/**'
+      - '.github/workflows/deploy-blazor-sample.yml'
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  BASE_HREF: /shiny/blazor-sample/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.300'
+
+      - name: Install wasm-tools workload
+        run: dotnet workload install wasm-tools
+
+      - name: Publish Blazor Sample
+        run: dotnet publish samples/Sample.Blazor/Sample.Blazor.csproj -c Release -o publish
+
+      - name: Rewrite base href
+        run: |
+          sed -i 's|<base href="/" />|<base href="${{ env.BASE_HREF }}" />|g' publish/wwwroot/index.html
+          cp publish/wwwroot/index.html publish/wwwroot/404.html
+          touch publish/wwwroot/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
