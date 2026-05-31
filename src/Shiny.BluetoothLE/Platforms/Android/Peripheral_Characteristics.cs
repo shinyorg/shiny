@@ -123,8 +123,11 @@ public partial class Peripheral
                     return () =>
                     {
                         sub?.Dispose();
-                        if (characteristic != null)
-                            this.TryNotificationCleanup(characteristic, serviceUuid, characteristicUuid);
+                        // Resolve a fresh characteristic from the current GATT — the
+                        // captured `characteristic` may belong to a closed/stale GATT
+                        // client after a reconnect cycle, and operating on it can
+                        // trigger spurious status 133 on the next op.
+                        this.TryNotificationCleanup(serviceUuid, characteristicUuid);
                     };
                 })
                 .Publish()
@@ -168,14 +171,26 @@ public partial class Peripheral
     });
 
 
-    protected void TryNotificationCleanup(BluetoothGattCharacteristic ch, string serviceUuid, string characteristicUuid)
+    protected void TryNotificationCleanup(string serviceUuid, string characteristicUuid)
     {
         try
         {
-            this.RemoveNotify(ch);
-
-            if (this.Status == ConnectionState.Connected)
+            // Re-resolve against the current GATT — the prior reference may be stale
+            // after a disconnect/reconnect cycle.
+            BluetoothGattCharacteristic? ch = null;
+            var gatt = this.Gatt;
+            if (gatt != null && this.Status == ConnectionState.Connected)
             {
+                var serviceUuidType = Utils.ToUuidType(serviceUuid);
+                var charUuidType = Utils.ToUuidType(characteristicUuid);
+                var service = gatt.GetService(serviceUuidType);
+                ch = service?.Characteristics?.FirstOrDefault(x => x.Uuid != null && x.Uuid.Equals(charUuidType));
+            }
+
+            if (ch != null)
+            {
+                this.RemoveNotify(ch);
+
                 this.WriteDescriptor(
                         serviceUuid,
                         characteristicUuid,
@@ -188,10 +203,15 @@ public partial class Peripheral
                         ex => this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid)
                     );
 
-                if (!this.Gatt!.SetCharacteristicNotification(ch, false))
+                if (!gatt!.SetCharacteristicNotification(ch, false))
                     this.logger.DisableNotificationError(null!, serviceUuid, characteristicUuid);
-                
+
                 this.charSubSubj?.OnNext(this.FromNative(ch));
+            }
+            else
+            {
+                // Disconnected or characteristic no longer present — just clear local notify state.
+                this.RemoveNotifyByKey(serviceUuid, characteristicUuid);
             }
             this.logger.LogDebug($"Cleaned up characteristic subscription: {serviceUuid} / {characteristicUuid}");
         }
@@ -199,6 +219,15 @@ public partial class Peripheral
         {
             this.logger.DisableNotificationError(ex, serviceUuid, characteristicUuid);
         }
+    }
+
+
+    protected void RemoveNotifyByKey(string serviceUuid, string characteristicUuid)
+    {
+        this.notifications ??= new();
+        var key = $"{serviceUuid}-{characteristicUuid}".ToLower();
+        lock (this.notifications)
+            this.notifications.Remove(key);
     }
 
 

@@ -27,7 +27,7 @@ public partial class Peripheral
         this.AssertConnection();
 
         var suid = Utils.ToUuidType(serviceUuid);
-        var result = await this.Native!.GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Cached).AsTask(ct).ConfigureAwait(false);
+        var result = await this.Native!.GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Uncached).AsTask(ct).ConfigureAwait(false);
         result.Status.Assert("GetServices", serviceUuid);
 
         var service = result.Services.FirstOrDefault()
@@ -241,7 +241,7 @@ public partial class Peripheral
         var suid = Utils.ToUuidType(serviceUuid);
 
         var result = await this.Native!
-            .GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Cached)
+            .GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Uncached)
             .AsTask(ct)
             .ConfigureAwait(false);
 
@@ -253,7 +253,7 @@ public partial class Peripheral
 
         var cuid = Utils.ToUuidType(characteristicUuid);
         var chResult = await service
-            .GetCharacteristicsForUuidAsync(cuid, BluetoothCacheMode.Cached)
+            .GetCharacteristicsForUuidAsync(cuid, BluetoothCacheMode.Uncached)
             .AsTask(ct)
             .ConfigureAwait(false);
 

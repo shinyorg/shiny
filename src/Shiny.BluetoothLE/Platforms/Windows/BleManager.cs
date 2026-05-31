@@ -90,33 +90,10 @@ public partial class BleManager : IBleManager, IShinyStartupTask
 
 
     public IPeripheral? GetKnownPeripheral(string peripheralUuid)
-    {
-        var peripheral = this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
-
-        if (peripheral != null && !IsReusablePeripheral(peripheral))
-        {
-            this.logger.LogDebug(
-                "WIN-PERIPHERAL-KNOWN-EVICT: peripheral={PeripheralId}, reason={Reason}",
-                DescribePeripheral(peripheral),
-                !peripheral.CanReuse ? "not_reusable" : "disconnected_requires_fresh_native"
-            );
-            if (this.peripherals.TryGetValue(peripheral.BluetoothAddress, out var current) && ReferenceEquals(current, peripheral))
-            {
-                peripheral.DisposeForManagerRemoval();
-                this.peripherals.TryRemove(peripheral.BluetoothAddress, out _);
-            }
-            return null;
-        }
-
-        return peripheral;
-    }
+        => this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
 
 
     public IObservable<AccessState> RequestAccess() => this.GetRadio().Select(x => x.GetAccessStatus());
-
-
-    static bool IsReusablePeripheral(Peripheral peripheral)
-        => peripheral.CanReuse && peripheral.Status == ConnectionState.Connected;
 
 
     public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => this.RequestAccess()
@@ -144,7 +121,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             {
                 var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress).AsTask(ct).ConfigureAwait(false);
                 if (btDevice != null)
-                    peripheral = this.GetPeripheral(btDevice, preferReplacement: true);
+                    peripheral = this.GetPeripheral(btDevice);
             }
             finally
             {
@@ -353,13 +330,13 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     Peripheral? GetOrCreatePeripheral(ulong bluetoothAddress)
     {
         this.peripherals.TryGetValue(bluetoothAddress, out var peripheral);
-        if (peripheral != null && !IsReusablePeripheral(peripheral))
+        if (peripheral != null && !peripheral.CanReuse)
         {
+            // Wrapper is fully disposed (e.g. user called CancelConnection). Evict.
             this.logger.LogDebug(
-                "WIN-PERIPHERAL-CACHE-EVICT: address={BluetoothAddress}, peripheral={PeripheralId}, reason={Reason}",
+                "WIN-PERIPHERAL-CACHE-EVICT: address={BluetoothAddress}, peripheral={PeripheralId}",
                 bluetoothAddress,
-                DescribePeripheral(peripheral),
-                !peripheral.CanReuse ? "not_reusable" : "disconnected_requires_fresh_native"
+                DescribePeripheral(peripheral)
             );
             if (this.peripherals.TryGetValue(bluetoothAddress, out var current) && ReferenceEquals(current, peripheral))
             {
@@ -383,7 +360,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     }
 
 
-    Peripheral GetPeripheral(BluetoothLEDevice native, bool preferReplacement = false)
+    Peripheral GetPeripheral(BluetoothLEDevice native)
     {
         var created = false;
         var peripheral = this.peripherals.AddOrUpdate(
@@ -395,18 +372,22 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             },
             (_, existing) =>
             {
-                if (!preferReplacement && IsReusablePeripheral(existing))
-                    return existing;
+                if (!existing.CanReuse)
+                {
+                    created = true;
+                    this.logger.LogDebug(
+                        "WIN-PERIPHERAL-CACHE-REPLACE: address={BluetoothAddress}, oldPeripheral={OldPeripheralId}, reason=fully_disposed",
+                        native.BluetoothAddress,
+                        DescribePeripheral(existing)
+                    );
+                    existing.DisposeForManagerRemoval();
+                    return new Peripheral(this, native, this.services.GetRequiredService<ILogger<IPeripheral>>());
+                }
 
-                created = true;
-                this.logger.LogDebug(
-                    "WIN-PERIPHERAL-CACHE-REPLACE: address={BluetoothAddress}, oldPeripheral={OldPeripheralId}, reason={Reason}",
-                    native.BluetoothAddress,
-                    DescribePeripheral(existing),
-                    !existing.CanReuse ? "not_reusable" : "disconnected_requires_fresh_native"
-                );
-                existing.DisposeForManagerRemoval();
-                return new Peripheral(this, native, this.services.GetRequiredService<ILogger<IPeripheral>>());
+                // Reuse the existing wrapper - caller references survive the reconnect.
+                // RefreshNative is a no-op if the BluetoothLEDevice instance is the same.
+                existing.RefreshNative(native);
+                return existing;
             }
         );
 
@@ -443,8 +424,11 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     }
 
 
+    // Only remove fully-disposed wrappers. Disconnected-but-reusable peripherals
+    // are kept so callers holding IPeripheral references can reconnect on the same
+    // instance after a scan/restart.
     void Clear() => this.peripherals
-        .Where(x => !IsReusablePeripheral(x.Value))
+        .Where(x => !x.Value.CanReuse)
         .ToList()
         .ForEach(x =>
         {

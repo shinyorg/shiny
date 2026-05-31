@@ -17,7 +17,7 @@ public partial class Peripheral
 
         var suid = Utils.ToUuidType(serviceUuid);
         var result = await this.Native!
-            .GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Cached)
+            .GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Uncached)
             .AsTask(ct)
             .ConfigureAwait(false);
 

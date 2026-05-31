@@ -295,7 +295,10 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
 
     void Clear() => this.peripherals
-        .Where(x => x.Value.Status != ConnectionState.Connected)
+        .Where(x =>
+            x.Value.Status != ConnectionState.Connected &&
+            x.Value.Status != ConnectionState.Connecting
+        )
         .ToList()
         .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));
 

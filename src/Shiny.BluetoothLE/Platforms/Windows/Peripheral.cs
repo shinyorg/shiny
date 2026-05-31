@@ -53,6 +53,37 @@ public partial class Peripheral : IPeripheral
     public string Uuid { get; }
     public string? Name => this.Native?.Name;
     internal bool CanReuse => this.Native != null;
+    GattSession? gattSession;
+
+
+    // Refresh the underlying BluetoothLEDevice without replacing the wrapper.
+    // Callers (scans, GetKnownPeripheral) hold IPeripheral references that must
+    // survive a disconnect/reconnect cycle.
+    internal void RefreshNative(BluetoothLEDevice newNative)
+    {
+        if (newNative == null)
+            return;
+
+        if (ReferenceEquals(this.Native, newNative))
+            return;
+
+        if (this.Native != null)
+        {
+            try
+            {
+                this.Native.ConnectionStatusChanged -= this.OnConnectionStatusChanged;
+                this.Native.GattServicesChanged -= this.OnGattServicesChanged;
+                this.Native.Dispose();
+            }
+            catch
+            {
+                // best effort
+            }
+        }
+
+        this.Native = newNative;
+        this.HookNativeEvents();
+    }
 
     // Windows doesn't expose negotiated MTU - return default usable payload (23 - 3 ATT header)
     public int Mtu => 20;
@@ -111,7 +142,9 @@ public partial class Peripheral : IPeripheral
             );
 
             // Windows BLE connections are implicit - they occur when you access GATT services
-            // Calling GetGattServicesAsync forces the connection
+            // Calling GetGattServicesAsync forces the connection. We additionally acquire
+            // a GattSession with MaintainConnection=true so the OS doesn't tear down the
+            // link the moment we're idle.
             this.connectSub?.Dispose();
             this.connectSub = Observable.FromAsync(async ct =>
             {
@@ -127,6 +160,8 @@ public partial class Peripheral : IPeripheral
                 if (result.Status != Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
                     throw new BleException($"Failed to connect: {result.Status}");
 
+                await this.AcquireGattSessionAsync(linkedCts.Token).ConfigureAwait(false);
+
                 return result;
             })
             .Subscribe(
@@ -134,26 +169,17 @@ public partial class Peripheral : IPeripheral
                 {
                     stopwatch.Stop();
 
-                    if (!this.IsNativeConnected())
-                    {
-                        this.logger.LogDebug(
-                            "WIN-CONNECT-LATE-SUCCESS-BLOCKED: peripheral={PeripheralId}, attempt={AttemptId}, pendingCleanup={PendingCleanup}, nativeConnected={NativeConnected}",
-                            this.DescribeIdentity(),
-                            attemptId,
-                            this.pendingDisconnectedCleanup,
-                            this.IsNativeConnected()
-                        );
-                        this.FinishConnectAttempt();
-                        this.HandleConnectFailure(new BleException("Connect completed after peripheral was disconnected"), stopwatch.Elapsed);
-                        return;
-                    }
-
+                    // Services were retrieved successfully - the link was up at least
+                    // long enough for that. If ConnectionStatus reports Disconnected
+                    // momentarily here, treat it as transient: the ConnectionStatusChanged
+                    // handler will fire if it's a real disconnect and clean up properly.
                     this.LogConnectSuccess(stopwatch.Elapsed);
                     this.logger.LogDebug(
-                        "WIN-CONNECT-SUCCESS: peripheral={PeripheralId}, attempt={AttemptId}, elapsedMs={ElapsedMs}",
+                        "WIN-CONNECT-SUCCESS: peripheral={PeripheralId}, attempt={AttemptId}, elapsedMs={ElapsedMs}, nativeConnected={NativeConnected}",
                         this.DescribeIdentity(),
                         attemptId,
-                        stopwatch.Elapsed.TotalMilliseconds
+                        stopwatch.Elapsed.TotalMilliseconds,
+                        this.IsNativeConnected()
                     );
                     this.CancelDelayedCleanup();
                     this.connSubj.OnNext(ConnectionState.Connected);
@@ -242,20 +268,28 @@ public partial class Peripheral : IPeripheral
 
         if (state == ConnectionState.Disconnected)
         {
-            if (this.ShouldDelayDisconnectedCleanup())
-            {
-            }
-            else
-            {
+            if (!this.ShouldDelayDisconnectedCleanup())
                 cleanupNow = true;
-            }
         }
 
         this.connSubj.OnNext(state);
         this.manager.FirePeripheralStateChanged(this);
 
         if (cleanupNow)
-            this.CleanupDisconnectedPeripheral();
+            this.SoftCleanupOnDisconnect();
+    }
+
+
+    // Release per-connection resources (tracked services, notifications, GATT session)
+    // but keep the wrapper and the underlying BluetoothLEDevice alive so callers
+    // holding an IPeripheral reference can reconnect on the same instance. The OS
+    // BluetoothLEDevice is identity-only; disposing it releases the connection
+    // intent and orphans caller references unnecessarily on a transient drop.
+    void SoftCleanupOnDisconnect()
+    {
+        this.CancelDelayedCleanup();
+        this.logger.LogDebug("WIN-SOFT-CLEANUP-DISCONNECTED: peripheral={PeripheralId}", this.DescribeIdentity());
+        this.ReleaseNativeResources(disposeNative: false);
     }
 
 
@@ -295,6 +329,27 @@ public partial class Peripheral : IPeripheral
         this.connectSub = null;
         this.ClearNotifications();
 
+        // Only tear down the GattSession on a hard cleanup. Keeping it alive with
+        // MaintainConnection=true after a transient drop lets the OS auto-reconnect
+        // when the device returns in range.
+        if (disposeNative)
+        {
+            var session = this.gattSession;
+            this.gattSession = null;
+            if (session != null)
+            {
+                try
+                {
+                    session.MaintainConnection = false;
+                    session.Dispose();
+                }
+                catch
+                {
+                    // best effort
+                }
+            }
+        }
+
         List<GattDeviceService> services;
         lock (this.trackedServices)
         {
@@ -322,6 +377,55 @@ public partial class Peripheral : IPeripheral
             this.logger.LogDebug("WIN-NATIVE-DISPOSE: peripheral={PeripheralId}", this.DescribeIdentity());
             this.Native.Dispose();
             this.Native = null;
+        }
+    }
+
+
+    async Task AcquireGattSessionAsync(CancellationToken ct)
+    {
+        if (this.Native == null)
+            return;
+
+        if (this.gattSession != null)
+        {
+            try
+            {
+                this.gattSession.MaintainConnection = true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Failed to re-arm GattSession.MaintainConnection on peripheral {Uuid}", this.Uuid);
+            }
+            return;
+        }
+
+        try
+        {
+            var deviceId = BluetoothDeviceId.FromId(this.Native.DeviceId);
+            var session = await GattSession
+                .FromDeviceIdAsync(deviceId)
+                .AsTask(ct)
+                .ConfigureAwait(false);
+
+            if (session == null)
+            {
+                this.logger.LogWarning("GattSession.FromDeviceIdAsync returned null for peripheral {Uuid}", this.Uuid);
+                return;
+            }
+
+            session.MaintainConnection = true;
+            this.gattSession = session;
+            this.logger.LogDebug("WIN-SESSION-ACQUIRED: peripheral={PeripheralId}", this.DescribeIdentity());
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Acquiring a GattSession is best-effort - the connection will still work
+            // without it, just less robustly. Don't fail the connect for this.
+            this.logger.LogWarning(ex, "Could not acquire GattSession for peripheral {Uuid} - connection may drop on idle", this.Uuid);
         }
     }
 
@@ -439,15 +543,7 @@ public partial class Peripheral : IPeripheral
     {
         var elapsedMs = elapsed == TimeSpan.Zero ? ConnectAttemptTimeout.TotalMilliseconds : elapsed.TotalMilliseconds;
         var connectException = ex as BleException ?? new BleException(ex.Message, ex);
-        var shouldCleanup =
-            this.Native == null ||
-            this.Status != ConnectionState.Connected ||
-            ex is OperationCanceledException ||
-            ex is TimeoutException ||
-            ex.Message.Contains("disposed", StringComparison.OrdinalIgnoreCase) ||
-            ex.Message.Contains("failed to connect", StringComparison.OrdinalIgnoreCase) ||
-            ex.Message.Contains("unreachable", StringComparison.OrdinalIgnoreCase) ||
-            ex.Message.Contains("disconnected", StringComparison.OrdinalIgnoreCase);
+        var hardCleanup = this.Native == null || ex.Message.Contains("disposed", StringComparison.OrdinalIgnoreCase);
 
         this.logger.LogWarning(
             ex,
@@ -459,13 +555,22 @@ public partial class Peripheral : IPeripheral
         this.connFailedSubj.OnNext(connectException);
         this.connSubj.OnNext(ConnectionState.Disconnected);
 
-        if (shouldCleanup)
+        if (hardCleanup)
         {
-            this.ScheduleDisconnectedCleanup("connect_failure");
+            this.ScheduleDisconnectedCleanup("connect_failure_hard");
+        }
+        else
+        {
+            // Keep the wrapper alive so the caller can retry on the same IPeripheral
+            // reference. Just release per-connection resources.
+            this.SoftCleanupOnDisconnect();
         }
     }
 
 
+    // Hard cleanup: only invoked when the caller has explicitly given up on this
+    // peripheral (CancelConnection / FinishConnectAttempt with pending hard cleanup).
+    // Disposes the native device and removes the wrapper from the manager cache.
     void CleanupDisconnectedPeripheral()
     {
         this.CancelDelayedCleanup();

@@ -100,22 +100,42 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
     public IPeripheral? GetKnownPeripheral(string peripheralUuid)
     {
-        //var uuid = new NSUuid(peripheralUuid);
-        //var peripheral = this.Manager
-        //    .RetrievePeripheralsWithIdentifiers(uuid)
-        //    .FirstOrDefault();
+        var cached = this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
+        if (cached != null)
+            return cached;
 
-        //if (peripheral == null)
-        //    return Observable.Return<IPeripheral?>(null);
+        // Ask CoreBluetooth for an already-known peripheral so callers can reconnect
+        // by UUID after a process restart without burning battery on a scan.
+        NSUuid uuid;
+        try
+        {
+            uuid = new NSUuid(peripheralUuid);
+        }
+        catch
+        {
+            return null;
+        }
 
-        //var device = this.GetPeripheral(peripheral);
-        //return Observable.Return(device);
-        return this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
+        var native = this.Manager
+            .RetrievePeripheralsWithIdentifiers(uuid)
+            .FirstOrDefault();
+
+        return native == null ? null : this.GetPeripheral(native);
     }
 
 
     public IEnumerable<IPeripheral> GetConnectedPeripherals()
-        => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
+    {
+        // Seed the cache from the OS so peripherals connected via other apps/restored
+        // sessions are visible too.
+        var connected = this.Manager.RetrieveConnectedPeripherals(Array.Empty<CBUUID>());
+        foreach (var native in connected)
+            this.GetPeripheral(native);
+
+        return this.peripherals
+            .Where(x => x.Value.Status == ConnectionState.Connected)
+            .Select(x => x.Value);
+    }
     
 
 

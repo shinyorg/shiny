@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -58,6 +59,7 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     public void CancelConnection()
     {
         this.autoReconnectSub?.Dispose();
+        this.autoReconnectSub = null;
         this.manager.Manager.CancelPeripheralConnection(this.Native);
     }
 
@@ -67,16 +69,48 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         var arc = config?.AutoConnect ?? true;
         if (arc)
         {
-            var skipFirst = true;
-            this.autoReconnectSub = this
+            this.autoReconnectSub?.Dispose();
+
+            var composite = new CompositeDisposable();
+
+            // Re-issue connect on disconnect. Skip(1) drops the seeded Disconnected
+            // value emitted by the BehaviorSubject on subscribe.
+            composite.Add(this
                 .WhenDisconnected()
+                .Skip(1)
+                .Subscribe(_ => this.DoReconnect())
+            );
+
+            // Cold-start ConnectPeripheral failures (FailedToConnectPeripheral)
+            // do not fire a Disconnected status change, so subscribe to retry here
+            // as well. Small delay avoids tight retry loops.
+            composite.Add(this
+                .WhenConnectionFailed()
+                .Throttle(TimeSpan.FromSeconds(1))
                 .Subscribe(_ =>
                 {
-                    if (skipFirst)
-                        skipFirst = false;
-                    else
-                        this.DoConnect();
-                });
+                    if (this.Status != ConnectionState.Connected && this.Status != ConnectionState.Connecting)
+                        this.DoReconnect();
+                })
+            );
+
+            this.autoReconnectSub = composite;
+        }
+        this.DoConnect();
+    }
+
+
+    void DoReconnect()
+    {
+        // Cancel any stale pending connection slot before re-issuing — iOS holds
+        // the previous pending connection until you explicitly cancel it.
+        try
+        {
+            this.manager.Manager.CancelPeripheralConnection(this.Native);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Error cancelling prior connection before reconnect");
         }
         this.DoConnect();
     }
@@ -105,26 +139,21 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     }
 
 
-    public IObservable<ConnectionState> WhenStatusChanged() => Observable.Create<ConnectionState>(ob =>
-    {
-        ob.OnNext(this.Status);
-        var sub = this.connSubj.Subscribe(ob.OnNext);
-
-        return () => sub.Dispose();
-    });
+    public IObservable<ConnectionState> WhenStatusChanged() => this.connSubj.DistinctUntilChanged();
 
 
-    readonly Subject<ConnectionState> connSubj = new();
+    readonly BehaviorSubject<ConnectionState> connSubj = new(ConnectionState.Disconnected);
     internal void ReceiveStateChange(ConnectionState connStatus)
     {
         if (connStatus == ConnectionState.Disconnected)
             this.ClearNotifiers();
 
-        this.connSubj.OnNext(connStatus);
+        if (this.connSubj.Value != connStatus)
+            this.connSubj.OnNext(connStatus);
     }
 
 
-    readonly Subject<BleException> connFailedSubj = new();
+    readonly ReplaySubject<BleException> connFailedSubj = new(1, TimeSpan.FromSeconds(5));
     public IObservable<BleException> WhenConnectionFailed() => this.connFailedSubj;
 
 

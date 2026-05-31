@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using Android.Bluetooth;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
@@ -63,21 +64,24 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     public void CancelConnection()
     {
-        if (this.Gatt == null)
+        var gatt = this.Gatt;
+        if (gatt == null)
             return;
 
         try
         {
             this.RequiresServiceDiscovery = true;
-            this.Gatt.Disconnect();
-            this.Gatt.Close();
             this.Gatt = null;
+            gatt.Disconnect();
+            gatt.Close();
         }
         catch (Exception ex)
         {
             this.logger.LogWarning(ex, "BLE Peripheral did not cleanly disconnect");
         }
-        this.connSubj.OnNext(ConnectionState.Disconnected);
+        // Gatt.Close() prevents the framework from firing OnConnectionStateChange,
+        // so emit Disconnected here (deduped by EmitConnectionState).
+        this.EmitConnectionState(ConnectionState.Disconnected);
     }
 
 
@@ -93,6 +97,11 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             else
                 cfg = new AndroidConnectionConfig(config.AutoConnect);
 
+            // Close any prior GATT client before opening a new one — otherwise
+            // each retry leaks a client and Android's 7-client limit kicks in,
+            // producing status 133 on subsequent connects.
+            this.CloseExistingGatt();
+
             this.Gatt = this.Native.ConnectGatt(
                 this.platform.AppContext,
                 cfg.AutoConnect,
@@ -104,23 +113,42 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
             this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
 
-            this.connSubj.OnNext(ConnectionState.Connecting);
+            this.EmitConnectionState(ConnectionState.Connecting);
         }
         catch (BleException ex)
         {
-            this.connFailSubj?.OnNext(ex);
+            this.connFailSubj.OnNext(ex);
             this.logger.LogWarning(ex, "Failed to connect");
         }
         catch (Exception ex)
         {
-            this.connFailSubj?.OnNext(new("Failed to connect", ex));
+            this.connFailSubj.OnNext(new("Failed to connect", ex));
             this.logger.LogWarning(ex, "Failed to connect");
         }
     }
 
 
-    Subject<BleException>? connFailSubj;
-    public IObservable<BleException> WhenConnectionFailed() => this.connFailSubj ??= new();
+    void CloseExistingGatt()
+    {
+        var prior = this.Gatt;
+        if (prior == null)
+            return;
+
+        this.Gatt = null;
+        try
+        {
+            prior.Disconnect();
+            prior.Close();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Error closing prior GATT client before reconnect");
+        }
+    }
+
+
+    readonly ReplaySubject<BleException> connFailSubj = new(1, TimeSpan.FromSeconds(5));
+    public IObservable<BleException> WhenConnectionFailed() => this.connFailSubj;
 
     public IObservable<int> ReadRssi() => this.operations.QueueToObservable(async ct =>
     {
@@ -138,8 +166,15 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     });
    
 
-    readonly Subject<ConnectionState> connSubj = new();
-    public IObservable<ConnectionState> WhenStatusChanged() => this.connSubj.StartWith(this.Status);
+    readonly BehaviorSubject<ConnectionState> connSubj = new(ConnectionState.Disconnected);
+    public IObservable<ConnectionState> WhenStatusChanged() => this.connSubj.DistinctUntilChanged();
+
+
+    void EmitConnectionState(ConnectionState state)
+    {
+        if (this.connSubj.Value != state)
+            this.connSubj.OnNext(state);
+    }
 
 
     Subject<(GattStatus Status, int Rssi)>? rssiSubj;
@@ -168,7 +203,12 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             }
             this.Gatt = null;
         }
-        this.connSubj.OnNext(newState.ToStatus());
+
+        // Push subscriber notifications off the GATT callback thread. The Binder
+        // callback thread is single-threaded; subscribers that await on a queued
+        // operation deadlock further callbacks otherwise.
+        var nextState = newState.ToStatus();
+        Task.Run(() => this.EmitConnectionState(nextState));
     }
 
 
