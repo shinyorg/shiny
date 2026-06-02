@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shiny="http://shiny.net/maui/controls"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Events"
+             x:Class="Sample.Shared.Maui.Pages.Events.EventsPage"
+             x:DataType="vm:EventsViewModel"
+             Title="Events">
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Filter">
+                <shiny:TextPickerCell Title="Category"
+                                      ItemsSource="{Binding Categories}"
+                                      SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" />
+                <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Actions">
+                <shiny:ButtonCell Title="Refresh" Command="{Binding RefreshCommand}" />
+                <shiny:ButtonCell Title="Clear All" Command="{Binding ClearCommand}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Recent" ItemsSource="{Binding Items}">
+                <shiny:TableSection.ItemTemplate>
+                    <DataTemplate x:DataType="vm:EventItemViewModel">
+                        <shiny:LabelCell Title="{Binding TitleDisplay}"
+                                         Description="{Binding Description}"
+                                         ValueText="{Binding ValueText}" />
+                    </DataTemplate>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
+</ContentPage>

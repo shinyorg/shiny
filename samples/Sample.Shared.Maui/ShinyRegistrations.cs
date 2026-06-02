@@ -1,3 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
+using Sample.Shared.Maui.Services;
+
 namespace Sample.Shared.Maui;
 
 public static class ShinyRegistrations
@@ -14,6 +17,7 @@ public static class ShinyRegistrations
             });
 
         var s = builder.Services;
+        s.AddSingleton<IEventStore, SqliteEventStore>();
 
 #if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
         s.AddBattery();

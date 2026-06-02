@@ -27,6 +27,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls" />
         <PackageReference Include="CommunityToolkit.Mvvm" />
+        <PackageReference Include="Microsoft.Data.Sqlite" />
         <PackageReference Include="Shiny.Maui.Controls" />
         <PackageReference Include="Shiny.Maui.Shell">
             <PrivateAssets>analyzers</PrivateAssets>

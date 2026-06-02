@@ -1,14 +1,29 @@
 using Microsoft.Extensions.Logging;
-using Shiny.Locations;
+using Sample.Shared.Maui.Services;
 
 namespace Sample.Shared.Maui.Delegates;
 
-public class SampleGpsDelegate(ILogger<SampleGpsDelegate> logger) : IGpsDelegate
+
+public class SampleGpsDelegate(ILogger<SampleGpsDelegate> logger, IEventStore events) : IGpsDelegate
 {
     public Task OnReading(GpsReading reading)
     {
         logger.LogInformation("GPS Reading: Lat={Lat}, Lng={Lng}, Alt={Alt}",
             reading.Position.Latitude, reading.Position.Longitude, reading.Altitude);
-        return Task.CompletedTask;
+
+        return events.Add(
+            "GPS",
+            $"{reading.Position.Latitude:F5}, {reading.Position.Longitude:F5}",
+            new Dictionary<string, string?>
+            {
+                ["Latitude"] = reading.Position.Latitude.ToString("F6"),
+                ["Longitude"] = reading.Position.Longitude.ToString("F6"),
+                ["Altitude"] = reading.Altitude.ToString("F2"),
+                ["Speed"] = reading.Speed.ToString("F2"),
+                ["Heading"] = reading.Heading.ToString("F2"),
+                ["PositionAccuracy"] = reading.PositionAccuracy.ToString("F2"),
+                ["Timestamp"] = reading.Timestamp.ToString("O")
+            }
+        );
     }
 }

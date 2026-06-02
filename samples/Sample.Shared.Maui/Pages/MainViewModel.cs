@@ -17,6 +17,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             {
                 new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
                 new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"),
+                new("📝 Events", "Captured delegate events (SQLite)", "events"),
                 new("🔋 Battery", "Observe battery level & state", "battery"),
                 new("🌐 Connectivity", "Observe network connectivity", "connectivity")
             };
@@ -29,6 +30,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             new("🔔 Notifications", "Local notifications", "notifications"),
             new("📣 Notification Channels", "Manage notification channels", "notificationchannels"),
             new("⬇️ HTTP Transfers", "Background uploads & downloads", "httptransfers"),
+            new("📝 Events", "Captured delegate events (SQLite)", "events"),
             new("🔋 Battery", "Observe battery level & state", "battery"),
             new("🌐 Connectivity", "Observe network connectivity", "connectivity"),
             new("⚙️ Settings", "Connectivity, battery, key-value store", "settings")
