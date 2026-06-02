@@ -51,7 +51,10 @@ jobs:
 
       - name: Rewrite base href + add SPA fallback
         run: |
-          sed -i -E 's|<base href="/" ?/>|<base href="${{ env.BASE_HREF }}" />|g' publish/wwwroot/index.html
+          # -i.bak is the only -i form that works the same on both BSD (macOS) and GNU sed.
+          sed -i.bak -E 's|<base href="/" ?/>|<base href="${{ env.BASE_HREF }}" />|g' publish/wwwroot/index.html
+          rm publish/wwwroot/index.html.bak
+          grep -q '<base href="${{ env.BASE_HREF }}"' publish/wwwroot/index.html || { echo "base href rewrite failed"; exit 1; }
           cp publish/wwwroot/index.html publish/wwwroot/404.html
           touch publish/wwwroot/.nojekyll
 
