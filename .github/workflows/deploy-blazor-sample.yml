@@ -28,7 +28,10 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # macOS so the multi-target src libs (net10.0-ios, net10.0-android, …) can
+    # resolve their workload packs during project-graph restore. Linux runners
+    # fail with NETSDK1178 on Microsoft.iOS.Sdk.net10.0_26.x packs.
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
