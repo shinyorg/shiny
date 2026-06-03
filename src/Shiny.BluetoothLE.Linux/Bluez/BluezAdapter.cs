@@ -9,10 +9,10 @@ namespace Shiny.BluetoothLE.Bluez;
 
 internal class BluezAdapter
 {
-    readonly Connection connection;
+    readonly DBusConnection connection;
     readonly string objectPath;
 
-    public BluezAdapter(Connection connection, string objectPath = BluezConstants.DefaultAdapterPath)
+    public BluezAdapter(DBusConnection connection, string objectPath = BluezConstants.DefaultAdapterPath)
     {
         this.connection = connection;
         this.objectPath = objectPath;

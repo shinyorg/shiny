@@ -12,6 +12,7 @@
             <shiny:TableSection Title="Access">
                 <shiny:CommandCell Title="Request Access" Command="{Binding RequestAccessCommand}" ShowArrow="False" />
                 <shiny:CommandCell Title="Manage Channels" Command="{Binding GoToChannelsCommand}" />
+                <shiny:CommandCell Title="Pending Notifications" Command="{Binding GoToPendingCommand}" />
                 <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
             </shiny:TableSection>
 
@@ -59,20 +60,6 @@
 
             <shiny:TableSection>
                 <shiny:ButtonCell Title="Send Notification" Command="{Binding SendCommand}" />
-            </shiny:TableSection>
-
-            <shiny:TableSection Title="{Binding PendingCount, StringFormat='Pending ({0})'}">
-                <shiny:CommandCell Title="Cancel All" Command="{Binding CancelAllCommand}" ShowArrow="False" />
-            </shiny:TableSection>
-
-            <shiny:TableSection ItemsSource="{Binding PendingNotifications}">
-                <shiny:TableSection.ItemTemplate>
-                    <DataTemplate x:DataType="vm:PendingNotificationViewModel">
-                        <shiny:CommandCell Title="{Binding Title}" ValueText="{Binding TriggerInfo}" Description="{Binding Message}"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}, Path=CancelNotificationCommand}"
-                                        CommandParameter="{Binding Id}" ShowArrow="False" />
-                    </DataTemplate>
-                </shiny:TableSection.ItemTemplate>
             </shiny:TableSection>
         </shiny:TableRoot>
     </shiny:TableView>

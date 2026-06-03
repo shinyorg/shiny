@@ -18,7 +18,7 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
 {
     readonly ILogger<BleHostingManager> logger;
     readonly Dictionary<string, GattService> services = new();
-    Connection? connection;
+    DBusConnection? connection;
     bool advertising;
 
 
@@ -76,7 +76,7 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
 
         this.services.Add(uuid, svc);
 
-        // TODO: export GattService1/GattCharacteristic1 D-Bus objects via Connection.AddMethodHandler
+        // TODO: export GattService1/GattCharacteristic1 D-Bus objects via DBusConnection.AddMethodHandler
         // and (re)call org.bluez.GattManager1.RegisterApplication on the adapter so BlueZ picks
         // up the application root at BluezConstants.ApplicationRootPath.
         throw new NotSupportedException(
@@ -203,7 +203,7 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     async Task EnsureConnectionAsync(CancellationToken ct = default)
     {
         if (this.connection != null) return;
-        this.connection = new Connection(Address.System!);
+        this.connection = new DBusConnection(DBusAddress.System!);
         await this.connection.ConnectAsync().ConfigureAwait(false);
     }
 

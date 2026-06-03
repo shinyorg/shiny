@@ -9,10 +9,10 @@ namespace Shiny.BluetoothLE.Bluez;
 
 internal class BluezDevice
 {
-    readonly Connection connection;
+    readonly DBusConnection connection;
     readonly string objectPath;
 
-    public BluezDevice(Connection connection, string objectPath)
+    public BluezDevice(DBusConnection connection, string objectPath)
     {
         this.connection = connection;
         this.objectPath = objectPath;

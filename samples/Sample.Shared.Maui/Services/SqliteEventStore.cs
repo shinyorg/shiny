@@ -59,7 +59,7 @@ public sealed class SqliteEventStore : IEventStore, IAsyncDisposable
         catch (Exception ex) { this.logger.LogWarning(ex, "EventAdded handler threw"); }
     }
 
-    public async Task<IReadOnlyList<EventRecord>> GetAll(string? category = null, int limit = 200, CancellationToken ct = default)
+    public async Task<IReadOnlyList<EventRecord>> GetAll(string? category = null, long? beforeId = null, int limit = 50, CancellationToken ct = default)
     {
         await this.EnsureInit(ct);
 
@@ -69,15 +69,23 @@ public sealed class SqliteEventStore : IEventStore, IAsyncDisposable
             await using var conn = new SqliteConnection(this.connectionString);
             await conn.OpenAsync(ct);
             await using var cmd = conn.CreateCommand();
-            if (category is null)
+
+            var sql = "SELECT id, category, description, metadata, timestamp FROM events";
+            var clauses = new List<string>();
+            if (category is not null)
             {
-                cmd.CommandText = "SELECT id, category, description, metadata, timestamp FROM events ORDER BY id DESC LIMIT $limit";
-            }
-            else
-            {
-                cmd.CommandText = "SELECT id, category, description, metadata, timestamp FROM events WHERE category = $cat ORDER BY id DESC LIMIT $limit";
+                clauses.Add("category = $cat");
                 cmd.Parameters.AddWithValue("$cat", category);
             }
+            if (beforeId is not null)
+            {
+                clauses.Add("id < $before");
+                cmd.Parameters.AddWithValue("$before", beforeId.Value);
+            }
+            if (clauses.Count > 0)
+                sql += " WHERE " + string.Join(" AND ", clauses);
+            sql += " ORDER BY id DESC LIMIT $limit";
+            cmd.CommandText = sql;
             cmd.Parameters.AddWithValue("$limit", limit);
 
             var list = new List<EventRecord>(capacity: Math.Min(limit, 64));

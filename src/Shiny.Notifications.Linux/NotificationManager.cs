@@ -25,7 +25,7 @@ public class NotificationManager(
     readonly ConcurrentDictionary<uint, int> nativeToShinyId = new();
 
     int nextId;
-    Connection? connection;
+    DBusConnection? connection;
     Timer? scheduler;
 
     public void Start()
@@ -237,7 +237,7 @@ public class NotificationManager(
     async Task EnsureConnectionAsync()
     {
         if (this.connection != null) return;
-        this.connection = new Connection(Address.Session!);
+        this.connection = new DBusConnection(DBusAddress.Session!);
         await this.connection.ConnectAsync().ConfigureAwait(false);
     }
 

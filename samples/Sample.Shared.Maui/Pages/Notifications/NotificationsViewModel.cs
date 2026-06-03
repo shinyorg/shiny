@@ -11,7 +11,6 @@ public partial class NotificationsViewModel(
 ) : ObservableObject, IPageLifecycleAware
 {
     [ObservableProperty] string status = string.Empty;
-    [ObservableProperty] int pendingCount;
 
     [ObservableProperty] string notifTitle = "Test Notification";
     [ObservableProperty] string notifMessage = "Hello from Shiny!";
@@ -31,24 +30,15 @@ public partial class NotificationsViewModel(
 
     public enum TriggerKind { Immediate, Scheduled, Geofence, Repeating }
 
-    static readonly List<(string Label, TriggerKind Kind)> SupportedTriggers = BuildSupportedTriggers();
-
-    static List<(string Label, TriggerKind Kind)> BuildSupportedTriggers()
+    public List<string> NotificationTypes
     {
-        var list = new List<(string, TriggerKind)>
+        get;
+        private set
         {
-            ("Immediate", TriggerKind.Immediate),
-            ("Scheduled", TriggerKind.Scheduled)
-        };
-#if IOS || ANDROID
-        // Geofence triggers require Shiny.Locations and only Apple/Android notification managers handle them
-        list.Add(("Geofence", TriggerKind.Geofence));
-#endif
-        list.Add(("Repeating", TriggerKind.Repeating));
-        return list;
-    }
-
-    public List<string> NotificationTypes { get; } = SupportedTriggers.Select(x => x.Label).ToList();
+            field = value;
+            OnPropertyChanged();
+        }
+    } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsScheduled))]
@@ -56,10 +46,17 @@ public partial class NotificationsViewModel(
     [NotifyPropertyChangedFor(nameof(IsRepeating))]
     int selectedTypeIndex;
 
-    TriggerKind CurrentTrigger =>
-        this.SelectedTypeIndex >= 0 && this.SelectedTypeIndex < SupportedTriggers.Count
-            ? SupportedTriggers[this.SelectedTypeIndex].Kind
-            : TriggerKind.Immediate;
+    TriggerKind CurrentTrigger => this.SelectedTypeIndex switch
+    {
+        1 => TriggerKind.Scheduled,
+#if IOS || ANDROID
+        2 => TriggerKind.Geofence,
+        3 => TriggerKind.Repeating,
+#else
+        2 => TriggerKind.Repeating,
+#endif
+        _ => TriggerKind.Immediate
+    };
 
     public bool IsScheduled => this.CurrentTrigger == TriggerKind.Scheduled;
     public bool IsGeofence => this.CurrentTrigger == TriggerKind.Geofence;
@@ -102,20 +99,17 @@ public partial class NotificationsViewModel(
     [ObservableProperty] string iosSubtitle = string.Empty;
     [ObservableProperty] string iosRelevanceScore = "0";
 
-    public List<PendingNotificationViewModel> PendingNotifications
-    {
-        get;
-        private set
-        {
-            field = value;
-            this.OnPropertyChanged();
-        }
-    } = [];
-
     public void OnAppearing()
     {
+        var types = new List<string> { "Immediate", "Scheduled" };
+#if IOS || ANDROID
+        // Geofence triggers require Shiny.Locations and only Apple/Android notification managers handle them
+        types.Add("Geofence");
+#endif
+        types.Add("Repeating");
+        this.NotificationTypes = types;
+
         this.RefreshChannels();
-        _ = this.RefreshPending();
     }
 
     public void OnDisappearing() { }
@@ -136,6 +130,9 @@ public partial class NotificationsViewModel(
 
     [RelayCommand]
     Task GoToChannels() => navigator.NavigateTo("notificationchannels");
+
+    [RelayCommand]
+    Task GoToPending() => navigator.NavigateTo("pendingnotifications");
 
     public bool IsGpsAvailable => gpsManager != null;
 
@@ -245,7 +242,6 @@ public partial class NotificationsViewModel(
 
             await notifications.Send(notification);
             this.Status = "Notification sent!";
-            await this.RefreshPending();
         }
         catch (Exception ex)
         {
@@ -281,53 +277,4 @@ public partial class NotificationsViewModel(
         notification.Message = this.NotifMessage;
         return notification;
     }
-
-    [RelayCommand]
-    async Task CancelNotification(int id)
-    {
-        await notifications.Cancel(id);
-        await this.RefreshPending();
-    }
-
-    [RelayCommand]
-    async Task CancelAll()
-    {
-        await notifications.Cancel();
-        await this.RefreshPending();
-        this.Status = "All cancelled";
-    }
-
-    async Task RefreshPending()
-    {
-        var list = await notifications.GetPendingNotifications();
-        this.PendingNotifications = list.Select(n => new PendingNotificationViewModel
-        {
-            Id = n.Id,
-            Title = n.Title ?? "(no title)",
-            Message = n.Message ?? "(no message)",
-            TriggerInfo = GetTriggerInfo(n)
-        }).ToList();
-        this.PendingCount = list.Count;
-    }
-
-    static string GetTriggerInfo(Shiny.Notifications.Notification n)
-    {
-        if (n.ScheduleDate != null) return $"Scheduled: {n.ScheduleDate:g}";
-        if (n.Geofence != null) return $"Geofence: {n.Geofence.Center?.Latitude:F4}, {n.Geofence.Center?.Longitude:F4}";
-        if (n.RepeatInterval != null)
-        {
-            if (n.RepeatInterval.TimeOfDay != null)
-                return $"Repeat: {n.RepeatInterval.TimeOfDay:hh\\:mm} {n.RepeatInterval.DayOfWeek?.ToString() ?? "daily"}";
-            return $"Repeat: every {n.RepeatInterval.Interval?.TotalMinutes:F0} min";
-        }
-        return "Immediate";
-    }
-}
-
-public partial class PendingNotificationViewModel : ObservableObject
-{
-    [ObservableProperty] int id;
-    [ObservableProperty] string title = string.Empty;
-    [ObservableProperty] string message = string.Empty;
-    [ObservableProperty] string triggerInfo = string.Empty;
 }

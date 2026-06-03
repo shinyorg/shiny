@@ -1,14 +1,116 @@
 namespace Sample.Shared.Maui.Pages.Locations;
 
 [ShellMap<GpsPage>("gps")]
-public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, IDisposable
+public partial class GpsViewModel : ObservableObject, IDisposable, IPageLifecycleAware
 {
+    readonly IGpsManager gpsManager;
+    readonly GpsDelegate? filter;
     EventHandler<GpsReading>? gpsHandler;
+
+    public GpsViewModel(IGpsManager gpsManager, IEnumerable<IGpsDelegate> gpsDelegates)
+    {
+        this.gpsManager = gpsManager;
+        this.filter = gpsDelegates.OfType<GpsDelegate>().FirstOrDefault();
+    }
 
     // Configuration
     public List<string> BackgroundModes { get; } = ["Foreground", "Standard", "Realtime"];
     [ObservableProperty] int selectedModeIndex;
     [ObservableProperty] bool requestPreciseAccuracy;
+
+    // Reading filters (delegate-level min/max thresholds; blank disables the filter)
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FilterStatus))]
+    string minDistanceMeters = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FilterStatus))]
+    string minTimeSeconds = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FilterStatus))]
+    string maxDistanceMeters = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FilterStatus))]
+    string maxTimeSeconds = string.Empty;
+
+    public string FilterStatus { get; private set; } = string.Empty;
+
+    partial void OnMinDistanceMetersChanged(string value) => this.ApplyFilters();
+    partial void OnMinTimeSecondsChanged(string value) => this.ApplyFilters();
+    partial void OnMaxDistanceMetersChanged(string value) => this.ApplyFilters();
+    partial void OnMaxTimeSecondsChanged(string value) => this.ApplyFilters();
+
+    void ApplyFilters()
+    {
+        if (this.filter is null)
+        {
+            this.FilterStatus = "GpsDelegate filter not available on this platform";
+            this.OnPropertyChanged(nameof(this.FilterStatus));
+            return;
+        }
+
+        var errors = new List<string>();
+
+        var minDist = ParseMeters(this.MinDistanceMeters, "Min distance", errors);
+        var maxDist = ParseMeters(this.MaxDistanceMeters, "Max distance", errors);
+        var minTime = ParseSeconds(this.MinTimeSeconds, "Min time", errors);
+        var maxTime = ParseSeconds(this.MaxTimeSeconds, "Max time", errors);
+
+        if (minDist is not null && maxDist is not null && minDist.TotalMeters > maxDist.TotalMeters)
+            errors.Add("Min distance must be <= max distance");
+
+        if (minTime is not null && maxTime is not null && minTime > maxTime)
+            errors.Add("Min time must be <= max time");
+
+        if (errors.Count > 0)
+        {
+            this.FilterStatus = string.Join("; ", errors);
+        }
+        else
+        {
+            this.filter.MinimumDistance = minDist;
+            this.filter.MaximumDistance = maxDist;
+            this.filter.MinimumTime = minTime;
+            this.filter.MaximumTime = maxTime;
+            this.FilterStatus = "Filters applied";
+        }
+        this.OnPropertyChanged(nameof(this.FilterStatus));
+    }
+
+    static Distance? ParseMeters(string raw, string label, List<string> errors)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        if (!double.TryParse(raw, out var meters) || meters < 0)
+        {
+            errors.Add($"{label} must be a non-negative number");
+            return null;
+        }
+        return Distance.FromMeters(meters);
+    }
+
+    static TimeSpan? ParseSeconds(string raw, string label, List<string> errors)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        if (!double.TryParse(raw, out var seconds) || seconds < 0)
+        {
+            errors.Add($"{label} must be a non-negative number");
+            return null;
+        }
+        return TimeSpan.FromSeconds(seconds);
+    }
+
+    public void OnAppearing()
+    {
+        if (this.filter is null) return;
+        this.MinDistanceMeters = this.filter.MinimumDistance?.TotalMeters.ToString("0.##") ?? string.Empty;
+        this.MaxDistanceMeters = this.filter.MaximumDistance?.TotalMeters.ToString("0.##") ?? string.Empty;
+        this.MinTimeSeconds = this.filter.MinimumTime?.TotalSeconds.ToString("0.##") ?? string.Empty;
+        this.MaxTimeSeconds = this.filter.MaximumTime?.TotalSeconds.ToString("0.##") ?? string.Empty;
+    }
+
+    public void OnDisappearing() { }
 
     // iOS options (always defined so XAML compiled bindings resolve on every platform;
     // visibility is gated at runtime with IsIos / IsAndroid)
@@ -114,28 +216,28 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
         {
             if (this.gpsHandler != null)
             {
-                gpsManager.GpsReadingReceived -= this.gpsHandler;
+                this.gpsManager.GpsReadingReceived -= this.gpsHandler;
                 this.gpsHandler = null;
             }
-            await gpsManager.StopListener();
+            await this.gpsManager.StopListener();
             this.IsListening = false;
             this.Status = "Listener stopped";
             return;
         }
 
         var request = this.BuildRequest();
-        var access = await gpsManager.RequestAccess(request);
+        var access = await this.gpsManager.RequestAccess(request);
         if (access != AccessState.Available)
         {
             this.Status = $"Access: {access}";
             return;
         }
 
-        await gpsManager.StartListener(request);
+        await this.gpsManager.StartListener(request);
         this.IsListening = true;
         this.Status = "Listening...";
         this.gpsHandler = (_, reading) => MainThread.BeginInvokeOnMainThread(() => this.SetReading(reading));
-        gpsManager.GpsReadingReceived += this.gpsHandler;
+        this.gpsManager.GpsReadingReceived += this.gpsHandler;
     }
 
     [RelayCommand]
@@ -144,7 +246,7 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
         try
         {
             this.Status = "Getting position...";
-            var reading = await gpsManager.GetCurrentPosition();
+            var reading = await this.gpsManager.GetCurrentPosition();
             if (reading != null)
                 this.SetReading(reading);
             this.Status = "Position received";
@@ -159,7 +261,7 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
     void CheckPermission()
     {
         var request = this.BuildRequest();
-        var state = gpsManager.GetCurrentStatus(request);
+        var state = this.gpsManager.GetCurrentStatus(request);
         this.Status = $"Permission: {state}";
     }
 
@@ -167,7 +269,7 @@ public partial class GpsViewModel(IGpsManager gpsManager) : ObservableObject, ID
     {
         if (this.gpsHandler != null)
         {
-            gpsManager.GpsReadingReceived -= this.gpsHandler;
+            this.gpsManager.GpsReadingReceived -= this.gpsHandler;
             this.gpsHandler = null;
         }
     }

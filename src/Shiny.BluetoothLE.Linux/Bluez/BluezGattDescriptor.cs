@@ -8,10 +8,10 @@ namespace Shiny.BluetoothLE.Bluez;
 
 internal class BluezGattDescriptor
 {
-    readonly Connection connection;
+    readonly DBusConnection connection;
     readonly string objectPath;
 
-    public BluezGattDescriptor(Connection connection, string objectPath)
+    public BluezGattDescriptor(DBusConnection connection, string objectPath)
     {
         this.connection = connection;
         this.objectPath = objectPath;

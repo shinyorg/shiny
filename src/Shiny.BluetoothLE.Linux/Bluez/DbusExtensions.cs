@@ -8,7 +8,7 @@ namespace Shiny.BluetoothLE.Bluez;
 internal static class DbusExtensions
 {
     public static MessageBuffer CreateMethodCall(
-        this Connection connection,
+        this DBusConnection connection,
         string destination,
         string path,
         string @interface,
@@ -28,7 +28,7 @@ internal static class DbusExtensions
 
 
     public static MessageBuffer CreateGetPropertyCall(
-        this Connection connection,
+        this DBusConnection connection,
         string destination,
         string path,
         string @interface,
@@ -49,7 +49,7 @@ internal static class DbusExtensions
 
 
     public static MessageBuffer CreateGetAllPropertiesCall(
-        this Connection connection,
+        this DBusConnection connection,
         string destination,
         string path,
         string @interface)

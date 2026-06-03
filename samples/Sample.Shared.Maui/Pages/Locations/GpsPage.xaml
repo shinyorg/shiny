@@ -31,6 +31,14 @@
                 <shiny:SwitchCell Title="Stop Service With Task" On="{Binding StopForegroundServiceWithTask, Mode=TwoWay}" />
             </shiny:TableSection>
 
+            <shiny:TableSection Title="Reading Filters (Delegate)">
+                <shiny:EntryCell Title="Min Distance (m)" ValueText="{Binding MinDistanceMeters, Mode=TwoWay}" Keyboard="Numeric" Placeholder="blank = off" />
+                <shiny:EntryCell Title="Min Time (sec)" ValueText="{Binding MinTimeSeconds, Mode=TwoWay}" Keyboard="Numeric" Placeholder="blank = off" />
+                <shiny:EntryCell Title="Max Distance (m)" ValueText="{Binding MaxDistanceMeters, Mode=TwoWay}" Keyboard="Numeric" Placeholder="blank = off" />
+                <shiny:EntryCell Title="Max Time (sec)" ValueText="{Binding MaxTimeSeconds, Mode=TwoWay}" Keyboard="Numeric" Placeholder="blank = off" />
+                <shiny:LabelCell Title="Filter Status" ValueText="{Binding FilterStatus}" />
+            </shiny:TableSection>
+
             <shiny:TableSection Title="Actions">
                 <shiny:ButtonCell Title="{Binding ListenText}" Command="{Binding ToggleListenerCommand}" />
                 <shiny:ButtonCell Title="Get Current Position" Command="{Binding GetCurrentPositionCommand}" />

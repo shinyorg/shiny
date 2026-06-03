@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Notifications"
+             x:Class="Sample.Shared.Maui.Pages.Notifications.PendingNotificationsPage"
+             x:DataType="vm:PendingNotificationsViewModel"
+             Title="Pending Notifications">
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <VerticalStackLayout Grid.Row="0" Padding="16,12,16,8" Spacing="8">
+            <Label Text="{Binding Status}" FontSize="12" Opacity="0.7" />
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="Refresh" Command="{Binding RefreshCommand}" />
+                <Button Text="Cancel All" Command="{Binding CancelAllCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <BoxView Grid.Row="1"
+                 HeightRequest="1"
+                 Color="{AppThemeBinding Light=#E5E7EB, Dark=#374151}" />
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Items}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:PendingNotificationItemViewModel">
+                    <Grid Padding="16,10"
+                          ColumnDefinitions="*,Auto"
+                          RowDefinitions="Auto,Auto,Auto"
+                          ColumnSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Text="{Binding Title}"
+                               FontAttributes="Bold"
+                               FontSize="14"
+                               LineBreakMode="TailTruncation" />
+                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                               Text="{Binding Message}"
+                               FontSize="13"
+                               Opacity="0.8"
+                               LineBreakMode="TailTruncation" />
+                        <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                               Text="{Binding TriggerInfo}"
+                               FontSize="11"
+                               Opacity="0.6" />
+                        <Button Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
+                                Text="✕"
+                                FontSize="16"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                Padding="0"
+                                VerticalOptions="Center"
+                                Command="{Binding Source={RelativeSource Mode=FindAncestorBindingContext, AncestorType={x:Type vm:PendingNotificationsViewModel}}, Path=CancelCommand}"
+                                CommandParameter="{Binding Id}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="No pending notifications"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Margin="16"
+                       Opacity="0.6" />
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
+</ContentPage>

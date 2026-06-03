@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Bluez;
 using Shiny.BluetoothLE.Intrastructure;
 using Tmds.DBus.Protocol;
+using MessageNotification = Tmds.DBus.Protocol.Notification<Tmds.DBus.Protocol.Message>;
 
 namespace Shiny.BluetoothLE;
 
@@ -18,7 +19,7 @@ public class BleManager : IBleManager, IAsyncDisposable
     readonly IOperationQueue operations;
     readonly ILogger<BleManager> logger;
     readonly ILogger<Peripheral> peripheralLogger;
-    Connection? connection;
+    DBusConnection? connection;
     BluezAdapter? adapter;
     readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
 
@@ -38,11 +39,11 @@ public class BleManager : IBleManager, IAsyncDisposable
     public AccessState CurrentAccess => AccessState.Unknown;
 
 
-    async Task<Connection> GetConnectionAsync(CancellationToken ct = default)
+    async Task<DBusConnection> GetConnectionAsync(CancellationToken ct = default)
     {
         if (this.connection == null)
         {
-            this.connection = new Connection(Address.System!);
+            this.connection = new DBusConnection(DBusAddress.System!);
             await this.connection.ConnectAsync().ConfigureAwait(false);
         }
         return this.connection;
@@ -126,22 +127,22 @@ public class BleManager : IBleManager, IAsyncDisposable
                 var ifaceSub = await conn.AddMatchAsync(
                     ifaceRule,
                     static (Message msg, object? _) => msg,
-                    (Exception? ex, Message msg, object? _, object? state) =>
+                    static (MessageNotification n) =>
                     {
-                        if (ex != null) return;
+                        if (n.Exception != null) return;
+                        var ctx = (ScanContext)n.State!;
                         try
                         {
-                            var ctx = (ScanContext)state!;
-                            ctx.Manager.ProcessInterfacesAdded(msg, ctx.Observer);
+                            ctx.Manager.ProcessInterfacesAdded(n.Value, ctx.Observer);
                         }
                         catch (Exception exc)
                         {
-                            ((ScanContext)state!).Manager.logger.BluezError(exc, "Error processing InterfacesAdded");
+                            ctx.Manager.logger.BluezError(exc, "Error processing InterfacesAdded");
                         }
                     },
+                    emitOnCapturedContext: false,
                     ObserverFlags.None,
-                    readerState: null,
-                    handlerState: new ScanContext(this, ob)
+                    new ScanContext(this, ob)
                 ).ConfigureAwait(false);
                 disposables.Add(ifaceSub);
 
@@ -156,22 +157,22 @@ public class BleManager : IBleManager, IAsyncDisposable
                 var propsSub = await conn.AddMatchAsync(
                     propsRule,
                     static (Message msg, object? _) => msg,
-                    (Exception? ex, Message msg, object? _, object? state) =>
+                    static (MessageNotification n) =>
                     {
-                        if (ex != null) return;
+                        if (n.Exception != null) return;
+                        var ctx = (ScanContext)n.State!;
                         try
                         {
-                            var ctx = (ScanContext)state!;
-                            ctx.Manager.ProcessPropertiesChanged(msg, ctx.Observer);
+                            ctx.Manager.ProcessPropertiesChanged(n.Value, ctx.Observer);
                         }
                         catch (Exception exc)
                         {
-                            ((ScanContext)state!).Manager.logger.BluezError(exc, "Error processing PropertiesChanged");
+                            ctx.Manager.logger.BluezError(exc, "Error processing PropertiesChanged");
                         }
                     },
+                    emitOnCapturedContext: false,
                     ObserverFlags.None,
-                    readerState: null,
-                    handlerState: new ScanContext(this, ob)
+                    new ScanContext(this, ob)
                 ).ConfigureAwait(false);
                 disposables.Add(propsSub);
 
@@ -339,7 +340,7 @@ public class BleManager : IBleManager, IAsyncDisposable
     }
 
 
-    async Task EmitExistingDevicesAsync(Connection conn, IObserver<ScanResult> ob, ScanConfig? config, CancellationToken ct)
+    async Task EmitExistingDevicesAsync(DBusConnection conn, IObserver<ScanResult> ob, ScanConfig? config, CancellationToken ct)
     {
         var msg = conn.CreateMethodCall(
             BluezConstants.Service,

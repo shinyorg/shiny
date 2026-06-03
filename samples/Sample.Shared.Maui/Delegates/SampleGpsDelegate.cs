@@ -4,11 +4,11 @@ using Sample.Shared.Maui.Services;
 namespace Sample.Shared.Maui.Delegates;
 
 
-public class SampleGpsDelegate(ILogger<SampleGpsDelegate> logger, IEventStore events) : IGpsDelegate
+public class SampleGpsDelegate(ILogger<SampleGpsDelegate> logger, IEventStore events) : GpsDelegate(logger)
 {
-    public Task OnReading(GpsReading reading)
+    protected override Task OnGpsReading(GpsReading reading)
     {
-        logger.LogInformation("GPS Reading: Lat={Lat}, Lng={Lng}, Alt={Alt}",
+        this.Logger.LogInformation("GPS Reading: Lat={Lat}, Lng={Lng}, Alt={Alt}",
             reading.Position.Latitude, reading.Position.Longitude, reading.Altitude);
 
         return events.Add(

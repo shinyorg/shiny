@@ -9,10 +9,10 @@ namespace Shiny.BluetoothLE.Bluez;
 
 internal class BluezGattCharacteristic
 {
-    readonly Connection connection;
+    readonly DBusConnection connection;
     readonly string objectPath;
 
-    public BluezGattCharacteristic(Connection connection, string objectPath)
+    public BluezGattCharacteristic(DBusConnection connection, string objectPath)
     {
         this.connection = connection;
         this.objectPath = objectPath;

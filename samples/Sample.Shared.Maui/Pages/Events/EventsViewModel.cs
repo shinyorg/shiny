@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Sample.Shared.Maui.Services;
 
 namespace Sample.Shared.Maui.Pages.Events;
@@ -5,6 +6,8 @@ namespace Sample.Shared.Maui.Pages.Events;
 [ShellMap<EventsPage>("events")]
 public partial class EventsViewModel(IEventStore events) : ObservableObject, IPageLifecycleAware
 {
+    const int PageSize = 50;
+
     public List<string> Categories { get; } = ["All", "GPS", "Geofence", "MotionActivity", "Notification", "Push", "Job", "HttpTransfer"];
 
     [ObservableProperty]
@@ -12,12 +15,26 @@ public partial class EventsViewModel(IEventStore events) : ObservableObject, IPa
     int selectedCategoryIndex;
 
     [ObservableProperty] string status = string.Empty;
+    [ObservableProperty] bool hasMore;
 
-    public ObservableCollection<EventItemViewModel> Items { get; } = new();
+    [ObservableProperty] bool isMetadataPanelOpen;
+    [ObservableProperty] string selectedTitle = string.Empty;
+    [ObservableProperty] string selectedMetadata = string.Empty;
+
+    public List<EventItemViewModel> Items
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = [];
 
     public string SelectedCategory => this.Categories[this.SelectedCategoryIndex];
 
     EventHandler<EventRecord>? eventHandler;
+    bool loading;
 
     public void OnAppearing()
     {
@@ -38,15 +55,60 @@ public partial class EventsViewModel(IEventStore events) : ObservableObject, IPa
     [RelayCommand]
     async Task Refresh()
     {
-        var category = this.SelectedCategoryIndex == 0 ? null : this.SelectedCategory;
-        var records = await events.GetAll(category);
-        await MainThread.InvokeOnMainThreadAsync(() =>
+        if (this.loading) return;
+        this.loading = true;
+        try
         {
-            this.Items.Clear();
+            var category = this.SelectedCategoryIndex == 0 ? null : this.SelectedCategory;
+            var records = await events.GetAll(category, beforeId: null, limit: PageSize);
+            var items = records.Select(r => new EventItemViewModel(r)).ToList();
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                this.Items = items;
+                this.HasMore = records.Count >= PageSize;
+                this.Status = $"Loaded {items.Count} event(s)";
+            });
+        }
+        finally
+        {
+            this.loading = false;
+        }
+    }
+
+    [RelayCommand]
+    async Task LoadMore()
+    {
+        if (this.loading || !this.HasMore) return;
+        var cursor = this.Items.Count == 0 ? (long?)null : this.Items[^1].Id;
+        if (cursor is null) return;
+
+        this.loading = true;
+        try
+        {
+            var category = this.SelectedCategoryIndex == 0 ? null : this.SelectedCategory;
+            var records = await events.GetAll(category, beforeId: cursor, limit: PageSize);
+            if (records.Count == 0)
+            {
+                await MainThread.InvokeOnMainThreadAsync(() => this.HasMore = false);
+                return;
+            }
+
+            var next = new List<EventItemViewModel>(this.Items.Count + records.Count);
+            next.AddRange(this.Items);
             foreach (var r in records)
-                this.Items.Add(new EventItemViewModel(r));
-            this.Status = $"Loaded {records.Count} event(s)";
-        });
+                next.Add(new EventItemViewModel(r));
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                this.Items = next;
+                this.HasMore = records.Count >= PageSize;
+                this.Status = $"Loaded {next.Count} event(s)";
+            });
+        }
+        finally
+        {
+            this.loading = false;
+        }
     }
 
     [RelayCommand]
@@ -54,6 +116,32 @@ public partial class EventsViewModel(IEventStore events) : ObservableObject, IPa
     {
         await events.Clear();
         await this.Refresh();
+    }
+
+    [RelayCommand]
+    void ShowMetadata(EventItemViewModel? item)
+    {
+        if (item is null)
+            return;
+
+        this.SelectedTitle = item.TitleDisplay;
+        this.SelectedMetadata = FormatMetadata(item.Metadata);
+        this.IsMetadataPanelOpen = true;
+    }
+
+    static string FormatMetadata(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+            return "(no metadata)";
+        try
+        {
+            using var doc = JsonDocument.Parse(raw);
+            return JsonSerializer.Serialize(doc.RootElement, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch
+        {
+            return raw;
+        }
     }
 
     async Task OnEventAdded(EventRecord record)
@@ -64,7 +152,7 @@ public partial class EventsViewModel(IEventStore events) : ObservableObject, IPa
 
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
-            this.Items.Insert(0, new EventItemViewModel(record));
+            this.Items = [new EventItemViewModel(record), .. this.Items];
             this.Status = $"Loaded {this.Items.Count} event(s)";
         });
     }

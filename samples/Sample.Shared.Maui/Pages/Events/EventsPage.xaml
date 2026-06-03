@@ -1,34 +1,94 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:shiny="http://shiny.net/maui/controls"
-             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Events"
-             x:Class="Sample.Shared.Maui.Pages.Events.EventsPage"
-             x:DataType="vm:EventsViewModel"
-             Title="Events">
-    <shiny:TableView>
-        <shiny:TableRoot>
-            <shiny:TableSection Title="Filter">
-                <shiny:TextPickerCell Title="Category"
-                                      ItemsSource="{Binding Categories}"
-                                      SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" />
-                <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
-            </shiny:TableSection>
+<shiny:ShinyContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                        xmlns:shiny="http://shiny.net/maui/controls"
+                        xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Events"
+                        x:Class="Sample.Shared.Maui.Pages.Events.EventsPage"
+                        x:DataType="vm:EventsViewModel"
+                        Title="Events">
 
-            <shiny:TableSection Title="Actions">
-                <shiny:ButtonCell Title="Refresh" Command="{Binding RefreshCommand}" />
-                <shiny:ButtonCell Title="Clear All" Command="{Binding ClearCommand}" />
-            </shiny:TableSection>
+    <shiny:ShinyContentPage.PageContent>
+        <Grid RowDefinitions="Auto,Auto,*">
 
-            <shiny:TableSection Title="Recent" ItemsSource="{Binding Items}">
-                <shiny:TableSection.ItemTemplate>
+            <VerticalStackLayout Grid.Row="0" Padding="16,12,16,8" Spacing="8">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" VerticalOptions="Center">
+                    <Label Grid.Column="0" Text="Category" VerticalOptions="Center" />
+                    <Picker Grid.Column="1"
+                            ItemsSource="{Binding Categories}"
+                            SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" />
+                </Grid>
+                <Label Text="{Binding Status}" FontSize="12" Opacity="0.7" />
+                <HorizontalStackLayout Spacing="8">
+                    <Button Text="Refresh" Command="{Binding RefreshCommand}" />
+                    <Button Text="Clear All" Command="{Binding ClearCommand}" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <BoxView Grid.Row="1"
+                     HeightRequest="1"
+                     Color="{AppThemeBinding Light=#E5E7EB, Dark=#374151}" />
+
+            <CollectionView Grid.Row="2"
+                            ItemsSource="{Binding Items}"
+                            RemainingItemsThreshold="10"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:EventItemViewModel">
-                        <shiny:LabelCell Title="{Binding TitleDisplay}"
-                                         Description="{Binding Description}"
-                                         ValueText="{Binding ValueText}" />
+                        <Grid Padding="16,10"
+                              ColumnDefinitions="*,Auto"
+                              RowDefinitions="Auto,Auto"
+                              ColumnSpacing="8">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource Mode=FindAncestorBindingContext, AncestorType={x:Type vm:EventsViewModel}}, Path=ShowMetadataCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding TitleDisplay}"
+                                   FontAttributes="Bold"
+                                   FontSize="14" />
+                            <Label Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding ValueText}"
+                                   FontSize="11"
+                                   Opacity="0.6"
+                                   VerticalOptions="Center" />
+                            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Text="{Binding Description}"
+                                   FontSize="13"
+                                   Opacity="0.8"
+                                   LineBreakMode="TailTruncation" />
+                        </Grid>
                     </DataTemplate>
-                </shiny:TableSection.ItemTemplate>
-            </shiny:TableSection>
-        </shiny:TableRoot>
-    </shiny:TableView>
-</ContentPage>
+                </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <Label Text="No events"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="16"
+                           Opacity="0.6" />
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </Grid>
+    </shiny:ShinyContentPage.PageContent>
+
+    <shiny:ShinyContentPage.Panels>
+        <shiny:FloatingPanel IsOpen="{Binding IsMetadataPanelOpen, Mode=TwoWay}"
+                             PanelCornerRadius="20">
+            <Grid RowDefinitions="Auto,*" Padding="16">
+                <Label Grid.Row="0"
+                       Text="{Binding SelectedTitle}"
+                       FontAttributes="Bold"
+                       FontSize="16"
+                       Margin="0,0,0,8" />
+                <ScrollView Grid.Row="1">
+                    <Label Text="{Binding SelectedMetadata}"
+                           FontFamily="Monospace"
+                           FontSize="12"
+                           LineBreakMode="WordWrap" />
+                </ScrollView>
+            </Grid>
+        </shiny:FloatingPanel>
+    </shiny:ShinyContentPage.Panels>
+</shiny:ShinyContentPage>

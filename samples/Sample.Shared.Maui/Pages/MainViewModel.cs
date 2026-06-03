@@ -17,35 +17,33 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             {
                 new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
                 new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"),
-                new("📝 Events", "Captured delegate events (SQLite)", "events"),
                 new("🔋 Battery", "Observe battery level & state", "battery"),
-                new("🌐 Connectivity", "Observe network connectivity", "connectivity")
+                new("🌐 Connectivity", "Observe network connectivity", "connectivity"),
+                new("📝 Events", "Captured delegate events (SQLite)", "events")
             };
         }
 
-        var list = new List<FeatureItem>
-        {
-            new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
-            new("📢 BLE Hosting", "Advertise as a GATT server", "blehosting"),
-            new("🔔 Notifications", "Local notifications", "notifications"),
-            new("📣 Notification Channels", "Manage notification channels", "notificationchannels"),
-            new("⬇️ HTTP Transfers", "Background uploads & downloads", "httptransfers"),
-            new("📝 Events", "Captured delegate events (SQLite)", "events"),
-            new("🔋 Battery", "Observe battery level & state", "battery"),
-            new("🌐 Connectivity", "Observe network connectivity", "connectivity"),
-            new("⚙️ Settings", "Connectivity, battery, key-value store", "settings")
-        };
+        var list = new List<FeatureItem>();
 
-        // L2CAP: implemented on Android (29+), Apple (iOS/MacCatalyst/MacOS), and Linux/BlueZ.
-        // Windows has no Bluetooth.GenericAttributeProfile L2CAP surface in WinRT.
+        // --- BLE ---
+        list.Add(new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"));
+        list.Add(new("📢 BLE Hosting", "Advertise as a GATT server", "blehosting"));
+        // L2CAP: Android (29+), Apple, Linux/BlueZ. No WinRT surface for it.
         if (!OperatingSystem.IsWindows())
             list.Add(new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"));
 
+        // --- Notifications & Push ---
+        list.Add(new("🔔 Notifications", "Local notifications", "notifications"));
+        list.Add(new("📣 Notification Channels", "Manage notification channels", "notificationchannels"));
+        list.Add(new("⏳ Pending Notifications", "View & cancel scheduled notifications", "pendingnotifications"));
         // Push: every MAUI-supported OS except Linux (no Shiny.Push Linux impl)
         if (!OperatingSystem.IsLinux())
             list.Add(new("📲 Push", "Push notification registration", "push"));
 
-        // GPS / Geofencing: mobile-only (Shiny.Locations is wired for Android & iOS)
+        // --- Background transfers ---
+        list.Add(new("⬇️ HTTP Transfers", "Background uploads & downloads", "httptransfers"));
+
+        // --- Location / Activity (mobile-only) ---
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
         {
             list.Add(new("📍 GPS", "Track location with GPS", "gps"));
@@ -53,10 +51,17 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             list.Add(new("🏃 Motion Activity", "Activity recognition (walk, drive, etc.)", "motionactivity"));
         }
 
-        // Jobs: Android, iOS, and Linux (not registered on the MacOS/Windows samples)
+        // --- Jobs (Android, iOS, Linux) ---
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsLinux())
             list.Add(new("⏰ Jobs", "Background job scheduling", "jobs"));
 
+        // --- Device state ---
+        list.Add(new("🔋 Battery", "Observe battery level & state", "battery"));
+        list.Add(new("🌐 Connectivity", "Observe network connectivity", "connectivity"));
+        list.Add(new("⚙️ Settings", "Connectivity, battery, key-value store", "settings"));
+
+        // --- Diagnostics ---
+        list.Add(new("📝 Events", "Captured delegate events (SQLite)", "events"));
         return list;
     }
 

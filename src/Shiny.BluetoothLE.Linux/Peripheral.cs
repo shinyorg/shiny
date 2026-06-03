@@ -10,13 +10,14 @@ using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Bluez;
 using Shiny.BluetoothLE.Intrastructure;
 using Tmds.DBus.Protocol;
+using MessageNotification = Tmds.DBus.Protocol.Notification<Tmds.DBus.Protocol.Message>;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral : IPeripheral
 {
-    readonly Connection connection;
+    readonly DBusConnection connection;
     readonly BluezDevice device;
     readonly IOperationQueue operations;
     readonly ILogger logger;
@@ -26,7 +27,7 @@ public partial class Peripheral : IPeripheral
 
 
     internal Peripheral(
-        Connection connection,
+        DBusConnection connection,
         string objectPath,
         string uuid,
         string? name,
@@ -264,12 +265,12 @@ public partial class Peripheral : IPeripheral
                 signalSub = await this.connection.AddMatchAsync(
                     rule,
                     static (Message msg, object? _) => msg,
-                    static (Exception? ex, Message msg, object? _, object? state) =>
+                    static (MessageNotification n) =>
                     {
-                        if (ex != null) return;
-                        var ctx = (NotifyContext)state!;
+                        if (n.Exception != null) return;
+                        var ctx = (NotifyContext)n.State!;
 
-                        var reader = msg.GetBodyReader();
+                        var reader = n.Value.GetBodyReader();
                         var iface = reader.ReadString();
                         if (iface != BluezConstants.GattCharacteristicInterface)
                             return;
@@ -297,9 +298,9 @@ public partial class Peripheral : IPeripheral
                             }
                         }
                     },
+                    emitOnCapturedContext: false,
                     ObserverFlags.None,
-                    readerState: null,
-                    handlerState: new NotifyContext(serviceUuid, characteristicUuid, ob)
+                    new NotifyContext(serviceUuid, characteristicUuid, ob)
                 ).ConfigureAwait(false);
 
                 await ch.StartNotifyAsync(cts.Token).ConfigureAwait(false);
