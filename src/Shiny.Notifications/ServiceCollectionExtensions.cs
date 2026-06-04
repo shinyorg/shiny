@@ -18,7 +18,10 @@ public static class NotificationsServiceCollectionExtensions
         services.AddSingletonAsImplementedInterfaces<ChannelManager>();
         services.AddDefaultRepository();
         services.AddJsonContext(ShinyNotificationsJsonContext.Default);
-#if IOS || MACCATALYST
+#if ANDROID
+        services.AddSingleton<AndroidNotificationManager>();
+        services.AddSingleton<AndroidNotificationProcessor>();
+#elif IOS || MACCATALYST
         services.TryAddSingleton(new IosConfiguration());
 #endif
         return services;

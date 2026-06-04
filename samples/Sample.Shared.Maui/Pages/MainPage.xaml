@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages"
              xmlns:shiny="http://shiny.net/maui/controls"
              x:Class="Sample.Shared.Maui.Pages.MainPage"
+             x:Name="PageRoot"
              x:DataType="vm:MainViewModel"
              Title="Shiny Sample">
     <shiny:TableView>
@@ -11,9 +12,9 @@
             <shiny:TableSection Title="Features" ItemsSource="{Binding Features}">
                 <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:FeatureItem">
-                        <shiny:CommandCell Title="{Binding Title}" 
+                        <shiny:CommandCell Title="{Binding Title}"
                                            Description="{Binding Description}"
-                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=NavigateCommand}"
+                                           Command="{Binding BindingContext.NavigateCommand, Source={x:Reference PageRoot}}"
                                            CommandParameter="{Binding Route}" />
                     </DataTemplate>
                 </shiny:TableSection.ItemTemplate>
