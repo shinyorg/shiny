@@ -24,6 +24,7 @@ public partial class AndroidPlatform : IPlatform,
                                        IAndroidLifecycle.IOnActivityResult
 {
     const string PermissionsKey = nameof(PermissionsKey);
+    const char PermissionsSeparator = '';
     int requestCode;
     readonly List<string> requestedPermissions;
     readonly ConcurrentDictionary<int, TaskCompletionSource<PermissionRequestResult>> pendingPermissions = new();
@@ -43,8 +44,10 @@ public partial class AndroidPlatform : IPlatform,
             this.Public = new DirectoryInfo(publicDir.AbsolutePath);
 
         this.store = store;
-        var stored = this.store.Get<string[]>(PermissionsKey);
-        this.requestedPermissions = stored == null ? new List<string>() : new List<string>(stored);
+        var stored = this.store.Get<string>(PermissionsKey);
+        this.requestedPermissions = string.IsNullOrEmpty(stored)
+            ? new List<string>()
+            : new List<string>(stored.Split(PermissionsSeparator, StringSplitOptions.RemoveEmptyEntries));
     }
 
 
@@ -245,7 +248,7 @@ public partial class AndroidPlatform : IPlatform,
                     this.requestedPermissions.Add(p);
             }
             if (count != this.requestedPermissions.Count)
-                this.store.Set(PermissionsKey, this.requestedPermissions.ToArray());
+                this.store.Set(PermissionsKey, string.Join(PermissionsSeparator, this.requestedPermissions));
         }
     }
 
