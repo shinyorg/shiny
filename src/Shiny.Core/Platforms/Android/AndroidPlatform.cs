@@ -43,7 +43,8 @@ public partial class AndroidPlatform : IPlatform,
             this.Public = new DirectoryInfo(publicDir.AbsolutePath);
 
         this.store = store;
-        this.requestedPermissions = this.store.Get<List<string>>(PermissionsKey) ?? new List<string>();
+        var stored = this.store.Get<string[]>(PermissionsKey);
+        this.requestedPermissions = stored == null ? new List<string>() : new List<string>(stored);
     }
 
 
@@ -244,7 +245,7 @@ public partial class AndroidPlatform : IPlatform,
                     this.requestedPermissions.Add(p);
             }
             if (count != this.requestedPermissions.Count)
-                this.store.Set(PermissionsKey, this.requestedPermissions);
+                this.store.Set(PermissionsKey, this.requestedPermissions.ToArray());
         }
     }
 
