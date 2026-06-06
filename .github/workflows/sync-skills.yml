@@ -33,13 +33,16 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Sync skills directory
+        env:
+          PLUGIN_NAME: shiny-client
         run: |
+          target_dir="skills-repo/plugins/$PLUGIN_NAME/skills"
+          mkdir -p "$target_dir"
           for skill_dir in source/skills/*/; do
             skill_name=$(basename "$skill_dir")
-            echo "Syncing skill: $skill_name"
-            rm -rf "skills-repo/skills/$skill_name"
-            mkdir -p skills-repo/skills
-            cp -r "$skill_dir" "skills-repo/skills/$skill_name"
+            echo "Syncing skill: $skill_name -> plugins/$PLUGIN_NAME/skills/$skill_name"
+            rm -rf "$target_dir/$skill_name"
+            cp -r "$skill_dir" "$target_dir/$skill_name"
           done
 
       - name: Create Pull Request
