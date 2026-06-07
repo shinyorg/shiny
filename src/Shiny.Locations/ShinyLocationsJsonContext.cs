@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Shiny.Locations;
 
+[Shiny.ShinyJsonContext]
 #if APPLE
 [JsonSerializable(typeof(AppleGpsRequest))]
 #elif ANDROID

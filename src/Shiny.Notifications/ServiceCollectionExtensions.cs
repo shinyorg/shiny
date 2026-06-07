@@ -17,7 +17,6 @@ public static class NotificationsServiceCollectionExtensions
         services.AddSingletonAsImplementedInterfaces<NotificationManager>();
         services.AddSingletonAsImplementedInterfaces<ChannelManager>();
         services.AddDefaultRepository();
-        services.AddJsonContext(ShinyNotificationsJsonContext.Default);
 #if ANDROID
         services.AddSingleton<AndroidNotificationManager>();
         services.AddSingleton<AndroidNotificationProcessor>();

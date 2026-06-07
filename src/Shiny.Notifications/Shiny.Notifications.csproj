@@ -12,6 +12,7 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="Shiny.Extensions.Serialization" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
     </ItemGroup>

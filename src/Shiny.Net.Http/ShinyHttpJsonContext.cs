@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Shiny.Net.Http;
 
+[Shiny.ShinyJsonContext]
 #if APPLE
 [JsonSerializable(typeof(AppleHttpTransferRequest))]
 #endif

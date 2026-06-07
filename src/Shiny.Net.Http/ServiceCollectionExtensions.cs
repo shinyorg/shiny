@@ -54,7 +54,6 @@ public static class HttpTransferServiceCollectionExtensions
         services.AddConnectivity();
 #endif
         services.AddDefaultRepository();
-        services.AddJsonContext(ShinyHttpJsonContext.Default);
-        services.AddSingleton<HttpTransferMonitor>(); 
+        services.AddSingleton<HttpTransferMonitor>();
     }
 }

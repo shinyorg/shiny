@@ -31,7 +31,6 @@ public static class BlazorHttpServiceCollectionExtensions
         services.AddBattery();
         services.AddConnectivity();
         services.AddLocalStorageRepository();
-        services.AddJsonContext(ShinyHttpJsonContext.Default);
 
         services.AddSingleton(options);
         services.AddSingleton<BlazorHttpTransferManager>();

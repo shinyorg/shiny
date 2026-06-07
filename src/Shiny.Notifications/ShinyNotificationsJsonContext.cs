@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Shiny.Notifications;
 
+[Shiny.ShinyJsonContext]
 #if ANDROID
 [JsonSerializable(typeof(AndroidNotification))]
 [JsonSerializable(typeof(AndroidChannel))]
