@@ -5,6 +5,18 @@
         <Project Path="samples\Sample.MacOS\Sample.MacOS.csproj" />
         <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
     </Folder>
+    <Folder Name="/ServerSamples/">
+        <Project Path="samples/Sample.Api/Sample.Api.csproj" />
+    </Folder>
+    <Folder Name="/tests/">
+        <Project Path="tests/Shiny.Tests/Shiny.Tests.csproj" />
+        <Project Path="tests/Shiny.Data.Sync.Tests/Shiny.Data.Sync.Tests.csproj" />
+        <Project Path="tests/Shiny.Net.Http.Tests/Shiny.Net.Http.Tests.csproj" />
+        <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
+        <Project Path="tests/Shiny.Notifications.Tests/Shiny.Notifications.Tests.csproj" />
+        <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
+        <Project Path="tests/Shiny.BluetoothLE.Common.Tests/Shiny.BluetoothLE.Common.Tests.csproj" />
+    </Folder>
     <Folder Name="/Solution Items/">
         <File Path=".editorconfig" />
         <File Path=".github\CODE_OF_CONDUCT.md" />
@@ -30,6 +42,7 @@
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
     <Project Path="src\Shiny.Core\Shiny.Core.csproj" />
+    <Project Path="src\Shiny.Data.Sync\Shiny.Data.Sync.csproj" />
     <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
     <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
     <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" />
@@ -46,6 +59,7 @@
         <Project Path="src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
         <Project Path="src/Shiny.Locations.Blazor/Shiny.Locations.Blazor.csproj" />
         <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
+        <Project Path="src/Shiny.Data.Sync.Blazor/Shiny.Data.Sync.Blazor.csproj" />
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />

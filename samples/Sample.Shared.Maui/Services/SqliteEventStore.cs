@@ -14,7 +14,7 @@ public sealed class SqliteEventStore : IEventStore, IAsyncDisposable
     public SqliteEventStore(ILogger<SqliteEventStore> logger)
     {
         this.logger = logger;
-        var dbPath = Path.Combine(FileSystem.AppDataDirectory, "sample-events.db3");
+        var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "sample-events.db3");
         this.connectionString = new SqliteConnectionStringBuilder
         {
             DataSource = dbPath,

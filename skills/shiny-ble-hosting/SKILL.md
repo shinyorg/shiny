@@ -1,6 +1,6 @@
 ---
 name: shiny-ble-hosting
-description: Generate code using Shiny.BluetoothLE.Hosting, a BLE peripheral hosting library for .NET with GATT server, advertising, and managed characteristic patterns
+description: Generate code using Shiny.BluetoothLE.Hosting, a BLE peripheral hosting library for .NET with GATT server, advertising, and L2CAP CoC channels
 auto_invoke: true
 triggers:
   - ble hosting
@@ -19,10 +19,7 @@ triggers:
   - IGattServiceBuilder
   - IGattCharacteristic
   - IGattCharacteristicBuilder
-  - BleGattCharacteristic
-  - BleGattCharacteristicAttribute
   - AddBluetoothLeHosting
-  - AddBleHostedCharacteristic
   - StartAdvertising
   - StopAdvertising
   - AdvertiseBeacon
@@ -36,8 +33,6 @@ triggers:
   - NotificationOptions
   - IPeripheral
   - Shiny.BluetoothLE.Hosting
-  - AttachRegisteredServices
-  - DetachRegisteredServices
   - ibeacon advertise
   - ble notify
   - ble indicate
@@ -53,34 +48,33 @@ triggers:
 
 # Shiny.BluetoothLE.Hosting Skill
 
-You are an expert in Shiny.BluetoothLE.Hosting, a .NET library for turning a mobile device into a BLE peripheral. It provides a GATT server, BLE advertising, iBeacon broadcasting, and a managed characteristic pattern using dependency injection and attribute-based registration.
+You are an expert in Shiny.BluetoothLE.Hosting, a .NET library for turning a device into a BLE peripheral. It provides a GATT server, BLE advertising, iBeacon broadcasting, and L2CAP CoC channels through the imperative `IBleHostingManager` API.
+
+> The attribute-based managed characteristic pattern (`BleGattCharacteristic` base class, `[BleGattCharacteristic]` attribute, `AddBleHostedCharacteristic<T>`, `AttachRegisteredServices`) was removed for AOT compliance. Use the imperative `AddService(...)` builder pattern below — it is the single supported way to expose a GATT service.
 
 ## When to Use This Skill
 
 Invoke this skill when the user wants to:
-- Set up a BLE GATT server on a mobile device (iOS, Android)
+- Set up a BLE GATT server on a device (iOS, macOS, Mac Catalyst, Android, Linux)
 - Advertise as a BLE peripheral with custom service UUIDs or a local name
 - Broadcast as an iBeacon
 - Create GATT services with read, write, and notify characteristics
 - Handle read requests from connected centrals
 - Handle write requests from connected centrals
 - Send notifications or indications to subscribed centrals
-- Use the managed `BleGattCharacteristic` pattern with DI registration
 - Configure characteristic properties (read, write, notify, indicate, encryption)
 - React to central subscribe/unsubscribe events
 - Build a MAUI app that acts as a BLE peripheral
-- Publish an L2CAP PSM for centrals to open streaming channels against
+- Publish an L2CAP PSM for centrals to open streaming channels against (iOS/macOS, Android API 29+, Linux)
 
 ## Library Overview
 
-- **NuGet**: `Shiny.BluetoothLE.Hosting`
-- **Namespaces**: `Shiny.BluetoothLE.Hosting`, `Shiny.BluetoothLE.Hosting.Managed`
-- **Platforms**: iOS, Mac Catalyst, macOS (CoreBluetooth), Android (no Windows support for full hosting)
+- **NuGet**: `Shiny.BluetoothLE.Hosting` (Android, iOS/macOS, Mac Catalyst, Windows stub), `Shiny.BluetoothLE.Hosting.Linux` (Linux via BlueZ)
+- **Namespaces**: `Shiny.BluetoothLE.Hosting`
+- **Platforms**: iOS, Mac Catalyst, macOS (CoreBluetooth), Android, Linux (BlueZ). Windows throws `NotSupportedException` for advertising/GATT-server hosting; only the `OpenL2Cap` API is exposed and it also throws on Windows.
 - **Dependencies**: `Shiny.Core`, `Shiny.BluetoothLE.Common`
 
-The library has two usage patterns:
-1. **Imperative API** -- inject `IBleHostingManager`, call `AddService` with a builder lambda to configure characteristics inline
-2. **Managed pattern** -- create `BleGattCharacteristic` subclasses decorated with `[BleGattCharacteristic]`, register them via `AddBleHostedCharacteristic<T>()`, and attach/detach them at runtime
+The library exposes a single imperative API: inject `IBleHostingManager`, call `AddService(uuid, primary, builder)` to register a GATT service inline.
 
 ## Setup
 
@@ -91,16 +85,8 @@ dotnet add package Shiny.BluetoothLE.Hosting
 
 ### 2. Register in MauiProgram.cs
 
-**Imperative (no managed characteristics):**
 ```csharp
 builder.Services.AddBluetoothLeHosting();
-```
-
-**Managed pattern (preferred for structured services):**
-```csharp
-builder.Services.AddBleHostedCharacteristic<MyReadCharacteristic>();
-builder.Services.AddBleHostedCharacteristic<MyWriteCharacteristic>();
-// AddBluetoothLeHosting() is called automatically by AddBleHostedCharacteristic
 ```
 
 ## Code Generation Instructions
@@ -153,59 +139,7 @@ var service = await hostingManager.AddService("12345678-1234-1234-1234-123456789
 });
 ```
 
-### 3. Managed Characteristic Pattern
-
-Create a class that extends `BleGattCharacteristic` and decorate it with `[BleGattCharacteristic]`:
-
-```csharp
-[BleGattCharacteristic("12345678-1234-1234-1234-123456789abc", "12345678-1234-1234-1234-123456789ab1")]
-public class MyCharacteristic : BleGattCharacteristic
-{
-    public override Task OnStart()
-    {
-        // Called when the service is attached
-        return Task.CompletedTask;
-    }
-
-    public override void OnStop()
-    {
-        // Called when the service is detached
-    }
-
-    public override Task<GattResult> OnRead(ReadRequest request)
-    {
-        var data = System.Text.Encoding.UTF8.GetBytes("Hello");
-        return Task.FromResult(GattResult.Success(data));
-    }
-
-    public override Task OnWrite(WriteRequest request)
-    {
-        var received = request.Data;
-        if (request.IsReplyNeeded)
-            request.Respond(GattState.Success);
-        return Task.CompletedTask;
-    }
-
-    public override Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
-    {
-        // React to central subscribing/unsubscribing
-        return Task.CompletedTask;
-    }
-}
-```
-
-Register in DI:
-```csharp
-builder.Services.AddBleHostedCharacteristic<MyCharacteristic>();
-```
-
-Attach at runtime:
-```csharp
-await hostingManager.AttachRegisteredServices();
-await hostingManager.StartAdvertising(new AdvertisementOptions("MyDevice", "12345678-1234-1234-1234-123456789abc"));
-```
-
-### 4. Advertising
+### 3. Advertising
 
 ```csharp
 // Advertise with local name and service UUIDs
@@ -221,7 +155,7 @@ await hostingManager.StartAdvertising();
 hostingManager.StopAdvertising();
 ```
 
-### 5. iBeacon Broadcasting
+### 4. iBeacon Broadcasting
 
 ```csharp
 await hostingManager.AdvertiseBeacon(
@@ -232,7 +166,7 @@ await hostingManager.AdvertiseBeacon(
 );
 ```
 
-### 6. Sending Notifications
+### 5. Sending Notifications
 
 ```csharp
 // From an IGattCharacteristic reference
@@ -245,29 +179,7 @@ await characteristic.Notify(data);
 await characteristic.Notify(data, specificPeripheral1, specificPeripheral2);
 ```
 
-### 7. Request Pattern (Write + Notify Response)
-
-In the managed pattern, override `Request` instead of `OnWrite` to receive a write, process it, and automatically respond via notification:
-
-```csharp
-[BleGattCharacteristic("service-uuid", "char-uuid")]
-public class MyRequestCharacteristic : BleGattCharacteristic
-{
-    public override Task<GattResult> Request(WriteRequest request)
-    {
-        // Process incoming data
-        var received = System.Text.Encoding.UTF8.GetString(request.Data);
-
-        // Return result -- this is sent back as a notification to the requesting central
-        var response = System.Text.Encoding.UTF8.GetBytes($"Echo: {received}");
-        return Task.FromResult(GattResult.Success(response));
-    }
-}
-```
-
-Note: `Request` and `OnWrite` cannot both be overridden on the same characteristic.
-
-### 8. Responding to Write Requests
+### 6. Responding to Write Requests
 
 When `WriteRequest.IsReplyNeeded` is true, you must call `Respond`:
 
@@ -289,7 +201,7 @@ cb.SetWrite(request =>
 }, WriteOptions.Write);
 ```
 
-### 9. L2CAP Channels
+### 7. L2CAP Channels
 
 Publish an L2CAP PSM that centrals can connect to for streaming data without going through GATT. `OpenL2Cap` returns an `L2CapInstance` representing the listener; the `onOpen` callback fires for every accepted central connection. Each `L2CapChannel` is itself an `IDisposable` — dispose it to close that specific central's channel; dispose the `L2CapInstance` to stop accepting new connections and release the PSM.
 
@@ -327,6 +239,8 @@ The platform-assigned PSM is on `instance.Psm` — advertise it to centrals out-
 Platform notes:
 - **iOS / Mac Catalyst / macOS**: `CBPeripheralManager.PublishL2CapChannel(encryptionRequired)`. The `secure` flag maps to encryption-required.
 - **Android**: `BluetoothAdapter.ListenUsing[Insecure]L2capChannel`. Requires API 29+ — throws `InvalidOperationException` on older versions.
+- **Linux**: `AF_BLUETOOTH` / `BTPROTO_L2CAP` / `SOCK_SEQPACKET` socket via `Shiny.BluetoothLE.Hosting.Linux`. PSM is kernel-assigned from the LE dynamic range (≥ `0x80`); `secure=true` maps to `BT_SECURITY_MEDIUM`, `secure=false` to `BT_SECURITY_LOW`. Independent of GATT-server / LE-advertisement hosting (still WIP on Linux) — centrals must learn the device address out-of-band.
+- **Windows / Blazor WASM**: not supported. `OpenL2Cap` throws `NotSupportedException`.
 
 #### File Transfer
 
@@ -350,10 +264,10 @@ using var instance = await hostingManager.OpenL2Cap(secure: false, onOpen: async
 
 A `Stream` overload is available for non-file sources; pass `totalBytes` to enable percent / ETA computation.
 
-### 10. File Organization
+### 8. File Organization
 
-- Managed characteristics: `BleHosting/{Name}Characteristic.cs`
-- Or by feature: `Features/{Feature}/{Name}Characteristic.cs`
+- Group hosting services in a `BleHosting/` folder, one class per GATT service
+- Or by feature: `Features/{Feature}/{Name}HostingService.cs`
 
 ## Namespace Ambiguities
 
@@ -362,15 +276,13 @@ A `Stream` overload is available for non-file sources; pass `totalBytes` to enab
 ## Best Practices
 
 1. **Always request access first** -- call `RequestAccess()` and check the result before any hosting operations
-2. **Use the managed pattern for structured services** -- `BleGattCharacteristic` subclasses are easier to test and maintain
+2. **Compose services in code, not attributes** -- the managed `BleGattCharacteristic` pattern was removed for AOT compliance. Build services with `AddService(uuid, primary, sb => ...)` lambdas inside a service class registered in DI so they're easy to unit-test
 3. **Use valid UUIDs** -- standard 128-bit UUID format (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`) or short 16-bit UUIDs for standard Bluetooth SIG services
 4. **Respond to writes when needed** -- always check `WriteRequest.IsReplyNeeded` and call `Respond` with the appropriate `GattState`
 5. **Return GattResult.Error on failures** -- use `GattResult.Error(GattState.Failure)` in read handlers when an error occurs
 6. **Stop advertising before cleanup** -- call `StopAdvertising()` and `ClearServices()` when done
-7. **Do not override both Request and OnWrite** -- they are mutually exclusive on a managed characteristic
-8. **Use AttachRegisteredServices for managed setup** -- this wires up all DI-registered `BleGattCharacteristic` instances to the GATT server
-9. **DetachRegisteredServices to tear down** -- cleanly removes managed services and calls `OnStop` on each characteristic
-10. **Check IsAdvertising** -- avoid calling `StartAdvertising` if already advertising
+7. **Check IsAdvertising** -- avoid calling `StartAdvertising` if already advertising
+8. **Dispose `L2CapInstance` and per-central `L2CapChannel`s explicitly** -- disposing the instance closes the listener but does not auto-close already-open channels
 
 ## Reference Files
 

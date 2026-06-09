@@ -18,11 +18,16 @@ public class IntervalTrigger
     /// </summary>
     public TimeSpan? TimeOfDay { get; set; }
 
-
     /// <summary>
     /// The repeating interval between fires. Mutually exclusive with <see cref="TimeOfDay"/>.
     /// </summary>
     public TimeSpan? Interval { get; set; }
+
+    /// <summary>
+    /// Clock source used by <see cref="CalculateNextAlarm"/>. Defaults to <see cref="TimeProvider.System"/>;
+    /// tests can substitute a <see cref="FakeTimeProvider"/> for deterministic alarm calculation.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 
 
     /// <summary>
@@ -36,7 +41,7 @@ public class IntervalTrigger
         if (this.Interval != null && this.TimeOfDay != null)
             throw new InvalidOperationException("TimeOfDay and Interval cannot be set");
 
-        if (this.TimeOfDay!.Value.TotalMinutes > (24 * 60))
+        if (this.TimeOfDay != null && this.TimeOfDay.Value.TotalMinutes > (24 * 60))
             throw new InvalidOperationException("TimeOfDay must be within 24 hours");
     }
 
@@ -47,24 +52,17 @@ public class IntervalTrigger
     /// <returns>The next fire time in UTC.</returns>
     public DateTime CalculateNextAlarm()
     {
+        var now = this.TimeProvider.GetUtcNow().UtcDateTime;
+
         if (this.Interval != null)
-            return DateTime.UtcNow.Add(this.Interval.Value);
+            return now.Add(this.Interval.Value);
 
-        var now = DateTime.UtcNow;
         var time = this.TimeOfDay!.Value;
-
-        var dt = new DateTime(
-            now.Year,
-            now.Month,
-            now.Day + 1,
-            time.Hours,
-            time.Minutes,
-            time.Seconds
-        );
+        var dt = now.Date.AddDays(1).Add(time);
 
         if (this.DayOfWeek != null)
         {
-            var day = this.DayOfWeek!.Value;
+            var day = this.DayOfWeek.Value;
             while (dt.DayOfWeek != day)
                 dt = dt.AddDays(1);
         }

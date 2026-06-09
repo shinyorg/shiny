@@ -140,14 +140,14 @@ When generating code for Shiny.Locations:
 6. **Use `Position` record** with `(latitude, longitude)` -- latitude range is -90 to 90, longitude range is -180 to 180.
 7. **Use `Distance` factory methods** -- `Distance.FromMeters()`, `Distance.FromKilometers()`, `Distance.FromMiles()`. Never construct `Distance` directly with kilometers unless intentional.
 8. **Use extension methods** for convenience: `GetCurrentPosition()`, `GetLastReadingOrCurrentPosition()`, `IsListening()`, `IsPositionInside()`, `IsInsideRegion()`.
-9. **Use `WhenReading()` for UI bindings** (observable stream). Use delegates for background processing. This applies to both `IGpsManager` and `IMotionActivityManager`.
+9. **Subscribe to the `GpsReadingReceived` C# event on `IGpsManager` (or `MotionActivityReadingReceived` on `IMotionActivityManager`) for foreground UI updates.** Rx has been removed from Shiny.Locations — use `event EventHandler<GpsReading>` / `event EventHandler<MotionActivityReading>` and always unsubscribe on disappear/dispose to avoid leaks. Delegates remain the way to handle readings while the app is backgrounded.
 10. **For `GeofenceRegion`**, always provide a unique `Identifier` string. The `SingleUse` parameter removes the region after the first trigger. To register a region idempotently, use the `TryStartMonitoring(region, replaceIfExists)` extension on `IGeofenceManager` — it only starts monitoring if a region with the same identifier isn't already being monitored, and (when `replaceIfExists` is `true`, the default) stops and restarts an existing region so changed position/notification settings take effect. It returns `true` when the region already existed, `false` when it was newly added.
-11. **Inject `IMotionActivityManager`** via constructor injection for motion activity features. Call `RequestAccess()` before `StartListener()`, and use `WhenReading()` for foreground observation or register `IMotionActivityDelegate` for background processing.
+11. **Inject `IMotionActivityManager`** via constructor injection for motion activity features. Call `RequestAccess()` before `StartListener()`, then subscribe to `MotionActivityReadingReceived` for foreground updates or register `IMotionActivityDelegate` for background processing.
 
 ## Conventions
 
 - All async operations return `Task` or `Task<T>`.
-- Reactive streams use `IObservable<T>` from System.Reactive.
+- Foreground observation uses C# `event EventHandler<T>` on the managers (`GpsReadingReceived`, `MotionActivityReadingReceived`) — Rx is no longer used in Shiny.Locations.
 - The `GpsBackgroundMode` enum controls background behavior: `None` (foreground), `Standard` (periodic), `Realtime` (continuous).
 - `GeofenceState` enum values: `Unknown`, `Entered`, `Exited`.
 - `AccessState` is from Shiny.Core and includes `Available`, `Denied`, `Disabled`, `Restricted`, `NotSupported`, `Unknown`.
@@ -159,7 +159,7 @@ When generating code for Shiny.Locations:
 - Stop listeners when they are no longer needed (`StopListener()` / `StopAllMonitoring()`).
 - Use the abstract `GpsDelegate` base class instead of implementing `IGpsDelegate` directly. It provides `MinimumDistance`, `MinimumTime` (AND when both set), `MaximumDistance`, `MaximumTime` (OR, overrides minimums) filtering, and stationary detection out of the box.
 - For single position reads, use the `GetCurrentPosition()` extension method which handles starting/stopping the listener automatically.
-- Dispose of `IObservable` subscriptions from `WhenReading()` when the view/page is no longer active.
+- Unsubscribe from `GpsReadingReceived` / `MotionActivityReadingReceived` when the view/page is no longer active (pair `+=` with `-=` on disappear/dispose).
 - On iOS, configure `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription` in `Info.plist`.
 - On Android, configure `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, and `ACCESS_BACKGROUND_LOCATION` permissions in `AndroidManifest.xml`.
 - On iOS, add `NSMotionUsageDescription` to `Info.plist` when using motion activity recognition.

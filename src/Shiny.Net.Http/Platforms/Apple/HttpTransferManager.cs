@@ -70,6 +70,8 @@ public partial class HttpTransferManager(
     }
 
 
+    string SessionIdentifier => $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
+
     NSUrlSession? nsUrlSession;
     public NSUrlSession Session
     {
@@ -77,8 +79,7 @@ public partial class HttpTransferManager(
         {
             if (this.nsUrlSession == null)
             {
-                var sessionName = $"{NSBundle.MainBundle.BundleIdentifier}.Shiny";
-                var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(sessionName);
+                var cfg = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(this.SessionIdentifier);
                 cfg.HttpMaximumConnectionsPerHost = 2;
                 configurator?.Configure(cfg);
                 cfg.SessionSendsLaunchEvents = true;
@@ -156,13 +157,11 @@ public partial class HttpTransferManager(
 
     public bool Handle(string sessionIdentifier, Action incomingCompletionHandler)
     {
-        //if (this.SessionName.Equals(sessionIdentifier))
-        //{
-        //    this.completionHandler = incomingCompletionHandler;
-        //    return true;
-        //}
-        //return false;
-        this.completionHandler = incomingCompletionHandler; // TODO
+        if (!this.SessionIdentifier.Equals(sessionIdentifier, StringComparison.InvariantCulture))
+            return false;
+
+        _ = this.Session;
+        this.completionHandler = incomingCompletionHandler;
         return true;
     }
 
@@ -324,7 +323,7 @@ public partial class HttpTransferManager(
         if (transfers.Count == 0)
         {
             this.completionHandler?.Invoke();
-            this.nsUrlSession = null;
+            this.completionHandler = null;
         }
     }
 }

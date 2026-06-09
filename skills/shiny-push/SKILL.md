@@ -115,7 +115,7 @@ builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
 
 3. **Use `PushAccessState.Assert()`** when you want to throw on denied/restricted permissions rather than checking the status manually.
 
-4. **Multiple delegates are supported.** You can register multiple `IPushDelegate` implementations; all will be called. Use `AddShinyService<T>()` for additional delegates.
+4. **Multiple delegates are supported.** You can register multiple `IPushDelegate` implementations; all will be called. Register additional delegates as keyed/standard services via `services.AddSingleton<IPushDelegate, MyOtherPushDelegate>()` or tag the class with `[Singleton]` from `Shiny.Extensions.DependencyInjection`.
 
 5. **Apple-specific customization:**
    - Cast `IPushManager` to `IApplePushManager` for custom `UNAuthorizationOptions`.

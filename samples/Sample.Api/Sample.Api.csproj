@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Sample.Api</RootNamespace>
+        <UserSecretsId>shiny-sample-api</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Shiny.DocumentDb.Sqlite" />
+        <PackageReference Include="Shiny.DocumentDb.Extensions.DependencyInjection" />
+    </ItemGroup>
+</Project>

@@ -44,7 +44,7 @@ public partial class HttpTransferDownloadViewModel(IHttpTransferManager transfer
         if (string.IsNullOrWhiteSpace(fileName))
             fileName = "download.bin";
 
-        var localPath = Path.Combine(FileSystem.CacheDirectory, fileName);
+        var localPath = Path.Combine(Path.GetTempPath(), fileName);
 
         Dictionary<string, string>? headers = null;
         if (this.Headers.Count > 0)

@@ -173,9 +173,9 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 
 ### Monitoring Progress
 
-- Use `WhenUpdateReceived()` for a global stream of all transfer updates.
-- Use the `WatchTransfer(identifier)` extension method to observe a single transfer that completes or errors.
-- Use `WatchCount()` to reactively display the number of active transfers.
+- Subscribe to the `UpdateReceived` C# event on `IHttpTransferManager` for a global stream of all transfer updates (`event EventHandler<HttpTransferResult>`). Rx has been removed from `Shiny.Net.Http`; remember to `-=` your handler when done.
+- Subscribe to the `CountChanged` event (`event EventHandler<int>`) to react to the number of active transfers.
+- Use the `WatchTransfer(identifier)` extension method to `await` a single transfer to completion — it returns `Task<HttpTransferResult>` and unsubscribes from `UpdateReceived` internally.
 - For UI binding, use `HttpTransferMonitor` -- call `Start()` to begin monitoring and bind to the `Transfers` collection of `HttpTransferObject` items. These implement `INotifyPropertyChanged`.
 
 ### Building Requests
@@ -188,7 +188,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 
 ### Foreground (Non-Background) Transfers
 
-- For transfers that only need to run while the app is in the foreground, use the `HttpClient` extension methods `Upload(...)` and `Download(...)` which return `IObservable<TransferProgress>` with real-time progress.
+- For transfers that only need to run while the app is in the foreground, use the `HttpClient` extension methods `Upload(...)` and `Download(...)`. They return `Task` and accept an optional `Action<TransferProgress> onProgress` callback for real-time progress reporting (Rx removed).
 
 ### Platform Configuration (Apple)
 
@@ -198,7 +198,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 
 1. **Use the abstract base class** -- `HttpTransferDelegate` provides built-in retry and 401-handling logic. Only implement `IHttpTransferDelegate` directly if you need full control.
 2. **Validate before queuing** -- Call `request.AssertValid()` to check the request is well-formed before calling `Queue()`.
-3. **Observe on the main thread** -- When binding `HttpTransferMonitor` to UI, pass a `scheduler` (e.g., `RxApp.MainThreadScheduler` or `SynchronizationContext.Current`) to `Start()`.
+3. **Observe on the main thread** -- When binding `HttpTransferMonitor` to UI, pass a `SynchronizationContext` to `Start()` so collection mutations marshal to the UI thread.
 4. **Clean up the monitor** -- `HttpTransferMonitor` implements `IDisposable`. Dispose it when the page or view model is torn down.
 5. **Handle metered connections** -- Set `UseMeteredConnection = false` for large files so the system waits for an unmetered (Wi-Fi) connection.
 6. **Unique identifiers** -- Always provide meaningful, unique identifiers for transfers so they can be individually tracked, cancelled, and retried.

@@ -58,6 +58,12 @@ public class AwsS3UploadRequest(string localFilePath)
     /// <summary>Optional S3 storage class (e.g. STANDARD_IA, GLACIER).</summary>
     public string? StorageClass { get; set; }
 
+    /// <summary>
+    /// Clock source used to stamp the request date during SigV4 signing. Defaults to
+    /// <see cref="TimeProvider.System"/>; tests can substitute a deterministic provider.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
 
     /// <summary>Sets the destination bucket and region.</summary>
     public AwsS3UploadRequest WithBucket(string bucketName, string region)
@@ -187,7 +193,7 @@ public class AwsS3UploadRequest(string localFilePath)
 
     void SignRequest(string uri, FileInfo fileInfo, string objectKey)
     {
-        var now = DateTimeOffset.UtcNow;
+        var now = this.TimeProvider.GetUtcNow();
         var dateStamp = now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
         var amzDate = now.ToString("yyyyMMdd'T'HHmmss'Z'", CultureInfo.InvariantCulture);
         var host = new Uri(uri).Host;

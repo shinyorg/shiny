@@ -42,6 +42,12 @@ public class AzureBlobStorageUploadRequest(string localFilePath)
     /// <summary>Additional HTTP headers attached to the upload request.</summary>
     public Dictionary<string, string> Headers { get; } = new();
 
+    /// <summary>
+    /// Clock source used to stamp default <c>x-ms-date</c> and <c>x-ms-version</c> values. Defaults
+    /// to <see cref="TimeProvider.System"/>; tests can substitute a deterministic provider.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
 
     // public async Task<AzureBlobStorageUploadRequest> WithSasTokenRequest(CancellationToken cancellationToken = default)
     // {
@@ -134,9 +140,10 @@ public class AzureBlobStorageUploadRequest(string localFilePath)
         }
         else if (this.SharedAuthorizationKey != null)
         {
+            var now = this.TimeProvider.GetUtcNow();
             this.Headers.Add("Authorization", $"SharedKey {this.SharedAuthorizationKey}");
-            this.Headers.Add("x-ms-date", (this.AuthDate ?? DateTimeOffset.UtcNow).ToString(DATE_FORMAT));
-            this.Headers.Add("x-ms-version", (this.AuthVersion ?? DateTimeOffset.UtcNow).ToString(DATE_FORMAT));
+            this.Headers.Add("x-ms-date", (this.AuthDate ?? now).ToString(DATE_FORMAT));
+            this.Headers.Add("x-ms-version", (this.AuthVersion ?? now).ToString(DATE_FORMAT));
         }
         
         return new HttpTransferRequest(

@@ -27,6 +27,7 @@
         <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
         <PackageVersion Include="System.Reactive" Version="6.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>
+        <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MsftExtensionVersion)"/>
@@ -34,6 +35,12 @@
         <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1"/>
         <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
+        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="6.1.0"/>
+        <PackageVersion Include="Shiny.DocumentDb.Extensions.DependencyInjection" Version="6.1.0"/>
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0"/>
+        <PackageVersion Include="xunit" Version="2.9.3"/>
+        <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
+        <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="$(MsftExtensionVersion)"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.17.0.2"/>
