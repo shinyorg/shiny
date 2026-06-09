@@ -30,6 +30,8 @@
 
             <CollectionView Grid.Row="2"
                             ItemsSource="{Binding Items}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                             RemainingItemsThreshold="10"
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
                 <CollectionView.ItemsLayout>
@@ -41,10 +43,6 @@
                               ColumnDefinitions="*,Auto"
                               RowDefinitions="Auto,Auto"
                               ColumnSpacing="8">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource Mode=FindAncestorBindingContext, AncestorType={x:Type vm:EventsViewModel}}, Path=ShowMetadataCommand}"
-                                                      CommandParameter="{Binding .}" />
-                            </Grid.GestureRecognizers>
                             <Label Grid.Row="0" Grid.Column="0"
                                    Text="{Binding TitleDisplay}"
                                    FontAttributes="Bold"

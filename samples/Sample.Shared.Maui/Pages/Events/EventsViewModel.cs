@@ -20,6 +20,15 @@ public partial class EventsViewModel(IEventStore events) : ObservableObject, IPa
     [ObservableProperty] bool isMetadataPanelOpen;
     [ObservableProperty] string selectedTitle = string.Empty;
     [ObservableProperty] string selectedMetadata = string.Empty;
+    [ObservableProperty] EventItemViewModel? selectedItem;
+
+    partial void OnSelectedItemChanged(EventItemViewModel? value)
+    {
+        if (value is null)
+            return;
+        this.ShowMetadata(value);
+        this.SelectedItem = null;
+    }
 
     public List<EventItemViewModel> Items
     {
