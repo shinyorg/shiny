@@ -17,6 +17,7 @@ public static class ShinyRegistrations
             });
 
         var s = builder.Services;
+        s.AddSingleton<AppStateTracker>();
         s.AddSingleton<IEventStore, SqliteEventStore>();
 
 #if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS

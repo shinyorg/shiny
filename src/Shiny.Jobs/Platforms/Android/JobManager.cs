@@ -81,9 +81,6 @@ public class JobManager(
     /// </summary>
     internal void RegisterNativeCategories()
     {
-        // Cancel all existing Shiny work first
-        this.Instance.CancelAllWorkByTag("com.shiny.job");
-
         var categories = new[]
         {
             (Id: GetCategoryId(false, false), Charging: false, Network: InternetAccess.None),
@@ -96,33 +93,41 @@ public class JobManager(
         {
             var jobs = this.GetJobsByCategory(cat.Id);
             if (jobs.Count == 0)
-                continue;
+            {
+                // Clean up a schedule left over from a previous run that registered jobs in this category
+                this.Instance.CancelUniqueWork(cat.Id);
+            }
+            else
+            {
+                var constraints = new Constraints.Builder()
+                    .SetRequiresCharging(cat.Charging)
+                    .SetRequiredNetworkType(ToNative(cat.Network))
+                    .Build();
 
-            var constraints = new Constraints.Builder()
-                .SetRequiresCharging(cat.Charging)
-                .SetRequiredNetworkType(ToNative(cat.Network))
-                .Build();
+                var data = new Data.Builder();
+                data.PutString(ShinyJobWorker.ShinyCategoryIdentifier, cat.Id);
 
-            var data = new Data.Builder();
-            data.PutString(ShinyJobWorker.ShinyCategoryIdentifier, cat.Id);
+                var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15))
+                    .SetConstraints(constraints)
+                    .SetInputData(data.Build())
+                    .AddTag("com.shiny.job")
+                    .Build();
 
-            var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15))
-                .SetConstraints(constraints)
-                .SetInputData(data.Build())
-                .AddTag("com.shiny.job")
-                .Build();
+                // Update applies constraint changes without resetting the period clock or
+                // cancelling an in-flight/due execution - critical when WorkManager itself
+                // started this process to run a due job
+                this.Instance.EnqueueUniquePeriodicWork(
+                    cat.Id,
+                    ExistingPeriodicWorkPolicy.Update!,
+                    request
+                );
 
-            this.Instance.EnqueueUniquePeriodicWork(
-                cat.Id,
-                ExistingPeriodicWorkPolicy.Replace!,
-                request
-            );
-
-            this.Log.LogDebug(
-                "Registered Android Worker category '{Category}' with {Count} job(s)",
-                cat.Id,
-                jobs.Count
-            );
+                this.Log.LogDebug(
+                    "Registered Android Worker category '{Category}' with {Count} job(s)",
+                    cat.Id,
+                    jobs.Count
+                );
+            }
         }
     }
 

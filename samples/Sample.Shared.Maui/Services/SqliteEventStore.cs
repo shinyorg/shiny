@@ -8,12 +8,14 @@ public sealed class SqliteEventStore : IEventStore, IAsyncDisposable
 {
     readonly SemaphoreSlim sync = new(1, 1);
     readonly ILogger<SqliteEventStore> logger;
+    readonly AppStateTracker appState;
     readonly string connectionString;
     bool initialized;
 
-    public SqliteEventStore(ILogger<SqliteEventStore> logger)
+    public SqliteEventStore(ILogger<SqliteEventStore> logger, AppStateTracker appState)
     {
         this.logger = logger;
+        this.appState = appState;
         var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "sample-events.db3");
         this.connectionString = new SqliteConnectionStringBuilder
         {
@@ -29,7 +31,12 @@ public sealed class SqliteEventStore : IEventStore, IAsyncDisposable
     {
         await this.EnsureInit(ct);
         var ts = DateTimeOffset.UtcNow;
-        var metaJson = metadata is { Count: > 0 } ? JsonSerializer.Serialize(metadata) : null;
+
+        var meta = metadata == null
+            ? new Dictionary<string, string?>(1)
+            : new Dictionary<string, string?>(metadata);
+        meta["appState"] = this.appState.IsInForeground ? "foreground" : "background";
+        var metaJson = JsonSerializer.Serialize(meta);
 
         long id;
         await this.sync.WaitAsync(ct);

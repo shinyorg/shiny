@@ -73,7 +73,7 @@ public sealed class JobRegistrar(IServiceCollection services)
             reg = configure(reg);
 
         this.registrations[typeof(TJob)] = reg;
-        services.AddScopedAsImplementedInterfaces<TJob>();
+        services.AddSingletonAsImplementedInterfaces<TJob>();
         return this;
     }
 }
