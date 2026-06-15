@@ -81,7 +81,7 @@ Also enable the `processing` background mode.
 
 ### Android Setup
 
-No additional manifest setup is required. Shiny.Jobs uses AndroidX `WorkManager` under the hood (minimum periodic interval: 15 minutes). If you want wake-lock support for `RunTask` and `RunJob(runAsTask: true)`, add the `WAKE_LOCK` permission to your `AndroidManifest.xml`.
+No additional manifest setup is required. Shiny.Jobs uses AndroidX `WorkManager` under the hood (minimum periodic interval: 15 minutes).
 
 ### Windows Setup
 
@@ -136,8 +136,7 @@ When generating job-related code, follow these conventions:
 - **Use constraints wisely** — `DeviceCharging = true` or `BatteryNotLow = true` means the job may not run for extended periods under hostile conditions.
 - **Prefer `InternetAccess.Any` over `Unmetered`** unless the job transfers large amounts of data.
 - **Use the `Job` base class with `MinimumTime`** when the OS may invoke your job more often than necessary and you want a simple in-memory throttle.
-- **Use `RunJob(typeof(TJob), runAsTask: true)`** for event-driven on-demand runs — `runAsTask: true` wraps the run in iOS `BeginBackgroundTask` / Android partial wake-lock for extended execution.
-- **Use `RunTask(name, work)`** for ad-hoc one-shot work that is not a registered job (still gets platform extended-execution wrapping on iOS/Android).
+- **Use `RunJob(typeof(TJob))`** for event-driven on-demand runs of a registered job. The job runs normally (inline); there is no extended-execution / background-task wrapping.
 
 ## Reference Files
 

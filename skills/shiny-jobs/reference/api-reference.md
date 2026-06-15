@@ -52,22 +52,11 @@ namespace Shiny.Jobs;
 public interface IJobManager
 {
     /// <summary>
-    /// Runs a one-time, ad-hoc task. On iOS this initiates a background task to extend execution time;
-    /// on Android it acquires a partial wake lock when WAKE_LOCK is in the manifest.
-    /// Fire-and-forget (returns void).
-    /// </summary>
-    void RunTask(string taskName, Func<CancellationToken, Task> task);
-
-    /// <summary>
-    /// Runs a single registered job by its CLR type.
+    /// Runs a single registered job by its CLR type. The job runs normally (inline).
     /// </summary>
     /// <param name="jobType">The registered IJob implementation type.</param>
-    /// <param name="runAsTask">
-    /// When true, wraps the run in platform-specific extended-execution semantics
-    /// (iOS BeginBackgroundTask, Android partial wake-lock); when false, runs inline.
-    /// </param>
     /// <param name="cancellationToken">Token used to cancel the running job.</param>
-    Task<JobRunResult> RunJob(Type jobType, bool runAsTask = false, CancellationToken cancellationToken = default);
+    Task<JobRunResult> RunJob(Type jobType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Force-runs all registered jobs and returns the result for each.
@@ -98,13 +87,6 @@ public abstract class AbstractJobManager : IJobManager
 
     /// <summary>Requests the platform permissions required to schedule background jobs.</summary>
     public abstract Task<AccessState> RequestAccess();
-
-    /// <summary>
-    /// Override on a platform that supports a longer-lived background task wrapping
-    /// (e.g. iOS BeginBackgroundTask, Android wake-lock). Default forwards to RunJob.
-    /// Invoked by RunJob(...) when runAsTask is true.
-    /// </summary>
-    protected virtual Task<JobRunResult> RunAsTask(Type jobType, JobRegistration reg, CancellationToken cancellationToken);
 }
 ```
 
@@ -358,8 +340,8 @@ public class JobDashboardViewModel(IJobManager jobManager)
         foreach (var (type, reg) in jobs)
             Console.WriteLine($"{type.FullName} foreground={reg.RunOnForeground}");
 
-        // Run a specific job, wrapped in platform extended-execution semantics
-        var result = await jobManager.RunJob(typeof(DataSyncJob), runAsTask: true);
+        // Run a specific job now (runs normally / inline)
+        var result = await jobManager.RunJob(typeof(DataSyncJob));
         if (!result.Success)
         {
             // result.Exception holds the cause
@@ -393,14 +375,11 @@ public class StartupCheck(IJobManager jobManager)
 }
 ```
 
-### Running an Ad-Hoc Task
+### Running a Registered Job On Demand
 
 ```csharp
-// Not a registered job — just a one-off async block that gets platform extended-execution wrapping.
-jobManager.RunTask("QuickUpload", async cancelToken =>
-{
-    await myService.UploadPendingData(cancelToken);
-});
+// Force a single registered job to run now. It runs normally (inline).
+var result = await jobManager.RunJob(typeof(MyJob));
 ```
 
 ---
@@ -422,7 +401,6 @@ jobManager.RunTask("QuickUpload", async cancelToken =>
 
 - AndroidX `WorkManager` has a minimum periodic interval of **15 minutes**.
 - Ensure the device is not in battery optimization / Doze mode during testing.
-- Add `WAKE_LOCK` permission if you need `RunTask` or `RunJob(runAsTask: true)` to acquire a wake lock; without it, runs proceed without wake-lock protection.
 
 ### `RequestAccess()` Returns Unexpected State
 

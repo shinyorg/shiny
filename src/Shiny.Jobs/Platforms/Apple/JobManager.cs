@@ -42,47 +42,6 @@ public class JobManager(
     }
 
 
-    public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
-    {
-        var app = UIApplication.SharedApplication;
-        var taskId = 0;
-        try
-        {
-            using var cancelSrc = new CancellationTokenSource();
-
-            taskId = (int)app.BeginBackgroundTask(taskName, cancelSrc.Cancel);
-            this.LogTask(JobState.Start, taskName);
-            await task(cancelSrc.Token).ConfigureAwait(false);
-            this.LogTask(JobState.Finish, taskName);
-        }
-        catch (Exception ex)
-        {
-            this.LogTask(JobState.Error, taskName, ex);
-        }
-        finally
-        {
-            app.EndBackgroundTask(taskId);
-        }
-    }
-
-
-    protected override async Task<JobRunResult> RunAsTask(Type jobType, JobRegistration reg, CancellationToken cancellationToken)
-    {
-        var app = UIApplication.SharedApplication;
-        var taskId = 0;
-        using var cancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        try
-        {
-            taskId = (int)app.BeginBackgroundTask(jobType.FullName, cancelSrc.Cancel);
-            return await this.RunJob(jobType, reg, cancelSrc.Token).ConfigureAwait(false);
-        }
-        finally
-        {
-            app.EndBackgroundTask(taskId);
-        }
-    }
-
-
     public override Task<AccessState> RequestAccess()
     {
         var result = AccessState.Available;

@@ -42,39 +42,12 @@ public abstract class AbstractJobManager(
 
 
     /// <inheritdoc />
-    public virtual Task<JobRunResult> RunJob(Type jobType, bool runAsTask = false, CancellationToken cancellationToken = default)
+    public virtual Task<JobRunResult> RunJob(Type jobType, CancellationToken cancellationToken = default)
     {
         if (!registrar.Jobs.TryGetValue(jobType, out var reg))
             throw new InvalidOperationException($"Job '{jobType.FullName}' is not registered");
 
-        return runAsTask
-            ? this.RunAsTask(jobType, reg, cancellationToken)
-            : this.RunJob(jobType, reg, cancellationToken);
-    }
-
-
-    /// <summary>
-    /// Runs a job under platform-specific extended-execution semantics.
-    /// Override on a platform that supports a longer-lived background task
-    /// (e.g. iOS <c>BeginBackgroundTask</c>, Android wake-lock); the default
-    /// implementation simply forwards to <see cref="RunJob(Type, JobRegistration, CancellationToken)"/>.
-    /// </summary>
-    protected virtual Task<JobRunResult> RunAsTask(Type jobType, JobRegistration reg, CancellationToken cancellationToken)
-        => this.RunJob(jobType, reg, cancellationToken);
-
-    /// <inheritdoc />
-    public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
-    {
-        try
-        {
-            this.LogTask(JobState.Start, taskName);
-            await task(CancellationToken.None).ConfigureAwait(false);
-            this.LogTask(JobState.Finish, taskName);
-        }
-        catch (Exception ex)
-        {
-            this.LogTask(JobState.Error, taskName, ex);
-        }
+        return this.RunJob(jobType, reg, cancellationToken);
     }
 
 
@@ -200,20 +173,5 @@ public abstract class AbstractJobManager(
             this.Log.LogInformation(state == JobState.Finish ? "Job '{JobName}' succeeded" : "Job '{JobName}' {State}", jobType.FullName, state);
         else
             this.Log.LogError(exception, "Error running job '{JobName}'", jobType.FullName);
-    }
-
-
-    /// <summary>
-    /// Logs the lifecycle state of an ad-hoc task run. Override to customize logging.
-    /// </summary>
-    /// <param name="state">The current lifecycle state.</param>
-    /// <param name="taskName">The task name.</param>
-    /// <param name="exception">The exception, if any.</param>
-    protected virtual void LogTask(JobState state, string taskName, Exception? exception = null)
-    {
-        if (exception == null)
-            this.Log.LogInformation(state == JobState.Finish ? "Task '{TaskName}' succeeded" : "Task '{TaskName}' {State}", taskName, state);
-        else
-            this.Log.LogError(exception, "Task '{TaskName}' failed", taskName);
     }
 }

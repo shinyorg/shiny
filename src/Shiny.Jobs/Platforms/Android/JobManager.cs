@@ -1,10 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Android.Content;
 using AndroidX.Work;
 using Microsoft.Extensions.Logging;
-using P = Android.Manifest.Permission;
 
 namespace Shiny.Jobs;
 
@@ -20,59 +17,6 @@ public class JobManager(
 
 
     public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
-
-
-    public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
-    {
-        if (!platform.IsInManifest(P.WakeLock))
-        {
-            base.RunTask(taskName, task);
-        }
-        else
-        {
-            try
-            {
-                using var pm = platform.GetSystemService<Android.OS.PowerManager>(Context.PowerService);
-                using var wakeLock = pm.NewWakeLock(Android.OS.WakeLockFlags.Partial, "ShinyTask");
-                try
-                {
-                    wakeLock.Acquire();
-                    await task(CancellationToken.None).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    this.Log.LogError(ex, "Error running task - {TaskName}", taskName);
-                }
-                finally
-                {
-                    wakeLock.Release();
-                }
-            }
-            catch (Exception ex)
-            {
-                this.Log.LogError(ex, "Error setting up task - {TaskName}", taskName);
-            }
-        }
-    }
-
-
-    protected override async Task<JobRunResult> RunAsTask(Type jobType, JobRegistration reg, CancellationToken cancellationToken)
-    {
-        if (!platform.IsInManifest(P.WakeLock))
-            return await base.RunAsTask(jobType, reg, cancellationToken).ConfigureAwait(false);
-
-        using var pm = platform.GetSystemService<Android.OS.PowerManager>(Context.PowerService);
-        using var wakeLock = pm.NewWakeLock(Android.OS.WakeLockFlags.Partial, "ShinyJob");
-        try
-        {
-            wakeLock.Acquire();
-            return await this.RunJob(jobType, reg, cancellationToken).ConfigureAwait(false);
-        }
-        finally
-        {
-            wakeLock.Release();
-        }
-    }
 
 
     /// <summary>
