@@ -111,15 +111,45 @@ public class JobManager(
             null,
             async task =>
             {
-                using var cancelSrc = new CancellationTokenSource();
-                task.ExpirationHandler = cancelSrc.Cancel;
+                // NOTE: the CancellationTokenSource is intentionally NOT disposed via `using`.
+                // iOS holds a native reference to the expiration handler below for the lifetime
+                // of the task; disposing the CTS while that reference is live causes the native
+                // callback to dereference a freed object (SIGSEGV). We dispose only once we know
+                // the task has fully completed.
+                var cancelSrc = new CancellationTokenSource();
 
-                var jobs = this.GetJobsByCategory(task.Identifier);
-                foreach (var job in jobs)
+                // iOS gives a very short window after expiration to mark the task complete.
+                // SetTaskCompleted must run exactly once - whether the work finished or the OS
+                // expired us - otherwise the reclaimed native task becomes a dangling pointer.
+                var completed = 0;
+                void Complete(bool success)
                 {
-                    await this.RunJob(job, cancelSrc.Token);
+                    if (Interlocked.Exchange(ref completed, 1) == 0)
+                    {
+                        task.SetTaskCompleted(success);
+                        cancelSrc.Dispose();
+                    }
                 }
-                task.SetTaskCompleted(true);
+
+                task.ExpirationHandler = () =>
+                {
+                    cancelSrc.Cancel();
+                    Complete(false);
+                };
+
+                try
+                {
+                    var jobs = this.GetJobsByCategory(task.Identifier);
+                    foreach (var job in jobs)
+                        await this.RunJob(job, cancelSrc.Token).ConfigureAwait(false);
+
+                    Complete(true);
+                }
+                catch (Exception ex)
+                {
+                    this.Log.LogError(ex, "Error running background job batch for '{Identifier}'", task.Identifier);
+                    Complete(false);
+                }
             }
         );
     }
