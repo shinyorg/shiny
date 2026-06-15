@@ -65,7 +65,7 @@ public partial class JobsViewModel(IJobManager jobManager) : ObservableObject, I
         this.Status = $"Running {label}...";
         try
         {
-            await jobManager.RunJob(jobType, runAsTask: true);
+            await jobManager.RunJob(jobType);
             this.Status = $"{label}: success";
             this.RunLog.Insert(0, new JobRunEntry(DateTime.Now, label, "Success", null));
         }
