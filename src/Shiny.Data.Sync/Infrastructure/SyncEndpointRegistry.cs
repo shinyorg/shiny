@@ -19,6 +19,8 @@ public class SyncEndpointRegistry : ISyncEndpointBuilder
             Key = typeof(T).FullName!,
             EntityType = typeof(T),
             Url = url,
+            // Default to "always pull" on scheduled passes; set MinPullInterval = null in configure to make the endpoint manual-only.
+            MinPullInterval = TimeSpan.Zero,
             SerializeEntity = static entity => Json.Default.Serialize<T>((T)entity),
             DeserializeEntity = static payload => Json.Default.Deserialize<T>(payload)
         };

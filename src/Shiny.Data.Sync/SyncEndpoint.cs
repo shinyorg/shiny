@@ -92,9 +92,17 @@ public class SyncEndpoint
     public string? CursorParameter { get; set; } = "since";
 
     /// <summary>
-    /// Minimum interval between scheduled (<see cref="IDataSyncManager.PullAll"/> / SyncJob)
-    /// pulls. When the persisted <see cref="SyncCursor.LastPulledAt"/> is within this window,
-    /// the endpoint is skipped. <see cref="IDataSyncManager.PullNow{T}"/> bypasses the throttle.
+    /// Controls how scheduled (<see cref="IDataSyncManager.PullAll"/> / SyncJob / connectivity)
+    /// pulls behave:
+    /// <list type="bullet">
+    /// <item><c>null</c> — <b>manual only</b>: automatic pulls skip this endpoint entirely; it pulls
+    /// only when you call <see cref="IDataSyncManager.PullNow{T}"/>.</item>
+    /// <item><see cref="TimeSpan.Zero"/> — <b>always pull</b> on every scheduled pass (the default
+    /// applied at registration).</item>
+    /// <item>A positive value — throttle: skip when the persisted
+    /// <see cref="SyncCursor.LastPulledAt"/> is within this window.</item>
+    /// </list>
+    /// <see cref="IDataSyncManager.PullNow{T}"/> always bypasses this and pulls regardless.
     /// </summary>
     public TimeSpan? MinPullInterval { get; set; }
 

@@ -53,7 +53,7 @@ public class SyncEndpointRegistryTests
         Assert.Equal(ConflictPolicy.AskDelegate, ep.DefaultConflictPolicy);
         Assert.True(ep.UseMeteredConnection);
         Assert.False(ep.Batch);
-        Assert.Null(ep.MinPullInterval);
+        Assert.Equal(TimeSpan.Zero, ep.MinPullInterval);
         Assert.Null(ep.PullUrl);
         Assert.Null(ep.BatchUrl);
         Assert.Null(ep.TombstoneUrl);

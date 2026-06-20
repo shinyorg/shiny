@@ -87,8 +87,11 @@ builder.Services.AddDataSync<MyDataSyncDelegate>(opts =>
         // -- Conflicts --
         ep.DefaultConflictPolicy = ConflictPolicy.ServerWins;
 
-        // -- Inbox throttle --
-        ep.MinPullInterval = TimeSpan.FromMinutes(5); // SyncJob/PullAll skip; PullNow bypasses
+        // -- Inbox throttle / scheduling --
+        // null        = manual only: SyncJob/PullAll skip this endpoint; only PullNow<T> pulls it
+        // TimeSpan.Zero = always pull on every scheduled pass (the default applied at registration)
+        // positive     = throttle: SyncJob/PullAll skip while within the window; PullNow bypasses
+        ep.MinPullInterval = TimeSpan.FromMinutes(5);
 
         // -- Per-verb URL overrides (optional) --
         ep.PullUrl = "https://api.example.com/projects/feed";  // GET different URL on pull
@@ -397,3 +400,4 @@ builder.Services.AddSingleton<ISyncTransport, GrpcSyncTransport>();   // overrid
 - **Apple `PullAll` is fire-and-forget.** The returned `Task` completes once tasks are kicked off, not when the downloads finish — observe `PullCompleted` for completion.
 - **Apple session shares the connection limit.** Uploads and downloads share `HttpMaximumConnectionsPerHost = 4`; a saturated outbox queues inbox pulls behind it.
 - **Inbox in-flight requests are lost on process exit for HttpClient platforms.** Only iOS / Mac Catalyst gets the survives-app-kill guarantee for pulls.
+- **Overlapping pulls are coalesced per endpoint.** If a pull for an entity type is already in progress, a second request for the same type is skipped (this applies even to `PullNow<T>`) — so a connectivity trigger, the `SyncJob`, and a manual refresh firing together won't race on the same cursor.

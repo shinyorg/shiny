@@ -39,6 +39,10 @@ public class SyncInboxProcessor(
         => this.PullEndpoint(endpoint, force: true, cancelToken);
 
 
+    readonly object inFlightLock = new();
+    readonly HashSet<string> inFlight = new();
+
+
     public async Task PullEndpoint(SyncEndpoint endpoint, bool force, CancellationToken cancelToken = default)
     {
         if (endpoint.Direction == SyncDirection.PushOnly)
@@ -50,6 +54,30 @@ public class SyncInboxProcessor(
             return;
         }
 
+        // Coalesce overlapping pulls for the same endpoint - if one is already running, skip this one
+        // (applies even to forced/PullNow calls, since concurrent pulls race on the same cursor).
+        lock (this.inFlightLock)
+        {
+            if (!this.inFlight.Add(endpoint.Key))
+            {
+                logger.LogDebug("Skipping pull for {key}: a pull is already in progress", endpoint.Key);
+                return;
+            }
+        }
+        try
+        {
+            await this.PullEndpointCore(endpoint, cancelToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            lock (this.inFlightLock)
+                this.inFlight.Remove(endpoint.Key);
+        }
+    }
+
+
+    async Task PullEndpointCore(SyncEndpoint endpoint, CancellationToken cancelToken)
+    {
         var cursor = repository.Get<SyncCursor>(endpoint.Key)?.Cursor;
         var startingCursor = cursor;
         var totalDispatched = 0;
@@ -210,8 +238,14 @@ public class SyncInboxProcessor(
     static bool IsThrottled(IRepository repository, SyncEndpoint endpoint, out string reason)
     {
         reason = string.Empty;
+
+        // Null = manual-only: never pull on scheduled/automatic (non-forced) passes.
+        // TimeSpan.Zero = always pull (elapsed is never negative, so the interval check below never trips).
         if (!endpoint.MinPullInterval.HasValue)
-            return false;
+        {
+            reason = "manual-only (MinPullInterval is null)";
+            return true;
+        }
 
         var last = repository.Get<SyncCursor>(endpoint.Key)?.LastPulledAt;
         if (!last.HasValue)

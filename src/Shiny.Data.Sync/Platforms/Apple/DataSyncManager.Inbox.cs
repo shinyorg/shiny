@@ -41,6 +41,14 @@ public partial class DataSyncManager
             return;
         }
 
+        // Coalesce overlapping pulls - skip if a download task for this endpoint is already pending.
+        var taskDescription = InboxTaskPrefix + endpoint.Key;
+        if (this.inboxRequests.ContainsKey(taskDescription))
+        {
+            logger.LogDebug("Skipping pull for {key}: a pull is already in progress", endpoint.Key);
+            return;
+        }
+
         var cursor = repository.Get<SyncCursor>(endpoint.Key)?.Cursor;
         var pullUrl = endpoint.PullUrl ?? endpoint.Url;
         var uri = AppendCursor(pullUrl, endpoint.CursorParameter, cursor);
@@ -48,7 +56,7 @@ public partial class DataSyncManager
         logger.LogInformation("Starting inbox pull for {key} (cursor: {cursor})", endpoint.Key, cursor ?? "<none>");
         this.RaiseActivity(new SyncEvent(SyncEventType.InboxPullStarted, endpoint.Key, Cursor: cursor));
 
-        await this.StartDownload(endpoint, uri, InboxTaskPrefix + endpoint.Key, isTombstone: false, cursor, cancelToken).ConfigureAwait(false);
+        await this.StartDownload(endpoint, uri, taskDescription, isTombstone: false, cursor, cancelToken).ConfigureAwait(false);
     }
 
 
@@ -279,8 +287,9 @@ public partial class DataSyncManager
 
     bool IsThrottled(SyncEndpoint endpoint)
     {
+        // Null = manual-only (skip automatic pulls); TimeSpan.Zero = always pull.
         if (!endpoint.MinPullInterval.HasValue)
-            return false;
+            return true;
         var last = repository.Get<SyncCursor>(endpoint.Key)?.LastPulledAt;
         if (!last.HasValue)
             return false;

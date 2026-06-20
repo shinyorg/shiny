@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shiny.Data.Sync.Infrastructure;
@@ -148,6 +149,67 @@ public class SyncInboxProcessorTests
         transport.QueuePull(endpoint.Key, new SyncPullResult("x", Array.Empty<SyncPullItem>()));
         await proc.PullEndpoint(endpoint, force: true);
         Assert.Single(transport.PullCalls);
+    }
+
+
+    [Fact]
+    public async Task Pull_NullMinPullInterval_IsManualOnly()
+    {
+        // null = manual only: scheduled (force:false) passes skip, PullNow (force:true) still pulls.
+        var (proc, _, transport, _, _, endpoint) = BuildFixture(ep => ep.MinPullInterval = null);
+
+        await proc.PullEndpoint(endpoint, force: false);
+        Assert.Empty(transport.PullCalls);
+
+        transport.QueuePull(endpoint.Key, new SyncPullResult("x", Array.Empty<SyncPullItem>()));
+        await proc.PullEndpoint(endpoint, force: true);
+        Assert.Single(transport.PullCalls);
+    }
+
+
+    [Fact]
+    public async Task Pull_ZeroMinPullInterval_AlwaysPullsOnSchedule()
+    {
+        // TimeSpan.Zero = always pull, even immediately after a prior pull.
+        var (proc, _, transport, repo, _, endpoint) = BuildFixture(ep => ep.MinPullInterval = TimeSpan.Zero);
+        repo.Set(new SyncCursor(endpoint.Key, "x", DateTimeOffset.UtcNow));
+
+        transport.QueuePull(endpoint.Key, new SyncPullResult("x", Array.Empty<SyncPullItem>()));
+        await proc.PullEndpoint(endpoint, force: false);
+        Assert.Single(transport.PullCalls);
+    }
+
+
+    [Fact]
+    public async Task Pull_SkipsOverlappingPullForSameEndpoint()
+    {
+        var (proc, _, transport, _, _, endpoint) = BuildFixture(ep => ep.MinPullInterval = TimeSpan.Zero);
+
+        using var entered = new ManualResetEventSlim(false);
+        using var release = new ManualResetEventSlim(false);
+        transport.QueuePull(endpoint.Key, _ =>
+        {
+            entered.Set();
+            release.Wait();
+            return new SyncPullResult("x", Array.Empty<SyncPullItem>());
+        });
+
+        // First pull blocks inside the transport, holding the in-flight slot.
+        var first = Task.Run(() => proc.PullEndpoint(endpoint, force: true));
+        Assert.True(entered.Wait(2000));
+
+        // Second pull while the first is in flight must skip without hitting the transport.
+        await proc.PullEndpoint(endpoint, force: true);
+        Assert.Single(transport.PullCalls);
+
+        release.Set();
+        await first;
+        Assert.Single(transport.PullCalls);
+
+        // Once the first finishes, the slot is freed and a new pull proceeds.
+        transport.QueuePull(endpoint.Key, new SyncPullResult("y", Array.Empty<SyncPullItem>()));
+        await proc.PullEndpoint(endpoint, force: true);
+        Assert.Equal(2, transport.PullCalls.Count);
     }
 
 
