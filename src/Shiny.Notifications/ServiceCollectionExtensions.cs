@@ -22,6 +22,8 @@ public static class NotificationsServiceCollectionExtensions
         services.AddSingleton<AndroidNotificationProcessor>();
 #elif IOS || MACCATALYST
         services.TryAddSingleton(new IosConfiguration());
+#elif MACOS
+        services.TryAddSingleton(new MacConfiguration());
 #endif
         return services;
     }

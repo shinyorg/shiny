@@ -23,28 +23,24 @@ public class NotificationManager(
 ) : INotificationManager, IMacLifecycle.INotificationHandler
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates = new(() => services.GetRequiredService<IEnumerable<INotificationDelegate>>());
-    readonly MacConfiguration configuration = configuration;
-    readonly IPlatform platform = platform;
     readonly ILogger logger = logger;
-    readonly IChannelManager channelManager = channelManager;
-    readonly IKeyValueStore settings = settings;
 
 
-    public void AddChannel(Channel channel) => this.channelManager.Add(channel);
-    public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
-    public void ClearChannels() => this.channelManager.Clear();
-    public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
+    public void AddChannel(Channel channel) => channelManager.Add(channel);
+    public void RemoveChannel(string channelId) => channelManager.Remove(channelId);
+    public void ClearChannels() => channelManager.Clear();
+    public Channel? GetChannel(string channelId) => channelManager.Get(channelId);
+    public IList<Channel> GetChannels() => channelManager.GetAll();
 
 
-    public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
+    public Task<int> GetBadge() => platform.InvokeOnMainThreadAsync<int>(() =>
     {
         var label = NSApplication.SharedApplication.DockTile.BadgeLabel;
         return Int32.TryParse(label, out var v) ? v : 0;
     });
 
 
-    public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(() =>
+    public Task SetBadge(int? badge) => platform.InvokeOnMainThreadAsync(() =>
         NSApplication.SharedApplication.DockTile.BadgeLabel = (badge.GetValueOrDefault() == 0) ? null : badge!.Value.ToString()
     );
 
@@ -90,7 +86,7 @@ public class NotificationManager(
         => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-    public Task<IList<Notification>> GetPendingNotifications() => this.platform.InvokeTaskOnMainThread(async () =>
+    public Task<IList<Notification>> GetPendingNotifications() => platform.InvokeTaskOnMainThread(async () =>
     {
         var requests = await UNUserNotificationCenter
             .Current
@@ -102,7 +98,7 @@ public class NotificationManager(
     });
 
 
-    public Task Send(Notification notification) => this.platform.InvokeTaskOnMainThread(async () =>
+    public Task Send(Notification notification) => platform.InvokeTaskOnMainThread(async () =>
     {
         notification.AssertValid();
 
@@ -110,12 +106,12 @@ public class NotificationManager(
             throw new NotSupportedException("Geofence notifications are not supported on macOS");
 
         if (notification.Id == 0)
-            notification.Id = this.settings.IncrementValue("NotificationId");
+            notification.Id = settings.IncrementValue("NotificationId");
 
         var channel = Channel.Default;
         if (!notification.Channel.IsEmpty())
         {
-            channel = this.channelManager.Get(notification.Channel!);
+            channel = channelManager.Get(notification.Channel!);
             if (channel == null)
                 throw new InvalidOperationException($"{notification.Channel} does not exist");
         }
@@ -135,7 +131,7 @@ public class NotificationManager(
     });
 
 
-    public Task Cancel(CancelScope scope) => this.platform.InvokeOnMainThreadAsync(() =>
+    public Task Cancel(CancelScope scope) => platform.InvokeOnMainThreadAsync(() =>
     {
         if (scope == CancelScope.All || scope == CancelScope.Pending)
             UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
@@ -145,7 +141,7 @@ public class NotificationManager(
     });
 
 
-    public Task Cancel(int notificationId) => this.platform.InvokeOnMainThreadAsync(() =>
+    public Task Cancel(int notificationId) => platform.InvokeOnMainThreadAsync(() =>
     {
         var ids = new[] { notificationId.ToString() };
 
@@ -206,7 +202,7 @@ public class NotificationManager(
 
         native.CategoryIdentifier = channel.Identifier;
         var useCriticalSound =
-            this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
+            configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) &&
             channel.Importance == ChannelImportance.Critical;
 
         switch (channel.Sound)
@@ -325,7 +321,7 @@ public class NotificationManager(
                 .RunDelegates(x => x.OnEntry(shiny), this.logger)
                 .ConfigureAwait(false);
 
-            this.platform.InvokeOnMainThread(() =>
+            platform.InvokeOnMainThread(() =>
                 completionHandler.Invoke()
             );
         }
@@ -337,8 +333,8 @@ public class NotificationManager(
         var t = notification?.Request?.Trigger;
         if (t == null || t is not UNPushNotificationTrigger)
         {
-            this.platform.InvokeOnMainThread(() =>
-                completionHandler.Invoke(this.configuration.PresentationOptions)
+            platform.InvokeOnMainThread(() =>
+                completionHandler.Invoke(configuration.PresentationOptions)
             );
         }
     }
