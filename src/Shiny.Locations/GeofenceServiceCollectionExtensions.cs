@@ -17,12 +17,10 @@ public static class GeofenceServiceCollectionExtensions
     ///
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="delegateType"></param>
+    /// <typeparam name="TDelegate"></typeparam>
     /// <returns></returns>
-    public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
+    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
     {
-        services.AddSingleton(delegateType);
-        services.AddSingleton(typeof(IGeofenceDelegate), sp => sp.GetRequiredService(delegateType));
         services.AddDefaultRepository();
 
 #if ANDROID
@@ -33,74 +31,41 @@ public static class GeofenceServiceCollectionExtensions
                 .IsGooglePlayServicesAvailable(Application.Context);
 
             if (resultCode == ConnectionResult.ServiceMissing)
-                return services.AddGpsDirectGeofencing(delegateType);
+                return services.AddGpsDirectGeofencing<TDelegate>();
 
-            services.AddSingleton<GeofenceManager>();
-            services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManager>());
-            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GeofenceManager>());
+            services.AddSingletonAsImplementedInterfaces<GeofenceManager>();
         }
 #elif APPLE
         if (!services.HasService<IGeofenceManager>())
         {
             if (OperatingSystem.IsIOSVersionAtLeast(18) || OperatingSystem.IsMacCatalystVersionAtLeast(18))
-            {
-                services.AddSingleton<GeofenceManager>();
-                services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManager>());
-                services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GeofenceManager>());
-            }
+                services.AddSingletonAsImplementedInterfaces<GeofenceManager>();
             else
-            {
-                services.AddSingleton<CLLocationGeofenceManager>();
-                services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<CLLocationGeofenceManager>());
-            }
+                services.AddSingletonAsImplementedInterfaces<CLLocationGeofenceManager>();
         }
 #elif WINDOWS
         if (!services.HasService<IGeofenceManager>())
-        {
-            services.AddSingleton<GeofenceManager>();
-            services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManager>());
-            services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GeofenceManager>());
-        }
+            services.AddSingletonAsImplementedInterfaces<GeofenceManager>();
 #endif
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+        
         return services;
     }
-
-
+    
+    
     /// <summary>
-    ///
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IGeofenceDelegate
-        => services.AddGeofencing(typeof(T));
-
-
-    /// <summary>
-    /// This uses background GPS in realtime broadcasts to monitor geofences - DO NOT USE THIS IF YOU DON"T KNOW WHAT YOU ARE DOING
-    /// It is potentially hostile to battery life
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddGpsDirectGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IGeofenceDelegate
-        => services.AddGpsDirectGeofencing(typeof(T));
-
-
-    /// <summary>
-    /// This uses background GPS in realtime broadcasts to monitor geofences - DO NOT USE THIS IF YOU DON"T KNOW WHAT YOU ARE DOING
+    /// This uses background GPS in realtime broadcasts to monitor geofences - DO NOT USE THIS IF YOU DON'T KNOW WHAT YOU ARE DOING
     /// It is potentially hostile to battery life
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="delegateType"></param>
+    /// <typeparam name="TDelegate"></typeparam>
     /// <returns></returns>
-    public static IServiceCollection AddGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
+    public static IServiceCollection AddGpsDirectGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
     {
-        services.AddSingleton(delegateType);
-        services.AddSingleton(typeof(IGeofenceDelegate), sp => sp.GetRequiredService(delegateType));
-        services.AddSingleton<GpsGeofenceManagerImpl>();
-        services.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GpsGeofenceManagerImpl>());
-        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<GpsGeofenceManagerImpl>());
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+        if (!services.HasService<IGeofenceManager>())
+            services.AddSingletonAsImplementedInterfaces<GpsGeofenceManagerImpl>();
+        
         return services;
     }
 #else
@@ -108,18 +73,9 @@ public static class GeofenceServiceCollectionExtensions
     /// This is a blank AddGeofencing - you won't see this documentation if you've got a proper target that is supported
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="delegateType"></param>
+    /// <typeparam name="TDelegate"></typeparam>
     /// <returns></returns>
-    public static IServiceCollection AddGeofencing(this IServiceCollection services, Type delegateType)
-        => services;
-
-    /// <summary>
-    /// This is a blank AddGeofencing - you won't see this documentation if you've got a proper target that is supported
-    /// </summary>
-    /// <param name="services"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
         => services;
 
 #endif

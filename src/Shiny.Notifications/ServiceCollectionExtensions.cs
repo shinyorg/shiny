@@ -20,6 +20,7 @@ public static class NotificationsServiceCollectionExtensions
 #if ANDROID
         services.AddSingleton<AndroidNotificationManager>();
         services.AddSingleton<AndroidNotificationProcessor>();
+        services.AddGeofencing<NotificationGeofenceDelegate>();
 #elif IOS || MACCATALYST
         services.TryAddSingleton(new IosConfiguration());
 #elif MACOS
