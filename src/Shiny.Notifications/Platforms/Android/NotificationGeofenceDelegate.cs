@@ -4,9 +4,7 @@ using Shiny.Locations;
 namespace Shiny.Notifications;
 
 
-public class NotificationGeofenceDelegate : IGeofenceDelegate
+public class NotificationGeofenceDelegate(AndroidNotificationProcessor processor) : IGeofenceDelegate
 {
-    readonly AndroidNotificationProcessor processor;
-    public NotificationGeofenceDelegate(AndroidNotificationProcessor processor) => this.processor = processor;
-    public Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region) => this.processor.ProcessGeofence(newStatus, region);
+    public Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region) => processor.ProcessGeofence(newStatus, region);
 }
