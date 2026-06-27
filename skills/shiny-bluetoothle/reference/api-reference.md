@@ -144,12 +144,12 @@ public record ScanConfig(params string[] ServiceUuids);
 public record AndroidScanConfig(
     ScanMode ScanMode = ScanMode.Balanced,
     bool UseScanBatching = false,                  // Enable scan batching if supported
-    bool IncludeExtendedAdvertisements = false,    // false = default legacy scan (sees virtually all devices); true = legacy + BT5 extended
+    bool IncludeExtendedAdvertisements = true,     // true (default) = legacy + BT5 extended (when chipset supports it); false = legacy only
     params string[] ServiceUuids
 ) : ScanConfig(ServiceUuids);
 ```
 
-> Leave `IncludeExtendedAdvertisements = false` (the default) unless you specifically need Bluetooth 5 extended-advertising devices. Enabling extended scanning uses `setLegacy(false)`, which on most chipsets suppresses the legacy advertisements that nearly all peripherals send unless paired with all-PHY scanning (Shiny does this for you when the flag is set).
+> `IncludeExtendedAdvertisements` defaults to `true`, so scans discover both legacy and Bluetooth 5 extended advertisements automatically. Shiny only enables extended scanning when the chipset reports `IsLeExtendedAdvertisingSupported`, and always pairs `setLegacy(false)` with all-PHY scanning so legacy advertisements (what most peripherals send) are never suppressed. Set it to `false` only if you specifically want a legacy-only scan.
 
 ### ScanResult
 

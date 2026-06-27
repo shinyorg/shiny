@@ -123,7 +123,7 @@ Add the BLE permissions to `Platforms/Android/AndroidManifest.xml`. **Critical:*
 
 If you DO use BLE to infer location, omit `neverForLocation` and also request/grant `ACCESS_FINE_LOCATION` at runtime.
 
-By default Shiny uses Android's legacy scan, which discovers the legacy advertisements that virtually all peripherals send. To also discover Bluetooth 5 extended-advertising devices, scan with `new AndroidScanConfig(IncludeExtendedAdvertisements: true)`.
+Scans discover both legacy and Bluetooth 5 extended advertisements automatically (when the chipset supports extended advertising); legacy advertisements that virtually all peripherals send are always included. To force a legacy-only scan, use `new AndroidScanConfig(IncludeExtendedAdvertisements: false)`.
 
 ## Code Generation Instructions
 

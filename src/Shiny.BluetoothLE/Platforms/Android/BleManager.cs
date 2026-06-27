@@ -282,12 +282,14 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         if (cfg.UseScanBatching && this.Native.Adapter!.IsOffloadedScanBatchingSupported)
             builder.SetReportDelay(100);
 
-        // By default we leave Android's legacy scan in place (setLegacy defaults to true),
-        // which reports the legacy advertisements that virtually all BLE peripherals send.
-        // Forcing setLegacy(false) on its own suppresses legacy advertisements on most
-        // chipsets, hiding nearly every device.  Opt-in extended scanning pairs it with
-        // all-PHY scanning so BOTH legacy and BT5 extended advertisements are reported.
-        if (OperatingSystem.IsAndroidVersionAtLeast(26) && cfg.IncludeExtendedAdvertisements)
+        // Discover Bluetooth 5 extended advertisements automatically.  setLegacy(false) on its
+        // own suppresses legacy advertisements on most chipsets (hiding nearly every device),
+        // so we pair it with all-PHY scanning, which reports BOTH legacy and extended.  We only
+        // do this when the chipset actually supports LE extended advertising; otherwise we leave
+        // Android's default legacy scan in place so legacy advertisements are never suppressed.
+        if (OperatingSystem.IsAndroidVersionAtLeast(26) &&
+            cfg.IncludeExtendedAdvertisements &&
+            this.Native.Adapter!.IsLeExtendedAdvertisingSupported)
         {
             builder.SetLegacy(false);
 
