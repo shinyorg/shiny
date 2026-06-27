@@ -105,6 +105,26 @@ public class MyBleDelegate : BleDelegate
 }
 ```
 
+### Android Manifest (required for scanning)
+
+Add the BLE permissions to `Platforms/Android/AndroidManifest.xml`. **Critical:** on Android 12+ (API 31+) Shiny requests only `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT` at runtime — it does NOT request `ACCESS_FINE_LOCATION`. If you declare `BLUETOOTH_SCAN` *without* the `neverForLocation` flag, Android silently withholds **all** scan results unless fine location is also granted, so scans appear to return nothing. Unless your app actually derives physical location from BLE, always add `neverForLocation`:
+
+```xml
+<!-- Android 12+ -->
+<uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+                 android:usesPermissionFlags="neverForLocation" />
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+<!-- Android 11 and below -->
+<uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+```
+
+If you DO use BLE to infer location, omit `neverForLocation` and also request/grant `ACCESS_FINE_LOCATION` at runtime.
+
+By default Shiny uses Android's legacy scan, which discovers the legacy advertisements that virtually all peripherals send. To also discover Bluetooth 5 extended-advertising devices, scan with `new AndroidScanConfig(IncludeExtendedAdvertisements: true)`.
+
 ## Code Generation Instructions
 
 When generating BLE client code, follow these conventions:

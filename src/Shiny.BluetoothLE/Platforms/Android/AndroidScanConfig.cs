@@ -14,6 +14,17 @@ public record AndroidScanConfig(
     /// </summary>
     bool UseScanBatching = false,
 
+
+    /// <summary>
+    /// When true, the scanner reports both legacy AND Bluetooth 5 extended advertisements
+    /// (setLegacy(false) + all-PHY scanning).  Defaults to false, which uses Android's
+    /// default legacy scan - this is what virtually all BLE peripherals advertise with.
+    /// Only enable this if you specifically need to discover devices using BT5 extended
+    /// advertising; doing so unconditionally suppresses legacy advertisements on many
+    /// chipsets, which makes most devices invisible.
+    /// </summary>
+    bool IncludeExtendedAdvertisements = false,
+
     params string[] ServiceUuids
 ) : ScanConfig(
     ServiceUuids

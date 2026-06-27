@@ -205,33 +205,44 @@ public partial class AndroidPlatform : IPlatform,
         }
 
         this.SetRequestedPermissions(androidPermissions);
-        var current = Interlocked.Increment(ref this.requestCode);
 
+        // we need an activity to present the OS permission dialog.  If one isn't available yet
+        // (eg. the request fired before the UI was up), wait briefly for one to appear.  This
+        // timeout ONLY covers acquiring the activity - it must NEVER cover the time the user
+        // spends interacting with the dialog, otherwise a slow tap throws after 5s and crashes
+        // the app while the dialog is still on screen (see issue #1625).
+        var activity = this.CurrentActivity;
+        if (activity == null)
+        {
+            using var actCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            actCts.CancelAfter(TimeSpan.FromSeconds(5));
+            try
+            {
+                var change = await this
+                    .WaitForActivity(ActivityState.Resumed, actCts.Token)
+                    .ConfigureAwait(false);
+
+                activity = change.Activity;
+            }
+            catch (System.OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                throw new TimeoutException("A current activity was not detected to be able to request permissions");
+            }
+        }
+
+        var current = Interlocked.Increment(ref this.requestCode);
         var tcs = new TaskCompletionSource<PermissionRequestResult>();
         this.pendingPermissions[current] = tcs;
 
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(TimeSpan.FromSeconds(5));
-        cts.Token.Register(() =>
+        // honor caller-driven cancellation while waiting for the user's response, but apply
+        // NO wall-clock timeout - the user may take as long as they like in the dialog.
+        using var reg = cancellationToken.Register(() =>
         {
             if (this.pendingPermissions.TryRemove(current, out var t))
-                t.TrySetException(new TimeoutException("A current activity was not detected to be able to request permissions"));
+                t.TrySetCanceled(cancellationToken);
         });
 
-        if (this.CurrentActivity != null)
-        {
-            ActivityCompat.RequestPermissions(this.CurrentActivity, androidPermissions, current);
-        }
-        else
-        {
-            EventHandler<ActivityChanged>? actHandler = null;
-            actHandler = (_, x) =>
-            {
-                activityLifecycle.ActivityChanged -= actHandler;
-                ActivityCompat.RequestPermissions(x.Activity, androidPermissions, current);
-            };
-            activityLifecycle.ActivityChanged += actHandler;
-        }
+        ActivityCompat.RequestPermissions(activity, androidPermissions, current);
 
         return await tcs.Task.ConfigureAwait(false);
     }

@@ -143,10 +143,13 @@ public record ScanConfig(params string[] ServiceUuids);
 ```csharp
 public record AndroidScanConfig(
     ScanMode ScanMode = ScanMode.Balanced,
-    bool UseScanBatching = false,          // Enable scan batching if supported
+    bool UseScanBatching = false,                  // Enable scan batching if supported
+    bool IncludeExtendedAdvertisements = false,    // false = default legacy scan (sees virtually all devices); true = legacy + BT5 extended
     params string[] ServiceUuids
 ) : ScanConfig(ServiceUuids);
 ```
+
+> Leave `IncludeExtendedAdvertisements = false` (the default) unless you specifically need Bluetooth 5 extended-advertising devices. Enabling extended scanning uses `setLegacy(false)`, which on most chipsets suppresses the legacy advertisements that nearly all peripherals send unless paired with all-PHY scanning (Shiny does this for you when the flag is set).
 
 ### ScanResult
 

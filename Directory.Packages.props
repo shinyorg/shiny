@@ -6,12 +6,12 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Shiny.Maui.Shell" Version="6.1.1"/>
+        <PackageVersion Include="Shiny.Maui.Shell" Version="6.3.1"/>
         <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0096"/>
-        <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="5.0.0-beta-0051"/>
-        <PackageVersion Include="Shiny.Extensions.Stores" Version="5.0.0-beta-0051"/>
-        <PackageVersion Include="Shiny.Extensions.Stores.Web" Version="5.0.0-beta-0051"/>
-        <PackageVersion Include="Shiny.Extensions.Serialization" Version="5.0.0-beta-0051"/>
+        <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="5.1.1"/>
+        <PackageVersion Include="Shiny.Extensions.Stores" Version="5.1.1"/>
+        <PackageVersion Include="Shiny.Extensions.Stores.Web" Version="5.1.1"/>
+        <PackageVersion Include="Shiny.Extensions.Serialization" Version="5.1.1"/>
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>
@@ -35,9 +35,9 @@
         <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1"/>
         <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="6.1.0"/>
-        <PackageVersion Include="Shiny.DocumentDb.Extensions.DependencyInjection" Version="6.1.0"/>
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0"/>
+        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="9.1.0"/>
+        <PackageVersion Include="Shiny.DocumentDb.Extensions.DependencyInjection" Version="9.1.0"/>
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.7.0"/>
         <PackageVersion Include="xunit" Version="2.9.3"/>
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
         <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="$(MsftExtensionVersion)"/>
