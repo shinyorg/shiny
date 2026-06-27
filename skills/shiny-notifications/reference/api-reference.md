@@ -629,6 +629,7 @@ notificationManager.AddChannel(new Channel
 2. On Android 13+, the POST_NOTIFICATIONS permission must be granted at runtime -- `RequestAccess()` handles this.
 3. On iOS, check that the user has not disabled notifications in system settings.
 4. Ensure the `Notification.Message` property is set (it is required).
+5. On Windows, unpackaged apps cannot query `ToastNotifier.Setting`, so `RequestAccess()`/`GetCurrentAccess()` return `AccessState.Available` (the real setting is unknown). To actually display toasts, an unpackaged app must register its AUMID (Start Menu shortcut + COM activator).
 
 ### Scheduled notification not firing
 

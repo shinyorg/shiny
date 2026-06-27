@@ -14,19 +14,12 @@ namespace Shiny.Notifications;
 
 
 public class NotificationManager(
-    IServiceProvider services,
     IChannelManager channelManager,
     IRepository repository,
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings,
     ILogger<NotificationManager> logger
 ) : INotificationManager
 {
-    readonly IServiceProvider services = services;
-    readonly IChannelManager channelManager = channelManager;
-    readonly IRepository repository = repository;
-    readonly IKeyValueStore settings = settings;
-    readonly ILogger logger = logger;
-
     string? aumid;
     ToastNotifier? notifier;
     ToastNotifier Notifier
@@ -53,11 +46,11 @@ public class NotificationManager(
     }
 
 
-    public void AddChannel(Channel channel) => this.channelManager.Add(channel);
-    public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
-    public void ClearChannels() => this.channelManager.Clear();
-    public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
+    public void AddChannel(Channel channel) => channelManager.Add(channel);
+    public void RemoveChannel(string channelId) => channelManager.Remove(channelId);
+    public void ClearChannels() => channelManager.Clear();
+    public Channel? GetChannel(string channelId) => channelManager.Get(channelId);
+    public IList<Channel> GetChannels() => channelManager.GetAll();
 
 
     public Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)
@@ -77,8 +70,12 @@ public class NotificationManager(
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Failed to get notifier setting");
-            return Task.FromResult(AccessState.NotSupported);
+            // Unpackaged apps have no package identity, so ToastNotifier.Setting throws
+            // ELEMENT_NOT_FOUND (0x80070490). Toasts still work in that scenario once the
+            // AUMID is registered, so assume access is available rather than reporting a
+            // failure that would block the app from sending notifications.
+            logger.LogDebug(ex, "Unable to read notifier setting - assuming notifications are available (likely an unpackaged app)");
+            return Task.FromResult(AccessState.Available);
         }
     }
 
@@ -89,14 +86,14 @@ public class NotificationManager(
 
     public Task<Notification>? GetNotification(int notificationId)
     {
-        var n = this.repository.Get<Notification>(notificationId.ToString());
+        var n = repository.Get<Notification>(notificationId.ToString());
         return n == null ? null : Task.FromResult(n);
     }
 
 
     public Task<IList<Notification>> GetPendingNotifications()
     {
-        IList<Notification> list = this.repository.GetAll<Notification>().ToList();
+        IList<Notification> list = repository.GetAll<Notification>().ToList();
         return Task.FromResult(list);
     }
 
@@ -109,12 +106,12 @@ public class NotificationManager(
             throw new NotSupportedException("Geofence notifications are not supported on Windows");
 
         if (notification.Id == 0)
-            notification.Id = this.settings.IncrementValue("NotificationId");
+            notification.Id = settings.IncrementValue("NotificationId");
 
         var channel = Channel.Default;
         if (!notification.Channel.IsEmpty())
         {
-            channel = this.channelManager.Get(notification.Channel!)
+            channel = channelManager.Get(notification.Channel!)
                 ?? throw new InvalidOperationException($"Channel '{notification.Channel}' does not exist");
         }
 
@@ -132,7 +129,7 @@ public class NotificationManager(
                 Tag = tag,
                 Group = "shiny"
             };
-            this.repository.Set(notification);
+            repository.Set(notification);
             this.Notifier.AddToSchedule(scheduled);
         }
         else if (notification.RepeatInterval != null)
@@ -155,7 +152,7 @@ public class NotificationManager(
                     Tag = tag,
                     Group = "shiny"
                 };
-                this.repository.Set(notification);
+                repository.Set(notification);
                 this.Notifier.AddToSchedule(scheduled);
             }
             else
@@ -167,7 +164,7 @@ public class NotificationManager(
                     Tag = tag,
                     Group = "shiny"
                 };
-                this.repository.Set(notification);
+                repository.Set(notification);
                 this.Notifier.AddToSchedule(scheduled);
             }
         }
@@ -178,7 +175,7 @@ public class NotificationManager(
                 Tag = tag,
                 Group = "shiny"
             };
-            this.repository.Set(notification);
+            repository.Set(notification);
             this.Notifier.Show(toast);
         }
 
@@ -206,10 +203,10 @@ public class NotificationManager(
         }
         catch (Exception ex)
         {
-            this.logger.LogWarning(ex, "Failed to cancel notification {Id}", id);
+            logger.LogWarning(ex, "Failed to cancel notification {Id}", id);
         }
 
-        this.repository.Remove<Notification>(tag);
+        repository.Remove<Notification>(tag);
         return Task.CompletedTask;
     }
 
@@ -234,11 +231,11 @@ public class NotificationManager(
         }
         catch (Exception ex)
         {
-            this.logger.LogWarning(ex, "Failed to cancel notifications (scope: {Scope})", scope);
+            logger.LogWarning(ex, "Failed to cancel notifications (scope: {Scope})", scope);
         }
 
         if (scope == CancelScope.All || scope == CancelScope.Pending)
-            this.repository.Clear<Notification>();
+            repository.Clear<Notification>();
 
         return Task.CompletedTask;
     }
