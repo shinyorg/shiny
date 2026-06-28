@@ -19,7 +19,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <param name="services"></param>
     /// <typeparam name="TDelegate"></typeparam>
     /// <returns></returns>
-    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
+    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
     {
         services.AddDefaultRepository();
 
@@ -60,7 +60,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <param name="services"></param>
     /// <typeparam name="TDelegate"></typeparam>
     /// <returns></returns>
-    public static IServiceCollection AddGpsDirectGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
+    public static IServiceCollection AddGpsDirectGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         if (!services.HasService<IGeofenceManager>())
@@ -75,7 +75,7 @@ public static class GeofenceServiceCollectionExtensions
     /// <param name="services"></param>
     /// <typeparam name="TDelegate"></typeparam>
     /// <returns></returns>
-    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
+    public static IServiceCollection AddGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
         => services;
 
 #endif
