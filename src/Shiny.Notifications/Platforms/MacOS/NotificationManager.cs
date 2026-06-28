@@ -64,7 +64,7 @@ public class NotificationManager(
         var tcs = new TaskCompletionSource<AccessState>();
 
         UNUserNotificationCenter.Current.RequestAuthorization(
-            this.configuration.UNAuthorizationOptions,
+            configuration.UNAuthorizationOptions,
             (approved, error) =>
             {
                 if (error != null)
@@ -244,7 +244,7 @@ public class NotificationManager(
             {
                 case ChannelImportance.Critical:
                 case ChannelImportance.High:
-                    native.Sound = this.configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert)
+                    native.Sound = configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert)
                         ? UNNotificationSound.DefaultCriticalSound
                         : UNNotificationSound.Default;
                     break;
