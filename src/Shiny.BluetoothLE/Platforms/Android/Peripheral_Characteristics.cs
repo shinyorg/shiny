@@ -83,37 +83,50 @@ public partial class Peripheral
                             return this.GetNativeCharacteristic(serviceUuid, characteristicUuid);
                         })
                         .Switch()
-                        .Select(ch => this.operations.QueueToObservable(async ct =>
+                        .Select(ch =>
                         {
-                            characteristic = ch;
+                            // Live notification stream. Merge subscribes to this FIRST (below), so any
+                            // OnCharacteristicChanged arriving the instant the CCCD write lands at the
+                            // peripheral is captured. notifySubj is a hot subject with no replay, so
+                            // enabling notifications before subscribing here would drop the earliest
+                            // emissions for devices that stream immediately on subscribe (issue #1542).
+                            var notifyStream = this.notifySubj
+                                .Where(x => x.Is(ch.Service!.Uuid!, ch.Uuid!))
+                                .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification));
 
-                            this.FromNative(ch).AssertNotify();
-                            this.logger.LogDebug("Char InstanceID: " + ch.InstanceId);
+                            // Enable operation - runs SetCharacteristicNotification + the CCCD descriptor
+                            // write on the operation queue and emits nothing to the consumer.
+                            var enable = this.operations
+                                .QueueToObservable(async ct =>
+                                {
+                                    characteristic = ch;
 
-                            this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribing");
+                                    this.FromNative(ch).AssertNotify();
+                                    this.logger.LogDebug("Char InstanceID: " + ch.InstanceId);
 
-                            if (!this.Gatt!.SetCharacteristicNotification(ch, true))
-                                throw new BleException("Failed to set characteristic notification value");
+                                    this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribing");
 
-                            var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
-                            var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
-                            if (nativeDescriptor == null)
-                                throw new BleException("Characteristic notification descriptor not found");
+                                    if (!this.Gatt!.SetCharacteristicNotification(ch, true))
+                                        throw new BleException("Failed to set characteristic notification value");
 
-                            ct.ThrowIfCancellationRequested();
-                            await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
-                            this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
+                                    var notifyBytes = this.GetNotifyDescriptorBytes(ch, useIndicationsIfAvailable);
+                                    var nativeDescriptor = ch.GetDescriptor(Utils.ToUuidType(NotifyDescriptorUuid));
+                                    if (nativeDescriptor == null)
+                                        throw new BleException("Characteristic notification descriptor not found");
 
-                            this.AddNotify(ch);
-                            this.charSubSubj.OnNext(this.FromNative(ch));
+                                    ct.ThrowIfCancellationRequested();
+                                    await this.WriteDescriptor(nativeDescriptor, notifyBytes, ct).ConfigureAwait(false);
+                                    this.logger.HookedCharacteristic(serviceUuid, characteristicUuid, "Subscribed");
 
-                            return ch;
-                        }))
-                        .Switch()
-                        .Select(ch => this.notifySubj
-                            .Where(x => x.Is(ch.Service!.Uuid!, ch.Uuid!))
-                            .Select(x => this.ToResult(x, BleCharacteristicEvent.Notification))
-                        )
+                                    this.AddNotify(ch);
+                                    this.charSubSubj.OnNext(this.FromNative(ch));
+
+                                    return ch;
+                                })
+                                .SelectMany(_ => Observable.Empty<BleCharacteristicResult>());
+
+                            return notifyStream.Merge(enable);
+                        })
                         .Switch()
                         .Subscribe(
                             ob.OnNext,

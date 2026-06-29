@@ -44,12 +44,22 @@ public partial class Peripheral
                             native = ch;
                             this.FromNative(ch).AssertNotify();
 
-                            this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
-                            this.Native.SetNotifyValue(true, ch);
-
-                            return this.charUpdateSubj
+                            // Live notification stream. Merge subscribes to this FIRST (below), so the
+                            // earliest UpdatedCharacterteristicValue callbacks are captured before
+                            // SetNotifyValue turns the peripheral's notifications on - devices that
+                            // stream immediately on subscribe would otherwise drop them (issue #1542).
+                            var notifyStream = this.charUpdateSubj
                                 .Where(x => x.Char.Equals(ch))
                                 .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification));
+
+                            var enable = Observable.Defer(() =>
+                            {
+                                this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
+                                this.Native.SetNotifyValue(true, ch);
+                                return Observable.Empty<BleCharacteristicResult>();
+                            });
+
+                            return notifyStream.Merge(enable);
                         })
                         .Switch()
                         .Subscribe(
