@@ -18,6 +18,7 @@ public static class HttpTransferServiceCollectionExtensions
 #elif ANDROID || WINDOWS
         services.AddSingletonAsImplementedInterfaces<HttpClientHttpTransferManager>();
         services.AddSingleton<HttpClientHttpTransferProcess>();
+        services.AddHttpClient(HttpClientHttpTransferProcess.HttpClientName);
 #endif
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         AddCore(services);
@@ -42,7 +43,8 @@ public static class HttpTransferServiceCollectionExtensions
         services.AddSingletonAsImplementedInterfaces<HttpClientHttpTransferManager>();
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         services.AddSingleton<HttpClientHttpTransferProcess>();
-        
+        services.AddHttpClient(HttpClientHttpTransferProcess.HttpClientName);
+
         AddCore(services);
         return services;
     }

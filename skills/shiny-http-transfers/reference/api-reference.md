@@ -55,17 +55,24 @@ public interface IHttpTransferManager
     // Queues a new HTTP transfer for background execution
     Task<HttpTransfer> Queue(HttpTransferRequest request);
 
-    // Cancels a transfer by identifier
+    // Cancels and removes a transfer by identifier
     Task Cancel(string identifier);
 
-    // Cancels all pending and active transfers
+    // Pauses a transfer WITHOUT cancelling it (stays queued, reports HttpTransferState.Paused).
+    // Downloads resume from where they left off; uploads restart from the beginning on resume.
+    Task Pause(string identifier);
+
+    // Resumes a transfer previously paused with Pause(...)
+    Task Resume(string identifier);
+
+    // Cancels and removes all pending and active transfers
     Task CancelAll();
 
-    // Returns an observable that emits the current transfer count when it changes
-    IObservable<int> WatchCount();
+    // Raised whenever the active transfer count changes
+    event EventHandler<int> CountChanged;
 
-    // Returns an observable that emits transfer progress and completion updates
-    IObservable<HttpTransferResult> WhenUpdateReceived();
+    // Raised whenever a transfer emits a progress or completion update
+    event EventHandler<HttpTransferResult> UpdateReceived;
 }
 ```
 

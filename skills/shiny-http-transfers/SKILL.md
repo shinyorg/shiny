@@ -23,6 +23,10 @@ triggers:
   - download file
   - upload file
   - transfer progress
+  - pause transfer
+  - resume transfer
+  - pause download
+  - resume download
 ---
 
 # Shiny HTTP Transfers
@@ -116,6 +120,8 @@ public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
 
 On non-platform .NET hosts (Linux, macOS server, console apps, etc.) call `AddHttpClientTransfers<TDelegate>()` instead of `AddHttpTransfers<TDelegate>()`. It registers `HttpClientHttpTransferManager` backed by an `HttpClient` loop driven by `IConnectivity` that wakes immediately on connectivity changes. Downloads resume after network interruption via HTTP Range requests (`Range: bytes=N-`, `FileMode.Append` when the server responds with `206 Partial Content`); uploads always restart from scratch.
 
+The managed loop resolves its `HttpClient` from `IHttpClientFactory` using the named client `HttpClientHttpTransferProcess.HttpClientName` (`"Shiny.Net.Http"`). To customize it (timeouts, default headers, a custom primary handler, Polly, etc.), configure that named client after registering transfers: `services.AddHttpClient("Shiny.Net.Http").ConfigureHttpClient(c => c.Timeout = TimeSpan.FromMinutes(10));`. (iOS/Mac Catalyst use `NSUrlSession` and ignore this.)
+
 You must register an `IConnectivity` implementation yourself (e.g. `AddConnectivity()` from `Shiny.Core.Linux` or `Shiny.Core.Blazor`). A default JSON filesystem repository is registered automatically and persists transfer state to `{LocalApplicationData}/Shiny` across process restarts.
 
 Cancelled downloads clean up any partial file on disk so a subsequent re-queue starts fresh.
@@ -177,6 +183,12 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 - Subscribe to the `CountChanged` event (`event EventHandler<int>`) to react to the number of active transfers.
 - Use the `WatchTransfer(identifier)` extension method to `await` a single transfer to completion — it returns `Task<HttpTransferResult>` and unsubscribes from `UpdateReceived` internally.
 - For UI binding, use `HttpTransferMonitor` -- call `Start()` to begin monitoring and bind to the `Transfers` collection of `HttpTransferObject` items. These implement `INotifyPropertyChanged`.
+
+### Pausing & Resuming
+
+- Call `transferManager.Pause(identifier)` to stop a transfer **without cancelling it**. The transfer stays in the queue and reports `HttpTransferState.Paused`. Use this instead of `Cancel(identifier)` (which removes the transfer and deletes a download's partial file) when the user may want to continue later.
+- Call `transferManager.Resume(identifier)` to continue a paused transfer. **Downloads** resume from where they left off (HTTP Range on managed platforms; native `NSUrlSessionTask.Resume()` on iOS/Mac Catalyst). **Uploads** are not resumable — resuming an upload restarts it from the beginning.
+- A user-paused transfer is not auto-resumed when the app relaunches or when connectivity returns; it stays paused until you call `Resume`.
 
 ### Building Requests
 

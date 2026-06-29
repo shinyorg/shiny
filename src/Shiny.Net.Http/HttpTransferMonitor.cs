@@ -204,6 +204,22 @@ public class HttpTransferMonitor(
 
 
     /// <summary>
+    /// Pauses a transfer without cancelling it. The bound <see cref="HttpTransferObject"/>
+    /// reflects <see cref="HttpTransferState.Paused"/>. Downloads resume from where they left
+    /// off; uploads restart on resume.
+    /// </summary>
+    /// <param name="identifier">The transfer identifier.</param>
+    public Task Pause(string identifier) => manager.Pause(identifier);
+
+
+    /// <summary>
+    /// Resumes a transfer previously paused with <see cref="Pause"/>.
+    /// </summary>
+    /// <param name="identifier">The transfer identifier.</param>
+    public Task Resume(string identifier) => manager.Resume(identifier);
+
+
+    /// <summary>
     /// Stops monitoring and detaches event handlers.
     /// </summary>
     public void Stop()

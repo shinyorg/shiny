@@ -44,7 +44,12 @@ public partial class HttpTransferManager(
         {
             var tasks = await this.Session.GetAllTasksAsync();
             foreach (var task in tasks)
-                task.Resume();
+            {
+                // don't auto-resume transfers the user explicitly paused
+                var ht = repository.Get<HttpTransfer>(task.TaskDescription ?? String.Empty);
+                if (ht?.Status != HttpTransferState.Paused)
+                    task.Resume();
+            }
         }
         catch (Exception ex)
         {
@@ -143,6 +148,51 @@ public partial class HttpTransferManager(
         if (task != null)
             task.Cancel();
     }
+
+
+    public async Task Pause(string identifier)
+    {
+        var ht = repository.Get<HttpTransfer>(identifier);
+        if (ht == null)
+            return;
+
+        var task = await this.GetTask(identifier).ConfigureAwait(false);
+
+        // NSUrlSessionTask.Suspend stops the task (upload or download) without cancelling it -
+        // the native task stays alive and is resumed in place, so uploads are not lost.
+        if (task != null && task.State == NSUrlSessionTaskState.Running)
+            task.Suspend();
+
+        repository.Set(ht with { Status = HttpTransferState.Paused });
+        this.UpdateReceived?.Invoke(this, new(
+            ht.Request,
+            HttpTransferState.Paused,
+            new TransferProgress(0, ht.BytesToTransfer, ht.BytesTransferred),
+            null
+        ));
+    }
+
+
+    public async Task Resume(string identifier)
+    {
+        var ht = repository.Get<HttpTransfer>(identifier);
+        if (ht == null || ht.Status != HttpTransferState.Paused)
+            return;
+
+        var task = await this.GetTask(identifier).ConfigureAwait(false);
+        if (task != null && task.State == NSUrlSessionTaskState.Suspended)
+            task.Resume();
+
+        repository.Set(ht with { Status = HttpTransferState.InProgress });
+    }
+
+
+    async Task<NSUrlSessionTask?> GetTask(string identifier)
+        => (await this.Session.GetAllTasksAsync())
+            .FirstOrDefault(x => x
+                .TaskDescription!
+                .Equals(identifier, StringComparison.InvariantCultureIgnoreCase)
+            );
 
 
     public async Task CancelAll()

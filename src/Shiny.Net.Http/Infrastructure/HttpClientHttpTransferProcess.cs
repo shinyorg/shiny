@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -19,10 +20,27 @@ public class HttpClientHttpTransferProcess(
     ILogger<HttpClientHttpTransferProcess> logger,
     IRepository repository,
     IConnectivity connectivity,
-    IEnumerable<IHttpTransferDelegate> delegates
+    IEnumerable<IHttpTransferDelegate> delegates,
+    IHttpClientFactory httpClientFactory,
+    TimeSpan? pollInterval = null
 )
 {
-    readonly HttpClient httpClient = new();
+    /// <summary>
+    /// Name of the <see cref="IHttpClientFactory"/> client used by the managed transfer loop.
+    /// Registered via <c>services.AddHttpClient(...)</c>; apps can call
+    /// <c>.ConfigureHttpClient(...)</c>/<c>.ConfigurePrimaryHttpMessageHandler(...)</c> against it.
+    /// </summary>
+    public const string HttpClientName = "Shiny.Net.Http";
+
+    // HttpClient comes from IHttpClientFactory (handler pooling/lifetime, DI-configurable, and
+    // fakeable in tests via a stub factory) - consistent with Shiny.Data.Sync's RestSyncTransport.
+    // The inter-pass poll interval stays injectable so the loop can be unit-tested with a short tick.
+    readonly HttpClient httpClient = httpClientFactory.CreateClient(HttpClientName);
+    readonly TimeSpan loopInterval = pollInterval ?? TimeSpan.FromSeconds(10);
+
+    // Tracks the cancellation source of each in-flight transfer so a pause (repository status
+    // flipped to Paused) can interrupt the active request without removing the transfer.
+    readonly ConcurrentDictionary<string, CancellationTokenSource> activeTransfers = new();
 
     public static event EventHandler<HttpTransferResult>? ProgressOccurred;
 
@@ -34,18 +52,36 @@ public class HttpClientHttpTransferProcess(
             logger.LogInformation("Starting Transfer Loop");
             using var cancelSrc = new CancellationTokenSource();
 
-            EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> clearHandler = null!;
-            clearHandler = (_, x) =>
+            EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoHandler = null!;
+            repoHandler = (_, x) =>
             {
-                if (x.EntityType == typeof(HttpTransfer) && x.Action == RepositoryAction.Clear)
+                if (x.EntityType != typeof(HttpTransfer))
+                    return;
+
+                if (x.Action == RepositoryAction.Clear)
                 {
-                    repository.ActionOccurred -= clearHandler;
+                    repository.ActionOccurred -= repoHandler;
                     logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
                     cancelSrc.Cancel();
                 }
+                else if (x.Action == RepositoryAction.Update &&
+                         x.Entity is HttpTransfer ht &&
+                         ht.Status == HttpTransferState.Paused &&
+                         this.activeTransfers.TryGetValue(ht.Identifier, out var transferCancel))
+                {
+                    logger.StandardInfo(ht.Identifier, "Pausing active transfer");
+                    try
+                    {
+                        transferCancel.Cancel();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // transfer already completed - nothing to pause
+                    }
+                }
             };
-            repository.ActionOccurred += clearHandler;
-            using var clearSub = new RepoSub(() => repository.ActionOccurred -= clearHandler);
+            repository.ActionOccurred += repoHandler;
+            using var clearSub = new RepoSub(() => repository.ActionOccurred -= repoHandler);
 
             try
             {
@@ -67,6 +103,10 @@ public class HttpClientHttpTransferProcess(
                             else if (!repository.Exists<HttpTransfer>(transfer.Identifier))
                             {
                                 logger.LogDebug($"HTTP Transfer {transfer.Identifier} has been removed");
+                            }
+                            else if (transfer.Status == HttpTransferState.Paused)
+                            {
+                                logger.LogDebug($"HTTP Transfer {transfer.Identifier} is paused - skipping");
                             }
                             else if (transfer.Request.UseMeteredConnection || full)
                             {
@@ -113,12 +153,13 @@ public class HttpClientHttpTransferProcess(
 
 
     Task WaitForNextPass(CancellationToken cancelToken)
-        => Task.Delay(10000, cancelToken);
+        => Task.Delay(this.loopInterval, cancelToken);
 
 
     async Task RunTransfer(HttpTransfer transfer, CancellationToken cancelToken)
     {
         using var cancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+        this.activeTransfers[transfer.Identifier] = cancelSrc;
 
         EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> removeHandler = null!;
         removeHandler = (_, x) =>
@@ -134,6 +175,7 @@ public class HttpClientHttpTransferProcess(
         };
         repository.ActionOccurred += removeHandler;
         using var repoSub = new RepoSub(() => repository.ActionOccurred -= removeHandler);
+        using var activeSub = new RepoSub(() => this.activeTransfers.TryRemove(transfer.Identifier, out _));
 
         try
         {
@@ -349,15 +391,18 @@ public class HttpClientHttpTransferProcess(
 
     void PublishProgress(HttpTransfer transfer, TransferProgress progress)
     {
-        if (repository.Exists<HttpTransfer>(transfer.Identifier))
+        // A pause flips the persisted status to Paused while the request is still unwinding.
+        // Don't resurrect a paused (or removed) transfer with a late progress tick.
+        var current = repository.Get<HttpTransfer>(transfer.Identifier);
+        if (current == null || current.Status == HttpTransferState.Paused)
+            return;
+
+        repository.Set(transfer with
         {
-            repository.Set(transfer with
-            {
-                Status = HttpTransferState.InProgress,
-                BytesToTransfer = progress.BytesToTransfer,
-                BytesTransferred = progress.BytesTransferred
-            });
-        }
+            Status = HttpTransferState.InProgress,
+            BytesToTransfer = progress.BytesToTransfer,
+            BytesTransferred = progress.BytesTransferred
+        });
 
         ProgressOccurred?.Invoke(null, new HttpTransferResult(
             transfer.Request,

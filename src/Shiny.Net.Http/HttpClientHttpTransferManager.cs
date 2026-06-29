@@ -136,6 +136,47 @@ public class HttpClientHttpTransferManager(
     }
 
 
+    public Task Pause(string identifier)
+    {
+        var transfer = repository.Get<HttpTransfer>(identifier);
+        if (transfer != null && IsPausable(transfer.Status))
+        {
+            // The process loop watches for this status change and interrupts the in-flight
+            // request (if any) without removing the transfer. Downloads keep their partial
+            // file for range-resume; uploads restart on resume.
+            var paused = transfer with { Status = HttpTransferState.Paused };
+            repository.Set(paused);
+
+            this.UpdateReceived?.Invoke(this, new(
+                paused.Request,
+                HttpTransferState.Paused,
+                new TransferProgress(0, paused.BytesToTransfer, paused.BytesTransferred),
+                null
+            ));
+        }
+        return Task.CompletedTask;
+    }
+
+
+    public Task Resume(string identifier)
+    {
+        var transfer = repository.Get<HttpTransfer>(identifier);
+        if (transfer != null && IsPaused(transfer.Status))
+        {
+            repository.Set(transfer with { Status = HttpTransferState.Pending });
+            this.TryStartProcess();
+        }
+        return Task.CompletedTask;
+    }
+
+
+    static bool IsPausable(HttpTransferState state)
+        => state is HttpTransferState.Pending or HttpTransferState.InProgress or HttpTransferState.PausedByNoNetwork or HttpTransferState.PausedByCostedNetwork;
+
+    static bool IsPaused(HttpTransferState state)
+        => state is HttpTransferState.Paused or HttpTransferState.PausedByNoNetwork or HttpTransferState.PausedByCostedNetwork;
+
+
     public Task CancelAll()
     {
         var transfers = repository.GetAll<HttpTransfer>();
