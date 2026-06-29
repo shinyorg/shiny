@@ -129,6 +129,50 @@ export async function remove(identifier) {
     }
 }
 
+// Marks a transfer 'paused'. The service worker drain only runs 'pending'/'error' entries,
+// so a paused entry is skipped without being removed. NOTE: an already in-flight fetch cannot
+// be aborted, so pause only guarantees a not-yet-started (or retry-pending) transfer stays
+// parked. Returns false if the transfer is missing or already completed.
+export async function pause(identifier) {
+    const db = await openDb();
+    try {
+        const row = await promisify(store(db, 'readonly').get(identifier));
+        if (!row || row.status === 'completed' || row.status === 'paused') return false;
+        row.status = 'paused';
+        row.updatedAt = Date.now();
+        await promisify(store(db, 'readwrite').put(row));
+        return true;
+    } finally {
+        db.close();
+    }
+}
+
+// Re-queues a paused transfer and nudges the service worker to drain it. Downloads are not
+// resumable on Blazor (the SW fetch returns a whole Blob), so a resumed download restarts.
+export async function resume(identifier) {
+    const db = await openDb();
+    try {
+        const row = await promisify(store(db, 'readonly').get(identifier));
+        if (!row || row.status !== 'paused') return false;
+        row.status = 'pending';
+        row.updatedAt = Date.now();
+        await promisify(store(db, 'readwrite').put(row));
+    } finally {
+        db.close();
+    }
+
+    try {
+        if (serviceWorkerReg && 'sync' in serviceWorkerReg) {
+            await serviceWorkerReg.sync.register(SHINY_HTTP_SYNC_TAG);
+        }
+    } catch (_) { /* not supported — immediate drain below */ }
+
+    if (serviceWorkerReg && serviceWorkerReg.active) {
+        serviceWorkerReg.active.postMessage({ shinyHttp: true, type: 'drain' });
+    }
+    return true;
+}
+
 export async function clear() {
     const db = await openDb();
     try {

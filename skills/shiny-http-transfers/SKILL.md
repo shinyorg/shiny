@@ -149,6 +149,7 @@ importScripts('./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js');
 **Blazor limitations (v1)**:
 
 - **No resumable downloads** — the SW receives a whole response `Blob`; partial-body appending is not supported.
+- **Pause/Resume is best-effort** — `Pause(identifier)` marks the IndexedDB entry `paused` so the SW drain skips it (it only processes `pending`/`error`), and `Resume(identifier)` re-queues it. An already in-flight SW `fetch()` cannot be aborted (no `AbortController` wiring), so it runs to completion; and because downloads aren't resumable, a resumed download restarts from zero. Pausing a not-yet-started (or retry-pending) transfer works cleanly.
 - **Upload bodies are base64-bridged through JS interop** and persisted as IndexedDB `Blob`s. Fine for small/medium files; very large uploads should wait for a future OPFS streaming path.
 - **Browser support for Background Sync is Chromium-only** (no Firefox, no Safari). On unsupported browsers queued transfers drain while the tab is foreground and then sit in IndexedDB until next visit.
 - **Retrieving completed downloads**: use `(manager as Shiny.Net.Http.Blazor.HttpTransferManager).GetDownloadBytes(identifier)` which reads the blob back out of IndexedDB as a `byte[]`.

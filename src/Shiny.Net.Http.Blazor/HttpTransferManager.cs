@@ -150,6 +150,33 @@ public class HttpTransferManager(
     }
 
 
+    public async Task Pause(string identifier)
+    {
+        // Best-effort on Blazor: the Service Worker drain skips 'paused' entries, so a queued
+        // (not-yet-started) transfer is parked without being removed. An already in-flight SW
+        // fetch cannot be aborted and will still complete; downloads are not resumable, so a
+        // resumed download restarts from the beginning.
+        var mod = await this.EnsureInit().ConfigureAwait(false);
+        var paused = await mod.InvokeAsync<bool>("pause", identifier).ConfigureAwait(false);
+        if (paused)
+        {
+            this.UpdateReceived?.Invoke(this, new HttpTransferResult(
+                new HttpTransferRequest(identifier, "", TransferType.Download, ""),
+                HttpTransferState.Paused,
+                TransferProgress.Empty,
+                null
+            ));
+        }
+    }
+
+
+    public async Task Resume(string identifier)
+    {
+        var mod = await this.EnsureInit().ConfigureAwait(false);
+        await mod.InvokeVoidAsync("resume", identifier).ConfigureAwait(false);
+    }
+
+
     async Task FireCountChanged()
     {
         try
@@ -306,6 +333,7 @@ public class HttpTransferManager(
     {
         "pending" => HttpTransferState.Pending,
         "in-progress" => HttpTransferState.InProgress,
+        "paused" => HttpTransferState.Paused,
         "completed" => HttpTransferState.Completed,
         "error" => HttpTransferState.Error,
         _ => HttpTransferState.Unknown
