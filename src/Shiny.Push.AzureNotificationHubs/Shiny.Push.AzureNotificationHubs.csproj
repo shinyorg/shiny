@@ -12,6 +12,7 @@
     
     <ItemGroup>
         <PackageReference Include="Microsoft.Azure.NotificationHubs"/>
+        <PackageReference Include="Shiny.Extensions.Serialization" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
     </ItemGroup>
 
