@@ -27,29 +27,21 @@ public partial class NotificationManager(
 ) : INotificationManager, IAndroidLifecycle.IOnActivityOnCreate, IAndroidLifecycle.IOnActivityNewIntent
 {
     readonly Lazy<AndroidNotificationProcessor> processor = new(() => services.GetRequiredService<AndroidNotificationProcessor>());
-    readonly AndroidPlatform platform = platform;
-    readonly AndroidNotificationManager manager = manager;
-    readonly IRepository repository = repository;
-    readonly IChannelManager channelManager = channelManager;
-    readonly IGeofenceManager geofenceManager = geofenceManager;
-    readonly IKeyValueStore settings = settings;
-    readonly ILogger logger = logger;
 
-
-    public void AddChannel(Channel channel) => this.channelManager.Add(channel);
-    public void RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
-    public void ClearChannels() => this.channelManager.Clear();
-    public Channel? GetChannel(string channelId) => this.channelManager.Get(channelId);
-    public IList<Channel> GetChannels() => this.channelManager.GetAll();
+    public void AddChannel(Channel channel) => channelManager.Add(channel);
+    public void RemoveChannel(string channelId) => channelManager.Remove(channelId);
+    public void ClearChannels() => channelManager.Clear();
+    public Channel? GetChannel(string channelId) => channelManager.Get(channelId);
+    public IList<Channel> GetChannels() => channelManager.GetAll();
 
 
     public async Task Cancel(int id)
     {
-        var notification = this.repository.Get<AndroidNotification>(id.ToString());
+        var notification = repository.Get<AndroidNotification>(id.ToString());
         if (notification != null)
         {
             await this.CancelInternal(notification).ConfigureAwait(false);
-            this.repository.Remove<AndroidNotification>(id.ToString());
+            repository.Remove<AndroidNotification>(id.ToString());
         }
     }
 
@@ -58,49 +50,49 @@ public partial class NotificationManager(
     {
         if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
         {
-            this.manager.NativeManager.CancelAll();
+            manager.NativeManager.CancelAll();
         }
         if (scope == CancelScope.All || scope == CancelScope.Pending)
         {
-            var notifications = this.repository.GetAll<AndroidNotification>();
+            var notifications = repository.GetAll<AndroidNotification>();
             foreach (var notification in notifications)
             {
                 await this.CancelInternal(notification).ConfigureAwait(false);
             }
-            this.repository.Clear<AndroidNotification>();
+            repository.Clear<AndroidNotification>();
         }
     }
 
 
     public Task<Notification?> GetNotification(int notificationId)
-        => Task.FromResult((Notification?)this.repository.Get<AndroidNotification>(notificationId.ToString()));
+        => Task.FromResult((Notification?)repository.Get<AndroidNotification>(notificationId.ToString()));
 
 
     public Task<IList<Notification>> GetPendingNotifications()
-        => Task.FromResult((IList<Notification>)this.repository.GetAll<AndroidNotification>().OfType<Notification>().ToList());
+        => Task.FromResult((IList<Notification>)repository.GetAll<AndroidNotification>().OfType<Notification>().ToList());
 
 
     public Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)
     {
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
-            var status = this.platform.GetCurrentPermissionStatus(P.PostNotifications);
+            var status = platform.GetCurrentPermissionStatus(P.PostNotifications);
             if (status != AccessState.Available)
                 return Task.FromResult(status);
         }
 
-        if (!this.manager.NativeManager.AreNotificationsEnabled())
+        if (!manager.NativeManager.AreNotificationsEnabled())
             return Task.FromResult(AccessState.Disabled);
 
         if (flags.HasFlag(AccessRequestFlags.LocationAware))
         {
-            var fineLocation = this.platform.GetCurrentPermissionStatus(P.AccessFineLocation);
+            var fineLocation = platform.GetCurrentPermissionStatus(P.AccessFineLocation);
             if (fineLocation != AccessState.Available)
                 return Task.FromResult(AccessState.Denied);
 
             if (OperatingSystem.IsAndroidVersionAtLeast(29))
             {
-                var bgLocation = this.platform.GetCurrentPermissionStatus(P.AccessBackgroundLocation);
+                var bgLocation = platform.GetCurrentPermissionStatus(P.AccessBackgroundLocation);
                 if (bgLocation != AccessState.Available)
                     return Task.FromResult(AccessState.Denied);
             }
@@ -108,7 +100,7 @@ public partial class NotificationManager(
 
         if (OperatingSystem.IsAndroidVersionAtLeast(31) && flags.HasFlag(AccessRequestFlags.TimeSensitivity))
         {
-            if (!this.manager.Alarms.CanScheduleExactAlarms())
+            if (!manager.Alarms.CanScheduleExactAlarms())
                 return Task.FromResult(AccessState.Restricted);
         }
 
@@ -124,11 +116,11 @@ public partial class NotificationManager(
             list.Add(P.PostNotifications); // required
 
         if (access.HasFlag(AccessRequestFlags.LocationAware))
-            list.AddRange(new[] { P.AccessCoarseLocation, P.AccessFineLocation }); // required, along with access bg
+            list.AddRange([ P.AccessCoarseLocation, P.AccessFineLocation ]); // required, along with access bg
 
         if (list.Count > 0)
         {
-            var result = await this.platform.RequestPermissions(list.ToArray());
+            var result = await platform.RequestPermissions(list.ToArray());
             if (list.Contains(P.PostNotifications) && !result.IsGranted(P.PostNotifications))
                 return AccessState.Denied;
 
@@ -139,33 +131,33 @@ public partial class NotificationManager(
 
                 if (OperatingSystem.IsAndroidVersionAtLeast(29))
                 {
-                    var bgResult = await this.platform.RequestAccess(P.AccessBackgroundLocation);
+                    var bgResult = await platform.RequestAccess(P.AccessBackgroundLocation);
                     if (bgResult != AccessState.Available)
                         return AccessState.Denied;
                 }
             }
         }
 
-        if (!this.manager.NativeManager.AreNotificationsEnabled())
+        if (!manager.NativeManager.AreNotificationsEnabled())
             return AccessState.Disabled;
 
         // SCHEDULE_EXACT_ALARM is a special app-op permission, not a runtime permission
         // It must be checked via AlarmManager.CanScheduleExactAlarms() and granted via Settings
         if (OperatingSystem.IsAndroidVersionAtLeast(31) && access.HasFlag(AccessRequestFlags.TimeSensitivity))
         {
-            if (!this.manager.Alarms.CanScheduleExactAlarms())
+            if (!manager.Alarms.CanScheduleExactAlarms())
             {
                 var intent = new Intent(
                     Android.Provider.Settings.ActionRequestScheduleExactAlarm,
-                    Android.Net.Uri.Parse("package:" + this.platform.AppContext.PackageName)
+                    Android.Net.Uri.Parse("package:" + platform.AppContext.PackageName)
                 );
                 intent.AddFlags(Android.Content.ActivityFlags.NewTask);
-                this.platform.AppContext.StartActivity(intent);
+                platform.AppContext.StartActivity(intent);
 
                 // wait for the user to return from settings
-                await this.platform.WaitForActivity(ActivityState.Resumed).ConfigureAwait(false);
+                await platform.WaitForActivity(ActivityState.Resumed).ConfigureAwait(false);
 
-                if (!this.manager.Alarms.CanScheduleExactAlarms())
+                if (!manager.Alarms.CanScheduleExactAlarms())
                     return AccessState.Restricted;
             }
         }
@@ -181,18 +173,18 @@ public partial class NotificationManager(
 
         // TODO: should I cancel an existing id if the user is setting it?
         if (notification.Id == 0)
-            notification.Id = this.settings.IncrementValue("NotificationId");
+            notification.Id = settings.IncrementValue("NotificationId");
 
         var channelId = notification.Channel ?? Channel.Default.Identifier;
-        var channel = this.channelManager.Get(channelId);
+        var channel = channelManager.Get(channelId);
         if (channel == null)
             throw new InvalidProgramException("No channel found for " + channelId);
 
-        var builder = this.manager.CreateNativeBuilder(android, channel!);
+        var builder = manager.CreateNativeBuilder(android, channel!);
 
         if (notification.Geofence != null)
         {
-            await this.geofenceManager.StartMonitoring(new GeofenceRegion(
+            await geofenceManager.StartMonitoring(new GeofenceRegion(
                 AndroidNotificationProcessor.GetGeofenceId(notification),
                 notification.Geofence!.Center!,
                 notification.Geofence!.Radius!
@@ -204,19 +196,19 @@ public partial class NotificationManager(
             notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
         }
 
-        if (notification.ScheduleDate == null && notification.Geofence == null)
+        if (notification is { ScheduleDate: null, Geofence: null })
         {
             var native = builder.Build();
-            this.manager.NativeManager.Notify(notification.Id, native);
+            manager.NativeManager.Notify(notification.Id, native);
         }
         else
         {
             // ensure a channel is set
             notification.Channel = channel!.Identifier;
-            this.repository.Set(notification);
+            repository.Set(notification);
 
             if (notification.ScheduleDate != null)
-                this.manager.SetAlarm(notification);
+                manager.SetAlarm(notification);
         }
     }
 
@@ -226,12 +218,12 @@ public partial class NotificationManager(
         if (notification.Geofence != null)
         {
             var geofenceId = AndroidNotificationProcessor.GetGeofenceId(notification);
-            await this.geofenceManager.StopMonitoring(geofenceId);
+            await geofenceManager.StopMonitoring(geofenceId);
         }
         if (notification.ScheduleDate != null || notification.RepeatInterval != null)
-            this.manager.CancelAlarm(notification);
+            manager.CancelAlarm(notification);
 
-        this.manager.NativeManager.Cancel(notification.Id);
+        manager.NativeManager.Cancel(notification.Id);
     }
 
 
@@ -245,7 +237,7 @@ public partial class NotificationManager(
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error trying to process intent");
+            logger.LogError(ex, "Error trying to process intent");
         }
     }
 
