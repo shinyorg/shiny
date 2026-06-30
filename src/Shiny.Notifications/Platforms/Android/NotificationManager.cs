@@ -169,46 +169,51 @@ public partial class NotificationManager(
     public async Task Send(Notification notification)
     {
         notification.AssertValid();
-        var android = notification.TryToNative<AndroidNotification>();
 
         // TODO: should I cancel an existing id if the user is setting it?
         if (notification.Id == 0)
             notification.Id = settings.IncrementValue("NotificationId");
 
-        var channelId = notification.Channel ?? Channel.Default.Identifier;
+        // convert AFTER the id is assigned - TryToNative copies the source notification when it
+        // isn't already an AndroidNotification, so converting earlier would leave android.Id == 0.
+        // From here on everything operates on `android` so the persisted entity, the alarm, and
+        // the reads (GetPendingNotifications/Get/Remove/Clear all use AndroidNotification) agree.
+        var android = notification.TryToNative<AndroidNotification>();
+
+        var channelId = android.Channel ?? Channel.Default.Identifier;
         var channel = channelManager.Get(channelId);
         if (channel == null)
             throw new InvalidProgramException("No channel found for " + channelId);
 
         var builder = manager.CreateNativeBuilder(android, channel!);
 
-        if (notification.Geofence != null)
+        if (android.Geofence != null)
         {
             await geofenceManager.StartMonitoring(new GeofenceRegion(
-                AndroidNotificationProcessor.GetGeofenceId(notification),
-                notification.Geofence!.Center!,
-                notification.Geofence!.Radius!
+                AndroidNotificationProcessor.GetGeofenceId(android),
+                android.Geofence!.Center!,
+                android.Geofence!.Radius!
             ));
         }
-        else if (notification.RepeatInterval != null)
+        else if (android.RepeatInterval != null)
         {
             // calc first date if repeating interval
-            notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
+            android.ScheduleDate = android.RepeatInterval!.CalculateNextAlarm();
         }
 
-        if (notification is { ScheduleDate: null, Geofence: null })
+        if (android is { ScheduleDate: null, Geofence: null })
         {
             var native = builder.Build();
-            manager.NativeManager.Notify(notification.Id, native);
+            manager.NativeManager.Notify(android.Id, native);
         }
         else
         {
             // ensure a channel is set
-            notification.Channel = channel!.Identifier;
-            repository.Set(notification);
+            android.Channel = channel!.Identifier;
+            repository.Set(android);
 
-            if (notification.ScheduleDate != null)
-                manager.SetAlarm(notification);
+            if (android.ScheduleDate != null)
+                manager.SetAlarm(android);
         }
     }
 

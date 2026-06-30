@@ -130,7 +130,10 @@ public class AndroidNotificationProcessor
     }
 
 
-    void DeleteOrReschedule(Notification notification)
+    // param MUST be typed AndroidNotification, not Notification - repository.Set<T> buckets by the
+    // compile-time T, so a base Notification reference would persist the reschedule into the wrong
+    // type bucket and it would vanish from GetPendingNotifications/Cancel (which read AndroidNotification).
+    void DeleteOrReschedule(AndroidNotification notification)
     {
         if (notification.RepeatInterval == null)
         {

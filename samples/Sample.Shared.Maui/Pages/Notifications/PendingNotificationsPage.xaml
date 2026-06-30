@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Notifications"
              x:Class="Sample.Shared.Maui.Pages.Notifications.PendingNotificationsPage"
+             x:Name="PageRoot"
              x:DataType="vm:PendingNotificationsViewModel"
              Title="Pending Notifications">
     <Grid RowDefinitions="Auto,Auto,*">
@@ -50,7 +51,7 @@
                                 HeightRequest="40"
                                 Padding="0"
                                 VerticalOptions="Center"
-                                Command="{Binding Source={RelativeSource Mode=FindAncestorBindingContext, AncestorType={x:Type vm:PendingNotificationsViewModel}}, Path=CancelCommand}"
+                                Command="{Binding BindingContext.CancelCommand, Source={x:Reference PageRoot}}"
                                 CommandParameter="{Binding Id}" />
                     </Grid>
                 </DataTemplate>

@@ -636,6 +636,10 @@ notificationManager.AddChannel(new Channel
 1. Ensure `RequestAccess(AccessRequestFlags.TimeSensitivity)` is called and returns `AccessState.Available`.
 2. Verify `ScheduleDate` is set in the future -- past dates will throw during validation.
 3. Do not mix `ScheduleDate` with `RepeatInterval` or `Geofence` on the same notification.
+4. **Android exact alarms:** On Android 12+ (API 31), exact alarms require the `SCHEDULE_EXACT_ALARM`/`USE_EXACT_ALARM` special-access permission. If it is not granted, Shiny falls back to an **inexact** alarm so the notification still fires (the OS may delay it). For exact, on-time delivery, request `AccessRequestFlags.TimeSensitivity` (sends the user to the exact-alarm settings screen) and declare the permission in `AndroidManifest.xml`. Pick **one** of two setups:
+   - **Most apps** (notifications are a feature): declare `<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />` with **no** `maxSdkVersion`. Auto-granted on API 31-32, user-grantable via the `TimeSensitivity` settings prompt on API 33+.
+   - **Alarm-clock / reminder apps** (core function): `SCHEDULE_EXACT_ALARM` with `android:maxSdkVersion="32"` **plus** `USE_EXACT_ALARM` (auto-granted, non-revocable on API 33+; Google Play policy restricted to alarm/timer/calendar apps).
+   - **Trap:** capping `SCHEDULE_EXACT_ALARM` at `maxSdkVersion="32"` *without* also adding `USE_EXACT_ALARM` leaves the app with no exact-alarm permission on API 33+ - `CanScheduleExactAlarms()` returns `false`, the "Alarms & reminders" toggle is **greyed out and unchecked**, and notifications silently use the inexact fallback. After changing the manifest, fully uninstall/reinstall the app (permissions are evaluated at install time).
 
 ### Geofence notification not firing
 

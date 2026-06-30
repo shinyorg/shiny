@@ -3,11 +3,12 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
         <MsftExtensionVersion>10.0.5</MsftExtensionVersion>
+        <MauiLabsVersion>0.1.0-preview.11.26317.2</MauiLabsVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
         <PackageVersion Include="Shiny.Maui.Shell" Version="6.3.1"/>
-        <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0096"/>
+        <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0141"/>
         <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="5.1.1"/>
         <PackageVersion Include="Shiny.Extensions.Stores" Version="5.1.1"/>
         <PackageVersion Include="Shiny.Extensions.Stores.Web" Version="5.1.1"/>
@@ -15,17 +16,18 @@
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS" Version="0.1.0-preview.10.26274.3"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS.Essentials" Version="0.1.0-preview.10.26274.3"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4" Version="0.1.0-preview.10.26274.3"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials" Version="0.1.0-preview.10.26274.3"/>
-        <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="0.1.0-preview.9.26258.5"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS" Version="$(MauiLabsVersion)"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS.Essentials" Version="$(MauiLabsVersion)"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4" Version="$(MauiLabsVersion)"/>
+        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials" Version="$(MauiLabsVersion)"/>
+        <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="$(MauiLabsVersion)"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
         <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
         <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
         <PackageVersion Include="System.Reactive" Version="6.0.0"/>
+        <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.7.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MsftExtensionVersion)"/>
@@ -40,7 +42,6 @@
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.7.0"/>
         <PackageVersion Include="xunit" Version="2.9.3"/>
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
-        <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="$(MsftExtensionVersion)"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.17.0.2"/>

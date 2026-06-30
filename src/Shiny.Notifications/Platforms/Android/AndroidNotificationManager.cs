@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
 using Java.Lang;
+using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores;
 using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
 
@@ -16,18 +17,21 @@ public class AndroidNotificationManager
     readonly AndroidPlatform platform;
     readonly IChannelManager channelManager;
     readonly ISerializer serializer;
+    readonly ILogger logger;
 
 
     public AndroidNotificationManager(
         AndroidPlatform platform,
         IChannelManager channelManager,
-        ISerializer serializer
+        ISerializer serializer,
+        ILogger<AndroidNotificationManager> logger
     )
     {
         this.platform = platform;
         this.NativeManager = NotificationManagerCompat.From(this.platform.AppContext);
         this.channelManager = channelManager;
         this.serializer = serializer;
+        this.logger = logger;
     }
 
 
@@ -97,7 +101,24 @@ public class AndroidNotificationManager
         var pendingIntent = this.GetAlarmPendingIntent(notification);
         var triggerTime = (notification.ScheduleDate!.Value.ToUniversalTime() - DateTime.UtcNow).TotalMilliseconds;
         var androidTriggerTime = JavaSystem.CurrentTimeMillis() + (long)triggerTime;
-        this.Alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, androidTriggerTime, pendingIntent);
+
+        // Exact alarms (SCHEDULE_EXACT_ALARM/USE_EXACT_ALARM) are a special access permission on
+        // Android 12+ (API 31).  When it isn't granted, SetExactAndAllowWhileIdle throws a
+        // SecurityException - which previously meant the scheduled notification silently never
+        // fired.  Fall back to an inexact alarm so the notification still delivers (the OS may
+        // batch/delay it slightly) instead of being dropped entirely.
+        if (!OperatingSystem.IsAndroidVersionAtLeast(31) || this.Alarms.CanScheduleExactAlarms())
+        {
+            this.Alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, androidTriggerTime, pendingIntent);
+        }
+        else
+        {
+            this.logger.LogWarning(
+                "Exact alarm permission is not granted - notification {NotificationId} will be scheduled as an inexact alarm and may be delayed.  Request AccessRequestFlags.TimeSensitivity to prompt the user for exact alarm access.",
+                notification.Id
+            );
+            this.Alarms.SetAndAllowWhileIdle(AlarmType.RtcWakeup, androidTriggerTime, pendingIntent);
+        }
     }
 
 
@@ -111,13 +132,16 @@ public class AndroidNotificationManager
         => this.platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
             ShinyNotificationBroadcastReceiver.AlarmIntentAction,
             PendingIntentFlags.UpdateCurrent,
-            0,
+            // the request code MUST be unique per notification - Android PendingIntent equality
+            // ignores extras, so a shared request code (e.g. 0) makes every scheduled/repeating
+            // notification collide on a single PendingIntent: new alarms overwrite earlier ones,
+            // Cancel cancels the wrong alarm, and the fired intent carries the wrong notification id.
+            notification.Id,
             intent => intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id)
         );
 
-
-    AlarmManager? alarms;
-    public AlarmManager Alarms => this.alarms ??= this.platform.GetSystemService<AlarmManager>(Context.AlarmService);
+    
+    public AlarmManager Alarms => field ??= this.platform.GetSystemService<AlarmManager>(Context.AlarmService);
 
 
     public virtual PendingIntent GetLaunchPendingIntent(AndroidNotification notification)
