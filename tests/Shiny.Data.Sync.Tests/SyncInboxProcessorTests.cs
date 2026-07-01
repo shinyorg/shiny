@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shiny.Data.Sync.Infrastructure;
 using Shiny.Data.Sync.Tests.Fakes;
@@ -23,12 +24,15 @@ public class SyncInboxProcessorTests
         var transport = new FakeSyncTransport();
         var repo = new InMemoryRepository();
         var del = new RecordingDelegate();
+        var services = new ServiceCollection()
+            .AddSingleton<IDataSyncDelegate>(del)
+            .BuildServiceProvider();
         var processor = new SyncInboxProcessor(
             NullLogger<SyncInboxProcessor>.Instance,
             repo,
             transport,
             registry,
-            new[] { del }
+            services
         );
         return (processor, registry, transport, repo, del, endpoint);
     }
@@ -378,7 +382,10 @@ public class SyncInboxProcessorTests
         var transport = new FakeSyncTransport();
         var repo = new InMemoryRepository();
         var del = new RecordingDelegate();
-        var proc = new SyncInboxProcessor(NullLogger<SyncInboxProcessor>.Instance, repo, transport, registry, new[] { del });
+        var services = new ServiceCollection()
+            .AddSingleton<IDataSyncDelegate>(del)
+            .BuildServiceProvider();
+        var proc = new SyncInboxProcessor(NullLogger<SyncInboxProcessor>.Instance, repo, transport, registry, services);
         transport.QueuePull(registry.Get<Item>()!.Key, new SyncPullResult("c", Array.Empty<SyncPullItem>()));
 
         await proc.PullAll();

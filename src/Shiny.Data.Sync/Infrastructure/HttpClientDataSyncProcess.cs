@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores.Repositories;
 using Shiny.Net;
@@ -22,7 +23,7 @@ public class HttpClientDataSyncProcess(
     IConnectivity connectivity,
     ISyncTransport transport,
     SyncEndpointRegistry registry,
-    IEnumerable<IDataSyncDelegate> delegates
+    IServiceProvider services
 )
 {
     static readonly TimeSpan MaxBackoff = TimeSpan.FromSeconds(60);
@@ -172,7 +173,7 @@ public class HttpClientDataSyncProcess(
             }
 
             logger.StandardInfo(op.Identifier, "Sent successfully");
-            foreach (var d in delegates)
+            foreach (var d in services.GetServices<IDataSyncDelegate>())
             {
                 try { await d.OnSent(inProgress, result.ResponseBody).ConfigureAwait(false); }
                 catch (Exception dex) { logger.LogError(dex, "Sync delegate OnSent threw"); }
@@ -220,7 +221,7 @@ public class HttpClientDataSyncProcess(
         if (repository.Exists<SyncOperation>(op.Identifier))
             repository.Set(updated);
 
-        foreach (var d in delegates)
+        foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
             try { await d.OnError(updated, statusCode, ex).ConfigureAwait(false); }
             catch (Exception dex) { logger.LogError(dex, "Sync delegate OnError threw"); }
@@ -312,7 +313,7 @@ public class HttpClientDataSyncProcess(
             }
             else
             {
-                foreach (var d in delegates)
+                foreach (var d in services.GetServices<IDataSyncDelegate>())
                 {
                     try { await d.OnSent(coalescedOp, item.ResponseBody).ConfigureAwait(false); }
                     catch (Exception dex) { logger.LogError(dex, "Sync delegate OnSent threw"); }
@@ -384,7 +385,7 @@ public class HttpClientDataSyncProcess(
         catch (Exception ex) { logger.LogError(ex, "Failed to deserialize conflict remote payload for {key}", endpoint.Key); }
 
         var item = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, remotePayload, SyncVerb.Update);
-        foreach (var d in delegates)
+        foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
             try { await d.OnReceived(item).ConfigureAwait(false); }
             catch (Exception dex) { logger.LogError(dex, "Delegate OnReceived threw during conflict resolution"); }
@@ -394,7 +395,7 @@ public class HttpClientDataSyncProcess(
 
     async Task<ConflictResolution> AskDelegate(SyncOperation op, string remotePayload)
     {
-        foreach (var d in delegates)
+        foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
             try
             {

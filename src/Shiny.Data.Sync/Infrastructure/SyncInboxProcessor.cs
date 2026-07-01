@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores.Repositories;
 
@@ -19,7 +20,7 @@ public class SyncInboxProcessor(
     IRepository repository,
     ISyncTransport transport,
     SyncEndpointRegistry registry,
-    IEnumerable<IDataSyncDelegate> delegates
+    IServiceProvider services
 )
 {
     /// <summary>
@@ -177,7 +178,7 @@ public class SyncInboxProcessor(
 
         var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, item.Payload, verb);
 
-        foreach (var d in delegates)
+        foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
             try
             {
@@ -226,7 +227,7 @@ public class SyncInboxProcessor(
     async Task DispatchTombstone(SyncEndpoint endpoint, string entityId)
     {
         var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, Entity: null, RawPayload: "null", SyncVerb.Delete);
-        foreach (var d in delegates)
+        foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
             try { await d.OnReceived(received).ConfigureAwait(false); }
             catch (Exception ex) { logger.LogError(ex, "Delegate OnReceived threw for tombstone {key}/{id}", endpoint.Key, entityId); }

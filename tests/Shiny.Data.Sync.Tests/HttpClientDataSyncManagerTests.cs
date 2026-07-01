@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shiny.Data.Sync.Infrastructure;
 using Shiny.Data.Sync.Tests.Fakes;
@@ -22,14 +23,17 @@ public class HttpClientDataSyncManagerTests
         var transport = new FakeSyncTransport();
         var repo = new InMemoryRepository();
         var del = new RecordingDelegate();
-        var inbox = new SyncInboxProcessor(NullLogger<SyncInboxProcessor>.Instance, repo, transport, registry, new[] { del });
+        var services = new ServiceCollection()
+            .AddSingleton<IDataSyncDelegate>(del)
+            .BuildServiceProvider();
+        var inbox = new SyncInboxProcessor(NullLogger<SyncInboxProcessor>.Instance, repo, transport, registry, services);
         var process = new HttpClientDataSyncProcess(
             NullLogger<HttpClientDataSyncProcess>.Instance,
             repo,
             new StubConnectivity(),
             transport,
             registry,
-            new[] { del }
+            services
         );
         var mgr = new HttpClientDataSyncManager(process, inbox, NullLogger<HttpClientDataSyncManager>.Instance, repo, registry);
         return (mgr, transport, repo, del, endpoint);
