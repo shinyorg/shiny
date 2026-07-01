@@ -20,7 +20,7 @@ public class HttpClientHttpTransferProcess(
     ILogger<HttpClientHttpTransferProcess> logger,
     IRepository repository,
     IConnectivity connectivity,
-    IEnumerable<IHttpTransferDelegate> delegates,
+    IServiceProvider services,
     IHttpClientFactory httpClientFactory,
     TimeSpan? pollInterval = null
 )
@@ -184,8 +184,8 @@ public class HttpClientHttpTransferProcess(
                 .ConfigureAwait(false);
 
             logger.LogInformation("Completing Successful Transfer: " + transfer.Identifier);
-            await delegates
-                .RunDelegates(x => x.OnCompleted(transfer.Request), logger)
+            await services
+                .RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(transfer.Request), logger)
                 .ConfigureAwait(false);
 
             ProgressOccurred?.Invoke(null, new(
@@ -205,8 +205,8 @@ public class HttpClientHttpTransferProcess(
             repository.Remove(transfer);
 
             logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
-            await delegates
-                .RunDelegates(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), logger)
+            await services
+                .RunDelegates<IHttpTransferDelegate>(x => x.OnError(transfer!.Request, ex.StatusCode == null ? 0 : (int)ex.StatusCode, ex), logger)
                 .ConfigureAwait(false);
 
             ProgressOccurred?.Invoke(null, new(
