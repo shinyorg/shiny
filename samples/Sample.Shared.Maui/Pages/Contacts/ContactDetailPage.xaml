@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             xmlns:local="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             x:Class="Sample.Shared.Maui.Pages.Contacts.ContactDetailPage"
+             x:DataType="vm:ContactDetailViewModel"
+             Title="Contact Detail">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:NullToBoolConverter x:Key="NullToBool" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16" IsVisible="{Binding Contact, Converter={StaticResource NullToBool}}">
+
+            <!-- Name -->
+            <Border Padding="16" StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{Binding Contact.DisplayName}"
+                           FontSize="24"
+                           FontAttributes="Bold" />
+                    <Label Text="{Binding Contact.Nickname, StringFormat='aka {0}'}"
+                           FontSize="14"
+                           TextColor="Gray"
+                           IsVisible="{Binding Contact.Nickname, Converter={StaticResource NullToBool}}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Organization -->
+            <Border Padding="16" StrokeShape="RoundRectangle 8"
+                   IsVisible="{Binding Contact.Organization, Converter={StaticResource NullToBool}}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Organization" FontSize="12" TextColor="Gray" FontAttributes="Bold" />
+                    <Label Text="{Binding Contact.Organization.Company}" FontSize="16" />
+                    <Label Text="{Binding Contact.Organization.Title}" FontSize="14" TextColor="Gray" />
+                    <Label Text="{Binding Contact.Organization.Department}" FontSize="14" TextColor="Gray" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Phones -->
+            <Border Padding="16" StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Phone Numbers" FontSize="12" TextColor="Gray" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding Contact.Phones}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:Object">
+                                <HorizontalStackLayout Spacing="8" Padding="0,4">
+                                    <Label Text="{Binding Type}" FontSize="13" TextColor="Gray" WidthRequest="60" />
+                                    <Label Text="{Binding Number}" FontSize="16" />
+                                </HorizontalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <Label Text="No phone numbers" TextColor="Gray" FontSize="14" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Emails -->
+            <Border Padding="16" StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Email Addresses" FontSize="12" TextColor="Gray" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding Contact.Emails}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:Object">
+                                <HorizontalStackLayout Spacing="8" Padding="0,4">
+                                    <Label Text="{Binding Type}" FontSize="13" TextColor="Gray" WidthRequest="60" />
+                                    <Label Text="{Binding Address}" FontSize="16" />
+                                </HorizontalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <Label Text="No email addresses" TextColor="Gray" FontSize="14" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Addresses -->
+            <Border Padding="16" StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Addresses" FontSize="12" TextColor="Gray" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding Contact.Addresses}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:Object">
+                                <VerticalStackLayout Padding="0,4">
+                                    <Label Text="{Binding Type}" FontSize="13" TextColor="Gray" />
+                                    <Label Text="{Binding .}" FontSize="14" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <Label Text="No addresses" TextColor="Gray" FontSize="14" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Websites -->
+            <Border Padding="16" StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Websites" FontSize="12" TextColor="Gray" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding Contact.Websites}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:Object">
+                                <Label Text="{Binding Url}" FontSize="14" TextColor="#512BD4" Padding="0,4" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <Label Text="No websites" TextColor="Gray" FontSize="14" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Notes -->
+            <Border Padding="16" StrokeShape="RoundRectangle 8"
+                   IsVisible="{Binding Contact.Note, Converter={StaticResource NullToBool}}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Notes" FontSize="12" TextColor="Gray" FontAttributes="Bold" />
+                    <Label Text="{Binding Contact.Note}" FontSize="14" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Edit" Command="{Binding EditContactCommand}" />
+        <ToolbarItem Text="Delete" Command="{Binding DeleteContactCommand}" />
+    </ContentPage.ToolbarItems>
+</ContentPage>

@@ -18,6 +18,11 @@ triggers:
   - INotificationDelegate
   - notification permission
   - notification sound
+  - reminders AI tools
+  - Shiny.Notifications.Extensions.AI
+  - AddNotificationAITools
+  - NotificationAITools
+  - ReminderAICapabilities
   - channel importance
 ---
 
@@ -153,6 +158,37 @@ When generating code that uses Shiny Notifications, follow these conventions:
 - On Android, create a drawable resource named `notification` for the default small icon, or set `SmallIconResourceName` on `AndroidNotification`.
 - Prefer the `RequestRequiredAccess` extension method to automatically determine needed permission flags from a `Notification` object.
 - Use `Payload` dictionary on `Notification` to pass custom data that you can read back in your `INotificationDelegate.OnEntry`.
+
+## AI Tool Integration (Shiny.Notifications.Extensions.AI)
+
+The optional `Shiny.Notifications.Extensions.AI` package exposes `INotificationManager` as **reminder-framed** `Microsoft.Extensions.AI` tool functions (`AIFunction`s) for LLM agents. You opt-in exactly which operations the model can see — a read/write allow-list you control on behalf of the agent (**not** an OS permission prompt; the platform notification permission must already be granted). Read-only by default; write is opt-in. AOT-compatible (hand-built schemas, `JsonNode` results — no reflection).
+
+```csharp
+using Shiny.Notifications;
+using Shiny.Notifications.Extensions.AI;
+
+builder.Services.AddNotifications();                             // registers INotificationManager
+builder.Services.AddNotificationAITools(tools => tools
+    .AddReminders(ReminderAICapabilities.ReadWrite, channel: "reminders")   // channel is optional
+);
+
+// resolve the bundle and pass the tools to any IChatClient
+var tools = sp.GetRequiredService<NotificationAITools>().Tools;
+var response = await chatClient.GetResponseAsync(
+    messages,
+    new ChatOptions { Tools = [.. tools] }
+);
+```
+
+Key types:
+- `AddNotificationAITools(Action<INotificationAIToolBuilder>)` — DI extension; throws if nothing is added.
+- `INotificationAIToolBuilder` — `AddReminders(ReminderAICapabilities, string? channel = null)`. The channel (if supplied) must already be registered via `AddChannel`.
+- `ReminderAICapabilities` `[Flags]` — `None`, `Read` (default), `Write`, `ReadWrite`.
+- `NotificationAITools` — resolve from DI; `.Tools` is `IReadOnlyList<AITool>`.
+
+Generated tools (only for opted-in capabilities): `list_reminders` (pending/scheduled), `create_reminder` (omit both `scheduleFor`/`repeatDailyAt` to send now, `scheduleFor` for a one-time reminder, `repeatDailyAt` "HH:mm" for a daily one), `cancel_reminder` (by id). `scheduleFor` and `repeatDailyAt` are mutually exclusive; dates are ISO-8601.
+
+> The AI tools assume permissions are already granted — they do **not** trigger the platform permission UI (needs a foreground activity). Call `INotificationManager.RequestAccess(...)` from the app before invoking the agent.
 
 ## Reference Files
 

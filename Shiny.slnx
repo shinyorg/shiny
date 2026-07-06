@@ -41,6 +41,8 @@
     <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+    <Project Path="src\Shiny.Contacts\Shiny.Contacts.csproj" />
+    <Project Path="src\Shiny.Contacts.Extensions.AI\Shiny.Contacts.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Core\Shiny.Core.csproj" />
     <Project Path="src\Shiny.Data.Sync\Shiny.Data.Sync.csproj" />
     <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
@@ -48,8 +50,10 @@
     <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" />
     <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" />
     <Project Path="src\Shiny.Locations\Shiny.Locations.csproj" />
+    <Project Path="src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
     <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" />
+    <Project Path="src\Shiny.Notifications.Extensions.AI\Shiny.Notifications.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
     <Project Path="src\Shiny.Push\Shiny.Push.csproj" />
     <Folder Name="/Blazor/">

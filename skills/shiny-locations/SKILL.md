@@ -18,6 +18,11 @@ triggers:
   - GPS delegate
   - geofence delegate
   - GpsReading
+  - location AI tools
+  - Shiny.Locations.Extensions.AI
+  - AddLocationAITool
+  - LocationAITools
+  - estimate travel time
   - GpsRequest
   - GeofenceRegion
   - IGpsManager
@@ -164,6 +169,33 @@ When generating code for Shiny.Locations:
 - On Android, configure `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, and `ACCESS_BACKGROUND_LOCATION` permissions in `AndroidManifest.xml`.
 - On iOS, add `NSMotionUsageDescription` to `Info.plist` when using motion activity recognition.
 - On Android, motion activity recognition requires `com.google.android.gms.permission.ACTIVITY_RECOGNITION` permission and Google Play Services.
+
+## AI Tool Integration (Shiny.Locations.Extensions.AI)
+
+The optional `Shiny.Locations.Extensions.AI` package exposes `IGpsManager` as **read-only** `Microsoft.Extensions.AI` tool functions (`AIFunction`s) for LLM agents — the agent can learn where the user is and reason about distance/time to a destination, but never writes location data. You opt-in via `AddGps()` (an allow-list you control on behalf of the agent — **not** an OS permission prompt; location permission must already be granted). AOT-compatible (hand-built schemas, `JsonNode` results — no reflection).
+
+```csharp
+using Shiny.Locations;
+using Shiny.Locations.Extensions.AI;
+
+builder.Services.AddGps();                                  // registers IGpsManager
+builder.Services.AddLocationAITool();                       // read-only; there is no write capability for GPS
+
+// resolve the bundle and pass the tools to any IChatClient
+var tools = sp.GetRequiredService<LocationAITools>().Tools;
+var response = await chatClient.GetResponseAsync(
+    messages,
+    new ChatOptions { Tools = [.. tools] }
+);
+```
+
+Key types:
+- `AddLocationAITool()` — parameterless DI extension. GPS is read-only, so there is no builder or capability to opt-in to; the call registers all three location tools.
+- `LocationAITools` — resolve from DI; `.Tools` is `IReadOnlyList<AITool>`.
+
+Generated tools: `get_current_location` (last cached fix — lat/lng, accuracy, altitude, speed, heading, timestamp), `get_distance_to` (great-circle distance + compass bearing to a destination lat/lng), `estimate_travel_time` (`mode` walking/cycling/transit/driving or a `speedKmh` override → straight-line ETA).
+
+> The tools read the **last cached GPS reading**; start a listener or ensure a recent fix exists first. Distances and travel times are **great-circle (straight-line) estimates** — not routed ETAs with roads/traffic — and the tool results say so. Location permission should already be granted before invoking the agent.
 
 ## Reference Files
 

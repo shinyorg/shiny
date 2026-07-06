@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             xmlns:local="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             x:Class="Sample.Shared.Maui.Pages.Contacts.ContactListPage"
+             x:DataType="vm:ContactListViewModel"
+             Title="Contacts">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:ByteArrayToImageSourceConverter x:Key="ByteArrayToImage" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Search bar -->
+        <SearchBar Grid.Row="0"
+                   Text="{Binding SearchText}"
+                   Placeholder="Search contacts..."
+                   SearchCommand="{Binding SearchCommand}" />
+
+        <!-- Contact list -->
+        <RefreshView Grid.Row="1"
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding LoadContactsCommand}">
+            <CollectionView ItemsSource="{Binding Contacts}"
+                            SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <Label Text="No contacts found"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           TextColor="Gray"
+                           Margin="0,40,0,0" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Delete"
+                                               BackgroundColor="Red"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ContactListViewModel}}, Path=DeleteContactCommand}"
+                                               CommandParameter="{Binding}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                            <Grid Padding="16,12" ColumnDefinitions="48,*,Auto" ColumnSpacing="12">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ContactListViewModel}}, Path=ViewContactCommand}"
+                                        CommandParameter="{Binding}" />
+                                </Grid.GestureRecognizers>
+
+                                <!-- Round contact photo -->
+                                <Border Grid.Column="0"
+                                        StrokeShape="RoundRectangle 24"
+                                        Stroke="LightGray"
+                                        StrokeThickness="1"
+                                        WidthRequest="48"
+                                        HeightRequest="48"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                    <Grid>
+                                        <Label Text="👤"
+                                               FontSize="22"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               IsVisible="True" />
+                                        <Image Source="{Binding Thumbnail, Converter={StaticResource ByteArrayToImage}}"
+                                               Aspect="AspectFill"
+                                               WidthRequest="48"
+                                               HeightRequest="48" />
+                                    </Grid>
+                                </Border>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding DisplayName}"
+                                           FontSize="16"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding Phones[0].Number}"
+                                           FontSize="13"
+                                           TextColor="Gray" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2"
+                                       Text="›"
+                                       FontSize="20"
+                                       TextColor="Gray"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="+" Command="{Binding AddContactCommand}" />
+    </ContentPage.ToolbarItems>
+</ContentPage>

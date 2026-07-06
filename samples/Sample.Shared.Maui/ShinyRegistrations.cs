@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui.Media;
 using Sample.Shared.Maui.Services;
 
 namespace Sample.Shared.Maui;
@@ -52,6 +53,12 @@ public static class ShinyRegistrations
         s.AddGps<SampleGpsDelegate>();
         s.AddGeofencing<SampleGeofenceDelegate>();
         s.AddMotionActivity<SampleMotionActivityDelegate>();
+#endif
+
+#if IOS || ANDROID
+        // Contacts: Shiny.Contacts has native implementations for iOS and Android.
+        s.AddContactStore();
+        s.AddSingleton(MediaPicker.Default);
 #endif
 
 #if !(PLATFORM && MACOS)

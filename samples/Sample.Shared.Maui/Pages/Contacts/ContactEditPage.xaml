@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             xmlns:local="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             x:Class="Sample.Shared.Maui.Pages.Contacts.ContactEditPage"
+             x:DataType="vm:ContactEditViewModel"
+             Title="{Binding PageTitle}">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <!-- Photo Section -->
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Border StrokeShape="RoundRectangle 50"
+                        Stroke="LightGray"
+                        StrokeThickness="2"
+                        WidthRequest="100"
+                        HeightRequest="100"
+                        HorizontalOptions="Center">
+                    <Grid>
+                        <Label Text="📷"
+                               FontSize="36"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                        <Image Source="{Binding PhotoImageSource}"
+                               Aspect="AspectFill"
+                               WidthRequest="100"
+                               HeightRequest="100" />
+                    </Grid>
+                </Border>
+                <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                    <Button Text="📸 Camera"
+                            Command="{Binding TakePhotoCommand}"
+                            FontSize="13"
+                            Padding="12,6"
+                            BackgroundColor="{StaticResource Gray200}"
+                            TextColor="{StaticResource Gray600}" />
+                    <Button Text="🖼 Library"
+                            Command="{Binding PickPhotoCommand}"
+                            FontSize="13"
+                            Padding="12,6"
+                            BackgroundColor="{StaticResource Gray200}"
+                            TextColor="{StaticResource Gray600}" />
+                    <Button Text="✕"
+                            Command="{Binding RemovePhotoCommand}"
+                            FontSize="13"
+                            Padding="12,6"
+                            IsVisible="{Binding HasPhoto}"
+                            BackgroundColor="{StaticResource Gray200}"
+                            TextColor="Red" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Name Section -->
+            <Label Text="NAME" FontSize="12" TextColor="Gray" FontAttributes="Bold" />
+            <Entry Placeholder="First Name" Text="{Binding GivenName}" />
+            <Entry Placeholder="Last Name" Text="{Binding FamilyName}" />
+            <Entry Placeholder="Middle Name" Text="{Binding MiddleName}" />
+            <Entry Placeholder="Prefix (e.g. Dr.)" Text="{Binding NamePrefix}" />
+            <Entry Placeholder="Suffix (e.g. Jr.)" Text="{Binding NameSuffix}" />
+            <Entry Placeholder="Nickname" Text="{Binding Nickname}" />
+
+            <!-- Organization Section -->
+            <Label Text="ORGANIZATION" FontSize="12" TextColor="Gray" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Entry Placeholder="Company" Text="{Binding Company}" />
+            <Entry Placeholder="Job Title" Text="{Binding JobTitle}" />
+            <Entry Placeholder="Department" Text="{Binding Department}" />
+
+            <!-- Contact Info Section -->
+            <Label Text="CONTACT INFO" FontSize="12" TextColor="Gray" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Entry Placeholder="Phone Number"
+                   Text="{Binding PhoneNumber}"
+                   Keyboard="Telephone" />
+            <Entry Placeholder="Email Address"
+                   Text="{Binding EmailAddress}"
+                   Keyboard="Email" />
+            <Entry Placeholder="Website"
+                   Text="{Binding Website}"
+                   Keyboard="Url" />
+
+            <!-- Address Section -->
+            <Label Text="ADDRESS" FontSize="12" TextColor="Gray" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Entry Placeholder="Street" Text="{Binding Street}" />
+            <Entry Placeholder="City" Text="{Binding City}" />
+            <Entry Placeholder="State / Province" Text="{Binding State}" />
+            <Entry Placeholder="Postal Code" Text="{Binding PostalCode}" />
+            <Entry Placeholder="Country" Text="{Binding Country}" />
+
+            <!-- Notes Section -->
+            <Label Text="NOTES" FontSize="12" TextColor="Gray" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Editor Placeholder="Notes"
+                    Text="{Binding Note}"
+                    HeightRequest="100"
+                    AutoSize="TextChanges" />
+
+            <!-- Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,16,0,32">
+                <Button Grid.Column="0"
+                        Text="Cancel"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="{StaticResource Gray200}"
+                        TextColor="{StaticResource Gray600}" />
+                <Button Grid.Column="1"
+                        Text="Save"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Entry">
+                <Setter Property="Margin" Value="0,-4,0,0" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+</ContentPage>

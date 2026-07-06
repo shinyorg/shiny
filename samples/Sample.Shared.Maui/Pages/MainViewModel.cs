@@ -51,6 +51,10 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             list.Add(new("🏃 Motion Activity", "Activity recognition (walk, drive, etc.)", "motionactivity"));
         }
 
+        // --- Contacts (iOS/Android only) ---
+        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+            list.Add(new("👤 Contacts", "Browse, search & edit device contacts", "contacts"));
+
         // --- Jobs (Android, iOS, Linux) ---
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsLinux())
             list.Add(new("⏰ Jobs", "Background job scheduling", "jobs"));
