@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shiny.Net.Http.Infrastructure;
 using Shiny.Net.Http.Tests.Fakes;
@@ -18,7 +19,7 @@ public class PauseResumeTests
             NullLogger<HttpClientHttpTransferProcess>.Instance,
             repo,
             new FakeConnectivity(),
-            Array.Empty<IHttpTransferDelegate>(),
+            new ServiceCollection().BuildServiceProvider(),
             new StubHttpClientFactory(handler),
             TimeSpan.FromMilliseconds(50) // short poll so resume is picked up fast
         );

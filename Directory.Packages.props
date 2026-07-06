@@ -4,6 +4,7 @@
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
         <MsftExtensionVersion>10.0.5</MsftExtensionVersion>
         <MauiLabsVersion>0.1.0-preview.11.26317.2</MauiLabsVersion>
+        <MauiVersion>10.0.80</MauiVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>

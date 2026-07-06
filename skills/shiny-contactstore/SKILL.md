@@ -214,7 +214,7 @@ await contactStore.Delete(contactId);
 | DisplayName    | `string`                    |
 | Note           | `string?`                   |
 | Organization   | `ContactOrganization?`      |
-| Photo          | `byte[]?`                   |
+| Photo          | `byte[]?` (see note below)  |
 | Thumbnail      | `byte[]?`                   |
 | Phones         | `List<ContactPhone>`        |
 | Emails         | `List<ContactEmail>`        |
@@ -235,6 +235,10 @@ await contactStore.Delete(contactId);
 
 **RelationshipType:** Father, Mother, Parent, Brother, Sister, Child, Friend, Spouse, Partner, Assistant, Manager, Other, Custom
 
+## Photo vs Thumbnail (bulk reads)
+
+`GetAll()` and `Query()` populate **`Thumbnail`** only; **`Photo` (the full-resolution image) is `null`** on these bulk reads. Decoding every contact's full photo into a `byte[]` at once spikes memory and can get the app OOM/jetsam-killed on a real device with many photo contacts. To get the full `Photo`, fetch the single contact with **`GetById(id)`** (which populates both `Thumbnail` and `Photo`). Bind list rows to `Thumbnail` and load `Photo` on a detail screen.
+
 ## iOS Notes & Relations Entitlement
 
 Reading `Note` and `Relationships` on iOS requires the `com.apple.developer.contacts.notes` entitlement. The library auto-detects this at runtime. If absent, `Note` returns `null` and `Relationships` is empty.
@@ -245,7 +249,8 @@ Reading `Note` and `Relationships` on iOS requires the `com.apple.developer.cont
 2. **Use LINQ queries for filtering** — prefer `Query().Where(...)` over `GetAll()` when filtering, as it uses native queries
 3. **Check for Restricted on Android** — `AccessState.Restricted` means partial access (read-only or write-only)
 4. **Handle iOS entitlements gracefully** — Notes and Relations silently return empty without the entitlement
-5. **Use primary constructors** — inject `IContactStore` via primary constructor
+5. **Bind lists to `Thumbnail`, not `Photo`** — bulk reads (`GetAll`/`Query`) only load `Thumbnail`; get the full `Photo` from `GetById` on a detail screen
+6. **Use primary constructors** — inject `IContactStore` via primary constructor
 
 ## AI Tool Integration (Shiny.Contacts.Extensions.AI)
 

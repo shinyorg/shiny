@@ -1,8 +1,6 @@
 ﻿<Project>
     <PropertyGroup>
         <BaseTargetFramework>net10.0</BaseTargetFramework>
-        <MauiVersion>10.0.60</MauiVersion>
-        
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
         <LangVersion>latest</LangVersion>

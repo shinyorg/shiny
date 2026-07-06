@@ -36,6 +36,12 @@ public class ContactStoreImpl : IContactStore
         _ => AccessState.Unknown
     };
 
+    // NOTE: CNContactKey.ImageData (the full-resolution photo) is intentionally NOT in the base
+    // keys. Apple warns that imageData is large; requesting it during a bulk EnumerateContacts
+    // loads every contact's full photo into memory at once, which on a real device with many
+    // photo contacts spikes memory and gets the app jetsam-killed (an uncatchable native
+    // termination). Bulk fetches use the lightweight ThumbnailImageData; the full photo is only
+    // pulled for single-contact operations (GetById/Update/Delete) via GetFetchKeys(includeFullPhoto: true).
     static readonly NSString[] BaseFetchKeys =
     [
         CNContactKey.Identifier,
@@ -54,7 +60,6 @@ public class ContactStoreImpl : IContactStore
         CNContactKey.Birthday,
         CNContactKey.Dates,
         CNContactKey.UrlAddresses,
-        CNContactKey.ImageData,
         CNContactKey.ThumbnailImageData,
         CNContactKey.Type
     ];
@@ -85,17 +90,23 @@ public class ContactStoreImpl : IContactStore
         }
     }
 
-    static NSString[] GetFetchKeys()
+    static NSString[] GetFetchKeys(bool includeFullPhoto)
     {
-        if (!HasNotesEntitlement)
-            return BaseFetchKeys;
+        var keys = new List<NSString>(BaseFetchKeys);
+        if (includeFullPhoto)
+            keys.Add(CNContactKey.ImageData);
 
-        return [..BaseFetchKeys, CNContactKey.Relations, CNContactKey.Note];
+        if (HasNotesEntitlement)
+        {
+            keys.Add(CNContactKey.Relations);
+            keys.Add(CNContactKey.Note);
+        }
+        return keys.ToArray();
     }
 
-    static List<CNContact> FetchContacts(CNContactStore store, NSPredicate? predicate = null)
+    static List<CNContact> FetchContacts(CNContactStore store, NSPredicate? predicate = null, bool includeFullPhoto = false)
     {
-        var request = new CNContactFetchRequest(GetFetchKeys());
+        var request = new CNContactFetchRequest(GetFetchKeys(includeFullPhoto));
         if (predicate != null)
             request.Predicate = predicate;
 
@@ -130,7 +141,7 @@ public class ContactStoreImpl : IContactStore
     {
         var store = new CNContactStore();
         var predicate = CNContact.GetPredicateForContacts([contactId]);
-        var contacts = FetchContacts(store, predicate);
+        var contacts = FetchContacts(store, predicate, includeFullPhoto: true);
 
         var cn = contacts.FirstOrDefault();
         var result = cn == null ? null : ToContact(cn);
@@ -181,7 +192,7 @@ public class ContactStoreImpl : IContactStore
 
         var store = new CNContactStore();
         var predicate = CNContact.GetPredicateForContacts([contact.Id]);
-        var contacts = FetchContacts(store, predicate);
+        var contacts = FetchContacts(store, predicate, includeFullPhoto: true);
 
         var existing = contacts.FirstOrDefault()
             ?? throw new InvalidOperationException($"Contact with Id '{contact.Id}' not found.");
@@ -241,7 +252,10 @@ public class ContactStoreImpl : IContactStore
                 Title = cn.JobTitle,
                 Department = cn.DepartmentName
             },
-            Photo = cn.ImageData?.ToArray(),
+            // ImageData is only fetched for single-contact operations (see BaseFetchKeys note);
+            // accessing an unfetched key raises a native CNContactPropertyNotFetchedException, so
+            // guard on IsKeyAvailable rather than assuming the full photo was requested.
+            Photo = cn.IsKeyAvailable(CNContactKey.ImageData) ? cn.ImageData?.ToArray() : null,
             Thumbnail = cn.ThumbnailImageData?.ToArray()
         };
 

@@ -54,7 +54,8 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         {
             var contacts = ReadContacts(
                 ContactsContract.Contacts.InterfaceConsts.Id + " = ?",
-                new[] { contactId }
+                new[] { contactId },
+                includeFullPhoto: true
             );
             return contacts.Count > 0 ? contacts[0] : null;
         }, ct);
@@ -385,7 +386,11 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
 
     // ── Reading contacts ─────────────────────────────────────────────
 
-    List<Contact> ReadContacts(string? selection, string[]? selectionArgs)
+    // includeFullPhoto: only single-contact reads (GetById) pull the full-resolution display photo.
+    // Bulk reads (GetAll/Query) load thumbnails only — decoding every contact's full photo into a
+    // byte[] at once spikes memory and can get the app OOM/jetsam-killed on devices with many
+    // photo contacts. The full Photo remains available per-contact via GetById.
+    List<Contact> ReadContacts(string? selection, string[]? selectionArgs, bool includeFullPhoto = false)
     {
         var contacts = new Dictionary<string, Contact>();
 
@@ -524,33 +529,34 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
             }
         }
 
-        // Step 3: Load photos & thumbnails via photo streams
+        // Step 3: Load thumbnails (always) and the full-size photo (single-contact reads only)
         foreach (var kvp in contacts)
         {
             var contactUri = ContentUris.WithAppendedId(ContactsContract.Contacts.ContentUri, long.Parse(kvp.Key));
-            if (contactUri == null) continue;
-
-            // Thumbnail
-            if (kvp.Value.Thumbnail == null)
+            if (contactUri != null)
             {
-                using var thumbStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, false);
-                if (thumbStream != null)
+                // Thumbnail
+                if (kvp.Value.Thumbnail == null)
                 {
-                    using var ms = new MemoryStream();
-                    thumbStream.CopyTo(ms);
-                    kvp.Value.Thumbnail = ms.ToArray();
+                    using var thumbStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, false);
+                    if (thumbStream != null)
+                    {
+                        using var ms = new MemoryStream();
+                        thumbStream.CopyTo(ms);
+                        kvp.Value.Thumbnail = ms.ToArray();
+                    }
                 }
-            }
 
-            // Full-size photo
-            if (kvp.Value.Photo == null)
-            {
-                using var photoStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, true);
-                if (photoStream != null)
+                // Full-size photo — only for single-contact reads to avoid bulk memory blow-up
+                if (includeFullPhoto && kvp.Value.Photo == null)
                 {
-                    using var ms = new MemoryStream();
-                    photoStream.CopyTo(ms);
-                    kvp.Value.Photo = ms.ToArray();
+                    using var photoStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, true);
+                    if (photoStream != null)
+                    {
+                        using var ms = new MemoryStream();
+                        photoStream.CopyTo(ms);
+                        kvp.Value.Photo = ms.ToArray();
+                    }
                 }
             }
         }

@@ -17,7 +17,7 @@
         <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
         <Project Path="tests/Shiny.BluetoothLE.Common.Tests/Shiny.BluetoothLE.Common.Tests.csproj" />
     </Folder>
-    <Folder Name="/Solution Items/">
+    <Folder Name="/.Solution/">
         <File Path=".editorconfig" />
         <File Path=".github\CODE_OF_CONDUCT.md" />
         <File Path=".github\FUNDING.yml" />

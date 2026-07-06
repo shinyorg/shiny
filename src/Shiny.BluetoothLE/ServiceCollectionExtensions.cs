@@ -64,11 +64,5 @@ public static class BleServiceCollectionExtensions
         return services.AddSingletonAsImplementedInterfaces<TCentralDelegate>();
     }
 #endif
-#else
-    public static IServiceCollection AddBluetoothLE<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TCentralDelegate>(this IServiceCollection services) where TCentralDelegate : class, IBleDelegate
-        => services;
-    
-    public static IServiceCollection AddBluetoothLE(this IServiceCollection services)
-        => services;
 #endif
 }

@@ -58,6 +58,11 @@
                             Type="Boolean"
                             Value="true"
                             Visible="false" />
+
+        <CustomEntitlements Include="com.apple.security.personal-information.addressbook"
+                            Type="Boolean"
+                            Value="true"
+                            Visible="false" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('-maccatalyst'))">
