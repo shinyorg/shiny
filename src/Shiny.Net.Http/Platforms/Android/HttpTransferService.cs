@@ -33,7 +33,7 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
     public static bool UseShortService { get; set; }
 
     protected override ForegroundService StartForegroundServiceType =>
-        UseShortService && OperatingSystem.IsAndroidVersionAtLeast(34)
+        UseShortService && System.OperatingSystem.IsAndroidVersionAtLeast(34)
             ? ForegroundService.TypeShortService
             : ForegroundService.TypeDataSync;
 
