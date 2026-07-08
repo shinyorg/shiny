@@ -15,7 +15,19 @@ public static class HttpTransferServiceCollectionExtensions
     {
 #if IOS || MACCATALYST
         services.AddSingletonAsImplementedInterfaces<HttpTransferManager>();
-#elif ANDROID || WINDOWS
+#elif ANDROID
+        // Register the Android platform HttpTransferManager so transfers run inside
+        // the dataSync foreground service (HttpTransferService) the package ships.
+        // Registering HttpClientHttpTransferManager here instead runs the transfer
+        // loop as an in-process Task.Run: transfers don't survive backgrounding and
+        // the loop's isRunning flag stalls after its first batch ("N uploaded then
+        // everything stuck Pending"). The FGS still resolves
+        // HttpClientHttpTransferProcess + the named HttpClient from DI to move the
+        // bytes, so those registrations stay.
+        services.AddSingletonAsImplementedInterfaces<HttpTransferManager>();
+        services.AddSingleton<HttpClientHttpTransferProcess>();
+        services.AddHttpClient(HttpClientHttpTransferProcess.HttpClientName);
+#elif WINDOWS
         services.AddSingletonAsImplementedInterfaces<HttpClientHttpTransferManager>();
         services.AddSingleton<HttpClientHttpTransferProcess>();
         services.AddHttpClient(HttpClientHttpTransferProcess.HttpClientName);
