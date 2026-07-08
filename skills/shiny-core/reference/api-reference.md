@@ -22,7 +22,7 @@
 <PackageReference Include="Shiny.Extensions.Configuration" />
 ```
 
-Dependencies: `System.Reactive`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Logging`
+Dependencies: `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Logging`
 
 ## Namespaces
 
@@ -34,7 +34,7 @@ Dependencies: `System.Reactive`, `Microsoft.Extensions.DependencyInjection`, `Mi
 - `Shiny.Reflection` -- Reflection extension helpers
 - `Shiny.Net` -- Connectivity types
 - `Shiny.Power` -- Battery types
-- `Shiny.Support.Repositories` -- Repository types
+- `Shiny.Extensions.Stores.Repositories` -- Repository types
 - `Shiny.Extensions.Configuration` -- Remote configuration types
 
 ---
@@ -255,20 +255,6 @@ public record AndroidPermission(
 );
 ```
 
-### ItemChanged\<T\>
-
-```csharp
-namespace Shiny;
-
-public record ItemChanged<T>(
-    T Object,
-    string? PropertyName
-)
-{
-    public object? GetValue();
-}
-```
-
 ---
 
 ## Exceptions
@@ -313,14 +299,15 @@ public partial class AndroidPlatform : IPlatform
 {
     public Application AppContext { get; }
     public Activity? CurrentActivity { get; }
-    public IObservable<ActivityChanged> WhenActivityChanged();
-    public IObservable<ActivityChanged> WhenActivityStatusChanged();
+    public event EventHandler<ActivityChanged> ActivityChanged;
+    public Task<ActivityChanged> WaitForActivity(ActivityState state = ActivityState.Resumed, CancellationToken cancellationToken = default);
 
     // Permissions
     public AccessState GetCurrentPermissionStatus(string androidPermission);
-    public IObservable<AccessState> RequestAccess(string androidPermissions);
-    public IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions);
-    public IObservable<PermissionRequestResult> RequestFilteredPermissions(params AndroidPermission[] androidPermissions);
+    public Task<AccessState> RequestAccess(string androidPermission);
+    public Task<PermissionRequestResult> RequestPermissions(params string[] androidPermissions);
+    public Task<PermissionRequestResult> RequestPermissions(CancellationToken cancellationToken, params string[] androidPermissions);
+    public Task<PermissionRequestResult> RequestFilteredPermissions(params AndroidPermission[] androidPermissions);
     public Task<AccessState> RequestForegroundServicePermissions();
     public bool IsInManifest(string androidPermission);
     public bool EnsureAllManifestEntries(params AndroidPermission[] androidPermissions);
@@ -616,96 +603,6 @@ public class NotifyPropertyChanged : INotifyPropertyChanged
 }
 ```
 
-### ShinySubject\<T\>
-
-Error-safe `ISubject<T>` with logging support:
-
-```csharp
-namespace Shiny;
-
-public class ShinySubject<T> : ISubject<T>
-{
-    public ShinySubject(ILogger? logger = null);
-    public ILogger? Logger { get; set; }
-    public void OnCompleted();
-    public void OnError(Exception error);
-    public void OnNext(T value);
-    public IDisposable Subscribe(IObserver<T> observer);
-}
-```
-
----
-
-## Observable Extension Methods
-
-```csharp
-namespace Shiny;
-
-public static class ObservableExtensions
-{
-    // Monitor a specific property on an INPC object
-    public static IObservable<TRet?> WhenAnyProperty<TSender, TRet>(
-        this TSender This, Expression<Func<TSender, TRet>> expression
-    ) where TSender : INotifyPropertyChanged;
-
-    // Monitor all property changes on an INPC object
-    public static IObservable<ItemChanged<TSender>> WhenAnyProperty<TSender>(
-        this TSender This
-    ) where TSender : INotifyPropertyChanged;
-
-    // SwitchMap equivalent
-    public static IObservable<U> SelectSwitch<T, U>(
-        this IObservable<T> current, Func<T, IObservable<U>> next
-    );
-
-    // Async select (Task<U>)
-    public static IObservable<U> SelectAsync<T, U>(
-        this IObservable<T> observable, Func<Task<U>> task
-    );
-
-    // Async select (CancellationToken)
-    public static IObservable<U> SelectAsync<T, U>(
-        this IObservable<T> observable, Func<CancellationToken, Task<U>> task
-    );
-
-    // Conditional ObserveOn
-    public static IObservable<T> ObserveOnIf<T>(
-        this IObservable<T> ob, IScheduler? scheduler
-    );
-
-    // Execute action only on first emission
-    public static IObservable<T> DoOnce<T>(this IObservable<T> obs, Action<T> action);
-
-    // Add to CompositeDisposable
-    public static T DisposedBy<T>(
-        this T @this, CompositeDisposable compositeDisposable
-    ) where T : IDisposable;
-
-    // OnNext + OnCompleted in one call
-    public static void Respond<T>(this IObserver<T> ob, T value);
-
-    // Async subscribe (sequential)
-    public static IDisposable SubscribeAsync<T>(
-        this IObservable<T> observable, Func<T, Task> onNextAsync
-    );
-    public static IDisposable SubscribeAsync<T>(
-        this IObservable<T> observable, Func<T, Task> onNextAsync, Action<Exception> onError
-    );
-    public static IDisposable SubscribeAsync<T>(
-        this IObservable<T> observable, Func<T, Task> onNextAsync,
-        Action<Exception> onError, Action onComplete
-    );
-
-    // Async subscribe (concurrent)
-    public static IDisposable SubscribeAsyncConcurrent<T>(
-        this IObservable<T> observable, Func<T, Task> onNextAsync
-    );
-    public static IDisposable SubscribeAsyncConcurrent<T>(
-        this IObservable<T> observable, Func<T, Task> onNextAsync, int maxConcurrent
-    );
-}
-```
-
 ---
 
 ## General Extension Methods
@@ -803,7 +700,8 @@ namespace Shiny.Net;
 
 public interface IConnectivity
 {
-    IObservable<IConnectivity> WhenChanged();
+    // Fires when connectivity state changes; read ConnectionTypes / Access in the handler
+    event EventHandler? Changed;
     ConnectionTypes ConnectionTypes { get; }
     NetworkAccess Access { get; }
 }
@@ -862,7 +760,6 @@ namespace Shiny;
 public static class ConnectivityExtensions
 {
     public static bool IsInternetAvailable(this IConnectivity connectivity, bool allowConstrained = true);
-    public static IObservable<bool> WhenInternetStatusChanged(this IConnectivity connectivity, bool allowConstrained = true);
 }
 ```
 
@@ -873,7 +770,8 @@ namespace Shiny.Power;
 
 public interface IBattery
 {
-    IObservable<IBattery> WhenChanged();
+    // Fires when the battery status or level changes; read Status / Level in the handler
+    event EventHandler? Changed;
     BatteryState Status { get; }
     double Level { get; }
 }
@@ -900,7 +798,6 @@ namespace Shiny;
 
 public static class BatteryExtensions
 {
-    public static IObservable<bool> WhenChargingChanged(this IBattery battery);
     public static bool IsPluggedIn(this IBattery battery);
 }
 ```
@@ -924,7 +821,7 @@ public static class ServiceCollectionExtensions
 ### IRepositoryEntity
 
 ```csharp
-namespace Shiny.Support.Repositories;
+namespace Shiny.Extensions.Stores.Repositories;
 
 public interface IRepositoryEntity
 {
@@ -935,26 +832,28 @@ public interface IRepositoryEntity
 ### IRepository
 
 ```csharp
-namespace Shiny.Support.Repositories;
+namespace Shiny.Extensions.Stores.Repositories;
 
 public interface IRepository
 {
-    bool Exists<TEntity>(string identifier) where TEntity : IRepositoryEntity;
-    TEntity? Get<TEntity>(string identifier) where TEntity : IRepositoryEntity;
-    IList<TEntity> GetList<TEntity>(Expression<Func<TEntity, bool>>? expression = null) where TEntity : IRepositoryEntity;
-    bool Set<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
-    bool Remove<TEntity>(string identifier) where TEntity : IRepositoryEntity;
-    void Clear<TEntity>() where TEntity : IRepositoryEntity;
-    void Insert<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
-    void Update<TEntity>(TEntity entity) where TEntity : IRepositoryEntity;
-    IObservable<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> WhenActionOccurs();
+    // Fires on every mutation; inspect e.Action, e.EntityType, e.Entity in the handler
+    event EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)>? ActionOccurred;
+
+    bool Exists<T>(string identifier) where T : IRepositoryEntity;
+    T? Get<T>(string identifier) where T : IRepositoryEntity;
+    IReadOnlyList<T> GetAll<T>() where T : IRepositoryEntity;
+    bool Set<T>(T entity) where T : IRepositoryEntity;
+    bool Remove<T>(string identifier) where T : IRepositoryEntity;
+    void Clear<T>() where T : IRepositoryEntity;
+    void Insert<T>(T entity) where T : IRepositoryEntity;
+    void Update<T>(T entity) where T : IRepositoryEntity;
 }
 ```
 
 ### RepositoryAction
 
 ```csharp
-namespace Shiny.Support.Repositories;
+namespace Shiny.Extensions.Stores.Repositories;
 
 public enum RepositoryAction
 {
@@ -968,7 +867,7 @@ public enum RepositoryAction
 ### RepositoryException
 
 ```csharp
-namespace Shiny.Support.Repositories;
+namespace Shiny.Extensions.Stores.Repositories;
 
 public class RepositoryException : Exception
 {
@@ -988,9 +887,6 @@ public static class RepositoryExtensions
 
     // Remove by entity instance
     public static bool Remove<T>(this IRepository repository, T item) where T : IRepositoryEntity;
-
-    // Create an observable count watcher for an entity type
-    public static IObservable<int> CreateCountWatcher<T>(this IRepository repository) where T : IRepositoryEntity;
 }
 ```
 
@@ -1220,35 +1116,34 @@ public class CacheService
 using Shiny;
 using Shiny.Net;
 
-public class NetworkAwareService
+public class NetworkAwareService : IDisposable
 {
     readonly IConnectivity _connectivity;
 
     public NetworkAwareService(IConnectivity connectivity)
     {
         _connectivity = connectivity;
+        _connectivity.Changed += this.OnConnectivityChanged;
     }
 
-    public void MonitorNetwork(CompositeDisposable disposer)
+    void OnConnectivityChanged(object? sender, EventArgs args)
     {
-        _connectivity
-            .WhenInternetStatusChanged()
-            .Subscribe(hasInternet =>
-            {
-                if (hasInternet)
-                    Console.WriteLine("Internet available");
-                else
-                    Console.WriteLine("No internet");
-            })
-            .DisposedBy(disposer);
+        // Read the current state from the connectivity instance in the handler
+        if (_connectivity.IsInternetAvailable())
+            Console.WriteLine("Internet available");
+        else
+            Console.WriteLine("No internet");
     }
+
+    public void Dispose() => _connectivity.Changed -= this.OnConnectivityChanged;
 }
 ```
 
 ### Using the Repository
 
 ```csharp
-using Shiny.Support.Repositories;
+using System.Linq;
+using Shiny.Extensions.Stores.Repositories;
 
 public record TodoItem : IRepositoryEntity
 {
@@ -1257,17 +1152,26 @@ public record TodoItem : IRepositoryEntity
     public bool IsComplete { get; init; }
 }
 
-public class TodoService
+public class TodoService : IDisposable
 {
     readonly IRepository _repository;
 
     public TodoService(IRepository repository)
     {
         _repository = repository;
+
+        // React to any change to the store
+        _repository.ActionOccurred += this.OnRepositoryChanged;
+    }
+
+    void OnRepositoryChanged(object? sender, (RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity) e)
+    {
+        if (e.EntityType == typeof(TodoItem))
+            Console.WriteLine($"TodoItem {e.Action}: current count = {_repository.GetAll<TodoItem>().Count}");
     }
 
     public void AddItem(TodoItem item) => _repository.Insert(item);
-    public IList<TodoItem> GetPending() => _repository.GetList<TodoItem>(x => !x.IsComplete);
+    public IReadOnlyList<TodoItem> GetPending() => _repository.GetAll<TodoItem>().Where(x => !x.IsComplete).ToList();
     public void Complete(string id)
     {
         var item = _repository.Get<TodoItem>(id);
@@ -1275,31 +1179,33 @@ public class TodoService
             _repository.Set(item with { IsComplete = true });
     }
 
-    public IObservable<int> WatchCount() => _repository.CreateCountWatcher<TodoItem>();
+    public void Dispose() => _repository.ActionOccurred -= this.OnRepositoryChanged;
 }
 ```
 
-### Reactive Property Monitoring
+### Property Change Monitoring
 
 ```csharp
+using System.ComponentModel;
 using Shiny;
 
-public class SettingsWatcher
+public class SettingsWatcher : IDisposable
 {
-    public SettingsWatcher(AppSettings settings, CompositeDisposable disposer)
-    {
-        // Watch a specific property
-        settings
-            .WhenAnyProperty(x => x.IsDarkMode)
-            .Subscribe(isDark => Console.WriteLine($"Dark mode: {isDark}"))
-            .DisposedBy(disposer);
+    readonly AppSettings _settings;
 
-        // Watch all property changes
-        settings
-            .WhenAnyProperty()
-            .Subscribe(change => Console.WriteLine($"{change.PropertyName} changed to {change.GetValue()}"))
-            .DisposedBy(disposer);
+    public SettingsWatcher(AppSettings settings)
+    {
+        _settings = settings;
+        _settings.PropertyChanged += this.OnSettingsChanged;
     }
+
+    void OnSettingsChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(AppSettings.IsDarkMode))
+            Console.WriteLine($"Dark mode: {_settings.IsDarkMode}");
+    }
+
+    public void Dispose() => _settings.PropertyChanged -= this.OnSettingsChanged;
 }
 ```
 

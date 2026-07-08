@@ -190,7 +190,7 @@ public record HttpTransfer(
 
 ### HttpTransferResult
 
-Emitted by `WhenUpdateReceived()` and `WatchTransfer()` to report transfer progress.
+Emitted by the `UpdateReceived` event and returned by `WatchTransfer()` to report transfer progress.
 
 ```csharp
 public record HttpTransferResult(
@@ -350,12 +350,12 @@ public class HttpTransferMonitor(
     // Whether the monitor is currently active
     public bool IsStarted { get; }
 
-    // Start monitoring transfers. Pass a scheduler for UI thread marshalling.
+    // Start monitoring transfers. Pass a SynchronizationContext for UI thread marshalling.
     public Task Start(
         bool removeFinished = true,
         bool removeErrors = true,
         bool removeCancelled = true,
-        IScheduler? scheduler = null
+        SynchronizationContext? syncContext = null
     );
 
     // Remove items from the Transfers collection by state
@@ -519,45 +519,50 @@ public static class HttpTransferExtensions
     // Returns true if the TransferType is an upload (UploadMultipart or UploadRaw)
     public static bool IsUpload(this TransferType type);
 
-    // Monitors a specific transfer by identifier.
-    // Completes when the transfer finishes. Errors if the transfer fails.
-    // Unlike WhenUpdateReceived(), this observable terminates.
-    public static IObservable<HttpTransferResult> WatchTransfer(
+    // Awaits a specific transfer by identifier to completion and returns the final result.
+    // Completes when the transfer reaches Completed or Canceled; throws if the transfer fails.
+    // Subscribes to UpdateReceived internally and unsubscribes when it resolves.
+    public static Task<HttpTransferResult> WatchTransfer(
         this IHttpTransferManager manager,
-        string identifier
+        string identifier,
+        CancellationToken cancellationToken = default
     );
 }
 ```
 
 ### HttpClientExtensions
 
-Foreground-only transfer helpers on `HttpClient` that return `IObservable<TransferProgress>` with real-time progress. These do NOT use the background transfer system.
+Foreground-only transfer helpers on `HttpClient` that return `Task` and report real-time progress through an optional `Action<TransferProgress>` callback. These do NOT use the background transfer system.
 
 ```csharp
 public static class HttpClientExtensions
 {
     // Upload a file with progress reporting
-    public static IObservable<TransferProgress> Upload(
+    public static Task Upload(
         this HttpClient httpClient,
         string uri,
         string filePath,
         bool sendAsMultipart,
         HttpMethod? httpMethod = null,
         HttpContent? bodyContent = null,
-        string contentFormDataName = "value",
+        string contenFormDataName = "value",
         string fileFormDataName = "file",
-        params (string Name, string Value)[] headers
+        (string Name, string Value)[]? headers = null,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken cancellationToken = default
     );
 
     // Download a file with progress reporting
-    public static IObservable<TransferProgress> Download(
+    public static Task Download(
         this HttpClient httpClient,
         string uri,
         string toFilePath,
         int bufferSize = 8192,
         HttpMethod? httpMethod = null,
         HttpContent? bodyContent = null,
-        params (string Name, string Value)[] headers
+        (string Name, string Value)[]? headers = null,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken cancellationToken = default
     );
 }
 ```
@@ -672,19 +677,53 @@ await transferManager.Queue(request);
 
 ### Watch a Single Transfer
 
+`WatchTransfer` awaits one transfer to completion and returns its final `HttpTransferResult`
+(or throws if the transfer fails).
+
 ```csharp
-transferManager
-    .WatchTransfer("download-report-123")
-    .Subscribe(
-        result =>
-        {
-            Console.WriteLine($"Progress: {result.Progress.PercentComplete:P0}");
-            Console.WriteLine($"Speed: {result.Progress.BytesPerSecond} B/s");
-            Console.WriteLine($"ETA: {result.Progress.EstimatedTimeRemaining}");
-        },
-        ex => Console.WriteLine($"Transfer failed: {ex.Message}"),
-        () => Console.WriteLine("Transfer completed!")
-    );
+try
+{
+    var result = await transferManager.WatchTransfer("download-report-123");
+
+    Console.WriteLine($"Progress: {result.Progress.PercentComplete:P0}");
+    Console.WriteLine($"Speed: {result.Progress.BytesPerSecond} B/s");
+    Console.WriteLine("Transfer completed!");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Transfer failed: {ex.Message}");
+}
+```
+
+### Watch All Transfers Globally
+
+Subscribe to the `UpdateReceived` and `CountChanged` C# events for a global stream of transfer
+updates. Remember to unsubscribe with `-=` when you are done (e.g. in `Dispose`).
+
+```csharp
+public class TransferProgressListener : IDisposable
+{
+    readonly IHttpTransferManager transferManager;
+
+    public TransferProgressListener(IHttpTransferManager transferManager)
+    {
+        this.transferManager = transferManager;
+        this.transferManager.UpdateReceived += this.OnUpdateReceived;
+        this.transferManager.CountChanged += this.OnCountChanged;
+    }
+
+    void OnUpdateReceived(object? sender, HttpTransferResult result)
+        => Console.WriteLine($"{result.Request.Identifier}: {result.Progress.PercentComplete:P0}");
+
+    void OnCountChanged(object? sender, int count)
+        => Console.WriteLine($"Active transfers: {count}");
+
+    public void Dispose()
+    {
+        this.transferManager.UpdateReceived -= this.OnUpdateReceived;
+        this.transferManager.CountChanged -= this.OnCountChanged;
+    }
+}
 ```
 
 ### Monitor All Transfers in the UI
@@ -704,11 +743,12 @@ public class TransferListViewModel : IDisposable
 
     public async Task OnAppearing()
     {
-        // Pass a scheduler if using MVVM framework for UI thread marshalling
+        // Pass SynchronizationContext.Current for UI thread marshalling of collection updates
         await this.monitor.Start(
             removeFinished: true,
             removeErrors: false,
-            removeCancelled: true
+            removeCancelled: true,
+            syncContext: SynchronizationContext.Current
         );
     }
 
@@ -767,20 +807,23 @@ await transferManager.Queue(request);
 ```csharp
 using var httpClient = new HttpClient();
 
-httpClient
-    .Download(
+try
+{
+    await httpClient.Download(
         "https://example.com/largefile.zip",
         "/local/path/largefile.zip",
-        bufferSize: 8192
-    )
-    .Subscribe(
-        progress =>
+        bufferSize: 8192,
+        onProgress: progress =>
         {
             Console.WriteLine($"{progress.PercentComplete:P0} - {progress.BytesPerSecond} B/s");
-        },
-        ex => Console.WriteLine($"Error: {ex.Message}"),
-        () => Console.WriteLine("Download complete")
+        }
     );
+    Console.WriteLine("Download complete");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error: {ex.Message}");
+}
 ```
 
 ### Foreground Upload with HttpClient
@@ -788,22 +831,25 @@ httpClient
 ```csharp
 using var httpClient = new HttpClient();
 
-httpClient
-    .Upload(
+try
+{
+    await httpClient.Upload(
         "https://api.example.com/upload",
         "/local/path/photo.jpg",
         sendAsMultipart: true,
         fileFormDataName: "file",
-        headers: ("Authorization", "Bearer token123")
-    )
-    .Subscribe(
-        progress =>
+        headers: new[] { ("Authorization", "Bearer token123") },
+        onProgress: progress =>
         {
             Console.WriteLine($"{progress.PercentComplete:P0}");
-        },
-        ex => Console.WriteLine($"Error: {ex.Message}"),
-        () => Console.WriteLine("Upload complete")
+        }
     );
+    Console.WriteLine("Upload complete");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error: {ex.Message}");
+}
 ```
 
 ### Apple-Specific Request Configuration
@@ -895,7 +941,7 @@ public class AuthRetryDelegate : HttpTransferDelegate
 | `InvalidOperationException: Identifier is not set` | `HttpTransferRequest.Identifier` is empty or null | Provide a non-empty unique identifier |
 | `ArgumentException: ... does not exist` | Upload file path does not exist on disk | Ensure the file exists before calling `Queue()` |
 | Transfer pauses on cellular | `UseMeteredConnection` is `false` | Set `UseMeteredConnection = true` or wait for Wi-Fi |
-| No progress events received | Not subscribed to `WhenUpdateReceived()` or `WatchTransfer()` | Subscribe to the observable and keep the subscription alive |
+| No progress events received | Not subscribed to the `UpdateReceived` event or not awaiting `WatchTransfer()` | Attach a handler to `UpdateReceived` (and keep it attached) or `await WatchTransfer(id)` |
 | `InvalidOperationException: Already running monitor` | `HttpTransferMonitor.Start()` called twice | Call `Stop()` before calling `Start()` again |
 | Transfer stuck in `Pending` on Android | No internet or foreground service not configured | Ensure the delegate implements `IAndroidForegroundServiceDelegate` and internet is available |
 | 401 errors not retrying | Using `IHttpTransferDelegate` directly instead of `HttpTransferDelegate` base class | Use `HttpTransferDelegate` and override `OnAuthorizationFailed` |

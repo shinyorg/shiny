@@ -240,11 +240,11 @@ public interface IGpsManager
     /// Request access to use GPS hardware
     Task<AccessState> RequestAccess(GpsRequest request);
 
-    /// Gets the last reading. Throws if access not granted.
-    IObservable<GpsReading?> GetLastReading();
+    /// Gets the last reading (optionally waiting up to a timeout for one). Throws if access not granted.
+    Task<GpsReading?> GetLastReading(TimeSpan? timeout = null);
 
-    /// Hook to GPS events (foreground only). Use delegates for background.
-    IObservable<GpsReading> WhenReading();
+    /// Fired when a GPS reading is received (foreground only). Use delegates for background.
+    event EventHandler<GpsReading> GpsReadingReceived;
 
     /// Start the GPS listener
     Task StartListener(GpsRequest request);
@@ -325,10 +325,10 @@ public interface IMotionActivityManager
     Task<AccessState> RequestAccess();
 
     /// Gets the last known motion activity reading, or queries the platform for the current one
-    IObservable<MotionActivityReading?> GetLastReading();
+    Task<MotionActivityReading?> GetLastReading();
 
-    /// Hook to activity change events (foreground). Use delegates for background.
-    IObservable<MotionActivityReading> WhenReading();
+    /// Fired when a motion activity reading is received (foreground). Use delegates for background.
+    event EventHandler<MotionActivityReading> MotionActivityReadingReceived;
 
     /// Start listening for motion activity changes
     Task StartListener();
@@ -422,12 +422,16 @@ public static class Extensions
     static bool IsListening(this IGpsManager manager);
 
     /// Requests a single GPS reading - starts & stops the listener if not already running
-    static IObservable<GpsReading> GetCurrentPosition(this IGpsManager gpsManager);
+    static Task<GpsReading?> GetCurrentPosition(
+        this IGpsManager gpsManager,
+        CancellationToken cancellationToken = default
+    );
 
     /// Gets the last reading (optionally filtered by age), or falls back to current position
-    static IObservable<GpsReading> GetLastReadingOrCurrentPosition(
+    static Task<GpsReading?> GetLastReadingOrCurrentPosition(
         this IGpsManager gpsManager,
-        DateTime? maxAgeOfLastReading = null
+        DateTime? maxAgeOfLastReading = null,
+        CancellationToken cancellationToken = default
     );
 
     /// Checks if the current GPS position is inside the specified region
@@ -557,23 +561,19 @@ public class MyViewModel
         }
 
         await this.gpsManager.StartListener(request);
+        this.gpsManager.GpsReadingReceived += this.OnGpsReadingReceived;
     }
 
-    public void ObserveReadings(CompositeDisposable disposable)
+    void OnGpsReadingReceived(object? sender, GpsReading reading)
     {
-        this.gpsManager
-            .WhenReading()
-            .Subscribe(reading =>
-            {
-                var lat = reading.Position.Latitude;
-                var lng = reading.Position.Longitude;
-                var speed = reading.Speed;
-            })
-            .DisposeWith(disposable);
+        var lat = reading.Position.Latitude;
+        var lng = reading.Position.Longitude;
+        var speed = reading.Speed;
     }
 
     public async Task StopTracking()
     {
+        this.gpsManager.GpsReadingReceived -= this.OnGpsReadingReceived;
         await this.gpsManager.StopListener();
     }
 }
@@ -582,8 +582,8 @@ public class MyViewModel
 ### Get a Single Current Position
 
 ```csharp
-var reading = await gpsManager.GetCurrentPosition().ToTask();
-var position = reading.Position;
+var reading = await gpsManager.GetCurrentPosition();
+var position = reading?.Position;
 ```
 
 ### Get Last Reading or Current Position
@@ -591,8 +591,7 @@ var position = reading.Position;
 ```csharp
 // Accept readings up to 5 minutes old, otherwise get a fresh one
 var reading = await gpsManager
-    .GetLastReadingOrCurrentPosition(DateTime.UtcNow.AddMinutes(-5))
-    .ToTask();
+    .GetLastReadingOrCurrentPosition(DateTime.UtcNow.AddMinutes(-5));
 ```
 
 ### Background GPS Delegate
@@ -736,23 +735,19 @@ public class MyViewModel
         }
 
         await this.activityManager.StartListener();
+        this.activityManager.MotionActivityReadingReceived += this.OnActivityReadingReceived;
     }
 
-    public void ObserveActivity(CompositeDisposable disposable)
+    void OnActivityReadingReceived(object? sender, MotionActivityReading reading)
     {
-        this.activityManager
-            .WhenReading()
-            .Subscribe(reading =>
-            {
-                var activity = reading.Activity;     // Walking, Running, Cycling, etc.
-                var confidence = reading.Confidence;  // Low, Medium, High
-                var timestamp = reading.Timestamp;
-            })
-            .DisposeWith(disposable);
+        var activity = reading.Activity;      // Walking, Running, Cycling, etc.
+        var confidence = reading.Confidence;  // Low, Medium, High
+        var timestamp = reading.Timestamp;
     }
 
     public async Task StopTracking()
     {
+        this.activityManager.MotionActivityReadingReceived -= this.OnActivityReadingReceived;
         await this.activityManager.StopListener();
     }
 }
