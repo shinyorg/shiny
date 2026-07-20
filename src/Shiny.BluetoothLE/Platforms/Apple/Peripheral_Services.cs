@@ -26,7 +26,7 @@ public partial class Peripheral
             return service;
 
         this.serviceDiscoverySubj ??= new();
-        var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
+        var task = this.WaitForOperation(this.serviceDiscoverySubj, ct);
 
         this.Native.DiscoverServices(new[] { nativeUuid });
         var result = await task.ConfigureAwait(false);
@@ -52,7 +52,7 @@ public partial class Peripheral
         this.AssertConnnection();
 
         this.serviceDiscoverySubj ??= new();
-        var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
+        var task = this.WaitForOperation(this.serviceDiscoverySubj, ct);
         this.Native.DiscoverServices();
 
         var result = await task.ConfigureAwait(false);

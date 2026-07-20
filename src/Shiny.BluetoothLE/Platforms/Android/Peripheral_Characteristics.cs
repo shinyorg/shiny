@@ -36,10 +36,10 @@ public partial class Peripheral
             this.charEventSubj ??= new();
 
             this.FromNative(ch).AssertRead();
-            var task = this.charEventSubj
-                .Where(x => x.Char.Equals(ch) && !x.IsWrite)
-                .Take(1)
-                .ToTask(ct);
+            var task = this.WaitForOperation(
+                this.charEventSubj.Where(x => x.Char.Equals(ch) && !x.IsWrite),
+                ct
+            );
 
             if (!this.Gatt!.ReadCharacteristic(ch))
                 throw new BleException("Failed to read characteristic: " + characteristicUuid);
@@ -258,10 +258,10 @@ public partial class Peripheral
             if (withResponse)
             {
                 this.charEventSubj ??= new();
-                var task = this.charEventSubj
-                    .Where(x => x.Char.Equals(ch) && x.IsWrite)
-                    .Take(1)
-                    .ToTask(ct);
+                var task = this.WaitForOperation(
+                    this.charEventSubj.Where(x => x.Char.Equals(ch) && x.IsWrite),
+                    ct
+                );
 
 #if XAMARIN
                 if (!ch.SetValue(data))

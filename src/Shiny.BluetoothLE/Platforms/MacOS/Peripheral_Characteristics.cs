@@ -173,7 +173,7 @@ public partial class Peripheral
             if (!ch.Properties.HasFlag(CBCharacteristicProperties.Read))
                 throw new InvalidOperationException($"Characteristic '{characteristicUuid}' does not support read");
 
-            var task = this.charUpdateSubj.Where(x => x.Char.Equals(ch)).Take(1).ToTask(ct);
+            var task = this.WaitForOperation(this.charUpdateSubj.Where(x => x.Char.Equals(ch)), ct);
             this.Native.ReadValue(ch);
 
             var result = await task.ConfigureAwait(false);
@@ -252,10 +252,10 @@ public partial class Peripheral
             if (ch != null)
                 return ch;
 
-            var task = this.charDiscoverySubj
-                .Where(x => x.Service.Equals(service))
-                .Take(1)
-                .ToTask(ct);
+            var task = this.WaitForOperation(
+                this.charDiscoverySubj.Where(x => x.Service.Equals(service)),
+                ct
+            );
 
             this.Native.DiscoverCharacteristics(new[] { uuid }, service);
             var result = await task.ConfigureAwait(false);
@@ -274,7 +274,7 @@ public partial class Peripheral
     protected IObservable<BleCharacteristicResult> WriteWithResponse(CBCharacteristic nativeCh, byte[] value) => this.operations.QueueToObservable(async ct =>
     {
         var data = NSData.FromArray(value);
-        var task = this.charWroteSubj.Where(x => x.Char.Equals(nativeCh)).Take(1).ToTask(ct);
+        var task = this.WaitForOperation(this.charWroteSubj.Where(x => x.Char.Equals(nativeCh)), ct);
         this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithResponse);
 
         var result = await task.ConfigureAwait(false);
@@ -290,7 +290,7 @@ public partial class Peripheral
         if (!this.Native.CanSendWriteWithoutResponse)
         {
             this.logger.CanSendWriteWithoutResponse(nativeCh, false);
-            await this.readyWwrSubj.Take(1).ToTask(ct);
+            await this.WaitForOperation(this.readyWwrSubj, ct).ConfigureAwait(false);
             this.logger.CanSendWriteWithoutResponse(nativeCh, true);
         }
         this.logger.LogDebug("Writing characteristic without response");

@@ -42,7 +42,7 @@ public partial class Peripheral
 
             // TODO: should lock here
             this.RefreshServices(); // force refresh of services on GATT
-            var task = this.serviceDiscoverySubj.Take(1).ToTask(ct);
+            var task = this.WaitForOperation(this.serviceDiscoverySubj, ct);
             if (!this.Gatt!.DiscoverServices())
                 throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
 

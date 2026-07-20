@@ -40,10 +40,10 @@ public partial class Peripheral
         {
             this.descSubj ??= new();
 
-            var task = this.descSubj
-                .Where(x => x.Descriptor.Equals(desc) && !x.IsWrite)
-                .Take(1)
-                .ToTask(ct);
+            var task = this.WaitForOperation(
+                this.descSubj.Where(x => x.Descriptor.Equals(desc) && !x.IsWrite),
+                ct
+            );
             
             if (!this.Gatt!.ReadDescriptor(desc))
                 throw new InvalidOperationException("Could not read descriptor: " + descriptorUuid);
@@ -57,10 +57,10 @@ public partial class Peripheral
     protected async Task WriteDescriptor(BluetoothGattDescriptor descriptor, byte[] data, CancellationToken ct)
     {
         this.descSubj ??= new();
-        var task = this.descSubj
-            .Where(x => x.Descriptor.Equals(descriptor) && x.IsWrite)
-            .Take(1)
-            .ToTask(ct);
+        var task = this.WaitForOperation(
+            this.descSubj.Where(x => x.Descriptor.Equals(descriptor) && x.IsWrite),
+            ct
+        );
 
 #if XAMARIN
         if (!descriptor.SetValue(data))

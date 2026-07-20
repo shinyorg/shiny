@@ -26,7 +26,7 @@ public partial class Peripheral
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.descSubj.Where(x => x.Descriptor.Equals(desc)).Take(1).ToTask(ct);
+            var task = this.WaitForOperation(this.descSubj.Where(x => x.Descriptor.Equals(desc)), ct);
             this.Native.ReadValue(desc);
             var result = await task.ConfigureAwait(false);
             if (result.Error != null)
@@ -41,7 +41,7 @@ public partial class Peripheral
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.descSubj.Where(x => x.Descriptor!.Equals(desc)).Take(1).ToTask(ct);
+            var task = this.WaitForOperation(this.descSubj.Where(x => x.Descriptor!.Equals(desc)), ct);
 
             var nsdata = NSData.FromArray(data);            
             this.Native.WriteValue(nsdata, desc);
@@ -83,7 +83,7 @@ public partial class Peripheral
         .GetNativeCharacteristic(serviceUuid, characteristicUuid)
         .Select(ch => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.descDiscSubj.Where(x => x.Char!.Equals(ch)).Take(1).ToTask(ct);
+            var task = this.WaitForOperation(this.descDiscSubj.Where(x => x.Char!.Equals(ch)), ct);
             this.Native!.DiscoverDescriptors(ch);
 
             var result = await task.ConfigureAwait(false);
