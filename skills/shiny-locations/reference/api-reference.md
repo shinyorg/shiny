@@ -416,7 +416,7 @@ public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
 ```csharp
 namespace Shiny.Locations;
 
-public static class Extensions
+public static class LocationExtensions
 {
     /// Returns true if there is a current GPS listener running
     static bool IsListening(this IGpsManager manager);
@@ -449,7 +449,7 @@ public static class Extensions
 ```csharp
 namespace Shiny.Locations;
 
-public static class Extensions
+public static class LocationExtensions
 {
     /// Starts monitoring a region only if its identifier isn't already monitored.
     /// When replaceIfExists is true (default), an existing region with the same
@@ -469,7 +469,7 @@ public static class Extensions
 ```csharp
 namespace Shiny.Locations;
 
-public static class Extensions
+public static class LocationExtensions
 {
     /// Determines if the provided position is inside the geofence region
     static bool IsPositionInside(this GeofenceRegion region, Position position);

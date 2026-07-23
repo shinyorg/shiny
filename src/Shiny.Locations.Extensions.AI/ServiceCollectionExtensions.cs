@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations.Extensions.AI.Internal;
 
-namespace Shiny.Locations.Extensions.AI;
+namespace Shiny;
 
 /// <summary>
 /// Dependency-injection extensions for exposing <see cref="IGpsManager"/> as read-only LLM tools.
 /// </summary>
-public static class ServiceCollectionExtensions
+public static class LocationsAiServiceCollectionExtensions
 {
     /// <summary>
     /// Registers a <see cref="LocationAITools"/> singleton whose read-only GPS tools wrap

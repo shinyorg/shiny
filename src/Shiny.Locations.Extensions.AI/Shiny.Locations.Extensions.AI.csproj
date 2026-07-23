@@ -8,8 +8,6 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Microsoft.Extensions.AI tool surface for Shiny.Locations - exposes read-only GPS (current location, distance/travel-time to a destination) as AIFunction tools for LLM tool-calling.</Description>
         <PackageTags>shiny locations gps ai aifunction mcp llm tools aot</PackageTags>
-        <!-- The Shiny.Locations.Extensions.AI namespace's 'Extensions' segment benignly collides with the public Shiny.Locations.Extensions type; the compiler resolves to the namespace. -->
-        <NoWarn>$(NoWarn);CS0435</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

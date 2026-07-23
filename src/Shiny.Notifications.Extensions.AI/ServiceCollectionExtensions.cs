@@ -1,12 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Notifications;
+using Shiny.Notifications.Extensions.AI;
 using Shiny.Notifications.Extensions.AI.Internal;
 
-namespace Shiny.Notifications.Extensions.AI;
+namespace Shiny;
 
 /// <summary>
 /// Dependency-injection extensions for exposing <see cref="INotificationManager"/> as LLM reminder tools.
 /// </summary>
-public static class ServiceCollectionExtensions
+public static class NotificationAiServiceCollectionExtensions
 {
     /// <summary>
     /// Registers a <see cref="NotificationAITools"/> singleton whose tools wrap

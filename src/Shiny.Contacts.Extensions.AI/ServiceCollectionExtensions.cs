@@ -1,12 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
+using Shiny.Contacts;
+using Shiny.Contacts.Extensions.AI;
 using Shiny.Contacts.Extensions.AI.Internal;
 
-namespace Shiny.Contacts.Extensions.AI;
+namespace Shiny;
 
 /// <summary>
 /// Dependency-injection extensions for exposing <see cref="IContactStore"/> as LLM tools.
 /// </summary>
-public static class ServiceCollectionExtensions
+public static class ContactsAiServiceCollectionExtensions
 {
     /// <summary>
     /// Registers a <see cref="ContactAITools"/> singleton whose tools wrap <see cref="IContactStore"/>

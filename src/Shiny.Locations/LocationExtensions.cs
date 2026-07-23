@@ -6,7 +6,16 @@ using System.Threading.Tasks;
 namespace Shiny.Locations;
 
 
-public static class Extensions
+/// <summary>
+/// Convenience extensions over <see cref="IGpsManager"/> and <see cref="IGeofenceManager"/>.
+/// </summary>
+/// <remarks>
+/// Named <c>LocationExtensions</c> rather than <c>Extensions</c>: a type called
+/// <c>Shiny.Locations.Extensions</c> is indistinguishable from the
+/// <c>Shiny.Locations.Extensions.AI</c> namespace once both assemblies are referenced, which the
+/// compiler reports as CS0434 (an error, not a warning) in consuming projects.
+/// </remarks>
+public static class LocationExtensions
 {
     /// <summary>
     /// Tries to create the geofence region if the identifier does not already exist - returns true if it exists

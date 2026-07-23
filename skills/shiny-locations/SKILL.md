@@ -152,6 +152,7 @@ When generating code for Shiny.Locations:
 ## Conventions
 
 - All async operations return `Task` or `Task<T>`.
+- The convenience extension methods live on `Shiny.Locations.LocationExtensions` (renamed from `Extensions` in 5.2.5 — a type named `Shiny.Locations.Extensions` collides with the `Shiny.Locations.Extensions.AI` namespace and produces CS0434 in consuming projects). They are extension methods, so call sites are unaffected.
 - Foreground observation uses C# `event EventHandler<T>` on the managers (`GpsReadingReceived`, `MotionActivityReadingReceived`) — Rx is no longer used in Shiny.Locations.
 - The `GpsBackgroundMode` enum controls background behavior: `None` (foreground), `Standard` (periodic), `Realtime` (continuous).
 - `GeofenceState` enum values: `Unknown`, `Entered`, `Exited`.
