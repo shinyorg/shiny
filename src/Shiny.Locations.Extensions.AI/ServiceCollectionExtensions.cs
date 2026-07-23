@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Locations;
+using Shiny.Locations.Extensions.AI;
 using Shiny.Locations.Extensions.AI.Internal;
 
 namespace Shiny;

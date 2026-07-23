@@ -6,7 +6,7 @@ using CoreLocation;
 namespace Shiny.Locations;
 
 
-public static class LocationExtensions
+public static class AppleLocationExtensions
 {
     public static AccessState FromNative(this CLAuthorizationStatus status, bool background) => status switch
     {
