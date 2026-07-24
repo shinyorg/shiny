@@ -22,6 +22,10 @@
     <string>This app needs location access to demonstrate GPS features</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>This app needs background location for geofencing</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
     <key>NSContactsUsageDescription</key>
     <string>This app needs access to your contacts to demonstrate reading and editing device contacts</string>
     <key>UIBackgroundModes</key>

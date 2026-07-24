@@ -15,6 +15,8 @@
             "src\\Shiny.BluetoothLE.Linux\\Shiny.BluetoothLE.Linux.csproj",
             "src\\Shiny.Contacts\\Shiny.Contacts.csproj",
             "src\\Shiny.Contacts.Extensions.AI\\Shiny.Contacts.Extensions.AI.csproj",
+            "src\\Shiny.Calendar\\Shiny.Calendar.csproj",
+            "src\\Shiny.Calendar.Extensions.AI\\Shiny.Calendar.Extensions.AI.csproj",
             "src\\Shiny.BluetoothLE.Blazor\\Shiny.BluetoothLE.Blazor.csproj",
             "src\\Shiny.Jobs\\Shiny.Jobs.csproj",
             "src\\Shiny.Locations\\Shiny.Locations.csproj",

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Calendar"
+             xmlns:conv="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             x:Class="Sample.Shared.Maui.Pages.Calendar.CalendarListPage"
+             x:DataType="vm:CalendarListViewModel"
+             Title="Calendar">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:NullToBoolConverter x:Key="NullToBool" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Calendars strip -->
+        <Label Grid.Row="0" Text="Calendars" FontAttributes="Bold" Margin="16,12,16,4" />
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Calendars}" HeightRequest="44" Margin="8,0">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:Object">
+                    <Border Padding="12,6" StrokeThickness="1" Stroke="LightGray">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="14" />
+                        </Border.StrokeShape>
+                        <Label Text="{Binding Name}" FontSize="13" VerticalOptions="Center" />
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Upcoming events -->
+        <RefreshView Grid.Row="2"
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding LoadCommand}">
+            <CollectionView ItemsSource="{Binding Events}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <Label Text="No upcoming events in the next 30 days"
+                           HorizontalOptions="Center" VerticalOptions="Center"
+                           TextColor="Gray" Margin="0,40,0,0" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Delete"
+                                               BackgroundColor="Red"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CalendarListViewModel}}, Path=DeleteEventCommand}"
+                                               CommandParameter="{Binding}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                            <Grid Padding="16,12" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CalendarListViewModel}}, Path=EditEventCommand}"
+                                        CommandParameter="{Binding}" />
+                                </Grid.GestureRecognizers>
+
+                                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding Start, StringFormat='{0:ddd MMM d, h:mm tt}'}"
+                                           FontSize="13" TextColor="Gray" />
+                                    <Label Text="{Binding Location}" FontSize="12" TextColor="Gray"
+                                           IsVisible="{Binding Location, Converter={StaticResource NullToBool}}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1" Text="›" FontSize="20" TextColor="Gray" VerticalOptions="Center" />
+                            </Grid>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="+" Command="{Binding AddEventCommand}" />
+    </ContentPage.ToolbarItems>
+</ContentPage>

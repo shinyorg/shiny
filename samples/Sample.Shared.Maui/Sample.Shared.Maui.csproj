@@ -28,6 +28,8 @@
         <PackageReference Include="Microsoft.Maui.Controls" />
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="Microsoft.Data.Sqlite" />
+        <PackageReference Include="Microsoft.Extensions.AI" />
+        <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
         <PackageReference Include="Shiny.Maui.Controls" />
         <PackageReference Include="Shiny.Maui.Shell">
             <PrivateAssets>analyzers</PrivateAssets>
@@ -47,8 +49,15 @@
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Contacts\Shiny.Contacts.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Calendar\Shiny.Calendar.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+
+        <!-- AI tool surfaces (Microsoft.Extensions.AI) for the AI Assistant sample page -->
+        <ProjectReference Include="..\..\src\Shiny.Calendar.Extensions.AI\Shiny.Calendar.Extensions.AI.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Contacts.Extensions.AI\Shiny.Contacts.Extensions.AI.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Notifications.Extensions.AI\Shiny.Notifications.Extensions.AI.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />

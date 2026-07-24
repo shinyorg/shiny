@@ -36,6 +36,10 @@
     <string>This app uses motion activity recognition to detect walking, running, driving, and other activities</string>
     <key>NSContactsUsageDescription</key>
     <string>This app needs access to your contacts to demonstrate reading and editing device contacts</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>bluetooth-central</string>

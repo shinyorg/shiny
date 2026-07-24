@@ -17,6 +17,8 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             {
                 new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
                 new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"),
+                new("📅 Calendar", "Browse & edit device calendar events", "calendar"),
+                new("🤖 AI Assistant", "Chat + Shiny AI tools via GitHub Copilot", "ai"),
                 new("🔋 Battery", "Observe battery level & state", "battery"),
                 new("🌐 Connectivity", "Observe network connectivity", "connectivity"),
                 new("📝 Events", "Captured delegate events (SQLite)", "events")
@@ -54,6 +56,12 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         // --- Contacts (iOS/Android only) ---
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
             list.Add(new("👤 Contacts", "Browse, search & edit device contacts", "contacts"));
+
+        // --- Calendar (every MAUI-native platform) ---
+        list.Add(new("📅 Calendar", "Browse & edit device calendar events", "calendar"));
+
+        // --- AI Assistant (GitHub Copilot + Shiny *.Extensions.AI tools) ---
+        list.Add(new("🤖 AI Assistant", "Chat with your device via GitHub Copilot", "ai"));
 
         // --- Jobs (Android, iOS, Linux) ---
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsLinux())

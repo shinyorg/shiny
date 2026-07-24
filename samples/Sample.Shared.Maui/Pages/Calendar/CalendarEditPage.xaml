@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Calendar"
+             xmlns:ai="clr-namespace:Sample.Shared.Maui.Pages.Ai"
+             x:Class="Sample.Shared.Maui.Pages.Calendar.CalendarEditPage"
+             x:DataType="vm:CalendarEditViewModel"
+             Title="{Binding PageTitle}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ai:InvertBoolConverter x:Key="InvertBool" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <Label Text="Title" FontAttributes="Bold" />
+            <Entry Text="{Binding Title}" Placeholder="Event title" />
+
+            <Label Text="Calendar" FontAttributes="Bold" />
+            <Picker ItemsSource="{Binding Calendars}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedCalendar}" />
+
+            <Label Text="Location" FontAttributes="Bold" />
+            <Entry Text="{Binding Location}" Placeholder="Optional" />
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="All day" FontAttributes="Bold" VerticalOptions="Center" />
+                <Switch Grid.Column="1" IsToggled="{Binding IsAllDay}" HorizontalOptions="End" />
+            </Grid>
+
+            <Label Text="Starts" FontAttributes="Bold" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <DatePicker Date="{Binding StartDate}" />
+                <TimePicker Grid.Column="1" Time="{Binding StartTime}"
+                            IsVisible="{Binding IsAllDay, Converter={StaticResource InvertBool}}" />
+            </Grid>
+
+            <Label Text="Ends" FontAttributes="Bold" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <DatePicker Date="{Binding EndDate}" />
+                <TimePicker Grid.Column="1" Time="{Binding EndTime}"
+                            IsVisible="{Binding IsAllDay, Converter={StaticResource InvertBool}}" />
+            </Grid>
+
+            <Label Text="Notes" FontAttributes="Bold" />
+            <Editor Text="{Binding Description}" AutoSize="TextChanges" HeightRequest="90" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,12,0,0">
+                <Button Text="Cancel" Command="{Binding CancelCommand}" />
+                <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBool}}" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

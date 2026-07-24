@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.Calendar.Extensions.AI</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Microsoft.Extensions.AI tool surface for Shiny.Calendar - exposes ICalendarStore reads/writes as AIFunction tools for LLM tool-calling.</Description>
+        <PackageTags>shiny calendar ai aifunction mcp llm tools aot</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
+        <ProjectReference Include="..\Shiny.Calendar\Shiny.Calendar.csproj" />
+    </ItemGroup>
+
+</Project>

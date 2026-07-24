@@ -1,6 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Media;
 using Sample.Shared.Maui.Services;
+using Sample.Shared.Maui.Ai;
+using Shiny.Calendar.Extensions.AI;
+using Shiny.Contacts.Extensions.AI;
+using Shiny.Notifications.Extensions.AI;
 
 namespace Sample.Shared.Maui;
 
@@ -59,6 +63,28 @@ public static class ShinyRegistrations
         // Contacts: Shiny.Contacts has native implementations for iOS and Android.
         s.AddContactStore();
         s.AddSingleton(MediaPicker.Default);
+#endif
+
+#if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
+        // Calendar: Shiny.Calendar has native implementations on every MAUI platform
+        // (EventKit on Apple, CalendarContract on Android, AppointmentStore on Windows).
+        s.AddCalendarStore();
+#endif
+
+        // ── AI: GitHub Copilot chat client + the *.Extensions.AI tool surfaces ──
+        // The AI Assistant page drives whichever tool bundles are registered here against a
+        // Copilot IChatClient (device-code sign-in). Each bundle is gated to the platforms where
+        // its underlying store is supported.
+#if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
+        s.AddSingleton<GitHubCopilotChatClientProvider>();
+        s.AddCalendarAITools(b => b.AddCalendar(CalendarAICapabilities.All));
+        s.AddNotificationAITools(b => b.AddReminders(ReminderAICapabilities.ReadWrite));
+#endif
+#if IOS || ANDROID
+        s.AddContactsAITools(b => b.AddContacts(ContactAICapabilities.ReadWrite));
+#endif
+#if IOS || ANDROID || MACCATALYST
+        s.AddLocationAITool();
 #endif
 
 #if !(PLATFORM && MACOS)

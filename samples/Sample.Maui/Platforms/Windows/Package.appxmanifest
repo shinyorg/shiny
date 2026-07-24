@@ -64,6 +64,8 @@
     <DeviceCapability Name="bluetooth" />
     <!-- Shiny.Locations (GPS / Geofencing) -->
     <DeviceCapability Name="location" />
+    <!-- Shiny.Calendar (AppointmentStore) -->
+    <uap:Capability Name="appointments" />
   </Capabilities>
 
 </Package>

@@ -43,6 +43,9 @@
     <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
     <Project Path="src\Shiny.Contacts\Shiny.Contacts.csproj" />
     <Project Path="src\Shiny.Contacts.Extensions.AI\Shiny.Contacts.Extensions.AI.csproj" />
+    <Project Path="src\Shiny.Calendar\Shiny.Calendar.csproj" />
+    <Project Path="src\Shiny.Calendar.Extensions.AI\Shiny.Calendar.Extensions.AI.csproj" />
+    <Project Path="tests\Shiny.Calendar.Tests\Shiny.Calendar.Tests.csproj" />
     <Project Path="src\Shiny.Core\Shiny.Core.csproj" />
     <Project Path="src\Shiny.Data.Sync\Shiny.Data.Sync.csproj" />
     <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
