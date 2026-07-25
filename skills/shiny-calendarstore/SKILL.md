@@ -84,8 +84,7 @@ builder.Services.AddCalendarStore();
 <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 ```
 
-**iOS 17+ / Mac Catalyst / macOS** — Add to `Info.plist` (and the macOS sandbox entitlement
-`com.apple.security.personal-information.calendars` if sandboxed):
+**iOS 17+ / Mac Catalyst / macOS** — Add to `Info.plist`:
 ```xml
 <key>NSCalendarsFullAccessUsageDescription</key>
 <string>This app needs access to your calendar.</string>
@@ -94,6 +93,14 @@ builder.Services.AddCalendarStore();
 <string>This app needs to add events to your calendar.</string>
 ```
 **iOS < 17** — Add `NSCalendarsUsageDescription`.
+
+**Mac Catalyst / sandboxed macOS** — the `Info.plist` keys are not enough. The App Sandbox (which
+Mac Catalyst enables by default) also requires the calendar entitlement, or `RequestAccess` returns
+`Denied` with no prompt ever appearing:
+```xml
+<CustomEntitlements Include="com.apple.security.personal-information.calendars"
+                    Type="Boolean" Value="true" />
+```
 
 **Windows** — Add to `Package.appxmanifest`:
 ```xml

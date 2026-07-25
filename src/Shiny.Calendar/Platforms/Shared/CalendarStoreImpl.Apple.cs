@@ -10,6 +10,11 @@ namespace Shiny.Calendar;
 /// <summary>
 /// EventKit-backed calendar store shared across iOS, Mac Catalyst, and macOS.
 /// </summary>
+/// <remarks>
+/// This lives under Platforms/Shared (not Platforms/Apple) because Directory.Build.targets only
+/// compiles Platforms/Apple for the ios/maccatalyst TFMs - Platforms/Shared is the only folder
+/// that also flows into net10.0-macos. The #if APPLE guard compiles it away on Android/Windows.
+/// </remarks>
 public class CalendarStoreImpl : ICalendarStore
 {
     readonly EKEventStore store = new();
