@@ -331,7 +331,7 @@ public class CalendarStoreImpl : ICalendarStore
         AppointmentParticipantResponse.Accepted => AttendeeStatus.Accepted,
         AppointmentParticipantResponse.Declined => AttendeeStatus.Declined,
         AppointmentParticipantResponse.Tentative => AttendeeStatus.Tentative,
-        AppointmentParticipantResponse.NoResponseReceived => AttendeeStatus.Pending,
+        AppointmentParticipantResponse.None => AttendeeStatus.Pending,
         _ => AttendeeStatus.Unknown
     };
 
