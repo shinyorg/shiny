@@ -153,4 +153,24 @@ public class AiToolTests
         Assert.True(json.GetProperty("success").GetBoolean());
         Assert.Null(await store.GetEvent("2"));
     }
+
+    [Fact]
+    public async Task DeleteEvent_Defaults_To_Single_Occurrence()
+    {
+        var (store, tools) = Build(CalendarAICapabilities.Delete);
+        var json = await Invoke(Tool(tools, "delete_event"), ("eventId", "2"));
+
+        Assert.False(json.GetProperty("deletedSeries").GetBoolean());
+        Assert.False(store.LastDeleteSeries);
+    }
+
+    [Fact]
+    public async Task DeleteEvent_Passes_DeleteSeries_Through()
+    {
+        var (store, tools) = Build(CalendarAICapabilities.Delete);
+        var json = await Invoke(Tool(tools, "delete_event"), ("eventId", "2"), ("deleteSeries", true));
+
+        Assert.True(json.GetProperty("deletedSeries").GetBoolean());
+        Assert.True(store.LastDeleteSeries);
+    }
 }

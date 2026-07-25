@@ -98,8 +98,11 @@ public class FakeCalendarStore : ICalendarStore
         return Task.CompletedTask;
     }
 
-    public Task DeleteEvent(string eventId, CancellationToken ct = default)
+    public bool? LastDeleteSeries { get; private set; }
+
+    public Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default)
     {
+        this.LastDeleteSeries = deleteSeries;
         this.events.RemoveAll(e => e.Id == eventId);
         return Task.CompletedTask;
     }

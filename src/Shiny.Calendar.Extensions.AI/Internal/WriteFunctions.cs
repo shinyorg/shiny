@@ -139,7 +139,11 @@ sealed class DeleteEventFunction : CalendarAIFunctionBase
         => AiSchema.ToElement(AiSchema.Object(
             new JsonObject
             {
-                ["eventId"] = AiSchema.String("The id of the event to delete.")
+                ["eventId"] = AiSchema.String("The id of the event to delete."),
+                ["deleteSeries"] = AiSchema.Boolean(
+                    "For a recurring event, true deletes this occurrence and all future ones in the series, "
+                    + "false deletes only this occurrence. Defaults to false. Ask the user which they meant "
+                    + "before calling on a recurring event.")
             },
             "eventId"));
 
@@ -149,7 +153,9 @@ sealed class DeleteEventFunction : CalendarAIFunctionBase
         if (string.IsNullOrWhiteSpace(id))
             return new JsonObject { ["error"] = "'eventId' is required." };
 
-        await this.Store.DeleteEvent(id, cancellationToken).ConfigureAwait(false);
-        return new JsonObject { ["success"] = true, ["id"] = id };
+        var deleteSeries = GetBool(arguments, "deleteSeries") ?? false;
+
+        await this.Store.DeleteEvent(id, deleteSeries, cancellationToken).ConfigureAwait(false);
+        return new JsonObject { ["success"] = true, ["id"] = id, ["deletedSeries"] = deleteSeries };
     }
 }

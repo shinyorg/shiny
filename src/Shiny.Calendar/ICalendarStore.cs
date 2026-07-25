@@ -80,5 +80,10 @@ public interface ICalendarStore
     /// <summary>
     /// Deletes the event with the specified identifier.
     /// </summary>
-    Task DeleteEvent(string eventId, CancellationToken ct = default);
+    /// <param name="deleteSeries">
+    /// For a recurring event, <c>true</c> removes this occurrence and all future ones in the series;
+    /// <c>false</c> (the default) removes only this occurrence. Ignored for non-recurring events.
+    /// Check <see cref="CalendarEvent.IsRecurring"/> to decide whether the choice is worth prompting for.
+    /// </param>
+    Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default);
 }

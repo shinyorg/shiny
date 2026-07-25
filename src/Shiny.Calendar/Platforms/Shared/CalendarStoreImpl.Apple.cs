@@ -220,12 +220,13 @@ public class CalendarStoreImpl : ICalendarStore
         return Task.CompletedTask;
     }
 
-    public Task DeleteEvent(string eventId, CancellationToken ct = default)
+    public Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default)
     {
         var ev = this.store.EventFromIdentifier(eventId)
             ?? throw new InvalidOperationException($"Event with Id '{eventId}' not found.");
 
-        if (!this.store.RemoveEvent(ev, EKSpan.ThisEvent, true, out var error))
+        var span = deleteSeries ? EKSpan.FutureEvents : EKSpan.ThisEvent;
+        if (!this.store.RemoveEvent(ev, span, true, out var error))
             throw new InvalidOperationException($"Failed to delete event: {error?.LocalizedDescription}");
 
         return Task.CompletedTask;

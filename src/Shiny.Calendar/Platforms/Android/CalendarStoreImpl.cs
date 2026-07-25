@@ -155,10 +155,30 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
         WriteAttendees(eventId, calendarEvent.Attendees);
     }, ct);
 
-    public Task DeleteEvent(string eventId, CancellationToken ct = default) => Task.Run(() =>
+    public Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default) => Task.Run(() =>
     {
-        var uri = ContentUris.WithAppendedId(EventsColumns.ContentUri!, long.Parse(eventId));
-        Resolver.Delete(uri!, null, null);
+        var id = long.Parse(eventId);
+        var existing = this.ReadEventsBySelection(EventsColumns.InterfaceConsts.Id + " = ?", [eventId]).FirstOrDefault()
+            ?? throw new InvalidOperationException($"Event with Id '{eventId}' not found.");
+
+        // Deleting the Events row takes the whole series with it, which is what we want for a series
+        // delete and the only sensible option for a one-off event.
+        if (deleteSeries || !existing.IsRecurring)
+        {
+            var uri = ContentUris.WithAppendedId(EventsColumns.ContentUri!, id);
+            Resolver.Delete(uri!, null, null);
+            return;
+        }
+
+        // Cancelling a single occurrence means inserting an exception row against the occurrence's
+        // original start time. Reads come from the Events table (series masters), so the only instance
+        // time we can resolve here is the series' own DTSTART - i.e. the first occurrence.
+        var values = new ContentValues();
+        values.Put(EventsColumns.InterfaceConsts.OriginalInstanceTime, existing.Start.ToUnixTimeMilliseconds());
+        values.Put(EventsColumns.InterfaceConsts.Status, (int)EventsStatus.Canceled);
+
+        var exceptionUri = ContentUris.WithAppendedId(EventsColumns.ContentExceptionUri!, id);
+        Resolver.Insert(exceptionUri!, values);
     }, ct);
 
     // ── Calendar reading ─────────────────────────────────────────────

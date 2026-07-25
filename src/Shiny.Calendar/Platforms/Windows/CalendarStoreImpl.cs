@@ -178,7 +178,7 @@ public class CalendarStoreImpl : ICalendarStore
         await cal.SaveAppointmentAsync(appt);
     }
 
-    public async Task DeleteEvent(string eventId, CancellationToken ct = default)
+    public async Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default)
     {
         var store = await this.GetWriteStore();
         var appCals = await store.FindAppointmentCalendarsAsync();
@@ -187,6 +187,8 @@ public class CalendarStoreImpl : ICalendarStore
             var appt = await cal.GetAppointmentAsync(eventId);
             if (appt != null)
             {
+                // AppointmentStore has no per-instance delete for an app-owned calendar - removing the
+                // appointment removes its recurrence with it, so deleteSeries makes no difference here.
                 await cal.DeleteAppointmentAsync(eventId);
                 return;
             }

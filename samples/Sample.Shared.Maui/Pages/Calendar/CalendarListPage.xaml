@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Calendar"
              xmlns:conv="clr-namespace:Sample.Shared.Maui.Pages.Contacts"
+             xmlns:cal="clr-namespace:Shiny.Calendar;assembly=Shiny.Calendar"
              x:Class="Sample.Shared.Maui.Pages.Calendar.CalendarListPage"
              x:DataType="vm:CalendarListViewModel"
              Title="Calendar">
@@ -15,18 +16,47 @@
 
     <Grid RowDefinitions="Auto,Auto,*">
 
-        <!-- Calendars strip -->
+        <!-- Calendars strip - tap a pill to filter the event list below -->
         <Label Grid.Row="0" Text="Calendars" FontAttributes="Bold" Margin="16,12,16,4" />
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Calendars}" HeightRequest="44" Margin="8,0">
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Calendars}"
+                        SelectedItem="{Binding SelectedCalendar, Mode=TwoWay}"
+                        SelectionMode="Single"
+                        HeightRequest="44"
+                        Margin="8,0">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="x:Object">
-                    <Border Padding="12,6" StrokeThickness="1" Stroke="LightGray">
+                <DataTemplate x:DataType="cal:Calendar">
+                    <!-- BackgroundColor is required or the border has no hit-test surface on iOS -->
+                    <Border Padding="12,6"
+                            StrokeThickness="1"
+                            Stroke="LightGray"
+                            BackgroundColor="Transparent">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="14" />
                         </Border.StrokeShape>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="Stroke" Value="LightGray" />
+                                            <Setter Property="StrokeThickness" Value="1" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <!-- Stroke only, not a fill - the label colour follows the light/dark
+                                         theme and would wash out against a solid Primary background. -->
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                                            <Setter Property="StrokeThickness" Value="3" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
                         <Label Text="{Binding Name}" FontSize="13" VerticalOptions="Center" />
                     </Border>
                 </DataTemplate>

@@ -20,7 +20,7 @@ things like dependency injection & logging in a structured way to your code!
 * **BluetoothLE Hosting** - GATT server, advertising, iBeacon broadcasting, and L2CAP CoC listeners on iOS/macOS, Android, Windows, and Linux (BlueZ AF_BLUETOOTH sockets)
 * **Locations** - foreground/background GPS, geofence monitoring, and motion-activity recognition (CMMotionActivity / ActivityRecognition)
 * **Contacts** - cross-platform device contact access with CRUD and LINQ queries (iOS/Android)
-* **Calendar** - cross-platform calendar & event access with CRUD and LINQ queries on iOS/Mac Catalyst/macOS (EventKit), Android (CalendarContract), and Windows (`AppointmentStore`, best-effort - system events are read-only, writes go to an app-owned calendar)
+* **Calendar** - cross-platform calendar & event access with CRUD and LINQ queries on iOS/Mac Catalyst/macOS (EventKit), Android (CalendarContract), and Windows (`AppointmentStore`, best-effort - system events are read-only, writes go to an app-owned calendar). `DeleteEvent(id, deleteSeries)` chooses between removing one occurrence of a recurring event or the rest of the series
 * **Local Notifications** - scheduled, repeating, and geofence-triggered notifications on iOS/macOS, Android, Windows, and Linux (`org.freedesktop.Notifications` D-Bus)
 * **Push Notifications** - native APNs/FCM, Firebase Cloud Messaging, Azure Notification Hubs, and Blazor (Web Push)
 * **Core** - hosting, DI, key/value stores, object-store binding, lifecycle hooks, connectivity & battery monitoring, and the platform abstractions every Shiny module builds on
