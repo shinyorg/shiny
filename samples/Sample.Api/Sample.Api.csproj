@@ -9,6 +9,5 @@
 
     <ItemGroup>
         <PackageReference Include="Shiny.DocumentDb.Sqlite" />
-        <PackageReference Include="Shiny.DocumentDb.Extensions.DependencyInjection" />
     </ItemGroup>
 </Project>

@@ -41,6 +41,14 @@ public partial class CalendarEditViewModel(
     {
         try
         {
+            var access = await calendarStore.RequestAccess(CalendarAccessType.ReadWrite);
+            if (access != AccessState.Available)
+            {
+                await dialogs.Alert("FAIL", $"Calendar access not granted ({access})", "OK");
+                await navigator.GoBack();
+                return;
+            }
+
             IsBusy = true;
             Calendars = (await calendarStore.GetAll()).Where(c => !c.IsReadOnly).ToList();
 

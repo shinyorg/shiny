@@ -1,4 +1,5 @@
 #if APPLE
+using CoreFoundation;
 using CoreGraphics;
 using EventKit;
 using Foundation;
@@ -30,34 +31,55 @@ public class CalendarStoreImpl : ICalendarStore
 
     public Task<AccessState> RequestAccess(CalendarAccessType accessType = CalendarAccessType.ReadWrite, CancellationToken ct = default)
     {
+        // Access is only ever decided once - iOS will not re-present the prompt after the user has
+        // answered, so requesting again on a Denied/Restricted status just returns Denied without any UI.
+        // Only run the request flow when the status is still undetermined.
+        var current = EKEventStore.GetAuthorizationStatus(EKEntityType.Event);
+        if (current != EKAuthorizationStatus.NotDetermined)
+            return Task.FromResult(FromNative(current));
+
         var tcs = new TaskCompletionSource<AccessState>();
 
         void Handle(bool granted, NSError? error)
-        {
-            if (error != null)
-                tcs.TrySetResult(AccessState.Denied);
-            else
-                tcs.TrySetResult(granted ? AccessState.Available : AccessState.Denied);
-        }
+            => tcs.TrySetResult(error == null && granted ? AccessState.Available : AccessState.Denied);
 
-        var useNewApi =
-            OperatingSystem.IsIOSVersionAtLeast(17) ||
-            OperatingSystem.IsMacCatalystVersionAtLeast(17) ||
-            OperatingSystem.IsMacOSVersionAtLeast(14);
+        void Request()
+        {
+            try
+            {
+                var useNewApi =
+                    OperatingSystem.IsIOSVersionAtLeast(17) ||
+                    OperatingSystem.IsMacCatalystVersionAtLeast(17) ||
+                    OperatingSystem.IsMacOSVersionAtLeast(14);
 
-        if (useNewApi)
-        {
-            if (accessType == CalendarAccessType.WriteOnly)
-                this.store.RequestWriteOnlyAccessToEvents(Handle);
-            else
-                this.store.RequestFullAccessToEvents(Handle);
-        }
-        else
-        {
+                if (useNewApi)
+                {
+                    if (accessType == CalendarAccessType.WriteOnly)
+                        this.store.RequestWriteOnlyAccessToEvents(Handle);
+                    else
+                        this.store.RequestFullAccessToEvents(Handle);
+                }
+                else
+                {
 #pragma warning disable CA1422 // pre-iOS17 API
-            this.store.RequestAccess(EKEntityType.Event, Handle);
+                    this.store.RequestAccess(EKEntityType.Event, Handle);
 #pragma warning restore CA1422
+                }
+            }
+            catch (Exception ex)
+            {
+                tcs.TrySetException(ex);
+            }
         }
+
+        // The EventKit TCC prompt must be presented from the main thread. RequestAccess may be called
+        // from a background thread (e.g. a page-lifecycle hook), in which case the prompt silently fails
+        // to appear and the completion returns "denied" - which is the classic "it never asked me" bug.
+        if (NSThread.Current.IsMainThread)
+            Request();
+        else
+            DispatchQueue.MainQueue.DispatchAsync(Request);
+
         return tcs.Task;
     }
 
