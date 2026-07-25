@@ -31,17 +31,16 @@ public partial class CalendarListViewModel(
     /// The calendar pill currently tapped in the top strip. The "All" sentinel has a null Id, which
     /// means "don't filter by calendar".
     /// </summary>
-    Shiny.Calendar.Calendar? selectedCalendar;
     public Shiny.Calendar.Calendar? SelectedCalendar
     {
-        get => this.selectedCalendar;
+        get;
         set
         {
-            if (ReferenceEquals(this.selectedCalendar, value))
+            if (ReferenceEquals(field, value))
                 return;
 
-            this.selectedCalendar = value;
-            OnPropertyChanged();
+            field = value;
+            this.OnPropertyChanged();
             _ = this.LoadEvents();
         }
     }
