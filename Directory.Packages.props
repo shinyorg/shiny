@@ -2,9 +2,9 @@
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-        <MsftExtensionVersion>10.0.5</MsftExtensionVersion>
-        <MauiLabsVersion>0.1.0-preview.11.26317.2</MauiLabsVersion>
-        <MauiVersion>10.0.80</MauiVersion>
+        <MsftExtensionVersion>10.0.7</MsftExtensionVersion>
+        <MauiLabsVersion>0.1.0-preview.12.26368.2</MauiLabsVersion>
+        <MauiVersion>10.0.90</MauiVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
@@ -24,11 +24,11 @@
         <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="$(MauiLabsVersion)"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
+        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.10.91"/>
         <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
         <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
-        <PackageVersion Include="System.Reactive" Version="6.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.5.2"/>
+        <PackageVersion Include="System.Reactive" Version="7.0.0"/>
+        <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.8.1"/>
         <PackageVersion Include="Microsoft.Extensions.AI" Version="10.5.2"/>
         <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.5.2"/>
         <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.7.0"/>
@@ -41,7 +41,7 @@
         <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1"/>
         <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="11.3.0"/>
+        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="12.1.0"/>
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1"/>
         <PackageVersion Include="xunit" Version="2.9.3"/>
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
