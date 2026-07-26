@@ -67,7 +67,7 @@ public partial class CalendarListViewModel(
             // GetAll hands back fresh instances every time, so the previously selected pill is a dead
             // reference after a refresh - re-resolve it by Id and fall back to "All". Assign the field
             // directly so the setter doesn't kick off a second event load.
-            this.selectedCalendar = cals.FirstOrDefault(c => c.Id == this.selectedCalendar?.Id) ?? cals[0];
+            this.SelectedCalendar = cals.FirstOrDefault(c => c.Id == this.SelectedCalendar?.Id) ?? cals[0];
             OnPropertyChanged(nameof(SelectedCalendar));
 
             await this.LoadEvents();
@@ -95,7 +95,7 @@ public partial class CalendarListViewModel(
                 .Query()
                 .Where(e => e.Start >= now && e.End <= now.AddDays(30));
 
-            var calendarId = this.selectedCalendar?.Id;
+            var calendarId = this.SelectedCalendar?.Id;
             if (calendarId != null)
                 query = query.Where(e => e.CalendarId == calendarId);
 
