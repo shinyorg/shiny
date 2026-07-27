@@ -148,13 +148,14 @@ public class CalendarStoreImpl : ICalendarStore
         }
     }
 
-    public IQueryable<CalendarEvent> Query()
-        => new CalendarEventQueryable(new CalendarEventQueryProvider(this.ExecuteQuery));
+    public CalendarEventQuery Query() => new(async (descriptor, ct) =>
+    {
+        var events = await this
+            .GetEvents(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore, ct)
+            .ConfigureAwait(false);
 
-    IEnumerable<CalendarEvent> ExecuteQuery(CalendarEventQueryDescriptor descriptor)
-        => this.GetEvents(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore)
-            .GetAwaiter()
-            .GetResult();
+        return (IEnumerable<CalendarEvent>)events;
+    });
 
     public async Task<string> CreateEvent(CalendarEvent calendarEvent, CancellationToken ct = default)
     {

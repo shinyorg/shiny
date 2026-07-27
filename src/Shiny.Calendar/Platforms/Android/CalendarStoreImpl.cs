@@ -115,11 +115,10 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
         return results.Count > 0 ? results[0] : null;
     }, ct);
 
-    public IQueryable<CalendarEvent> Query()
-        => new CalendarEventQueryable(new CalendarEventQueryProvider(ExecuteQuery));
-
-    IEnumerable<CalendarEvent> ExecuteQuery(CalendarEventQueryDescriptor descriptor)
-        => ReadEvents(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore);
+    public CalendarEventQuery Query() => new((descriptor, ct) => Task.Run(
+        () => (IEnumerable<CalendarEvent>)ReadEvents(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore),
+        ct
+    ));
 
     public Task<string> CreateEvent(CalendarEvent calendarEvent, CancellationToken ct = default) => Task.Run(() =>
     {

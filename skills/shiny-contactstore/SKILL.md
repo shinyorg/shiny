@@ -1,6 +1,6 @@
 ---
 name: shiny-contactstore
-description: Generate code using Shiny.Contacts for cross-platform device contact access with CRUD, LINQ queries, and Shiny.Core permissions
+description: Generate code using Shiny.Contacts for cross-platform device contact access with CRUD, a fluent async query builder, and Shiny.Core permissions
 auto_invoke: true
 triggers:
   - contact store
@@ -13,7 +13,12 @@ triggers:
   - read contacts
   - write contacts
   - contact query
-  - contact LINQ
+  - ContactQuery
+  - ContactField
+  - ContactSortField
+  - ContactFilterMatch
+  - ContactFilterOperation
+  - search contacts
   - contacts AI tools
   - Shiny.Contacts.Extensions.AI
   - AddContactsAITools
@@ -29,7 +34,7 @@ You are an expert in Shiny.Contacts, a cross-platform library for accessing devi
 
 Invoke this skill when the user wants to:
 - Access device contacts (read, create, update, delete)
-- Query contacts with LINQ
+- Query contacts (filter/search/sort/page)
 - Request contact permissions using Shiny's AccessState model
 - Register the contact store in DI
 - Work with contact models (phones, emails, addresses, etc.)
@@ -42,7 +47,7 @@ Invoke this skill when the user wants to:
 
 Shiny.Contacts provides:
 - Full CRUD operations on device contacts
-- LINQ query support with native translation (Android content provider queries, iOS CNContact predicates)
+- A fluent async query builder with native translation (Android content provider queries, iOS CNContact predicates)
 - Permission handling via Shiny.Core's `AccessState` model
 - Dependency injection integration
 - AOT and trimmer compatible
@@ -116,7 +121,7 @@ public interface IContactStore
     Task<AccessState> RequestAccess(CancellationToken ct = default);
     Task<IReadOnlyList<Contact>> GetAll(CancellationToken ct = default);
     Task<Contact?> GetById(string contactId, CancellationToken ct = default);
-    IQueryable<Contact> Query();
+    ContactQuery Query();
     Task<string> Create(Contact contact, CancellationToken ct = default);
     Task Update(Contact contact, CancellationToken ct = default);
     Task Delete(string contactId, CancellationToken ct = default);
@@ -130,44 +135,71 @@ public interface IContactStore
 Task<IReadOnlyList<char>> contactStore.GetFamilyNameFirstLetters(CancellationToken ct = default);
 ```
 
-### Query with LINQ
+### Querying
 
-The library translates LINQ predicates to native queries where possible, with in-memory fallback.
+`Query()` returns a **`ContactQuery`** builder. It is lazy — nothing runs until `ToListAsync` /
+`FirstOrDefaultAsync` / `CountAsync`, and the native read happens off the calling thread, so awaiting
+it from a UI/view-model method is correct. There is **no `IQueryable`** — do not write
+`.Where(c => …).ToList()` LINQ against `Query()`.
 
 ```csharp
-// Filter by name
-var results = contactStore.Query()
-    .Where(c => c.GivenName.Contains("John"))
-    .ToList();
+public sealed class ContactQuery
+{
+    ContactQuery Where(ContactField field, string value, ContactFilterOperation operation = ContactFilterOperation.Contains);
+    ContactQuery Where(Func<Contact, bool> predicate);   // arbitrary, in-memory
+    ContactQuery Search(string text);                    // name/phone/email OR-search; sets Match(Any)
+    ContactQuery Match(ContactFilterMatch match);        // All (default) | Any
+    ContactQuery OrderBy(ContactSortField field, bool descending = false);
+    ContactQuery ThenBy(ContactSortField field, bool descending = false);
+    ContactQuery Skip(int count);
+    ContactQuery Take(int count);
 
-// Filter by phone number
-var results = contactStore.Query()
-    .Where(c => c.Phones.Any(p => p.Number.Contains("555")))
-    .ToList();
-
-// Filter by email
-var results = contactStore.Query()
-    .Where(c => c.Emails.Any(e => e.Address.Contains("@example.com")))
-    .ToList();
-
-// Combine filters
-var results = contactStore.Query()
-    .Where(c => c.GivenName.StartsWith("J") && c.FamilyName.Contains("Smith"))
-    .ToList();
-
-// Paging
-var page = contactStore.Query()
-    .Where(c => c.FamilyName.StartsWith("A"))
-    .Skip(10)
-    .Take(20)
-    .ToList();
+    Task<IReadOnlyList<Contact>> ToListAsync(CancellationToken ct = default);
+    Task<Contact?> FirstOrDefaultAsync(CancellationToken ct = default);
+    Task<int> CountAsync(CancellationToken ct = default);
+}
 ```
 
-**Supported operations:** `Contains`, `StartsWith`, `EndsWith`, `Equals`
+```csharp
+// Search box — matches given/family/display name, phone numbers, and emails
+var results = await contactStore.Query()
+    .Search(searchText)
+    .OrderBy(ContactSortField.FamilyName)
+    .ThenBy(ContactSortField.GivenName)
+    .ToListAsync(ct);
 
-**Filterable properties:** `GivenName`, `FamilyName`, `MiddleName`, `NamePrefix`, `NameSuffix`, `Nickname`, `DisplayName`, `Note`
+// Filter by a specific field (Contains is the default operation)
+var johns = await contactStore.Query()
+    .Where(ContactField.GivenName, "John")
+    .ToListAsync(ct);
 
-**Filterable collections:** `Phones` (by `Number`), `Emails` (by `Address`)
+// Multiple field filters are ANDed
+var results = await contactStore.Query()
+    .Where(ContactField.GivenName, "J", ContactFilterOperation.StartsWith)
+    .Where(ContactField.FamilyName, "Smith")
+    .ToListAsync(ct);
+
+// Anything the fields don't cover — plain predicate, applied in-memory
+var withBirthdays = await contactStore.Query()
+    .Where(c => c.Dates.Any(d => d.Type == ContactDateType.Birthday))
+    .ToListAsync(ct);
+
+// Paging
+var page = await contactStore.Query()
+    .Where(ContactField.FamilyName, "A", ContactFilterOperation.StartsWith)
+    .OrderBy(ContactSortField.FamilyName)
+    .Skip(10)
+    .Take(20)
+    .ToListAsync(ct);
+```
+
+**`ContactField`:** `GivenName`, `FamilyName`, `MiddleName`, `NamePrefix`, `NameSuffix`, `Nickname`, `DisplayName`, `Note`, `Company`, `JobTitle`, `Department`, `Phone`, `Email`
+
+**`ContactFilterOperation`:** `Contains` (default), `StartsWith`, `EndsWith`, `Equals` — all case-insensitive
+
+**`ContactSortField`:** `GivenName`, `FamilyName`, `DisplayName`, `Company`
+
+**Natively translated:** name fields, `Phone` and `Email` on Android; `StartsWith`/`Equals` on given/family/display name on iOS (in `Match.All` mode only). Everything else reads the full contact list and filters in-memory — correct, just slower. Field filters are always re-applied in-memory, so a filter never silently goes missing.
 
 ### Create a Contact
 
@@ -246,7 +278,7 @@ Reading `Note` and `Relationships` on iOS requires the `com.apple.developer.cont
 ## Best Practices
 
 1. **Always request access first** — use `await contactStore.RequestAccess()` and check for `AccessState.Available` before any CRUD operation
-2. **Use LINQ queries for filtering** — prefer `Query().Where(...)` over `GetAll()` when filtering, as it uses native queries
+2. **Use `Query()` for filtering** — prefer `Query().Where(ContactField.…, …).ToListAsync(ct)` (or `.Search(text)`) over `GetAll()` + LINQ, as it narrows the native read
 3. **Check for Restricted on Android** — `AccessState.Restricted` means partial access (read-only or write-only)
 4. **Handle iOS entitlements gracefully** — Notes and Relations silently return empty without the entitlement
 5. **Bind lists to `Thumbnail`, not `Photo`** — bulk reads (`GetAll`/`Query`) only load `Thumbnail`; get the full `Photo` from `GetById` on a detail screen

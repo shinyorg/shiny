@@ -50,17 +50,14 @@ public partial class ContactListViewModel(
             }
             else
             {
-                Contacts = contactStore
+                var results = await contactStore
                     .Query()
-                    .Where(c =>
-                        c.GivenName!.Contains(search) ||
-                        c.FamilyName!.Contains(search) ||
-                        c.Phones.Any(p => p.Number.Contains(search)) ||
-                        c.Emails.Any(e => e.Address.Contains(search))
-                    )
-                    .OrderBy(x => x.FamilyName)
-                    .ThenBy(x => x.GivenName)
-                    .ToList();
+                    .Search(search)
+                    .OrderBy(ContactSortField.FamilyName)
+                    .ThenBy(ContactSortField.GivenName)
+                    .ToListAsync();
+
+                Contacts = results.ToList();
             }
         }
         catch (Exception ex)

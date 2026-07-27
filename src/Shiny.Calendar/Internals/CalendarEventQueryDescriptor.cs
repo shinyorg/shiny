@@ -1,28 +1,23 @@
-using System.Linq.Expressions;
-
 namespace Shiny.Calendar.Internals;
 
 /// <summary>
-/// Holds the parsed query information extracted from an <see cref="IQueryable{CalendarEvent}"/> expression.
-/// Platform implementations map <see cref="CalendarId"/> / <see cref="StartAfter"/> / <see cref="EndBefore"/>
-/// onto their native fetch; the remainder is applied in-memory.
+/// The fetch instructions a <see cref="CalendarEventQuery"/> hands to the platform store.
+/// <para>
+/// Everything here is a HINT used to narrow the native read. The builder applies its in-memory
+/// predicates, sorting and paging afterwards, so an implementation is free to return a superset - it
+/// must never return fewer events than the hints allow.
+/// </para>
 /// </summary>
 public class CalendarEventQueryDescriptor
 {
-    /// <summary>Native filter: only events on this calendar (from <c>e.CalendarId == "..."</c>).</summary>
+    /// <summary>Native filter: only events on this calendar. Null means all calendars.</summary>
     public string? CalendarId { get; set; }
 
-    /// <summary>Native filter: lower bound of the event window (from <c>e.Start &gt;= d</c> / <c>e.End &gt;= d</c>).</summary>
+    /// <summary>Native filter: lower bound of the event window.</summary>
     public DateTimeOffset? StartAfter { get; set; }
 
-    /// <summary>Native filter: upper bound of the event window (from <c>e.End &lt;= d</c> / <c>e.Start &lt;= d</c>).</summary>
+    /// <summary>Native filter: upper bound of the event window.</summary>
     public DateTimeOffset? EndBefore { get; set; }
-
-    /// <summary>
-    /// Any predicate portions that couldn't be translated to native filters.
-    /// Applied as in-memory post-filters.
-    /// </summary>
-    public Expression<Func<CalendarEvent, bool>>? InMemoryPredicate { get; set; }
 
     public int? Skip { get; set; }
     public int? Take { get; set; }

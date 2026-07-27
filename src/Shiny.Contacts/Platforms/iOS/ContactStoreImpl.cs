@@ -148,20 +148,23 @@ public class ContactStoreImpl : IContactStore
         return Task.FromResult(result);
     }
 
-    public IQueryable<Contact> Query()
-    {
-        var provider = new ContactQueryProvider(ExecuteQuery);
-        return new ContactQueryable(provider);
-    }
+    public ContactQuery Query()
+        => new((descriptor, ct) => Task.Run(() => ExecuteQuery(descriptor), ct));
 
     IEnumerable<Contact> ExecuteQuery(ContactQueryDescriptor descriptor)
     {
         var store = new CNContactStore();
 
-        var nameFilter = descriptor.Filters.FirstOrDefault(f =>
-            f.PropertyName is nameof(Contact.GivenName)
-                           or nameof(Contact.FamilyName)
-                           or nameof(Contact.DisplayName));
+        // CNContact only offers a name-matching predicate, and it matches on name-token PREFIX. So it
+        // can only be pushed down when the result is guaranteed to be a superset of the filter:
+        //  - Match.All only, otherwise a phone/email-only match would be dropped before the builder's
+        //    in-memory pass ever sees it.
+        //  - StartsWith/Equals only, since a prefix match is not a superset of Contains/EndsWith.
+        var nameFilter = descriptor.Match == ContactFilterMatch.All
+            ? descriptor.Filters.FirstOrDefault(f =>
+                (f.Field is ContactField.GivenName or ContactField.FamilyName or ContactField.DisplayName) &&
+                (f.Operation is ContactFilterOperation.StartsWith or ContactFilterOperation.Equals))
+            : null;
 
         NSPredicate? predicate = null;
         if (nameFilter != null)

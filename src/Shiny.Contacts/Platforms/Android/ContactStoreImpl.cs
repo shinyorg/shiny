@@ -61,10 +61,8 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         }, ct);
     }
 
-    public IQueryable<Contact> Query()
-    {
-        return new ContactQueryable(new ContactQueryProvider(ExecuteQuery));
-    }
+    public ContactQuery Query()
+        => new((descriptor, ct) => Task.Run(() => ExecuteQuery(descriptor), ct));
 
     public Task<string> Create(Contact contact, CancellationToken ct = default)
     {
@@ -238,41 +236,45 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
 
         foreach (var filter in descriptor.Filters)
         {
-            HashSet<string>? ids = null;
+            HashSet<string> ids;
 
-            switch (filter.PropertyName)
+            switch (filter.Field)
             {
-                case "GivenName":
-                case "FamilyName":
-                case "MiddleName":
-                case "NamePrefix":
-                case "NameSuffix":
-                case "DisplayName":
-                case "Nickname":
+                case ContactField.GivenName:
+                case ContactField.FamilyName:
+                case ContactField.MiddleName:
+                case ContactField.NamePrefix:
+                case ContactField.NameSuffix:
+                case ContactField.DisplayName:
+                case ContactField.Nickname:
                     ids = QueryByName(filter);
                     break;
 
-                case "Phones":
+                case ContactField.Phone:
                     ids = QueryByPhone(filter);
                     break;
 
-                case "Emails":
+                case ContactField.Email:
                     ids = QueryByEmail(filter);
                     break;
 
                 default:
-                    // Unsupported filter — load all and let in-memory predicate handle
+                    // No native column for this field (note/organization) — read everything and let the
+                    // query builder's in-memory pass narrow it.
                     return ReadContacts(null, null);
             }
 
-            if (ids != null)
-                contactIds = contactIds == null ? ids : new HashSet<string>(contactIds.Intersect(ids));
+            if (contactIds == null)
+                contactIds = ids;
+            else if (descriptor.Match == ContactFilterMatch.Any)
+                contactIds.UnionWith(ids);
+            else
+                contactIds.IntersectWith(ids);
         }
 
         if (contactIds == null || contactIds.Count == 0)
             return Array.Empty<Contact>();
 
-        var idList = string.Join(",", contactIds);
         return ReadContacts(
             ContactsContract.Contacts.InterfaceConsts.Id + " IN (" + string.Join(",", contactIds.Select(_ => "?")) + ")",
             contactIds.ToArray()
@@ -284,27 +286,27 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         var (op, val) = GetLikeArgs(filter.Operation, filter.Value);
         string column;
 
-        switch (filter.PropertyName)
+        switch (filter.Field)
         {
-            case "GivenName":
+            case ContactField.GivenName:
                 column = CommonColumns.StructuredName.GivenName;
                 break;
-            case "FamilyName":
+            case ContactField.FamilyName:
                 column = CommonColumns.StructuredName.FamilyName;
                 break;
-            case "MiddleName":
+            case ContactField.MiddleName:
                 column = CommonColumns.StructuredName.MiddleName;
                 break;
-            case "NamePrefix":
+            case ContactField.NamePrefix:
                 column = CommonColumns.StructuredName.Prefix;
                 break;
-            case "NameSuffix":
+            case ContactField.NameSuffix:
                 column = CommonColumns.StructuredName.Suffix;
                 break;
-            case "DisplayName":
+            case ContactField.DisplayName:
                 column = CommonColumns.StructuredName.DisplayName;
                 break;
-            case "Nickname":
+            case ContactField.Nickname:
                 return QueryDataTable(
                     CommonColumns.Nickname.ContentItemType,
                     CommonColumns.Nickname.Name,

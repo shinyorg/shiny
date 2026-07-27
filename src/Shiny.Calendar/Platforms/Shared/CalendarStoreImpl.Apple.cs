@@ -170,11 +170,10 @@ public class CalendarStoreImpl : ICalendarStore
         return Task.FromResult(ev == null ? null : ToEvent(ev));
     }
 
-    public IQueryable<CalendarEvent> Query()
-        => new CalendarEventQueryable(new CalendarEventQueryProvider(this.ExecuteQuery));
-
-    IEnumerable<CalendarEvent> ExecuteQuery(CalendarEventQueryDescriptor descriptor)
-        => this.FetchEvents(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore).Select(ToEvent);
+    public CalendarEventQuery Query() => new((descriptor, ct) => Task.Run(
+        () => this.FetchEvents(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore).Select(ToEvent),
+        ct
+    ));
 
     EKEvent[] FetchEvents(string? calendarId, DateTimeOffset? start, DateTimeOffset? end)
     {

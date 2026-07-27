@@ -60,11 +60,21 @@ public interface ICalendarStore
     Task<CalendarEvent?> GetEvent(string eventId, CancellationToken ct = default);
 
     /// <summary>
-    /// Returns a LINQ-queryable source of events. <c>.Where()</c> filters on <see cref="CalendarEvent.CalendarId"/>
-    /// and the <see cref="CalendarEvent.Start"/>/<see cref="CalendarEvent.End"/> date window are translated
-    /// to native queries; all other predicates are applied in-memory.
+    /// Starts a fluent event query. Configure it with <c>ForCalendar</c>/<c>Between</c>/<c>Where</c>/
+    /// <c>OrderBy</c>/<c>Skip</c>/<c>Take</c>, then run it with <c>ToListAsync(ct)</c>. The calendar id
+    /// and date window are pushed down to the native fetch; everything else is applied to the results.
+    /// The native read runs off the calling thread, so it is safe to await from the UI thread.
     /// </summary>
-    IQueryable<CalendarEvent> Query();
+    /// <example>
+    /// <code>
+    /// var events = await store
+    ///     .Query()
+    ///     .Between(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(30))
+    ///     .OrderBy(CalendarEventSortField.Start)
+    ///     .ToListAsync(ct);
+    /// </code>
+    /// </example>
+    CalendarEventQuery Query();
 
     /// <summary>
     /// Creates a new event and returns the platform-assigned identifier. Set <see cref="CalendarEvent.CalendarId"/>

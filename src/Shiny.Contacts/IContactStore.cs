@@ -23,11 +23,17 @@ public interface IContactStore
     Task<Contact?> GetById(string contactId, CancellationToken ct = default);
 
     /// <summary>
-    /// Returns a LINQ-queryable source of contacts.
-    /// Supports .Where() with .Contains(), .StartsWith(), .Equals() on string properties.
-    /// Predicates are translated to native queries where possible, with in-memory fallback.
+    /// Starts a fluent contact query. Configure it with <c>Where</c>/<c>Search</c>/<c>OrderBy</c>/
+    /// <c>Skip</c>/<c>Take</c>, then run it with <c>ToListAsync(ct)</c>. Field filters are translated
+    /// to native queries where the platform supports it, and always re-applied in-memory. The native
+    /// read runs off the calling thread, so it is safe to await from the UI thread.
     /// </summary>
-    IQueryable<Contact> Query();
+    /// <example>
+    /// <code>
+    /// var results = await store.Query().Search("smith").Take(50).ToListAsync(ct);
+    /// </code>
+    /// </example>
+    ContactQuery Query();
 
     /// <summary>
     /// Creates a new contact and returns the platform-assigned identifier.

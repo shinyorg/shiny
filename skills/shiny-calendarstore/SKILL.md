@@ -1,6 +1,6 @@
 ---
 name: shiny-calendarstore
-description: Generate code using Shiny.Calendar for cross-platform device calendar & event access with CRUD, LINQ queries, and Shiny.Core permissions
+description: Generate code using Shiny.Calendar for cross-platform device calendar & event access with CRUD, a fluent async query builder, and Shiny.Core permissions
 auto_invoke: true
 triggers:
   - calendar store
@@ -18,7 +18,9 @@ triggers:
   - update event
   - delete event
   - calendar query
-  - calendar LINQ
+  - CalendarEventQuery
+  - CalendarEventSortField
+  - search events
   - EventKit
   - CalendarContract
   - AppointmentStore
@@ -38,7 +40,7 @@ events on iOS, Mac Catalyst, macOS, Android, and Windows.
 
 Invoke this skill when the user wants to:
 - Access device calendars and events (read, create, update, delete)
-- Query events with LINQ
+- Query events (filter/sort/page over a date window)
 - Request calendar permissions using Shiny's AccessState model
 - Register the calendar store in DI
 - Work with calendar models (events, attendees, reminders)
@@ -51,8 +53,8 @@ Invoke this skill when the user wants to:
 
 Shiny.Calendar provides:
 - Full CRUD operations on device calendars and events
-- LINQ query support with native fetch translation (calendar id + start/end window are pushed to the
-  native query; other predicates run in-memory)
+- A fluent async query builder with native fetch translation (calendar id + start/end window are
+  pushed to the native query; other filters, sorting and paging run in-memory)
 - Permission handling via Shiny.Core's `AccessState` model
 - Dependency injection integration
 - AOT and trimmer compatible
@@ -148,7 +150,7 @@ public interface ICalendarStore
     // Events
     Task<IReadOnlyList<CalendarEvent>> GetEvents(string? calendarId = null, DateTimeOffset? start = null, DateTimeOffset? end = null, CancellationToken ct = default);
     Task<CalendarEvent?> GetEvent(string eventId, CancellationToken ct = default);
-    IQueryable<CalendarEvent> Query();
+    CalendarEventQuery Query();
     Task<string> CreateEvent(CalendarEvent calendarEvent, CancellationToken ct = default);
     Task UpdateEvent(CalendarEvent calendarEvent, CancellationToken ct = default);
     Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default);
@@ -169,32 +171,64 @@ Task<string> store.CreateAllDayEvent(string? calendarId, string title, string? d
 Task<Shiny.Contacts.Contact?> attendee.ResolveContact(IContactStore contactStore, CancellationToken ct = default);
 ```
 
-### Query with LINQ
+### Querying events
 
-`Query()` (over events) pushes `CalendarId` equality and the `Start`/`End` date window down to the
-native fetch; the full predicate is always re-applied in-memory, so any `Where` is safe.
+`Query()` returns a **`CalendarEventQuery`** builder. It is lazy — nothing runs until `ToListAsync` /
+`FirstOrDefaultAsync` / `CountAsync`, and the native calendar read happens off the calling thread, so
+awaiting it from a UI/view-model method is correct (do NOT wrap it in `Task.Run`). There is **no
+`IQueryable`** — do not write `.Where(e => …).ToList()` LINQ against `Query()`.
 
 ```csharp
-// Events on a calendar within a date window
-var events = store.Query()
-    .Where(e => e.CalendarId == calId
-             && e.Start >= DateTimeOffset.Now
-             && e.End <= DateTimeOffset.Now.AddDays(7))
-    .ToList();
+public sealed class CalendarEventQuery
+{
+    CalendarEventQuery ForCalendar(string? calendarId);   // native hint
+    CalendarEventQuery From(DateTimeOffset start);        // native hint
+    CalendarEventQuery To(DateTimeOffset end);            // native hint
+    CalendarEventQuery Between(DateTimeOffset start, DateTimeOffset end);
+    CalendarEventQuery Where(Func<CalendarEvent, bool> predicate);   // in-memory, ANDed
+    CalendarEventQuery TitleContains(string text);                   // in-memory, case-insensitive
+    CalendarEventQuery OrderBy(CalendarEventSortField field, bool descending = false);
+    CalendarEventQuery ThenBy(CalendarEventSortField field, bool descending = false);
+    CalendarEventQuery Skip(int count);
+    CalendarEventQuery Take(int count);
 
-// Free-text (runs in-memory)
-var standups = store.Query()
-    .Where(e => e.Title.Contains("Standup"))
-    .ToList();
-
-// Attendee filter (in-memory) + paging
-var withAlice = store.Query()
-    .Where(e => e.Attendees.Any(a => a.Email == "alice@example.com"))
-    .Skip(0).Take(20)
-    .ToList();
+    Task<IReadOnlyList<CalendarEvent>> ToListAsync(CancellationToken ct = default);
+    Task<CalendarEvent?> FirstOrDefaultAsync(CancellationToken ct = default);
+    Task<int> CountAsync(CancellationToken ct = default);
+}
 ```
 
-**Native fetch hints:** `CalendarId` (`==`), `Start` / `End` (`>=`, `<=`). Everything else is in-memory.
+```csharp
+// Events on a calendar within a date window (both hints pushed to the native fetch)
+var events = await store.Query()
+    .ForCalendar(calId)
+    .Between(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(7))
+    .OrderBy(CalendarEventSortField.Start)
+    .ToListAsync(ct);
+
+// Free-text title (in-memory)
+var standups = await store.Query()
+    .From(DateTimeOffset.Now.AddDays(-30))
+    .TitleContains("standup")
+    .ToListAsync(ct);
+
+// Attendee filter (in-memory) + paging
+var withAlice = await store.Query()
+    .Where(e => e.Attendees.Any(a => a.Email == "alice@example.com"))
+    .Skip(0).Take(20)
+    .ToListAsync(ct);
+
+// Count
+var busy = await store.Query()
+    .Between(from, to)
+    .Where(e => e.Availability == EventAvailability.Busy)
+    .CountAsync(ct);
+```
+
+**Native fetch hints:** `ForCalendar`, `From`, `To`, `Between`. Everything else — `Where`,
+`TitleContains`, sorting, `Skip`/`Take` — is applied to the fetched events.
+
+**`CalendarEventSortField`:** `Start`, `End`, `Title`. `ThenBy` throws without a preceding `OrderBy`.
 
 ### Create an Event
 
@@ -311,10 +345,11 @@ Android reads series masters from the `Events` table rather than expanded instan
 ## Best Practices
 
 1. **Always request access first** — `await store.RequestAccess(...)` and check `AccessState.Available`.
-2. **Prefer `Query().Where(...)` with a date window** — the `Start`/`End`/`CalendarId` hints narrow the native fetch; unbounded reads default to a ~4-month window.
-3. **Handle `Restricted`** — iOS write-only and Android partial grants surface as `AccessState.Restricted`.
-4. **Don't rely on attendee writes on Apple** — set attendees where supported (Android), and use `ResolveContact` to map an attendee's email back to a device contact.
-5. **Use primary constructors** — inject `ICalendarStore` via primary constructor.
+2. **Always set a date window** — `Between(from, to)` (or `From`/`To`) plus `ForCalendar(id)` are the only hints pushed to the native fetch; unbounded reads default to a ~4-month window.
+3. **Await the query, don't wrap it** — `ToListAsync` already does the native read off the calling thread. Do not add `Task.Run` around it.
+4. **Handle `Restricted`** — iOS write-only and Android partial grants surface as `AccessState.Restricted`.
+5. **Don't rely on attendee writes on Apple** — set attendees where supported (Android), and use `ResolveContact` to map an attendee's email back to a device contact.
+6. **Use primary constructors** — inject `ICalendarStore` via primary constructor.
 
 ## AI Tool Integration (Shiny.Calendar.Extensions.AI)
 

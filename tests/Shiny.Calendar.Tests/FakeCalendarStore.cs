@@ -4,12 +4,11 @@ using Shiny.Calendar.Internals;
 namespace Shiny.Calendar.Tests;
 
 /// <summary>
-/// In-memory <see cref="ICalendarStore"/> used to exercise the device-independent logic (LINQ
-/// visitor/interpreter/provider and the AI tool surface) without a real platform backend. The
-/// <see cref="Query"/> path wires up the real <see cref="CalendarEventQueryProvider"/> so tests verify
-/// the actual expression translation; the executor honours the native fetch hints
-/// (<see cref="CalendarEventQueryDescriptor.CalendarId"/> / <c>StartAfter</c> / <c>EndBefore</c>) so we
-/// can assert they were extracted.
+/// In-memory <see cref="ICalendarStore"/> used to exercise the device-independent logic (the query
+/// builder and the AI tool surface) without a real platform backend. The <see cref="Query"/> executor
+/// honours only the native fetch hints (<see cref="CalendarEventQueryDescriptor.CalendarId"/> /
+/// <c>StartAfter</c> / <c>EndBefore</c>) - exactly like a real backend - so tests can assert both what
+/// was pushed down and what the builder applied afterwards.
 /// </summary>
 public class FakeCalendarStore : ICalendarStore
 {
@@ -76,12 +75,11 @@ public class FakeCalendarStore : ICalendarStore
     public Task<CalendarEvent?> GetEvent(string eventId, CancellationToken ct = default)
         => Task.FromResult(this.events.FirstOrDefault(e => e.Id == eventId));
 
-    public IQueryable<CalendarEvent> Query()
-        => new CalendarEventQueryable(new CalendarEventQueryProvider(descriptor =>
-        {
-            this.LastDescriptor = descriptor;
-            return Fetch(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore);
-        }));
+    public CalendarEventQuery Query() => new((descriptor, ct) =>
+    {
+        this.LastDescriptor = descriptor;
+        return Task.FromResult(Fetch(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore));
+    });
 
     public Task<string> CreateEvent(CalendarEvent calendarEvent, CancellationToken ct = default)
     {

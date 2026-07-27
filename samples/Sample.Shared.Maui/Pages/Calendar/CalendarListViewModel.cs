@@ -12,8 +12,15 @@ public partial class CalendarListViewModel(
     IDialogs dialogs
 ) : ObservableObject, IPageLifecycleAware
 {
+    // RefreshView OWNS IsRefreshing while it is driving a refresh: setting it to true from code
+    // re-executes the bound Command. Load() must therefore only ever set it to false (to dismiss the
+    // spinner after a pull), never to true - otherwise every Load schedules the next one and the page
+    // spins forever on the UI thread.
     [ObservableProperty]
     bool isRefreshing;
+
+    bool isLoading;
+    Shiny.Calendar.Calendar? selectedCalendar;
 
     public List<Shiny.Calendar.Calendar> Calendars
     {
@@ -33,15 +40,19 @@ public partial class CalendarListViewModel(
     /// </summary>
     public Shiny.Calendar.Calendar? SelectedCalendar
     {
-        get;
+        get => selectedCalendar;
         set
         {
-            if (ReferenceEquals(field, value))
+            if (ReferenceEquals(selectedCalendar, value))
                 return;
 
-            field = value;
+            selectedCalendar = value;
             this.OnPropertyChanged();
-            _ = this.LoadEvents();
+
+            // Replacing Calendars makes the CollectionView drop its selection, which lands back here
+            // as a null write. Load() re-resolves the pill itself, so ignore writes while it runs.
+            if (!isLoading)
+                _ = this.LoadEvents();
         }
     }
 
@@ -50,6 +61,10 @@ public partial class CalendarListViewModel(
     [RelayCommand]
     async Task Load()
     {
+        if (isLoading)
+            return;
+
+        isLoading = true;
         try
         {
             var access = await calendarStore.RequestAccess(CalendarAccessType.ReadWrite);
@@ -58,7 +73,6 @@ public partial class CalendarListViewModel(
                 await dialogs.Alert("FAIL", $"Calendar access not granted ({access})", "OK");
                 return;
             }
-            IsRefreshing = true;
 
             var cals = (await calendarStore.GetAll()).ToList();
             cals.Insert(0, CreateAllPill());
@@ -67,7 +81,7 @@ public partial class CalendarListViewModel(
             // GetAll hands back fresh instances every time, so the previously selected pill is a dead
             // reference after a refresh - re-resolve it by Id and fall back to "All". Assign the field
             // directly so the setter doesn't kick off a second event load.
-            this.SelectedCalendar = cals.FirstOrDefault(c => c.Id == this.SelectedCalendar?.Id) ?? cals[0];
+            selectedCalendar = cals.FirstOrDefault(c => c.Id == selectedCalendar?.Id) ?? cals[0];
             OnPropertyChanged(nameof(SelectedCalendar));
 
             await this.LoadEvents();
@@ -78,6 +92,7 @@ public partial class CalendarListViewModel(
         }
         finally
         {
+            isLoading = false;
             IsRefreshing = false;
         }
     }
@@ -86,28 +101,22 @@ public partial class CalendarListViewModel(
     {
         try
         {
-            IsRefreshing = true;
-
             // Upcoming events for the next 30 days. Both the window and the calendar id are pushed
-            // down to the native fetch by the query provider.
+            // down to the native fetch. ToListAsync does the native read off the UI thread.
             var now = DateTimeOffset.Now;
-            var query = calendarStore
+
+            var events = await calendarStore
                 .Query()
-                .Where(e => e.Start >= now && e.End <= now.AddDays(30));
+                .ForCalendar(this.SelectedCalendar?.Id)
+                .Between(now, now.AddDays(30))
+                .OrderBy(CalendarEventSortField.Start)
+                .ToListAsync();
 
-            var calendarId = this.SelectedCalendar?.Id;
-            if (calendarId != null)
-                query = query.Where(e => e.CalendarId == calendarId);
-
-            Events = query.OrderBy(e => e.Start).ToList();
+            Events = events.ToList();
         }
         catch (Exception ex)
         {
             await dialogs.Alert("Error", ex.ToString(), "OK");
-        }
-        finally
-        {
-            IsRefreshing = false;
         }
     }
 

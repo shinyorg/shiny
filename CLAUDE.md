@@ -38,6 +38,10 @@ Notes use the `<RN>` component (`import RN from '/src/components/ReleaseNote.ast
 stays at the top. Use a `### <version> - TBD` heading for unreleased work and promote it to a dated
 heading when cutting the release.
 
+**Never write a release note for a sample-app fix.** Release notes describe the *shipped library*.
+Changes confined to `samples/` get no note — fix the sample, and only add a note if the same change
+also altered library behavior or documented guidance (write the note about *that*, not the sample).
+
 ## Blog posts (only when explicitly requested)
 
 Do **not** write blog posts automatically as part of a fix/feature. Write them **only when the user asks**. When asked to blog a feature, produce **two** posts — first the docs-site version, then adapt it for the personal blog.
