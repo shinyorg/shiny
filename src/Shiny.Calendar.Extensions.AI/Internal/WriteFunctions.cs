@@ -7,9 +7,9 @@ namespace Shiny.Calendar.Extensions.AI.Internal;
 /// <summary>Creates a new calendar event.</summary>
 sealed class CreateEventFunction : CalendarAIFunctionBase
 {
-    public CreateEventFunction(ICalendarStore store)
-        : base(store, "create_event",
-            "Create a new calendar event. Requires a title, start, and end (ISO-8601). If calendarId is omitted the device default calendar is used. Returns the new event's id.",
+    public CreateEventFunction(ICalendarStore store, CalendarAccessPolicy policy)
+        : base(store, policy, "create_event",
+            "Create a new calendar event. Requires a title, start, and end (ISO-8601). If calendarId is omitted the device default calendar is used - when you are limited to specific calendars you must pass a calendarId whose allowedOperations include create. Returns the new event's id.",
             BuildSchema())
     { }
 
@@ -33,6 +33,7 @@ sealed class CreateEventFunction : CalendarAIFunctionBase
         var title = GetString(arguments, "title");
         var start = GetDate(arguments, "start");
         var end = GetDate(arguments, "end");
+        var calendarId = GetString(arguments, "calendarId");
 
         if (string.IsNullOrWhiteSpace(title))
             return new JsonObject { ["error"] = "'title' is required." };
@@ -41,9 +42,24 @@ sealed class CreateEventFunction : CalendarAIFunctionBase
         if (end < start)
             return new JsonObject { ["error"] = "'end' must be on or after 'start'." };
 
+        if (calendarId is null)
+        {
+            // Without an id the platform writes to the default calendar, which we cannot vet ahead of
+            // time - only allow that when creating is permitted everywhere.
+            if (!this.Policy.Global.HasFlag(CalendarAICapabilities.Create))
+                return new JsonObject
+                {
+                    ["error"] = "'calendarId' is required - you may only create events in specific calendars. Call list_calendars and pick one whose allowedOperations include 'create'."
+                };
+        }
+        else if (!this.Policy.Allows(calendarId, CalendarAICapabilities.Create))
+        {
+            return Denied(calendarId);
+        }
+
         var evt = new CalendarEvent
         {
-            CalendarId = GetString(arguments, "calendarId"),
+            CalendarId = calendarId,
             Title = title,
             Description = GetString(arguments, "description"),
             Location = GetString(arguments, "location"),
@@ -64,8 +80,8 @@ sealed class CreateEventFunction : CalendarAIFunctionBase
 /// <summary>Updates fields on an existing calendar event.</summary>
 sealed class UpdateEventFunction : CalendarAIFunctionBase
 {
-    public UpdateEventFunction(ICalendarStore store)
-        : base(store, "update_event",
+    public UpdateEventFunction(ICalendarStore store, CalendarAccessPolicy policy)
+        : base(store, policy, "update_event",
             "Update an existing event (found by id). Only the fields you supply are changed.",
             BuildSchema())
     { }
@@ -93,6 +109,9 @@ sealed class UpdateEventFunction : CalendarAIFunctionBase
         var evt = await this.Store.GetEvent(id, cancellationToken).ConfigureAwait(false);
         if (evt is null)
             return new JsonObject { ["error"] = $"No event found with id '{id}'." };
+
+        if (!this.Policy.Allows(evt.CalendarId, CalendarAICapabilities.Update))
+            return Denied(evt.CalendarId);
 
         var title = GetString(arguments, "title");
         if (title != null)
@@ -129,8 +148,8 @@ sealed class UpdateEventFunction : CalendarAIFunctionBase
 /// <summary>Deletes a calendar event by id.</summary>
 sealed class DeleteEventFunction : CalendarAIFunctionBase
 {
-    public DeleteEventFunction(ICalendarStore store)
-        : base(store, "delete_event",
+    public DeleteEventFunction(ICalendarStore store, CalendarAccessPolicy policy)
+        : base(store, policy, "delete_event",
             "Delete a calendar event by its id. This is irreversible - confirm with the user before calling.",
             BuildSchema())
     { }
@@ -154,6 +173,17 @@ sealed class DeleteEventFunction : CalendarAIFunctionBase
             return new JsonObject { ["error"] = "'eventId' is required." };
 
         var deleteSeries = GetBool(arguments, "deleteSeries") ?? false;
+
+        // Only pay for the lookup when the delete rules differ between calendars.
+        if (!this.Policy.AppliesToAll(CalendarAICapabilities.Delete))
+        {
+            var evt = await this.Store.GetEvent(id, cancellationToken).ConfigureAwait(false);
+            if (evt is null)
+                return new JsonObject { ["error"] = $"No event found with id '{id}'." };
+
+            if (!this.Policy.Allows(evt.CalendarId, CalendarAICapabilities.Delete))
+                return Denied(evt.CalendarId);
+        }
 
         await this.Store.DeleteEvent(id, deleteSeries, cancellationToken).ConfigureAwait(false);
         return new JsonObject { ["success"] = true, ["id"] = id, ["deletedSeries"] = deleteSeries };

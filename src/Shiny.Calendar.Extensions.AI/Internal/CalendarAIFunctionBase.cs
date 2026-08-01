@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.AI;
 
 namespace Shiny.Calendar.Extensions.AI.Internal;
@@ -11,13 +12,21 @@ namespace Shiny.Calendar.Extensions.AI.Internal;
 abstract class CalendarAIFunctionBase : AIFunction
 {
     protected ICalendarStore Store { get; }
+    protected CalendarAccessPolicy Policy { get; }
     readonly string name;
     readonly string description;
     readonly JsonElement schema;
 
-    protected CalendarAIFunctionBase(ICalendarStore store, string name, string description, JsonElement schema)
+    protected CalendarAIFunctionBase(
+        ICalendarStore store,
+        CalendarAccessPolicy policy,
+        string name,
+        string description,
+        JsonElement schema
+    )
     {
         this.Store = store;
+        this.Policy = policy;
         this.name = name;
         this.description = description;
         this.schema = schema;
@@ -26,6 +35,32 @@ abstract class CalendarAIFunctionBase : AIFunction
     public override string Name => this.name;
     public override string Description => this.description;
     public override JsonElement JsonSchema => this.schema;
+
+    /// <summary>
+    /// The calendar ids the agent may use for <paramref name="capability"/>. When the capability is
+    /// global this enumerates the device calendars (minus any excluded by an id entry); otherwise it is
+    /// just the explicitly allowed ids - no device read needed.
+    /// </summary>
+    protected async Task<IReadOnlyList<string>> GetAllowedCalendarIds(CalendarAICapabilities capability, CancellationToken ct)
+    {
+        if (!this.Policy.Global.HasFlag(capability))
+            return this.Policy.ExplicitlyAllowed(capability);
+
+        var all = await this.Store.GetAll(ct).ConfigureAwait(false);
+        return all
+            .Where(c => c.Id != null && this.Policy.Allows(c.Id, capability))
+            .Select(c => c.Id!)
+            .ToList();
+    }
+
+    /// <summary>The standard refusal handed back to the LLM when a calendar is outside its allow-list.</summary>
+    protected static JsonObject Denied(string? calendarId)
+        => new()
+        {
+            ["error"] = calendarId is null
+                ? "This app has not granted the assistant access to that operation."
+                : $"Calendar '{calendarId}' is not available to you. Call list_calendars to see the calendars you can use."
+        };
 
     protected static string? GetString(AIFunctionArguments args, string key)
     {

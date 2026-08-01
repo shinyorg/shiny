@@ -29,6 +29,10 @@ triggers:
   - AddCalendarAITools
   - CalendarAITools
   - CalendarAICapabilities
+  - ICalendarAIToolBuilder
+  - AddCalendars
+  - calendar AI filter
+  - per-calendar AI access
 ---
 
 # Shiny.Calendar Skill
@@ -355,9 +359,9 @@ Android reads series masters from the `Events` table rather than expanded instan
 
 The optional `Shiny.Calendar.Extensions.AI` package exposes `ICalendarStore` as
 `Microsoft.Extensions.AI` tool functions (`AIFunction`s) for LLM agents. You opt-in **per operation**
-(read / create / update / delete) — an allow-list you control on behalf of the agent (**not** an OS
-permission prompt; the platform calendar permission must already be granted). AOT-compatible
-(hand-built schemas, `JsonNode` results — no reflection).
+(read / create / update / delete) and, optionally, **per calendar id** — an allow-list you control on
+behalf of the agent (**not** an OS permission prompt; the platform calendar permission must already be
+granted). AOT-compatible (hand-built schemas, `JsonNode` results — no reflection).
 
 ```csharp
 using Shiny.Calendar;
@@ -376,9 +380,54 @@ var response = await chatClient.GetResponseAsync(
 );
 ```
 
+### Scoping to specific calendars
+
+`AddCalendar(calendarId, capabilities)` grants capabilities for **one calendar**, and the entry
+**replaces** the global set for that calendar — so it can widen *or* narrow access. Use it to give the
+agent read-only access to everything but read/write on a work calendar, to expose an allow-list of
+calendars and nothing else, or to hide one calendar entirely with `None`.
+
+```csharp
+builder.Services.AddCalendarAITools(tools => tools
+    .AddCalendar(CalendarAICapabilities.Read)                    // global default: read everything
+    .AddCalendar(workCalendarId, CalendarAICapabilities.All)     // …but full read/write here
+    .AddCalendar(privateCalendarId, CalendarAICapabilities.None) // …and hide this one entirely
+);
+
+// strict allow-list — no global grant, so ONLY these two calendars exist to the agent
+builder.Services.AddCalendarAITools(tools => tools
+    .AddCalendar(workCalendarId, CalendarAICapabilities.All)
+    .AddCalendars([teamCalendarId, holidayCalendarId], CalendarAICapabilities.Read)
+);
+```
+
+Enforcement (the tools do this on every call — the model can't work around it):
+- `list_calendars` returns only calendars with at least one capability, each with an
+  `allowedOperations` array (`read`/`create`/`update`/`delete`) so the model knows where it may write.
+- `search_events` searches only readable calendars; an explicit `calendarId` outside the filter errors.
+- `get_event` / `update_event` / `delete_event` resolve the event's calendar first and refuse when it
+  isn't allowed.
+- `create_event` refuses a disallowed `calendarId`. With no global `Create` grant, omitting
+  `calendarId` errors too — the device default calendar can't be vetted ahead of time, so the model is
+  told to pick one from `list_calendars`.
+- A tool is generated when **any** calendar grants that capability, so
+  `AddCalendar("work", All)` alone still produces `create_event`/`update_event`/`delete_event`.
+
+Calendar ids are platform-assigned, so they're normally chosen by the user at runtime and persisted.
+Use the service-provider overload to read them back when the tools are first resolved:
+
+```csharp
+builder.Services.AddCalendarAITools((sp, tools) =>
+{
+    var settings = sp.GetRequiredService<AppSettings>();   // ids the user picked, persisted
+    tools.AddCalendars(settings.AgentCalendarIds, CalendarAICapabilities.All);
+});
+```
+
 Key types:
 - `AddCalendarAITools(Action<ICalendarAIToolBuilder>)` — DI extension; throws if nothing is added.
-- `ICalendarAIToolBuilder` — `AddCalendar(CalendarAICapabilities)`.
+- `AddCalendarAITools(Action<IServiceProvider, ICalendarAIToolBuilder>)` — same, but the callback runs on first resolve so the filter can come from your own services.
+- `ICalendarAIToolBuilder` — `AddCalendar(CalendarAICapabilities)` (global), `AddCalendar(string calendarId, CalendarAICapabilities)`, `AddCalendars(IEnumerable<string> calendarIds, CalendarAICapabilities)`.
 - `CalendarAICapabilities` `[Flags]` — `None`, `Read`, `Create`, `Update`, `Delete`, `Write` (= Create|Update|Delete), `All` (= Read|Write). Combine flags to allow operations independently.
 - `CalendarAITools` — resolve from DI; `.Tools` is `IReadOnlyList<AITool>`.
 

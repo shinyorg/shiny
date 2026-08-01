@@ -5,14 +5,30 @@ namespace Shiny.Calendar.Extensions.AI.Internal;
 /// <summary>Projects calendar models into LLM-friendly JSON.</summary>
 static class CalendarJson
 {
-    public static JsonObject Calendar(Calendar c) => new()
+    public static JsonObject Calendar(Calendar c, CalendarAICapabilities capabilities)
     {
-        ["id"] = c.Id,
-        ["name"] = c.Name,
-        ["color"] = c.Color,
-        ["isReadOnly"] = c.IsReadOnly,
-        ["account"] = c.Account
-    };
+        var o = new JsonObject
+        {
+            ["id"] = c.Id,
+            ["name"] = c.Name,
+            ["color"] = c.Color,
+            ["isReadOnly"] = c.IsReadOnly,
+            ["account"] = c.Account
+        };
+
+        var ops = new JsonArray();
+        if (capabilities.HasFlag(CalendarAICapabilities.Read))
+            ops.Add((JsonNode)"read");
+        if (capabilities.HasFlag(CalendarAICapabilities.Create))
+            ops.Add((JsonNode)"create");
+        if (capabilities.HasFlag(CalendarAICapabilities.Update))
+            ops.Add((JsonNode)"update");
+        if (capabilities.HasFlag(CalendarAICapabilities.Delete))
+            ops.Add((JsonNode)"delete");
+        o["allowedOperations"] = ops;
+
+        return o;
+    }
 
     public static JsonObject EventSummary(CalendarEvent e) => new()
     {

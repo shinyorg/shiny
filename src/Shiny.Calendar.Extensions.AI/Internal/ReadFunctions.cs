@@ -4,12 +4,12 @@ using Microsoft.Extensions.AI;
 
 namespace Shiny.Calendar.Extensions.AI.Internal;
 
-/// <summary>Lists the calendars available on the device.</summary>
+/// <summary>Lists the calendars the agent is allowed to work with.</summary>
 sealed class ListCalendarsFunction : CalendarAIFunctionBase
 {
-    public ListCalendarsFunction(ICalendarStore store)
-        : base(store, "list_calendars",
-            "List the calendars available on the device (id, name, colour, whether read-only). Use a calendar id when searching or creating events.",
+    public ListCalendarsFunction(ICalendarStore store, CalendarAccessPolicy policy)
+        : base(store, policy, "list_calendars",
+            "List the calendars you are allowed to work with (id, name, colour, whether read-only, and the operations you may perform on it via allowedOperations). Calendars you have no access to are not listed. Use a calendar id when searching or creating events.",
             AiSchema.ToElement(AiSchema.Object(new JsonObject())))
     { }
 
@@ -17,8 +17,13 @@ sealed class ListCalendarsFunction : CalendarAIFunctionBase
     {
         var cals = await this.Store.GetAll(cancellationToken).ConfigureAwait(false);
         var results = new JsonArray();
+
         foreach (var c in cals)
-            results.Add((JsonNode)CalendarJson.Calendar(c));
+        {
+            var caps = this.Policy.For(c.Id);
+            if (caps != CalendarAICapabilities.None)
+                results.Add((JsonNode)CalendarJson.Calendar(c, caps));
+        }
         return new JsonObject { ["count"] = results.Count, ["calendars"] = results };
     }
 }
@@ -28,9 +33,9 @@ sealed class SearchEventsFunction : CalendarAIFunctionBase
 {
     const int DefaultLimit = 50;
 
-    public SearchEventsFunction(ICalendarStore store)
-        : base(store, "search_events",
-            "Search calendar events within a date range. Optionally filter by calendarId and a free-text query matched against title, location, and description. Dates are ISO-8601 (e.g. 2026-07-24 or 2026-07-24T09:00:00). Returns matching events (id, title, start, end). Use the id with get_event/update_event/delete_event.",
+    public SearchEventsFunction(ICalendarStore store, CalendarAccessPolicy policy)
+        : base(store, policy, "search_events",
+            "Search calendar events within a date range. Only calendars you are allowed to read are searched. Optionally filter by calendarId and a free-text query matched against title, location, and description. Dates are ISO-8601 (e.g. 2026-07-24 or 2026-07-24T09:00:00). Returns matching events (id, title, start, end). Use the id with get_event/update_event/delete_event.",
             BuildSchema())
     { }
 
@@ -55,7 +60,10 @@ sealed class SearchEventsFunction : CalendarAIFunctionBase
         if (limit < 1)
             limit = DefaultLimit;
 
-        var events = await this.Store.GetEvents(calendarId, start, end, cancellationToken).ConfigureAwait(false);
+        if (calendarId != null && !this.Policy.Allows(calendarId, CalendarAICapabilities.Read))
+            return Denied(calendarId);
+
+        var events = await this.GetReadableEvents(calendarId, start, end, cancellationToken).ConfigureAwait(false);
 
         IEnumerable<CalendarEvent> matches = events;
         if (!string.IsNullOrWhiteSpace(query))
@@ -68,6 +76,28 @@ sealed class SearchEventsFunction : CalendarAIFunctionBase
         return new JsonObject { ["count"] = results.Count, ["events"] = results };
     }
 
+    async Task<IReadOnlyList<CalendarEvent>> GetReadableEvents(
+        string? calendarId,
+        DateTimeOffset? start,
+        DateTimeOffset? end,
+        CancellationToken ct
+    )
+    {
+        // A specific (already authorised) calendar, or read access to every calendar - one native fetch.
+        if (calendarId != null || this.Policy.AppliesToAll(CalendarAICapabilities.Read))
+            return await this.Store.GetEvents(calendarId, start, end, ct).ConfigureAwait(false);
+
+        // Otherwise walk only the calendars in the allow-list so nothing else is ever fetched.
+        var allowed = await this.GetAllowedCalendarIds(CalendarAICapabilities.Read, ct).ConfigureAwait(false);
+        var events = new List<CalendarEvent>();
+        foreach (var id in allowed)
+        {
+            var subset = await this.Store.GetEvents(id, start, end, ct).ConfigureAwait(false);
+            events.AddRange(subset);
+        }
+        return events;
+    }
+
     static bool Matches(CalendarEvent e, string query)
     {
         bool Has(string? s) => s != null && s.Contains(query, StringComparison.OrdinalIgnoreCase);
@@ -78,8 +108,8 @@ sealed class SearchEventsFunction : CalendarAIFunctionBase
 /// <summary>Reads a single event by its platform identifier, including full detail.</summary>
 sealed class GetEventFunction : CalendarAIFunctionBase
 {
-    public GetEventFunction(ICalendarStore store)
-        : base(store, "get_event",
+    public GetEventFunction(ICalendarStore store, CalendarAccessPolicy policy)
+        : base(store, policy, "get_event",
             "Read a single calendar event by its platform id (as returned by search_events), including description, attendees, reminders, and recurrence.",
             BuildSchema())
     { }
@@ -101,6 +131,9 @@ sealed class GetEventFunction : CalendarAIFunctionBase
         var e = await this.Store.GetEvent(id, cancellationToken).ConfigureAwait(false);
         if (e is null)
             return new JsonObject { ["error"] = $"No event found with id '{id}'." };
+
+        if (!this.Policy.Allows(e.CalendarId, CalendarAICapabilities.Read))
+            return Denied(e.CalendarId);
 
         return CalendarJson.EventDetail(e);
     }
