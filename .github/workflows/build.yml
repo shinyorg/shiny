@@ -21,6 +21,9 @@ env:
 
 jobs:
   build:
+    permissions:
+      id-token: write   # required for NuGet trusted publishing (OIDC)
+      contents: read
 
     runs-on: windows-latest
 #    runs-on: macos-latest
@@ -47,6 +50,13 @@ jobs:
         path: ${{ github.workspace }}/artifacts
         retention-days: 5
 
+    - name: NuGet Login (OIDC)
+      id: nuget-login
+      if: ${{ github.ref == 'refs/heads/preview' || startsWith(github.ref, 'refs/heads/v') }}
+      uses: NuGet/login@v1
+      with:
+        user: aritchie
+
     - name: Publish NuGets
       if: ${{ github.ref == 'refs/heads/preview' || startsWith(github.ref, 'refs/heads/v') }}
-      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGETAPIKEY }} --skip-duplicate
+      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
