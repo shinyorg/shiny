@@ -15,7 +15,7 @@ sealed class ManagedMdnsManager : IMdnsManager, IDisposable
     /// <summary>How long a resolve waits before giving up.</summary>
     static readonly TimeSpan defaultResolveTimeout = TimeSpan.FromSeconds(5);
 
-    readonly MulticastClient client;
+    readonly MdnsMulticastClient client;
     readonly ILogger logger;
     readonly DnsName hostName;
 
@@ -23,7 +23,7 @@ sealed class ManagedMdnsManager : IMdnsManager, IDisposable
     public ManagedMdnsManager(ILogger<ManagedMdnsManager> logger)
     {
         this.logger = logger;
-        this.client = new MulticastClient(logger);
+        this.client = new MdnsMulticastClient(logger);
         this.hostName = BuildHostName();
     }
 

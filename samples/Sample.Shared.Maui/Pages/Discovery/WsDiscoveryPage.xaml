@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Discovery"
+             x:Class="Sample.Shared.Maui.Pages.Discovery.WsDiscoveryPage"
+             x:DataType="vm:WsDiscoveryViewModel"
+             Title="WS-Discovery">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="8">
+        <HorizontalStackLayout Grid.Row="0" Spacing="8">
+            <Button Text="{Binding BrowseText}" Command="{Binding ToggleBrowseCommand}" />
+            <Label Text="ONVIF only" VerticalOptions="Center" />
+            <Switch IsToggled="{Binding OnvifOnly, Mode=TwoWay}" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="1" Text="{Binding Status}" FontAttributes="Italic" />
+
+        <Label Grid.Row="2"
+               Text="Cameras are slow - give it 5 seconds or more"
+               FontSize="11"
+               TextColor="Gray" />
+
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Targets}" SelectionMode="Single">
+            <CollectionView.EmptyView>
+                <Label Text="No targets" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:WsdItem">
+                    <Border Padding="8" Margin="0,4" StrokeThickness="1" Stroke="Gray">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding Name}" FontAttributes="Bold" />
+                            <Label Text="{Binding Address}" FontSize="12" />
+                            <Label Text="{Binding Types}" FontSize="11" TextColor="Gray" />
+                            <Label Text="{Binding Hardware}" FontSize="11" TextColor="Gray" />
+                            <Label Text="{Binding Detail}" FontSize="10" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

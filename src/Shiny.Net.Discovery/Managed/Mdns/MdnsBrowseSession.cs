@@ -13,7 +13,7 @@ namespace Shiny.Net.Discovery.Managed;
 /// TTL-aware cache, and pushes appear/disappear changes onto a channel.
 /// </summary>
 sealed class MdnsBrowseSession(
-    MulticastClient client,
+    MdnsMulticastClient client,
     ServiceTypeInfo serviceType,
     MdnsBrowseConfig config,
     ILogger logger

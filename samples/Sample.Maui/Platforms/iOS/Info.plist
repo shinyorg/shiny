@@ -24,6 +24,16 @@
     </array>
     <key>XSAppIconAssets</key>
     <string>Assets.xcassets/appicon.appiconset</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>This sample discovers devices and services on your local network.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <!-- Every mDNS service type the app browses for or publishes must be listed here,
+             or browsing silently returns nothing. This does NOT apply to SSDP or WS-Discovery. -->
+        <string>_http._tcp</string>
+        <string>_ipp._tcp</string>
+        <string>_airplay._tcp</string>
+    </array>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses Bluetooth to scan for and connect to nearby devices</string>
     <key>NSBluetoothPeripheralUsageDescription</key>

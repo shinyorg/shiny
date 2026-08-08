@@ -27,7 +27,7 @@ sealed class ManagedPublication : IMdnsPublication
     static readonly TimeSpan probeInterval = TimeSpan.FromMilliseconds(250);
     static readonly TimeSpan announceInterval = TimeSpan.FromSeconds(1);
 
-    readonly MulticastClient client;
+    readonly MdnsMulticastClient client;
     readonly ILogger logger;
     readonly IDisposable lease;
     readonly DnsName typeName;
@@ -39,7 +39,7 @@ sealed class ManagedPublication : IMdnsPublication
 
 
     ManagedPublication(
-        MulticastClient client,
+        MdnsMulticastClient client,
         ILogger logger,
         IDisposable lease,
         ServiceTypeInfo serviceType,
@@ -75,7 +75,7 @@ sealed class ManagedPublication : IMdnsPublication
 
 
     public static async Task<ManagedPublication> Create(
-        MulticastClient client,
+        MdnsMulticastClient client,
         ILogger logger,
         DnsName hostName,
         MdnsServiceRegistration registration,

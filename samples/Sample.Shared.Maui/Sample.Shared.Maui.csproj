@@ -60,6 +60,7 @@
         <ProjectReference Include="..\..\src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
     </ItemGroup>

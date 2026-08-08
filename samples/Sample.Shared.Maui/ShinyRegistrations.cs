@@ -87,6 +87,15 @@ public static class ShinyRegistrations
         s.AddLocationAITool();
 #endif
 
+        // ── Network discovery ──
+        // All three protocols work on every platform this sample targets. mDNS goes through
+        // NSNetService/NsdManager so it needs no entitlement; SSDP and WS-Discovery have no OS
+        // API anywhere and therefore use raw multicast - see the manifest/entitlement notes in
+        // Sample.Maui (Platforms/Android/AndroidManifest.xml and Sample.Maui.csproj).
+        s.AddMdns();
+        s.AddSsdp();
+        s.AddWsDiscovery();
+
 #if !(PLATFORM && MACOS)
         // Jobs: iOS, Android, MacCatalyst, Windows (in-proc COM-activated), and bare .NET (in-proc).
         // MacOS does not expose a background-task scheduler we wrap today.

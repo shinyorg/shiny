@@ -12,6 +12,7 @@ global using Shiny.Contacts;
 global using Shiny.Jobs;
 global using Shiny.Locations;
 global using Shiny.Net.Http;
+global using Shiny.Net.Discovery;
 global using Shiny.Extensions.Stores;
 global using Shiny.Maui.Controls;
 global using Sample.Shared.Maui.Delegates;

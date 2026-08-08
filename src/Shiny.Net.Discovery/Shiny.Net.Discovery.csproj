@@ -12,7 +12,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsAotCompatible>true</IsAotCompatible>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-        <Description>Shiny Network Discovery - cross-platform mDNS/DNS-SD (Bonjour) service browsing, resolution and publishing</Description>
+        <Description>Shiny Network Discovery - cross-platform local network discovery: mDNS/DNS-SD (Bonjour/Zeroconf), SSDP/UPnP and WS-Discovery browsing, resolution and publishing</Description>
 
         <!-- imported explicitly below so Platforms\Apple can be re-added for -macos -->
         <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
@@ -29,17 +29,21 @@
     </PropertyGroup>
 
     <!--
-        The managed responder only ships where there is no OS-level DNS-SD daemon to lean on:
+        The managed mDNS responder only ships where there is no OS-level DNS-SD daemon to lean on:
         plain .NET (Linux/macOS console/server) and Windows. Android and Apple delegate to
         NsdManager / NSNetService instead.
+
+        Only Managed\Mdns is dropped - the shared multicast socket layer, SSDP and WS-Discovery
+        are managed on every platform, because no OS exposes an API for those two protocols.
     -->
     <ItemGroup Condition="$(TargetFramework.Contains('-android')) OR $(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos'))">
-        <Compile Remove="Managed\**\*.cs" />
-        <None Include="Managed\**\*.cs" />
+        <Compile Remove="Managed\Mdns\**\*.cs" />
+        <None Include="Managed\Mdns\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
     </ItemGroup>
 
     <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.build.targets" />
