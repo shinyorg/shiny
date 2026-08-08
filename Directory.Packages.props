@@ -31,7 +31,7 @@
         <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.8.1"/>
         <PackageVersion Include="Microsoft.Extensions.AI" Version="10.8.1"/>
         <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.1"/>
-        <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.8.1"/>
+        <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.8.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MsftExtensionVersion)"/>

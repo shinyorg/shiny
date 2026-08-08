@@ -24,6 +24,7 @@
             "src\\Shiny.Locations.Blazor\\Shiny.Locations.Blazor.csproj",
             "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
             "src\\Shiny.Net.Http.Blazor\\Shiny.Net.Http.Blazor.csproj",
+            "src\\Shiny.Net.Discovery\\Shiny.Net.Discovery.csproj",
             "src\\Shiny.Notifications\\Shiny.Notifications.csproj",
             "src\\Shiny.Notifications.Linux\\Shiny.Notifications.Linux.csproj",
             "src\\Shiny.Notifications.Extensions.AI\\Shiny.Notifications.Extensions.AI.csproj",
