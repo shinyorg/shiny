@@ -67,6 +67,11 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsLinux())
             list.Add(new("⏰ Jobs", "Background job scheduling", "jobs"));
 
+        // --- Network discovery ---
+        list.Add(new("🔎 mDNS / Bonjour", "Browse DNS-SD services on the local network", "mdns"));
+        list.Add(new("🛰️ SSDP / UPnP", "Find routers, media servers & smart TVs", "ssdp"));
+        list.Add(new("🎥 WS-Discovery", "Find ONVIF cameras, WSD printers & PCs", "wsdiscovery"));
+
         // --- Device state ---
         list.Add(new("🔋 Battery", "Observe battery level & state", "battery"));
         list.Add(new("🌐 Connectivity", "Observe network connectivity", "connectivity"));

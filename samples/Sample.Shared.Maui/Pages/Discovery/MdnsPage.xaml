@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Discovery"
+             x:Class="Sample.Shared.Maui.Pages.Discovery.MdnsPage"
+             x:DataType="vm:MdnsViewModel"
+             Title="mDNS / Bonjour">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="8">
+        <Entry Grid.Row="0"
+               Text="{Binding ServiceType, Mode=TwoWay}"
+               Placeholder="Service type, e.g. _http._tcp" />
+
+        <Button Grid.Row="1" Text="{Binding BrowseText}" Command="{Binding ToggleBrowseCommand}" />
+
+        <Label Grid.Row="2" Text="{Binding Status}" FontAttributes="Italic" />
+
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Services}" SelectionMode="Single">
+            <CollectionView.EmptyView>
+                <Label Text="No services" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:MdnsItem">
+                    <Border Padding="8" Margin="0,4" StrokeThickness="1" Stroke="Gray">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding Name}" FontAttributes="Bold" />
+                            <Label Text="{Binding Endpoint}" FontSize="12" />
+                            <Label Text="{Binding Addresses}" FontSize="11" TextColor="Gray" />
+                            <Label Text="{Binding Txt}" FontSize="11" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

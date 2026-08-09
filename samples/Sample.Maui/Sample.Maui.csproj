@@ -70,6 +70,23 @@
                             Visible="false" />
     </ItemGroup>
 
+    <!--
+        SSDP and WS-Discovery use raw multicast, which on iOS requires
+        com.apple.developer.networking.multicast. That entitlement is granted per developer team
+        only after Apple approves a request at
+        https://developer.apple.com/contact/request/networking-multicast
+
+        It is left commented out deliberately: including an entitlement your provisioning profile
+        does not carry fails the signing step, so enabling it by default would break this sample
+        for everyone who has not been granted it. Uncomment once Apple has approved your team.
+        The mDNS page needs none of this - it goes through NSNetService.
+
+        <CustomEntitlements Include="com.apple.developer.networking.multicast"
+                            Type="Boolean"
+                            Value="true"
+                            Visible="false" />
+    -->
+
     <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('-maccatalyst'))">
         <CustomEntitlements Include="aps-environment" Type="string" Value="development" Condition="'$(Configuration)' == 'Debug'" Visible="false" />
         <CustomEntitlements Include="aps-environment" Type="string" Value="production" Condition="'$(Configuration)' == 'Release'" Visible="false" />

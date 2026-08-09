@@ -20,6 +20,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Network discovery. mDNS needs nothing beyond INTERNET/ACCESS_NETWORK_STATE because it
+         goes through NsdManager. SSDP and WS-Discovery use raw multicast, so the Wi-Fi driver
+         must be told to stop filtering (CHANGE_WIFI_MULTICAST_STATE - without it sends work and
+         nothing is ever received), and from Android 17 local network access is a runtime
+         permission. Shiny acquires and releases the MulticastLock itself. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
