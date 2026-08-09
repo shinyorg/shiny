@@ -21,10 +21,20 @@
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
+        <!--
+            Platform targets are dropped on hosts that cannot build them, the same way the Windows
+            target is. The ios/maccatalyst/macos workloads refuse to install on Linux ("Workload ID
+            ios isn't supported on this platform"), so leaving them in TargetFrameworks makes every
+            multi-targeted project unbuildable there. Windows and macOS hosts are unaffected - CI
+            builds and packs on windows-latest, so the shipped packages still carry every target.
+            Android installs everywhere, so it stays unconditional.
+        -->
+        <AppleTargetsSupported Condition="!$([MSBuild]::IsOSPlatform('linux'))">true</AppleTargetsSupported>
+
         <AndroidTarget>$(BaseTargetFramework)-android</AndroidTarget>
-        <IosTarget>$(BaseTargetFramework)-ios</IosTarget>
-        <MacCatalystTarget>$(BaseTargetFramework)-maccatalyst</MacCatalystTarget>
-        <MacOsTarget>$(BaseTargetFramework)-macos</MacOsTarget>
+        <IosTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-ios</IosTarget>
+        <MacCatalystTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-maccatalyst</MacCatalystTarget>
+        <MacOsTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-macos</MacOsTarget>
         <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">$(BaseTargetFramework)-windows10.0.19041.0</WindowsTarget>
     </PropertyGroup>
 

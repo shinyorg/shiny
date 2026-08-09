@@ -26,10 +26,7 @@
       "src\\Shiny.Push.Blazor\\Shiny.Push.Blazor.csproj",
       "src\\Shiny.Push\\Shiny.Push.csproj",
       "src\\Shiny.Core.Blazor\\Shiny.Core.Blazor.csproj",
-      "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj",
-      "src\\Shiny.Support.DeviceMonitoring\\Shiny.Support.DeviceMonitoring.csproj",
-      "src\\Shiny.Support.Locations\\Shiny.Support.Locations.csproj",
-      "src\\Shiny.Support.Repositories\\Shiny.Support.Repositories.csproj"
+      "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj"
     ]
   }
 }
