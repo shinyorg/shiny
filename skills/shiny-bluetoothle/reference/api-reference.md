@@ -830,9 +830,129 @@ public static class FeatureL2Cap
 }
 ```
 
-### L2CapChannel File Transfer (L2CapChannelExtensions)
+### L2CAP File Transfer — peripheral one-liners (PeripheralL2CapFileTransferExtensions)
 
-Helpers for streaming file content over an open `L2CapChannel`. Progress callbacks emit `TransferProgress` snapshots with throughput / percent-complete / ETA — same shape as `Shiny.Net.Http.TransferProgress`.
+Open a channel, run one transfer, close the channel. The peer must be serving the Shiny L2CAP file
+transfer protocol (`IBleHostingManager.OpenL2CapFileServer(...)`). Throws `NotSupportedException` when
+the platform has no L2CAP support.
+
+```csharp
+public static class PeripheralL2CapFileTransferExtensions
+{
+    static Task<L2CapTransferResult> UploadFile(
+        this IPeripheral peripheral,
+        ushort psm,
+        string localFilePath,
+        string? remoteFileName = null,          // defaults to the local file name
+        bool secure = false,
+        Action<TransferProgress>? onProgress = null,
+        L2CapTransferOptions? options = null,
+        CancellationToken cancellationToken = default
+    );
+
+    static Task<L2CapTransferResult> DownloadFile(
+        this IPeripheral peripheral,
+        ushort psm,
+        string remoteFileName,
+        string localFilePath,
+        bool secure = false,
+        Action<TransferProgress>? onProgress = null,
+        L2CapTransferOptions? options = null,
+        CancellationToken cancellationToken = default
+    );
+
+    // Rx flavours - emit progress, complete when done, dispose to cancel
+    static IObservable<TransferProgress> UploadFileWithProgress(this IPeripheral peripheral, ushort psm, string localFilePath, string? remoteFileName = null, bool secure = false, L2CapTransferOptions? options = null);
+    static IObservable<TransferProgress> DownloadFileWithProgress(this IPeripheral peripheral, ushort psm, string remoteFileName, string localFilePath, bool secure = false, L2CapTransferOptions? options = null);
+
+    // Awaitable OpenL2CapChannel that throws NotSupportedException instead of returning Empty
+    static Task<L2CapChannel> OpenL2CapChannelAsync(this IPeripheral peripheral, ushort psm, bool secure = false, CancellationToken cancellationToken = default);
+}
+```
+
+### L2CAP File Transfer — channel level (L2CapFileTransferExtensions)
+
+Use these to run several transfers over one open channel, or to serve the other side of the protocol.
+Same type on both peers, so these work identically from client and hosting code.
+
+```csharp
+public static class L2CapFileTransferExtensions
+{
+    // ---- initiator ----
+    static Task<L2CapTransferResult> UploadFile(this L2CapChannel channel, string localFilePath, string? remoteFileName = null, Action<TransferProgress>? onProgress = null, L2CapTransferOptions? options = null, CancellationToken cancellationToken = default);
+    static Task<L2CapTransferResult> UploadFile(this L2CapChannel channel, Stream source, string remoteFileName, long length, Action<TransferProgress>? onProgress = null, L2CapTransferOptions? options = null, CancellationToken cancellationToken = default);
+    static Task<L2CapTransferResult> DownloadFile(this L2CapChannel channel, string remoteFileName, string localFilePath, Action<TransferProgress>? onProgress = null, L2CapTransferOptions? options = null, CancellationToken cancellationToken = default);
+    static Task<L2CapTransferResult> DownloadFile(this L2CapChannel channel, string remoteFileName, Stream destination, Action<TransferProgress>? onProgress = null, L2CapTransferOptions? options = null, CancellationToken cancellationToken = default);
+
+    static IObservable<TransferProgress> UploadFileWithProgress(this L2CapChannel channel, string localFilePath, string? remoteFileName = null, L2CapTransferOptions? options = null);
+    static IObservable<TransferProgress> DownloadFileWithProgress(this L2CapChannel channel, string remoteFileName, string localFilePath, L2CapTransferOptions? options = null);
+
+    // ---- responder ---- (null when the peer closed the channel)
+    static Task<L2CapFileRequest?> ReadFileRequest(this L2CapChannel channel, L2CapTransferOptions? options = null, CancellationToken cancellationToken = default);
+}
+```
+
+Transfers on a channel are **sequential** — run one at a time, and do not subscribe to
+`DataReceived` yourself while one is in flight (the helpers own the read side for the duration).
+
+### L2CapFileRequest (class, namespace `Shiny.BluetoothLE`)
+
+The serving side of a request. Exactly one accept/reject call is required per request.
+
+```csharp
+public sealed class L2CapFileRequest
+{
+    L2CapTransferType Type { get; }          // Upload = peer is sending you a file; Download = peer wants one
+    string FileName { get; }                 // untrusted - it came off the wire, validate before using as a path
+    long Size { get; }                       // bytes the peer will send; 0 for a download request
+    string PeerIdentifier { get; }
+    ushort Psm { get; }
+    bool IsAnswered { get; }
+
+    Task<L2CapTransferResult> AcceptUpload(string localFilePath, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task<L2CapTransferResult> AcceptUpload(Stream destination, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task<L2CapTransferResult> AcceptDownload(string localFilePath, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task<L2CapTransferResult> AcceptDownload(Stream source, long length, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task Reject(L2CapTransferError error = L2CapTransferError.NotPermitted, string? message = null, CancellationToken ct = default);
+}
+```
+
+### L2CapTransferOptions / L2CapTransferResult / L2CapTransferException
+
+```csharp
+public record L2CapTransferOptions
+{
+    static L2CapTransferOptions Default { get; }
+    int BufferSize { get; init; }            // default 4096
+    TimeSpan ProgressInterval { get; init; } // default 2s; a completion event always fires regardless
+    TimeSpan IdleTimeout { get; init; }      // default 30s; Timeout.InfiniteTimeSpan to wait forever
+}
+
+public record L2CapTransferResult(
+    L2CapTransferType Type,                  // Upload | Download, as named by the initiator - both peers agree
+    string FileName,
+    long BytesTransferred,
+    TimeSpan Elapsed
+)
+{
+    long BytesPerSecond { get; }             // average across the whole transfer
+}
+
+public class L2CapTransferException : BleException
+{
+    L2CapTransferError Error { get; }        // Unknown | NotFound | NotPermitted | TooLarge | IoError | ProtocolError | Cancelled
+}
+```
+
+Refusals (`Reject`) leave the channel usable for the next request. A transfer that fails mid-body does
+not — the peer's remaining bytes are still inbound, so the channel is marked faulted and further
+transfers throw `ProtocolError`; close it and open a new one. A failed download deletes the partial
+local file.
+
+### Raw L2CAP streaming (L2CapChannelExtensions)
+
+The protocol-less primitive: pushes bytes with progress and no handshake, so the receiver must already
+know the length and framing. Prefer `UploadFile` unless talking to a non-Shiny peer.
 
 ```csharp
 public static class L2CapChannelExtensions

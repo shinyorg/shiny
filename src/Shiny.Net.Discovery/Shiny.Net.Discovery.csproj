@@ -42,7 +42,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.build.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
 
     <!-- the NSNetService code is identical on macOS, so there is no separate Platforms\MacOS -->
     <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">

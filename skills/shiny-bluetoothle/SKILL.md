@@ -27,7 +27,18 @@ triggers:
   - L2CapChannel
   - ICanL2Cap
   - OpenL2CapChannel
+  - OpenL2CapChannelAsync
   - PSM
+  - l2cap file transfer
+  - ble file transfer
+  - UploadFile
+  - DownloadFile
+  - UploadFileWithProgress
+  - DownloadFileWithProgress
+  - L2CapTransferOptions
+  - L2CapTransferResult
+  - L2CapTransferException
+  - TransferProgress
 ---
 
 # Shiny BluetoothLE (Client/Central)
@@ -44,6 +55,7 @@ Use this skill when the user needs to:
 - Read standard BLE services (device information, battery, heart rate)
 - Work with BLE advertisement data
 - Open L2CAP CoC channels to a peripheral that has published a PSM
+- Upload or download files over L2CAP with percent-complete / throughput / ETA metrics
 
 Do NOT use this skill for BLE hosting/peripheral mode (advertising, GATT server). That is a separate library (`Shiny.BluetoothLE.Hosting`).
 
@@ -209,25 +221,72 @@ await channel.Write(payload).ToTask();
 - **Android**: `BluetoothDevice.CreateL2capChannel` / `CreateInsecureL2capChannel`. Requires API 29+. Throws `InvalidOperationException` on older versions.
 - **Windows / Linux / Blazor**: not currently supported (`IsL2CapAvailable()` returns false).
 
-### File Transfer
+### File Transfer (upload & download)
 
-`L2CapChannelExtensions.SendFile(...)` streams a file over the channel with progress metrics (throughput, percent-complete, estimated time remaining) that match `Shiny.Net.Http.TransferProgress`:
+Prefer these over hand-rolling a protocol on `DataReceived`/`Write`. The peripheral must be serving
+with `IBleHostingManager.OpenL2CapFileServer(...)` (or its own `ReadFileRequest` loop) — see the
+`shiny-ble-hosting` skill.
+
+The one-liners on `IPeripheral` open a channel, run the transfer, and close it again:
 
 ```csharp
 using Shiny.BluetoothLE;
 
-await channel.SendFile(
-    "/path/to/file.bin",
-    bufferSize: 4096,
+var result = await peripheral.UploadFile(
+    psm: 0x0083,
+    localFilePath: "/path/to/file.bin",
+    remoteFileName: "file.bin",          // optional, defaults to the local file name
+    secure: false,
     onProgress: p => Console.WriteLine(
         $"{p.PercentComplete:P0} ({p.BytesTransferred}/{p.BytesToTransfer}) " +
         $"{p.BytesPerSecond / 1024} KB/s, ETA {p.EstimatedTimeRemaining}"
     ),
     cancellationToken: ct
 );
+
+// result.BytesTransferred / result.Elapsed / result.BytesPerSecond (average for the whole transfer)
+
+await peripheral.DownloadFile(
+    psm: 0x0083,
+    remoteFileName: "firmware.bin",
+    localFilePath: "/local/firmware.bin",
+    onProgress: p => Console.WriteLine($"{p.PercentComplete:P0}")
+);
 ```
 
-- Progress emissions cadence ~2s plus a final 100% emission on completion.
+Rx flavours emit progress and complete when the transfer finishes — disposing the subscription cancels it:
+
+```csharp
+peripheral
+    .DownloadFileWithProgress(0x0083, "firmware.bin", "/local/firmware.bin")
+    .Subscribe(p => this.Percent = p.PercentComplete);
+```
+
+To move several files over **one** channel, open it yourself and use the `L2CapChannel` extensions:
+
+```csharp
+using var channel = await peripheral.OpenL2CapChannelAsync(psm: 0x0083, secure: false);
+
+await channel.UploadFile("/path/a.bin", onProgress: OnProgress);
+await channel.DownloadFile("b.bin", "/local/b.bin", onProgress: OnProgress);
+```
+
+Tuning is via `L2CapTransferOptions` (`BufferSize`, `ProgressInterval`, `IdleTimeout`).
+
+**Progress metrics** are `TransferProgress` — identical in shape to `Shiny.Net.Http.TransferProgress`:
+`PercentComplete`, `BytesPerSecond`, `BytesTransferred`, `BytesToTransfer`, `EstimatedTimeRemaining`,
+`IsDeterministic`. Because the peer agrees the exact byte count up front, percent complete and ETA are
+always real (never `-1`) on both ends. Emissions fire on `ProgressInterval` (default 2s) plus a final
+100% emission carrying the average throughput.
+
+**Failures**: a refusal from the peer surfaces as `L2CapTransferException` with an `Error` code
+(`NotFound`, `NotPermitted`, `TooLarge`, `IoError`, `ProtocolError`, `Cancelled`). Refusals leave the
+channel usable for the next request; a transfer that dies mid-body does not — close the channel and
+open a new one. A failed download never leaves a partial local file behind.
+
+**Raw streaming**: `channel.SendFile(...)` is the protocol-less primitive — it just pushes bytes with
+progress and no handshake, so the receiver must already know the length and framing. Use `UploadFile`
+unless you are talking to a non-Shiny peer.
 - A `Stream` overload exists for non-file sources. Pass `totalBytes` to enable percent / ETA; pass `null` and `IsDeterministic` will be false, `PercentComplete` returns `-1`, `EstimatedTimeRemaining` returns `TimeSpan.Zero`.
 
 ## Namespace Ambiguities

@@ -44,6 +44,15 @@ triggers:
   - L2CapInstance
   - OpenL2Cap
   - PSM
+  - l2cap file transfer
+  - ble file transfer
+  - ble file server
+  - OpenL2CapFileServer
+  - HandleL2CapRequests
+  - L2CapFileServerOptions
+  - L2CapFileRequest
+  - L2CapTransferOptions
+  - TransferProgress
 ---
 
 # Shiny.BluetoothLE.Hosting Skill
@@ -66,6 +75,7 @@ Invoke this skill when the user wants to:
 - React to central subscribe/unsubscribe events
 - Build a MAUI app that acts as a BLE peripheral
 - Publish an L2CAP PSM for centrals to open streaming channels against (iOS/macOS, Android API 29+, Linux)
+- Serve file uploads/downloads to connected centrals over L2CAP, with progress and throughput metrics
 
 ## Library Overview
 
@@ -242,27 +252,76 @@ Platform notes:
 - **Linux**: `AF_BLUETOOTH` / `BTPROTO_L2CAP` / `SOCK_SEQPACKET` socket via `Shiny.BluetoothLE.Hosting.Linux`. PSM is kernel-assigned from the LE dynamic range (≥ `0x80`); `secure=true` maps to `BT_SECURITY_MEDIUM`, `secure=false` to `BT_SECURITY_LOW`. Independent of GATT-server / LE-advertisement hosting (still WIP on Linux) — centrals must learn the device address out-of-band.
 - **Windows / Blazor WASM**: not supported. `OpenL2Cap` throws `NotSupportedException`.
 
-#### File Transfer
+#### File Transfer (serving uploads & downloads)
 
-`L2CapChannelExtensions.SendFile(...)` streams a file over a connected channel with progress metrics (throughput, percent-complete, ETA) matching the `Shiny.Net.Http.TransferProgress` shape. Useful for pushing large blobs to a connected central:
+`OpenL2CapFileServer(...)` publishes a PSM backed by a directory: connected centrals can push files to
+it and pull files from it, using `IPeripheral.UploadFile` / `IPeripheral.DownloadFile` on the client
+side (see the `shiny-bluetoothle` skill). This is the API to reach for — do **not** hand-roll a
+protocol over `DataReceived`.
 
 ```csharp
 using Shiny.BluetoothLE;
+using Shiny.BluetoothLE.Hosting;
 
-using var instance = await hostingManager.OpenL2Cap(secure: false, onOpen: async channel =>
-{
-    await channel.SendFile(
-        "/path/to/firmware.bin",
-        bufferSize: 4096,
-        onProgress: p => Console.WriteLine(
-            $"{p.PercentComplete:P0} {p.BytesPerSecond / 1024} KB/s ETA {p.EstimatedTimeRemaining}"
-        )
-    );
-    channel.Dispose();
-});
+var instance = await hostingManager.OpenL2CapFileServer(
+    rootDirectory: Path.Combine(FileSystem.AppDataDirectory, "ble-share"),
+    secure: false,
+    configure: o =>
+    {
+        o.AllowUploads = true;
+        o.AllowDownloads = true;
+        o.MaxUploadSize = 10 * 1024 * 1024;       // refused as TooLarge before any body byte moves
+        o.OverwriteExistingUploads = false;
+        o.Authorize = req => req.FileName.EndsWith(".bin");
+        o.OnProgress = e => Console.WriteLine($"{e.PeerIdentifier} {e.FileName} {e.Progress.PercentComplete:P0}");
+        o.OnCompleted = r => Console.WriteLine($"{r.LocalFilePath} <- {r.Result.BytesTransferred} bytes in {r.Result.Elapsed}");
+        o.OnError = (req, ex) => Console.WriteLine($"{req?.FileName}: {ex.Message}");
+    }
+);
+
+Console.WriteLine($"File server on PSM {instance.Psm}");
+instance.Dispose();   // unpublish and drop connected peers
 ```
 
-A `Stream` overload is available for non-file sources; pass `totalBytes` to enable percent / ETA computation.
+Peer-supplied file names are resolved **under** `RootDirectory`; absolute paths and anything traversing
+out (`../`) are refused with `NotPermitted` and never touch the filesystem.
+
+For anything the directory server does not cover, handle requests yourself — this is also how you serve
+from a database, generate content on the fly, or route by peer:
+
+```csharp
+var instance = await hostingManager.HandleL2CapRequests(
+    secure: false,
+    onRequest: async (request, ct) =>
+    {
+        // request.Type (Upload/Download), .FileName, .Size, .PeerIdentifier, .Psm
+        if (request.Type == L2CapTransferType.Download && request.FileName == "config.json")
+        {
+            var bytes = Encoding.UTF8.GetBytes(BuildConfigJson());
+            await request.AcceptDownload(new MemoryStream(bytes), bytes.Length, cancellationToken: ct);
+        }
+        else if (request.Type == L2CapTransferType.Upload && request.Size < 1_000_000)
+        {
+            await request.AcceptUpload(Path.Combine(inbox, Guid.NewGuid() + ".bin"), cancellationToken: ct);
+        }
+        else
+        {
+            await request.Reject(L2CapTransferError.NotPermitted, "nope", ct);
+        }
+    }
+);
+```
+
+Every request must be answered with an accept or `Reject` before returning; the peer is blocked waiting
+on the answer. Requests are served one at a time per channel. A refusal keeps the channel alive for the
+next request.
+
+Progress on the hosting side uses the same `TransferProgress` shape as the client
+(`PercentComplete`, `BytesPerSecond`, `BytesTransferred`, `BytesToTransfer`, `EstimatedTimeRemaining`).
+
+**Raw streaming**: `channel.SendFile(...)` remains available as the protocol-less primitive — bytes with
+progress, no handshake, receiver must already know the length and framing. Use the file server unless
+you are talking to a non-Shiny central.
 
 ### 8. File Organization
 

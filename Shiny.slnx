@@ -32,9 +32,9 @@
         <File Path="LICENSE.md" />
         <File Path="readme.md" />
         <File Path="nuget.config" />
-        <File Path="Directory.build.props" />
-        <File Path="Directory.build.targets" />
-        <File Path="Directory.packages.props" />
+        <File Path="Directory.Build.props" />
+        <File Path="Directory.Build.targets" />
+        <File Path="Directory.Packages.props" />
         <File Path="nuget.png" />
         <File Path="nuget.txt" />
         <File Path="version.json" />

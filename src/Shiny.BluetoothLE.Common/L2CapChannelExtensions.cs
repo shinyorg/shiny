@@ -79,12 +79,11 @@ public static class L2CapChannelExtensions
             if (read == 0)
                 break;
 
-            // For the partial last chunk, allocate a right-sized array so we
-            // don't send stale trailing bytes from the reused buffer.
-            var payload = read == buffer.Length ? buffer : buffer.AsSpan(0, read).ToArray();
-
+            // Hand Write its own array every time. It only promises the bytes are *queued*, so a
+            // reused buffer could be overwritten before the channel gets around to them - and a
+            // short read would otherwise trail stale bytes from the previous chunk.
             await channel
-                .Write(payload)
+                .Write(buffer.AsSpan(0, read).ToArray())
                 .ToTask(cancellationToken)
                 .ConfigureAwait(false);
 

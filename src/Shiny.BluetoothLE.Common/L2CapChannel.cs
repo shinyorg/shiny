@@ -25,5 +25,10 @@ public record L2CapChannel(
     /// <summary>
     /// Closes the channel and releases any platform resources.
     /// </summary>
-    public void Dispose() => this.OnDispose?.Invoke();
+    public void Dispose()
+    {
+        // drops the buffered reader the file transfer helpers attach on first use
+        Infrastructure.L2CapChannelReader.Release(this);
+        this.OnDispose?.Invoke();
+    }
 }

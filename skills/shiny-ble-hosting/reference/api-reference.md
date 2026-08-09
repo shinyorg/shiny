@@ -294,11 +294,89 @@ public struct L2CapInstance : IDisposable
 }
 ```
 
-Disposing the instance does **not** close already-open per-central channels — dispose each `L2CapChannel` explicitly if you need to terminate active connections.
+Disposing the instance does **not** close already-open per-central channels — dispose each `L2CapChannel` explicitly if you need to terminate active connections. The one exception is the L2CAP file server below: its instance also cancels the per-channel serve loops, which closes their channels.
+
+### L2CAP File Server (L2CapFileServerExtensions)
+
+```csharp
+public static class L2CapFileServerExtensions
+{
+    // Directory backed server - centrals upload into / download out of rootDirectory
+    static Task<L2CapInstance> OpenL2CapFileServer(this IBleHostingManager hosting, string rootDirectory, bool secure = false, Action<L2CapFileServerOptions>? configure = null);
+    static Task<L2CapInstance> OpenL2CapFileServer(this IBleHostingManager hosting, L2CapFileServerOptions options);
+
+    // Bring your own handler - every inbound request is passed to onRequest, one at a time per channel
+    static Task<L2CapInstance> HandleL2CapRequests(
+        this IBleHostingManager hosting,
+        bool secure,
+        Func<L2CapFileRequest, CancellationToken, Task> onRequest,
+        L2CapTransferOptions? options = null,
+        Action<L2CapFileRequest?, Exception>? onError = null
+    );
+}
+```
+
+`onRequest` must answer every request (an accept overload or `Reject`) before returning — an unanswered
+request is auto-rejected with `Unknown` so the peer is never left hanging.
+
+### L2CapFileServerOptions
+
+```csharp
+public class L2CapFileServerOptions
+{
+    public L2CapFileServerOptions(string rootDirectory);
+
+    string RootDirectory { get; }                   // created if missing; peer names are resolved under it
+    bool Secure { get; set; }                       // false
+    bool AllowUploads { get; set; }                 // true
+    bool AllowDownloads { get; set; }               // true
+    bool OverwriteExistingUploads { get; set; }     // true
+    long? MaxUploadSize { get; set; }               // null = no limit; refused as TooLarge pre-body
+    L2CapTransferOptions Transfer { get; set; }     // buffer size / progress interval / idle timeout
+
+    Func<L2CapFileRequest, bool>? Authorize { get; set; }        // false => NotPermitted
+    Action<L2CapFileTransferEvent>? OnProgress { get; set; }
+    Action<L2CapFileServerResult>? OnCompleted { get; set; }
+    Action<L2CapFileRequest?, Exception>? OnError { get; set; }
+}
+
+public record L2CapFileTransferEvent(string PeerIdentifier, L2CapTransferType Type, string FileName, TransferProgress Progress);
+public record L2CapFileServerResult(string PeerIdentifier, string LocalFilePath, L2CapTransferResult Result);
+```
+
+Peer-supplied names are resolved with `Path.GetFullPath` under `RootDirectory`; absolute paths and
+`../` traversal are refused with `NotPermitted` before any filesystem access.
+
+### L2CapFileRequest (class, namespace `Shiny.BluetoothLE`)
+
+Returned by `channel.ReadFileRequest(...)` and handed to `HandleL2CapRequests`. Exactly one accept or
+reject call per request.
+
+```csharp
+public sealed class L2CapFileRequest
+{
+    L2CapTransferType Type { get; }          // Upload = central is sending you a file; Download = it wants one
+    string FileName { get; }                 // untrusted - validate before using as a path
+    long Size { get; }                       // bytes the peer will send; 0 for a download request
+    string PeerIdentifier { get; }
+    ushort Psm { get; }
+    bool IsAnswered { get; }
+
+    Task<L2CapTransferResult> AcceptUpload(string localFilePath, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task<L2CapTransferResult> AcceptUpload(Stream destination, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task<L2CapTransferResult> AcceptDownload(string localFilePath, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task<L2CapTransferResult> AcceptDownload(Stream source, long length, Action<TransferProgress>? onProgress = null, CancellationToken ct = default);
+    Task Reject(L2CapTransferError error = L2CapTransferError.NotPermitted, string? message = null, CancellationToken ct = default);
+}
+```
+
+`L2CapTransferOptions`, `L2CapTransferResult`, `L2CapTransferError`, and `L2CapTransferException` live in
+`Shiny.BluetoothLE.Common` and are shared with the client library — see the `shiny-bluetoothle` skill
+reference for their shapes.
 
 ### TransferProgress (record, namespace `Shiny.BluetoothLE`)
 
-Used by `L2CapChannelExtensions.SendFile(...)` to report transfer metrics. Intentionally identical in shape to `Shiny.Net.Http.TransferProgress`.
+Reports transfer metrics for the L2CAP file server and `L2CapChannelExtensions.SendFile(...)`. Intentionally identical in shape to `Shiny.Net.Http.TransferProgress`.
 
 ```csharp
 public record TransferProgress(
