@@ -53,13 +53,36 @@ triggers:
   - L2CapFileRequest
   - L2CapTransferOptions
   - TransferProgress
+  - BleService
+  - BleServiceAttribute
+  - ReadCharacteristic
+  - WriteCharacteristic
+  - NotifyCharacteristic
+  - RequestResponseCharacteristic
+  - L2CapService
+  - OnChannelOpened
+  - BleServiceContext
+  - BleSubscription
+  - BleL2CapContext
+  - BleHostedServiceSession
+  - AddBleHostedServices
+  - AttachBleHostedServices
+  - StartBleHostedAdvertising
+  - ble source generator
+  - ble hosting source generator
+  - generated gatt service
 ---
 
 # Shiny.BluetoothLE.Hosting Skill
 
 You are an expert in Shiny.BluetoothLE.Hosting, a .NET library for turning a device into a BLE peripheral. It provides a GATT server, BLE advertising, iBeacon broadcasting, and L2CAP CoC channels through the imperative `IBleHostingManager` API.
 
-> The attribute-based managed characteristic pattern (`BleGattCharacteristic` base class, `[BleGattCharacteristic]` attribute, `AddBleHostedCharacteristic<T>`, `AttachRegisteredServices`) was removed for AOT compliance. Use the imperative `AddService(...)` builder pattern below — it is the single supported way to expose a GATT service.
+There are two ways to expose a GATT service, and both compile down to the same thing:
+
+1. **Imperative** — inject `IBleHostingManager` and call `AddService(uuid, primary, sb => ...)`. Best for one-off or dynamically shaped services.
+2. **Source generated** — put `[BleService]` / `[L2CapService]` on a `partial class` and let the bundled generator emit the `AddService(...)` calls, the `IsReplyNeeded`/offset handling, the notify push API, and the DI registration. Prefer this for anything with more than a characteristic or two.
+
+> The old reflection-based managed pattern (`BleGattCharacteristic` base class, `[BleGattCharacteristic]` attribute, `AddBleHostedCharacteristic<T>`, `AttachRegisteredServices`) was **removed** for AOT compliance. The source generator replaces it and emits no reflection. Never generate code against those types.
 
 ## When to Use This Skill
 
@@ -76,6 +99,8 @@ Invoke this skill when the user wants to:
 - Build a MAUI app that acts as a BLE peripheral
 - Publish an L2CAP PSM for centrals to open streaming channels against (iOS/macOS, Android API 29+, Linux)
 - Serve file uploads/downloads to connected centrals over L2CAP, with progress and throughput metrics
+- Declare a GATT service or L2CAP listener with attributes on a partial class instead of builder lambdas
+- Keep per-connected-central state (a SignalR-style context) across requests on a hosted service
 
 ## Library Overview
 
@@ -84,7 +109,7 @@ Invoke this skill when the user wants to:
 - **Platforms**: iOS, Mac Catalyst, macOS (CoreBluetooth), Android, Linux (BlueZ). Windows throws `NotSupportedException` for advertising/GATT-server hosting; only the `OpenL2Cap` API is exposed and it also throws on Windows.
 - **Dependencies**: `Shiny.Core`, `Shiny.BluetoothLE.Common`
 
-The library exposes a single imperative API: inject `IBleHostingManager`, call `AddService(uuid, primary, builder)` to register a GATT service inline.
+Inject `IBleHostingManager` and call `AddService(uuid, primary, builder)` to register a GATT service inline, or declare it with `[BleService]` on a partial class and let the bundled source generator emit that call. The generator ships inside the same package under `analyzers/dotnet/cs` - no extra `PackageReference` needed.
 
 ## Setup
 
@@ -147,6 +172,78 @@ var service = await hostingManager.AddService("12345678-1234-1234-1234-123456789
         }, NotificationOptions.Notify);
     });
 });
+```
+
+### 2b. Source-Generated GATT Service
+
+Put the attributes on a `partial class`. The generator emits the `AddService(...)` call, the
+`GattResult` wrapping, the `IsReplyNeeded`/`Respond` handling, the notify push API, and the DI
+registration. Every UUID is normalized to the full 128-bit form.
+
+```csharp
+[BleService("180D", Advertise = true, Name = "HeartRate")]
+public partial class HeartRateService(IHeartRateSensor sensor)
+{
+    // byte[] is wrapped in GattResult.Success; return GattResult to pick the status yourself
+    [ReadCharacteristic("2A37")]
+    Task<byte[]> ReadMeasurement(HeartRateServiceContext context)
+        => Task.FromResult(new byte[] { 0x00, sensor.Read(context.User) });
+
+    // the hook is optional - NotifyMeasurement / MeasurementSubscribers / HasMeasurementSubscribers
+    // are generated either way. Put [NotifyCharacteristic] on the class (with Name) to skip the hook
+    [NotifyCharacteristic("2A37", Name = "Measurement", Indicate = true)]
+    Task OnMeasurementSubscription(BleSubscription subscription, HeartRateServiceContext context)
+        => Task.CompletedTask;
+
+    // returning GattState responds that value, and only when the central asked for a reply.
+    // returning void/Task responds Success, or Failure if the handler throws
+    [WriteCharacteristic("2A39")]
+    Task<GattState> ControlPoint(byte[] data, int offset, HeartRateServiceContext context)
+        => Task.FromResult(offset == 0 ? GattState.Success : GattState.InvalidOffset);
+
+    // write + notify - the result is pushed back to the writing central, which must be subscribed
+    [RequestResponseCharacteristic("2A3B", Name = "Command")]
+    Task<byte[]> Exchange(byte[] request, CancellationToken cancellationToken) => Handle(request);
+
+    // opt-in hooks; the compiler drops the generated call when you do not implement them
+    partial void OnBleHandlerError(string characteristicUuid, Exception ex) => Log(ex);
+}
+
+// your half of the generated context - one instance per connected central, held across requests
+public partial class HeartRateServiceContext
+{
+    public AuthUser? User { get; set; }
+}
+```
+
+Handler parameters bind **by type, in any order, any subset** - none are required. See
+`reference/api-reference.md` for the full binding table and the `SBH001`-`SBH014` diagnostics.
+
+Wire it up:
+
+```csharp
+builder.Services.AddBluetoothLeHosting();
+builder.Services.AddBleHostedServices();   // generated
+
+await using var session = await hostingManager.AttachBleHostedServices(serviceProvider);
+await hostingManager.StartBleHostedAdvertising("MyDevice");
+```
+
+An `[L2CapService]` class works the same way - one `[OnChannelOpened]` handler per accepted central,
+and `PsmService`/`PsmCharacteristic` publish the assigned PSM as a read characteristic so centrals
+can discover it:
+
+```csharp
+[L2CapService(Secure = false, PsmService = "180D", PsmCharacteristic = "2ABC", Name = "EchoStream")]
+public partial class StreamService
+{
+    [OnChannelOpened]
+    async Task Echo(L2CapChannel channel, BleL2CapContext context, CancellationToken cancellationToken)
+    {
+        await foreach (var buffer in channel.ReadAll(cancellationToken))
+            await channel.Write(buffer).ToTask(cancellationToken);
+    }
+}
 ```
 
 ### 3. Advertising
@@ -335,13 +432,15 @@ you are talking to a non-Shiny central.
 ## Best Practices
 
 1. **Always request access first** -- call `RequestAccess()` and check the result before any hosting operations
-2. **Compose services in code, not attributes** -- the managed `BleGattCharacteristic` pattern was removed for AOT compliance. Build services with `AddService(uuid, primary, sb => ...)` lambdas inside a service class registered in DI so they're easy to unit-test
-3. **Use valid UUIDs** -- standard 128-bit UUID format (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`) or short 16-bit UUIDs for standard Bluetooth SIG services
+2. **Reach for `[BleService]` first** -- the generator emits the same builder calls plus the response/offset handling, subscriber tracking, and per-central context. Fall back to `AddService(uuid, primary, sb => ...)` lambdas when the service shape is only known at runtime
+3. **Always write the full 128-bit UUID when calling `AddService` by hand** -- short forms like `"180D"` work on Apple (`CBUUID.FromString`) but throw on Android (`java.util.UUID.fromString`). The generator normalizes for you; the imperative API does not
 4. **Respond to writes when needed** -- always check `WriteRequest.IsReplyNeeded` and call `Respond` with the appropriate `GattState`
 5. **Return GattResult.Error on failures** -- use `GattResult.Error(GattState.Failure)` in read handlers when an error occurs
 6. **Stop advertising before cleanup** -- call `StopAdvertising()` and `ClearServices()` when done
 7. **Check IsAdvertising** -- avoid calling `StartAdvertising` if already advertising
-8. **Dispose `L2CapInstance` and per-central `L2CapChannel`s explicitly** -- disposing the instance closes the listener but does not auto-close already-open channels
+8. **Dispose `L2CapInstance` and per-central `L2CapChannel`s explicitly** -- disposing the instance closes the listener but does not auto-close already-open channels. With `[L2CapService]` the generator disposes each channel when the handler returns, and the `BleHostedServiceSession` closes the listener
+9. **Keep the `BleHostedServiceSession` alive** -- `AttachBleHostedServices` returns it, and disposing it cancels in-flight handlers, closes L2CAP listeners, and removes the GATT services
+10. **Never register the same service UUID twice** -- `BleHostingManager` keys services by UUID. Several `[BleService]` classes may share one UUID; the generator merges them into a single `AddService` call
 
 ## Reference Files
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.BLE"
+             x:Class="Sample.Shared.Maui.Pages.BLE.BleHostingGeneratedPage"
+             x:DataType="vm:BleHostingGeneratedViewModel"
+             Title="BLE Hosting (Generated)">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="{Binding Activity.Status}" FontSize="16" FontAttributes="Bold" />
+
+            <Label Text="Same GATT server as the BLE Hosting page, declared with [BleService] attributes instead of AddService(...). Two classes share one service UUID and are merged by the generator."
+                   FontSize="12" />
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="GATT Server" FontAttributes="Bold" />
+                    <Entry Text="{Binding LocalName}" Placeholder="Local Name" />
+                    <Button Text="{Binding HostText}" Command="{Binding ToggleHostingCommand}" />
+                    <Label Text="{Binding Activity.Subscribers, StringFormat='Ticker subscribers: {0}'}" />
+                    <Label Text="{Binding Activity.Reads, StringFormat='Reads served: {0}'}" />
+                    <Label Text="{Binding Activity.Writes, StringFormat='Writes received: {0}'}" />
+                    <Label Text="{Binding Activity.LastWrite, StringFormat='Last write: {0}'}" />
+                    <Label Text="{Binding Activity.LastCentral, StringFormat='Last central: {0}'}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Notifications" FontAttributes="Bold" />
+                    <Entry Text="{Binding TickPayload}" Placeholder="Payload" />
+                    <Button Text="Notify Ticker" Command="{Binding SendTickCommand}" IsEnabled="{Binding IsHosting}" />
+                    <Label Text="{Binding TicksSent, StringFormat='Sent: {0}'}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="L2CAP" FontAttributes="Bold" />
+                    <Label Text="{Binding Psm, StringFormat='PSM: {0}'}" />
+                    <Label Text="The PSM is also served as a read characteristic on the same GATT service, which is how a central discovers it."
+                           FontSize="12" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -18,6 +18,51 @@
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj"/>
     </ItemGroup>
 
+    <!--
+        The [BleService] source generator ships inside this package. Built but not referenced for
+        compilation - the generator never runs against this project, only against consumers.
+    -->
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.BluetoothLE.Hosting.SourceGenerators\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj"
+                          ReferenceOutputAssembly="false"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- makes $(RootNamespace) compiler-visible so the generated registration class lands there -->
+        <None Include="..\Shiny.BluetoothLE.Hosting.SourceGenerators\SourceGenerators.targets"
+              Pack="true"
+              PackagePath="build/Shiny.BluetoothLE.Hosting.targets"
+              Visible="false"/>
+
+        <None Include="..\Shiny.BluetoothLE.Hosting.SourceGenerators\SourceGenerators.targets"
+              Pack="true"
+              PackagePath="buildTransitive/Shiny.BluetoothLE.Hosting.targets"
+              Visible="false"/>
+    </ItemGroup>
+
+    <!--
+        Asks the generator project where its assembly landed rather than hardcoding bin/$(Configuration).
+        A literal path is evaluated before the reference is built, so `dotnet pack` on this project
+        alone fails with "could not find a part of the path" on a clean tree.
+    -->
+    <Target Name="_PackShinyBleHostingSourceGenerator" BeforeTargets="_GetPackageFiles">
+        <MSBuild Projects="..\Shiny.BluetoothLE.Hosting.SourceGenerators\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj"
+                 Targets="Build"
+                 Properties="Configuration=$(Configuration);TargetFramework=netstandard2.0">
+            <Output TaskParameter="TargetOutputs" ItemName="_ShinyBleHostingSourceGenerator"/>
+        </MSBuild>
+
+        <Error Condition="'@(_ShinyBleHostingSourceGenerator)' == ''"
+               Text="The BLE hosting source generator produced no output - the package would ship without it."/>
+
+        <ItemGroup>
+            <None Include="@(_ShinyBleHostingSourceGenerator)"
+                  Pack="true"
+                  PackagePath="analyzers/dotnet/cs"
+                  Visible="false"/>
+        </ItemGroup>
+    </Target>
+
     <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets"/>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Shiny.BluetoothLE.Hosting.SourceGenerators.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- the generator under test, as a normal reference so the harness can instantiate it -->
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting.SourceGenerators\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj" />
+        <!-- attributes + runtime, so the test compilations can resolve them -->
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+    </ItemGroup>
+
+</Project>

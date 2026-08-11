@@ -11,8 +11,8 @@ dotnet add package Shiny.BluetoothLE.Hosting
 ```csharp
 using Shiny;                                // AccessState, ServiceCollectionExtensions
 using Shiny.BluetoothLE;                    // CharacteristicProperties
-using Shiny.BluetoothLE.Hosting;            // All hosting interfaces, enums, records
-using Shiny.BluetoothLE.Hosting.Managed;    // BleGattCharacteristic, BleGattCharacteristicAttribute
+using Shiny.BluetoothLE.Hosting;            // All hosting interfaces, enums, records, and the
+                                            // [BleService] source generator attributes
 ```
 
 ## IBleHostingManager Interface
@@ -67,15 +67,6 @@ public interface IBleHostingManager
 
     // Removes all GATT services from the server
     void ClearServices();
-
-    // Gets whether DI-registered GATT services are currently attached
-    bool IsRegisteredServicesAttached { get; }
-
-    // Attaches all GATT services registered via dependency injection
-    Task AttachRegisteredServices();
-
-    // Detaches all DI-registered GATT services
-    void DetachRegisteredServices();
 
     // Gets the list of active GATT services
     IReadOnlyList<IGattService> Services { get; }
@@ -509,68 +500,188 @@ public enum AccessState
 }
 ```
 
-## Managed Pattern Types
+## Source Generator Attributes
 
-### BleGattCharacteristic (abstract class)
-
-Base class for managed GATT characteristics registered via DI.
-
-```csharp
-// Namespace: Shiny.BluetoothLE.Hosting.Managed
-public abstract class BleGattCharacteristic
-{
-    // The underlying IGattCharacteristic (set internally after service is built)
-    public IGattCharacteristic Characteristic { get; }
-
-    // Number of centrals currently subscribed to notifications
-    protected int SubscriptionCount { get; }
-
-    // Called when the managed service is attached
-    public virtual Task OnStart();
-
-    // Called when the managed service is detached
-    public virtual void OnStop();
-
-    // Write + notify response pattern: process write, return data to send as notification
-    // Cannot be overridden together with OnWrite
-    public virtual Task<GattResult> Request(WriteRequest request);
-
-    // Handle a write request from a central
-    // Cannot be overridden together with Request
-    public virtual Task OnWrite(WriteRequest request);
-
-    // Handle a read request from a central
-    public virtual Task<GattResult> OnRead(ReadRequest request);
-
-    // Called when a central subscribes or unsubscribes from notifications
-    public virtual Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed);
-}
-```
-
-### BleGattCharacteristicAttribute
-
-Attribute to mark a `BleGattCharacteristic` subclass with its service and characteristic UUIDs.
+Shipped inside `Shiny.BluetoothLE.Hosting` (namespace `Shiny.BluetoothLE.Hosting`). Applied to a
+`partial class`, they make the generator emit the `AddService(...)` / `OpenL2Cap(...)` plumbing.
+Nothing reflective is emitted, so it stays AOT-safe.
 
 ```csharp
-// Namespace: Shiny.BluetoothLE.Hosting.Managed
-[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-public class BleGattCharacteristicAttribute : Attribute
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class BleServiceAttribute(string uuid) : Attribute
 {
-    public BleGattCharacteristicAttribute(string serviceUuid, string characteristicUuid);
-
-    public string ServiceUuid { get; }
-    public string CharacteristicUuid { get; }
-
-    // Whether the read requires encryption (default: false)
-    public bool IsReadSecure { get; set; }
-
-    // Notification type (default: NotificationOptions.Notify)
-    public NotificationOptions Notifications { get; set; }
-
-    // Write type (default: WriteOptions.WriteWithoutResponse)
-    public WriteOptions Write { get; set; }
+    public string Uuid { get; }
+    public bool Primary { get; set; } = true;   // default true
+    public bool Advertise { get; set; }         // collected into StartBleHostedAdvertising
+    public string? Name { get; set; }           // names the generated Add{Name} extension
 }
+
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class ReadCharacteristicAttribute(string uuid) : Attribute
+{
+    public string Uuid { get; }
+    public bool Encrypted { get; set; }
+}
+
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class WriteCharacteristicAttribute(string uuid) : Attribute
+{
+    public string Uuid { get; }
+    public bool WriteWithoutResponse { get; set; }
+    public bool AuthenticatedSignedWrites { get; set; }
+    public bool EncryptionRequired { get; set; }
+    public bool ManualRespond { get; set; }     // suppress the generated Respond call
+}
+
+// also valid on the class (AllowMultiple) for the push API without a subscription hook,
+// where Name is required
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
+public sealed class NotifyCharacteristicAttribute(string uuid) : Attribute
+{
+    public string Uuid { get; }
+    public bool Indicate { get; set; }
+    public bool EncryptionRequired { get; set; }
+    public string? Name { get; set; }
+}
+
+// write + notify: the handler result is pushed back to the writing central as a notification
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class RequestResponseCharacteristicAttribute(string uuid) : Attribute
+{
+    public string Uuid { get; }
+    public bool Indicate { get; set; }
+    public bool EncryptionRequired { get; set; }
+    public string? Name { get; set; }
+}
+
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class L2CapServiceAttribute : Attribute
+{
+    public bool Secure { get; set; }
+    public string? PsmService { get; set; }        // GATT service UUID to publish the PSM on
+    public string? PsmCharacteristic { get; set; } // read characteristic serving the PSM
+    public string? Name { get; set; }
+}
+
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class OnChannelOpenedAttribute : Attribute;
 ```
+
+### Generator runtime types
+
+```csharp
+// base of every generated {ServiceClass}Context - one per connected central, held for as long as
+// Shiny caches that IPeripheral. The derived type is partial: add your own properties to it.
+public abstract class BleServiceContext
+{
+    public IPeripheral Peripheral { get; }
+    public string ConnectionId { get; }              // Peripheral.Uuid
+    public int Mtu { get; }
+    public string ServiceUuid { get; }               // always available
+    public IGattService? Service { get; }            // null until AddService returns
+    public IDictionary<string, object?> Items { get; }
+}
+
+// passed to notify hooks; CharacteristicSubscription also binds
+public record BleSubscription(IGattCharacteristic Characteristic, IPeripheral Peripheral, bool IsSubscribing);
+
+// passed to [OnChannelOpened] handlers
+public sealed class BleL2CapContext
+{
+    public L2CapChannel Channel { get; }
+    public ushort Psm { get; }
+    public string PeerIdentifier { get; }
+    public IDictionary<string, object?> Items { get; }
+}
+
+// returned by AttachBleHostedServices - dispose to cancel handlers, close listeners, remove services
+public sealed class BleHostedServiceSession : IAsyncDisposable
+{
+    public IReadOnlyList<IGattService> Services { get; }
+    public IReadOnlyList<ushort> Psms { get; }
+}
+
+// IAsyncEnumerable convenience over L2CapChannel.DataReceived
+public static IAsyncEnumerable<byte[]> ReadAll(this L2CapChannel channel, CancellationToken ct = default);
+```
+
+### Generated members
+
+On each `[BleService]` partial class:
+
+```csharp
+public const string BleServiceUuid;
+public CancellationToken BleHostToken { get; }   // cancelled on teardown
+public IGattService? BleService { get; }
+
+// per notify-capable characteristic named "Ticker"
+public Task NotifyTicker(byte[] data, params IPeripheral[] centrals);
+public IReadOnlyList<IPeripheral> TickerSubscribers { get; }
+public bool HasTickerSubscribers { get; }
+
+// opt-in hooks - implement in your half of the class, or the compiler drops the call
+partial void OnBleHandlerError(string characteristicUuid, Exception exception);
+partial void OnBleResponseDropped(string characteristicUuid, IPeripheral peripheral, byte[] data);
+```
+
+On each `[L2CapService]` partial class:
+
+```csharp
+public ushort Psm { get; }        // zero while closed
+public bool IsListening { get; }
+partial void OnL2CapChannelError(L2CapChannel channel, Exception exception);
+```
+
+Assembly level, in the project's `$(RootNamespace)`:
+
+```csharp
+public static IServiceCollection AddBleHostedServices(this IServiceCollection services);
+public static Task<BleHostedServiceSession> AttachBleHostedServices(this IBleHostingManager m, IServiceProvider sp);
+public static Task StartBleHostedAdvertising(this IBleHostingManager m, string? localName = null);
+public static Task<IGattService> Add{Name}(this IBleHostingManager m, ...);       // per merge group
+public static Task<L2CapInstance> Add{Name}(this IBleHostingManager m, ...);      // per L2CAP listener
+```
+
+The DI pieces are only emitted when the compilation references
+`Microsoft.Extensions.DependencyInjection.Abstractions`.
+
+### Handler signature binding
+
+Parameters bind by type, in any order, any subset - none are required. Every return may be wrapped
+in `Task<>` or `ValueTask<>`.
+
+| Kind | Bindable parameters | Allowed returns |
+|---|---|---|
+| Read | `ReadRequest`, `{Service}Context`, `IPeripheral`, `IGattCharacteristic`, `int` (offset), `CancellationToken` | `byte[]`, `GattResult` |
+| Write | `byte[]` (data), `WriteRequest`, `{Service}Context`, `IPeripheral`, `IGattCharacteristic`, `int` (offset), `bool` (IsReplyNeeded), `CancellationToken` | `void`, `GattState` |
+| RequestResponse | same as Write | `byte[]`, `GattResult` |
+| Notify hook | `BleSubscription`, `CharacteristicSubscription`, `{Service}Context`, `IPeripheral`, `IGattCharacteristic`, `bool` (IsSubscribing), `CancellationToken` | `void` |
+| `[OnChannelOpened]` | `L2CapChannel`, `BleL2CapContext`, `CancellationToken` | `void` |
+
+- Read returning `byte[]` is wrapped in `GattResult.Success`; returning `GattResult` passes through.
+  An unhandled exception becomes `GattResult.Error(GattState.Failure)`.
+- Write returning nothing responds `GattState.Success` (or `Failure` on a throw), **only when
+  `WriteRequest.IsReplyNeeded`**. Returning `GattState` responds that value. Set `ManualRespond` and
+  take a `WriteRequest` to answer the central yourself.
+- Every UUID is normalized to the full 128-bit form. Short forms work on Apple (`CBUUID.FromString`)
+  but throw on Android (`java.util.UUID.fromString`), so never hand a short UUID to `AddService`
+  directly - only the generator normalizes for you.
+
+### Diagnostics
+
+`SBH001` non-partial/nested/generic/static type · `SBH002` invalid UUID · `SBH003` handler outside a
+`[BleService]` · `SBH004` two handlers of the same kind on one characteristic · `SBH005`
+request/response colliding with write or notify · `SBH006` unsupported signature · `SBH007` static or
+generic handler · `SBH008` invalid/dangling PSM publication · `SBH009` wrong `[OnChannelOpened]`
+count · `SBH010` one characteristic declared by two merged classes · `SBH011` (warning) merged
+services disagree on `Primary` · `SBH012` (warning) option combination not expressible ·
+`SBH013` `ManualRespond` misuse · `SBH014` class-level `[NotifyCharacteristic]` without a `Name`.
+
+Read + notify on one UUID is legal - `SBH004` is per handler *kind*, not per UUID.
+
+`SBH012` exists because `WriteOptions` and `NotificationOptions` are `[Flags]` enums declared without
+explicit values (`Write = 0`, `Notify = 0`), so only one member can be selected. The generator picks
+the security flag when a combination is requested.
 
 ## Extension Methods
 
@@ -583,11 +694,6 @@ public static class ServiceCollectionExtensions
 {
     // Registers IBleHostingManager in the DI container
     public static IServiceCollection AddBluetoothLeHosting(this IServiceCollection services);
-
-    // Registers a managed BleGattCharacteristic in the DI container
-    // Also calls AddBluetoothLeHosting automatically
-    public static void AddBleHostedCharacteristic<TService>(this IServiceCollection services)
-        where TService : BleGattCharacteristic;
 }
 ```
 
@@ -651,72 +757,80 @@ public class BleHostViewModel(IBleHostingManager hostingManager)
 }
 ```
 
-### Managed Characteristic with DI
+### Source-Generated Service (preferred for anything non-trivial)
 
 ```csharp
-// MyReadWriteCharacteristic.cs
+// HeartRateService.cs
 using Shiny.BluetoothLE.Hosting;
-using Shiny.BluetoothLE.Hosting.Managed;
 
-[BleGattCharacteristic(
-    "12345678-1234-1234-1234-123456789abc",
-    "12345678-1234-1234-1234-123456789ab1",
-    Write = WriteOptions.Write,
-    Notifications = NotificationOptions.Notify
-)]
-public class MyReadWriteCharacteristic : BleGattCharacteristic
+[BleService("180D", Advertise = true, Name = "HeartRate")]
+public partial class HeartRateService(IHeartRateSensor sensor)
 {
-    string currentValue = "Initial";
+    [ReadCharacteristic("2A37")]
+    Task<byte[]> ReadMeasurement(HeartRateServiceContext context)
+        => Task.FromResult(new byte[] { 0x00, sensor.Read(context.User) });
 
-    public override Task OnStart()
-    {
-        Console.WriteLine("Characteristic started");
-        return Task.CompletedTask;
-    }
+    // hook is optional - NotifyMeasurement/MeasurementSubscribers are generated either way
+    [NotifyCharacteristic("2A37", Name = "Measurement", Indicate = true)]
+    Task OnMeasurementSubscription(BleSubscription subscription, HeartRateServiceContext context)
+        => Task.CompletedTask;
 
-    public override void OnStop()
-    {
-        Console.WriteLine("Characteristic stopped");
-    }
+    // the returned status is what gets responded, and only when the central asked for a reply
+    [WriteCharacteristic("2A39")]
+    Task<GattState> ControlPoint(byte[] data, int offset, HeartRateServiceContext context)
+        => Task.FromResult(offset == 0 ? GattState.Success : GattState.InvalidOffset);
 
-    public override Task<GattResult> OnRead(ReadRequest request)
-    {
-        var data = System.Text.Encoding.UTF8.GetBytes(currentValue);
-        return Task.FromResult(GattResult.Success(data));
-    }
+    // write + notify: the result comes back to the writing central as a notification
+    [RequestResponseCharacteristic("2A3B", Name = "Command")]
+    Task<byte[]> Exchange(byte[] request, CancellationToken cancellationToken) => Handle(request);
 
-    public override async Task OnWrite(WriteRequest request)
-    {
-        currentValue = System.Text.Encoding.UTF8.GetString(request.Data);
-        if (request.IsReplyNeeded)
-            request.Respond(GattState.Success);
+    partial void OnBleHandlerError(string characteristicUuid, Exception ex)
+        => Console.WriteLine($"{characteristicUuid}: {ex.Message}");
+}
 
-        // Notify all subscribers of the new value
-        if (SubscriptionCount > 0)
-        {
-            var data = System.Text.Encoding.UTF8.GetBytes(currentValue);
-            await Characteristic.Notify(data);
-        }
-    }
-
-    public override Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
-    {
-        Console.WriteLine($"Peripheral {peripheral.Uuid} {(subscribed ? "subscribed" : "unsubscribed")} (MTU: {peripheral.Mtu})");
-        return Task.CompletedTask;
-    }
+// your half of the generated context - stamp anything onto the connected central
+public partial class HeartRateServiceContext
+{
+    public AuthUser? User { get; set; }
 }
 ```
 
 Register in MauiProgram.cs:
 ```csharp
-builder.Services.AddBleHostedCharacteristic<MyReadWriteCharacteristic>();
+builder.Services.AddBluetoothLeHosting();
+builder.Services.AddBleHostedServices();   // generated
 ```
 
-Start the managed server:
+Start it:
 ```csharp
-await hostingManager.AttachRegisteredServices();
-await hostingManager.StartAdvertising(new AdvertisementOptions("MyDevice"));
+await using var session = await hostingManager.AttachBleHostedServices(serviceProvider);
+await hostingManager.StartBleHostedAdvertising("MyDevice");
 ```
+
+Several classes may declare the same service UUID - the generator merges them into one
+`AddService` call, which matters because `BleHostingManager` keys its services by UUID and would
+throw on a second registration. Declaring the same characteristic UUID in two merged classes is
+`SBH010`.
+
+### Source-Generated L2CAP Listener
+
+```csharp
+[L2CapService(Secure = false, PsmService = "180D", PsmCharacteristic = "2ABC", Name = "EchoStream")]
+public partial class StreamService
+{
+    [OnChannelOpened]
+    async Task Echo(L2CapChannel channel, BleL2CapContext context, CancellationToken cancellationToken)
+    {
+        await foreach (var buffer in channel.ReadAll(cancellationToken))
+            await channel.Write(buffer).ToTask(cancellationToken);
+    }
+}
+```
+
+`PsmService` + `PsmCharacteristic` publish the assigned PSM as a read characteristic (two
+little-endian bytes) on a `[BleService]` in the same compilation - a central has no other in-band
+way to learn it. Listeners open before `AddService`, so an immediate read returns a live value.
+The channel is disposed once the handler returns.
 
 ### iBeacon Broadcasting
 
@@ -774,28 +888,6 @@ await hostingManager.AddService("12345678-1234-1234-1234-123456789abc", true, sb
 });
 ```
 
-### Managed Request Pattern (Write + Auto Notify)
-
-```csharp
-[BleGattCharacteristic(
-    "12345678-1234-1234-1234-123456789abc",
-    "12345678-1234-1234-1234-123456789ab1",
-    Write = WriteOptions.Write,
-    Notifications = NotificationOptions.Notify
-)]
-public class EchoCharacteristic : BleGattCharacteristic
-{
-    // Central must be subscribed to notifications before writing.
-    // The returned GattResult data is automatically sent back as a notification.
-    public override Task<GattResult> Request(WriteRequest request)
-    {
-        var input = System.Text.Encoding.UTF8.GetString(request.Data);
-        var output = System.Text.Encoding.UTF8.GetBytes($"Echo: {input}");
-        return Task.FromResult(GattResult.Success(output));
-    }
-}
-```
-
 ### Full MAUI Setup
 
 ```csharp
@@ -811,8 +903,8 @@ public static MauiApp CreateMauiApp()
         });
 
     // Register managed characteristics
-    builder.Services.AddBleHostedCharacteristic<MyReadWriteCharacteristic>();
-    builder.Services.AddBleHostedCharacteristic<EchoCharacteristic>();
+    builder.Services.AddBluetoothLeHosting();
+    builder.Services.AddBleHostedServices();   // generated - every [BleService]/[L2CapService]
 
     return builder.Build();
 }
@@ -848,16 +940,15 @@ public static MauiApp CreateMauiApp()
 - The central must subscribe to the characteristic first
 - Check `SubscribedCentrals` count before sending
 
-### Managed services not starting
-- Ensure `[BleGattCharacteristic]` attribute is applied to the class
-- Ensure `AddBleHostedCharacteristic<T>()` is called in DI registration
-- Call `AttachRegisteredServices()` at runtime to wire up the services
-- Service and characteristic UUIDs must be valid
+### Generated services not starting
+- Ensure the class is a top level, non-generic `partial class` carrying `[BleService]` (SBH001)
+- Ensure `AddBleHostedServices()` is called in DI registration
+- Call `AttachBleHostedServices(serviceProvider)` at runtime, and keep the returned session alive -
+  disposing it removes the services and closes the L2CAP listeners
+- A `PackageReference` to `Shiny.BluetoothLE.Hosting` carries the generator; a `ProjectReference`
+  does not, so in-repo consumers must reference the generator project with `OutputItemType="Analyzer"`
 
-### Request pattern throws InvalidOperationException
-- The central must be subscribed to notifications before writing to a `Request`-pattern characteristic
-- `Request` and `OnWrite` cannot both be overridden on the same characteristic
-
-### GattResult.Error returned from read
-- Check the `GattState` value for the specific error reason
-- Common causes: `ReadNotPermitted`, `InsufficientAuthentication`, `InsufficientEncryption`
+### Request/response reply never arrives
+- The writing central must be subscribed to the characteristic before it writes - a GATT write
+  response cannot carry a payload, so the reply travels as a notification. Implement
+  `OnBleResponseDropped` to observe the case where it was not subscribed

@@ -44,6 +44,11 @@ public static class ShinyRegistrations
         s.AddBluetoothLE<SampleBleDelegate>();
         s.AddBluetoothLeHosting();
         s.AddNotifications<SampleNotificationDelegate>();
+
+        // Source-generated GATT/L2CAP hosting - registers every [BleService] and [L2CapService]
+        // class in this assembly (see BleHosting/). Emitted by Shiny.BluetoothLE.Hosting's generator.
+        s.AddSingleton<Sample.Shared.Maui.BleHosting.SampleBleHostingActivity>();
+        s.AddBleHostedServices();
 #endif
 
 #if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS

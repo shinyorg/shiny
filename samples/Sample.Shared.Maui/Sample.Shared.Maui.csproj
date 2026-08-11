@@ -48,6 +48,15 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+
+        <!--
+            A ProjectReference does not carry the analyzers a PackageReference would, so the
+            [BleService] generator is wired up explicitly. Package consumers get it from
+            analyzers/dotnet/cs inside Shiny.BluetoothLE.Hosting.
+        -->
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting.SourceGenerators\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\..\src\Shiny.Contacts\Shiny.Contacts.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Calendar\Shiny.Calendar.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
@@ -64,5 +73,8 @@
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
     </ItemGroup>
+
+    <!-- what a package consumer picks up from buildTransitive/ - makes $(RootNamespace) compiler-visible -->
+    <Import Project="..\..\src\Shiny.BluetoothLE.Hosting.SourceGenerators\SourceGenerators.targets" />
 
 </Project>

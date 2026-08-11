@@ -10,6 +10,7 @@
             "src\\Shiny.Extensions.Configuration\\Shiny.Extensions.Configuration.csproj",
             "src\\Shiny.BluetoothLE.Common\\Shiny.BluetoothLE.Common.csproj",
             "src\\Shiny.BluetoothLE.Hosting\\Shiny.BluetoothLE.Hosting.csproj",
+            "src\\Shiny.BluetoothLE.Hosting.SourceGenerators\\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj",
             "src\\Shiny.BluetoothLE.Hosting.Linux\\Shiny.BluetoothLE.Hosting.Linux.csproj",
             "src\\Shiny.BluetoothLE\\Shiny.BluetoothLE.csproj",
             "src\\Shiny.BluetoothLE.Linux\\Shiny.BluetoothLE.Linux.csproj",
