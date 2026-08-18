@@ -143,7 +143,6 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
     async Task<NsdServiceInfo?> ResolveViaCallback(NsdServiceInfo info, TimeSpan timeout, CancellationToken ct)
     {
         var completion = new TaskCompletionSource<NsdServiceInfo?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var executor = Java.Util.Concurrent.Executors.NewSingleThreadExecutor()!;
         var callback = new NsdServiceInfoCallback(
             updated => completion.TrySetResult(updated),
             error =>
@@ -154,7 +153,7 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
         );
 
         var nsd = this.Native;
-        nsd.RegisterServiceInfoCallback(info, executor, callback);
+        nsd.RegisterServiceInfoCallback(info, DirectExecutor.Instance, callback);
         try
         {
             return await completion.Task.WaitAsync(timeout, ct).ConfigureAwait(false);
@@ -174,7 +173,6 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
             {
                 logger.LogDebug(ex, "NsdManager rejected UnregisterServiceInfoCallback");
             }
-            executor.Shutdown();
         }
     }
 

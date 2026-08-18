@@ -92,3 +92,32 @@ class NsdRegistrationListener(Action<NsdServiceInfo> onRegistered, Action<NsdFai
 
     public void OnUnregistrationFailed(NsdServiceInfo? serviceInfo, NsdFailure errorCode) { }
 }
+
+
+/// <summary>
+/// NsdManager keeps posting to the executor handed to RegisterServiceInfoCallback after the
+/// callback is unregistered - the unregistered confirmation itself is dispatched through it. A
+/// per-resolve executor that gets shut down therefore leaves the framework throwing
+/// RejectedExecutionException on its own handler thread, which kills the process. Running inline
+/// has nothing to shut down and can never reject: the callbacks only complete a
+/// TaskCompletionSource built with RunContinuationsAsynchronously, so no caller code runs on
+/// NsdManager's dispatch thread.
+/// </summary>
+sealed class DirectExecutor : Java.Lang.Object, Java.Util.Concurrent.IExecutor
+{
+    public static DirectExecutor Instance { get; } = new();
+
+    public void Execute(Java.Lang.IRunnable? command)
+    {
+        try
+        {
+            command?.Run();
+        }
+        catch
+        {
+            // anything escaping here lands on NsdManager's handler thread and takes the process
+            // with it - the callbacks only complete a TaskCompletionSource, so there is nothing
+            // left to report to
+        }
+    }
+}
