@@ -13,18 +13,25 @@ body:
     id: component
     attributes:
       label: Component/Nuget
-      description: The component you are filing against.  If it is not listed here it means there is no support for it
+      description: The component you are filing against.  If it is not listed here it means there is no support for it.  The Blazor WASM and Linux add-on packages (ie. Shiny.Net.Http.Blazor, Shiny.Core.Linux) belong to their feature above - pick the feature and check the matching operating system below
       options:
+        - Core / Foundation (Shiny.Core)
+        - Hosting - MAUI (Shiny.Hosting.Maui)
+        - Hosting - Native/Console (Shiny.Hosting.Native)
         - GPS or Geofencing (Shiny.Locations)
         - Jobs (Shiny.Jobs)
         - Configuration (Shiny.Extensions.Configuration)
         - HTTP Transfers (Shiny.Net.Http)
+        - Network Discovery - mDNS/DNS-SD, SSDP/UPnP, WS-Discovery (Shiny.Net.Discovery)
+        - Data Sync (Shiny.Data.Sync)
         - Notifications (Shiny.Notifications)
         - Push - Native (Shiny.Push)
         - Push - Azure Notification Hub (Shiny.Push.AzureNotificationHubs)
-        - Push - Firebase Cloud Messaging (Shiny.Push.FirebaseCloudMessaging) 
         - BluetoothLE Client (Shiny.BluetoothLE)
         - BluetoothLE Hosting (Shiny.BluetoothLE.Hosting)
+        - Calendar (Shiny.Calendar)
+        - Contacts (Shiny.Contacts)
+        - AI Tooling (Shiny.*.Extensions.AI)
         - Other
     validations:
       required: true
@@ -41,6 +48,7 @@ body:
       - label: Windows
       - label: Blazor
       - label: Linux
+      - label: Server/Console (.NET)
   - type: textarea
     validations:
       required: true
