@@ -13,6 +13,7 @@
         <Project Path="tests/Shiny.Data.Sync.Tests/Shiny.Data.Sync.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Http.Tests/Shiny.Net.Http.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Discovery.Tests/Shiny.Net.Discovery.Tests.csproj" />
+        <Project Path="tests/Shiny.Net.Wifi.Tests/Shiny.Net.Wifi.Tests.csproj" />
         <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
         <Project Path="tests/Shiny.Notifications.Tests/Shiny.Notifications.Tests.csproj" />
         <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
@@ -59,6 +60,7 @@
     <Project Path="src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
     <Project Path="src\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />
+    <Project Path="src\Shiny.Net.Wifi\Shiny.Net.Wifi.csproj" />
     <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" />
     <Project Path="src\Shiny.Notifications.Extensions.AI\Shiny.Notifications.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
@@ -77,5 +79,6 @@
         <Project Path="src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj" />
         <Project Path="src\Shiny.Core.Linux\Shiny.Core.Linux.csproj" />
         <Project Path="src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
+        <Project Path="src\Shiny.Net.Wifi.Linux\Shiny.Net.Wifi.Linux.csproj" />
     </Folder>
 </Solution>

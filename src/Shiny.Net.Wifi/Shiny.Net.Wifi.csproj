@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.Net.Wifi</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny Wi-Fi - cross-platform Wi-Fi scanning, connect/disconnect, current network (IP/DNS) monitoring, local hotspot and airplane mode for Android, iOS, Mac Catalyst, macOS and Windows</Description>
+
+        <!-- imported explicitly below so Platforms\AppleShared can be added to all three Apple targets -->
+        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    </PropertyGroup>
+
+    <!--
+        CaptiveNetwork.TryCopyCurrentNetworkInfo is soft-deprecated on iOS and CWInterface carries
+        deprecation attributes on macOS, but neither has a replacement that reports the joined SSID.
+        NEHotspotNetwork only exists inside a NEHotspotHelper (an entitlement Apple hands out one
+        app at a time) and Network.framework never exposes the SSID at all. Revisit if that changes.
+    -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos'))">
+        <NoWarn>$(NoWarn);CA1422</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
+
+    <!--
+        NWPathMonitor and the managed interface reader behave identically across iOS, Mac Catalyst
+        and macOS, but Directory.Build.targets only shares Platforms\Shared with Android and Windows
+        too - which cannot see the Network framework. Hence a dedicated Apple-only shared folder.
+    -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos'))">
+        <Compile Include="Platforms\AppleShared\**\*.cs" />
+    </ItemGroup>
+
+</Project>
