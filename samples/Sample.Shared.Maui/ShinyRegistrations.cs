@@ -56,6 +56,13 @@ public static class ShinyRegistrations
         s.AddPush<SamplePushDelegate>();
 #endif
 
+#if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
+        // Wi-Fi: capability varies wildly per platform - the sample page reads
+        // IWifiManager.Capabilities and only offers what the OS actually allows.
+        // Linux registers this from the Shiny.Net.Wifi.Linux package instead.
+        s.AddWifi();
+#endif
+
 #if IOS || ANDROID || MACCATALYST
         // GPS / Geofencing: Shiny.Locations only has a concrete platform
         // implementation for iOS and Android today.

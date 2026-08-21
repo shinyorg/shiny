@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Wifi"
+             x:Class="Sample.Shared.Maui.Pages.Wifi.WifiPage"
+             x:DataType="vm:WifiViewModel"
+             Title="Wi-Fi">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="8">
+
+            <Label Text="Capabilities" FontAttributes="Bold" />
+            <Label Text="{Binding Capabilities}" FontSize="11" TextColor="Gray" />
+
+            <Label Text="Current Network" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Label Text="{Binding CurrentNetwork}" FontSize="12" />
+
+            <Label Text="{Binding Status}" FontAttributes="Italic" Margin="0,8,0,0" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+            <Button Text="Request Access" Command="{Binding RequestAccessCommand}" />
+
+            <Button Text="Scan" Command="{Binding ScanCommand}" IsVisible="{Binding CanScan}" />
+            <Button Text="Disconnect" Command="{Binding DisconnectCommand}" IsVisible="{Binding CanDisconnect}" />
+            <Button Text="Toggle Radio" Command="{Binding ToggleRadioCommand}" IsVisible="{Binding CanToggleRadio}" />
+            <Label Text="{Binding RadioState, StringFormat='Radio: {0}'}" FontSize="12" />
+
+            <!-- join by name - the only way in on iOS, which has no scan API -->
+            <Label Text="Join a Network" FontAttributes="Bold" Margin="0,8,0,0" IsVisible="{Binding CanConnect}" />
+            <Entry Text="{Binding Ssid, Mode=TwoWay}" Placeholder="SSID" IsVisible="{Binding CanConnect}" />
+            <Entry Text="{Binding Passphrase, Mode=TwoWay}" Placeholder="Passphrase (blank for open)"
+                   IsPassword="True" IsVisible="{Binding CanConnect}" />
+            <Button Text="Connect" Command="{Binding ConnectCommand}" IsVisible="{Binding CanConnect}" />
+
+            <Label Text="Scan Results" FontAttributes="Bold" Margin="0,8,0,0" IsVisible="{Binding CanScan}" />
+            <CollectionView ItemsSource="{Binding Networks}" SelectionMode="Single" IsVisible="{Binding CanScan}">
+                <CollectionView.EmptyView>
+                    <Label Text="No scan results" HorizontalTextAlignment="Center" TextColor="Gray" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:WifiItem">
+                        <Border Padding="8" Margin="0,4" StrokeThickness="1" Stroke="Gray">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding Ssid}" FontAttributes="Bold" />
+                                <Label Text="{Binding Detail}" FontSize="12" />
+                                <Label Text="{Binding Signal}" FontSize="11" TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Saved Networks" FontAttributes="Bold" Margin="0,8,0,0" IsVisible="{Binding CanListKnown}" />
+            <Button Text="Load Saved Networks" Command="{Binding LoadKnownCommand}" IsVisible="{Binding CanListKnown}" />
+            <CollectionView ItemsSource="{Binding KnownNetworks}" SelectionMode="Single" IsVisible="{Binding CanListKnown}">
+                <CollectionView.EmptyView>
+                    <Label Text="No saved networks" HorizontalTextAlignment="Center" TextColor="Gray" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:KnownItem">
+                        <Border Padding="8" Margin="0,4" StrokeThickness="1" Stroke="Gray">
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="{Binding Ssid}" FontAttributes="Bold" />
+                                    <Label Text="{Binding Detail}" FontSize="11" TextColor="Gray" />
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1" Text="Join" FontSize="12" Padding="8,2"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WifiViewModel}}, Path=ConnectKnownCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:WifiViewModel}}, Path=CanConnectKnown}" />
+                                <Button Grid.Column="2" Text="Forget" FontSize="12" Padding="8,2"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WifiViewModel}}, Path=ForgetCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:WifiViewModel}}, Path=CanForget}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

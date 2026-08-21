@@ -26,6 +26,10 @@
          nothing is ever received), and from Android 17 local network access is a runtime
          permission. Shiny acquires and releases the MulticastLock itself. -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- Shiny.Net.Wifi: state + control, and NEARBY_WIFI_DEVICES for scanning on API 33+ -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
