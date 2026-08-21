@@ -25,8 +25,11 @@ jobs:
       id-token: write   # required for NuGet trusted publishing (OIDC)
       contents: read
 
-    runs-on: windows-latest
-#    runs-on: macos-latest
+    # macOS, not Windows: Shiny.LiveActivities.Binding builds the ActivityKit Swift shim
+    # (native/ShinyLiveActivities) through Xcode, which only exists here.
+    # NOTE: Directory.Build.props drops $(WindowsTarget) on non-Windows hosts, so the
+    # net10.0-windows TFM is NOT produced by this job.
+    runs-on: macos-latest
 
     steps:
     - name: Checkout
@@ -39,6 +42,21 @@ jobs:
       with:
           dotnet-version: '10.0.300'
           workloads: maui-ios, maui-android, maui-maccatalyst, maui-windows, macos, wasm-tools
+
+    - name: Install xcodegen
+      run: brew install xcodegen
+
+    - name: Regenerate the Xcode project
+      working-directory: native/ShinyLiveActivities
+      run: xcodegen generate
+
+    - name: Compile-check the widget extension template
+      working-directory: native/ShinyLiveActivities
+      run: >
+        xcodebuild -project ShinyLiveActivities.xcodeproj
+        -scheme ShinyLiveActivityWidgetTemplate
+        -sdk iphonesimulator -configuration Release
+        build CODE_SIGNING_ALLOWED=NO
 
     - name: Build
       run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true

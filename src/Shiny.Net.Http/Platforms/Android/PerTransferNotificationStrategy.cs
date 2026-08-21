@@ -6,6 +6,12 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Net.Http;
 
 
+[Obsolete(
+    "Use services.AddTransferProgress() instead. This strategy posts a SECOND notification alongside the " +
+    "transfer foreground service's own, so the user sees both a progress notification and a redundant " +
+    "'Shiny service is continuing to transfer data in the background'. TransferProgressManager draws on " +
+    "the foreground service's notification instead, and shares its wording with the iOS Live Activity."
+)]
 public class PerTransferNotificationStrategy : AbstractTransferNotificationStrategy
 {
     static int CurrentNotificationId = 9999;

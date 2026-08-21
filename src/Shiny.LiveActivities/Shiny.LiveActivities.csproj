@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <!-- No Mac Catalyst: ActivityKit does not exist there, and the binding is iOS-only. -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+
+        <Description>Live Activities for .NET - iOS Live Activities (ActivityKit) and Android 16 Live Updates behind one API, with push token plumbing for server-driven updates.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+        <ProjectReference Include="..\Shiny.LiveActivities.Binding\Shiny.LiveActivities.Binding.csproj" />
+    </ItemGroup>
+
+</Project>

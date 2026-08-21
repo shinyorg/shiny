@@ -1,6 +1,6 @@
 ---
 name: shiny-http-transfers
-description: Guide for generating code that uses Shiny.NET HTTP Transfers for background uploads and downloads on iOS/Android, Windows, Linux, macOS, and Blazor WASM (Service Worker Background Sync)
+description: Guide for generating code that uses Shiny.NET HTTP Transfers for background uploads and downloads on iOS/Android, Windows, Linux, macOS, and Blazor WASM (Service Worker Background Sync), including transfer progress surfaces - iOS Live Activities and the Android foreground-service notification
 auto_invoke: true
 triggers:
   - http transfer
@@ -27,6 +27,24 @@ triggers:
   - resume transfer
   - pause download
   - resume download
+  - AddTransferProgress
+  - TransferProgressManager
+  - TransferProgressOptions
+  - TransferProgressFields
+  - TransferProgressShortStatus
+  - TransferProgressScope
+  - TransferProgressSnapshot
+  - TransferProgressContent
+  - TransferProgressContentBuilder
+  - TransferProgressBar
+  - ITransferProgressRenderer
+  - ITransferProgressDelegate
+  - ForegroundNotificationRenderer
+  - transfer live activity
+  - transfer notification progress
+  - upload progress notification
+  - download progress notification
+  - lock screen transfer progress
 ---
 
 # Shiny HTTP Transfers
@@ -206,6 +224,53 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 ### Platform Configuration (Apple)
 
 - Optionally register an `INativeConfigurator` implementation to customize `NSUrlSessionConfiguration` and `NSMutableUrlRequest` objects before they are sent.
+
+## Transfer progress surfaces (Live Activity / notification)
+
+Showing progress to a user who has left the app is one call. Do **not** hand-roll this from
+`UpdateReceived`, and never register `PerTransferNotificationStrategy` (obsolete - it posts a second
+Android notification alongside the foreground service's own).
+
+```csharp
+builder.Services.AddHttpTransfers<MyTransferDelegate>();
+builder.Services.AddTransferProgress(opts =>
+{
+    opts.Scope       = TransferProgressScope.Summary;      // one surface for all (default), or PerTransfer
+    opts.Fields      = TransferProgressFields.Default;     // file, direction, %, bytes, speed, ETA
+    opts.ShortStatus = TransferProgressShortStatus.Percent; // Dynamic Island / status bar chip
+});
+```
+
+`TransferProgressManager` is one manager for every platform: it subscribes at startup (`IShinyStartupTask`,
+because iOS relaunches the app in the background to finish a transfer), coalesces the progress firehose to
+one update a second, aggregates a batch, and starts/updates/retires the surface. Renderers only draw.
+
+| Platform | Surface |
+|---|---|
+| Android 16+ | The foreground-service notification, promoted ongoing (status bar chip, AOD) |
+| Android 8-15 | The foreground-service notification with a determinate bar |
+| iOS 16.2+ | A Live Activity - add `Shiny.LiveActivities.HttpTransfers` and call `AddHttpTransferLiveActivities()` |
+| Elsewhere | No renderer; the manager no-ops |
+
+**Configuring what shows.** `Fields` is a `[Flags]` enum (`FileName`, `Direction`, `Percent`,
+`TransferredBytes`, `Speed`, `TimeRemaining`, `Host`) gating the human-readable text only; unselected fields
+are simply not written. Raw values (`bytes`, `total`, `percent`, `bps`, `etaSeconds`, `state`, `direction`,
+`transferId`, `fileName`, `uri`) always ride in `TransferProgressContent.Data` unless `IncludeRawData =
+false`. Percent is omitted from the body when it is already the `ShortStatus`, so it never prints twice.
+
+For custom wording or localization, subclass `TransferProgressDelegate` and override only what you need
+(returning null keeps the built-in string), then register with `AddTransferProgress<TDelegate>()`.
+
+**The iOS suspension gap.** A background `NSURLSession` delivers no progress callbacks while the app is
+suspended, so a fraction-based bar freezes for most of a long transfer. `ProjectTimeRemaining` (default on)
+emits a self-animating time range instead, anchored in the past so the bar already sits at the true fraction
+rather than snapping to zero on every update. Android resolves the range back to a fraction - its foreground
+service is alive throughout. For uploads, the Live Activities package's `RequestPushToken` lets a server push
+byte-accurate progress through the suspended window.
+
+**Custom renderers.** Implement `ITransferProgressRenderer` (`IsAvailable`, `Show`, `Hide`, `Reconcile`) and
+register it; the same manager drives it. `TransferProgressContentBuilder.FormatBytes/FormatRate/
+FormatDuration/FormatPercent` are public statics, reusable in ordinary in-app progress UI.
 
 ## Best Practices
 

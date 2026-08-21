@@ -12,6 +12,7 @@
         <Project Path="tests/Shiny.Tests/Shiny.Tests.csproj" />
         <Project Path="tests/Shiny.Data.Sync.Tests/Shiny.Data.Sync.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Http.Tests/Shiny.Net.Http.Tests.csproj" />
+        <Project Path="tests/Shiny.LiveActivities.Tests/Shiny.LiveActivities.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Discovery.Tests/Shiny.Net.Discovery.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Wifi.Tests/Shiny.Net.Wifi.Tests.csproj" />
         <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
@@ -58,6 +59,9 @@
     <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" />
     <Project Path="src\Shiny.Locations\Shiny.Locations.csproj" />
     <Project Path="src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
+    <Project Path="src\Shiny.LiveActivities\Shiny.LiveActivities.csproj" />
+    <Project Path="src\Shiny.LiveActivities.Binding\Shiny.LiveActivities.Binding.csproj" />
+    <Project Path="src\Shiny.LiveActivities.HttpTransfers\Shiny.LiveActivities.HttpTransfers.csproj" />
     <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
     <Project Path="src\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />
     <Project Path="src\Shiny.Net.Wifi\Shiny.Net.Wifi.csproj" />

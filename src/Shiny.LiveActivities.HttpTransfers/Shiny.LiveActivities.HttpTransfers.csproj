@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <!-- The iOS renderer for Shiny.Net.Http transfer progress. The bare net10.0 target exists so
+             multi-targeted apps restore (and resolve an inert assembly) on their Android head, where
+             Shiny.Net.Http's own ForegroundNotificationRenderer does the drawing. -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+
+        <Description>Shows Shiny.Net.Http background uploads and downloads as an iOS Live Activity on the Lock Screen and in the Dynamic Island.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.LiveActivities\Shiny.LiveActivities.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+    </ItemGroup>
+
+</Project>
