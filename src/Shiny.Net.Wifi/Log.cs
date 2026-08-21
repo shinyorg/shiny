@@ -75,4 +75,28 @@ internal static partial class Log
         Message = "The requested hotspot SSID/passphrase was ignored - this platform chooses its own"
     )]
     public static partial void HotspotConfigurationIgnored(this ILogger logger);
+
+
+    [LoggerMessage(
+        EventId = 10,
+        Level = LogLevel.Debug,
+        Message = "Forgetting saved Wi-Fi network '{id}'"
+    )]
+    public static partial void Forgetting(this ILogger logger, string id);
+
+
+    [LoggerMessage(
+        EventId = 11,
+        Level = LogLevel.Debug,
+        Message = "Found {count} saved Wi-Fi network(s)"
+    )]
+    public static partial void KnownNetworksRead(this ILogger logger, int count);
+
+
+    [LoggerMessage(
+        EventId = 12,
+        Level = LogLevel.Information,
+        Message = "Suggested Wi-Fi network '{ssid}' to the OS - it joins once the user approves"
+    )]
+    public static partial void Suggested(this ILogger logger, string ssid);
 }

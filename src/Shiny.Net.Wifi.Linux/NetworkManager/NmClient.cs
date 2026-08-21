@@ -199,6 +199,29 @@ internal sealed class NmClient : IAsyncDisposable
     }
 
 
+    /// <summary>
+    /// Maps a saved profile's <c>802-11-wireless-security.key-mgmt</c> to a scheme.
+    /// </summary>
+    /// <remarks>
+    /// Far less guesswork than <see cref="ToSecurity(NmApFlags, NmApSecurity, NmApSecurity)"/> -
+    /// a profile names its key management outright rather than advertising cipher bits. An absent
+    /// security group means the profile has no authentication at all, and "none" is NetworkManager's
+    /// confusing spelling of WEP, where the key lives in <c>wep-key0</c> rather than <c>psk</c>.
+    /// </remarks>
+    public static WifiSecurity ToSecurity(string? keyManagement) => keyManagement switch
+    {
+        null => WifiSecurity.Open,
+        "none" => WifiSecurity.Wep,
+        "owe" => WifiSecurity.Owe,
+        "sae" => WifiSecurity.Wpa3Psk,
+        "wpa-psk" => WifiSecurity.Wpa2Psk,
+        "wpa-eap" => WifiSecurity.Enterprise,
+        "wpa-eap-suite-b-192" => WifiSecurity.Enterprise,
+        "ieee8021x" => WifiSecurity.Enterprise,
+        _ => WifiSecurity.Unknown
+    };
+
+
     public async Task<NmAccessPoint?> GetActiveAccessPoint(string devicePath, CancellationToken ct = default)
     {
         var conn = await this.GetConnection(ct).ConfigureAwait(false);
@@ -323,6 +346,93 @@ internal sealed class NmClient : IAsyncDisposable
                 return reader.ReadObjectPathAsString();
             }
         ).ConfigureAwait(false);
+    }
+
+
+    /// <summary>
+    /// Brings up a profile NetworkManager already has saved, returning the active connection path.
+    /// </summary>
+    public async Task<string> Activate(string connectionPath, string devicePath, CancellationToken ct = default)
+    {
+        var conn = await this.GetConnection(ct).ConfigureAwait(false);
+        var writer = conn.GetMessageWriter();
+        writer.WriteMethodCallHeader(
+            destination: NmConstants.Service,
+            path: NmConstants.RootPath,
+            @interface: NmConstants.ManagerInterface,
+            member: "ActivateConnection",
+            signature: "ooo"
+        );
+        writer.WriteObjectPath(connectionPath);
+        writer.WriteObjectPath(devicePath);
+
+        // "/" is NetworkManager's null - let it pick the access point itself
+        writer.WriteObjectPath(NmConstants.NullPath);
+
+        return await conn.CallMethodAsync(
+            writer.CreateMessage(),
+            static (Message reply, object? _) => reply.GetBodyReader().ReadObjectPathAsString()
+        ).ConfigureAwait(false);
+    }
+
+
+    /// <summary>Every saved profile the daemon holds, of any type - not just Wi-Fi.</summary>
+    public async Task<IReadOnlyList<string>> ListConnections(CancellationToken ct = default)
+    {
+        var conn = await this.GetConnection(ct).ConfigureAwait(false);
+        var msg = conn.CreateMethodCall(NmConstants.SettingsPath, NmConstants.SettingsInterface, "ListConnections");
+
+        return await conn.CallMethodAsync(
+            msg,
+            static (Message reply, object? _) => reply
+                .GetBodyReader()
+                .ReadArrayOfObjectPath()
+                .Select(x => x.ToString())
+                .ToArray()
+        ).ConfigureAwait(false);
+    }
+
+
+    /// <summary>
+    /// Reads a saved profile's settings - the same <c>a{sa{sv}}</c> shape that creates one.
+    /// </summary>
+    /// <remarks>
+    /// Secrets are never included; <c>GetSecrets</c> is a separate, polkit-gated call this library
+    /// has no reason to make.
+    /// </remarks>
+    public async Task<Dictionary<string, Dictionary<string, VariantValue>>> GetConnectionSettings(
+        string connectionPath,
+        CancellationToken ct = default
+    )
+    {
+        var conn = await this.GetConnection(ct).ConfigureAwait(false);
+        var msg = conn.CreateMethodCall(connectionPath, NmConstants.SettingsConnectionInterface, "GetSettings");
+
+        return await conn.CallMethodAsync(
+            msg,
+            static (Message reply, object? _) =>
+            {
+                var reader = reply.GetBodyReader();
+                var groups = new Dictionary<string, Dictionary<string, VariantValue>>();
+
+                var end = reader.ReadDictionaryStart();
+                while (reader.HasNext(end))
+                {
+                    var name = reader.ReadString();
+                    groups[name] = reader.ReadDictionaryOfStringToVariantValue();
+                }
+                return groups;
+            }
+        ).ConfigureAwait(false);
+    }
+
+
+    /// <summary>Deletes a saved profile. Goes through polkit.</summary>
+    public async Task DeleteConnection(string connectionPath, CancellationToken ct = default)
+    {
+        var conn = await this.GetConnection(ct).ConfigureAwait(false);
+        var msg = conn.CreateMethodCall(connectionPath, NmConstants.SettingsConnectionInterface, "Delete");
+        await conn.CallMethodAsync(msg).ConfigureAwait(false);
     }
 
 

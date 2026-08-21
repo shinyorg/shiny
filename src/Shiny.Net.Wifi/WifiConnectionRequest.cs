@@ -38,10 +38,18 @@ public sealed record WifiConnectionRequest
     public bool IsHidden { get; init; }
 
     /// <summary>
-    /// Save the network so the OS rejoins it automatically later. Ignored on Android 10+, where a
-    /// specifier-based join is never persisted, and on iOS, where the configuration lives until
-    /// your app is deleted or calls <see cref="IWifiManager.Disconnect"/>.
+    /// Save the network so the OS can rejoin it later, and so it shows up in
+    /// <see cref="IWifiManager.GetKnownNetworks"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>What gets saved differs. Windows, macOS and Linux write an ordinary profile. iOS keeps
+    /// the hotspot configuration until your app is deleted or
+    /// <see cref="IWifiManager.Forget"/> removes it. Android 11+ registers a network suggestion
+    /// alongside the join - the join itself is still a specifier and is never persisted, so the
+    /// suggestion is purely what lets the OS come back to the network on its own, and it only takes
+    /// effect once the user approves the notification Android raises.</para>
+    /// <para>Turning this off leaves nothing behind anywhere.</para>
+    /// </remarks>
     public bool Remember { get; init; } = true;
 
     /// <summary>How long to wait for association before giving up. Defaults to 30 seconds.</summary>

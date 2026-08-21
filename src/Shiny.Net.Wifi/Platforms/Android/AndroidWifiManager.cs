@@ -51,9 +51,22 @@ public class AndroidWifiManager(
                        WifiCapabilities.CurrentNetwork |
                        WifiCapabilities.RadioState;
 
-            // SetWifiEnabled became a no-op returning false for third-party apps in API 29
+            // SetWifiEnabled became a no-op returning false for third-party apps in API 29, and the
+            // legacy configuration list it goes with is the only saved network an app can join on
+            // demand - a suggestion is a hint the OS acts on when it likes, not a call
             if (!OperatingSystem.IsAndroidVersionAtLeast(29))
-                caps |= WifiCapabilities.RadioToggle;
+            {
+                caps |= WifiCapabilities.RadioToggle |
+                        WifiCapabilities.ConnectKnownNetwork |
+                        WifiCapabilities.KnownNetworks |
+                        WifiCapabilities.ForgetNetwork;
+            }
+            else if (OperatingSystem.IsAndroidVersionAtLeast(30))
+            {
+                // API 29 is the gap: it accepts suggestions but cannot enumerate them, so there is
+                // no way to list what is saved or to name one to remove
+                caps |= WifiCapabilities.KnownNetworks | WifiCapabilities.ForgetNetwork;
+            }
 
             return caps;
         }
@@ -243,13 +256,74 @@ public class AndroidWifiManager(
         await this.Disconnect(ct).ConfigureAwait(false);
 
         if (OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            // a specifier join is what actually gets the device onto the network now, but it is
+            // never saved - so when the caller asked to be remembered, a suggestion goes in
+            // alongside it purely to persist the credential for later
+            if (request.Remember && OperatingSystem.IsAndroidVersionAtLeast(30))
+                this.Suggest(request);
+
             await this.ConnectViaSpecifier(request, ct).ConfigureAwait(false);
+        }
         else
+        {
             this.ConnectViaConfiguration(request);
+        }
 
         return await this
             .WaitForAddress(request.Ssid, request.Timeout ?? defaultConnectTimeout, ct)
             .ConfigureAwait(false);
+    }
+
+
+    /// <remarks>
+    /// Suggestions are additive and duplicates are rejected, so an SSID already suggested is
+    /// removed first - which also lets a changed passphrase replace the stored one. A failure here
+    /// is never fatal: the specifier join that follows is what the caller is waiting on, and losing
+    /// the ability to auto-rejoin later is not worth failing that.
+    /// </remarks>
+    [SupportedOSPlatform("android30.0")]
+    void Suggest(WifiConnectionRequest request)
+    {
+        try
+        {
+            var native = this.Native;
+            var existing = native
+                .NetworkSuggestions?
+                .Where(x => x.Ssid == request.Ssid)
+                .ToList();
+
+            if (existing?.Count > 0)
+                native.RemoveNetworkSuggestions(existing);
+
+            var builder = new WifiNetworkSuggestion.Builder()
+                .SetSsid(request.Ssid)!
+                .SetIsHiddenSsid(request.IsHidden)!;
+
+            if (request.Bssid != null)
+                builder = builder.SetBssid(MacAddress.FromString(request.Bssid))!;
+
+            if (request.Passphrase != null)
+            {
+                builder = request.Security == WifiSecurity.Wpa3Psk
+                    ? builder.SetWpa3Passphrase(request.Passphrase)!
+                    : builder.SetWpa2Passphrase(request.Passphrase)!;
+            }
+            else if (request.Security == WifiSecurity.Owe)
+            {
+                builder = builder.SetIsEnhancedOpen(true)!;
+            }
+
+            var status = native.AddNetworkSuggestions([builder.Build()!]);
+            if (status == NetworkStatus.SuggestionsSuccess)
+                logger.Suggested(request.Ssid);
+            else
+                logger.WifiError(new WifiException($"Android refused the suggestion - {status}"), $"Could not save '{request.Ssid}' for later");
+        }
+        catch (Exception ex)
+        {
+            logger.WifiError(ex, $"Could not save '{request.Ssid}' for later");
+        }
     }
 
 
@@ -336,6 +410,47 @@ public class AndroidWifiManager(
     }
 
 
+    /// <remarks>
+    /// Only reachable below API 29, where a saved network is a WifiConfiguration with a numeric id
+    /// that <c>enableNetwork</c> accepts. From API 29 the OS decides when to act on a suggestion
+    /// and there is no equivalent call, so this throws.
+    /// </remarks>
+    public override async Task<WifiNetworkInfo> Connect(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            throw WifiNotSupportedException.For(
+                WifiCapabilities.ConnectKnownNetwork,
+                "Android 10 removed enableNetwork for third-party apps. A saved network here is a WifiNetworkSuggestion, which the OS joins on its own schedule - call Connect(WifiConnectionRequest) with the passphrase to join now"
+            );
+        }
+
+        var known = (await this.GetKnownNetworks(ct).ConfigureAwait(false))
+            .FirstOrDefault(x => x.Id == knownNetworkId)
+            ?? throw new WifiConnectionException($"No saved network with id '{knownNetworkId}'");
+
+        this.EnableSavedNetwork(knownNetworkId, known.Ssid);
+
+        return await this
+            .WaitForAddress(known.Ssid, defaultConnectTimeout, ct)
+            .ConfigureAwait(false);
+    }
+
+
+#pragma warning disable CA1422 // deliberately the legacy path - only reached below API 29
+    void EnableSavedNetwork(string id, string ssid)
+    {
+        if (!Int32.TryParse(id, out var networkId))
+            throw new WifiConnectionException($"'{id}' is not an Android network id");
+
+        if (!this.Native.EnableNetwork(networkId, true))
+            throw new WifiConnectionException($"Android would not enable the saved network '{ssid}'");
+    }
+#pragma warning restore CA1422
+
+
     public override Task Disconnect(CancellationToken ct = default)
     {
         if (this.requestCallback != null)
@@ -351,6 +466,146 @@ public class AndroidWifiManager(
         }
         return Task.CompletedTask;
     }
+
+
+    /// <remarks>
+    /// <para>Android never discloses the user's own saved networks to an app. What comes back is
+    /// this app's entries only: the suggestions it added (API 30+, which is where
+    /// <see cref="WifiConnectionRequest.Remember"/> puts them) plus any configurations it created
+    /// itself (API 31+, and in practice only on a device that was upgraded from Android 9).</para>
+    /// <para>Below API 29 the legacy configuration list is readable in full, and each entry carries
+    /// the numeric network id that <see cref="Connect(string, CancellationToken)"/> takes.</para>
+    /// </remarks>
+    public override Task<IReadOnlyList<KnownWifiNetwork>> GetKnownNetworks(CancellationToken ct = default)
+    {
+        List<KnownWifiNetwork> results;
+        if (!OperatingSystem.IsAndroidVersionAtLeast(29))
+            results = this.ReadLegacyConfigurations();
+
+        else if (OperatingSystem.IsAndroidVersionAtLeast(30))
+            results = this.ReadSuggestions();
+
+        else
+        {
+            throw WifiNotSupportedException.For(
+                WifiCapabilities.KnownNetworks,
+                "Android 10 accepts network suggestions but cannot enumerate them - getNetworkSuggestions only arrived in Android 11, and the legacy configuration list was closed off in Android 10"
+            );
+        }
+
+        logger.KnownNetworksRead(results.Count);
+        return Task.FromResult<IReadOnlyList<KnownWifiNetwork>>(results);
+    }
+
+
+    [SupportedOSPlatform("android30.0")]
+    List<KnownWifiNetwork> ReadSuggestions()
+    {
+        var native = this.Native;
+        var results = (native.NetworkSuggestions ?? [])
+            .Where(x => !String.IsNullOrEmpty(x.Ssid))
+            .Select(x => new KnownWifiNetwork
+            {
+                // a suggestion has no handle of its own - it is matched back by SSID
+                Id = x.Ssid!,
+                Ssid = x.Ssid!,
+                Security = ToSecurity(x),
+                IsHidden = x.IsHiddenSsid,
+                AddedByThisApp = true
+            })
+            .ToList();
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        {
+            // an SSID can be both suggested and configured; the suggestion is the richer entry, so
+            // it wins and the configuration is folded in only where there is no suggestion for it
+            var seen = results.Select(x => x.Ssid).ToHashSet(StringComparer.Ordinal);
+
+            var configured = (native.CallerConfiguredNetworks ?? [])
+                .Select(x => Unquote(x.Ssid))
+                .Where(x => !String.IsNullOrEmpty(x) && seen.Add(x))
+                .Select(x => new KnownWifiNetwork
+                {
+                    Id = x!,
+                    Ssid = x!,
+                    AddedByThisApp = true
+                })
+                .ToList();
+
+            results.AddRange(configured);
+        }
+        return results;
+    }
+
+
+#pragma warning disable CA1422 // deliberately the legacy path - only reached below API 29
+    List<KnownWifiNetwork> ReadLegacyConfigurations()
+        => (this.Native.ConfiguredNetworks ?? [])
+            .Where(x => !String.IsNullOrEmpty(Unquote(x.Ssid)))
+            .Select(x => new KnownWifiNetwork
+            {
+                // pre-29 Android issues a real handle, so use it rather than the name
+                Id = x.NetworkId.ToString(),
+                Ssid = Unquote(x.Ssid)!,
+                IsHidden = x.HiddenSSID
+            })
+            .ToList();
+#pragma warning restore CA1422
+
+
+    /// <remarks>
+    /// Removes the suggestion your app added (API 30+) or the legacy configuration it created.
+    /// Networks the user saved themselves are neither visible nor removable from here.
+    /// </remarks>
+    public override Task Forget(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+        logger.Forgetting(knownNetworkId);
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(30))
+            this.ForgetSuggestion(knownNetworkId);
+        else if (!OperatingSystem.IsAndroidVersionAtLeast(29))
+            this.ForgetLegacyConfiguration(knownNetworkId);
+        else
+        {
+            throw WifiNotSupportedException.For(
+                WifiCapabilities.ForgetNetwork,
+                "Android 10 exposes no way to read back or remove a saved network - the suggestion API only became enumerable in Android 11"
+            );
+        }
+        return Task.CompletedTask;
+    }
+
+
+    [SupportedOSPlatform("android30.0")]
+    void ForgetSuggestion(string ssid)
+    {
+        var native = this.Native;
+        var matches = (native.NetworkSuggestions ?? [])
+            .Where(x => x.Ssid == ssid)
+            .ToList();
+
+        // already gone is a success, not a failure - Forget is meant to be safe to call blind
+        if (matches.Count == 0)
+            return;
+
+        var status = native.RemoveNetworkSuggestions(matches);
+        if (status != NetworkStatus.SuggestionsSuccess)
+            throw new WifiException($"Android would not remove the saved network '{ssid}' - {status}");
+    }
+
+
+#pragma warning disable CA1422 // deliberately the legacy path - only reached below API 29
+    void ForgetLegacyConfiguration(string id)
+    {
+        if (!Int32.TryParse(id, out var networkId))
+            throw new WifiException($"'{id}' is not an Android network id");
+
+        var native = this.Native;
+        if (native.RemoveNetwork(networkId))
+            native.SaveConfiguration();
+    }
+#pragma warning restore CA1422
 
 
     public override Task<bool> GetRadioEnabled(CancellationToken ct = default)
@@ -448,6 +703,23 @@ public class AndroidWifiManager(
             WifiSecurityType.EapWpa3Enterprise192Bit => WifiSecurity.Enterprise,
             _ => WifiSecurity.Unknown
         };
+    }
+
+
+    /// <remarks>
+    /// A suggestion does not report its scheme, only which passphrase slot was filled - which is
+    /// enough to tell WPA3 from WPA2 from open, and is all we ever put in one.
+    /// </remarks>
+    [SupportedOSPlatform("android29.0")]
+    static WifiSecurity ToSecurity(WifiNetworkSuggestion suggestion)
+    {
+        if (suggestion.EnterpriseConfig != null)
+            return WifiSecurity.Enterprise;
+
+        if (suggestion.IsEnhancedOpen)
+            return WifiSecurity.Owe;
+
+        return suggestion.Passphrase == null ? WifiSecurity.Open : WifiSecurity.Unknown;
     }
 
 

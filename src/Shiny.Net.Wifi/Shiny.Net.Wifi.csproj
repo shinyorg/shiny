@@ -12,7 +12,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsAotCompatible>true</IsAotCompatible>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-        <Description>Shiny Wi-Fi - cross-platform Wi-Fi scanning, connect/disconnect, current network (IP/DNS) monitoring, local hotspot and airplane mode for Android, iOS, Mac Catalyst, macOS and Windows</Description>
+        <Description>Shiny Wi-Fi - cross-platform Wi-Fi scanning, connect/disconnect, current network (IP/DNS) monitoring, saved/known network management and local hotspot for Android, iOS, Mac Catalyst, macOS and Windows</Description>
 
         <!-- imported explicitly below so Platforms\AppleShared can be added to all three Apple targets -->
         <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
@@ -26,6 +26,11 @@
     -->
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos'))">
         <NoWarn>$(NoWarn);CA1422</NoWarn>
+    </PropertyGroup>
+
+    <!-- the saved-profile store lives in wlanapi.dll, and LibraryImport's generated marshalling is unsafe -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

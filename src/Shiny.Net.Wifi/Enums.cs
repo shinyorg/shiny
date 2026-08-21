@@ -6,8 +6,8 @@ namespace Shiny.Net.Wifi;
 /// </summary>
 /// <remarks>
 /// <para>Wi-Fi is the most unevenly exposed capability across the platforms Shiny targets. iOS has
-/// no scanning API at all outside an Apple-granted NEHotspotHelper entitlement, no third-party app
-/// on any mobile OS can toggle airplane mode, and only Android and Windows can raise a hotspot.
+/// no scanning API at all outside an Apple-granted NEHotspotHelper entitlement, only Android and
+/// Windows can raise a hotspot, and "known networks" means something different on all six.
 /// Rather than pretend otherwise, every manager reports what it can do here and throws
 /// <see cref="WifiNotSupportedException"/> - naming the specific platform limit - for the rest.</para>
 /// <para>Check the flag before offering the feature in your UI; catching the exception afterwards
@@ -22,7 +22,10 @@ public enum WifiCapabilities
     /// <summary><see cref="IWifiManager.Scan"/> returns the access points in range.</summary>
     Scan = 1,
 
-    /// <summary><see cref="IWifiManager.Connect"/> can join a named network.</summary>
+    /// <summary>
+    /// <see cref="IWifiManager.Connect(WifiConnectionRequest, CancellationToken)"/> can join a
+    /// named network.
+    /// </summary>
     Connect = 2,
 
     /// <summary><see cref="IWifiManager.Disconnect"/> can leave the current network.</summary>
@@ -57,11 +60,28 @@ public enum WifiCapabilities
     /// </summary>
     HotspotClients = 256,
 
-    /// <summary><see cref="IAirplaneMode.IsEnabled"/> reports the real airplane mode state.</summary>
-    AirplaneModeState = 512,
+    /// <summary>
+    /// <see cref="IWifiManager.GetKnownNetworks"/> can list the networks saved on the device.
+    /// </summary>
+    /// <remarks>
+    /// What "known" covers is platform-specific: iOS and Mac Catalyst see only the networks your
+    /// own app configured, Android sees your app's suggestions and configurations, and Windows,
+    /// macOS and Linux see every profile on the machine.
+    /// </remarks>
+    KnownNetworks = 512,
 
-    /// <summary><see cref="IAirplaneMode.SetEnabled"/> can turn airplane mode on and off.</summary>
-    AirplaneModeToggle = 1024
+    /// <summary><see cref="IWifiManager.Forget"/> can delete a saved network.</summary>
+    ForgetNetwork = 1024,
+
+    /// <summary>
+    /// <see cref="IWifiManager.Connect(string, CancellationToken)"/> can rejoin a saved network by
+    /// id, without being handed the passphrase again.
+    /// </summary>
+    /// <remarks>
+    /// Absent on iOS and modern Android, where a saved network is a standing hint the OS acts on
+    /// when it chooses - there is no call to make it join one on demand.
+    /// </remarks>
+    ConnectKnownNetwork = 2048
 }
 
 

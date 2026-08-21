@@ -81,8 +81,17 @@ public abstract class AbstractWifiManager : IWifiManager
     public virtual Task<WifiNetworkInfo> Connect(WifiConnectionRequest request, CancellationToken ct = default)
         => throw this.NotSupported(WifiCapabilities.Connect);
 
+    public virtual Task<WifiNetworkInfo> Connect(string knownNetworkId, CancellationToken ct = default)
+        => throw this.NotSupported(WifiCapabilities.ConnectKnownNetwork);
+
     public virtual Task Disconnect(CancellationToken ct = default)
         => throw this.NotSupported(WifiCapabilities.Disconnect);
+
+    public virtual Task<IReadOnlyList<KnownWifiNetwork>> GetKnownNetworks(CancellationToken ct = default)
+        => throw this.NotSupported(WifiCapabilities.KnownNetworks);
+
+    public virtual Task Forget(string knownNetworkId, CancellationToken ct = default)
+        => throw this.NotSupported(WifiCapabilities.ForgetNetwork);
 
     public virtual Task<bool> GetRadioEnabled(CancellationToken ct = default)
         => throw this.NotSupported(WifiCapabilities.RadioState);

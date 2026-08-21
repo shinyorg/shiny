@@ -39,17 +39,4 @@ public static class LinuxWifiServiceCollectionExtensions
         ));
         return services;
     }
-
-
-    /// <summary>
-    /// Registers <see cref="IAirplaneMode"/> for Linux - NetworkManager's wireless and WWAN kill
-    /// switches, which is what desktop environments label airplane mode.
-    /// </summary>
-    public static IServiceCollection AddAirplaneMode(this IServiceCollection services)
-    {
-        services.AddSingleton<IAirplaneMode>(sp => new LinuxAirplaneMode(
-            sp.GetRequiredService<ILogger<LinuxAirplaneMode>>()
-        ));
-        return services;
-    }
 }

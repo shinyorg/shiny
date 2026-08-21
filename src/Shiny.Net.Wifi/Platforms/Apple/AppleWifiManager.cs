@@ -21,6 +21,10 @@ namespace Shiny.Net.Wifi;
 /// rather than failing, so call <see cref="RequestAccess"/> first.</para>
 /// <para>Scanning is absent by design: the only API that lists nearby networks lives inside a
 /// NEHotspotHelper, and that entitlement is granted case by case by Apple.</para>
+/// <para>The configurations your app has applied can be listed and removed - that is what
+/// <see cref="GetKnownNetworks"/> and <see cref="Forget"/> map onto - but they cannot be re-joined
+/// on demand. A stored configuration is a standing instruction iOS acts on when the network is in
+/// range, so <see cref="Connect(string, CancellationToken)"/> throws here.</para>
 /// </remarks>
 public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiManager, IDisposable
 {
@@ -35,7 +39,9 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
     public override WifiCapabilities Capabilities =>
         WifiCapabilities.Connect |
         WifiCapabilities.Disconnect |
-        WifiCapabilities.CurrentNetwork;
+        WifiCapabilities.CurrentNetwork |
+        WifiCapabilities.KnownNetworks |
+        WifiCapabilities.ForgetNetwork;
 
 
     public override WifiNetworkInfo? CurrentNetwork
@@ -165,6 +171,52 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
         if (ssid != null)
             NEHotspotConfigurationManager.SharedManager.RemoveConfiguration(ssid);
 
+        return Task.CompletedTask;
+    }
+
+
+    /// <remarks>
+    /// <para>NEHotspotConfigurationManager only discloses the SSIDs <b>this app</b> configured, so
+    /// the user's own saved networks never appear here - the list is empty until your app has
+    /// called <see cref="Connect(WifiConnectionRequest, CancellationToken)"/> with
+    /// <see cref="WifiConnectionRequest.Remember"/> left on.</para>
+    /// <para>Only names come back. iOS reports no security type or hidden flag for a stored
+    /// configuration, so those stay at their defaults.</para>
+    /// </remarks>
+    public override async Task<IReadOnlyList<KnownWifiNetwork>> GetKnownNetworks(CancellationToken ct = default)
+    {
+        var ssids = await NEHotspotConfigurationManager
+            .SharedManager
+            .GetConfiguredSsidsAsync()
+            .WaitAsync(ct)
+            .ConfigureAwait(false);
+
+        var results = ssids
+            .Select(x => new KnownWifiNetwork
+            {
+                // iOS keys its configurations by SSID and offers no other handle
+                Id = x,
+                Ssid = x,
+                AddedByThisApp = true
+            })
+            .ToList();
+
+        logger.KnownNetworksRead(results.Count);
+        return results;
+    }
+
+
+    /// <remarks>
+    /// Drops the configuration your app added. Any network the user saved themselves is untouched -
+    /// and unreachable from here - so the device may simply rejoin it.
+    /// </remarks>
+    public override Task Forget(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+        logger.Forgetting(knownNetworkId);
+
+        // no-ops when the SSID was never configured, which is the contract we want
+        NEHotspotConfigurationManager.SharedManager.RemoveConfiguration(knownNetworkId);
         return Task.CompletedTask;
     }
 

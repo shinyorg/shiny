@@ -13,6 +13,10 @@ internal static class NmConstants
     public const string Ip4ConfigInterface = "org.freedesktop.NetworkManager.IP4Config";
     public const string ActiveConnectionInterface = "org.freedesktop.NetworkManager.Connection.Active";
     public const string PropertiesInterface = "org.freedesktop.DBus.Properties";
+    public const string SettingsInterface = "org.freedesktop.NetworkManager.Settings";
+    public const string SettingsConnectionInterface = "org.freedesktop.NetworkManager.Settings.Connection";
+
+    public const string SettingsPath = "/org/freedesktop/NetworkManager/Settings";
 
     /// <summary>NM_DEVICE_TYPE_WIFI</summary>
     public const uint DeviceTypeWifi = 2;

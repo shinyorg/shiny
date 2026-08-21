@@ -87,10 +87,17 @@
                             Visible="false" />
     -->
 
-    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('-maccatalyst'))">
-        <CustomEntitlements Include="aps-environment" Type="string" Value="development" Condition="'$(Configuration)' == 'Debug'" Visible="false" />
-        <CustomEntitlements Include="aps-environment" Type="string" Value="production" Condition="'$(Configuration)' == 'Release'" Visible="false" />
-    </ItemGroup>
+    <!--
+        The aps-environment entitlement requires a provisioning profile that carries the Push
+        Notifications capability, which fails the signing step for anyone using a plain
+        wildcard/automatic profile. Commented out so the sample builds and deploys by default.
+        The push code and page are still here - uncomment this block to exercise them.
+
+        <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('-maccatalyst'))">
+            <CustomEntitlements Include="aps-environment" Type="string" Value="development" Condition="'$(Configuration)' == 'Debug'" Visible="false" />
+            <CustomEntitlements Include="aps-environment" Type="string" Value="production" Condition="'$(Configuration)' == 'Release'" Visible="false" />
+        </ItemGroup>
+    -->
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls"/>

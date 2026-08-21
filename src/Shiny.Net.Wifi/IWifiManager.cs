@@ -2,7 +2,8 @@ namespace Shiny.Net.Wifi;
 
 
 /// <summary>
-/// Scans for, joins and leaves Wi-Fi networks, and reports the one currently joined.
+/// Scans for, joins and leaves Wi-Fi networks, manages the ones the device has saved, and reports
+/// the one currently joined.
 /// </summary>
 /// <remarks>
 /// <para>Backed by WifiManager + ConnectivityManager on Android, NEHotspotConfiguration on
@@ -67,6 +68,21 @@ public interface IWifiManager
     Task<WifiNetworkInfo> Connect(WifiConnectionRequest request, CancellationToken ct = default);
 
     /// <summary>
+    /// Rejoins a network already saved on the device, by <see cref="KnownWifiNetwork.Id"/>.
+    /// </summary>
+    /// <remarks>
+    /// No passphrase is needed - the platform already holds it. Only Windows, macOS, Linux and
+    /// Android below API 29 can do this; on iOS and modern Android a saved network is a standing
+    /// hint the OS acts on when it chooses, with no call to force the join.
+    /// </remarks>
+    /// <param name="knownNetworkId">The <see cref="KnownWifiNetwork.Id"/> to rejoin.</param>
+    /// <param name="ct">Cancels the attempt.</param>
+    /// <returns>The joined network, with addressing populated.</returns>
+    /// <exception cref="WifiNotSupportedException">The platform cannot join a saved network on demand.</exception>
+    /// <exception cref="WifiConnectionException">The id is unknown, or the join failed or timed out.</exception>
+    Task<WifiNetworkInfo> Connect(string knownNetworkId, CancellationToken ct = default);
+
+    /// <summary>
     /// Leaves the current network.
     /// </summary>
     /// <remarks>
@@ -75,6 +91,31 @@ public interface IWifiManager
     /// On Windows, macOS and Linux it disassociates the adapter outright.
     /// </remarks>
     Task Disconnect(CancellationToken ct = default);
+
+    /// <summary>
+    /// Lists the networks saved on the device.
+    /// </summary>
+    /// <remarks>
+    /// Read <see cref="KnownWifiNetwork"/> before trusting the size of this list - iOS, Mac
+    /// Catalyst and Android only disclose the entries your own app created, while Windows, macOS
+    /// and Linux hand back every profile on the machine.
+    /// </remarks>
+    /// <exception cref="WifiNotSupportedException">The platform will not enumerate saved networks.</exception>
+    /// <exception cref="WifiPermissionException">Listing needs a permission that has not been granted.</exception>
+    Task<IReadOnlyList<KnownWifiNetwork>> GetKnownNetworks(CancellationToken ct = default);
+
+    /// <summary>
+    /// Deletes a saved network so the device stops rejoining it.
+    /// </summary>
+    /// <remarks>
+    /// Forgetting the network you are currently on drops you off it. Succeeds silently when the id
+    /// is already gone, so this is safe to call speculatively.
+    /// </remarks>
+    /// <param name="knownNetworkId">The <see cref="KnownWifiNetwork.Id"/> to delete.</param>
+    /// <param name="ct">Cancels the operation.</param>
+    /// <exception cref="WifiNotSupportedException">The platform will not let apps delete saved networks.</exception>
+    /// <exception cref="WifiPermissionException">macOS, where editing the profile list needs an admin authorization this API cannot raise.</exception>
+    Task Forget(string knownNetworkId, CancellationToken ct = default);
 
     /// <summary>Whether the Wi-Fi radio is powered on.</summary>
     /// <exception cref="WifiNotSupportedException">The platform will not disclose radio state.</exception>

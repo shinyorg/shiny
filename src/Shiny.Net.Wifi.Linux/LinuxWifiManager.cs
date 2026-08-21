@@ -40,7 +40,10 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
         WifiCapabilities.Disconnect |
         WifiCapabilities.CurrentNetwork |
         WifiCapabilities.RadioState |
-        WifiCapabilities.RadioToggle;
+        WifiCapabilities.RadioToggle |
+        WifiCapabilities.KnownNetworks |
+        WifiCapabilities.ForgetNetwork |
+        WifiCapabilities.ConnectKnownNetwork;
 
 
     public override WifiNetworkInfo? CurrentNetwork
@@ -277,6 +280,162 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
 
         await this.client.Deactivate(path, ct).ConfigureAwait(false);
         this.activeConnectionPath = null;
+    }
+
+
+    /// <remarks>
+    /// The only platform here where the id is a real handle rather than a name: NetworkManager
+    /// stamps every profile with a UUID, so two saved profiles for the same SSID stay distinct and
+    /// the right one is activated. The passphrase stays in the daemon's secret store throughout.
+    /// </remarks>
+    public override async Task<WifiNetworkInfo> Connect(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+
+        var known = await this.FindConnection(knownNetworkId, ct).ConfigureAwait(false)
+            ?? throw new WifiConnectionException($"No saved network with id '{knownNetworkId}'");
+
+        logger.Connecting(known.Network.Ssid);
+        var device = await this.client.GetWifiDevicePath(ct).ConfigureAwait(false);
+
+        try
+        {
+            this.activeConnectionPath = await this.client
+                .Activate(known.Path, device, ct)
+                .ConfigureAwait(false);
+        }
+        catch (DBusExceptionBase ex)
+        {
+            throw new WifiConnectionException($"NetworkManager refused to activate '{known.Network.Ssid}' - {ex.Describe()}", ex);
+        }
+
+        return await this
+            .WaitForAddress(known.Network.Ssid, TimeSpan.FromSeconds(30), ct)
+            .ConfigureAwait(false);
+    }
+
+
+    /// <remarks>
+    /// Every Wi-Fi profile the daemon holds, whoever created it. Non-Wi-Fi profiles - ethernet,
+    /// VPN, bridges - are filtered out on the connection type rather than on whether they happen
+    /// to carry an SSID.
+    /// </remarks>
+    public override async Task<IReadOnlyList<KnownWifiNetwork>> GetKnownNetworks(CancellationToken ct = default)
+    {
+        var results = (await this.ReadConnections(ct).ConfigureAwait(false))
+            .Select(x => x.Network)
+            .ToList();
+
+        logger.KnownNetworksRead(results.Count);
+        return results;
+    }
+
+
+    public override async Task Forget(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+
+        var known = await this.FindConnection(knownNetworkId, ct).ConfigureAwait(false);
+        if (known == null)
+            return;
+
+        logger.Forgetting(knownNetworkId);
+        try
+        {
+            await this.client.DeleteConnection(known.Path, ct).ConfigureAwait(false);
+        }
+        catch (DBusExceptionBase ex)
+        {
+            throw new WifiPermissionException($"NetworkManager refused to delete '{known.Network.Ssid}' - {ex.Describe()}. This needs the polkit action org.freedesktop.NetworkManager.settings.modify.system", ex);
+        }
+    }
+
+
+    sealed record SavedConnection(string Path, KnownWifiNetwork Network);
+
+
+    async Task<SavedConnection?> FindConnection(string id, CancellationToken ct)
+        => (await this.ReadConnections(ct).ConfigureAwait(false))
+            .FirstOrDefault(x => x.Network.Id == id);
+
+
+    /// <remarks>
+    /// One D-Bus round trip per profile - NetworkManager has no bulk read - so a machine with a
+    /// long connection history spends a moment here.
+    /// </remarks>
+    async Task<List<SavedConnection>> ReadConnections(CancellationToken ct)
+    {
+        var paths = await this.client.ListConnections(ct).ConfigureAwait(false);
+        var results = new List<SavedConnection>();
+
+        foreach (var path in paths)
+        {
+            var saved = await this.ReadConnection(path, ct).ConfigureAwait(false);
+            if (saved != null)
+                results.Add(saved);
+        }
+        return results;
+    }
+
+
+    async Task<SavedConnection?> ReadConnection(string path, CancellationToken ct)
+    {
+        Dictionary<string, Dictionary<string, VariantValue>> groups;
+        try
+        {
+            groups = await this.client.GetConnectionSettings(path, ct).ConfigureAwait(false);
+        }
+        catch (DBusExceptionBase ex)
+        {
+            // a profile can vanish between the listing and the read, and one owned by another user
+            // may be unreadable - neither is worth failing the whole listing over
+            logger.WifiError(ex, $"Could not read the saved profile at {path}");
+            return null;
+        }
+
+        if (!groups.TryGetValue("connection", out var connection))
+            return null;
+
+        if (ReadString(connection, "type") != "802-11-wireless")
+            return null;
+
+        groups.TryGetValue("802-11-wireless", out var wireless);
+
+        var ssid = ReadSsid(wireless) ?? ReadString(connection, "id");
+        if (String.IsNullOrEmpty(ssid))
+            return null;
+
+        var uuid = ReadString(connection, "uuid");
+        if (String.IsNullOrEmpty(uuid))
+            return null;
+
+        groups.TryGetValue("802-11-wireless-security", out var security);
+
+        return new SavedConnection(path, new KnownWifiNetwork
+        {
+            Id = uuid,
+            Ssid = ssid,
+            Security = NmClient.ToSecurity(ReadString(security, "key-mgmt")),
+            IsHidden = wireless != null && wireless.TryGetValue("hidden", out var hidden) && hidden.GetBool()
+        });
+    }
+
+
+    static string? ReadString(Dictionary<string, VariantValue>? group, string key)
+        => group != null && group.TryGetValue(key, out var value) ? value.GetString() : null;
+
+
+    /// <remarks>
+    /// The SSID is stored as raw bytes because it is not required to be UTF-8. A profile whose name
+    /// is not decodable falls back to the connection id, which always is.
+    /// </remarks>
+    static string? ReadSsid(Dictionary<string, VariantValue>? wireless)
+    {
+        if (wireless == null || !wireless.TryGetValue("ssid", out var value))
+            return null;
+
+        var bytes = value.GetArray<byte>();
+        return bytes.Length == 0 ? null : Encoding.UTF8.GetString(bytes);
     }
 
 

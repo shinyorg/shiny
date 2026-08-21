@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
-        <Description>Shiny Wi-Fi for Linux via NetworkManager/D-Bus - scanning, connect/disconnect, current network (IP/DNS), access point hosting and airplane mode</Description>
+        <Description>Shiny Wi-Fi for Linux via NetworkManager/D-Bus - scanning, connect/disconnect, current network (IP/DNS), access point hosting and saved network management</Description>
         <RootNamespace>Shiny.Net.Wifi</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <IsAotCompatible>true</IsAotCompatible>

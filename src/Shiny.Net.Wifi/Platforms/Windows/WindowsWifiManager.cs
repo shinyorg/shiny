@@ -20,6 +20,8 @@ namespace Shiny.Net.Wifi;
 /// <para>The current SSID comes from the connection profile rather than the adapter, because the
 /// adapter only knows what it last scanned - a network joined before the app started would
 /// otherwise read as null.</para>
+/// <para>Saved profiles are outside WinRT entirely - WiFiAdapter cannot list, delete or join one -
+/// so those three go through <c>wlanapi.dll</c> directly. See <see cref="WlanApi"/>.</para>
 /// </remarks>
 public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWifiManager
 {
@@ -35,7 +37,10 @@ public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWi
         WifiCapabilities.Disconnect |
         WifiCapabilities.CurrentNetwork |
         WifiCapabilities.RadioState |
-        WifiCapabilities.RadioToggle;
+        WifiCapabilities.RadioToggle |
+        WifiCapabilities.KnownNetworks |
+        WifiCapabilities.ForgetNetwork |
+        WifiCapabilities.ConnectKnownNetwork;
 
 
     public override WifiNetworkInfo? CurrentNetwork
@@ -164,10 +169,72 @@ public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWi
     }
 
 
+    /// <remarks>
+    /// Joins by profile, so Windows supplies the credential it already holds and the network does
+    /// not have to be in the current scan report the way
+    /// <see cref="Connect(WifiConnectionRequest, CancellationToken)"/> requires.
+    /// </remarks>
+    public override async Task<WifiNetworkInfo> Connect(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+
+        var profile = await Task
+            .Run(() => WlanApi.GetProfiles().FirstOrDefault(x => x.Name == knownNetworkId), ct)
+            .ConfigureAwait(false)
+            ?? throw new WifiConnectionException($"No saved profile named '{knownNetworkId}'");
+
+        logger.Connecting(knownNetworkId);
+        await Task.Run(() => WlanApi.Connect(profile.InterfaceId, profile.Name), ct).ConfigureAwait(false);
+
+        return await this
+            .WaitForAddress(knownNetworkId, defaultConnectTimeout, ct)
+            .ConfigureAwait(false);
+    }
+
+
     public override async Task Disconnect(CancellationToken ct = default)
     {
         var wifi = await this.GetAdapter(ct).ConfigureAwait(false);
         wifi.Disconnect();
+    }
+
+
+    /// <remarks>
+    /// Every profile on the machine, whoever saved it - Windows keeps one store per adapter and
+    /// does not record which app wrote an entry, so <see cref="KnownWifiNetwork.AddedByThisApp"/>
+    /// is always false even for profiles this app created.
+    /// </remarks>
+    public override async Task<IReadOnlyList<KnownWifiNetwork>> GetKnownNetworks(CancellationToken ct = default)
+    {
+        // the WLAN calls are blocking and read one profile's XML at a time, so a machine with a
+        // long history spends real time here
+        var profiles = await Task.Run(WlanApi.GetProfiles, ct).ConfigureAwait(false);
+
+        var results = profiles
+            .Select(x => new KnownWifiNetwork
+            {
+                // profile names are unique per adapter and, for anything Windows saved itself,
+                // identical to the SSID
+                Id = x.Name,
+                Ssid = x.Name,
+                Security = x.Security,
+                IsHidden = x.IsHidden
+            })
+            .ToList();
+
+        logger.KnownNetworksRead(results.Count);
+        return results;
+    }
+
+
+    public override async Task Forget(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+        logger.Forgetting(knownNetworkId);
+
+        // a false return means no adapter had a profile by that name, which is the state the
+        // caller asked for
+        await Task.Run(() => WlanApi.DeleteProfile(knownNetworkId), ct).ConfigureAwait(false);
     }
 
 

@@ -16,6 +16,8 @@ namespace Shiny.Net.Wifi;
 /// app also needs <c>com.apple.security.network.client</c>.</para>
 /// <para>CoreWLAN's calls are synchronous and a scan blocks for several seconds, so the blocking
 /// ones are pushed off the calling thread here.</para>
+/// <para>Saved networks are the machine's preferred-network list, readable by anyone but editable
+/// only with an administrator authorization - see <see cref="Forget"/>.</para>
 /// </remarks>
 public class MacOSWifiManager(ILogger<MacOSWifiManager> logger) : AbstractWifiManager, IDisposable
 {
@@ -31,7 +33,10 @@ public class MacOSWifiManager(ILogger<MacOSWifiManager> logger) : AbstractWifiMa
         WifiCapabilities.Disconnect |
         WifiCapabilities.CurrentNetwork |
         WifiCapabilities.RadioState |
-        WifiCapabilities.RadioToggle;
+        WifiCapabilities.RadioToggle |
+        WifiCapabilities.KnownNetworks |
+        WifiCapabilities.ForgetNetwork |
+        WifiCapabilities.ConnectKnownNetwork;
 
 
     public override WifiNetworkInfo? CurrentNetwork
@@ -141,9 +146,110 @@ public class MacOSWifiManager(ILogger<MacOSWifiManager> logger) : AbstractWifiMa
     }
 
 
+    /// <remarks>
+    /// The passphrase comes out of the login keychain, so a profile saved by the user joins without
+    /// your app ever seeing it - but the network still has to be in range, because CoreWLAN
+    /// associates to a scanned access point rather than to a name.
+    /// </remarks>
+    public override async Task<WifiNetworkInfo> Connect(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+        var iface = RequireInterface();
+        logger.Connecting(knownNetworkId);
+
+        await Task
+            .Run(() =>
+            {
+                var candidates = iface.ScanForNetworksWithName(knownNetworkId, out var scanError);
+                if (scanError != null)
+                    throw new WifiConnectionException($"Could not scan for '{knownNetworkId}' - {scanError.LocalizedDescription}");
+
+                var target = (candidates ?? Array.Empty<CWNetwork>())
+                    .OrderByDescending(x => (int)x.RssiValue)
+                    .FirstOrDefault();
+
+                if (target == null)
+                    throw new WifiConnectionException($"Saved network '{knownNetworkId}' was not found in range");
+
+                // a null passphrase tells CoreWLAN to use the credential already in the keychain,
+                // which is the whole point of joining by saved profile
+                if (!iface.AssociateToNetwork(target, null!, out var joinError))
+                    throw new WifiConnectionException($"Could not rejoin '{knownNetworkId}' - {joinError?.LocalizedDescription ?? "the association was refused"}");
+            }, ct)
+            .ConfigureAwait(false);
+
+        return await this
+            .WaitForAddress(knownNetworkId, TimeSpan.FromSeconds(30), ct)
+            .ConfigureAwait(false);
+    }
+
+
     public override Task Disconnect(CancellationToken ct = default)
     {
         RequireInterface().Disassociate();
+        return Task.CompletedTask;
+    }
+
+
+    /// <remarks>
+    /// The whole machine's preferred-network list, in the order macOS tries them - not just the
+    /// profiles this app added, which CoreWLAN does not distinguish.
+    /// </remarks>
+    public override Task<IReadOnlyList<KnownWifiNetwork>> GetKnownNetworks(CancellationToken ct = default)
+    {
+        var profiles = RequireInterface().Configuration?.NetworkProfiles ?? Array.Empty<CWNetworkProfile>();
+
+        var results = profiles
+            .Where(x => !String.IsNullOrEmpty(x.Ssid))
+            .Select(x => new KnownWifiNetwork
+            {
+                // CoreWLAN gives a profile no identity beyond its SSID
+                Id = x.Ssid!,
+                Ssid = x.Ssid!,
+                Security = ToSecurity(x.Security)
+            })
+            .ToList();
+
+        logger.KnownNetworksRead(results.Count);
+        return Task.FromResult<IReadOnlyList<KnownWifiNetwork>>(results);
+    }
+
+
+    /// <remarks>
+    /// Editing the preferred-network list means committing a whole new CWConfiguration, and macOS
+    /// gates that behind an SFAuthorization that a plain app cannot raise. Expect this to throw
+    /// <see cref="WifiPermissionException"/> unless the process is already running with the rights -
+    /// there is no third-party route around it, which is why the capability is advertised but the
+    /// call may still fail.
+    /// </remarks>
+    public override Task Forget(string knownNetworkId, CancellationToken ct = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(knownNetworkId);
+        var iface = RequireInterface();
+
+        var current = iface.Configuration?.NetworkProfiles ?? Array.Empty<CWNetworkProfile>();
+        var remaining = current
+            .Where(x => !String.Equals(x.Ssid, knownNetworkId, StringComparison.Ordinal))
+            .ToArray();
+
+        if (remaining.Length == current.Length)
+            return Task.CompletedTask;
+
+        logger.Forgetting(knownNetworkId);
+
+        // a mutable copy carries the rest of the configuration across - building a fresh
+        // CWMutableConfiguration would reset RememberJoinedNetworks and the administrator flags
+        var config = (CWMutableConfiguration)iface.Configuration!.MutableCopy(null!);
+        config.NetworkProfiles = new NSOrderedSet<CWNetworkProfile>(remaining);
+
+        // the second argument is an SFAuthorization; there is no binding for one and no way for a
+        // sandboxed app to obtain it, so this succeeds only where the process already holds the right
+        if (!iface.CommitConfiguration(config, null!, out var error))
+        {
+            throw new WifiPermissionException(
+                $"macOS refused to remove the saved network '{knownNetworkId}' - {error?.LocalizedDescription ?? "committing the Wi-Fi configuration needs an administrator authorization"}"
+            );
+        }
         return Task.CompletedTask;
     }
 

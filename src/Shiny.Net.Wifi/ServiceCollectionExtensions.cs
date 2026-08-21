@@ -85,35 +85,4 @@ public static class WifiServiceCollectionExtensions
 #endif
         return services;
     }
-
-
-    /// <summary>
-    /// Registers <see cref="IAirplaneMode"/>.
-    /// </summary>
-    /// <remarks>
-    /// Only Windows can toggle it, and only by switching every radio - which is what the Windows
-    /// airplane mode switch does. Android reports the real state but cannot change it, and Apple's
-    /// platforms expose neither. Everywhere else <see cref="IAirplaneMode.OpenSettings"/> is the
-    /// route: it puts the user on the settings screen carrying the switch.
-    /// </remarks>
-    public static IServiceCollection AddAirplaneMode(this IServiceCollection services)
-    {
-#if ANDROID
-        services.AddSingleton<IAirplaneMode>(sp => new AndroidAirplaneMode(
-            sp.GetRequiredService<AndroidPlatform>(),
-            sp.GetRequiredService<ILogger<AndroidAirplaneMode>>()
-        ));
-#elif IOS || MACCATALYST
-        services.AddSingleton<IAirplaneMode>(_ => new AppleAirplaneMode());
-#elif MACOS
-        services.AddSingleton<IAirplaneMode>(_ => new MacOSAirplaneMode());
-#elif WINDOWS
-        services.AddSingleton<IAirplaneMode>(sp => new WindowsAirplaneMode(
-            sp.GetRequiredService<ILogger<WindowsAirplaneMode>>()
-        ));
-#else
-        services.AddSingleton<IAirplaneMode>(_ => new NetAirplaneMode());
-#endif
-        return services;
-    }
 }

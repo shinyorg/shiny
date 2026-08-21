@@ -1,6 +1,6 @@
 ---
 name: shiny-wifi
-description: Generate code using Shiny.Net.Wifi for cross-platform Wi-Fi - scanning for access points, connecting and disconnecting, monitoring the current network (SSID, signal, IP, DNS), hosting a hotspot with connected-client listing, and airplane mode on Android, iOS, Mac Catalyst, macOS, Windows, and Linux
+description: Generate code using Shiny.Net.Wifi for cross-platform Wi-Fi - scanning for access points, connecting and disconnecting, listing/forgetting/rejoining the networks the device has saved, monitoring the current network (SSID, signal, IP, DNS), and hosting a hotspot with connected-client listing on Android, iOS, Mac Catalyst, macOS, Windows, and Linux
 auto_invoke: true
 triggers:
   - wifi
@@ -32,8 +32,17 @@ triggers:
   - access point mode
   - hotspot clients
   - who is connected to my hotspot
-  - airplane mode
-  - flight mode
+  - known networks
+  - saved networks
+  - saved wifi profiles
+  - remembered networks
+  - forget a wifi network
+  - remove a saved network
+  - reconnect to a saved network
+  - rejoin a known network
+  - list configured SSIDs
+  - getConfiguredSSIDs
+  - network suggestion
   - toggle wifi
   - turn wifi on
   - wifi radio
@@ -45,9 +54,10 @@ triggers:
   - subnet mask
   - IWifiManager
   - IWifiHotspot
-  - IAirplaneMode
   - IHotspotSession
   - WifiNetwork
+  - KnownWifiNetwork
+  - GetKnownNetworks
   - WifiNetworkInfo
   - WifiConnectionRequest
   - WifiCapabilities
@@ -61,13 +71,17 @@ triggers:
   - WifiConnectionException
   - AddWifi
   - AddWifiHotspot
-  - AddAirplaneMode
   - Shiny.Net.Wifi
   - NEHotspotConfiguration
+  - NEHotspotConfigurationManager
   - CaptiveNetwork
   - CoreWLAN
   - CWInterface
+  - CWNetworkProfile
   - WifiNetworkSpecifier
+  - WifiNetworkSuggestion
+  - wlanapi
+  - WlanGetProfileList
   - NEARBY_WIFI_DEVICES
   - wiFiControl
   - NetworkOperatorTetheringManager
@@ -77,7 +91,8 @@ triggers:
 # Shiny.Net.Wifi Skill
 
 You are an expert in Shiny.Net.Wifi, a cross-platform Wi-Fi library covering **scanning**,
-**connect/disconnect**, **current-network monitoring**, **hotspot hosting** and **airplane mode**.
+**connect/disconnect**, **saved (known) network management**, **current-network monitoring** and
+**hotspot hosting**.
 
 ## When to Use This Skill
 
@@ -85,9 +100,10 @@ Invoke this skill when the user wants to:
 - List the Wi-Fi networks in range, with signal strength and security
 - Join or leave a named network from code
 - Read or watch the current network - SSID, BSSID, signal, IP, DNS, gateway, mask
+- List, forget, or rejoin the networks the device has saved
 - Raise a hotspot / access point and show the user its SSID and passphrase
 - See which devices are connected to a hotspot
-- Read or toggle airplane mode, or power the Wi-Fi radio
+- Power the Wi-Fi radio on or off
 - Ask why Wi-Fi scanning "does not work on iOS"
 
 ## ⚠️ Read this before writing anything
@@ -113,17 +129,18 @@ throws `WifiNotSupportedException` with a message naming the exact limit.
 | Radio toggle | ⚠️ API ≤ 28 only | ❌ | ✅ | ✅ | ✅ |
 | Hotspot | ⚠️ local-only, OS picks SSID | ❌ **no API** | ❌ **no API** | ✅ full tethering | ✅ AP mode |
 | Hotspot clients | ❌ | ❌ | ❌ | ✅ | ✅ |
-| Airplane mode read | ✅ | ❌ | ❌ | ⚠️ inferred from radios | ✅ |
-| Airplane mode set | ❌ **never** | ❌ **never** | ❌ | ⚠️ switches all radios | ✅ |
+| List known networks | ⚠️ own app only | ⚠️ own app only | ✅ whole machine | ✅ whole machine | ✅ whole machine |
+| Forget a known network | ⚠️ own app only | ⚠️ own app only | ⚠️ needs admin auth | ✅ | ✅ (polkit) |
+| Connect by known id | ⚠️ API ≤ 28 only | ❌ | ✅ | ✅ | ✅ |
 
 ### The three things users most often ask for that cannot be done
 
 1. **Scanning on iOS.** There is no public API. `NEHotspotHelper` can list networks but its
    entitlement is granted case by case by Apple to captive-network-assistant apps. Do not suggest
    `CNCopyCurrentNetworkInfo` as a substitute - it reports the *joined* network, not nearby ones.
-2. **Toggling airplane mode on a phone.** Android made `AIRPLANE_MODE_ON` write-protected behind
-   the signature permission `WRITE_SECURE_SETTINGS` in 4.2; iOS never exposed it. Use
-   `OpenSettings()` to put the user one tap away.
+2. **Reading the user's saved networks on a phone.** Neither iOS nor Android will show an app the
+   networks the *user* saved. `GetKnownNetworks()` on those two returns only what **your own app**
+   configured. Do not build a "manage all my Wi-Fi networks" screen for mobile.
 3. **Naming an Android hotspot.** `SoftApConfiguration.Builder` exposes only the channel to
    non-system apps - `setSsid`/`setPassphrase` are `@SystemApi`. The OS generates both and you read
    them back off `IHotspotSession.Info` to show the user.
@@ -139,17 +156,17 @@ throws `WifiNotSupportedException` with a message naming the exact limit.
 
 ### How each platform is backed
 
-| Platform | Manager | Hotspot | Airplane mode |
-|----------|---------|---------|---------------|
-| Android | `WifiManager` + `ConnectivityManager` | `startLocalOnlyHotspot` | `Settings.Global` (read only) |
-| iOS / Mac Catalyst | `NEHotspotConfiguration` + `CaptiveNetwork` | none | none |
-| macOS | CoreWLAN (`CWInterface`) | none | none (use `SetRadioEnabled`) |
-| Windows | `WiFiAdapter` (WinRT) | `NetworkOperatorTetheringManager` | `Windows.Devices.Radios` |
-| Linux | NetworkManager / D-Bus | NetworkManager AP mode + `ipv4.method=shared` | `WirelessEnabled` + `WwanEnabled` |
+| Platform | Manager | Known networks | Hotspot |
+|----------|---------|----------------|---------|
+| Android | `WifiManager` + `ConnectivityManager` | `WifiNetworkSuggestion` (API 30+), `WifiConfiguration` below 29 | `startLocalOnlyHotspot` |
+| iOS / Mac Catalyst | `NEHotspotConfiguration` + `CaptiveNetwork` | `NEHotspotConfigurationManager.getConfiguredSSIDs` | none |
+| macOS | CoreWLAN (`CWInterface`) | `CWConfiguration.networkProfiles` | none |
+| Windows | `WiFiAdapter` (WinRT) | `wlanapi.dll` - WinRT has no profile API | `NetworkOperatorTetheringManager` |
+| Linux | NetworkManager / D-Bus | `Settings.ListConnections` (UUID-keyed) | NetworkManager AP mode + `ipv4.method=shared` |
 | plain .NET | `System.Net.NetworkInformation` (addressing only) | none | none |
 
 **On Linux, reference `Shiny.Net.Wifi.Linux` instead of the base package.** It registers
-NetworkManager-backed implementations of the same three interfaces. The base package's plain .NET
+NetworkManager-backed implementations of the same interfaces. The base package's plain .NET
 target reports IP/DNS off the wireless interface and raises `Changed`, but every Wi-Fi-specific call
 throws - it is a deliberate stub, not a fallback.
 
@@ -158,10 +175,9 @@ throws - it is a deliberate stub, not a fallback.
 ```csharp
 builder.Services.AddWifi();            // IWifiManager
 builder.Services.AddWifiHotspot();     // IWifiHotspot
-builder.Services.AddAirplaneMode();    // IAirplaneMode
 ```
 
-All three are singletons. Register only what you use - each one costs a native watcher only once
+Both are singletons. Register only what you use - each one costs a native watcher only once
 something subscribes to its `Changed` event.
 
 ## Scanning
@@ -227,8 +243,55 @@ catch (WifiConnectionException ex)
 scheme off the beacon; a hidden network has no beacon to read, so it has to be told.
 
 **Android 10+ and iOS both show a system dialog naming the network.** Neither lets an app join
-silently. On Android the join lasts only while your app holds the request, and is never saved -
-`Remember` is honoured on Windows, macOS and Linux only.
+silently, and on Android the join itself lasts only while your app holds the request. `Remember`
+still does something everywhere: it writes an ordinary profile on Windows, macOS and Linux, keeps
+the hotspot configuration on iOS, and on Android 11+ registers a `WifiNetworkSuggestion` next to
+the join so the OS can come back to the network later. See **Known (saved) networks** below.
+
+## Known (saved) networks
+
+```csharp
+if (wifi.Capabilities.HasFlag(WifiCapabilities.KnownNetworks))
+{
+    foreach (var known in await wifi.GetKnownNetworks(ct))
+        Console.WriteLine($"{known.Ssid} ({known.Security}) id={known.Id}");
+}
+
+// forget one - safe to call even if it was never saved
+if (wifi.Capabilities.HasFlag(WifiCapabilities.ForgetNetwork))
+    await wifi.Forget(known.Id, ct);
+
+// rejoin one without handing the passphrase over again
+if (wifi.Capabilities.HasFlag(WifiCapabilities.ConnectKnownNetwork))
+    await wifi.Connect(known.Id, ct);
+```
+
+`KnownWifiNetwork` carries `Id`, `Ssid`, `Security`, `IsHidden` and `AddedByThisApp`.
+
+- **`Id` is opaque and platform-issued.** A NetworkManager connection UUID on Linux, a numeric
+  network id on Android below API 29, the SSID everywhere else. Round-trip it; never parse it,
+  construct it, or persist it across platforms. Match on `Ssid` if you need to find a network by
+  name.
+- **The scope of "known" is not the same everywhere, and this is the thing to get right.** iOS,
+  Mac Catalyst and Android disclose **only your own app's** entries -
+  `NEHotspotConfigurationManager.getConfiguredSSIDs` and network suggestions respectively. Windows,
+  macOS and Linux hand back every profile on the machine. `AddedByThisApp` tells the two apart; it
+  is false on the desktop platforms even for profiles your app created, because none of them record
+  who wrote an entry.
+- **`Connect(id)` is desktop-plus-legacy-Android only.** On iOS and Android 10+ a saved network is
+  a standing hint the OS acts on when it chooses - there is no call to force the join. Use
+  `Connect(WifiConnectionRequest)` with the passphrase there instead.
+- **Getting something *into* the list means `Remember = true` on the join.** On Android 11+ that
+  registers a `WifiNetworkSuggestion` alongside the specifier join; the specifier is still what
+  gets the device on the network now, and the suggestion only takes effect once the user approves
+  the notification Android raises.
+- **iOS reports names only.** A stored hotspot configuration carries no security type or hidden
+  flag, so those stay at their defaults there.
+- **macOS `Forget` usually throws.** Editing the preferred-network list means committing a whole
+  `CWConfiguration`, which macOS gates behind an `SFAuthorization` a normal app cannot raise -
+  expect `WifiPermissionException` and have a fallback. Listing is unprivileged.
+- **`GetKnownNetworks()` is not free on desktop.** Windows reads one profile's XML per entry and
+  Linux makes one D-Bus round trip per profile, so cache the result rather than polling it.
 
 ## Current network and change monitoring
 
@@ -303,25 +366,6 @@ if (wifi.Capabilities.HasFlag(WifiCapabilities.HotspotClients))
 - **Raising a hotspot usually takes the radio out of station mode**, dropping the device off any
   network it was joined to.
 
-## Airplane mode
-
-```csharp
-if (airplane.CanToggle)
-    await airplane.SetEnabled(true, ct);   // Windows and Linux only
-else
-    await airplane.OpenSettings(ct);       // everywhere else
-```
-
-- **`IsSupported`** means the state can be *read*; **`CanToggle`** means it can be *set*. They are
-  different flags because Android can do the first and not the second.
-- **Read `IsEnabled` only when `IsSupported`.** It is hard-coded false on Apple's platforms, which
-  is not the same as "airplane mode is off".
-- **On Windows this is an approximation**: WinRT has no airplane mode API, so it switches every
-  radio - which is what the Settings toggle does. Turning Wi-Fi and Bluetooth off individually will
-  make `IsEnabled` read true even though Settings shows off.
-- **On macOS there is no airplane mode at all.** Use `IWifiManager.SetRadioEnabled` instead, which
-  is what a Mac user means by "turn the wireless off".
-
 ## Radio power
 
 ```csharp
@@ -392,7 +436,8 @@ and in a headless session needing rules for
    `WifiNotSupportedException` is the backstop, not the plan.
 2. **Call `RequestAccess` before `Scan` or before reading `CurrentNetwork.Ssid`.**
 3. **Never claim scanning works on iOS.** Offer a "join by name" field there instead.
-4. **Never write code that toggles airplane mode on Android or iOS.** Use `OpenSettings()`.
+4. **Never present `GetKnownNetworks()` on iOS or Android as "the device's saved networks".** It is
+   your app's own entries only - say so in the UI, or the list looks broken when it comes back empty.
 5. **Always read `IHotspotSession.Info` back** rather than assuming the requested SSID was used.
 6. **Dispose the hotspot session** - `await using` is the idiomatic form.
 7. **Unsubscribe from `Changed`** in `Dispose`; the native watcher is reference-counted.
