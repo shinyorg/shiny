@@ -114,12 +114,24 @@ public class GpsManager(
         if (access is AccessState.Denied or AccessState.Disabled)
             return access;
 
-        // Already granted with a session alive to hold it. Anything else falls through and asks, including
-        // AccessState.Restricted: "authorized when in use" reports as restricted the moment a background
-        // request asks about it, and that is exactly the state an "always" session exists to upgrade.
-        // Reduced accuracy lands on the same value and is worth re-asking too, since the session carries the
-        // full-accuracy purpose key.
+        // Already granted with a session alive to hold it.
         if (access == AccessState.Available && this.CoveredBySession(requirement))
+            return access;
+
+        // ⚠️ AccessState.Restricted collapses three different answers, and only two are worth asking about
+        // again:
+        //   - a background request: "authorized when in use" reports as restricted the moment one asks, and
+        //     that is exactly the state an always session exists to upgrade
+        //   - RequestPreciseAccuracy: reduced accuracy lands here too, and the full-accuracy purpose key can
+        //     still prompt for a temporary grant
+        //   - anything else: a device restriction (parental controls, MDM), which no session can lift
+        // The last one has to short-circuit. Callers re-ask on every page appearance - which is the right
+        // thing to do, since the answer changes in the Settings app - and opening a session per appearance to
+        // be told the same thing is churn nobody asked for.
+        var upgradable = requirement == CLServiceSessionAuthorizationRequirement.Always ||
+                         request.RequestPreciseAccuracy;
+
+        if (access == AccessState.Restricted && !upgradable && this.CoveredBySession(requirement))
             return access;
 
         var tcs = new TaskCompletionSource<AccessState>();
