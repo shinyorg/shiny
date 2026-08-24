@@ -802,7 +802,9 @@ class ScanCallback(Action onResults) : Android.Net.Wifi.WifiManager.ScanResultsC
 }
 
 
-[BroadcastReceiver(Enabled = true, Exported = false)]
+// no [BroadcastReceiver] here - this is registered from code (see SubscribeToScanResults), so it
+// must stay out of the manifest.  Attributing it makes the manifest generator emit a <receiver>
+// node, which then demands a public type with a public default constructor and fails the build
 class ScanReceiver(Action onResults) : BroadcastReceiver
 {
     public override void OnReceive(Context? context, Intent? intent) => onResults();
