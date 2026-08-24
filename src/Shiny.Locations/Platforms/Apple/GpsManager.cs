@@ -21,9 +21,42 @@ public class GpsManager(
 {
     const string CurrentSettingsKey = "Shiny.Locations.GpsManager.CurrentSettings";
 
+    /// <summary>
+    /// How long <see cref="RequestAccess"/> waits for the session to say anything at all.
+    /// </summary>
+    /// <remarks>
+    /// ⚠️ <b>This covers the callback arriving, never the user reading the prompt.</b> The diagnostic
+    /// handler fires as soon as the session is created — first to say a request is in progress, then again
+    /// with the answer — so the only thing worth a wall clock is the first of those never coming. Arming it
+    /// across the second would throw a <see cref="TimeoutException"/> out from under somebody still looking
+    /// at an "allow always" dialog, which is the Android bug in issue #1625 wearing a different platform.
+    /// The timer is disarmed the moment the OS says it is asking.
+    /// </remarks>
+    static readonly TimeSpan NoDiagnosticTimeout = TimeSpan.FromSeconds(30);
+
     CLBackgroundActivitySession? bgSession;
-    CLServiceSession? session;
     CLLocationUpdater? updater;
+
+    /// <summary>The live authorization session, and the requirement it was created under.</summary>
+    /// <remarks>
+    /// ⚠️ <b>A session is bound to the requirement it was created with, so the pair moves together.</b> One
+    /// opened for <see cref="CLServiceSessionAuthorizationRequirement.WhenInUse"/> can never produce an
+    /// "always" grant — a background request has to replace it. This used to be a bare
+    /// <c>session ??= CreateSession(...)</c>, which meant the first caller decided the requirement for the
+    /// life of the process: an app that asked for foreground location first (any app with a live map) could
+    /// never afterwards raise the "always" prompt at all.
+    /// </remarks>
+    CLServiceSession? session;
+
+    /// <inheritdoc cref="session"/>
+    CLServiceSessionAuthorizationRequirement? sessionRequirement;
+
+    /// <summary>
+    /// Serializes <see cref="RequestAccess"/>. Each call replaces the session and waits on a completion
+    /// source the new session's handler owns, so two in flight together would leave the first waiting on a
+    /// handler that no longer exists.
+    /// </summary>
+    readonly SemaphoreSlim authGate = new(1, 1);
 
 
     AppleGpsRequest? currentSettings = store.Get<AppleGpsRequest>(CurrentSettingsKey);
@@ -56,59 +89,137 @@ public class GpsManager(
 
     public async Task<AccessState> RequestAccess(GpsRequest request)
     {
-        var access = this.GetCurrentStatus(request);
-        if (this.session != null && access != AccessState.Unknown)
-            return access;
+        await this.authGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            return await this.RequestAccessCore(request).ConfigureAwait(false);
+        }
+        finally
+        {
+            this.authGate.Release();
+        }
+    }
 
+
+    async Task<AccessState> RequestAccessCore(GpsRequest request)
+    {
         var requirement = request.BackgroundMode == GpsBackgroundMode.None
             ? CLServiceSessionAuthorizationRequirement.WhenInUse
             : CLServiceSessionAuthorizationRequirement.Always;
 
+        var access = this.GetCurrentStatus(request);
+
+        // A prompt cannot revisit either of these - the user has decided, or the device has - and opening a
+        // session to be told so costs a round trip and a dialog nobody sees.
+        if (access is AccessState.Denied or AccessState.Disabled)
+            return access;
+
+        // Already granted with a session alive to hold it.
+        if (access == AccessState.Available && this.CoveredBySession(requirement))
+            return access;
+
+        // ⚠️ AccessState.Restricted collapses three different answers, and only two are worth asking about
+        // again:
+        //   - a background request: "authorized when in use" reports as restricted the moment one asks, and
+        //     that is exactly the state an always session exists to upgrade
+        //   - RequestPreciseAccuracy: reduced accuracy lands here too, and the full-accuracy purpose key can
+        //     still prompt for a temporary grant
+        //   - anything else: a device restriction (parental controls, MDM), which no session can lift
+        // The last one has to short-circuit. Callers re-ask on every page appearance - which is the right
+        // thing to do, since the answer changes in the Settings app - and opening a session per appearance to
+        // be told the same thing is churn nobody asked for.
+        var upgradable = requirement == CLServiceSessionAuthorizationRequirement.Always ||
+                         request.RequestPreciseAccuracy;
+
+        if (access == AccessState.Restricted && !upgradable && this.CoveredBySession(requirement))
+            return access;
+
         var tcs = new TaskCompletionSource<AccessState>();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        cts.Token.Register(() => tcs.TrySetException(new TimeoutException("GPS authorization request timed out")));
+        using var cts = new CancellationTokenSource(NoDiagnosticTimeout);
+        using var reg = cts.Token.Register(
+            () => tcs.TrySetException(new TimeoutException("The GPS authorization session reported no status"))
+        );
 
         var fullAccuracy = request.RequestPreciseAccuracy
             ? "shinygps"
             : String.Empty;
 
-        this.session ??= CLServiceSession.CreateSession(
+        var replaced = this.session;
+        this.session = CLServiceSession.CreateSession(
             requirement,
             fullAccuracy,
             DispatchQueue.MainQueue,
             diag =>
             {
-                var currentAccess = AccessState.Unknown;
-                if (diag.AuthorizationRequestInProgress)
-                    return;
-
-                if (request.BackgroundMode != GpsBackgroundMode.None)
+                // ⚠️ The session outlives the request that opened it, and the OS re-runs this handler every
+                // time authorization changes - including from the Settings app, minutes later, long after
+                // the task below was awaited. Anything that escapes here escapes into a native callback,
+                // which takes the process with it, so the whole body is guarded.
+                try
                 {
-                    if (!diag.AlwaysAuthorizationDenied)
+                    // Whoever answered first owns the result; a later change re-runs the handler but has
+                    // nobody waiting on it, and the timer it would touch has already been disposed.
+                    if (tcs.Task.IsCompleted)
+                        return;
+
+                    if (diag.AuthorizationRequestInProgress)
                     {
-                        currentAccess = AccessState.Available;
-                        if (request.RequestPreciseAccuracy && diag.FullAccuracyDenied)
-                            currentAccess = AccessState.Restricted;
+                        // The OS is showing the dialog: stop the clock and wait for the handler to come back
+                        // with what the user chose. See NoDiagnosticTimeout.
+                        cts.CancelAfter(Timeout.InfiniteTimeSpan);
+                        return;
                     }
-                    else if (!diag.AuthorizationRestricted)
-                        currentAccess = AccessState.Restricted;
 
+                    var currentAccess = AccessState.Unknown;
+                    if (request.BackgroundMode != GpsBackgroundMode.None)
+                    {
+                        if (!diag.AlwaysAuthorizationDenied)
+                        {
+                            currentAccess = AccessState.Available;
+                            if (request.RequestPreciseAccuracy && diag.FullAccuracyDenied)
+                                currentAccess = AccessState.Restricted;
+                        }
+                        else if (!diag.AuthorizationRestricted)
+                            currentAccess = AccessState.Restricted;
+
+                        else
+                            currentAccess = AccessState.Denied;
+                    }
                     else
-                        currentAccess = AccessState.Denied;
-                }
-                else
-                {
-                    currentAccess = diag.AuthorizationDenied
-                        ? AccessState.Denied
-                        : AccessState.Available;
-                }
+                    {
+                        currentAccess = diag.AuthorizationDenied
+                            ? AccessState.Denied
+                            : AccessState.Available;
+                    }
 
-                tcs.TrySetResult(currentAccess);
+                    tcs.TrySetResult(currentAccess);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "The GPS authorization session handler failed");
+                    tcs.TrySetException(ex);
+                }
             }
         );
+        this.sessionRequirement = requirement;
+
+        // The one it replaces goes only once its replacement is alive. Dropping to no session at all, however
+        // briefly, is how an app tells CoreLocation it is finished with location.
+        replaced?.Invalidate();
 
         return await tcs.Task.ConfigureAwait(false);
     }
+
+
+    /// <summary>
+    /// Whether the session already open satisfies <paramref name="requirement"/>. An "always" session covers
+    /// a when-in-use request, so a foreground caller never tears down a background grant to ask for less.
+    /// </summary>
+    bool CoveredBySession(CLServiceSessionAuthorizationRequirement requirement)
+        => this.session != null && (
+            this.sessionRequirement == requirement ||
+            this.sessionRequirement == CLServiceSessionAuthorizationRequirement.Always
+        );
 
 
     GpsReading? lastReading;
