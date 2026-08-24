@@ -23,6 +23,7 @@ body:
         - Configuration (Shiny.Extensions.Configuration)
         - HTTP Transfers (Shiny.Net.Http)
         - Network Discovery - mDNS/DNS-SD, SSDP/UPnP, WS-Discovery (Shiny.Net.Discovery)
+        - WiFi - Scan/Connect/Hotspot (Shiny.Net.Wifi)
         - Data Sync (Shiny.Data.Sync)
         - Notifications (Shiny.Notifications)
         - Push - Native (Shiny.Push)
