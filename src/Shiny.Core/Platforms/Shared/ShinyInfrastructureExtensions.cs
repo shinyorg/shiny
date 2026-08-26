@@ -1,7 +1,8 @@
-#if PLATFORM
 using Microsoft.Extensions.DependencyInjection;
+#if PLATFORM
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
+#endif
 
 namespace Shiny.Infrastructure;
 
@@ -9,8 +10,14 @@ namespace Shiny.Infrastructure;
 public static class ShinyInfrastructureExtensions
 {
     /// <summary>
-    /// This is called by Shiny hosting - You should NOT be calling this yourself
+    /// This is called by Shiny hosting - You should NOT be calling this yourself.
     /// </summary>
+    /// <remarks>
+    /// With one exception, and it is the reason the base target framework has a branch below: on a
+    /// platform there is a hosting layer that calls this, and on plain .NET there is not - HostBuilder
+    /// only calls it under #if PLATFORM. A host that is just .NET, such as a GTK desktop head, has to
+    /// call it itself, in the same breath as registering whatever else it is standing in for.
+    /// </remarks>
     public static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
     {
         services.AddShinyStores();
@@ -50,8 +57,13 @@ public static class ShinyInfrastructureExtensions
 #elif WINDOWS
         services.AddSingleton<WindowsPlatform>();
         services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<WindowsPlatform>());
+#else
+        // A host that is just .NET - a GTK desktop app on Linux, a console app, a service. No
+        // lifecycle executor, because there is no platform lifecycle to execute: nothing here gets
+        // told the app went to the background, so nothing pretends to.
+        services.AddSingleton<NetPlatform>();
+        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<NetPlatform>());
 #endif
         return services;
     }
 }
-#endif

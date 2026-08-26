@@ -38,7 +38,17 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
+    <!--
+        Shared comes along on the base target framework too, which it did not used to.
+
+        Everything in Shared other than IPlatform and its extension methods is wrapped in
+        #if PLATFORM, and PLATFORM is not defined here - so this adds exactly those two and compiles
+        the rest away. What it buys is that a plain .NET host has an IPlatform to implement and to
+        resolve at all. There is no net10.0-linux target framework for a Linux build to ask for, so
+        the base one is the only place a GTK desktop head can get it from.
+    -->
     <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
         <Compile Include="Platforms\Net\**\*.cs" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 </Project>
