@@ -16,6 +16,14 @@ triggers:
   - ble connect
   - IBleManager
   - IPeripheral
+  - MTU
+  - mtu
+  - RequestMtu
+  - TryRequestMtu
+  - TryRequestMtuAsync
+  - ICanRequestMtu
+  - BleConstants
+  - AttHeaderSize
   - managed scan
   - ble notification
   - ble write
@@ -156,6 +164,8 @@ When generating BLE client code, follow these conventions:
 7. **Use `IManagedScan` for UI-bound scanning**: It provides an `INotifyReadOnlyCollection` that works with MVVM bindings and handles peripheral deduplication, buffering, and stale removal.
 
 8. **Feature detection via interface checks**: Optional capabilities (MTU request, pairing, reliable transactions) use feature interfaces. Always use the `Try*` or `Can*` extension methods rather than casting directly.
+
+8a. **`IPeripheral.Mtu` is the usable payload, not the ATT MTU**: It is already the negotiated ATT MTU minus the 3-byte ATT header (`BleConstants.AttHeaderSize`), so fragment writes to `peripheral.Mtu` directly — never write `peripheral.Mtu - 3`. The units are asymmetric across a single call: `TryRequestMtu(512)` passes 512 as an ATT MTU to the platform but emits `509`, the payload. When handing a value to an API that genuinely wants an ATT MTU, add the header back with `peripheral.Mtu + BleConstants.AttHeaderSize`.
 
 9. **Handle `BleException` and `BleOperationException`**: GATT operations can throw these. `BleOperationException` includes a `GattStatusCode`. An in-flight operation that is interrupted by a disconnect faults with a `BleException` rather than hanging, so always have an `onError` handler (or `catch`) on read/write/discovery calls — with auto-reconnect enabled, retry once the peripheral reports `Connected` again.
 
@@ -300,7 +310,7 @@ unless you are talking to a non-Shiny peer.
 - For Android, consider `AndroidScanConfig` for scan mode and batching options.
 - For Android, consider `AndroidConnectionConfig` for connection priority settings.
 - Always check `CharacteristicProperties` before attempting read/write/notify operations using the convenience extensions (`CanRead()`, `CanWrite()`, `CanNotify()`, etc.).
-- Use `WriteCharacteristicBlob()` for writing large data streams that exceed MTU size.
+- Use `WriteCharacteristicBlob()` for writing large data streams that exceed MTU size -- it already chunks to `peripheral.Mtu` (the payload size), so do not pre-chunk.
 - Use `NotifyCharacteristic()` for real-time data streaming from a peripheral -- it handles subscription lifecycle and auto-reconnection.
 - Buffer or throttle scan results in UI scenarios to avoid performance issues.
 - Use `WhenConnected()` and `WhenDisconnected()` convenience extensions for cleaner connection state handling.

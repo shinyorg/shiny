@@ -3,7 +3,7 @@ namespace Shiny.BluetoothLE.Hosting;
 
 public class Peripheral : IPeripheral
 {
-    public Peripheral(string devicePath, string address, int mtu = 23)
+    public Peripheral(string devicePath, string address, int mtu = BleConstants.DefaultPayloadSize)
     {
         this.DevicePath = devicePath;
         this.Uuid = address;

@@ -351,7 +351,11 @@ public interface IPeripheral
 {
     string Uuid { get; }
     string? Name { get; }
+
+    // Usable payload per GATT operation = negotiated ATT MTU - 3 (ATT header).
+    // Fragment writes to exactly this value - do NOT subtract 3 again. Starts at 20.
     int Mtu { get; }
+
     ConnectionState Status { get; }
 
     // Connect to the peripheral
@@ -524,7 +528,9 @@ public class ManagedScanResult : NotifyPropertyChanged, IAdvertisementData
 // Prefer using TryRequestMtu() extension instead
 public interface ICanRequestMtu : IPeripheral
 {
-    // Negotiate a requested MTU with the peripheral
+    // requestValue is an ATT MTU (includes the 3-byte header) - it goes straight to
+    // BluetoothGatt.requestMtu(). The emitted value is the resulting PAYLOAD (ATT MTU - 3)
+    // and is the new IPeripheral.Mtu. Requesting 512 typically emits 509.
     IObservable<int> RequestMtu(int requestValue);
 }
 ```
@@ -771,13 +777,14 @@ public static class CharacteristicExtensions
 ```csharp
 public static class FeatureMtu
 {
-    // Check if MTU requests are supported
+    // Check if ATT MTU requests are supported (Android only)
     static bool CanRequestMtu(this IPeripheral peripheral);
 
-    // Request MTU if supported, otherwise return current MTU
+    // requestedValue is an ATT MTU; the result is the usable payload (ATT MTU - 3),
+    // same units as IPeripheral.Mtu. Returns the current Mtu unchanged if unsupported.
     static IObservable<int> TryRequestMtu(this IPeripheral peripheral, int requestedValue);
 
-    // Async version (default 5s timeout)
+    // Async version (default 5s timeout) - also returns the payload size
     static Task<int> TryRequestMtuAsync(this IPeripheral peripheral, int requestedValue, int timeoutMillis = 5000, CancellationToken cancelToken = default);
 }
 ```
@@ -1148,9 +1155,14 @@ public void WriteLargeData(IPeripheral peripheral, Stream dataStream)
 ```csharp
 public async Task NegotiateMtu(IPeripheral peripheral)
 {
-    // Request larger MTU (works on Android, returns current MTU on other platforms)
-    var mtu = await peripheral.TryRequestMtuAsync(512);
-    Console.WriteLine($"Negotiated MTU: {mtu}");
+    // 512 is the requested ATT MTU (works on Android; other platforms return the current value).
+    // The result is the usable PAYLOAD - a granted 512 comes back as 509.
+    var payloadSize = await peripheral.TryRequestMtuAsync(512);
+    Console.WriteLine($"Usable payload: {payloadSize} bytes");
+
+    // Fragment to this value directly. Subtracting the 3-byte ATT header here would
+    // remove it a second time; feeding it to an API that wants an ATT MTU overshoots by 3.
+    var chunk = new byte[payloadSize];
 }
 ```
 

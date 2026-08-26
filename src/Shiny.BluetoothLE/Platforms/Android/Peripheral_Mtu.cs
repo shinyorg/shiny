@@ -8,14 +8,13 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral : ICanRequestMtu
 {
-    const int AttHeaderSize = 3;
-    public int Mtu { get; private set; } = 20;
+    public int Mtu { get; private set; } = BleConstants.DefaultPayloadSize;
 
 
     Subject<(int Mtu, GattStatus Status)>? mtuSubj;
     public override void OnMtuChanged(BluetoothGatt? gatt, int mtu, GattStatus status)
     {
-        this.Mtu = mtu - AttHeaderSize;
+        this.Mtu = mtu - BleConstants.AttHeaderSize;
         this.mtuSubj?.OnNext((this.Mtu, status));
     }
 

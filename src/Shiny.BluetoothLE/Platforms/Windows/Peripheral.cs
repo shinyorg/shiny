@@ -85,8 +85,8 @@ public partial class Peripheral : IPeripheral
         this.HookNativeEvents();
     }
 
-    // Windows doesn't expose negotiated MTU - return default usable payload (23 - 3 ATT header)
-    public int Mtu => 20;
+    // Windows doesn't expose the negotiated MTU on the client side - assume the default link payload
+    public int Mtu => BleConstants.DefaultPayloadSize;
 
 
     public ConnectionState Status

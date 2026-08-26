@@ -175,7 +175,8 @@ public interface IPeripheral
     // The connection ID
     string Uuid { get; }
 
-    // The current MTU
+    // Usable payload per GATT operation = negotiated ATT MTU - 3 (ATT header).
+    // Cap notification/read payloads at exactly this value - do NOT subtract 3 again. Starts at 20.
     int Mtu { get; }
 
     // You can set any data you want here (user context)
@@ -576,7 +577,7 @@ public abstract class BleServiceContext
 {
     public IPeripheral Peripheral { get; }
     public string ConnectionId { get; }              // Peripheral.Uuid
-    public int Mtu { get; }
+    public int Mtu { get; }                          // payload size = ATT MTU - 3; see IPeripheral.Mtu
     public string ServiceUuid { get; }               // always available
     public IGattService? Service { get; }            // null until AddService returns
     public IDictionary<string, object?> Items { get; }

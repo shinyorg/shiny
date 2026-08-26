@@ -46,7 +46,7 @@ public partial class Peripheral : IPeripheral
     internal string ObjectPath => this.device.ObjectPath;
     public string Uuid { get; }
     public string? Name { get; internal set; }
-    public int Mtu => 512; // BlueZ negotiates MTU internally; 512 is a safe default
+    public int Mtu => 512 - BleConstants.AttHeaderSize; // BlueZ negotiates MTU internally; 512 is a safe assumed ATT MTU
     public ConnectionState Status { get; internal set; } = ConnectionState.Disconnected;
 
 

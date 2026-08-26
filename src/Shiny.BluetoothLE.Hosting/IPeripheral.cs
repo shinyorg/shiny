@@ -12,7 +12,9 @@ public interface IPeripheral
     string Uuid { get; }
 
     /// <summary>
-    /// Gets the currently negotiated MTU (Maximum Transmission Unit) in bytes.
+    /// Gets the maximum number of bytes that fit in a single GATT operation to this central - the negotiated
+    /// ATT MTU minus the 3-byte ATT header. This is the size to cap notification and read payloads at; do NOT
+    /// subtract the header again. Reports 20 until the central negotiates a larger MTU.
     /// </summary>
     int Mtu { get; }
 

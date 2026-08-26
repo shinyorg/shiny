@@ -33,5 +33,5 @@ public class Peripheral : IPeripheral
     public BluetoothDevice Native { get; }
     public string Uuid => this.deviceUuidLazy.Value;
     public object Context { get; set; }
-    public int Mtu { get; internal set; } = 20; // Default MTU size from BLE spec
+    public int Mtu { get; internal set; } = BleConstants.DefaultPayloadSize;
 }

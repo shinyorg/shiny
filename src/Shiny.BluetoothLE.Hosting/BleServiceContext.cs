@@ -44,7 +44,8 @@ public abstract class BleServiceContext
     public string ConnectionId => this.Peripheral.Uuid;
 
     /// <summary>
-    /// Gets the currently negotiated MTU in bytes.
+    /// Gets the maximum number of bytes that fit in a single GATT operation to this central - the negotiated
+    /// ATT MTU minus the 3-byte ATT header. See <see cref="IPeripheral.Mtu"/>.
     /// </summary>
     public int Mtu => this.Peripheral.Mtu;
 

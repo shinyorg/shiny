@@ -32,6 +32,10 @@ triggers:
   - WriteOptions
   - NotificationOptions
   - IPeripheral
+  - MTU
+  - mtu
+  - BleConstants
+  - AttHeaderSize
   - Shiny.BluetoothLE.Hosting
   - ibeacon advertise
   - ble notify
@@ -286,6 +290,19 @@ await characteristic.Notify(data);
 await characteristic.Notify(data, specificPeripheral1, specificPeripheral2);
 ```
 
+`IPeripheral.Mtu` (and `BleServiceContext.Mtu`) is the usable payload -- the negotiated ATT MTU
+already minus the 3-byte ATT header. Cap a notification at `peripheral.Mtu` directly; do not
+subtract the header again. Anything larger is silently truncated by the platform.
+
+```csharp
+[Notify]
+public async Task Push(BleServiceContext context, byte[] payload)
+{
+    var max = context.Mtu;                       // NOT context.Mtu - 3
+    await this.Characteristic.Notify(payload.Take(max).ToArray(), context.Peripheral);
+}
+```
+
 ### 6. Responding to Write Requests
 
 When `WriteRequest.IsReplyNeeded` is true, you must call `Respond`:
@@ -440,7 +457,8 @@ you are talking to a non-Shiny central.
 7. **Check IsAdvertising** -- avoid calling `StartAdvertising` if already advertising
 8. **Dispose `L2CapInstance` and per-central `L2CapChannel`s explicitly** -- disposing the instance closes the listener but does not auto-close already-open channels. With `[L2CapService]` the generator disposes each channel when the handler returns, and the `BleHostedServiceSession` closes the listener
 9. **Keep the `BleHostedServiceSession` alive** -- `AttachBleHostedServices` returns it, and disposing it cancels in-flight handlers, closes L2CAP listeners, and removes the GATT services
-10. **Never register the same service UUID twice** -- `BleHostingManager` keys services by UUID. Several `[BleService]` classes may share one UUID; the generator merges them into a single `AddService` call
+10. **Size notifications with `Mtu` as-is** -- `IPeripheral.Mtu`/`BleServiceContext.Mtu` is the payload (ATT MTU minus `BleConstants.AttHeaderSize`), not the ATT MTU. Add the header back with `+ BleConstants.AttHeaderSize` only when feeding an API that genuinely wants an ATT MTU
+11. **Never register the same service UUID twice** -- `BleHostingManager` keys services by UUID. Several `[BleService]` classes may share one UUID; the generator merges them into a single `AddService` call
 
 ## Reference Files
 

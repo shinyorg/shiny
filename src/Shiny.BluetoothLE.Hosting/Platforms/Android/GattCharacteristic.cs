@@ -268,7 +268,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             {
                 var peripheral = this.subscribers[ch.Device.Address!] as Peripheral;
                 if (peripheral != null)
-                    peripheral.Mtu = ch.Mtu;
+                    peripheral.Mtu = ch.Mtu - BleConstants.AttHeaderSize;
             })
             .DisposedBy(this.disposer);
     }

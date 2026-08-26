@@ -21,7 +21,9 @@ public interface IPeripheral
     string? Name { get; }
 
     /// <summary>
-    /// Gets the currently negotiated MTU (Maximum Transmission Unit) in bytes.
+    /// Gets the maximum number of bytes that fit in a single GATT operation on the current link - the negotiated
+    /// ATT MTU minus the 3-byte ATT header. This is the size to fragment writes to; do NOT subtract the header
+    /// again. Reports 20 until a larger MTU is negotiated.
     /// </summary>
     int Mtu { get; }
 

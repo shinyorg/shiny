@@ -9,7 +9,7 @@ public class Peripheral : IPeripheral
     public Peripheral(GattSession session)
     {
         this.Uuid = session.DeviceId.Id;
-        this.Mtu = Convert.ToInt32(session.MaxPduSize);
+        this.Mtu = Convert.ToInt32(session.MaxPduSize) - BleConstants.AttHeaderSize;
     }
 
 
