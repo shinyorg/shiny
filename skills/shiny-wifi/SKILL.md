@@ -340,9 +340,11 @@ public sealed class NetworkWatcher(IWifiManager wifi) : IDisposable
 - **`GetCurrentNetwork(ct)` is async and reads live on every call.** Hold the result rather than
   re-reading it in a loop. There is no `CurrentNetwork` property - it was removed because the two
   mobile platforms stopped answering synchronously (see below).
-- **Addressing is always available; the SSID is not.** IP/DNS/gateway come from the managed network
-  stack. `Ssid` and `Bssid` need `WifiCapabilities.CurrentNetwork` and the platform permission
-  behind it, and come back null otherwise.
+- **Addressing is available everywhere; the SSID is not.** IP/DNS/gateway come from the managed
+  network stack, so they need no permission. Individual fields are still best-effort - a platform
+  may not implement one (`GatewayAddresses` is unsupported on Android) and a refused field comes
+  back null or empty rather than throwing. `Ssid` and `Bssid` need `WifiCapabilities.CurrentNetwork`
+  and the platform permission behind it, and come back null otherwise.
 
 ### Why reading the SSID is asynchronous
 
