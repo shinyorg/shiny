@@ -74,6 +74,9 @@ public abstract class AbstractWifiManager : IWifiManager
 
     public abstract Task<AccessState> RequestAccess(CancellationToken ct = default);
 
+    //TODO: Must be abstract afaics, but lets first await Allan's insights ;)
+    public virtual Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
+        => Task.FromResult(this.CurrentNetwork);
 
     public virtual Task<IReadOnlyList<WifiNetwork>> Scan(CancellationToken ct = default)
         => throw this.NotSupported(WifiCapabilities.Scan);

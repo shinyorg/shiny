@@ -49,6 +49,8 @@ public interface IWifiManager
     /// </remarks>
     Task<AccessState> RequestAccess(CancellationToken ct = default);
 
+    Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default);
+
     /// <summary>
     /// Scans for access points in range.
     /// </summary>

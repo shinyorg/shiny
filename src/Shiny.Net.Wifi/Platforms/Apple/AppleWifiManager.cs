@@ -98,6 +98,32 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
     public override Task<AccessState> RequestAccess(CancellationToken ct = default)
         => this.location.Request(ct);
 
+    public override async Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
+    {
+        if (OperatingSystem.IsIOSVersionAtLeast(14) || OperatingSystem.IsMacCatalyst())
+        {
+            var hotspotNetwork = await NEHotspotNetwork.FetchCurrentAsync().WaitAsync(ct);
+
+            var info = ManagedNetworkInfo.Read() ?? new WifiNetworkInfo { InterfaceName = "WiFi" };
+            return info with
+            {
+                Ssid = hotspotNetwork.Ssid,
+                Bssid = hotspotNetwork.Bssid,
+                SignalStrengthPercent = (int)(hotspotNetwork.SignalStrength * 10),
+                Security = info.Security != WifiSecurity.Unknown ? info.Security : hotspotNetwork.SecurityType switch
+                {
+                    NEHotspotNetworkSecurityType.Open => WifiSecurity.Open,
+                    NEHotspotNetworkSecurityType.Wep => WifiSecurity.Wep,
+                    NEHotspotNetworkSecurityType.Personal => WifiSecurity.WpaPsk, //Not true, so perhaps unkown would be more 'correct'?
+                    NEHotspotNetworkSecurityType.Enterprise => WifiSecurity.Enterprise,
+                    _ => WifiSecurity.Unknown,
+                }
+            };
+        }
+
+        return this.CurrentNetwork;
+    }
+
 
     public override Task<IReadOnlyList<WifiNetwork>> Scan(CancellationToken ct = default)
         => throw WifiNotSupportedException.For(

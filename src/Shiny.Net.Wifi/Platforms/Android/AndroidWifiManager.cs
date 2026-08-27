@@ -147,7 +147,9 @@ public class AndroidWifiManager(
             .AddTransportType(TransportType.Wifi)!
             .Build()!;
 
-        this.changeCallback = new WifiChangeCallback(this.RaiseChangedIfDifferent);
+        this.changeCallback = OperatingSystem.IsAndroidVersionAtLeast(31)
+            ? new WifiChangeCallback(this.RaiseChangedIfDifferent, includeLocationInfo: true)
+            : new WifiChangeCallback(this.RaiseChangedIfDifferent);
         this.Connectivity.RegisterNetworkCallback(request, this.changeCallback);
         logger.WatcherStarted(nameof(ConnectivityManager.NetworkCallback));
     }
@@ -180,6 +182,14 @@ public class AndroidWifiManager(
             : AccessState.Denied;
     }
 
+
+    public override Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(31))
+            return Task.FromResult(this.CurrentNetwork);
+
+        return WifiInfoCallback.GetWifiInfo(this.Connectivity, ct);
+    }
 
     public override async Task<IReadOnlyList<WifiNetwork>> Scan(CancellationToken ct = default)
     {
@@ -357,10 +367,23 @@ public class AndroidWifiManager(
             .Build()!;
 
         var tcs = new TaskCompletionSource<Network>();
-        var callback = new WifiRequestCallback(
-            network => tcs.TrySetResult(network),
-            () => tcs.TrySetException(new WifiConnectionException($"Android could not join '{request.Ssid}' - the network was unavailable or the user declined the prompt"))
-        );
+
+        WifiRequestCallback callback;
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        {
+            callback = new WifiRequestCallback(
+                network => tcs.TrySetResult(network),
+                () => tcs.TrySetException(new WifiConnectionException($"Android could not join '{request.Ssid}' - the network was unavailable or the user declined the prompt")),
+                includeLocationInfo: true
+            );
+        }
+        else
+        {
+            callback = new WifiRequestCallback(
+                network => tcs.TrySetResult(network),
+                () => tcs.TrySetException(new WifiConnectionException($"Android could not join '{request.Ssid}' - the network was unavailable or the user declined the prompt"))
+            );
+        }
 
         this.Connectivity.RequestNetwork(networkRequest, callback);
         this.requestCallback = callback;
@@ -776,23 +799,146 @@ public class AndroidWifiManager(
         this.StopListening();
         this.Disconnect().GetAwaiter().GetResult();
     }
+
+    //TODO: Not the most elegant type name / location but as it uses quite some methods from AndWifiMgr this was the best way test it
+    [SupportedOSPlatform("android31.0")]
+    class WifiInfoCallback : ConnectivityManager.NetworkCallback
+    {
+        Network? network;
+        LinkProperties? linkProperties;
+        NetworkCapabilities? networkCapabilities;
+        readonly TaskCompletionSource<WifiNetworkInfo> tcs = new();
+
+        WifiInfoCallback() : base((int)NetworkCallbackFlags.IncludeLocationInfo)
+        {
+        }
+
+        public static async Task<WifiNetworkInfo?> GetWifiInfo(ConnectivityManager connectivity, CancellationToken ct = default)
+        {
+            var callback = new WifiInfoCallback();
+            var nr = new NetworkRequest.Builder()
+                .AddTransportType(TransportType.Wifi)!
+                .ClearCapabilities();
+
+            connectivity.RegisterNetworkCallback(nr.Build()!, callback);
+            try
+            {
+                return await callback.tcs.Task.WaitAsync(ct);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                connectivity.UnregisterNetworkCallback(callback);
+            }
+        }
+
+        void TryComplete()
+        {
+            if (this.network == null || this.linkProperties == null || this.networkCapabilities == null) return;
+
+            var wifiInfo = this.networkCapabilities.TransportInfo as WifiInfo;
+            var rssi = wifiInfo?.Rssi;
+
+            var result = new WifiNetworkInfo
+            {
+                InterfaceName = this.linkProperties.InterfaceName ?? "wlan0",
+                Ssid = Unquote(wifiInfo?.SSID),
+                Bssid = Normalise(wifiInfo?.BSSID),
+                Security = ToSecurity(wifiInfo),
+                IpAddresses = this.linkProperties.LinkAddresses
+                    .Select(x => Convert(x.Address))
+                    .Where(x => x != null)
+                    .ToArray()!,
+                DnsAddresses = this.linkProperties.DnsServers
+                    .Select(Convert)
+                    .Where(x => x != null)
+                    .ToArray()!,
+                Gateway = this.linkProperties.Routes
+                    .Where(x => x.IsDefaultRoute)
+                    .Select(x => Convert(x.Gateway))
+                    .FirstOrDefault(x => x != null),
+                SubnetMask = ToMask(this.linkProperties),
+                SignalStrengthDbm = rssi,
+                SignalStrengthPercent = rssi == null ? null : WifiChannels.ToPercent(rssi.Value),
+                FrequencyMhz = wifiInfo?.Frequency
+            };
+
+            this.tcs.TrySetResult(result);
+        }
+
+        #region Overrides of NetworkCallback
+
+        /// <inheritdoc />
+        public override void OnAvailable(Network nw)
+        {
+            this.network = nw;
+            this.TryComplete();
+        }
+
+
+        /// <inheritdoc />
+        public override void OnLinkPropertiesChanged(Network nw, LinkProperties properties)
+        {
+            if (this.network?.NetworkHandle == nw.NetworkHandle) this.linkProperties = properties;
+            this.TryComplete();
+        }
+
+        /// <inheritdoc />
+        public override void OnCapabilitiesChanged(Network nw, NetworkCapabilities capabilities)
+        {
+            if (this.network?.NetworkHandle == nw.NetworkHandle) this.networkCapabilities = capabilities;
+            this.TryComplete();
+        }
+
+        #endregion
+    }
 }
 
 
-class WifiChangeCallback(Action onChange) : ConnectivityManager.NetworkCallback
+class WifiChangeCallback : ConnectivityManager.NetworkCallback
 {
-    public override void OnAvailable(Network network) => onChange();
-    public override void OnLost(Network network) => onChange();
-    public override void OnUnavailable() => onChange();
-    public override void OnLinkPropertiesChanged(Network network, LinkProperties linkProperties) => onChange();
-    public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) => onChange();
+    readonly Action onChange;
+
+    [SupportedOSPlatform("android31.0")]
+    public WifiChangeCallback(Action onChange, bool includeLocationInfo = true) : base(includeLocationInfo ? (int)NetworkCallbackFlags.IncludeLocationInfo : 0) => this.onChange = onChange;
+
+    public WifiChangeCallback(Action onChange) => this.onChange = onChange;
+
+    public override void OnAvailable(Network network) => this.onChange();
+    public override void OnLost(Network network) => this.onChange();
+    public override void OnUnavailable() => this.onChange();
+    public override void OnLinkPropertiesChanged(Network network, LinkProperties linkProperties) => this.onChange();
+    public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) => this.onChange();
 }
 
 
-class WifiRequestCallback(Action<Network> onAvailable, Action onFailed) : ConnectivityManager.NetworkCallback
+class WifiRequestCallback : ConnectivityManager.NetworkCallback
 {
-    public override void OnAvailable(Network network) => onAvailable(network);
-    public override void OnUnavailable() => onFailed();
+    readonly Action<Network> onAvailable;
+    readonly Action onFailed;
+
+    [SupportedOSPlatform("android31.0")]
+    public WifiRequestCallback(Action<Network> onAvailable, Action onFailed, bool includeLocationInfo = true) : base(includeLocationInfo ? (int)NetworkCallbackFlags.IncludeLocationInfo : 0)
+    {
+        this.onAvailable = onAvailable;
+        this.onFailed = onFailed;
+    }
+
+    public WifiRequestCallback(Action<Network> onAvailable, Action onFailed)
+    {
+        this.onAvailable = onAvailable;
+        this.onFailed = onFailed;
+    }
+
+    public override void OnAvailable(Network network) => this.onAvailable(network);
+    public override void OnUnavailable() => this.onFailed();
 }
 
 
