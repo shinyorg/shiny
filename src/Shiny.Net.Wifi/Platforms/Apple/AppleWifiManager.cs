@@ -2,7 +2,6 @@ using Foundation;
 using Microsoft.Extensions.Logging;
 using NetworkExtension;
 using Shiny.Net.Wifi.Internals;
-using SystemConfiguration;
 
 namespace Shiny.Net.Wifi;
 
@@ -16,9 +15,11 @@ namespace Shiny.Net.Wifi;
 /// capability on the App ID. The system shows its own confirmation dialog naming the network - your
 /// app cannot join anything silently, and a user who declines surfaces here as
 /// <see cref="WifiConnectionException"/>.</para>
-/// <para>Reading the SSID goes through CaptiveNetwork, which needs the <c>Access WiFi Information</c>
-/// capability and, since iOS 13, granted location access. Missing either returns a placeholder name
-/// rather than failing, so call <see cref="RequestAccess"/> first.</para>
+/// <para>Reading the SSID goes through <c>NEHotspotNetwork.fetchCurrent</c>, which needs the
+/// <c>Access WiFi Information</c> capability and granted location access. Missing either leaves the
+/// SSID and BSSID null rather than failing, so call <see cref="RequestAccess"/> first. This is the
+/// iOS 14 replacement for CaptiveNetwork's <c>CNCopyCurrentNetworkInfo</c>, which since iOS 14
+/// returns nothing at all unless your own app configured the network it is being asked about.</para>
 /// <para>Scanning is absent by design: the only API that lists nearby networks lives inside a
 /// NEHotspotHelper, and that entitlement is granted case by case by Apple.</para>
 /// <para>The configurations your app has applied can be listed and removed - that is what
@@ -26,7 +27,7 @@ namespace Shiny.Net.Wifi;
 /// on demand. A stored configuration is a standing instruction iOS acts on when the network is in
 /// range, so <see cref="Connect(string, CancellationToken)"/> throws here.</para>
 /// </remarks>
-public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiManager, IDisposable
+public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiManager(logger), IDisposable
 {
     // NEHotspotConfigurationError.AlreadyAssociated - the join succeeded before we asked
     const int AlreadyAssociated = 13;
@@ -44,40 +45,53 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
         WifiCapabilities.ForgetNetwork;
 
 
-    public override WifiNetworkInfo? CurrentNetwork
+    /// <remarks>
+    /// <para>Addressing comes from the managed stack and needs no permission; the SSID, BSSID,
+    /// security and signal come from NEHotspotNetwork and need the <c>Access WiFi Information</c>
+    /// capability plus location. Without those, iOS hands back nothing and the Wi-Fi half of the
+    /// result stays null while the addressing half is still populated.</para>
+    /// <para>NEHotspotNetwork also reports the security type and signal, which CaptiveNetwork never
+    /// did - so both are filled in here rather than left at their defaults.</para>
+    /// </remarks>
+    public override async Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
     {
-        get
-        {
-            if (CaptiveNetwork.TryGetSupportedInterfaces(out var interfaces) != StatusCode.OK || interfaces == null)
-                return null;
+        var addressing = ManagedNetworkInfo.Read();
+        var network = await NEHotspotNetwork
+            .FetchCurrentAsync()
+            .WaitAsync(ct)
+            .ConfigureAwait(false);
 
-            foreach (var name in interfaces.OfType<string>().Where(x => x.Length > 0))
-            {
-                var info = ReadInterface(name);
-                if (info != null)
-                    return info;
-            }
-            return null;
-        }
+        if (network == null)
+            return addressing;
+
+        addressing ??= new WifiNetworkInfo { InterfaceName = "en0" };
+
+        // iOS reports signal as 0-1 rather than an RSSI, and there is no lossless way back to dBm,
+        // so the percentage is authoritative here and dBm stays null
+        return addressing with
+        {
+            Ssid = network.Ssid,
+            Bssid = network.Bssid,
+            Security = ToSecurity(network),
+            SignalStrengthPercent = (int)Math.Round(network.SignalStrength * 100)
+        };
     }
 
 
-    static WifiNetworkInfo? ReadInterface(string name)
-    {
-        if (CaptiveNetwork.TryCopyCurrentNetworkInfo(name, out var dictionary) != StatusCode.OK || dictionary == null)
-            return null;
-
-        using (dictionary)
+    /// <remarks>
+    /// iOS reports "personal" without naming the generation - it does not distinguish WPA2 from
+    /// WPA3 - so that lands on the generation-agnostic <see cref="WifiSecurity.Psk"/> rather than
+    /// guessing at one of the two.
+    /// </remarks>
+    static WifiSecurity ToSecurity(NEHotspotNetwork network)
+        => network.SecurityType switch
         {
-            var addressing = ManagedNetworkInfo.Read(name) ?? new WifiNetworkInfo { InterfaceName = name };
-
-            return addressing with
-            {
-                Ssid = (dictionary[CaptiveNetwork.NetworkInfoKeySSID] as NSString)?.ToString(),
-                Bssid = (dictionary[CaptiveNetwork.NetworkInfoKeyBSSID] as NSString)?.ToString()
-            };
-        }
-    }
+            NEHotspotNetworkSecurityType.Open => WifiSecurity.Open,
+            NEHotspotNetworkSecurityType.Wep => WifiSecurity.Wep,
+            NEHotspotNetworkSecurityType.Personal => WifiSecurity.Psk,
+            NEHotspotNetworkSecurityType.Enterprise => WifiSecurity.Enterprise,
+            _ => WifiSecurity.Unknown
+        };
 
 
     protected override void StartListening()
@@ -138,7 +152,7 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
             throw new WifiConnectionException($"Timed out joining '{request.Ssid}'", ex);
         }
 
-        return this.CurrentNetwork
+        return await this.GetCurrentNetwork(ct).ConfigureAwait(false)
             ?? throw new WifiConnectionException($"Applied the configuration for '{request.Ssid}' but no Wi-Fi interface came up");
     }
 
@@ -165,13 +179,11 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
     /// then free to rejoin any network the user had already saved, so the device does not
     /// necessarily end up off Wi-Fi.
     /// </remarks>
-    public override Task Disconnect(CancellationToken ct = default)
+    public override async Task Disconnect(CancellationToken ct = default)
     {
-        var ssid = this.CurrentNetwork?.Ssid;
+        var ssid = (await this.GetCurrentNetwork(ct).ConfigureAwait(false))?.Ssid;
         if (ssid != null)
             NEHotspotConfigurationManager.SharedManager.RemoveConfiguration(ssid);
-
-        return Task.CompletedTask;
     }
 
 

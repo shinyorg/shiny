@@ -18,23 +18,31 @@ public interface IWifiManager
     WifiCapabilities Capabilities { get; }
 
     /// <summary>
-    /// The network currently joined, or null when Wi-Fi is off or unassociated.
+    /// Reads the network currently joined, or null when Wi-Fi is off or unassociated.
     /// </summary>
     /// <remarks>
-    /// Read live off the OS on every access, so it is always current but is not free - hold the
+    /// <para>Read live off the OS on every call, so it is always current but is not free - hold the
     /// result rather than re-reading it in a loop. Addressing details are always populated; SSID
-    /// and BSSID need <see cref="WifiCapabilities.CurrentNetwork"/>.
+    /// and BSSID need <see cref="WifiCapabilities.CurrentNetwork"/> and the platform permission
+    /// behind it, and come back null without it rather than failing.</para>
+    /// <para>Asynchronous because the platforms that still disclose the SSID only do so
+    /// asynchronously: iOS 14 replaced the synchronous CaptiveNetwork read with
+    /// <c>NEHotspotNetwork.fetchCurrent</c>, and Android 12 (API 31) redacts the SSID and BSSID
+    /// from every pull-style read, leaving a registered NetworkCallback as the only source.</para>
     /// </remarks>
-    WifiNetworkInfo? CurrentNetwork { get; }
+    Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default);
 
     /// <summary>
     /// Fires when the joined network changes - a different SSID, a new IP lease, a DNS change, or
     /// dropping off Wi-Fi entirely (which delivers null).
     /// </summary>
     /// <remarks>
-    /// Only raised on a real change; the platform watchers behind this are chatty and their
-    /// duplicates are filtered out. Listening costs a native watcher, so unsubscribe when you are
-    /// done - the last unsubscribe tears it down.
+    /// <para>Subscribing delivers the network you are on now - once, and only if there is one - so
+    /// a new subscriber is not left blind until the network next moves. Everything after that is a
+    /// real change: the platform watchers behind this are chatty and their duplicates are filtered
+    /// out.</para>
+    /// <para>Listening costs a native watcher, so unsubscribe when you are done - the last
+    /// unsubscribe tears it down.</para>
     /// </remarks>
     event EventHandler<WifiNetworkInfo?>? Changed;
 

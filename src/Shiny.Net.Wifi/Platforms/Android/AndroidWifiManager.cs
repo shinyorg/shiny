@@ -20,6 +20,11 @@ namespace Shiny.Net.Wifi;
 /// <c>ACCESS_FINE_LOCATION</c>; from API 33 add <c>NEARBY_WIFI_DEVICES</c>. Scanning and the SSID
 /// of the joined network both return empty rather than failing when location has not been granted,
 /// so call <see cref="RequestAccess"/> first.</para>
+/// <para>From API 31 the permission is no longer enough on its own: Android redacts the SSID and
+/// BSSID out of every pull-style read - <c>getConnectionInfo</c> and the <c>WifiInfo</c> hanging
+/// off <c>getNetworkCapabilities</c> alike - and hands them out only through a NetworkCallback
+/// registered with <c>FLAG_INCLUDE_LOCATION_INFO</c>. That callback is therefore the source here,
+/// with <see cref="LocationInfoCache"/> holding what it last delivered.</para>
 /// <para>From API 29 joining goes through a WifiNetworkSpecifier: Android shows the user a dialog
 /// naming the network, the join is never saved, and it lasts only while your app holds the request -
 /// which is why the callback is kept alive here until <see cref="Disconnect"/>. Older releases get
@@ -28,13 +33,15 @@ namespace Shiny.Net.Wifi;
 public class AndroidWifiManager(
     AndroidPlatform platform,
     ILogger<AndroidWifiManager> logger
-) : AbstractWifiManager, IDisposable
+) : AbstractWifiManager(logger), IDisposable
 {
     static readonly TimeSpan defaultConnectTimeout = TimeSpan.FromSeconds(30);
     static readonly TimeSpan scanTimeout = TimeSpan.FromSeconds(20);
+    static readonly TimeSpan wifiInfoTimeout = TimeSpan.FromSeconds(5);
 
-    ConnectivityManager.NetworkCallback? changeCallback;
-    ConnectivityManager.NetworkCallback? requestCallback;
+    readonly LocationInfoCache locationInfo = new();
+    WifiChangeCallback? changeCallback;
+    WifiRequestCallback? requestCallback;
     Network? boundNetwork;
 
     Android.Net.Wifi.WifiManager Native => platform.GetSystemService<Android.Net.Wifi.WifiManager>(Context.WifiService);
@@ -73,70 +80,104 @@ public class AndroidWifiManager(
     }
 
 
-    public override WifiNetworkInfo? CurrentNetwork
+    public override async Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
     {
-        get
+        var connectivity = this.Connectivity;
+
+        // a specifier-bound network is the one this app asked for, and is not necessarily the
+        // system's active network - prefer it when we are holding one
+        var network = this.boundNetwork ?? connectivity.ActiveNetwork;
+        if (network == null)
+            return null;
+
+        var caps = connectivity.GetNetworkCapabilities(network);
+        if (caps?.HasTransport(TransportType.Wifi) != true)
+            return null;
+
+        var link = connectivity.GetLinkProperties(network);
+        if (link == null)
+            return null;
+
+        var wifiInfo = await this.GetWifiInfo(connectivity, network, ct).ConfigureAwait(false);
+        var rssi = wifiInfo?.Rssi;
+
+        return new WifiNetworkInfo
         {
-            var connectivity = this.Connectivity;
-
-            // a specifier-bound network is the one this app asked for, and is not necessarily the
-            // system's active network - prefer it when we are holding one
-            var network = this.boundNetwork ?? connectivity.ActiveNetwork;
-            if (network == null)
-                return null;
-
-            var caps = connectivity.GetNetworkCapabilities(network);
-            if (caps?.HasTransport(TransportType.Wifi) != true)
-                return null;
-
-            var link = connectivity.GetLinkProperties(network);
-            if (link == null)
-                return null;
-
-            var wifiInfo = GetWifiInfo(caps, this.Native);
-            var rssi = wifiInfo?.Rssi;
-
-            return new WifiNetworkInfo
-            {
-                InterfaceName = link.InterfaceName ?? "wlan0",
-                Ssid = Unquote(wifiInfo?.SSID),
-                Bssid = Normalise(wifiInfo?.BSSID),
-                Security = ToSecurity(wifiInfo),
-                IpAddresses = link.LinkAddresses
-                    .Select(x => Convert(x.Address))
-                    .Where(x => x != null)
-                    .ToArray()!,
-                DnsAddresses = link.DnsServers
-                    .Select(Convert)
-                    .Where(x => x != null)
-                    .ToArray()!,
-                Gateway = link.Routes
-                    .Where(x => x.IsDefaultRoute)
-                    .Select(x => Convert(x.Gateway))
-                    .FirstOrDefault(x => x != null),
-                SubnetMask = ToMask(link),
-                SignalStrengthDbm = rssi,
-                SignalStrengthPercent = rssi == null ? null : WifiChannels.ToPercent(rssi.Value),
-                FrequencyMhz = wifiInfo?.Frequency
-            };
-        }
+            InterfaceName = link.InterfaceName ?? "wlan0",
+            Ssid = Unquote(wifiInfo?.SSID),
+            Bssid = Normalise(wifiInfo?.BSSID),
+            Security = ToSecurity(wifiInfo),
+            IpAddresses = link.LinkAddresses
+                .Select(x => Convert(x.Address))
+                .Where(x => x != null)
+                .ToArray()!,
+            DnsAddresses = link.DnsServers
+                .Select(Convert)
+                .Where(x => x != null)
+                .ToArray()!,
+            Gateway = link.Routes
+                .Where(x => x.IsDefaultRoute)
+                .Select(x => Convert(x.Gateway))
+                .FirstOrDefault(x => x != null),
+            SubnetMask = ToMask(link),
+            SignalStrengthDbm = rssi,
+            SignalStrengthPercent = rssi == null ? null : WifiChannels.ToPercent(rssi.Value),
+            FrequencyMhz = wifiInfo?.Frequency
+        };
     }
 
 
     /// <remarks>
-    /// WifiManager.ConnectionInfo was deprecated in API 31 in favour of pulling the WifiInfo off the
-    /// network's capabilities, which is also the only way to see a specifier-bound network.
+    /// <para>Below API 31 the deprecated WifiManager.ConnectionInfo is still the only source, and
+    /// still an honest one - the redaction that makes it useless arrived with API 31.</para>
+    /// <para>From API 31 the WifiInfo has to come from a callback registered with
+    /// FLAG_INCLUDE_LOCATION_INFO. The watcher behind <see cref="IWifiManager.Changed"/> is one
+    /// when it is running, and the callback holding a specifier-bound network is another, so most
+    /// reads are served from what those already delivered. A read with neither running registers a
+    /// short-lived callback of its own.</para>
     /// </remarks>
-    static WifiInfo? GetWifiInfo(NetworkCapabilities caps, Android.Net.Wifi.WifiManager native)
+    async Task<WifiInfo?> GetWifiInfo(ConnectivityManager connectivity, Network network, CancellationToken ct)
     {
-        if (OperatingSystem.IsAndroidVersionAtLeast(31))
-            return caps.TransportInfo as WifiInfo;
+        if (!OperatingSystem.IsAndroidVersionAtLeast(31))
+            return LegacyConnectionInfo(this.Native);
 
-        return LegacyConnectionInfo(native);
+        return this.locationInfo.TryGet(network.NetworkHandle, out var cached)
+            ? cached
+            : await FetchWifiInfo(connectivity, network.NetworkHandle, ct).ConfigureAwait(false);
     }
 
 
-#pragma warning disable CA1422 // ConnectionInfo is deprecated in API 31+, but we only reach it below 31 where NetworkCapabilities.TransportInfo does not carry WifiInfo
+    /// <remarks>
+    /// registerNetworkCallback has no "there is nothing to report" callback - onUnavailable only
+    /// fires for requestNetwork - so with the radio off or the device unassociated nothing ever
+    /// arrives. Hence the timeout: the SSID and BSSID come back null rather than the read hanging.
+    /// </remarks>
+    [SupportedOSPlatform("android31.0")]
+    static async Task<WifiInfo?> FetchWifiInfo(ConnectivityManager connectivity, long networkHandle, CancellationToken ct)
+    {
+        var tcs = new TaskCompletionSource<WifiInfo?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var callback = new WifiInfoCallback(networkHandle, info => tcs.TrySetResult(info));
+        var request = new NetworkRequest.Builder()
+            .AddTransportType(TransportType.Wifi)!
+            .Build()!;
+
+        connectivity.RegisterNetworkCallback(request, callback);
+        try
+        {
+            return await tcs.Task.WaitAsync(wifiInfoTimeout, ct).ConfigureAwait(false);
+        }
+        catch (TimeoutException)
+        {
+            return null;
+        }
+        finally
+        {
+            connectivity.UnregisterNetworkCallback(callback);
+        }
+    }
+
+
+#pragma warning disable CA1422 // ConnectionInfo is deprecated in API 31+, but we only reach it below 31 where the callback flag that replaces it does not exist
     static WifiInfo? LegacyConnectionInfo(Android.Net.Wifi.WifiManager native) => native.ConnectionInfo;
 #pragma warning restore CA1422
 
@@ -147,7 +188,7 @@ public class AndroidWifiManager(
             .AddTransportType(TransportType.Wifi)!
             .Build()!;
 
-        this.changeCallback = new WifiChangeCallback(this.RaiseChangedIfDifferent);
+        this.changeCallback = WifiChangeCallback.Create(this.RaiseChangedIfDifferent, this.locationInfo);
         this.Connectivity.RegisterNetworkCallback(request, this.changeCallback);
         logger.WatcherStarted(nameof(ConnectivityManager.NetworkCallback));
     }
@@ -159,6 +200,10 @@ public class AndroidWifiManager(
         {
             this.Connectivity.UnregisterNetworkCallback(this.changeCallback);
             this.changeCallback = null;
+
+            // nothing is feeding the cache any more, so a later read must go and fetch its own
+            // rather than answer from what the watcher happened to see last
+            this.locationInfo.Clear();
         }
     }
 
@@ -357,9 +402,14 @@ public class AndroidWifiManager(
             .Build()!;
 
         var tcs = new TaskCompletionSource<Network>();
-        var callback = new WifiRequestCallback(
+
+        // the flag matters here too: a specifier network is app-scoped and a plain
+        // registerNetworkCallback request does not match it, so this callback is the only thing
+        // that ever sees its unredacted WifiInfo
+        var callback = WifiRequestCallback.Create(
             network => tcs.TrySetResult(network),
-            () => tcs.TrySetException(new WifiConnectionException($"Android could not join '{request.Ssid}' - the network was unavailable or the user declined the prompt"))
+            () => tcs.TrySetException(new WifiConnectionException($"Android could not join '{request.Ssid}' - the network was unavailable or the user declined the prompt")),
+            this.locationInfo
         );
 
         this.Connectivity.RequestNetwork(networkRequest, callback);
@@ -453,6 +503,17 @@ public class AndroidWifiManager(
 
     public override Task Disconnect(CancellationToken ct = default)
     {
+        this.Release();
+        return Task.CompletedTask;
+    }
+
+
+    /// <remarks>
+    /// The whole of Disconnect, split out because <see cref="Dispose"/> needs it too and blocking
+    /// on the Task to get at it would be a deadlock waiting to happen.
+    /// </remarks>
+    void Release()
+    {
         if (this.requestCallback != null)
         {
             // releasing the request is what drops a specifier network - there is no disconnect call
@@ -464,7 +525,6 @@ public class AndroidWifiManager(
         {
             this.Native.Disconnect();
         }
-        return Task.CompletedTask;
     }
 
 
@@ -631,31 +691,6 @@ public class AndroidWifiManager(
 #pragma warning restore CA1422
 
 
-    async Task<WifiNetworkInfo> WaitForAddress(string ssid, TimeSpan timeout, CancellationToken ct)
-    {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        cts.CancelAfter(timeout);
-
-        while (!cts.IsCancellationRequested)
-        {
-            var current = this.CurrentNetwork;
-            if (current?.IpAddresses.Count > 0)
-                return current;
-
-            try
-            {
-                await Task.Delay(500, cts.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
-            {
-                break;
-            }
-        }
-        ct.ThrowIfCancellationRequested();
-        throw new WifiConnectionException($"Joined '{ssid}' but no address was assigned within {timeout}");
-    }
-
-
     static WifiNetwork ToNetwork(ScanResult native)
     {
         var ssid = Unquote(ReadSsid(native)) ?? String.Empty;
@@ -774,25 +809,176 @@ public class AndroidWifiManager(
     public void Dispose()
     {
         this.StopListening();
-        this.Disconnect().GetAwaiter().GetResult();
+        this.Release();
     }
 }
 
 
-class WifiChangeCallback(Action onChange) : ConnectivityManager.NetworkCallback
+/// <summary>
+/// Holds the unredacted <see cref="WifiInfo"/> a FLAG_INCLUDE_LOCATION_INFO callback last handed
+/// over, and the network it described.
+/// </summary>
+/// <remarks>
+/// From API 31 this is the only place an app can get the SSID and BSSID of the joined network -
+/// every synchronous read is redacted no matter what permissions are held. Written from a platform
+/// callback thread and read from whoever calls GetCurrentNetwork, hence the lock.
+/// </remarks>
+class LocationInfoCache
 {
-    public override void OnAvailable(Network network) => onChange();
-    public override void OnLost(Network network) => onChange();
-    public override void OnUnavailable() => onChange();
-    public override void OnLinkPropertiesChanged(Network network, LinkProperties linkProperties) => onChange();
-    public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) => onChange();
+    readonly Lock gate = new();
+    long handle;
+    WifiInfo? info;
+    bool populated;
+
+
+    public void Set(long networkHandle, WifiInfo? wifiInfo)
+    {
+        lock (this.gate)
+        {
+            this.handle = networkHandle;
+            this.info = wifiInfo;
+            this.populated = true;
+        }
+    }
+
+
+    /// <returns>
+    /// False when nothing has been delivered yet, or when what was delivered describes a different
+    /// network - the caller then has to go and fetch its own rather than answer from the wrong one.
+    /// </returns>
+    public bool TryGet(long networkHandle, out WifiInfo? wifiInfo)
+    {
+        lock (this.gate)
+        {
+            var hit = this.populated && this.handle == networkHandle;
+            wifiInfo = hit ? this.info : null;
+            return hit;
+        }
+    }
+
+
+    public void Clear()
+    {
+        lock (this.gate)
+        {
+            this.info = null;
+            this.populated = false;
+        }
+    }
 }
 
 
-class WifiRequestCallback(Action<Network> onAvailable, Action onFailed) : ConnectivityManager.NetworkCallback
+class WifiChangeCallback : ConnectivityManager.NetworkCallback
 {
-    public override void OnAvailable(Network network) => onAvailable(network);
-    public override void OnUnavailable() => onFailed();
+    readonly Action onChange;
+    readonly LocationInfoCache cache;
+
+    WifiChangeCallback(Action onChange, LocationInfoCache cache)
+    {
+        this.onChange = onChange;
+        this.cache = cache;
+    }
+
+
+    [SupportedOSPlatform("android31.0")]
+    WifiChangeCallback(Action onChange, LocationInfoCache cache, NetworkCallbackFlags flags) : base((int)flags)
+    {
+        this.onChange = onChange;
+        this.cache = cache;
+    }
+
+
+    /// <remarks>
+    /// FLAG_INCLUDE_LOCATION_INFO arrived in API 31 alongside the redaction it opts out of, so
+    /// below that there is no flag to pass and nothing to opt out of.
+    /// </remarks>
+    public static WifiChangeCallback Create(Action onChange, LocationInfoCache cache)
+        => OperatingSystem.IsAndroidVersionAtLeast(31)
+            ? new WifiChangeCallback(onChange, cache, NetworkCallbackFlags.IncludeLocationInfo)
+            : new WifiChangeCallback(onChange, cache);
+
+
+    public override void OnAvailable(Network network) => this.onChange();
+    public override void OnLinkPropertiesChanged(Network network, LinkProperties linkProperties) => this.onChange();
+
+    public override void OnLost(Network network)
+    {
+        this.cache.Clear();
+        this.onChange();
+    }
+
+    public override void OnUnavailable()
+    {
+        this.cache.Clear();
+        this.onChange();
+    }
+
+    public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
+    {
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+            this.cache.Set(network.NetworkHandle, networkCapabilities.TransportInfo as WifiInfo);
+
+        this.onChange();
+    }
+}
+
+
+class WifiRequestCallback : ConnectivityManager.NetworkCallback
+{
+    readonly Action<Network> onAvailable;
+    readonly Action onFailed;
+    readonly LocationInfoCache cache;
+
+    WifiRequestCallback(Action<Network> onAvailable, Action onFailed, LocationInfoCache cache)
+    {
+        this.onAvailable = onAvailable;
+        this.onFailed = onFailed;
+        this.cache = cache;
+    }
+
+
+    [SupportedOSPlatform("android31.0")]
+    WifiRequestCallback(Action<Network> onAvailable, Action onFailed, LocationInfoCache cache, NetworkCallbackFlags flags) : base((int)flags)
+    {
+        this.onAvailable = onAvailable;
+        this.onFailed = onFailed;
+        this.cache = cache;
+    }
+
+
+    public static WifiRequestCallback Create(Action<Network> onAvailable, Action onFailed, LocationInfoCache cache)
+        => OperatingSystem.IsAndroidVersionAtLeast(31)
+            ? new WifiRequestCallback(onAvailable, onFailed, cache, NetworkCallbackFlags.IncludeLocationInfo)
+            : new WifiRequestCallback(onAvailable, onFailed, cache);
+
+
+    public override void OnAvailable(Network network) => this.onAvailable(network);
+    public override void OnUnavailable() => this.onFailed();
+
+    public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
+    {
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+            this.cache.Set(network.NetworkHandle, networkCapabilities.TransportInfo as WifiInfo);
+    }
+}
+
+
+/// <summary>
+/// A one-shot FLAG_INCLUDE_LOCATION_INFO callback, for a read taken while no watcher is running.
+/// </summary>
+/// <remarks>
+/// Waits for the capabilities of one specific network, because registerNetworkCallback reports on
+/// every Wi-Fi network the app can see and only the one being read about is of any use.
+/// </remarks>
+[SupportedOSPlatform("android31.0")]
+class WifiInfoCallback(long networkHandle, Action<WifiInfo?> onInfo)
+    : ConnectivityManager.NetworkCallback((int)NetworkCallbackFlags.IncludeLocationInfo)
+{
+    public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
+    {
+        if (network.NetworkHandle == networkHandle)
+            onInfo(networkCapabilities.TransportInfo as WifiInfo);
+    }
 }
 
 

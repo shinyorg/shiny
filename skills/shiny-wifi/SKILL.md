@@ -15,6 +15,16 @@ triggers:
   - SSID
   - BSSID
   - RSSI
+  - GetCurrentNetwork
+  - current network
+  - which wifi am I on
+  - ssid is null
+  - bssid is null
+  - unknown ssid
+  - NEHotspotNetwork
+  - fetchCurrent
+  - CNCopyCurrentNetworkInfo
+  - FLAG_INCLUDE_LOCATION_INFO
   - signal strength
   - connect to wifi
   - join a wifi network
@@ -137,7 +147,8 @@ throws `WifiNotSupportedException` with a message naming the exact limit.
 
 1. **Scanning on iOS.** There is no public API. `NEHotspotHelper` can list networks but its
    entitlement is granted case by case by Apple to captive-network-assistant apps. Do not suggest
-   `CNCopyCurrentNetworkInfo` as a substitute - it reports the *joined* network, not nearby ones.
+   `CNCopyCurrentNetworkInfo` or `NEHotspotNetwork.fetchCurrent` as a substitute - both report the
+   *joined* network, not nearby ones.
 2. **Reading the user's saved networks on a phone.** Neither iOS nor Android will show an app the
    networks the *user* saved. `GetKnownNetworks()` on those two returns only what **your own app**
    configured. Do not build a "manage all my Wi-Fi networks" screen for mobile.
@@ -324,12 +335,31 @@ public sealed class NetworkWatcher(IWifiManager wifi) : IDisposable
   value for the same reason, so it is safe to diff yourself too.
 - **Unsubscribe.** The native watcher is created on the first subscription and torn down on the
   last, so a leaked handler keeps a radio callback alive.
-- **`CurrentNetwork` is read live on every access** on every platform except Linux, where D-Bus is
-  asynchronous and the value is cached behind the watcher. Hold the result rather than re-reading
-  it in a loop.
+- **Subscribing delivers the current network once**, then only real changes after that. A new
+  subscriber does not have to seed itself with a separate read.
+- **`GetCurrentNetwork(ct)` is async and reads live on every call.** Hold the result rather than
+  re-reading it in a loop. There is no `CurrentNetwork` property - it was removed because the two
+  mobile platforms stopped answering synchronously (see below).
 - **Addressing is always available; the SSID is not.** IP/DNS/gateway come from the managed network
   stack. `Ssid` and `Bssid` need `WifiCapabilities.CurrentNetwork` and the platform permission
   behind it, and come back null otherwise.
+
+### Why reading the SSID is asynchronous
+
+Both mobile platforms removed the synchronous answer, and on both the failure is silent - the call
+succeeds and the SSID is simply null:
+
+- **iOS 14+** - `CNCopyCurrentNetworkInfo` returns nothing unless your own app configured the
+  network being asked about. The replacement, `NEHotspotNetwork.fetchCurrent`, is async-only.
+  Shiny uses it, so iOS now also reports `Security` and `SignalStrengthPercent`, which
+  CaptiveNetwork never did.
+- **Android 12 (API 31)+** - the SSID and BSSID are redacted out of *every* pull-style read
+  (`getConnectionInfo`, and the `WifiInfo` off `getNetworkCapabilities`) no matter what permissions
+  are held. Only a `NetworkCallback` registered with `FLAG_INCLUDE_LOCATION_INFO` gets them, and
+  that is push-based. Shiny registers one and serves reads from it.
+
+**If a user reports a null or `<unknown ssid>` SSID with permissions granted, this is why** - check
+they are on a Shiny version with `GetCurrentNetwork` rather than telling them to add permissions.
 
 ## Hotspot
 
@@ -434,7 +464,8 @@ and in a headless session needing rules for
 
 1. **Check `Capabilities` before offering a feature in UI.** Catching
    `WifiNotSupportedException` is the backstop, not the plan.
-2. **Call `RequestAccess` before `Scan` or before reading `CurrentNetwork.Ssid`.**
+2. **Call `RequestAccess` before `Scan` or before `GetCurrentNetwork()`** if you need the SSID.
+   Without it the call still succeeds and `Ssid`/`Bssid` come back null.
 3. **Never claim scanning works on iOS.** Offer a "join by name" field there instead.
 4. **Never present `GetKnownNetworks()` on iOS or Android as "the device's saved networks".** It is
    your app's own entries only - say so in the UI, or the list looks broken when it comes back empty.
@@ -442,6 +473,10 @@ and in a headless session needing rules for
 6. **Dispose the hotspot session** - `await using` is the idiomatic form.
 7. **Unsubscribe from `Changed`** in `Dispose`; the native watcher is reference-counted.
 8. **Group scan results by SSID** when building a picker - one network yields several BSSIDs.
-9. **Do not treat `SignalStrengthDbm` as always present.** Linux reports only a percentage.
+9. **Do not treat `SignalStrengthDbm` as always present.** Linux and iOS report only a percentage.
+10. **Never write `wifi.CurrentNetwork`** - it does not exist. It is `await wifi.GetCurrentNetwork()`,
+    and the `Changed` handler already receives the new `WifiNetworkInfo?` so it never needs to re-read.
+11. **Handle `WifiSecurity.Psk`.** iOS reports "personal" without naming the WPA generation, so a
+    `switch` over `WifiSecurity` that only lists `Wpa2Psk`/`Wpa3Psk` will miss iOS entirely.
    `SignalStrengthPercent` is populated everywhere and is the safe one to display.
 10. **On Linux, reference `Shiny.Net.Wifi.Linux`,** not just the base package.

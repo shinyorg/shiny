@@ -19,17 +19,12 @@ namespace Shiny.Net.Wifi;
 /// need no privileges. Connecting, disconnecting and toggling the radio go through polkit, which on
 /// a desktop prompts the user and in a headless session needs a rule granting
 /// <c>org.freedesktop.NetworkManager.network-control</c>.</para>
-/// <para>D-Bus is asynchronous and <see cref="CurrentNetwork"/> is not, so the network state is
-/// cached and refreshed from the PropertiesChanged watcher. Only the first read pays for a blocking
-/// round trip.</para>
+/// <para>D-Bus is asynchronous throughout, which <see cref="GetCurrentNetwork"/> can simply await -
+/// there is no cache to prime and no round trip to block on.</para>
 /// </remarks>
-public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiManager, IAsyncDisposable
+public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiManager(logger), IAsyncDisposable
 {
-    static readonly TimeSpan primeTimeout = TimeSpan.FromSeconds(5);
-
     readonly NmClient client = new();
-    WifiNetworkInfo? cached;
-    bool primed;
     IDisposable? watcher;
     string? activeConnectionPath;
 
@@ -46,32 +41,18 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
         WifiCapabilities.ConnectKnownNetwork;
 
 
-    public override WifiNetworkInfo? CurrentNetwork
-    {
-        get
-        {
-            // Task.Run keeps this off any captured synchronization context - blocking on the
-            // D-Bus round trip directly would deadlock a UI thread. Refresh sets `primed` itself,
-            // so a read that times out is retried next time rather than latching null forever.
-            if (!this.primed)
-                Task.Run(() => this.Refresh(CancellationToken.None)).Wait(primeTimeout);
-
-            return this.cached;
-        }
-    }
-
-
-    async Task Refresh(CancellationToken ct)
+    public override async Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
     {
         try
         {
-            this.cached = await this.Read(ct).ConfigureAwait(false);
-            this.primed = true;
+            return await this.Read(ct).ConfigureAwait(false);
         }
-        catch (Exception ex)
+        catch (DBusExceptionBase ex)
         {
+            // NetworkManager not being reachable is the same answer as no Wi-Fi device: nothing to
+            // report. A genuine protocol failure still propagates.
             logger.WifiError(ex, "Could not read the current network from NetworkManager");
-            this.cached = null;
+            return null;
         }
     }
 
@@ -114,11 +95,7 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
         try
         {
             this.watcher = await this.client
-                .WatchPropertiesChanged(() =>
-                {
-                    _ = this.Refresh(CancellationToken.None)
-                        .ContinueWith(_ => this.RaiseChangedIfDifferent(), TaskScheduler.Default);
-                })
+                .WatchPropertiesChanged(this.RaiseChangedIfDifferent)
                 .ConfigureAwait(false);
 
             logger.WatcherStarted("NetworkManager PropertiesChanged");
@@ -454,31 +431,6 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
         {
             throw new WifiPermissionException($"NetworkManager refused to switch the Wi-Fi radio - {ex.Describe()}. This needs the polkit action org.freedesktop.NetworkManager.enable-disable-wifi", ex);
         }
-    }
-
-
-    async Task<WifiNetworkInfo> WaitForAddress(string ssid, TimeSpan timeout, CancellationToken ct)
-    {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        cts.CancelAfter(timeout);
-
-        while (!cts.IsCancellationRequested)
-        {
-            await this.Refresh(cts.Token).ConfigureAwait(false);
-            if (this.cached?.IpAddresses.Count > 0)
-                return this.cached;
-
-            try
-            {
-                await Task.Delay(500, cts.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
-            {
-                break;
-            }
-        }
-        ct.ThrowIfCancellationRequested();
-        throw new WifiConnectionException($"Joined '{ssid}' but no address was assigned within {timeout}");
     }
 
 

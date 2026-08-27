@@ -9,7 +9,7 @@ namespace Shiny.Net.Wifi;
 /// The fallback for plain .NET, where there is no OS Wi-Fi API to call.
 /// </summary>
 /// <remarks>
-/// <para>Addressing still works - <see cref="CurrentNetwork"/> reports the IP, DNS, gateway and
+/// <para>Addressing still works - <see cref="GetCurrentNetwork"/> reports the IP, DNS, gateway and
 /// mask of the wireless interface, and <see cref="Changed"/> fires off NetworkChange - because that
 /// all comes from the managed network stack. Everything Wi-Fi specific (SSID, signal, scanning,
 /// joining) needs native code and throws.</para>
@@ -17,14 +17,15 @@ namespace Shiny.Net.Wifi;
 /// D-Bus and supports the whole API. This type is what a Windows or macOS console app that
 /// referenced the base package gets, and it is deliberately a stub rather than a lie.</para>
 /// </remarks>
-public class NetWifiManager(ILogger<NetWifiManager> logger) : AbstractWifiManager
+public class NetWifiManager(ILogger<NetWifiManager> logger) : AbstractWifiManager(logger)
 {
     NetworkAddressChangedEventHandler? addressHandler;
     NetworkAvailabilityChangedEventHandler? availabilityHandler;
 
     public override WifiCapabilities Capabilities => WifiCapabilities.None;
 
-    public override WifiNetworkInfo? CurrentNetwork => ManagedNetworkInfo.Read();
+    public override Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
+        => Task.FromResult(ManagedNetworkInfo.Read());
 
 
     protected override void StartListening()

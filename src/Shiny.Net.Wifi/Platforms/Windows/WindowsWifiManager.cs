@@ -23,7 +23,7 @@ namespace Shiny.Net.Wifi;
 /// <para>Saved profiles are outside WinRT entirely - WiFiAdapter cannot list, delete or join one -
 /// so those three go through <c>wlanapi.dll</c> directly. See <see cref="WlanApi"/>.</para>
 /// </remarks>
-public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWifiManager
+public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWifiManager(logger)
 {
     static readonly TimeSpan defaultConnectTimeout = TimeSpan.FromSeconds(30);
 
@@ -43,43 +43,47 @@ public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWi
         WifiCapabilities.ConnectKnownNetwork;
 
 
-    public override WifiNetworkInfo? CurrentNetwork
+    /// <remarks>
+    /// WinRT answers synchronously here, so this only wraps the read to satisfy the interface.
+    /// </remarks>
+    public override Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
+        => Task.FromResult(this.Read());
+
+
+    WifiNetworkInfo? Read()
     {
-        get
+        var profile = NetworkInformation
+            .GetConnectionProfiles()
+            .FirstOrDefault(x => x.IsWlanConnectionProfile && x.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.None);
+
+        if (profile == null)
+            return null;
+
+        var ssid = profile.WlanConnectionProfileDetails?.GetConnectedSsid();
+        var info = ManagedNetworkInfo.Read(FindInterfaceName(profile));
+        if (info == null)
+            return null;
+
+        // NetworkReport is whatever the last scan produced, so signal is best-effort - it is
+        // null until something has scanned, and stale afterwards. Never worth failing over.
+        var seen = this.adapter?
+            .NetworkReport?
+            .AvailableNetworks
+            .Where(x => x.Ssid == ssid)
+            .OrderByDescending(x => x.NetworkRssiInDecibelMilliwatts)
+            .FirstOrDefault();
+
+        var rssi = seen == null ? (int?)null : (int)seen.NetworkRssiInDecibelMilliwatts;
+
+        return info with
         {
-            var profile = NetworkInformation
-                .GetConnectionProfiles()
-                .FirstOrDefault(x => x.IsWlanConnectionProfile && x.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.None);
-
-            if (profile == null)
-                return null;
-
-            var ssid = profile.WlanConnectionProfileDetails?.GetConnectedSsid();
-            var info = ManagedNetworkInfo.Read(FindInterfaceName(profile));
-            if (info == null)
-                return null;
-
-            // NetworkReport is whatever the last scan produced, so signal is best-effort - it is
-            // null until something has scanned, and stale afterwards. Never worth failing over.
-            var seen = this.adapter?
-                .NetworkReport?
-                .AvailableNetworks
-                .Where(x => x.Ssid == ssid)
-                .OrderByDescending(x => x.NetworkRssiInDecibelMilliwatts)
-                .FirstOrDefault();
-
-            var rssi = seen == null ? (int?)null : (int)seen.NetworkRssiInDecibelMilliwatts;
-
-            return info with
-            {
-                Ssid = ssid,
-                Bssid = seen?.Bssid,
-                Security = ToSecurity(seen?.SecuritySettings),
-                SignalStrengthDbm = rssi,
-                SignalStrengthPercent = rssi == null ? null : WifiChannels.ToPercent(rssi.Value),
-                FrequencyMhz = seen == null ? null : seen.ChannelCenterFrequencyInKilohertz / 1000
-            };
-        }
+            Ssid = ssid,
+            Bssid = seen?.Bssid,
+            Security = ToSecurity(seen?.SecuritySettings),
+            SignalStrengthDbm = rssi,
+            SignalStrengthPercent = rssi == null ? null : WifiChannels.ToPercent(rssi.Value),
+            FrequencyMhz = seen == null ? null : seen.ChannelCenterFrequencyInKilohertz / 1000
+        };
     }
 
 
@@ -286,36 +290,6 @@ public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWi
         var adapters = await WiFiAdapter.FindAllAdaptersAsync().AsTask(ct).ConfigureAwait(false);
         this.adapter = adapters.FirstOrDefault() ?? throw new WifiException("No Wi-Fi adapter was found on this machine");
         return this.adapter;
-    }
-
-
-    /// <remarks>
-    /// ConnectAsync returns as soon as association succeeds, which is before DHCP has run. Handing
-    /// back a WifiNetworkInfo with no address would be technically accurate and useless, so this
-    /// polls until one arrives or the caller's timeout expires.
-    /// </remarks>
-    async Task<WifiNetworkInfo> WaitForAddress(string ssid, TimeSpan timeout, CancellationToken ct)
-    {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        cts.CancelAfter(timeout);
-
-        while (!cts.IsCancellationRequested)
-        {
-            var current = this.CurrentNetwork;
-            if (current?.IpAddresses.Count > 0)
-                return current;
-
-            try
-            {
-                await Task.Delay(500, cts.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
-            {
-                break;
-            }
-        }
-        ct.ThrowIfCancellationRequested();
-        throw new WifiConnectionException($"Joined '{ssid}' but no address was assigned within {timeout}");
     }
 
 

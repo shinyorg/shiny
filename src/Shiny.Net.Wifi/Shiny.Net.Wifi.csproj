@@ -19,10 +19,11 @@
     </PropertyGroup>
 
     <!--
-        CaptiveNetwork.TryCopyCurrentNetworkInfo is soft-deprecated on iOS and CWInterface carries
-        deprecation attributes on macOS, but neither has a replacement that reports the joined SSID.
-        NEHotspotNetwork only exists inside a NEHotspotHelper (an entitlement Apple hands out one
-        app at a time) and Network.framework never exposes the SSID at all. Revisit if that changes.
+        CWInterface carries deprecation attributes on macOS but has no replacement that reports the
+        joined SSID, so the warnings are suppressed there. iOS is no longer in that boat:
+        NEHotspotNetwork.fetchCurrent (iOS 14+, and Mac Catalyst) needs only the Access WiFi
+        Information capability, not the case-by-case NEHotspotHelper entitlement that its
+        instance-side API once did - so the Apple manager uses it and CaptiveNetwork is gone.
     -->
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos'))">
         <NoWarn>$(NoWarn);CA1422</NoWarn>

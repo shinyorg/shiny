@@ -67,7 +67,7 @@ public partial class WifiViewModel(
             this.hooked = true;
         }
 
-        this.RefreshCurrent();
+        await this.RefreshCurrent();
         await this.ReadRadio();
     }
 
@@ -83,7 +83,7 @@ public partial class WifiViewModel(
         });
 
         if (result == AccessState.Available)
-            this.RefreshCurrent();
+            await this.RefreshCurrent();
     }
 
 
@@ -127,7 +127,7 @@ public partial class WifiViewModel(
             };
             var info = await wifi.Connect(request);
             this.Status = $"Joined {info.Ssid ?? this.Ssid}";
-            this.RefreshCurrent();
+            await this.RefreshCurrent();
             return true;
         });
     }
@@ -140,7 +140,7 @@ public partial class WifiViewModel(
             this.Status = $"Rejoining {item.Ssid}...";
             var info = await wifi.Connect(item.Id);
             this.Status = $"Joined {info.Ssid ?? item.Ssid}";
-            this.RefreshCurrent();
+            await this.RefreshCurrent();
             return true;
         });
 
@@ -151,7 +151,7 @@ public partial class WifiViewModel(
         {
             await wifi.Disconnect();
             this.Status = "Disconnected";
-            this.RefreshCurrent();
+            await this.RefreshCurrent();
             return true;
         });
 
@@ -210,19 +210,21 @@ public partial class WifiViewModel(
     }
 
 
-    void RefreshCurrent()
-    {
-        var info = wifi.CurrentNetwork;
-        this.CurrentNetwork = info == null
+    async Task RefreshCurrent()
+        => this.CurrentNetwork = Describe(await wifi.GetCurrentNetwork());
+
+
+    static string Describe(WifiNetworkInfo? info)
+        => info == null
             ? "(not connected)"
             : $"{info.Ssid ?? "(ssid hidden)"}\n{info.InterfaceName}  {info.Security}\nIP {info.IPv4Address?.ToString() ?? "-"}  GW {info.Gateway?.ToString() ?? "-"}";
-    }
 
 
+    // the event carries the new network, so this never has to go and read it again
     void OnChanged(object? sender, WifiNetworkInfo? info)
         => mainThread.BeginInvokeOnMainThread(() =>
         {
-            this.RefreshCurrent();
+            this.CurrentNetwork = Describe(info);
             this.Status = info == null ? "Left the network" : $"Now on {info.Ssid ?? "(ssid hidden)"}";
         });
 

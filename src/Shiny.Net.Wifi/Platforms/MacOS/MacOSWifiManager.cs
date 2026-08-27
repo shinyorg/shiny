@@ -19,7 +19,7 @@ namespace Shiny.Net.Wifi;
 /// <para>Saved networks are the machine's preferred-network list, readable by anyone but editable
 /// only with an administrator authorization - see <see cref="Forget"/>.</para>
 /// </remarks>
-public class MacOSWifiManager(ILogger<MacOSWifiManager> logger) : AbstractWifiManager, IDisposable
+public class MacOSWifiManager(ILogger<MacOSWifiManager> logger) : AbstractWifiManager(logger), IDisposable
 {
     readonly AppleLocationAccess location = new();
     ApplePathWatcher? watcher;
@@ -39,29 +39,31 @@ public class MacOSWifiManager(ILogger<MacOSWifiManager> logger) : AbstractWifiMa
         WifiCapabilities.ConnectKnownNetwork;
 
 
-    public override WifiNetworkInfo? CurrentNetwork
+    /// <remarks>
+    /// CoreWLAN answers synchronously and is the one Apple platform where it still does - macOS
+    /// never took away the station API the way iOS did - so this only wraps the read to satisfy the
+    /// interface.
+    /// </remarks>
+    public override Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
     {
-        get
+        var iface = Interface;
+        if (iface?.Ssid == null)
+            return Task.FromResult<WifiNetworkInfo?>(null);
+
+        var addressing = ManagedNetworkInfo.Read(iface.InterfaceName)
+            ?? new WifiNetworkInfo { InterfaceName = iface.InterfaceName ?? "en0" };
+
+        var rssi = (int)iface.RssiValue;
+
+        return Task.FromResult<WifiNetworkInfo?>(addressing with
         {
-            var iface = Interface;
-            if (iface?.Ssid == null)
-                return null;
-
-            var addressing = ManagedNetworkInfo.Read(iface.InterfaceName)
-                ?? new WifiNetworkInfo { InterfaceName = iface.InterfaceName ?? "en0" };
-
-            var rssi = (int)iface.RssiValue;
-
-            return addressing with
-            {
-                Ssid = iface.Ssid,
-                Bssid = iface.Bssid,
-                Security = ToSecurity(iface.Security),
-                SignalStrengthDbm = rssi,
-                SignalStrengthPercent = WifiChannels.ToPercent(rssi),
-                FrequencyMhz = ToFrequency(iface.WlanChannel)
-            };
-        }
+            Ssid = iface.Ssid,
+            Bssid = iface.Bssid,
+            Security = ToSecurity(iface.Security),
+            SignalStrengthDbm = rssi,
+            SignalStrengthPercent = WifiChannels.ToPercent(rssi),
+            FrequencyMhz = ToFrequency(iface.WlanChannel)
+        });
     }
 
 
@@ -265,35 +267,6 @@ public class MacOSWifiManager(ILogger<MacOSWifiManager> logger) : AbstractWifiMa
 
         logger.RadioToggled(enabled);
         return Task.CompletedTask;
-    }
-
-
-    /// <remarks>
-    /// Association completes before DHCP does, so handing back the network the moment CoreWLAN
-    /// returns would give the caller an entry with no address on it.
-    /// </remarks>
-    async Task<WifiNetworkInfo> WaitForAddress(string ssid, TimeSpan timeout, CancellationToken ct)
-    {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        cts.CancelAfter(timeout);
-
-        while (!cts.IsCancellationRequested)
-        {
-            var current = this.CurrentNetwork;
-            if (current?.IpAddresses.Count > 0)
-                return current;
-
-            try
-            {
-                await Task.Delay(500, cts.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
-            {
-                break;
-            }
-        }
-        ct.ThrowIfCancellationRequested();
-        throw new WifiConnectionException($"Joined '{ssid}' but no address was assigned within {timeout}");
     }
 
 

@@ -31,7 +31,7 @@ public enum WifiCapabilities
     /// <summary><see cref="IWifiManager.Disconnect"/> can leave the current network.</summary>
     Disconnect = 4,
 
-    /// <summary><see cref="IWifiManager.CurrentNetwork"/> reports the joined network's SSID.</summary>
+    /// <summary><see cref="IWifiManager.GetCurrentNetwork"/> reports the joined network's SSID.</summary>
     /// <remarks>
     /// IP and DNS details come from the managed network stack and are available even without this
     /// flag - it is the SSID/BSSID specifically that needs platform permission.
@@ -118,7 +118,18 @@ public enum WifiSecurity
     Enterprise,
 
     /// <summary>Opportunistic Wireless Encryption - unauthenticated but encrypted.</summary>
-    Owe
+    Owe,
+
+    /// <summary>
+    /// A pre-shared key of an unnamed generation - the network is personal rather than open or
+    /// enterprise, but the platform did not say which of WPA, WPA2 or WPA3 is in use.
+    /// </summary>
+    /// <remarks>
+    /// iOS is the one platform that reports at this resolution: <c>NEHotspotNetwork</c> answers
+    /// "personal" and nothing finer. Reporting it as <see cref="Unknown"/> would throw away the
+    /// part iOS does know, and picking one of the three would be a guess.
+    /// </remarks>
+    Psk
 }
 
 
