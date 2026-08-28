@@ -219,7 +219,23 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
 
     public IPeripheral? GetKnownPeripheral(string peripheralUuid)
-        => this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
+    {
+        var cached = this.peripherals.Values.FirstOrDefault(x => x.Uuid.Equals(peripheralUuid, StringComparison.InvariantCultureIgnoreCase));
+        if (cached != null)
+            return cached;
+
+        // Ask the adapter for the device so callers can reconnect by identifier after a process
+        // restart without burning battery on a scan, matching what Apple does with
+        // RetrievePeripheralsWithIdentifiers. Android offers no "has the OS seen this device"
+        // query for unbonded LE devices, so any identifier this platform could have produced
+        // resolves here; one that is not actually reachable fails at connect instead.
+        var address = Peripheral.GetAddress(peripheralUuid);
+        if (address == null)
+            return null;
+
+        var native = this.Native.Adapter?.GetRemoteDevice(address);
+        return native == null ? null : this.GetPeripheral(native);
+    }
 
     public override void OnScanResult([GeneratedEnum] ScanCallbackType callbackType, SR? result)
         => this.scanSubj.OnNext((result, null));
