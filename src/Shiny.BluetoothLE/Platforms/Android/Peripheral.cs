@@ -283,6 +283,27 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     }
 
 
+    // The inverse of GetUuid. GetUuid parks the six MAC bytes in the last six bytes of the GUID,
+    // which a GUID renders verbatim as its final group, so the encoding is lossless and an
+    // identifier this platform produced round-trips back to an address BluetoothAdapter accepts.
+    // Returns null for anything not shaped like one of our identifiers.
+    internal static string? GetAddress(string peripheralUuid)
+    {
+        if (!Guid.TryParse(peripheralUuid, out var guid))
+            return null;
+
+        var bytes = guid.ToByteArray();
+        for (var i = 0; i < 10; i++)
+        {
+            if (bytes[i] != 0)
+                return null;
+        }
+
+        // BluetoothAdapter.CheckBluetoothAddress requires the upper-case AA:BB:CC:DD:EE:FF form.
+        return String.Join(':', bytes.Skip(10).Select(x => x.ToString("X2")));
+    }
+
+
     protected void AssertConnection()
     {
         if (this.Status != ConnectionState.Connected)

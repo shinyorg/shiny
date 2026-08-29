@@ -21,7 +21,12 @@ public interface IBleManager
     IObservable<AccessState> RequestAccess();
 
     /// <summary>
-    /// Returns a previously seen peripheral by its identifier, or null if it has not been observed in this session.
+    /// Returns a peripheral by its identifier, or null when it cannot be resolved. A peripheral seen in
+    /// this session is returned from cache; otherwise the platform is asked, so a caller holding a
+    /// persisted identifier can reconnect after a process restart without scanning again. Whether an
+    /// unseen peripheral resolves is platform-dependent — Apple consults CoreBluetooth's known
+    /// peripherals, Android reconstructs the device from the identifier's address, and Windows resolves
+    /// only from cache.
     /// </summary>
     /// <param name="peripheralUuid">The platform-specific peripheral identifier.</param>
     /// <returns>The known peripheral instance, or null when not found.</returns>
