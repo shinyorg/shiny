@@ -19,6 +19,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     readonly BleManager manager;
     readonly IOperationQueue operations;
     readonly ILogger logger;
+    IDisposable? autoReconnectSub;
 
 
     public Peripheral(
@@ -66,6 +67,13 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     public void CancelConnection()
     {
+        // Disposed ahead of the Gatt null-check on purpose. After a dropped link Gatt is already
+        // null, so returning early with the subscription still live would let the auto-reconnect
+        // undo an explicit cancel. It also has to happen before the EmitConnectionState below,
+        // which would otherwise trip the reconnect itself.
+        this.autoReconnectSub?.Dispose();
+        this.autoReconnectSub = null;
+
         var gatt = this.Gatt;
         if (gatt == null)
             return;
@@ -90,16 +98,64 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     public void Connect(ConnectionConfig? config)
     {
+        AndroidConnectionConfig cfg = null!;
+        if (config == null)
+            cfg = new();
+        else if (config is AndroidConnectionConfig cfg1)
+            cfg = cfg1;
+        else
+            cfg = new AndroidConnectionConfig(config.AutoConnect);
+
+        this.autoReconnectSub?.Dispose();
+        this.autoReconnectSub = null;
+
+        if (cfg.AutoConnect)
+            this.ArmAutoReconnect(cfg);
+
+        this.DoConnect(cfg);
+    }
+
+
+    /// <summary>
+    /// Re-issues ConnectGatt after a dropped link, mirroring the Apple peripheral's autoReconnectSub.
+    /// </summary>
+    /// <remarks>
+    /// Android only keeps its own background reconnect pending while the GATT client stays open, and
+    /// OnConnectionStateChange has to close it on every disconnect to release the platform's 7-client
+    /// limit and to terminate in-flight operations. Nothing re-opened it afterwards, so a peripheral
+    /// that dropped out of range or was power-cycled stayed disconnected forever even with
+    /// AutoConnect set.
+    /// </remarks>
+    void ArmAutoReconnect(AndroidConnectionConfig cfg)
+        => this.autoReconnectSub = this
+            .WhenStatusChanged()
+            // Skip the value the BehaviorSubject replays on subscribe, and skip it BEFORE
+            // filtering - filtering first means a replayed Connected is what gets dropped and
+            // the first real disconnect is swallowed instead.
+            .Skip(1)
+            .Where(x => x == ConnectionState.Disconnected)
+            // A peripheral that rejects the reconnect can produce a status 133 connect/disconnect
+            // storm. Debouncing paces that at one attempt per second instead of a tight loop.
+            .Throttle(TimeSpan.FromSeconds(1))
+            .Subscribe(_ => this.DoReconnect(cfg));
+
+
+    void DoReconnect(AndroidConnectionConfig cfg)
+    {
+        // Both CancelConnection and CloseExistingGatt can emit a Disconnected while a fresh
+        // connect is already in flight; reconnecting on one of those would tear down a live link.
+        var status = this.Status;
+        if (status is ConnectionState.Connected or ConnectionState.Connecting)
+            return;
+
+        this.DoConnect(cfg);
+    }
+
+
+    void DoConnect(AndroidConnectionConfig cfg)
+    {
         try
         {
-            AndroidConnectionConfig cfg = null!;
-            if (config == null)
-                cfg = new();
-            else if (config is AndroidConnectionConfig cfg1)
-                cfg = cfg1;
-            else
-                cfg = new AndroidConnectionConfig(config.AutoConnect);
-
             // Close any prior GATT client before opening a new one — otherwise
             // each retry leaks a client and Android's 7-client limit kicks in,
             // producing status 133 on subsequent connects.
