@@ -169,7 +169,7 @@ When generating BLE client code, follow these conventions:
 
 9. **Handle `BleException` and `BleOperationException`**: GATT operations can throw these. `BleOperationException` includes a `GattStatusCode`. An in-flight operation that is interrupted by a disconnect faults with a `BleException` rather than hanging, so always have an `onError` handler (or `catch`) on read/write/discovery calls — with auto-reconnect enabled, retry once the peripheral reports `Connected` again.
 
-10. **Connection auto-reconnect**: `ConnectionConfig.AutoConnect = true` (default) enables automatic reconnection. Set to `false` for faster initial connections.
+10. **Connection auto-reconnect**: `ConnectionConfig.AutoConnect = true` (default) reconnects the peripheral after a dropped link or a power cycle on every platform — never write your own `WhenDisconnected().Subscribe(_ => peripheral.Connect())` loop on top of it, the two fight each other. Set `AutoConnect = false` for a faster initial connection when you intend to own reconnecting. `CancelConnection()` disposes the auto-reconnect, so a deliberate disconnect stays disconnected; call `Connect()` again to re-arm it. Auto-reconnect restores the *link* only — re-run per-connection setup (MTU request, authentication handshake, reading a config characteristic) from `WhenConnected()`, not once after the first `ConnectAsync()`.
 
 ## L2CAP Channels
 

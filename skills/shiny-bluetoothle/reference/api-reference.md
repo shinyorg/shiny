@@ -164,8 +164,14 @@ public record ScanResult(
 ### ConnectionConfig
 
 ```csharp
-// Android: false disables auto-reconnect but speeds up initial connection
-// iOS: controls whether to reconnect automatically
+// true (default): the link is re-established after a drop or power cycle on every platform.
+//   Android - the OS holds a pending background connect; Shiny re-issues ConnectGatt after a
+//             drop (the GATT client has to be closed on disconnect, which cancels it), throttled
+//             to one attempt per second
+//   Apple   - retries on disconnect and on a failed connect, cancelling the pending connection first
+//   Windows - GattSession with MaintainConnection keeps the OS holding the link
+// false: faster initial connection, but you own reconnecting.
+// CancelConnection() disposes the auto-reconnect - call Connect() again to re-arm it.
 public record ConnectionConfig(bool AutoConnect = true);
 ```
 
@@ -1258,7 +1264,7 @@ bleManager
 
 2. **Connection times out**
    - The default timeout for `ConnectAsync` is 30 seconds. Increase via the `timeout` parameter.
-   - Set `ConnectionConfig.AutoConnect = false` for faster initial connections (disables auto-reconnect).
+   - Set `ConnectionConfig.AutoConnect = false` for faster initial connections (disables auto-reconnect - you reconnect yourself).
    - On Android, use `AndroidConnectionConfig` to set `GattConnectionPriority.High`.
 
 3. **GATT operations fail with BleOperationException**
@@ -1270,15 +1276,20 @@ bleManager
    - `NotifyCharacteristic()` will attempt to auto-reconnect if the observable is kept alive.
    - Make sure not to dispose the subscription if you want reconnection behavior.
 
-5. **Only one scan at a time**
+5. **Peripheral never comes back after going out of range / being powered off**
+   - Connect with `AutoConnect: true` (the default) - `Connect(new ConnectionConfig(AutoConnect: false))` means nothing reconnects it for you.
+   - An earlier `CancelConnection()` is final: it disposes the auto-reconnect, so call `Connect()` again to re-arm it.
+   - Per-connection setup does not replay itself - redo MTU requests, handshakes, and config reads from `WhenConnected()`.
+
+6. **Only one scan at a time**
    - `IBleManager.Scan()` only allows one active scan. Dispose the previous scan or call `StopScan()` before starting a new one.
    - Check `IsScanning` before starting a scan.
 
-6. **iOS background scanning**
+7. **iOS background scanning**
    - You MUST provide `ServiceUuids` in `ScanConfig` for background scanning on iOS.
    - Set a `RestoreIdentifier` in `AppleBleConfiguration` for state restoration.
    - Register an `IBleDelegate` for background event handling.
 
-7. **MTU negotiation returns same value**
+8. **MTU negotiation returns same value**
    - MTU requests are only supported on Android (`ICanRequestMtu`). On iOS/Windows, the OS handles MTU negotiation automatically.
    - Use `CanRequestMtu()` to check support, or `TryRequestMtu()` which gracefully falls back.
