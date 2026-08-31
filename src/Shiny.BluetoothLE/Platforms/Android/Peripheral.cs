@@ -170,6 +170,13 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             if (this.Gatt == null)
                 throw new BleException("GATT connection could not be established");
 
+            // A new client has discovered nothing, so reset here rather than relying on a teardown
+            // path having run first — turning the adapter off delivers no OnConnectionStateChange on
+            // some devices, so a consumer reconnecting from OnAdapterStateChanged arrives with the
+            // flag still false. GetNativeServices would then return this client's empty (not null)
+            // service list instead of discovering, and every lookup would throw for the connection's life.
+            this.RequiresServiceDiscovery = true;
+
             this.Gatt.RequestConnectionPriority(cfg.ConnectionPriority);
 
             this.EmitConnectionState(ConnectionState.Connecting);
