@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.ScreenRecorder</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny Screen Recorder - record the screen to an MP4 with optional microphone and system audio on Android (MediaProjection), iOS and Mac Catalyst (ReplayKit), macOS (ScreenCaptureKit) and Windows (Windows.Graphics.Capture)</Description>
+
+        <!-- imported explicitly below so Platforms\AppleShared can be added to all three Apple targets -->
+        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    </PropertyGroup>
+
+    <!--
+        Two unrelated interop needs, both of which LibraryImport insists are unsafe.
+
+        Windows: CsWinRT cannot hand out an IDirect3DDevice, so the capture path reaches d3d11.dll
+        for D3D11CreateDevice + CreateDirect3D11DeviceFromDXGIDevice.
+
+        macOS: CGPreflightScreenCaptureAccess / CGRequestScreenCaptureAccess are not bound in
+        Microsoft.macOS.dll and are the only way to drive the Screen Recording TCC prompt.
+
+        Same reason Shiny.Net.Wifi turns this on for wlanapi.dll.
+    -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) OR $(TargetFramework.Contains('-macos'))">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
+
+    <!--
+        The AVAssetWriter sample sink is identical on iOS, Mac Catalyst and macOS - ReplayKit and
+        ScreenCaptureKit both hand over CMSampleBuffers and the writer does not care which produced
+        them. Directory.Build.targets only shares Platforms\Shared, which Android and Windows also
+        compile and which therefore cannot reference AVFoundation. Hence an Apple-only shared folder.
+    -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos'))">
+        <Compile Include="Platforms\AppleShared\**\*.cs" />
+    </ItemGroup>
+
+</Project>

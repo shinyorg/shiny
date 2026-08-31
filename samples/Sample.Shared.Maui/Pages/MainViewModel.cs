@@ -69,6 +69,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             list.Add(new("⏰ Jobs", "Background job scheduling", "jobs"));
 
         // --- Network discovery ---
+        list.Add(new("🎬 Screen Recorder", "Record the screen to a video file", "screenrecorder"));
         list.Add(new("📶 Wi-Fi", "Scan, join & manage Wi-Fi networks", "wifi"));
         list.Add(new("🔎 mDNS / Bonjour", "Browse DNS-SD services on the local network", "mdns"));
         list.Add(new("🛰️ SSDP / UPnP", "Find routers, media servers & smart TVs", "ssdp"));

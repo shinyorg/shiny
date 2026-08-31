@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny Screen Recorder for Linux - records the screen through the xdg-desktop-portal ScreenCast API (Wayland and X11), encoding with GStreamer or FFmpeg</Description>
+        <RootNamespace>Shiny.ScreenRecorder</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+
+        <!-- stopping the encoder needs kill(2) - Process.Kill only sends SIGKILL, which loses the MP4 index -->
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Tmds.DBus.Protocol" />
+    </ItemGroup>
+</Project>

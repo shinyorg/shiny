@@ -10,6 +10,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBluetoothLE();
 builder.Services.AddGps();
 builder.Services.AddBlazorHttpTransfers<SampleHttpTransferDelegate>();
+builder.Services.AddScreenRecorder();
 builder.Services.AddPush<SamplePushDelegate>(new WebPushOptions
 {
     // Replace with your own VAPID public key generated for your push backend

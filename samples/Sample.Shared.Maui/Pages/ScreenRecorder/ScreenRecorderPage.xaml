@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.ScreenRecorder"
+             x:Class="Sample.Shared.Maui.Pages.ScreenRecorder.ScreenRecorderPage"
+             x:DataType="vm:ScreenRecorderViewModel"
+             Title="Screen Recorder">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="8">
+
+            <Label Text="Capabilities" FontAttributes="Bold" />
+            <Label Text="{Binding Capabilities}" FontSize="11" TextColor="Gray" />
+
+            <Label Text="{Binding Status}" FontAttributes="Italic" Margin="0,8,0,0" />
+            <Label Text="{Binding Elapsed, StringFormat='Elapsed: {0}'}" FontSize="20" FontAttributes="Bold" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+            <!-- audio switches only appear where the platform actually has the source -->
+            <HorizontalStackLayout Spacing="8" IsVisible="{Binding CanUseMicrophone}">
+                <Switch IsToggled="{Binding IncludeMicrophone, Mode=TwoWay}" />
+                <Label Text="Microphone" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="8" IsVisible="{Binding CanUseSystemAudio}">
+                <Switch IsToggled="{Binding IncludeSystemAudio, Mode=TwoWay}" />
+                <Label Text="System / app audio" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <!-- desktop only; Linux and the browser run their own picker during Start -->
+            <Label Text="Record" FontAttributes="Bold" Margin="0,8,0,0" IsVisible="{Binding CanPickTarget}" />
+            <Picker ItemsSource="{Binding Targets}"
+                    ItemDisplayBinding="{Binding Display}"
+                    SelectedItem="{Binding SelectedTarget, Mode=TwoWay}"
+                    Title="Whole primary display"
+                    IsVisible="{Binding CanPickTarget}" />
+
+            <Button Text="Start" Command="{Binding StartCommand}"
+                    IsVisible="{Binding CanRecord}" IsEnabled="{Binding IsNotRecording}" />
+
+            <Button Text="Pause / Resume" Command="{Binding TogglePauseCommand}"
+                    IsVisible="{Binding CanPause}" IsEnabled="{Binding IsRecording}" />
+
+            <Button Text="Stop" Command="{Binding StopCommand}" IsEnabled="{Binding IsRecording}" />
+            <Button Text="Discard" Command="{Binding CancelCommand}" IsEnabled="{Binding IsRecording}" />
+
+            <Label Text="Last Recording" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Label Text="{Binding LastResult}" FontSize="12" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

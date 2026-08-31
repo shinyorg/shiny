@@ -42,6 +42,10 @@
     <string>This app needs location access to demonstrate GPS features</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>This app needs background location for geofencing</string>
+    <!-- Shiny.ScreenRecorder: ReplayKit needs no entitlement to record this app's own UI, but
+         mixing the microphone into the recording does need this. -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Records narration alongside a screen recording of this app</string>
     <key>NSMotionUsageDescription</key>
     <string>This app uses motion activity recognition to detect walking, running, driving, and other activities</string>
     <key>NSContactsUsageDescription</key>

@@ -27,6 +27,10 @@ public static class MauiProgram
         s.AddDefaultRepository();
         s.AddHttpClientTransfers<SampleHttpTransferDelegate>();
 
+        // Screen recording through the xdg-desktop-portal ScreenCast API, encoded by gst-launch or
+        // ffmpeg. The compositor runs its own picker, so the sample page hides its target list here.
+        s.AddScreenRecorder();
+
         return builder.Build();
     }
 }

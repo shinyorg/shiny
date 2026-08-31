@@ -28,7 +28,10 @@
       "src\\Shiny.Push.Blazor\\Shiny.Push.Blazor.csproj",
       "src\\Shiny.Push\\Shiny.Push.csproj",
       "src\\Shiny.Core.Blazor\\Shiny.Core.Blazor.csproj",
-      "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj"
+      "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj",
+      "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
+      "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
+      "src\\Shiny.ScreenRecorder.Blazor\\Shiny.ScreenRecorder.Blazor.csproj"
     ]
   }
 }

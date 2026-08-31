@@ -1,0 +1,179 @@
+@page "/screenrecorder"
+@using Shiny.ScreenRecorder
+@implements IAsyncDisposable
+@inject IScreenRecorder Recorder
+
+<PageTitle>Screen Recorder</PageTitle>
+
+<h1>Screen Recorder</h1>
+
+<p>
+    Records through <code>getDisplayMedia</code> + <code>MediaRecorder</code>. The browser runs its
+    own picker — screens, windows and tabs — so there is no target list to choose from here. Needs
+    HTTPS (or localhost) and a real button click: browsers refuse screen capture outside a user
+    gesture, so this cannot be started from page load.
+</p>
+
+<table class="table">
+    <tbody>
+        <tr><th>Capabilities</th><td><code>@capabilities</code></td></tr>
+        <tr><th>Status</th><td>@status</td></tr>
+        <tr><th>Elapsed</th><td>@elapsed.ToString(@"mm\:ss")</td></tr>
+    </tbody>
+</table>
+
+<div class="mb-3 form-check">
+    <input class="form-check-input" type="checkbox" id="mic" @bind="includeMicrophone" disabled="@(!canMicrophone)" />
+    <label class="form-check-label" for="mic">Microphone</label>
+</div>
+
+<div class="mb-3 form-check">
+    <input class="form-check-input" type="checkbox" id="sys" @bind="includeSystemAudio" disabled="@(!canSystemAudio)" />
+    <label class="form-check-label" for="sys">Tab / system audio (Chromium only)</label>
+</div>
+
+<div class="mb-3">
+    <button class="btn btn-primary me-2" @onclick="Start" disabled="@(session != null)">Start</button>
+    <button class="btn btn-secondary me-2" @onclick="TogglePause" disabled="@(session == null)">Pause / Resume</button>
+    <button class="btn btn-danger me-2" @onclick="Stop" disabled="@(session == null)">Stop</button>
+</div>
+
+@if (result != null)
+{
+    <div class="alert alert-success">
+        <div>@result.Duration.ToString(@"mm\:ss") — @result.Width x @result.Height</div>
+        <div><code>@result.MimeType</code> — @($"{result.ByteSize / 1024d / 1024d:0.0} MB")</div>
+        <button class="btn btn-sm btn-outline-primary mt-2" @onclick="Download">Download</button>
+    </div>
+}
+
+@code {
+    IScreenRecording? session;
+    ScreenRecordingResult? result;
+    System.Threading.Timer? ticker;
+
+    string capabilities = "(probing)";
+    string status = "Idle";
+    TimeSpan elapsed;
+    bool includeMicrophone;
+    bool includeSystemAudio;
+    bool canMicrophone;
+    bool canSystemAudio;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // browser feature detection needs a JS round trip, and Capabilities is synchronous by
+        // contract - so it reports None until this has run
+        var caps = await ((BlazorScreenRecorder)Recorder).Probe();
+
+        capabilities = caps == ScreenRecorderCapabilities.None ? "None - this browser cannot record" : caps.ToString();
+        canMicrophone = caps.HasFlag(ScreenRecorderCapabilities.Microphone);
+        canSystemAudio = caps.HasFlag(ScreenRecorderCapabilities.SystemAudio);
+    }
+
+    async Task Start()
+    {
+        try
+        {
+            status = "Waiting for the browser picker...";
+            result = null;
+
+            session = await Recorder.Start(new ScreenRecordingRequest
+            {
+                IncludeMicrophone = includeMicrophone && canMicrophone,
+                IncludeSystemAudio = includeSystemAudio && canSystemAudio,
+                MaxWidth = 1280
+            });
+
+            // the browser's own "Stop sharing" bar ends the capture without going through Stop
+            session.Faulted += OnFaulted;
+
+            status = "Recording";
+            StartTicker();
+        }
+        catch (ScreenRecorderPermissionException ex)
+        {
+            status = $"Declined — {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            status = $"Failed — {ex.Message}";
+        }
+    }
+
+    async Task TogglePause()
+    {
+        if (session == null)
+            return;
+
+        if (session.IsPaused)
+        {
+            await session.Resume();
+            status = "Recording";
+        }
+        else
+        {
+            await session.Pause();
+            status = "Paused";
+        }
+    }
+
+    async Task Stop()
+    {
+        if (session == null)
+            return;
+
+        result = await session.Stop();
+        Clear();
+        status = "Stopped";
+    }
+
+    async Task Download()
+    {
+        if (result == null)
+            return;
+
+        // the container varies by browser - Chrome and Safari give MP4, Firefox gives WebM
+        var extension = result.MimeType.Contains("mp4") ? "mp4" : "webm";
+        await Recorder.DownloadRecording(result, $"screen-recording.{extension}");
+    }
+
+    void OnFaulted(object? sender, ScreenRecordingFaultedEventArgs e) => InvokeAsync(() =>
+    {
+        status = $"Ended by the browser — {e.Reason}";
+        result = e.Result;
+        Clear();
+        StateHasChanged();
+    });
+
+    void StartTicker()
+        => ticker = new System.Threading.Timer(
+            _ => InvokeAsync(() =>
+            {
+                elapsed = session?.Elapsed ?? elapsed;
+                StateHasChanged();
+            }),
+            null,
+            TimeSpan.Zero,
+            TimeSpan.FromMilliseconds(500)
+        );
+
+    void Clear()
+    {
+        if (session != null)
+            session.Faulted -= OnFaulted;
+
+        session = null;
+        ticker?.Dispose();
+        ticker = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        ticker?.Dispose();
+
+        // leaving a session running would keep the browser's sharing bar up after navigating away
+        if (session != null)
+            await session.DisposeAsync();
+    }
+}

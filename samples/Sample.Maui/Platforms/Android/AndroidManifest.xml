@@ -16,6 +16,12 @@
     
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <!-- Shiny.ScreenRecorder: MediaProjection needs a mediaProjection foreground service, which
+         from Android 14 must already be running before getMediaProjection is called. RECORD_AUDIO
+         covers both the microphone and app-audio playback capture. The service and the consent
+         activity come from the package and merge in automatically. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />

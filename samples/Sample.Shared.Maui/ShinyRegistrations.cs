@@ -63,6 +63,14 @@ public static class ShinyRegistrations
         s.AddWifi();
 #endif
 
+#if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
+        // Screen recording: what "the screen" means differs per platform - iOS and Mac Catalyst
+        // record this app's own UI only, and Windows has no audio at all. The sample page reads
+        // IScreenRecorder.Capabilities and only offers what the OS actually allows.
+        // Linux registers this from the Shiny.ScreenRecorder.Linux package instead.
+        s.AddScreenRecorder();
+#endif
+
 #if IOS || ANDROID || MACCATALYST
         // GPS / Geofencing: Shiny.Locations only has a concrete platform
         // implementation for iOS and Android today.

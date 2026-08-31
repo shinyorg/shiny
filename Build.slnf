@@ -36,7 +36,10 @@
             "src\\Shiny.Push\\Shiny.Push.csproj",
             "src\\Shiny.Push.AzureNotificationHubs\\Shiny.Push.AzureNotificationHubs.csproj",
             "src\\Shiny.Data.Sync\\Shiny.Data.Sync.csproj",
-            "src\\Shiny.Data.Sync.Blazor\\Shiny.Data.Sync.Blazor.csproj"
+            "src\\Shiny.Data.Sync.Blazor\\Shiny.Data.Sync.Blazor.csproj",
+            "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
+            "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
+            "src\\Shiny.ScreenRecorder.Blazor\\Shiny.ScreenRecorder.Blazor.csproj"
         ]
     }
 }

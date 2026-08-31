@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny Screen Recorder for Blazor WebAssembly - records the screen through getDisplayMedia and MediaRecorder, with optional microphone and tab audio</Description>
+        <RootNamespace>Shiny.ScreenRecorder</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
+        <ProjectReference Include="..\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.JSInterop" />
+    </ItemGroup>
+
+</Project>

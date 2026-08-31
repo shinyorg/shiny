@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Shiny.ScreenRecorder: ScreenCaptureKit's microphone capture (macOS 15+). The Screen
+         Recording grant itself is a TCC prompt, not an Info.plist key. -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Records narration alongside a screen recording</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses Bluetooth to scan for and connect to nearby devices</string>
     <key>NSBluetoothPeripheralUsageDescription</key>

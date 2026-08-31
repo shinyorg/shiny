@@ -14,6 +14,7 @@
         <Project Path="tests/Shiny.Net.Http.Tests/Shiny.Net.Http.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Discovery.Tests/Shiny.Net.Discovery.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Wifi.Tests/Shiny.Net.Wifi.Tests.csproj" />
+        <Project Path="tests/Shiny.ScreenRecorder.Tests/Shiny.ScreenRecorder.Tests.csproj" />
         <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
         <Project Path="tests/Shiny.Notifications.Tests/Shiny.Notifications.Tests.csproj" />
         <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
@@ -65,6 +66,7 @@
     <Project Path="src\Shiny.Notifications.Extensions.AI\Shiny.Notifications.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
     <Project Path="src\Shiny.Push\Shiny.Push.csproj" />
+    <Project Path="src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
         <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />
@@ -73,6 +75,7 @@
         <Project Path="src/Shiny.Locations.Blazor/Shiny.Locations.Blazor.csproj" />
         <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
         <Project Path="src/Shiny.Data.Sync.Blazor/Shiny.Data.Sync.Blazor.csproj" />
+        <Project Path="src\Shiny.ScreenRecorder.Blazor\Shiny.ScreenRecorder.Blazor.csproj" />
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
@@ -80,5 +83,6 @@
         <Project Path="src\Shiny.Core.Linux\Shiny.Core.Linux.csproj" />
         <Project Path="src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
         <Project Path="src\Shiny.Net.Wifi.Linux\Shiny.Net.Wifi.Linux.csproj" />
+        <Project Path="src\Shiny.ScreenRecorder.Linux\Shiny.ScreenRecorder.Linux.csproj" />
     </Folder>
 </Solution>
