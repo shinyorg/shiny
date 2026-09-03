@@ -58,6 +58,13 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     }
 
 
+    /// <summary>
+    /// Whether the central is actually powered on. Connect calls below this are silent no-ops, so
+    /// the peripheral parks them instead of issuing them (issue #1652).
+    /// </summary>
+    internal bool IsAdapterAvailable => this.Manager.State == CBManagerState.PoweredOn;
+
+
     public AccessState CurrentAccess => CBCentralManager.Authorization switch
     {
         CBManagerAuthorization.NotDetermined => AccessState.Unknown,
@@ -166,6 +173,13 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
             return;
 
         this.stateUpdatedSubj.OnNext(state);
+
+        // Keyed off the native state rather than the mapped AccessState: Resetting maps to
+        // Available, but CoreBluetooth invalidates every connection for it just as it does for
+        // PoweredOff. Ahead of the delegates on purpose - a consumer handling OnAdapterStateChanged
+        // should see peripheral state that already agrees with the adapter (issue #1652).
+        this.OnAdapterStateChanged(central.State == CBManagerState.PoweredOn);
+
         await this.services.RunDelegates<IBleDelegate>(
             x => x.OnAdapterStateChanged(state),
             this.logger
@@ -173,8 +187,27 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
     }
 
 
+    void OnAdapterStateChanged(bool available)
+    {
+        foreach (var peripheral in this.peripherals.Values)
+        {
+            try
+            {
+                if (available)
+                    peripheral.OnAdapterAvailable();
+                else
+                    peripheral.OnAdapterUnavailable();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Error applying adapter state to peripheral {Uuid}", peripheral.Uuid);
+            }
+        }
+    }
+
+
     void Clear() => this.peripherals
-        .Where(x => x.Value.Status != ConnectionState.Connected)
+        .Where(x => x.Value.Status != ConnectionState.Connected && !x.Value.IsAwaitingReconnect)
         .ToList()
         .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));
 

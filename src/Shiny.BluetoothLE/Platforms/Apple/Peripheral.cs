@@ -63,24 +63,34 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     {
         this.autoReconnectSub?.Dispose();
         this.autoReconnectSub = null;
+        this.pendingAdapterConnect = false;
         this.manager.Manager.CancelPeripheralConnection(this.Native);
     }
 
 
     public void Connect(ConnectionConfig? config = null)
     {
+        // Disposed unconditionally. A Connect that downgrades to AutoConnect: false has to take
+        // the previous subscription with it - otherwise the peripheral keeps reconnecting on a
+        // config that no longer asks for it, and OnAdapterAvailable (which keys off this being
+        // armed) reconnects it across an adapter power cycle too.
+        this.autoReconnectSub?.Dispose();
+        this.autoReconnectSub = null;
+
         var arc = config?.AutoConnect ?? true;
         if (arc)
         {
-            this.autoReconnectSub?.Dispose();
-
             var composite = new CompositeDisposable();
 
-            // Re-issue connect on disconnect. Skip(1) drops the seeded Disconnected
-            // value emitted by the BehaviorSubject on subscribe.
+            // Re-issue connect on disconnect. Skip the value the BehaviorSubject replays on
+            // subscribe, and skip it BEFORE filtering - filtering first (which WhenDisconnected
+            // does) means a replayed Connected is what gets dropped, and the first real disconnect
+            // is swallowed instead, so a Connect() on an already-connected peripheral never
+            // re-armed.
             composite.Add(this
-                .WhenDisconnected()
+                .WhenStatusChanged()
                 .Skip(1)
+                .Where(x => x == ConnectionState.Disconnected)
                 .Subscribe(_ => this.DoReconnect())
             );
 
@@ -105,6 +115,13 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
 
     void DoReconnect()
     {
+        // A Disconnected can be emitted while the link is already back up - ReceiveStateChange
+        // synthesizes one to repair a stale subject, and the adapter teardown emits one for a
+        // peripheral CoreBluetooth may reconnect on its own. Cancelling then would tear down a
+        // live connection.
+        if (this.Status is ConnectionState.Connected or ConnectionState.Connecting)
+            return;
+
         // Cancel any stale pending connection slot before re-issuing — iOS holds
         // the previous pending connection until you explicitly cancel it.
         try
@@ -148,6 +165,14 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     readonly BehaviorSubject<ConnectionState> connSubj = new(ConnectionState.Disconnected);
     internal void ReceiveStateChange(ConnectionState connStatus)
     {
+        // CoreBluetooth only calls didConnectPeripheral for a brand new link, so a Connected
+        // arriving while the subject still says Connected means the previous link died without a
+        // didDisconnectPeripheral. Swallowing it would leave a live peripheral whose status stream
+        // never fired and whose managed notifications were never re-hooked (issue #1652), so
+        // deliver the transition the platform never gave us instead.
+        if (connStatus == ConnectionState.Connected && this.connSubj.Value == ConnectionState.Connected)
+            this.ReceiveStateChange(ConnectionState.Disconnected);
+
         if (connStatus == ConnectionState.Disconnected)
         {
             this.ClearNotifiers();
@@ -156,6 +181,38 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
 
         if (this.connSubj.Value != connStatus)
             this.connSubj.OnNext(connStatus);
+    }
+
+
+    /// <summary>
+    /// The adapter went below PoweredOn. CoreBluetooth does not deliver didDisconnectPeripheral for
+    /// this, but the link is gone - Status already reads Disconnected off the platform - so run the
+    /// teardown a real disconnect would have (issue #1652).
+    /// </summary>
+    internal void OnAdapterUnavailable()
+    {
+        if (this.connSubj.Value is not (ConnectionState.Connected or ConnectionState.Connecting))
+            return;
+
+        this.logger.LogDebug("Adapter unavailable - disconnecting peripheral {Uuid}", this.Uuid);
+        this.ReceiveStateChange(ConnectionState.Disconnected);
+    }
+
+
+    /// <summary>
+    /// The adapter is back. Re-issue any connect that was parked while it was down, and re-arm
+    /// peripherals that were connected with AutoConnect (issue #1652).
+    /// </summary>
+    internal void OnAdapterAvailable()
+    {
+        if (!this.pendingAdapterConnect && this.autoReconnectSub == null)
+            return;
+
+        if (this.Status is ConnectionState.Connected or ConnectionState.Connecting)
+            return;
+
+        this.logger.LogDebug("Adapter available - reconnecting peripheral {Uuid}", this.Uuid);
+        this.DoReconnect();
     }
 
 
@@ -229,14 +286,39 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
     }
 
 
-    protected void DoConnect() => this.manager
-        .Manager
-        .ConnectPeripheral(this.Native, new PeripheralConnectionOptions
+    // Set when a connect was requested while the adapter was down. ConnectPeripheral below
+    // PoweredOn is an API-misuse no-op that CoreBluetooth never reports on, so the request is
+    // parked here and the manager replays it on power-on (issue #1652).
+    bool pendingAdapterConnect;
+
+
+    /// <summary>
+    /// Whether this peripheral is waiting on a reconnect - an armed auto-reconnect, or a connect
+    /// parked until the adapter returns. Starting a scan must not evict these (issue #1652): the
+    /// manager's adapter hooks only reach peripherals still in its dictionary, and the fresh
+    /// wrapper a later lookup mints has neither the subscription nor the parked request.
+    /// </summary>
+    internal bool IsAwaitingReconnect => this.autoReconnectSub != null || this.pendingAdapterConnect;
+
+    protected void DoConnect()
+    {
+        if (!this.manager.IsAdapterAvailable)
         {
-            NotifyOnDisconnection = true,
-            NotifyOnConnection = true,
-            NotifyOnNotification = true
-        });
+            this.pendingAdapterConnect = true;
+            this.logger.LogDebug("Connect deferred - bluetooth adapter is not available: {Uuid}", this.Uuid);
+            return;
+        }
+        this.pendingAdapterConnect = false;
+
+        this.manager
+            .Manager
+            .ConnectPeripheral(this.Native, new PeripheralConnectionOptions
+            {
+                NotifyOnDisconnection = true,
+                NotifyOnConnection = true,
+                NotifyOnNotification = true
+            });
+    }
 
 
     protected static BleOperationException ToException(NSError error, string message = "") =>

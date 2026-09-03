@@ -65,6 +65,12 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     public bool IsScanning { get; private set; }
     public BluetoothManager Native { get; }
 
+    /// <summary>
+    /// Whether the adapter is actually on. ConnectGatt below this either returns null or produces a
+    /// client that never connects, so the peripheral parks the request instead (issue #1652).
+    /// </summary>
+    internal bool IsAdapterAvailable => this.Native.Adapter?.IsEnabled ?? false;
+
 
     public IObservable<(Peripheral Peripheral, Intent Intent)> PeripheralIntents => this.peripheralEventSubj;
     readonly Subject<(Peripheral Peripheral, Intent Intent)> peripheralEventSubj = new();
@@ -145,6 +151,10 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
                 var status = newState == State.On
                     ? AccessState.Available
                     : AccessState.Disabled;
+
+                // Ahead of the delegates on purpose - a consumer handling OnAdapterStateChanged
+                // should see peripheral state that already agrees with the adapter (issue #1652).
+                this.OnAdapterStateChanged(newState == State.On);
 
                 await this.services
                     .RunDelegates<IBleDelegate>(
@@ -253,6 +263,25 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
 
+    void OnAdapterStateChanged(bool available)
+    {
+        foreach (var peripheral in this.peripherals.Values)
+        {
+            try
+            {
+                if (available)
+                    peripheral.OnAdapterAvailable();
+                else
+                    peripheral.OnAdapterUnavailable();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Error applying adapter state to peripheral {Uuid}", peripheral.Uuid);
+            }
+        }
+    }
+
+
     readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
     Peripheral GetPeripheral(BluetoothDevice device) => this.peripherals.GetOrAdd(
         device.Address!,
@@ -326,7 +355,8 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     void Clear() => this.peripherals
         .Where(x =>
             x.Value.Status != ConnectionState.Connected &&
-            x.Value.Status != ConnectionState.Connecting
+            x.Value.Status != ConnectionState.Connecting &&
+            !x.Value.IsAwaitingReconnect
         )
         .ToList()
         .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));

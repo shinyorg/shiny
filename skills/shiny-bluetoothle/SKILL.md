@@ -23,6 +23,13 @@ triggers:
   - TryRequestMtuAsync
   - ICanRequestMtu
   - BleConstants
+  - AutoConnect
+  - ConnectionConfig
+  - auto reconnect
+  - OnAdapterStateChanged
+  - IBleDelegate
+  - adapter state
+  - bluetooth off
   - AttHeaderSize
   - managed scan
   - ble notification
@@ -170,6 +177,8 @@ When generating BLE client code, follow these conventions:
 9. **Handle `BleException` and `BleOperationException`**: GATT operations can throw these. `BleOperationException` includes a `GattStatusCode`. An in-flight operation that is interrupted by a disconnect faults with a `BleException` rather than hanging, so always have an `onError` handler (or `catch`) on read/write/discovery calls — with auto-reconnect enabled, retry once the peripheral reports `Connected` again.
 
 10. **Connection auto-reconnect**: `ConnectionConfig.AutoConnect = true` (default) reconnects the peripheral after a dropped link or a power cycle on every platform — never write your own `WhenDisconnected().Subscribe(_ => peripheral.Connect())` loop on top of it, the two fight each other. Set `AutoConnect = false` for a faster initial connection when you intend to own reconnecting. `CancelConnection()` disposes the auto-reconnect, so a deliberate disconnect stays disconnected; call `Connect()` again to re-arm it. Auto-reconnect restores the *link* only — re-run per-connection setup (MTU request, authentication handshake, reading a config characteristic) from `WhenConnected()`, not once after the first `ConnectAsync()`.
+
+11. **The user toggling Bluetooth off/on is handled for you (5.6+, iOS/Mac Catalyst/macOS/Android)**: Do not re-implement it on those platforms. Neither OS reports the resulting drop per peripheral, so Shiny watches the adapter and, on power-down, runs the full disconnect teardown on every connected peripheral — `WhenStatusChanged()` emits `Disconnected` (agreeing with `IPeripheral.Status`, which reads the platform live), notifiers are cleared, in-flight operations fault with `BleException`, and on Android the GATT client is closed and service discovery re-armed. On power-up, every peripheral connected with `AutoConnect: true` is reconnected. Never write a `Connect()` call in `IBleDelegate.OnAdapterStateChanged(AccessState.Available)` for an `AutoConnect: true` peripheral — that is the pre-5.6 workaround and it now races Shiny's own reconnect. A `Connect()` issued while the adapter is off is parked and replayed when it returns rather than silently no-oping, so an explicit connect from that handler is safe but redundant. If you own reconnecting (`AutoConnect = false`), gate your `WhenDisconnected()` handler on the adapter being available, since you will now get a `Disconnected` on power-down. Starting a `Scan()` while a peripheral is waiting to reconnect is safe - the scan's cache prune skips peripherals with an armed auto-reconnect or a parked connect. Windows needs none of this (its `ConnectionStatusChanged` fires on a radio power-down by itself); on Linux (BlueZ) and Blazor the adapter cycle is *not* tracked, so there you still handle it yourself.
 
 ## L2CAP Channels
 

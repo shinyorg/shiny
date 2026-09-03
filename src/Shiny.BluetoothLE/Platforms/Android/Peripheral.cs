@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -73,6 +74,8 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         // which would otherwise trip the reconnect itself.
         this.autoReconnectSub?.Dispose();
         this.autoReconnectSub = null;
+        this.pendingAdapterConnect = false;
+        this.lastConfig = null;
 
         var gatt = this.Gatt;
         if (gatt == null)
@@ -108,6 +111,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
         this.autoReconnectSub?.Dispose();
         this.autoReconnectSub = null;
+        this.lastConfig = cfg;
 
         if (cfg.AutoConnect)
             this.ArmAutoReconnect(cfg);
@@ -127,7 +131,10 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     /// AutoConnect set.
     /// </remarks>
     void ArmAutoReconnect(AndroidConnectionConfig cfg)
-        => this.autoReconnectSub = this
+    {
+        var composite = new CompositeDisposable();
+
+        composite.Add(this
             .WhenStatusChanged()
             // Skip the value the BehaviorSubject replays on subscribe, and skip it BEFORE
             // filtering - filtering first means a replayed Connected is what gets dropped and
@@ -137,7 +144,32 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
             // A peripheral that rejects the reconnect can produce a status 133 connect/disconnect
             // storm. Debouncing paces that at one attempt per second instead of a tight loop.
             .Throttle(TimeSpan.FromSeconds(1))
-            .Subscribe(_ => this.DoReconnect(cfg));
+            .Subscribe(_ => this.DoReconnect(cfg))
+        );
+
+        // A ConnectGatt that fails outright emits nothing on the status stream - the exception
+        // only lands on connFailSubj - so the branch above can never fire again and the peripheral
+        // stays disconnected for the life of the process. That is most likely on the adapter-on
+        // replay (#1652), where the GATT binder is not always up the instant STATE_ON arrives and
+        // OnAdapterAvailable is the only thing re-issuing the parked connect. Apple retries from
+        // the equivalent stream for the same reason.
+        composite.Add(this
+            .WhenConnectionFailed()
+            .Throttle(TimeSpan.FromSeconds(1))
+            .Subscribe(_ =>
+            {
+                // connFailSubj replays a failure from up to 5s ago on subscribe, so a Connect()
+                // issued right after one would otherwise retry over its own in-flight attempt.
+                // Gatt is non-null exactly while a client is open - a pending autoConnect client
+                // included, which GetConnectionState still reports as Disconnected - so this is
+                // the reliable "already connecting" test on Android, unlike Status.
+                if (this.Gatt == null)
+                    this.DoReconnect(cfg);
+            })
+        );
+
+        this.autoReconnectSub = composite;
+    }
 
 
     void DoReconnect(AndroidConnectionConfig cfg)
@@ -152,8 +184,31 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
     }
 
 
+    // Set when a connect was requested while the adapter was off. ConnectGatt then either returns
+    // null or produces a client that never connects, and it is the adapter coming back - not any
+    // retry - that makes the request viable, so it is parked and replayed on adapter-on (#1652).
+    bool pendingAdapterConnect;
+    AndroidConnectionConfig? lastConfig;
+
+
+    /// <summary>
+    /// Whether this peripheral is waiting on a reconnect - an armed auto-reconnect, or a connect
+    /// parked until the adapter returns. Starting a scan must not evict these (issue #1652): the
+    /// manager's adapter hooks only reach peripherals still in its dictionary, and the fresh
+    /// wrapper a later lookup mints has neither the subscription nor the parked request.
+    /// </summary>
+    internal bool IsAwaitingReconnect => this.autoReconnectSub != null || this.pendingAdapterConnect;
+
     void DoConnect(AndroidConnectionConfig cfg)
     {
+        if (!this.manager.IsAdapterAvailable)
+        {
+            this.pendingAdapterConnect = true;
+            this.logger.LogDebug("Connect deferred - bluetooth adapter is not available: {Uuid}", this.Uuid);
+            return;
+        }
+        this.pendingAdapterConnect = false;
+
         try
         {
             // Close any prior GATT client before opening a new one — otherwise
@@ -306,28 +361,72 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         this.logger.ConnectionStateChange(status, newState);
 
         if (newState == ProfileState.Disconnected)
-        {
-            this.RequiresServiceDiscovery = true;
-            this.ClearNotifications();
-            this.ClearNotifiers();
-            this.BreakOperations();
-
-            try
-            {
-                gatt?.Close();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogWarning(ex, "Error closing GATT on disconnect");
-            }
-            this.Gatt = null;
-        }
+            this.TearDownConnection(gatt);
 
         // Push subscriber notifications off the GATT callback thread. The Binder
         // callback thread is single-threaded; subscribers that await on a queued
         // operation deadlock further callbacks otherwise.
         var nextState = newState.ToStatus();
         Task.Run(() => this.EmitConnectionState(nextState));
+    }
+
+
+    void TearDownConnection(BluetoothGatt? gatt)
+    {
+        this.RequiresServiceDiscovery = true;
+        this.ClearNotifications();
+        this.ClearNotifiers();
+        this.BreakOperations();
+
+        try
+        {
+            gatt?.Close();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Error closing GATT on disconnect");
+        }
+        this.Gatt = null;
+    }
+
+
+    /// <summary>
+    /// The adapter was turned off. Some devices (Samsung among them) deliver no
+    /// OnConnectionStateChange for this, so the GATT client is dead while the status stream still
+    /// says Connected - run the same teardown a reported disconnect gets (issue #1652).
+    /// </summary>
+    internal void OnAdapterUnavailable()
+    {
+        if (this.connSubj.Value is not (ConnectionState.Connected or ConnectionState.Connecting))
+            return;
+
+        this.logger.LogDebug("Adapter unavailable - disconnecting peripheral {Uuid}", this.Uuid);
+        this.TearDownConnection(this.Gatt);
+        this.EmitConnectionState(ConnectionState.Disconnected);
+    }
+
+
+    /// <summary>
+    /// The adapter is back. Re-issue any connect that was parked while it was off, and re-arm
+    /// peripherals that were connected with AutoConnect (issue #1652).
+    /// </summary>
+    internal void OnAdapterAvailable()
+    {
+        var cfg = this.lastConfig;
+        if (cfg == null)
+            return;
+
+        if (!this.pendingAdapterConnect && this.autoReconnectSub == null)
+            return;
+
+        // The throttled auto-reconnect may have already re-issued this one - a non-null client is
+        // the only state in which a connect is in flight, since every teardown nulls it.
+        if (this.Gatt != null)
+            return;
+
+        this.pendingAdapterConnect = false;
+        this.logger.LogDebug("Adapter available - reconnecting peripheral {Uuid}", this.Uuid);
+        this.DoReconnect(cfg);
     }
 
 
