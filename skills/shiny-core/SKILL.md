@@ -86,6 +86,8 @@ Two Core APIs differ on tvOS:
 - **`IIosLifecycle.INotificationHandler` does not exist on tvOS.** A tvOS notification can only change the app icon badge, so there is no `UNNotificationResponse` and nothing is presented in the foreground. Code implementing it must be inside `#if !TVOS`.
 - **`IBattery` reports `BatteryState.Full` / `Level` 1.0 permanently.** An Apple TV is mains powered and `UIDevice` carries no battery API on tvOS. `IBattery.Changed` never fires there.
 
+A complete UIKit tvOS host is in `samples/Sample.tvOS` — use its `AppDelegate` as the shape for tvOS hosting guidance.
+
 Modules with a `net10.0-tvos` target: `Shiny.Core`, `Shiny.Hosting.Native`, `Shiny.BluetoothLE`, `Shiny.Net.Discovery`, `Shiny.Jobs`, `Shiny.Net.Http`, `Shiny.Push`, `Shiny.ScreenRecorder`, `Shiny.Data.Sync`. Modules with **no** tvOS target, because Apple withholds the underlying API: `Shiny.BluetoothLE.Hosting` (no peripheral role), `Shiny.Net.Wifi` (no NetworkExtension hotspot APIs), `Shiny.Locations` (no `CLMonitor` geofencing), `Shiny.Notifications`, `Shiny.Contacts`, `Shiny.Calendar`.
 
 ### Companion Libraries

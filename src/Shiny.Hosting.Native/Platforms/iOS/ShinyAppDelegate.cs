@@ -14,7 +14,11 @@ public abstract class ShinyAppDelegate : UIApplicationDelegate
     public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
     {
         this.CreateShinyHost().Run();
-        return base.FinishedLaunching(application, launchOptions);
+
+        // NOT base.FinishedLaunching - didFinishLaunchingWithOptions is an optional protocol
+        // member, so the binding's base implementation throws You_Should_Not_Call_base_In_This_Method
+        // and takes the app down before the first frame
+        return true;
     }
 
     public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)

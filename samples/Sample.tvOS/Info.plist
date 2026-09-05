@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDisplayName</key>
+    <string>Shiny tvOS</string>
+    <key>CFBundleName</key>
+    <string>Shiny tvOS</string>
+    <key>CFBundleIdentifier</key>
+    <string>org.shiny.sample.tvos</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>arm64</string>
+    </array>
+
+    <!--
+        Shiny.Jobs. These four identifiers are what Shiny registers with BGTaskScheduler - one per
+        (external power x network) combination. Omit them and BGTaskScheduler.Register throws at
+        host boot. Identical to the iOS setup.
+    -->
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.shiny.job</string>
+        <string>com.shiny.jobpower</string>
+        <string>com.shiny.jobnet</string>
+        <string>com.shiny.jobpowernet</string>
+    </array>
+
+    <!--
+        processing        - Shiny.Jobs (BGTaskScheduler)
+        fetch             - background app refresh
+        remote-notification - Shiny.Push silent pushes
+
+        Note what is NOT here and cannot be: tvOS has no bluetooth-central background mode, which
+        is why BLE scanning in this sample stops when the app is suspended.
+    -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>processing</string>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
+
+    <!-- Shiny.BluetoothLE -->
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Finds nearby Bluetooth accessories</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Talks to nearby Bluetooth accessories</string>
+
+    <!--
+        Shiny.Net.Discovery. Bonjour browsing silently returns nothing unless every service type
+        you browse for is listed here - there is no error, just an empty network.
+    -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Finds media servers and other devices on your network</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_http._tcp</string>
+        <string>_http._tcp.local.</string>
+    </array>
+</dict>
+</plist>

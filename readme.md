@@ -58,6 +58,8 @@ What Apple withholds on tvOS, and what Shiny does about it:
 * **No battery.** `IBattery` reports permanently full - an Apple TV is mains powered and `UIDevice` carries no battery API there
 * **No Wi-Fi API and no geofencing.** `NEHotspotConfiguration`/`NEHotspotNetwork` and `CLMonitor` are absent, so `Shiny.Net.Wifi` and `Shiny.Locations` have no tvOS targets
 
+A working UIKit tvOS app exercising all of it lives in [`samples/Sample.tvOS`](samples/Sample.tvOS).
+
 ## AI Tools
 
 Optional `*.Extensions.AI` packages expose Shiny modules as [`Microsoft.Extensions.AI`](https://learn.microsoft.com/dotnet/ai/) tool functions (`AIFunction`s) for LLM agents. You opt-in exactly which operations the model can see - a read/write allow-list you control on behalf of the agent (this is *not* an OS permission prompt; the underlying platform permissions must already be granted). Resolve the generated `*AITools` bundle from DI and pass `.Tools` to any `IChatClient`. All are AOT-compatible (hand-built schemas, no reflection).

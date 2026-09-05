@@ -5,6 +5,9 @@
         <Project Path="samples\Sample.MacOS\Sample.MacOS.csproj" />
         <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
     </Folder>
+    <Folder Name="/NativeSamples/">
+        <Project Path="samples\Sample.tvOS\Sample.tvOS.csproj" />
+    </Folder>
     <Folder Name="/ServerSamples/">
         <Project Path="samples/Sample.Api/Sample.Api.csproj" />
     </Folder>
