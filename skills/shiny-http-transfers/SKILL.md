@@ -53,10 +53,12 @@ Use this skill when the user needs to:
 |-------------|-----------------------------------------------------------------------------------------|
 | NuGet       | `Shiny.Net.Http`, `Shiny.Net.Http.Blazor`                                               |
 | Namespace   | `Shiny.Net.Http`                                                                        |
-| Platforms   | iOS (native NSURLSession); Android, Windows, Linux, macOS, .NET base (managed HttpClient loop); Blazor WASM (Service Worker) |
-| DI Setup    | `services.AddHttpTransfers<TDelegate>()` (iOS/Android/Windows), `services.AddHttpClientTransfers<TDelegate>()` (Linux/macOS/plain .NET), or `services.AddBlazorHttpTransfers<TDelegate>()` (Blazor) |
+| Platforms   | iOS, tvOS (native NSURLSession); Android, Windows, Linux, macOS, .NET base (managed HttpClient loop); Blazor WASM (Service Worker) |
+| DI Setup    | `services.AddHttpTransfers<TDelegate>()` (iOS/tvOS/Android/Windows), `services.AddHttpClientTransfers<TDelegate>()` (Linux/macOS/plain .NET), or `services.AddBlazorHttpTransfers<TDelegate>()` (Blazor) |
 
 The registration extension methods live in the `Shiny` namespace and are available on `IServiceCollection`.
+
+**tvOS** uses `services.AddHttpTransfers<TDelegate>()` and the same background `NSUrlSession` as iOS, so transfers continue while the app is suspended. Storage is the difference worth calling out: an Apple TV has no user-visible file system and a small, evictable app container — write transfer output to the cache directory and treat a completed download as something the OS may reclaim between launches.
 
 ## Setup
 

@@ -64,6 +64,9 @@ public interface IIosLifecycle
         void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler);
     }
 
+#if !TVOS
+    // tvOS notifications only ever update the app icon badge - there is no UNNotificationResponse
+    // to hand back, and nothing is ever presented in the foreground
     /// <summary>
     /// Handles local and remote notification presentation and response
     /// </summary>
@@ -83,6 +86,7 @@ public interface IIosLifecycle
         /// <param name="completionHandler">The completion handler to call with presentation options</param>
         void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler);
     }
+#endif
 
     /// <summary>
     /// Handles background URL session events

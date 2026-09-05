@@ -39,7 +39,11 @@ Shiny.Jobs provides cross-platform background job scheduling and execution. On i
 |------------|----------------------------------------------------------------------------------------|
 | NuGet      | `Shiny.Jobs`                                                                           |
 | Namespace  | `Shiny.Jobs` (types); `Shiny` (registration extensions)                                |
-| Platforms  | iOS, Android, Windows (native OS); Linux, macOS, Blazor WASM, .NET base (in-process)   |
+| Platforms  | iOS, tvOS, Android, Windows (native OS); Linux, macOS, Blazor WASM, .NET base (in-process) |
+
+### tvOS
+
+tvOS carries the same `BGTaskScheduler` iOS does, so jobs schedule and run identically — same `BGTaskSchedulerPermittedIdentifiers` and `processing` background mode in Info.plist, same "the OS decides when" semantics. As on iOS, jobs do not run on the simulator. There is no MAUI on tvOS, so register through `Shiny.Hosting.Native`, not `UseShiny()`.
 
 ## Setup
 

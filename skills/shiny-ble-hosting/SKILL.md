@@ -110,7 +110,7 @@ Invoke this skill when the user wants to:
 
 - **NuGet**: `Shiny.BluetoothLE.Hosting` (Android, iOS/macOS, Mac Catalyst, Windows stub), `Shiny.BluetoothLE.Hosting.Linux` (Linux via BlueZ)
 - **Namespaces**: `Shiny.BluetoothLE.Hosting`
-- **Platforms**: iOS, Mac Catalyst, macOS (CoreBluetooth), Android, Linux (BlueZ). Windows throws `NotSupportedException` for advertising/GATT-server hosting; only the `OpenL2Cap` API is exposed and it also throws on Windows.
+- **Platforms**: iOS, Mac Catalyst, macOS (CoreBluetooth), Android, Linux (BlueZ). Windows throws `NotSupportedException` for advertising/GATT-server hosting; only the `OpenL2Cap` API is exposed and it also throws on Windows. **There is no tvOS target and there cannot be one** — `CBMutableService` and `CBMutableCharacteristic` have no constructors on tvOS, which is Apple's way of saying an Apple TV cannot act as a GATT peripheral. If asked to build a GATT server or advertise from tvOS, say it is impossible rather than generating code; the central role (`Shiny.BluetoothLE`) does support tvOS.
 - **Dependencies**: `Shiny.Core`, `Shiny.BluetoothLE.Common`
 
 Inject `IBleHostingManager` and call `AddService(uuid, primary, builder)` to register a GATT service inline, or declare it with `[BleService]` on a partial class and let the bundled source generator emit that call. The generator ships inside the same package under `analyzers/dotnet/cs` - no extra `PackageReference` needed.

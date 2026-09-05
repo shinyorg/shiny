@@ -6,6 +6,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
         
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
         <RootNamespace>Shiny</RootNamespace>

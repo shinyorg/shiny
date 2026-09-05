@@ -17,7 +17,9 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     readonly IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers;
     readonly IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers;
     readonly IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers;
+#if !TVOS
     readonly IEnumerable<IIosLifecycle.INotificationHandler> notificationHandlers;
+#endif
     readonly DisposableCollection disposer = new();
 
     public IosLifecycleExecutor(
@@ -26,8 +28,11 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
         IEnumerable<IIosLifecycle.IOnFinishedLaunching> finishLaunchingHandlers,
         IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers,
         IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers,
-        IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers,
+        IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers
+#if !TVOS
+        ,
         IEnumerable<IIosLifecycle.INotificationHandler> notificationHandlers
+#endif
     )
     {
         this.logger = logger;
@@ -36,7 +41,9 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
         this.bgUrlHandlers = bgUrlHandlers;
         this.remoteHandlers = remoteHandlers;
         this.activityHandlers = activityHandlers;
+#if !TVOS
         this.notificationHandlers = notificationHandlers;
+#endif
     }
 
 
@@ -57,6 +64,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
             .ObserveDidEnterBackground((_, _) => this.Execute(this.appHandlers, x => x.OnBackground())));
 
 
+#if !TVOS
         if (this.notificationHandlers != null && this.notificationHandlers.Any())
         {
             if (UNUserNotificationCenter.Current.Delegate != null)
@@ -71,6 +79,7 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
                 );
             }
         }
+#endif
     }
 
     public void OnRegisteredForRemoteNotifications(NSData deviceToken)
@@ -130,7 +139,9 @@ public class IosLifecycleExecutor : IShinyStartupTask, IDisposable
     public void Dispose()
     {
         this.disposer.Dispose();
+#if !TVOS
         if (UNUserNotificationCenter.Current.Delegate is ShinyUNUserNotificationCenterDelegate)
             UNUserNotificationCenter.Current.Delegate = null;
+#endif
     }
 }

@@ -38,7 +38,7 @@ jobs:
       uses: actions/setup-dotnet@v6
       with:
           dotnet-version: '10.0.300'
-          workloads: maui-ios, maui-android, maui-maccatalyst, maui-windows, macos, wasm-tools
+          workloads: maui-ios, maui-android, maui-maccatalyst, maui-windows, macos, tvos, wasm-tools
 
     - name: Build
       run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true

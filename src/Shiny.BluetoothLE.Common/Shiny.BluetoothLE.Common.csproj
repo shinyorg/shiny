@@ -7,6 +7,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
         
         <Description>Shiny BluetoothLE - Common components for Hosting and Client</Description>
         <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>

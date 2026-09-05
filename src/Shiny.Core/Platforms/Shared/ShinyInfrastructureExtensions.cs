@@ -42,7 +42,7 @@ public static class ShinyInfrastructureExtensions
             sp.GetServices<IAndroidLifecycle.IOnActivityResult>()
         ));
         services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<AndroidLifecycleExecutor>());
-#elif IOS || MACCATALYST
+#elif IOS || MACCATALYST || TVOS
         services.AddSingleton<IosPlatform>();
         services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<IosPlatform>());
 

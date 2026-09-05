@@ -6,6 +6,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
         
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
     </PropertyGroup>

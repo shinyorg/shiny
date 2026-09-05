@@ -23,8 +23,11 @@ public class PushManager(
 ) :
     IApplePushManager,
     IIosLifecycle.IOnFinishedLaunching,
-    IIosLifecycle.IRemoteNotifications,
+    IIosLifecycle.IRemoteNotifications
+#if !TVOS
+    ,
     IIosLifecycle.INotificationHandler
+#endif
 {
     static readonly NSString apsKey = new("aps");
     static readonly NSString alertKey = new("alert");
@@ -170,7 +173,13 @@ public class PushManager(
 
 
     public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+#if TVOS
+        // tvOS notifications only ever update the app icon badge - asking for Alert or Sound gets
+        // you nothing and the authorization prompt is the poorer for it
+        => this.RequestAccess(UNAuthorizationOptions.Badge, cancelToken);
+#else
         => this.RequestAccess(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, cancelToken);
+#endif
 
 
     public async Task UnRegister()
@@ -217,6 +226,9 @@ public class PushManager(
     }
 
 
+#if !TVOS
+    // Neither hook exists on tvOS: notifications there can only change the app icon badge, so
+    // nothing is presented in the foreground and there is no UNNotificationResponse to tap through
     // This is called when notification is received in the app.
     public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
     {
@@ -275,6 +287,7 @@ public class PushManager(
                 platform.InvokeOnMainThread(() => completionHandler.Invoke());
             });
     }
+#endif
 
 
     public void OnRegistered(NSData deviceToken) => this.tokenSource?.TrySetResult(deviceToken);
@@ -318,6 +331,10 @@ public class PushManager(
     // This is called when app is fresh launched.
     public void Handle(UIApplicationLaunchEventArgs args)
     {
+#if TVOS
+        // tvOS does not surface the launching remote notification on UIApplicationLaunchEventArgs -
+        // a silent push that wakes the app arrives through OnDidReceive instead
+#else
         if (args.RemoteNotifications == null)
             return;
 
@@ -331,9 +348,13 @@ public class PushManager(
             x => x.OnEntry(push),
             logger
         );
+#endif
     }
 
 
+#if !TVOS
+    // UNNotificationContent on tvOS has no Title, Body or UserInfo - the only thing a tvOS
+    // notification carries is the badge count - so there is no payload here to project
     protected virtual void TryProcessIncomingNotification(UNNotification? notification, string logMessage, Action<PushNotification> completionHandler)
     {
         // if this errors, high level event hub will catch
@@ -366,6 +387,7 @@ public class PushManager(
    
         return data;
     }
+#endif
 
 
     protected virtual Notification? ToNotification(NSDictionary data)

@@ -127,6 +127,9 @@ public static class AppleExtensions
 #elif MACCATALYST
         if (OperatingSystem.IsMacCatalystVersionAtLeast(ifVersion.Value))
             return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
+#elif TVOS
+        if (OperatingSystem.IsTvOSVersionAtLeast(ifVersion.Value))
+            return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
 #endif
         return false;
     }

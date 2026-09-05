@@ -76,10 +76,19 @@ Do NOT use this skill for BLE hosting/peripheral mode (advertising, GATT server)
 
 ## Library Overview
 
-- **NuGet Package**: `Shiny.BluetoothLE` (Android, iOS/macOS, Windows), `Shiny.BluetoothLE.Linux` (Linux via BlueZ), `Shiny.BluetoothLE.Blazor` (Blazor WebAssembly via Web Bluetooth API)
+- **NuGet Package**: `Shiny.BluetoothLE` (Android, iOS/tvOS/macOS, Windows), `Shiny.BluetoothLE.Linux` (Linux via BlueZ), `Shiny.BluetoothLE.Blazor` (Blazor WebAssembly via Web Bluetooth API)
 - **Primary Namespace**: `Shiny.BluetoothLE`
 - **Managed Scan Namespace**: `Shiny.BluetoothLE.Managed`
-- **Platforms**: Android, iOS/macOS (Apple), Windows, Linux (BlueZ), WebAssembly (Web Bluetooth)
+- **Platforms**: Android, iOS/tvOS/macOS (Apple), Windows, Linux (BlueZ), WebAssembly (Web Bluetooth)
+
+### tvOS
+
+tvOS runs the same CoreBluetooth central implementation as iOS — scanning, connecting, GATT and L2CAP are identical and there is **no tvOS-specific code to write**. Two Apple limits to encode in any guidance you generate:
+
+- **No background Bluetooth.** tvOS has no `bluetooth-central` background mode. Scans and connections end when the app suspends, and setting `AppleBleConfiguration.RestoreIdentifier` accomplishes nothing — do not suggest it for tvOS.
+- **No peripheral role.** `Shiny.BluetoothLE.Hosting` has no tvOS target; `CBMutableService`/`CBMutableCharacteristic` carry no constructors there. If asked to build a GATT server on tvOS, say it is not possible rather than producing code that cannot compile.
+
+Also worth mentioning when relevant: the Siri Remote is itself a BLE device, so an Apple TV has fewer simultaneous connections to spare than an iPhone.
 
 ### Blazor WebAssembly / Web Bluetooth caveats
 

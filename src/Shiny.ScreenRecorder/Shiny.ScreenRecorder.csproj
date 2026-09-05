@@ -7,6 +7,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
 
         <RootNamespace>Shiny.ScreenRecorder</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -45,7 +46,7 @@
         them. Directory.Build.targets only shares Platforms\Shared, which Android and Windows also
         compile and which therefore cannot reference AVFoundation. Hence an Apple-only shared folder.
     -->
-    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos'))">
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos')) OR $(TargetFramework.Contains('-tvos'))">
         <Compile Include="Platforms\AppleShared\**\*.cs" />
     </ItemGroup>
 

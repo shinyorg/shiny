@@ -163,7 +163,7 @@ throws `WifiNotSupportedException` with a message naming the exact limit.
 | GitHub     | https://github.com/shinyorg/shiny                                              |
 | NuGet      | `Shiny.Net.Wifi`, plus `Shiny.Net.Wifi.Linux` on Linux                          |
 | Namespace  | `Shiny.Net.Wifi` (types); `Shiny` (registration extensions)                      |
-| Platforms  | Android, iOS, Mac Catalyst, macOS, Windows, Linux                               |
+| Platforms  | Android, iOS, Mac Catalyst, macOS, Windows, Linux. **No tvOS target** — `NEHotspotConfiguration` and `NEHotspotNetwork` do not exist on tvOS, so there is no way to join a network, read the SSID, scan, or raise a hotspot there |
 
 ### How each platform is backed
 

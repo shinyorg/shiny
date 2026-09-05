@@ -53,7 +53,18 @@ Use this skill when the user needs to:
 | **NuGet (Azure NH)** | `Shiny.Push.AzureNotificationHubs` |
 | **Primary Namespace** | `Shiny.Push` |
 | **Config Namespace** | `Shiny` (extension methods on `IServiceCollection`) |
-| **Platforms** | iOS (APNs), Android (FCM), Windows (WNS), WebAssembly (experimental) |
+| **Platforms** | iOS (APNs), tvOS (APNs, silent/badge only), Android (FCM), Windows (WNS), WebAssembly (experimental) |
+
+### tvOS
+
+tvOS registers with APNs and delivers **silent (background) pushes** exactly as iOS does — `IPushDelegate.OnReceived` fires and token handling is identical. What tvOS does not have is a notification a user can see or tap:
+
+- `UNNotificationContent` on tvOS carries only a badge count — no title, no body, no user info.
+- There is no `UNNotificationResponse`, so **`IPushDelegate.OnEntry` is never raised on tvOS** and nothing is presented in the foreground. Never generate tvOS code or guidance that relies on `OnEntry` or on a user tapping a push.
+- `RequestAccess()` requests `UNAuthorizationOptions.Badge` alone on tvOS. Do not pass Alert or Sound to the `RequestAccess(UNAuthorizationOptions)` overload there — they do nothing.
+- `IApplePushDelegate.GetPresentationOptions` is never called on tvOS.
+
+Treat a tvOS push as a signal to go fetch data, not as a message to read.
 
 ## Setup
 

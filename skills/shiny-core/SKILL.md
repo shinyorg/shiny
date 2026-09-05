@@ -75,7 +75,18 @@ Shiny.Core is the foundational library for the Shiny ecosystem. It provides the 
 |------------|---------------------------------|
 | NuGet      | `Shiny.Core` (pulls in `Shiny.Extensions.DependencyInjection` + `Shiny.Extensions.Stores`) |
 | Namespace  | `Shiny`, `Shiny.Hosting`, `Shiny.Net`, `Shiny.Power`, `Shiny.Collections`, `Shiny.Extensions.Stores` (storage), `Shiny.Extensions.Configuration` (remote config) |
-| Platforms  | iOS, Mac Catalyst, macOS, Android, Windows, Linux, Blazor WebAssembly, plain .NET |
+| Platforms  | iOS, tvOS, Mac Catalyst, macOS, Android, Windows, Linux, Blazor WebAssembly, plain .NET |
+
+### tvOS
+
+tvOS reuses the iOS platform layer wholesale — the same `ShinyAppDelegate` (from `Shiny.Hosting.Native`), `IosPlatform`, `IosLifecycleExecutor` and `IIosLifecycle.*` hooks. There is no tvOS-specific hosting code to write, and **there is no MAUI on tvOS**, so a tvOS head always hosts through `Shiny.Hosting.Native` — never generate `UseShiny()` / `MauiProgram.cs` guidance for tvOS.
+
+Two Core APIs differ on tvOS:
+
+- **`IIosLifecycle.INotificationHandler` does not exist on tvOS.** A tvOS notification can only change the app icon badge, so there is no `UNNotificationResponse` and nothing is presented in the foreground. Code implementing it must be inside `#if !TVOS`.
+- **`IBattery` reports `BatteryState.Full` / `Level` 1.0 permanently.** An Apple TV is mains powered and `UIDevice` carries no battery API on tvOS. `IBattery.Changed` never fires there.
+
+Modules with a `net10.0-tvos` target: `Shiny.Core`, `Shiny.Hosting.Native`, `Shiny.BluetoothLE`, `Shiny.Net.Discovery`, `Shiny.Jobs`, `Shiny.Net.Http`, `Shiny.Push`, `Shiny.ScreenRecorder`, `Shiny.Data.Sync`. Modules with **no** tvOS target, because Apple withholds the underlying API: `Shiny.BluetoothLE.Hosting` (no peripheral role), `Shiny.Net.Wifi` (no NetworkExtension hotspot APIs), `Shiny.Locations` (no `CLMonitor` geofencing), `Shiny.Notifications`, `Shiny.Contacts`, `Shiny.Calendar`.
 
 ### Companion Libraries
 

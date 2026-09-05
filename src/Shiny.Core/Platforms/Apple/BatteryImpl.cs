@@ -1,4 +1,27 @@
 // derived from dotnet MAUI source code
+#if TVOS
+using System;
+using Shiny.Power;
+
+namespace Shiny.Power;
+
+
+/// <summary>
+/// Apple TV runs on mains power and UIDevice carries none of the battery API on tvOS, so this
+/// reports a permanently full battery rather than pretending to monitor one.
+/// </summary>
+public class BatteryImpl : IBattery
+{
+    public event EventHandler? Changed
+    {
+        add { }
+        remove { }
+    }
+
+    public BatteryState Status => BatteryState.Full;
+    public double Level => 1.0;
+}
+#else
 using System;
 using System.Threading;
 using UIKit;
@@ -83,3 +106,4 @@ public class BatteryImpl : IBattery
         }
     }
 }
+#endif

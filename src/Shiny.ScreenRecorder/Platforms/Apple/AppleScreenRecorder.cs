@@ -35,12 +35,18 @@ public class AppleScreenRecorder(ILogger<AppleScreenRecorder> logger) : Abstract
             // no cursor to draw, no display or window to choose, and ReplayKit offers no say over
             // the capture frame rate - it delivers what the compositor produces. Bitrate and
             // downscaling are ours because we own the AVAssetWriter.
-            return ScreenRecorderCapabilities.Recording
+            var caps = ScreenRecorderCapabilities.Recording
                 | ScreenRecorderCapabilities.PauseResume
-                | ScreenRecorderCapabilities.Microphone
                 | ScreenRecorderCapabilities.SystemAudio
                 | ScreenRecorderCapabilities.BitrateControl
                 | ScreenRecorderCapabilities.Downscaling;
+
+#if !TVOS
+            // there is no microphone on an Apple TV, and RPScreenRecorder carries no
+            // MicrophoneEnabled on tvOS to ask for one
+            caps |= ScreenRecorderCapabilities.Microphone;
+#endif
+            return caps;
         }
     }
 
@@ -61,6 +67,11 @@ public class AppleScreenRecorder(ILogger<AppleScreenRecorder> logger) : Abstract
         if (!request.IncludeMicrophone)
             return AccessState.Available;
 
+#if TVOS
+        // Microphone is never advertised on tvOS, so a request that asks for it has already been
+        // rejected by validation - this is here only to keep the branch honest
+        return AccessState.NotSupported;
+#else
         var granted = await AVCaptureDevice
             .RequestAccessForMediaTypeAsync(AVAuthorizationMediaType.Audio)
             .ConfigureAwait(false);
@@ -69,6 +80,7 @@ public class AppleScreenRecorder(ILogger<AppleScreenRecorder> logger) : Abstract
             this.Logger.PermissionRefused("Microphone access was denied. Add NSMicrophoneUsageDescription to Info.plist and approve the prompt");
 
         return granted ? AccessState.Available : AccessState.Denied;
+#endif
     }
 
 

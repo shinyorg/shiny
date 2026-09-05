@@ -29,7 +29,7 @@ public class Host : IHost
     public static ILoggerFactory LoggingFactory => Current.Logging;
     public static T? GetService<T>() => ServiceProvider.GetService<T>();
 
-#if IOS || MACCATALYST
+#if IOS || MACCATALYST || TVOS
     public static IosPlatform Platform => ServiceProvider.GetRequiredService<IosPlatform>();
     public static IosLifecycleExecutor Lifecycle => ServiceProvider.GetRequiredService<IosLifecycleExecutor>();
 #elif MACOS

@@ -24,7 +24,7 @@ public static class DataSyncServiceCollectionExtensions
     )
         where TDelegate : class, IDataSyncDelegate
     {
-#if IOS || MACCATALYST
+#if IOS || MACCATALYST || TVOS
         services.AddSingletonAsImplementedInterfaces<Shiny.Data.Sync.DataSyncManager>();
 #elif ANDROID
         services.AddSingletonAsImplementedInterfaces<Shiny.Data.Sync.DataSyncManager>();

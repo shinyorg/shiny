@@ -19,7 +19,7 @@ public class JobManager(
 
     public void Start()
     {
-#if IOS
+#if IOS || TVOS
         if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
             return;
 #endif
@@ -48,7 +48,7 @@ public class JobManager(
         if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             result = AccessState.NotSupported;
 
-#if IOS
+#if IOS || TVOS
         else if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
             result = AccessState.NotSupported;
 #endif
@@ -116,7 +116,7 @@ public class JobManager(
 
     void ScheduleNative(JobRegistration reg)
     {
-#if IOS
+#if IOS || TVOS
         if (ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR)
             return;
 #endif

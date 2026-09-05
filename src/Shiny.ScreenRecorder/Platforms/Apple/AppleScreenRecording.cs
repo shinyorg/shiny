@@ -52,8 +52,10 @@ class AppleScreenRecording : AbstractScreenRecording
         var recorder = RPScreenRecorder.SharedRecorder;
         recorder.Delegate = this.recorderDelegate;
 
+#if !TVOS
         // must be set before capture starts; toggling it afterwards is ignored
         recorder.MicrophoneEnabled = this.Request.IncludeMicrophone;
+#endif
 
         var tcs = new TaskCompletionSource();
         using var registration = ct.Register(() => tcs.TrySetCanceled(ct));

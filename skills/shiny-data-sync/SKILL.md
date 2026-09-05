@@ -47,7 +47,7 @@ Do **not** use this skill for: large file uploads/downloads (use `shiny-http-tra
 |-------------|-----------------------------------------------------------------------------------------|
 | NuGet       | `Shiny.Data.Sync`, `Shiny.Data.Sync.Blazor`                                             |
 | Namespace   | `Shiny.Data.Sync`                                                                       |
-| Platforms   | iOS / Mac Catalyst (NSURLSession background, both outbox upload + inbox download); Android (Foreground Service + HttpClient); Windows / Linux / base .NET (HttpClient + connectivity loop); Blazor WASM (HttpClient + LocalStorage) |
+| Platforms   | iOS / tvOS / Mac Catalyst (NSURLSession background, both outbox upload + inbox download); Android (Foreground Service + HttpClient); Windows / Linux / base .NET (HttpClient + connectivity loop); Blazor WASM (HttpClient + LocalStorage) |
 | DI Setup    | `services.AddDataSync<TDelegate>(builder => ...)` on all native platforms (auto-picks NSURLSession / Foreground Service / HttpClient based on TFM), `services.AddBlazorDataSync<TDelegate>(...)` on Blazor WASM |
 
 ## Setup
@@ -230,7 +230,7 @@ await sync.CancelAll();                       // entire outbox (in-flight inbox 
 
 | Platform | Outbox transport | Inbox transport | Survives app kill? |
 |---|---|---|---|
-| iOS / Mac Catalyst | Background `NSURLSession` upload task | Background `NSURLSession` download task | **Yes** (both directions) |
+| iOS / tvOS / Mac Catalyst | Background `NSURLSession` upload task | Background `NSURLSession` download task | **Yes** (both directions) |
 | Android | Foreground Service + HttpClient | HttpClient (in-process) | Outbox **yes** (notification visible while syncing); inbox no |
 | Windows / Linux / base .NET | HttpClient + connectivity loop | HttpClient + connectivity loop | No — resumes on next launch |
 | Blazor WASM | HttpClient + LocalStorage | HttpClient + LocalStorage | No — syncs while tab is open |

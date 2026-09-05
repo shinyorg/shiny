@@ -110,20 +110,22 @@ recording that silently came out without the microphone is worse than one that r
 
 ## Capability matrix
 
-| | Android | iOS / Mac Catalyst | macOS 15+ | macOS 12.3-14 | Windows | Linux | Blazor WASM |
-|---|---|---|---|---|---|---|---|
-| What is recorded | system screen | **this app only** | system screen | system screen | system screen | system screen | user's pick |
-| Record | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Pause / Resume | ✅ | ✅ synth | ❌ | ✅ synth | ✅ synth | ❌ | ✅ **native** |
-| Microphone | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| System audio | ✅ API 29+ (app audio) | ✅ (app audio) | ✅ | ✅ | ❌ | ✅ | ⚠️ Chromium, tab only |
-| Pick a display | ❌ | ❌ | ✅ | ✅ | ✅ | portal picker | browser picker |
-| Pick a window | ❌ | ❌ | ✅ | ✅ | ✅ | portal picker | browser picker |
-| Hide the cursor | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Frame rate | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Bitrate | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Downscale | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Result has a file path | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ **null** |
+| | Android | iOS / Mac Catalyst | tvOS | macOS 15+ | macOS 12.3-14 | Windows | Linux | Blazor WASM |
+|---|---|---|---|---|---|---|---|---|
+| What is recorded | system screen | **this app only** | **this app only** | system screen | system screen | system screen | system screen | user's pick |
+| Record | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Pause / Resume | ✅ | ✅ synth | ✅ synth | ❌ | ✅ synth | ✅ synth | ❌ | ✅ **native** |
+| Microphone | ✅ | ✅ | ❌ **no mic** | ✅ | ❌ | ❌ | ✅ | ✅ |
+| System audio | ✅ API 29+ (app audio) | ✅ (app audio) | ✅ (app audio) | ✅ | ✅ | ❌ | ✅ | ⚠️ Chromium, tab only |
+| Pick a display | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | portal picker | browser picker |
+| Pick a window | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | portal picker | browser picker |
+| Hide the cursor | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Frame rate | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Bitrate | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Downscale | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Result has a file path | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ **null** |
+
+**tvOS** is the same ReplayKit implementation as iOS. The only difference is the microphone: an Apple TV has none, `RPScreenRecorder` carries no `MicrophoneEnabled` on tvOS, so `ScreenRecorderCapabilities.Microphone` is not advertised and `IncludeMicrophone = true` is rejected by request validation. Never generate a tvOS recording request that sets it.
 
 ### The four things users most often ask for that cannot be done
 

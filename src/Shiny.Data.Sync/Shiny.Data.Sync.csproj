@@ -6,6 +6,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
 
         <Description>Shiny addon for reliable, background-capable bidirectional JSON data sync over HTTP</Description>
     </PropertyGroup>

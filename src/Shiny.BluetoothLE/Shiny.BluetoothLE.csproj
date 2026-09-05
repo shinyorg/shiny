@@ -7,6 +7,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
         
         <Description>Shiny Reactive BluetoothLE Plugin for client/central operations</Description>
     </PropertyGroup>

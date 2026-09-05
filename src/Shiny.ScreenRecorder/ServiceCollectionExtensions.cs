@@ -39,7 +39,7 @@ public static class ScreenRecorderServiceCollectionExtensions
             sp.GetRequiredService<AndroidPlatform>(),
             sp.GetRequiredService<ILogger<AndroidScreenRecorder>>()
         ));
-#elif IOS || MACCATALYST
+#elif IOS || MACCATALYST || TVOS
         services.AddSingleton<IScreenRecorder>(sp => new AppleScreenRecorder(
             sp.GetRequiredService<ILogger<AppleScreenRecorder>>()
         ));

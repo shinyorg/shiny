@@ -35,6 +35,7 @@
         <IosTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-ios</IosTarget>
         <MacCatalystTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-maccatalyst</MacCatalystTarget>
         <MacOsTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-macos</MacOsTarget>
+        <TvOsTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-tvos</TvOsTarget>
         <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">$(BaseTargetFramework)-windows10.0.19041.0</WindowsTarget>
     </PropertyGroup>
 
@@ -67,6 +68,17 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-macos'))">
+        <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
+    </PropertyGroup>
+
+    <!--
+        tvOS reuses the iOS platform code - IosPlatform, IosLifecycleExecutor and the UIApplication
+        notifications are all present - so it defines APPLE and picks up Platforms\Apple. What it does
+        not have is the peripheral/GATT-server role, NetworkExtension's hotspot APIs, CLMonitor, or
+        any notification a user can tap; those are carved out with #if TVOS at the call site.
+    -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-tvos'))">
+        <SupportedOSPlatformVersion>17.0</SupportedOSPlatformVersion>
         <DefineConstants>$(DefineConstants);APPLE;PLATFORM</DefineConstants>
     </PropertyGroup>
 

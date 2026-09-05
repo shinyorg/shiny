@@ -103,7 +103,7 @@ speak the others.
 | GitHub     | https://github.com/shinyorg/shiny                                                          |
 | NuGet      | `Shiny.Net.Discovery`                                                                      |
 | Namespace  | `Shiny.Net.Discovery` (types); `Shiny` (registration extensions)                            |
-| Platforms  | iOS, Mac Catalyst, macOS, Android, Windows, Linux, server .NET                              |
+| Platforms  | iOS, tvOS, Mac Catalyst, macOS, Android, Windows, Linux, server .NET                        |
 
 ### How each platform is backed
 
@@ -111,7 +111,7 @@ speak the others.
 
 | Platform                     | Implementation                | Why                                                       |
 |------------------------------|-------------------------------|-----------------------------------------------------------|
-| iOS / Mac Catalyst / macOS   | `NSNetService` (Bonjour)      | Goes through the system mDNSResponder, so **no** `com.apple.developer.networking.multicast` entitlement |
+| iOS / tvOS / Mac Catalyst / macOS | `NSNetService` (Bonjour) | Goes through the system mDNSResponder, so **no** `com.apple.developer.networking.multicast` entitlement |
 | Android                      | `NsdManager`                  | No `CHANGE_WIFI_MULTICAST_STATE` and no `WifiManager.MulticastLock` |
 | Windows / Linux / server .NET| Managed responder on UDP 5353 | No OS DNS-SD API to lean on; dependency-free, AOT-safe     |
 

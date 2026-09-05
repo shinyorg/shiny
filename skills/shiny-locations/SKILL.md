@@ -68,7 +68,7 @@ Use this skill when the user needs to:
 |------------|------------------------------|
 | NuGet      | `Shiny.Locations` (MAUI), `Shiny.Locations.Blazor` (Blazor WASM) |
 | Namespace  | `Shiny.Locations`            |
-| Platforms  | iOS, Android, Windows, Blazor WebAssembly (foreground GPS only) |
+| Platforms  | iOS, Android, Windows, Blazor WebAssembly (foreground GPS only). **No tvOS target** — `CLMonitor`, `CLMonitorConfiguration` and `CLRegionState` are absent on tvOS, so geofencing cannot be implemented there |
 | DI Namespace | `Shiny` (extension methods on `IServiceCollection`) |
 | Support Library | `Shiny.Support.Locations` (provides `Position` and `Distance`) |
 

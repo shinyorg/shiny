@@ -13,7 +13,7 @@ public static class HttpTransferServiceCollectionExtensions
     public static IServiceCollection AddHttpTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services)
         where TDelegate : class, IHttpTransferDelegate
     {
-#if IOS || MACCATALYST
+#if IOS || MACCATALYST || TVOS
         services.AddSingletonAsImplementedInterfaces<HttpTransferManager>();
 #elif ANDROID
         // Register the Android platform HttpTransferManager so transfers run inside
