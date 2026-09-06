@@ -1,7 +1,7 @@
 # Plan: Live Activity interactivity & alert sound
 
 Status: **proposal** — nothing here is committed work.
-Last updated: 2026-09-06 (decisions 1 and 3 settled; the Android channel fix has shipped)
+Last updated: 2026-09-06 (Phase 0 spike run — see [Phase 0 results](#phase-0-results); decisions 1 and 3 settled; the Android channel fix has shipped)
 
 ## Summary
 
@@ -25,9 +25,9 @@ Scope decisions taken up front:
 | Decision | Choice | Consequence |
 |---|---|---|
 | iOS action buttons | **Declared in C#, rendered by SwiftUI** | The widget owns layout, so C# can only supply ids/titles for it to draw. Actions therefore ride in content-state, which makes this a **wire-contract change** (see [Cross-repo](#cross-repo-coordination)). |
-| iOS interactivity floor | **iOS 17** for in-place actions | `LiveActivityIntent` is 17.0+. The module targets 16.2, so 16.2–16.x degrades to Phase 2 deep-links rather than losing the activity. |
+| iOS interactivity floor | **iOS 17.2** for in-place actions | Declared as 17.0, but the metadata processor clamps every intent up to 17.2 (measured, Phase 0 result 4). The module targets 16.2, so 16.2–17.1 degrades to Phase 2 deep-links rather than losing the activity. |
 | Android alert sound | **Channel-level, not per-alert** | A notification channel owns its sound from API 26. `LiveActivityAlert.Sound` is honestly documented as iOS-only; Android gets a one-time channel setting. |
-| Widget/framework wiring | **Undecided — gated on the Phase 0 spike** | If AppIntents will not match a copied source file, the widget extension must *link* `ShinyLiveActivities.framework`, which breaks the current template instructions. |
+| Widget/framework wiring | **Link the framework** (settled by Phase 0) | A copied source file compiles into the widget's own module and yields a different mangled type. The widget must link `ShinyLiveActivities.framework`, which breaks the current template instructions. |
 
 ## SDK verification
 
@@ -52,7 +52,7 @@ These cannot be designed away and should be documented rather than papered over.
 |---|---|---|
 | Alert sound | Per-alert, on `AlertConfiguration` | Channel property (API 26+); cannot vary per notification |
 | Action buttons | Baked into your SwiftUI; C# supplies ids/titles only | Fully C#-declared per notification via `Notification.Builder.AddAction` |
-| Interactivity floor | iOS 17 in-place; 16.2 deep-links only | Works everywhere the module works |
+| Interactivity floor | iOS 17.2 in-place; 16.2–17.1 deep-links only | Works everywhere the module works |
 | Action dispatch | `LiveActivityIntent.perform()` in the app process | `PendingIntent` → `BroadcastReceiver` |
 
 ## The open risk
@@ -97,6 +97,101 @@ Prove, in a throwaway MAUI app:
 
 Outcome: confirm or kill Phase 3, and settle the template's copy-vs-link question either way.
 
+## Phase 0 results
+
+Run 2026-09-06 against Xcode 26.6 (17F113), iOS SDK 26.5, in a scratch copy of
+`native/ShinyLiveActivities` plus a throwaway host app and the widget template. Six builds; no device
+was involved, so everything below is build-time evidence. **The two runtime questions remain open.**
+
+### 1. The intent itself is fine ✅
+
+`ShinyLiveActivityActionIntent : AppIntent, LiveActivityIntent` with `@Parameter` properties compiles
+in the framework, and Xcode runs `appintentsmetadataprocessor` over it, emitting
+`ShinyLiveActivities.framework/Metadata.appintents`.
+
+### 2. Copy vs link — the risk was real ✅ *(answers open decision 2)*
+
+The same source file, compiled two ways:
+
+| Built as | `fullyQualifiedTypeName` | `mangledTypeNameV2` |
+|---|---|---|
+| Framework | `ShinyLiveActivities.ShinyLiveActivityActionIntent` | `19ShinyLiveActivities0aB20ActivityActionIntentV` |
+| Widget, copied source | `ShinyLiveActivityWidgetTemplate.ShinyLiveActivityActionIntent` | `31ShinyLiveActivityWidgetTemplate0abC12ActionIntentV` |
+
+The `identifier` matches (`ShinyLiveActivityActionIntent`) but the **type does not** — the module name
+is baked into the mangled name. **The widget must link `ShinyLiveActivities.framework`, not copy the
+Swift.** When it links, the `.appex` emits no metadata of its own and `otool -L` shows
+`@rpath/ShinyLiveActivities.framework/ShinyLiveActivities` — one definition, which is the correct
+topology.
+
+This settles the template's copy-vs-link contradiction in favour of *link*.
+
+### 3. The blocker: a linking app gets no metadata at all 🔴
+
+An app that merely links the framework produces **no `Metadata.appintents` bundle whatsoever**. The
+framework's intents are not merged automatically.
+
+Adding `AppIntentsPackage` on both sides fixes it, and reveals the mechanism — the app does *not* copy
+the intents, it **references** them:
+
+```
+HostApp.app/Metadata.appintents/extract.packagedata
+  {"version":1,"includes":["19ShinyLiveActivities0abC7PackageV"]}
+
+HostApp.app/Frameworks/ShinyLiveActivities.framework/Metadata.appintents/extract.actionsdata
+  actions: [ShinyLiveActivityActionIntent, ...]
+```
+
+So the chain is: **app package → framework package → framework's actions.** Both halves are required.
+
+**The problem is the app half.** It is `struct MyAppPackage: AppIntentsPackage` — *Swift, in the app
+target*. A .NET MAUI app has no Swift app target, and the .NET iOS SDK has **no AppIntents awareness at
+all**: nothing in `Microsoft.iOS.Sdk 26.5.9004` invokes `appintentsmetadataprocessor` or handles
+`Metadata.appintents`. A MAUI app therefore never generates the bundle, and the include chain can never
+form by ordinary means.
+
+**Workaround, viable but ugly.** The format is now known and tiny, so the NuGet package could ship a
+prebuilt `Metadata.appintents` as a `BundleResource`: `extract.packagedata` with the framework
+package's mangled name, an empty `extract.actionsdata` skeleton, and `version.json`. That pins an
+undocumented format, hard-codes a mangled Swift name, and stamps an Xcode version into `generator` —
+so it needs a guard test that rebuilds the framework and asserts the mangled name still matches.
+
+### 4. The floor is iOS 17.2, not 17.0 ⚠️
+
+Three intents declared `@available(iOS 17.0, *)` — including a plain `AppIntent` with no
+`LiveActivityIntent` conformance — all came out of the processor stamped `introducedVersion: 17.2`. A
+control declared `@available(iOS 18.0, *)` echoed `18.0`, so the processor clamps *up* to a 17.2 floor
+rather than ignoring the annotation. Cause not identified; the behaviour is consistent. **Phase 2's
+deep-link fallback therefore has to cover 16.2–17.1, not 16.2–16.x.**
+
+### 5. Incidental repo finding ⚠️
+
+`native/ShinyLiveActivities/project.yml` puts `BUILD_LIBRARY_FOR_DISTRIBUTION: YES` in `settings.base`,
+so the `ShinyLiveActivityWidgetTemplate` **app-extension** target inherits it. That is meaningless for
+an appex, and it hard-fails the build the moment the template gains an `AppIntent` — swiftinterface
+verification rejects `@Parameter`'s unavailable `init()`. Harmless today, a trap for Phase 3. One line
+to fix whenever it is touched.
+
+### Still unproven — needs a device 🔶
+
+Nothing above required running the app, and these two cannot be answered without a physical device and
+a human tapping a button:
+
+1. That `perform()` genuinely executes **in the app's process** for a .NET MAUI app once the metadata
+   chain is in place.
+2. That iOS **background-launches** the app for it when the app is not running.
+
+Both are documented Apple behaviour, and Shiny already relies on the same relaunch path for background
+`NSURLSession`. Neither is verified here.
+
+### Verdict
+
+Phase 3 is **not dead, but materially harder than assumed**. The Swift side is straightforward; the
+cost is entirely in the plumbing — the widget must link the framework, and the NuGet package must
+synthesize an app-level metadata bundle that the .NET iOS SDK has no notion of. Recommend deciding
+whether that plumbing is worth it *before* writing any of the Phase 3 API, and shipping Phase 2's
+deep-links regardless, since they now cover 16.2–17.1 and cost almost nothing.
+
 ## Phase 1 — alert sound
 
 Independent of the spike. Small. Ship first.
@@ -132,7 +227,7 @@ setting the OS will not let the app change afterwards.
 
 ## Phase 2 — deep-link actions
 
-Small, no contract change, and it is the **only** option on iOS 16.2–16.x.
+Small, no contract change, and it is the **only** option on iOS 16.2–17.1 (see [Phase 0 result 4](#4-the-floor-is-ios-172-not-170) — the AppIntents floor is 17.2, not 17.0).
 
 - Add `widgetURL(_:)` / `Link(destination:)` to `templates/WidgetExtension/ShinyLiveActivityWidget.swift`,
   built from a value in `content.Data` so no new content-state field is needed.
@@ -178,7 +273,7 @@ per-notification, so they may change on every update at no cost.
   `startObservingWithStarted:token:pushToStart:state:` already uses
   (`ShinyActivityBridge.swift:231`).
 - The template renders `Button(intent:)` per entry in `context.state.actions`, guarded
-  `if #available(iOS 17, *)` with the Phase 2 deep-link as the fallback below it.
+  `if #available(iOS 17.2, *)` with the Phase 2 deep-link as the fallback below it.
 
 ### The contract change
 
@@ -211,10 +306,15 @@ Watch the 4KB content-state cap; a handful of actions is comfortably inside it.
    drift there fails silently. Phase 3 is not blocked on this.
 3. ✅ **`LiveActivityOptions` shipped on its own** as Phase 1a (2026-09-06), ahead of alert sound.
 
+2. ✅ **Answered by the spike**: a copied source file does *not* match, so the widget must link the
+   framework. Whether that is acceptable is now folded into decision 5.
+
 ## Open decisions
 
-2. **If the spike says a copied source file will not match**, is requiring the widget extension to
-   link `ShinyLiveActivities.framework` acceptable — or should Phase 3 be dropped and Phase 2 stand as
-   the answer for actions? **Not answerable until Phase 0 runs.**
 4. **Is an Android channel sound worth exposing at all**, given it can only be set at channel creation
    and cannot be changed afterwards without resetting the user's own settings? Raised by Phase 1a.
+5. **Is Phase 3 worth its plumbing?** It now costs: the widget extension linking the framework
+   (breaking the current template instructions), an `AppIntentsPackage` in the framework, and a
+   hand-synthesized `Metadata.appintents` shipped as a `BundleResource` because the .NET iOS SDK does
+   not generate one — against an alternative (Phase 2 deep-links) that costs almost nothing and now
+   covers every device below iOS 17.2.
