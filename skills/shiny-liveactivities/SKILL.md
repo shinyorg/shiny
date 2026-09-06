@@ -134,6 +134,49 @@ public class OrderTracker(ILiveActivityManager activities)
 `GetAll()` returns what is currently running (newest first) and `EndAll()` clears everything — call it on
 logout. Pass a `LiveActivityAlert` to `Update` to surface a banner instead of refreshing silently.
 
+## What C# can and cannot express
+
+Get this wrong and you will generate code that cannot work. Two separate limits:
+
+**1. The layout is never C#.** WidgetKit requires SwiftUI in a widget extension signed with the app's own
+bundle id. C# only ever sends *state*. Never generate C# that tries to describe a Lock Screen or Dynamic
+Island layout, and never suggest a package that would.
+
+**2. There is exactly one `ActivityAttributes` type.** ActivityKit needs a concrete `Codable` type at
+compile time, so Shiny pins a single `ShinyActivityAttributes` and routes everything app-specific through
+string dictionaries.
+
+| Strongly typed | Free-form |
+|---|---|
+| `title`, `body`, `shortStatus`, `progress`, `progressStart`, `progressEnd`, `indeterminate` | `data` (dynamic), `values` (static, from `LiveActivityRequest.Attributes`) |
+
+Consequences to respect when generating code:
+
+- **Custom fields must be strings.** Flatten numbers, dates, objects and arrays into `Data` on the C# side
+  and parse them in Swift. Only the progress family is typed. Do not invent typed properties on
+  `LiveActivityContent`.
+- **One attributes type per app.** Use `Kind` as the discriminator (`switch context.attributes.kind` in the
+  widget), not several `ActivityAttributes` structs. A push-to-start payload names `ShinyActivityAttributes`
+  as its `attributes-type`.
+- **4KB content-state cap**, easier to hit with everything stringified.
+
+**Out of reach through this package** — say so rather than generating something that compiles and does
+nothing:
+
+- **Interactive activities.** A `Button`/`Toggle` backed by an `AppIntent` lives in the Swift extension, and
+  `ILiveActivityDelegate` has no action callback (only `OnStarted`, `OnStateChanged`, and the two token
+  events). Bridging back to .NET needs an app group or URL scheme the developer wires themselves.
+- **Alert sound.** `LiveActivityAlert` is title + body only.
+
+**What fits:** anything whose changing state is title / body / short status / progress / stale date /
+relevance score plus a string bag — delivery tracking, rideshare ETA, sports scores, timers, workouts,
+transfer progress.
+
+If a genuinely typed schema is required, the only route is forking `ShinyActivityAttributes.swift` in
+**both** `native/ShinyLiveActivities/` and `templates/WidgetExtension/` plus `LiveActivityContentSchema` —
+which leaves the contract shared with `Shiny.Extensions.Push`, where drift fails silently. Flag that
+tradeoff rather than doing it silently.
+
 ## Prefer a time range over a fraction
 
 ```csharp
