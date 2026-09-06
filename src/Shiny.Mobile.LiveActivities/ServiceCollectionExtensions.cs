@@ -1,4 +1,6 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.LiveActivities;
 
@@ -14,8 +16,24 @@ public static class LiveActivitiesServiceCollectionExtensions
     /// registered.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    public static IServiceCollection AddLiveActivities(this IServiceCollection services)
+    /// <param name="configure">
+    /// Optional configuration. Android-only today - it localizes the notification channel's name and
+    /// description, which are otherwise hard-coded English.
+    /// </param>
+    public static IServiceCollection AddLiveActivities(
+        this IServiceCollection services,
+        Action<LiveActivityOptions>? configure = null
+    )
     {
+        // A caller that configures nothing must not overwrite options someone else already set - the
+        // iOS transfer progress renderer calls this itself when the app has not
+        if (configure != null || services.All(x => x.ServiceType != typeof(LiveActivityOptions)))
+        {
+            var options = new LiveActivityOptions();
+            configure?.Invoke(options);
+            services.AddSingleton(options);
+        }
+
 #if PLATFORM
         services.AddSingletonAsImplementedInterfaces<LiveActivityManager>();
 #else
@@ -32,11 +50,13 @@ public static class LiveActivitiesServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TDelegate">Your <see cref="ILiveActivityDelegate"/> implementation.</typeparam>
     /// <param name="services">The service collection.</param>
+    /// <param name="configure">Optional configuration - see the non-generic overload.</param>
     public static IServiceCollection AddLiveActivities<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(
-        this IServiceCollection services
+        this IServiceCollection services,
+        Action<LiveActivityOptions>? configure = null
     ) where TDelegate : class, ILiveActivityDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
-        return services.AddLiveActivities();
+        return services.AddLiveActivities(configure);
     }
 }

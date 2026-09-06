@@ -1,7 +1,7 @@
 # Plan: Live Activity interactivity & alert sound
 
 Status: **proposal** — nothing here is committed work.
-Last updated: 2026-09-06
+Last updated: 2026-09-06 (decisions 1 and 3 settled; the Android channel fix has shipped)
 
 ## Summary
 
@@ -101,21 +101,31 @@ Outcome: confirm or kill Phase 3, and settle the template's copy-vs-link questio
 
 Independent of the spike. Small. Ship first.
 
+### Phase 1a — Android channel options ✅ **done**
+
+Split out and shipped on its own as the localization fix (open decision 3). `LiveActivityOptions` +
+`AddLiveActivities(configure)` / `AddLiveActivities<TDelegate>(configure)` now carry `ChannelName` and
+`ChannelDescription`; `EnsureChannel()` no longer skips when the channel exists, because a repeat
+`createNotificationChannel` with the same id is how Android updates a name and description - so a
+translation that ships after first launch still reaches the user's settings screen.
+
+Importance and sound are deliberately **not** options: Android ignores both once the channel exists,
+and they belong to the user from that point. That constrains Phase 1b below.
+
+### Phase 1b — alert sound (remaining)
+
 **iOS**
 - `LiveActivityAlert` gains `string? Sound` — null keeps `.default`, any other value maps to
   `.named(value)`. There is no silent option in `AlertSound`; an alerting update always makes noise.
 - `ShinyActivityBridge.update(...)` gains an `alertSound:` parameter; replace the hardcoded
   `sound: .default` at `ShinyActivityBridge.swift:120`. Update `ApiDefinition.cs` to match.
 
-**Android**
-- Introduces `LiveActivityOptions` and an `AddLiveActivities(Action<LiveActivityOptions>)` overload —
-  the module currently has no options object at all.
-- Carries channel sound, name, description and importance. `EnsureChannel()` in
-  `src/Shiny.Mobile.LiveActivities/Platforms/Android/LiveActivityManager.cs:244` presently hardcodes
-  the English strings `"Live Activities"` and `"Ongoing updates such as deliveries, timers and
-  scores"` — **a localization bug worth fixing on its own merits**, independent of sound.
-- Keep the existing guard: importance must stay at least `Default` or Android 16 refuses to promote
-  the notification.
+**Android** — `LiveActivityOptions` already exists after Phase 1a, so this is only the sound itself.
+Note the constraint found while doing 1a: a channel's sound is fixed **at creation** and Android
+ignores it on every subsequent `createNotificationChannel`. So an app that ships a custom sound in an
+update cannot apply it to users who already ran the old build without changing `ChannelId`, which
+resets the user's own preferences. Decide whether that is worth exposing at all, or whether Android
+should simply be documented as "channel default, set by the user".
 
 **Docs** — state plainly that `Alert.Sound` is iOS-only and that Android sound is a one-time channel
 setting the OS will not let the app change afterwards.
@@ -193,12 +203,18 @@ Watch the 4KB content-state cap; a handful of actions is comfortably inside it.
 | `~/Desktop/dev/documentation` | `liveactivities/` pages, widget template setup, release notes | 1–3 |
 | this repo | `skills/shiny-liveactivities/SKILL.md` trigger list + constraints section | 1–3 |
 
+## Decisions taken
+
+1. ✅ **The additive `actions` content-state field is accepted in principle** (2026-09-06). Existing
+   servers are unaffected because it is optional; the cost accepted is that both Swift `ContentState`
+   copies gain a field that must stay in step with the C# and the server payload forever after, and
+   drift there fails silently. Phase 3 is not blocked on this.
+3. ✅ **`LiveActivityOptions` shipped on its own** as Phase 1a (2026-09-06), ahead of alert sound.
+
 ## Open decisions
 
-1. **Is the additive `actions` content-state field acceptable?** Old servers are unaffected, but both
-   Swift `ContentState` copies must gain it and stay in step forever after.
 2. **If the spike says a copied source file will not match**, is requiring the widget extension to
    link `ShinyLiveActivities.framework` acceptable — or should Phase 3 be dropped and Phase 2 stand as
-   the answer for actions?
-3. **Should Phase 1's `LiveActivityOptions` ship on its own** as a localization fix for the Android
-   channel strings, ahead of any of this?
+   the answer for actions? **Not answerable until Phase 0 runs.**
+4. **Is an Android channel sound worth exposing at all**, given it can only be set at channel creation
+   and cannot be changed afterwards without resetting the user's own settings? Raised by Phase 1a.

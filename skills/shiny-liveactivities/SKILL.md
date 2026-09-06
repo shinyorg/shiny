@@ -21,6 +21,10 @@ triggers:
   - LiveActivityContentSchema
   - LiveActivityState
   - AddLiveActivities
+  - LiveActivityOptions
+  - ChannelName
+  - ChannelDescription
+  - notification channel localization
   - push to start token
   - PushToStartToken
   - OnPushToStartTokenChanged
@@ -78,6 +82,22 @@ builder.Services.AddLiveActivities();
 // or, if you push updates from a server — the delegate is the ONLY way to learn the tokens
 builder.Services.AddLiveActivities<MyLiveActivityDelegate>();
 ```
+
+Both overloads take an optional `Action<LiveActivityOptions>`. It is **Android-only** — iOS has no
+channel and nothing app-settable to configure:
+
+```csharp
+builder.Services.AddLiveActivities(o =>
+{
+    o.ChannelName        = Strings.LiveActivityChannelName;   // shown in Android notification settings
+    o.ChannelDescription = Strings.LiveActivityChannelBlurb;
+});
+```
+
+Always localize these. They default to English (`"Live Activities"` / `"Ongoing updates such as
+deliveries, timers and scores"`) and are re-applied on every startup, so a translation that ships after
+first launch still lands. Channel **importance and sound are not configurable** - Android ignores both
+once the channel exists, and from that point they belong to the user.
 
 ## Start, update, end
 

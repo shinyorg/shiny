@@ -23,6 +23,7 @@ namespace Shiny.LiveActivities;
 public class LiveActivityManager(
     IServiceProvider services,
     AndroidPlatform platform,
+    LiveActivityOptions options,
     ILogger<LiveActivityManager> logger
 ) : ILiveActivityManager
 {
@@ -247,12 +248,18 @@ public class LiveActivityManager(
             return;
 
         var manager = this.NotificationManager;
-        if (manager == null || manager.GetNotificationChannel(ChannelId) != null)
+        if (manager == null)
             return;
 
+        // Deliberately not skipped when the channel already exists. Android treats a repeat
+        // createNotificationChannel with the same id as an update of the name and description - which is
+        // how a localized string that shipped after first launch ever reaches the user's settings screen.
+        // Importance and sound are ignored on that path: once the channel exists those belong to the user,
+        // which is also why neither is an option here.
+        //
         // Importance must be at least Default or Android 16 will refuse to promote the notification.
-        var channel = new NotificationChannel(ChannelId, "Live Activities", NotificationImportance.Default);
-        channel.Description = "Ongoing updates such as deliveries, timers and scores";
+        var channel = new NotificationChannel(ChannelId, options.ChannelName, NotificationImportance.Default);
+        channel.Description = options.ChannelDescription;
         manager.CreateNotificationChannel(channel);
     }
 
