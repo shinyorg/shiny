@@ -1,6 +1,8 @@
 # Plan: Live Activity interactivity & alert sound
 
-Status: **proposal** — nothing here is committed work.
+Status: **capped at Phase 2** (2026-09-06). Phase 1a has shipped. Phase 3 is shelved — not
+rejected, but not being built now; revisit if the plumbing cost in [Phase 0 results](#phase-0-results)
+ever looks worth it.
 Last updated: 2026-09-06 (Phase 0 spike run — see [Phase 0 results](#phase-0-results); decisions 1 and 3 settled; the Android channel fix has shipped)
 
 ## Summary
@@ -239,7 +241,11 @@ Not true interactivity — it opens the app — but it covers a large share of r
 
 ## Phase 3 — true interactivity
 
-**Contingent on Phase 0.**
+> **Shelved 2026-09-06.** Phase 0 ran and moved the cost from "write some Swift" to "work around the
+> .NET iOS SDK having no AppIntents support" — the widget must link the framework, and the package
+> must hand-synthesize an app-level `Metadata.appintents` bundle. Phase 2's deep-links cover every
+> device below iOS 17.2 for almost nothing, so this is not worth it yet. Everything below is kept as
+> the design of record for whenever it is revisited; **nothing here is being built.**
 
 ### API surface
 
@@ -313,8 +319,6 @@ Watch the 4KB content-state cap; a handful of actions is comfortably inside it.
 
 4. **Is an Android channel sound worth exposing at all**, given it can only be set at channel creation
    and cannot be changed afterwards without resetting the user's own settings? Raised by Phase 1a.
-5. **Is Phase 3 worth its plumbing?** It now costs: the widget extension linking the framework
-   (breaking the current template instructions), an `AppIntentsPackage` in the framework, and a
-   hand-synthesized `Metadata.appintents` shipped as a `BundleResource` because the .NET iOS SDK does
-   not generate one — against an alternative (Phase 2 deep-links) that costs almost nothing and now
-   covers every device below iOS 17.2.
+5. ✅ **Phase 3 is not worth its plumbing yet** (2026-09-06). Scope capped at Phase 2. Revisit if the
+   .NET iOS SDK ever grows AppIntents support, or if in-place actions on iOS 17.2+ become a concrete
+   customer ask rather than a completeness argument.
