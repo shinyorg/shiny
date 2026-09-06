@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.LiveActivities\Shiny.LiveActivities.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Mobile.LiveActivities\Shiny.Mobile.LiveActivities.csproj" />
     </ItemGroup>
 
 </Project>

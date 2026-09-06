@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <!-- iOS only: ActivityKit is Swift-only and this binds it through an @objc shim. -->
+        <!-- iOS only, hence the package name. ActivityKit is Swift-only, so this binds it through an
+             @objc shim; and it is genuinely unavailable on macOS, Mac Catalyst, tvOS and watchOS, so
+             there is no wider Apple target to grow into. -->
         <TargetFrameworks>$(IosTarget)</TargetFrameworks>
         <IsBindingProject>true</IsBindingProject>
         <RootNamespace>ShinyLiveActivities</RootNamespace>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
 
-        <Description>ActivityKit binding for Shiny.LiveActivities - a Swift shim exposing Live Activity start/update/end and push token observation to .NET, because ActivityKit has no Objective-C interface.</Description>
+        <Description>ActivityKit binding for Shiny.Mobile.LiveActivities - a Swift shim exposing Live Activity start/update/end and push token observation to .NET, because ActivityKit has no Objective-C interface.</Description>
     </PropertyGroup>
 
     <!-- The .NET iOS SDK builds this Xcode project and links the resulting framework. Regenerate the

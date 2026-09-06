@@ -25,7 +25,7 @@ jobs:
       id-token: write   # required for NuGet trusted publishing (OIDC)
       contents: read
 
-    # macOS, not Windows: Shiny.LiveActivities.Binding builds the ActivityKit Swift shim
+    # macOS, not Windows: Shiny.iOS.LiveActivities.Binding builds the ActivityKit Swift shim
     # (native/ShinyLiveActivities) through Xcode, which only exists here.
     # NOTE: Directory.Build.props drops $(WindowsTarget) on non-Windows hosts, so the
     # net10.0-windows TFM is NOT produced by this job.

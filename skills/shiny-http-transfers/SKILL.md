@@ -251,8 +251,27 @@ one update a second, aggregates a batch, and starts/updates/retires the surface.
 |---|---|
 | Android 16+ | The foreground-service notification, promoted ongoing (status bar chip, AOD) |
 | Android 8-15 | The foreground-service notification with a determinate bar |
-| iOS 16.2+ | A Live Activity - add `Shiny.LiveActivities.HttpTransfers` and call `AddHttpTransferLiveActivities()` |
-| Elsewhere | No renderer; the manager no-ops |
+| iOS/iPadOS 16.2+ | A Live Activity on the Lock Screen and in the Dynamic Island |
+| Elsewhere (macOS, Mac Catalyst, tvOS, Windows, Linux, Blazor) | No renderer; the manager no-ops |
+
+Both renderers ship **inside `Shiny.Net.Http`** - there is no second package and no second registration
+call. On iOS the package pulls `Shiny.Mobile.LiveActivities` for you (that reference is on the `-ios` target
+only, so no other head carries ActivityKit) and `AddTransferProgress()` registers `ILiveActivityManager`
+itself if you have not already called `AddLiveActivities()`.
+
+iOS additionally needs the widget extension from `templates/WidgetExtension` in the app bundle and
+`NSSupportsLiveActivities` in Info.plist. Without them the activity starts and renders nothing - a silent
+failure, so check this first when an iOS activity never appears.
+
+The two iOS-only knobs live on the same options object:
+
+```csharp
+builder.Services.AddTransferProgress(opts =>
+{
+    opts.LiveActivity.Kind             = "shiny.httptransfers";  // your widget branches on this
+    opts.LiveActivity.RequestPushToken = true;                   // see "the iOS suspension gap" below
+});
+```
 
 **Configuring what shows.** `Fields` is a `[Flags]` enum (`FileName`, `Direction`, `Percent`,
 `TransferredBytes`, `Speed`, `TimeRemaining`, `Host`) gating the human-readable text only; unselected fields
@@ -267,8 +286,10 @@ For custom wording or localization, subclass `TransferProgressDelegate` and over
 suspended, so a fraction-based bar freezes for most of a long transfer. `ProjectTimeRemaining` (default on)
 emits a self-animating time range instead, anchored in the past so the bar already sits at the true fraction
 rather than snapping to zero on every update. Android resolves the range back to a fraction - its foreground
-service is alive throughout. For uploads, the Live Activities package's `RequestPushToken` lets a server push
-byte-accurate progress through the suspended window.
+service is alive throughout. For uploads, `opts.LiveActivity.RequestPushToken` lets a server push
+byte-accurate progress through the suspended window - the receiving server knows how many bytes actually
+landed. It buys nothing for downloads, where no server knows how far the device has got. The token arrives
+on `ILiveActivityDelegate.OnPushTokenChanged`.
 
 **Custom renderers.** Implement `ITransferProgressRenderer` (`IsAvailable`, `Show`, `Hide`, `Reconcile`) and
 register it; the same manager drives it. `TransferProgressContentBuilder.FormatBytes/FormatRate/

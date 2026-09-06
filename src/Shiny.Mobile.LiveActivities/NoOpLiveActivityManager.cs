@@ -2,7 +2,8 @@ namespace Shiny.LiveActivities;
 
 
 /// <summary>
-/// The implementation used on platforms with no live activity concept (Windows, macOS, Linux, Blazor).
+/// The implementation used on platforms with no live activity concept - macOS, Mac Catalyst, tvOS,
+/// Windows, Linux and Blazor, which is everything except iOS/iPadOS and Android.
 /// Every call is a safe no-op so shared view models don't need platform checks — branch on
 /// <see cref="ILiveActivityManager.IsSupported"/> if the UI should hide the feature entirely.
 /// </summary>

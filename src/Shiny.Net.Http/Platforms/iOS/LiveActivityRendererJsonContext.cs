@@ -1,6 +1,8 @@
+#if IOS
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Shiny.LiveActivities;
+namespace Shiny.Net.Http;
 
 
 /// <summary>
@@ -9,3 +11,4 @@ namespace Shiny.LiveActivities;
 /// </summary>
 [JsonSerializable(typeof(Dictionary<string, string>))]
 internal partial class LiveActivityRendererJsonContext : JsonSerializerContext;
+#endif

@@ -1,14 +1,19 @@
+#if IOS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores;
-using Shiny.Net.Http;
+using Shiny.LiveActivities;
 
-namespace Shiny.LiveActivities;
+namespace Shiny.Net.Http;
 
 
 /// <summary>
-/// Draws <c>Shiny.Net.Http</c> transfer progress as an iOS Live Activity.
+/// Draws transfer progress as an iOS Live Activity.
 /// </summary>
 /// <remarks>
 /// A renderer and nothing more: <c>TransferProgressManager</c> in <c>Shiny.Net.Http</c> owns aggregation,
@@ -23,13 +28,13 @@ namespace Shiny.LiveActivities;
 /// </remarks>
 public class LiveActivityTransferRenderer(
     ILiveActivityManager activities,
-    LiveActivityRendererOptions options,
+    TransferProgressOptions options,
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<LiveActivityTransferRenderer> logger
 ) : ITransferProgressRenderer
 {
     /// <summary>The key the activity map is persisted under.</summary>
-    public const string ActivityMapStoreKey = "Shiny.LiveActivities.HttpTransfers.Map";
+    public const string ActivityMapStoreKey = "Shiny.Net.Http.LiveActivityMap";
 
     readonly Dictionary<string, string> map = new();
     bool loaded;
@@ -65,9 +70,9 @@ public class LiveActivityTransferRenderer(
                 .Start(new LiveActivityRequest
                 {
                     Content = live,
-                    Kind = options.Kind,
+                    Kind = options.LiveActivity.Kind,
                     Attributes = BuildAttributes(key, content),
-                    RequestPushToken = options.RequestPushToken
+                    RequestPushToken = options.LiveActivity.RequestPushToken
                 })
                 .ConfigureAwait(false);
 
@@ -199,3 +204,4 @@ public class LiveActivityTransferRenderer(
         store.Set(ActivityMapStoreKey, json);
     }
 }
+#endif

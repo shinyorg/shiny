@@ -3,6 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Net.Http;
+#if IOS
+using Shiny.LiveActivities;
+#endif
 
 namespace Shiny;
 
@@ -20,10 +23,12 @@ public static class TransferProgressServiceCollectionExtensions
     /// </summary>
     /// <remarks>
     /// Android registers <see cref="ForegroundNotificationRenderer"/>, which draws on the notification the
-    /// transfer foreground service already posts - so there is one notification, not two. iOS ships no
-    /// renderer in this package: add <c>Shiny.LiveActivities.HttpTransfers</c> for the ActivityKit
-    /// one, or register your own <see cref="ITransferProgressRenderer"/>. With no available renderer the
-    /// manager quietly does nothing, so this is safe to call unconditionally.
+    /// transfer foreground service already posts - so there is one notification, not two. iOS registers
+    /// <c>LiveActivityTransferRenderer</c>, which needs the widget extension from
+    /// <c>templates/WidgetExtension</c> in your app bundle and <c>NSSupportsLiveActivities</c> in
+    /// Info.plist; without them the activity starts and renders nothing. Every other platform has no
+    /// surface to draw on, so the manager quietly does nothing - this is safe to call unconditionally, and
+    /// you can always register your own <see cref="ITransferProgressRenderer"/>.
     /// </remarks>
     /// <param name="services">The service collection.</param>
     /// <param name="configure">Optional configuration - which fields show, how often to update, and how progress is projected.</param>
@@ -39,6 +44,14 @@ public static class TransferProgressServiceCollectionExtensions
 #if ANDROID
         if (services.All(x => x.ImplementationType != typeof(ForegroundNotificationRenderer)))
             services.AddSingleton<ITransferProgressRenderer, ForegroundNotificationRenderer>();
+#elif IOS
+        // AddLiveActivities registers a singleton against every interface it implements, so calling it
+        // twice would produce two managers and two sets of ActivityKit observers
+        if (services.All(x => x.ServiceType != typeof(ILiveActivityManager)))
+            services.AddLiveActivities();
+
+        if (services.All(x => x.ImplementationType != typeof(LiveActivityTransferRenderer)))
+            services.AddSingleton<ITransferProgressRenderer, LiveActivityTransferRenderer>();
 #endif
         services.AddSingletonAsImplementedInterfaces<TransferProgressManager>();
         return services;

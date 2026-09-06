@@ -17,4 +17,12 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj"/>
     </ItemGroup>
 
+    <!-- iOS only. ActivityKit is unavailable on Mac Catalyst and tvOS (the framework ships in those SDKs
+         but every type in it is marked @available(..., unavailable)), so neither the reference nor
+         Platforms\iOS is worth carrying there. Android draws progress on the foreground-service
+         notification it already posts and needs nothing from this package. -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <ProjectReference Include="..\Shiny.Mobile.LiveActivities\Shiny.Mobile.LiveActivities.csproj"/>
+    </ItemGroup>
+
 </Project>

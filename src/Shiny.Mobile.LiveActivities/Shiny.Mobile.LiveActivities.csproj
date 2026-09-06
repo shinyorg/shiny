@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Shiny.LiveActivities</RootNamespace>
+        <!-- iOS and Android only, and that is the whole list. ActivityKit ships in the macOS and tvOS SDKs
+             but every public type in it is annotated @available(macOS, unavailable) /
+             @available(macCatalyst, unavailable) / @available(tvOS, unavailable) / @available(watchOS,
+             unavailable) - there is no AppKit or Mac Catalyst surface to bind. What macOS shows is an
+             iPhone's activity mirrored over iPhone Mirroring, which no Mac app declares or drives.
+             Everything else resolves the net10.0 asset and gets NoOpLiveActivityManager. -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+
+        <Description>Live Activities for .NET - iOS/iPadOS Live Activities (ActivityKit, 16.2+) and Android 16 Live Updates behind one API, with push token plumbing for server-driven updates. Mobile only: every other platform (macOS, Mac Catalyst, tvOS, Windows, Linux, Blazor) gets a safe no-op implementation, so shared code needs no platform checks.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+        <ProjectReference Include="..\Shiny.iOS.LiveActivities.Binding\Shiny.iOS.LiveActivities.Binding.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -2,20 +2,28 @@ namespace Shiny.LiveActivities;
 
 
 /// <summary>
-/// Starts, updates and ends live activities — iOS Live Activities (ActivityKit) and Android 16 Live
-/// Updates — behind one API.
+/// Starts, updates and ends live activities — iOS/iPadOS Live Activities (ActivityKit) and Android 16
+/// Live Updates — behind one API.
 /// </summary>
 /// <remarks>
 /// The two platforms are genuinely different: iOS renders arbitrary SwiftUI from a widget extension,
 /// Android renders a promoted ongoing notification. The shared contract is therefore a typed
 /// <see cref="LiveActivityContent"/> — a state, not a UI tree. Anything platform-specific rides in
 /// <see cref="LiveActivityContent.Data"/> for your own widget to read.
+/// <para>
+/// Those two are the entire supported list. ActivityKit is marked unavailable on macOS, Mac Catalyst,
+/// tvOS and watchOS in Apple's own SDK, so there is no Apple desktop implementation to add — a Mac only
+/// ever shows an iPhone's activity mirrored to it. Everywhere else <see cref="IsSupported"/> is false and
+/// every call is a no-op, so shared view models need no platform checks.
+/// </para>
 /// </remarks>
 public interface ILiveActivityManager
 {
     /// <summary>
-    /// Whether this OS version can show live activities at all (iOS 16.1+, Android 8+ for the fallback
-    /// notification). False everywhere else, where every call below is a safe no-op.
+    /// Whether this OS version can show live activities at all - iOS/iPadOS 16.2+ (what the ActivityKit
+    /// shim is built against) and Android 8+ for the fallback notification, with the promoted Android 16
+    /// live update from API 36. False on macOS, Mac Catalyst, tvOS, Windows, Linux and Blazor, where every
+    /// call below is a safe no-op.
     /// </summary>
     bool IsSupported { get; }
 

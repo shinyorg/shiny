@@ -90,6 +90,38 @@ public enum TransferProgressScope
 
 
 /// <summary>
+/// The ActivityKit-specific knobs for rendering transfer progress as an iOS Live Activity. Ignored
+/// everywhere else.
+/// </summary>
+/// <remarks>
+/// Everything platform-neutral - which fields show, how often to update, how progress is projected - lives
+/// on <see cref="TransferProgressOptions"/> itself, because Android renders the same content onto its
+/// foreground-service notification. Only what genuinely has no Android meaning is here.
+/// </remarks>
+public class TransferProgressLiveActivityOptions
+{
+    /// <summary>
+    /// The <c>LiveActivityRequest.Kind</c> stamped on the activity, so a widget shipping several layouts
+    /// can branch on it. Defaults to <c>shiny.httptransfers</c>.
+    /// </summary>
+    public string? Kind { get; set; } = "shiny.httptransfers";
+
+    /// <summary>
+    /// Ask ActivityKit for a per-activity push token so a server can update the activity directly. Off by
+    /// default.
+    /// </summary>
+    /// <remarks>
+    /// Worth turning on for <em>uploads</em>: the receiving server knows how many bytes have actually
+    /// landed, so it can push byte-accurate progress through the whole window where the app is suspended
+    /// and a background <c>NSURLSession</c> is delivering no callbacks at all. It buys nothing for
+    /// downloads, where no server knows how far the device has got. The token arrives on
+    /// <c>ILiveActivityDelegate.OnPushTokenChanged</c>.
+    /// </remarks>
+    public bool RequestPushToken { get; set; }
+}
+
+
+/// <summary>
 /// Controls how background transfers are projected onto a progress surface.
 /// </summary>
 /// <remarks>
@@ -174,4 +206,10 @@ public class TransferProgressOptions
     /// <see cref="TransferProgressScope.PerTransfer"/>. On by default; ignored on Android.
     /// </summary>
     public bool RankByProgress { get; set; } = true;
+
+    /// <summary>
+    /// The handful of settings that only mean something to the iOS Live Activity renderer. Ignored on
+    /// every other platform.
+    /// </summary>
+    public TransferProgressLiveActivityOptions LiveActivity { get; } = new();
 }
