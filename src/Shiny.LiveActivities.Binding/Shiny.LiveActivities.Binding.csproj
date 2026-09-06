@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- iOS only: ActivityKit is Swift-only and this binds it through an @objc shim. -->
+        <TargetFrameworks>$(IosTarget)</TargetFrameworks>
+        <IsBindingProject>true</IsBindingProject>
+        <RootNamespace>ShinyLiveActivities</RootNamespace>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+        <Description>ActivityKit binding for Shiny.LiveActivities - a Swift shim exposing Live Activity start/update/end and push token observation to .NET, because ActivityKit has no Objective-C interface.</Description>
+    </PropertyGroup>
+
+    <!-- The .NET iOS SDK builds this Xcode project and links the resulting framework. Regenerate the
+         .xcodeproj from project.yml with `xcodegen generate` after touching the Swift sources.
+         This is why the build job runs on macOS. -->
+    <ItemGroup>
+        <XcodeProject Include="$(MSBuildThisFileDirectory)../../native/ShinyLiveActivities/ShinyLiveActivities.xcodeproj">
+            <SchemeName>ShinyLiveActivities</SchemeName>
+        </XcodeProject>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
+    </ItemGroup>
+
+</Project>

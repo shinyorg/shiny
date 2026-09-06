@@ -1,0 +1,56 @@
+name: ShinyLiveActivities
+options:
+  bundleIdPrefix: com.shinyorg
+  deploymentTarget:
+    iOS: "16.2"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+    SKIP_INSTALL: NO
+    SWIFT_VERSION: "5.9"
+    ENABLE_BITCODE: NO
+    DEFINES_MODULE: YES
+    IPHONEOS_DEPLOYMENT_TARGET: "16.2"
+
+targets:
+  ShinyLiveActivities:
+    type: framework
+    platform: iOS
+    sources:
+      - path: ShinyLiveActivities
+        type: group
+    settings:
+      base:
+        INFOPLIST_FILE: ShinyLiveActivities/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.shinyorg.shinyliveactivities
+        PRODUCT_NAME: ShinyLiveActivities
+        TARGETED_DEVICE_FAMILY: "1,2"
+    scheme:
+      gatherCoverageData: false
+      shared: true
+
+  # Compile-checks the widget extension template shipped in templates/WidgetExtension so it can't rot.
+  # The .NET build only ever builds the ShinyLiveActivities scheme, so this target never ships.
+  ShinyLiveActivityWidgetTemplate:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ../../templates/WidgetExtension
+        type: group
+    settings:
+      base:
+        INFOPLIST_FILE: ../../templates/WidgetExtension/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.shinyorg.shinyliveactivities.widgettemplate
+        PRODUCT_NAME: ShinyLiveActivityWidgetTemplate
+        SKIP_INSTALL: YES
+    dependencies:
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    scheme:
+      gatherCoverageData: false
+      shared: true

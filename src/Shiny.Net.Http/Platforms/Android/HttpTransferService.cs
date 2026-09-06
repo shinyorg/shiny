@@ -18,6 +18,19 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
     public static bool IsStarted { get; private set; }
 
     /// <summary>
+    /// The running instance, or null when the service is stopped. Exposed so
+    /// <see cref="ForegroundNotificationRenderer"/> can draw transfer progress onto this service's own
+    /// notification instead of posting a second one.
+    /// </summary>
+    public static HttpTransferService? Current { get; private set; }
+
+    /// <summary>
+    /// The id of the notification this service was promoted to the foreground with. Re-posting this id is
+    /// how the notification gets updated in place.
+    /// </summary>
+    public int ForegroundNotificationId => this.NotificationId;
+
+    /// <summary>
     /// When true (and the device runs Android 14+), the service promotes itself as
     /// FOREGROUND_SERVICE_TYPE_SHORT_SERVICE instead of dataSync. shortService needs
     /// no type-specific manifest permission and no Google Play foreground-service
@@ -40,6 +53,7 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
 
     protected override void OnStart(Intent? intent)
     {
+        Current = this;
         if (!IsStarted)
         {
             this.GetService<HttpClientHttpTransferProcess>().Run(() => this.Stop());
@@ -48,7 +62,11 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
     }
 
 
-    protected override void OnStop() => IsStarted = false;
+    protected override void OnStop()
+    {
+        IsStarted = false;
+        Current = null;
+    }
 
     /// <summary>
     /// The OS says this service's time is up: shortService gets ~3 minutes per
