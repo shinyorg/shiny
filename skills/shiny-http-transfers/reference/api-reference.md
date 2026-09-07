@@ -569,44 +569,6 @@ public static class HttpClientExtensions
 
 ---
 
-## Android Notification Strategies
-
-### AbstractTransferNotificationStrategy
-
-Base class for Android notification display during background transfers. Implements `IShinyStartupTask`.
-
-```csharp
-// Platform: Android only
-public abstract class AbstractTransferNotificationStrategy : IShinyStartupTask
-{
-    public abstract void Start();
-    protected string NotificationChannelId { get; set; } // Default: "Transfers"
-    protected virtual NotificationCompat.Builder CreateBuilder(string channelId);
-    protected virtual string CreateChannel();
-}
-```
-
-### PerTransferNotificationStrategy
-
-Displays one notification per active transfer with progress.
-
-```csharp
-// Platform: Android only
-public class PerTransferNotificationStrategy : AbstractTransferNotificationStrategy
-{
-    public PerTransferNotificationStrategy(
-        IHttpTransferManager manager,
-        AndroidPlatform platform,
-        ILogger<PerTransferNotificationStrategy> logger
-    );
-
-    public override void Start();
-    protected virtual void Customize(NotificationCompat.Builder builder, HttpTransferResult result);
-}
-```
-
----
-
 ## Usage Examples
 
 ### Queue a Download

@@ -230,8 +230,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 ## Transfer progress surfaces (Live Activity / notification)
 
 Showing progress to a user who has left the app is one call. Do **not** hand-roll this from
-`UpdateReceived`, and never register `PerTransferNotificationStrategy` (obsolete - it posts a second
-Android notification alongside the foreground service's own).
+`UpdateReceived`.
 
 ```csharp
 builder.Services.AddHttpTransfers<MyTransferDelegate>();

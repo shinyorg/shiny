@@ -16,10 +16,9 @@ namespace Shiny.Net.Http;
 /// </summary>
 /// <remarks>
 /// Android requires a foreground service to move bytes in the background, and a foreground service requires
-/// a notification. Posting a <em>second</em> notification to show progress - which is what the older
-/// <c>PerTransferNotificationStrategy</c> did - leaves the user with two entries in the shade, one of them
-/// the useless "Shiny service is continuing to transfer data in the background". This renderer re-posts the
-/// service's own notification id instead, so there is exactly one.
+/// a notification. Posting a <em>second</em> notification to show progress leaves the user with two entries
+/// in the shade, one of them the useless "Shiny service is continuing to transfer data in the background".
+/// This renderer re-posts the service's own notification id instead, so there is exactly one.
 /// <para>
 /// On API 36+ it uses <c>Notification.ProgressStyle</c> with <c>requestPromotedOngoing</c> and
 /// <c>setShortCriticalText</c>, which gets the status bar chip and always-on-display treatment - the
