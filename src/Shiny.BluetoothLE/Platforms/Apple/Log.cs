@@ -93,4 +93,20 @@ internal static partial class Log
     )]
     public static partial void PeripheralStateChange(this ILogger logger, NSUuid peripheralIdentifier, bool connected, string error);
 
+
+    [LoggerMessage(
+        EventId = 10,
+        Level = LogLevel.Debug,
+        Message = "Scan deferred - the bluetooth adapter is not powered on yet.  It will start as soon as the adapter becomes available"
+    )]
+    public static partial void ScanDeferred(this ILogger logger);
+
+
+    [LoggerMessage(
+        EventId = 11,
+        Level = LogLevel.Debug,
+        Message = "Scan started - service uuid filters: {filterCount}"
+    )]
+    public static partial void ScanStarted(this ILogger logger, int filterCount);
+
 }

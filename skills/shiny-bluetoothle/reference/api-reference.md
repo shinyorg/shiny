@@ -1261,6 +1261,7 @@ bleManager
    - On Android, ensure location permissions and Bluetooth permissions are granted.
    - On iOS, ensure `NSBluetoothAlwaysUsageDescription` is set in `Info.plist`.
    - Check that the BLE adapter is enabled on the device.
+   - On Apple platforms before 5.6, a `Scan()` issued before the `CBCentralManager` finished powering on was silently discarded by CoreBluetooth and the observable never emitted, with `IsScanning` still reporting `true`. Upgrade, or await `RequestAccessAsync()` before subscribing.
 
 2. **Connection times out**
    - The default timeout for `ConnectAsync` is 30 seconds. Increase via the `timeout` parameter.

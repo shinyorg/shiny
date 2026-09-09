@@ -99,27 +99,43 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
     static readonly PeripheralScanningOptions peripheralScanningOptions = new PeripheralScanningOptions { AllowDuplicatesKey = true };
 
+    // Guards the scan state below - Scan/StopScan arrive on the caller's thread while the adapter
+    // hook runs on the manager's dispatch queue.
+    readonly object scanLock = new();
+
+    // Set while a scan subscription is alive, whether or not the native scan is actually running.
+    // ScanForPeripherals below PoweredOn is an API-misuse no-op that CoreBluetooth never reports
+    // on, and a freshly built CBCentralManager reports Unknown until UpdatedState lands - so the
+    // request is parked here and the adapter hook replays it on power-on (issue #1653).
+    bool scanRequested;
+    CBUUID[]? scanServiceUuids;
+
     public IObservable<ScanResult> Scan(ScanConfig? scanConfig = null) => Observable.Create<ScanResult>(ob =>
     {
-        if (this.IsScanning)
-            throw new InvalidOperationException("There is already an existing scan");
-
-        this.Clear();
         scanConfig ??= new ScanConfig();
 
-        if (scanConfig.ServiceUuids == null || scanConfig.ServiceUuids.Length == 0)
+        // Resolved before anything is mutated so a malformed uuid throws straight out of Subscribe
+        // without leaving the scan slot claimed.
+        var uuids = scanConfig.ServiceUuids is { Length: > 0 }
+            ? scanConfig.ServiceUuids.Select(CBUUID.FromString).ToArray()
+            : null;
+
+        lock (this.scanLock)
         {
-            this.Manager.ScanForPeripherals(
-                null!,
-                peripheralScanningOptions
-            );
+            // Keyed off the request rather than IsScanning: a parked scan is not running yet, but
+            // it still owns the single scan slot.
+            if (this.scanRequested)
+                throw new InvalidOperationException("There is already an existing scan");
+
+            // Both set together - the adapter hook can fire between here and the start below, and
+            // it would otherwise issue the parked scan with no service filter.
+            this.scanRequested = true;
+            this.scanServiceUuids = uuids;
         }
-        else
-        {
-            var uuids = scanConfig.ServiceUuids.Select(CBUUID.FromString).ToArray();
-            this.Manager.ScanForPeripherals(uuids, peripheralScanningOptions);
-        }
-        this.IsScanning = true;
+        this.Clear();
+
+        // Subscribed ahead of the native call on purpose - CoreBluetooth can deliver a cached
+        // advertisement the instant the scan starts, and subscribing afterwards dropped it.
         var sub = this.ScanResultReceived
             .Subscribe(
                 ob.OnNext,
@@ -127,16 +143,51 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
                 ob.OnCompleted
             );
 
+        lock (this.scanLock)
+            this.StartNativeScan();
+
         return () =>
         {
-            this.Manager.StopScan();
-            this.IsScanning = false;
-            sub?.Dispose();
+            this.StopScan();
+            sub.Dispose();
         };
     });
 
 
-    public void StopScan() => this.Manager.StopScan();
+    /// <summary>
+    /// Issues the requested scan against CoreBluetooth, but only once the central is actually
+    /// powered on. Called again from the adapter hook so a scan asked for against a cold or
+    /// powered-off central starts as soon as the adapter comes up (issue #1653).
+    /// </summary>
+    void StartNativeScan()
+    {
+        if (!this.scanRequested || this.IsScanning)
+            return;
+
+        // Touches Manager on purpose even when it is not up yet - building it is what gets
+        // CoreBluetooth to deliver the UpdatedState that brings us back here.
+        if (!this.IsAdapterAvailable)
+        {
+            this.logger.ScanDeferred();
+            return;
+        }
+
+        this.Manager.ScanForPeripherals(this.scanServiceUuids!, peripheralScanningOptions);
+        this.IsScanning = true;
+        this.logger.ScanStarted(this.scanServiceUuids?.Length ?? 0);
+    }
+
+
+    public void StopScan()
+    {
+        lock (this.scanLock)
+        {
+            this.scanRequested = false;
+            this.scanServiceUuids = null;
+            this.IsScanning = false;
+        }
+        this.Manager.StopScan();
+    }
 
 
     public override void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
@@ -189,6 +240,20 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
     void OnAdapterStateChanged(bool available)
     {
+        lock (this.scanLock)
+        {
+            if (available)
+            {
+                this.StartNativeScan();
+            }
+            else
+            {
+                // CoreBluetooth tears the scan down when the adapter drops. The request stays
+                // parked so it resumes on power-on instead of dying silently (issue #1653).
+                this.IsScanning = false;
+            }
+        }
+
         foreach (var peripheral in this.peripherals.Values)
         {
             try

@@ -448,7 +448,7 @@ you are talking to a non-Shiny central.
 
 ## Best Practices
 
-1. **Always request access first** -- call `RequestAccess()` and check the result before any hosting operations
+1. **Always request access first** -- call `RequestAccess()` and check the result before any hosting operations, so a denied permission or a switched-off adapter reaches the user rather than surfacing as a thrown `InvalidOperationException` deeper in. On Apple platforms it is no longer required for correctness: as of 5.6, `AddService(...)` and `StartAdvertising(...)` wait out the `CBPeripheralManager` power-on handshake themselves. Before that they issued the native call against a manager still reporting `Unknown`, which CoreBluetooth drops without ever invoking the completion delegate both methods await -- so a call made at app startup hung indefinitely instead of failing. Do not work around it with your own `await RequestAccess()` retry loop or a `Task.Delay` before advertising
 2. **Reach for `[BleService]` first** -- the generator emits the same builder calls plus the response/offset handling, subscriber tracking, and per-central context. Fall back to `AddService(uuid, primary, sb => ...)` lambdas when the service shape is only known at runtime
 3. **Always write the full 128-bit UUID when calling `AddService` by hand** -- short forms like `"180D"` work on Apple (`CBUUID.FromString`) but throw on Android (`java.util.UUID.fromString`). The generator normalizes for you; the imperative API does not
 4. **Respond to writes when needed** -- always check `WriteRequest.IsReplyNeeded` and call `Respond` with the appropriate `GattState`

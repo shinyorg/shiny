@@ -164,6 +164,8 @@ public partial class BleHostingManager : IBleHostingManager
 
     public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
     {
+        await this.EnsurePoweredOn().ConfigureAwait(false);
+
         var service = new GattService(this.Manager, uuid, primary);
         serviceBuilder(service);
 
@@ -248,8 +250,21 @@ public partial class BleHostingManager : IBleHostingManager
     }
 
 
+    /// <summary>
+    /// CBPeripheralManager reports Unknown until its first state callback lands, and commands
+    /// issued below PoweredOn are dropped without ever calling back - which left AddService and
+    /// StartAdvertising awaiting a completion that never came (issue #1653).  This does not prompt
+    /// for anything; it waits out the state handshake and fails loudly when the adapter is not
+    /// usable.  Callers still request permissions explicitly via RequestAccess.
+    /// </summary>
+    async Task EnsurePoweredOn()
+        => (await this.RequestAccess().ConfigureAwait(false)).Assert();
+
+
     async Task DoAdvertise(NSDictionary parameters)
     {
+        await this.EnsurePoweredOn().ConfigureAwait(false);
+
         if (this.Manager.Advertising)
             throw new InvalidOperationException("Advertising is already active");
         

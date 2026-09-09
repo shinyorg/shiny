@@ -215,7 +215,6 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
         return () =>
         {
-            this.IsScanning = false;
             this.StopScan();
             disp?.Dispose();
         };
@@ -223,7 +222,13 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
 
 
     public void StopScan()
-        => this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
+    {
+        // Cleared here rather than only in the scan subscription's dispose - a direct StopScan
+        // used to leave the flag set, and every later Scan() threw "There is already an active
+        // scan" for the life of the process (issue #1653).
+        this.IsScanning = false;
+        this.Native.Adapter!.BluetoothLeScanner?.StopScan(this);
+    }
 
     public IEnumerable<IPeripheral> GetConnectedPeripherals()
         => this.peripherals.Where(x => x.Value.Status == ConnectionState.Connected).Select(x => x.Value);
