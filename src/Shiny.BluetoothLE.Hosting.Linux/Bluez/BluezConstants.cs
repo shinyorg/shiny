@@ -12,9 +12,10 @@ internal static class BluezConstants
     public const string LEAdvertisingManagerInterface = "org.bluez.LEAdvertisingManager1";
     public const string LEAdvertisementInterface = "org.bluez.LEAdvertisement1";
     public const string ObjectManagerInterface = "org.freedesktop.DBus.ObjectManager";
+    public const string IntrospectableInterface = "org.freedesktop.DBus.Introspectable";
     public const string PropertiesInterface = "org.freedesktop.DBus.Properties";
 
     public const string DefaultAdapterPath = "/org/bluez/hci0";
     public const string ApplicationRootPath = "/org/shiny/ble";
-    public const string AdvertisementPath = "/org/shiny/ble/advertisement0";
+    public const string AdvertisementPathPrefix = "/org/shiny/ble/advertisement";
 }

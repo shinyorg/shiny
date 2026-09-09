@@ -290,7 +290,7 @@ distance directly, so the filter and estimator are bypassed there — only the t
 | macOS | CoreLocation | **Not supported by the OS** | BLE scan | iBeacon only |
 | Android | BLE scan | BLE scan + foreground service | BLE scan | iBeacon + Eddystone |
 | Windows | BLE scan | BLE scan | BLE scan | iBeacon + Eddystone |
-| Linux | BLE scan | BLE scan | BLE scan | **Not yet** (BlueZ advertising unimplemented) |
+| Linux | BLE scan | BLE scan | BLE scan | iBeacon + Eddystone |
 | Blazor WASM | BLE scan | BLE scan | BLE scan | No |
 | tvOS | — | — | — | — |
 
@@ -303,6 +303,10 @@ distance directly, so the filter and estimator are bypassed there — only the t
   UUIDs. `StartEddystoneUid`/`StartEddystoneUrl` throw `PlatformNotSupportedException` there.
 - **Apple broadcasting stops working when backgrounded.** iOS moves the advertisement into an
   overflow area only another iOS device explicitly scanning for the same service can read.
+- **Linux broadcasting needs a BlueZ that will let you register an advertisement.** BlueZ calls back
+  into the process to read the payload, and the adapter has to be powered. `bluetoothd` limits how
+  many advertising instances are active at once (`LEAdvertisingManager1.SupportedInstances`); when it
+  is full, `RegisterAdvertisement` fails and the exception carries BlueZ's own reason.
 - **Blazor** needs `navigator.bluetooth.requestLEScan`, which is Chromium-only and behind
   `chrome://flags/#enable-experimental-web-platform-features`. The chooser fallback reports no
   advertisement payload, so beacons are invisible through it.

@@ -29,7 +29,9 @@ namespace Shiny.Beacons;
 /// service can see - it is not a beacon any more.
 /// </item>
 /// <item>
-/// <b>Linux cannot broadcast yet.</b> BlueZ advertising is still unimplemented in the hosting module.
+/// <b>Linux broadcasts through BlueZ</b>, which calls back into the process to read the payload -
+/// so the app has to stay alive and connected to the system bus for the advertisement to keep
+/// running, and the number of concurrent advertising instances is capped by the adapter.
 /// </item>
 /// </list>
 /// </remarks>

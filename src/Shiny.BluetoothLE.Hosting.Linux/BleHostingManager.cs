@@ -19,7 +19,9 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     readonly ILogger<BleHostingManager> logger;
     readonly Dictionary<string, GattService> services = new();
     DBusConnection? connection;
-    bool advertising;
+    LEAdvertisement? advertisement;
+    Task? pendingUnregister;
+    int advertisementCounter;
 
 
     public BleHostingManager(ILogger<BleHostingManager> logger)
@@ -30,7 +32,7 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
 
     public AccessState AdvertisingAccessStatus { get; private set; } = AccessState.Unknown;
     public AccessState GattAccessStatus { get; private set; } = AccessState.Unknown;
-    public bool IsAdvertising => this.advertising;
+    public bool IsAdvertising => this.advertisement != null;
     public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
 
 
@@ -104,32 +106,175 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
 
     public Task StartAdvertising(AdvertisementOptions? options = null)
     {
-        // TODO: export LEAdvertisement1 object at BluezConstants.AdvertisementPath with
-        // Type=peripheral, ServiceUUIDs, LocalName from options, then call
-        // org.bluez.LEAdvertisingManager1.RegisterAdvertisement on the adapter.
-        throw new NotSupportedException("LE advertising via BlueZ is not yet implemented.");
-    }
+        options ??= new AdvertisementOptions();
 
+        var serviceData = options.ServiceData.ToDictionary(
+            x => NormalizeUuid(x.Uuid),
+            x => x.Data
+        );
 
-    public void StopAdvertising()
-    {
-        if (!this.advertising) return;
-        // TODO: call LEAdvertisingManager1.UnregisterAdvertisement and remove the exported object.
-        this.advertising = false;
+        var manufacturerData = new Dictionary<ushort, byte[]>();
+        if (options.ManufacturerData != null)
+            manufacturerData[options.ManufacturerData.CompanyId] = options.ManufacturerData.Data;
+
+        return this.RegisterAdvertisement(new LEAdvertisementProperties
+        {
+            Type = options.IsConnectable ? "peripheral" : "broadcast",
+            LocalName = options.LocalName.IsEmpty() ? null : options.LocalName,
+            ServiceUuids = options.ServiceUuids.Select(NormalizeUuid).ToList(),
+            ServiceData = serviceData,
+            ManufacturerData = manufacturerData,
+            Includes = options.IncludeTxPower ? ["tx-power"] : []
+        });
     }
 
 
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
-        // BlueZ is perfectly capable of this - LEAdvertisement1 has a ManufacturerData property -
-        // but it needs the same D-Bus object export StartAdvertising above is still missing.
-        => throw new NotSupportedException("Beacon advertising needs LE advertising via BlueZ, which is not yet implemented. Beacon scanning and monitoring do work on Linux.");
+        => this.RegisterAdvertisement(new LEAdvertisementProperties
+        {
+            // A beacon has no GATT server to connect to, and a connectable advertisement would
+            // invite centrals to try. Broadcast also means Discoverable is not reported at all -
+            // BlueZ rejects the advertisement outright if both are set.
+            Type = "broadcast",
+            ManufacturerData = new Dictionary<ushort, byte[]>
+            {
+                [IBeaconPacket.AppleCompanyId] = IBeaconPacket.Build(
+                    uuid,
+                    major,
+                    minor,
+                    txpower ?? IBeaconPacket.DefaultTxPower
+                )
+            }
+        });
+
+
+    public void StopAdvertising()
+    {
+        var current = this.advertisement;
+        if (current == null)
+            return;
+
+        this.advertisement = null;
+
+        // Unregistering is a round trip to BlueZ, but the interface is synchronous, so the call is
+        // kept as a task the next StartAdvertising awaits rather than being blocked on here. The
+        // exported object goes away immediately, which is what stops BlueZ reading from us.
+        this.connection?.RemoveMethodHandler(current.Path);
+        this.pendingUnregister = this.UnregisterAdvertisement(current.Path);
+    }
+
+
+    async Task RegisterAdvertisement(LEAdvertisementProperties properties)
+    {
+        await this.EnsureConnectionAsync().ConfigureAwait(false);
+
+        if (this.advertisement != null)
+            throw new InvalidOperationException("An advertisement is already running - call StopAdvertising first");
+
+        // let a Stop that is still in flight finish, so BlueZ is not holding the old registration
+        // when the new one arrives
+        var pending = this.pendingUnregister;
+        if (pending != null)
+        {
+            await pending.ConfigureAwait(false);
+            this.pendingUnregister = null;
+        }
+
+        // A fresh path per registration. BlueZ answers "Already Exists" if a path it still knows
+        // about is re-registered, and reusing one makes a Stop/Start race unnecessarily fragile.
+        var path = BluezConstants.AdvertisementPathPrefix + Interlocked.Increment(ref this.advertisementCounter);
+
+        var export = new LEAdvertisement(
+            path,
+            properties,
+            () => this.OnAdvertisementReleased(path)
+        );
+
+        this.connection!.AddMethodHandler(export);
+
+        try
+        {
+            var writer = this.connection.GetMessageWriter();
+            writer.WriteMethodCallHeader(
+                destination: BluezConstants.Service,
+                path: BluezConstants.DefaultAdapterPath,
+                @interface: BluezConstants.LEAdvertisingManagerInterface,
+                member: "RegisterAdvertisement",
+                signature: "oa{sv}"
+            );
+            writer.WriteObjectPath(path);
+
+            // no registration options - BlueZ defines none that matter here
+            var dict = writer.WriteDictionaryStart();
+            writer.WriteDictionaryEnd(dict);
+
+            await this.connection.CallMethodAsync(writer.CreateMessage()).ConfigureAwait(false);
+        }
+        catch
+        {
+            // BlueZ read our properties and refused them (or never answered) - do not leave an
+            // object exported that nothing is going to call
+            this.connection.RemoveMethodHandler(path);
+            throw;
+        }
+
+        this.advertisement = export;
+        this.logger.LogInformation("Registered BlueZ advertisement at {Path}", path);
+    }
+
+
+    async Task UnregisterAdvertisement(string path)
+    {
+        try
+        {
+            var writer = this.connection!.GetMessageWriter();
+            writer.WriteMethodCallHeader(
+                destination: BluezConstants.Service,
+                path: BluezConstants.DefaultAdapterPath,
+                @interface: BluezConstants.LEAdvertisingManagerInterface,
+                member: "UnregisterAdvertisement",
+                signature: "o"
+            );
+            writer.WriteObjectPath(path);
+
+            await this.connection.CallMethodAsync(writer.CreateMessage()).ConfigureAwait(false);
+            this.logger.LogInformation("Unregistered BlueZ advertisement at {Path}", path);
+        }
+        catch (Exception ex)
+        {
+            // DoesNotExist here means BlueZ already dropped it - a Release we raced, or the daemon
+            // restarting. Either way the advertisement is gone, which is what the caller wanted.
+            this.logger.LogDebug(ex, "Could not unregister BlueZ advertisement at {Path}", path);
+        }
+    }
+
+
+    void OnAdvertisementReleased(string path)
+    {
+        // BlueZ stopped the advertisement on its own - adapter powered down, another client took
+        // the slot, or bluetoothd restarted. Drop our side so IsAdvertising stops lying and a
+        // later StartAdvertising is not refused as "already running".
+        if (this.advertisement?.Path != path)
+            return;
+
+        this.logger.LogInformation("BlueZ released the advertisement at {Path}", path);
+        this.advertisement = null;
+        this.connection?.RemoveMethodHandler(path);
+    }
+
+
+    /// <summary>
+    /// BlueZ wants 128-bit UUIDs in the long lowercase form; callers routinely pass the 16-bit
+    /// short form that every other platform accepts.
+    /// </summary>
+    static string NormalizeUuid(string uuid)
+        => (uuid.Length == 4 ? $"0000{uuid}-0000-1000-8000-00805F9B34FB" : uuid).ToLowerInvariant();
 
 
     public Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
-        // L2CAP CoC is independent of BlueZ's GATT/advertising surface — it goes straight
-        // to the kernel via AF_BLUETOOTH sockets, so this works even though our GATT server
-        // and advertising hooks are still stubs.
+        // L2CAP CoC is independent of BlueZ's GATT surface — it goes straight to the kernel via
+        // AF_BLUETOOTH sockets, so this works even though the GATT server is still a stub.
         var (listener, psm) = L2CapSocket.Listen(secure);
         var cts = new CancellationTokenSource();
 
@@ -245,10 +390,28 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     }
 
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
+        // BlueZ keeps advertising until the registration is dropped, and dropping the connection
+        // underneath it leaves the daemon holding a registration for a client that no longer
+        // answers - so unregister first and wait for it.
+        this.StopAdvertising();
+
+        var pending = this.pendingUnregister;
+        if (pending != null)
+        {
+            try
+            {
+                await pending.ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogDebug(ex, "Error unregistering the advertisement during dispose");
+            }
+            this.pendingUnregister = null;
+        }
+
         this.connection?.Dispose();
         this.connection = null;
-        return ValueTask.CompletedTask;
     }
 }
