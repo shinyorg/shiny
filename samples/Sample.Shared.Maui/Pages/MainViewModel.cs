@@ -17,6 +17,11 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             {
                 new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"),
                 new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"),
+                // macOS ranges iBeacons and reads Eddystone, but CoreLocation has no beacon
+                // region monitoring on the Mac - that page is left off deliberately.
+                new("🔵 Beacon Ranging", "Range iBeacons and estimate distance", "beaconranging"),
+                new("🟢 Eddystone", "Scan Eddystone UID / URL / TLM frames", "eddystone"),
+                new("📶 Beacon Broadcast", "Advertise as an iBeacon", "beaconbroadcast"),
                 new("📅 Calendar", "Browse & edit device calendar events", "calendar"),
                 new("🤖 AI Assistant", "Chat + Shiny AI tools via GitHub Copilot", "ai"),
                 new("🔋 Battery", "Observe battery level & state", "battery"),
@@ -31,6 +36,12 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         list.Add(new("📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan"));
         list.Add(new("📢 BLE Hosting", "Advertise as a GATT server", "blehosting"));
         list.Add(new("🧬 BLE Hosting (Generated)", "Same GATT server via [BleService] attributes", "blehostinggen"));
+
+        // --- Beacons ---
+        list.Add(new("🔵 Beacon Ranging", "Range iBeacons and estimate distance", "beaconranging"));
+        list.Add(new("🎯 Beacon Monitoring", "Enter/exit beacon regions in the background", "beaconmonitoring"));
+        list.Add(new("🟢 Eddystone", "Scan Eddystone UID / URL / TLM frames", "eddystone"));
+        list.Add(new("📶 Beacon Broadcast", "Advertise as an iBeacon or Eddystone beacon", "beaconbroadcast"));
         // L2CAP: Android (29+), Apple, Linux/BlueZ. No WinRT surface for it.
         if (!OperatingSystem.IsWindows())
             list.Add(new("🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap"));

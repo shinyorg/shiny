@@ -52,6 +52,16 @@ public static class ShinyRegistrations
 #endif
 
 #if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
+        // Beacons: ranging and Eddystone work on every MAUI-native platform. Monitoring is
+        // registered too - on macOS it reports NotSupported rather than throwing at startup,
+        // because CoreLocation has no beacon region API on the Mac.
+        s.AddBeaconRanging();
+        s.AddEddystoneScanning();
+        s.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
+        s.AddBeaconBroadcasting();
+#endif
+
+#if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
         // Push: every MAUI-native platform; Linux has no Shiny.Push implementation.
         s.AddPush<SamplePushDelegate>();
 #endif

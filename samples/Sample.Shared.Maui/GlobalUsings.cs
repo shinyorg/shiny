@@ -7,6 +7,7 @@ global using Microsoft.Maui.Controls;
 global using Microsoft.Maui.Devices;
 global using Shiny;
 global using Shiny.BluetoothLE;
+global using Shiny.Beacons;
 global using Shiny.Calendar;
 global using Shiny.Contacts;
 global using Shiny.Jobs;

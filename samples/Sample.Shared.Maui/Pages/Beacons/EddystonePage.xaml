@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Beacons"
+             x:Class="Sample.Shared.Maui.Pages.Beacons.EddystonePage"
+             x:DataType="vm:EddystoneViewModel"
+             Title="Eddystone">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="6">
+        <HorizontalStackLayout Grid.Row="0" Spacing="8">
+            <Button Text="{Binding ScanText}" Command="{Binding ToggleScanCommand}" />
+            <Button Text="Clear" Command="{Binding ClearCommand}" />
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="1" Text="{Binding Status}" FontAttributes="Italic" />
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Frames}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="No Eddystone beacons seen" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:EddystoneFrameViewModel">
+                    <Border Padding="8" Margin="0,4" StrokeThickness="1" Stroke="Gray">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding FrameType}" FontAttributes="Bold" />
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Rssi}" />
+                            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Payload}" FontSize="13" />
+                            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Detail}" FontSize="11" TextColor="Gray" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

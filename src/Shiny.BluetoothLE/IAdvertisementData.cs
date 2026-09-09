@@ -1,25 +1,13 @@
-﻿namespace Shiny.BluetoothLE;
+﻿using System.Runtime.CompilerServices;
 
-/// <summary>
-/// Represents service data included in a BLE advertisement
-/// </summary>
-/// <param name="Uuid">The service UUID</param>
-/// <param name="Data">The service data bytes</param>
-public record AdvertisementServiceData(
-    string Uuid,
-    byte[] Data
-);
+// AdvertisementServiceData and ManufacturerData moved to Shiny.BluetoothLE.Common so that the
+// peripheral role can describe the payloads it advertises without taking a dependency on the
+// central role. Same namespace, so nothing recompiles; the forwards keep already-compiled
+// assemblies resolving against this one.
+[assembly: TypeForwardedTo(typeof(Shiny.BluetoothLE.AdvertisementServiceData))]
+[assembly: TypeForwardedTo(typeof(Shiny.BluetoothLE.ManufacturerData))]
 
-/// <summary>
-/// Represents manufacturer-specific data included in a BLE advertisement
-/// </summary>
-/// <param name="CompanyId">The Bluetooth SIG assigned company identifier</param>
-/// <param name="Data">The manufacturer data bytes</param>
-public record ManufacturerData(
-    ushort CompanyId,
-    byte[] Data
-);
-
+namespace Shiny.BluetoothLE;
 
 /// <summary>
 /// Represents the data contained in a BLE advertisement packet

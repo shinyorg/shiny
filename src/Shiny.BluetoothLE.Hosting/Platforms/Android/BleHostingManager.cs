@@ -143,15 +143,26 @@ public partial class BleHostingManager(AndroidPlatform platform) : IBleHostingMa
 
         var settings = new AdvertiseSettings.Builder()!
             .SetAdvertiseMode(AdvertiseMode.Balanced)!
-            .SetConnectable(true)!;
+            .SetConnectable(options.IsConnectable)!;
 
-        var data = new AdvertiseData.Builder()!;
+        var data = new AdvertiseData.Builder()!
+            .SetIncludeTxPowerLevel(options.IncludeTxPower)!;
+
         foreach (var uuid in options.ServiceUuids)
         {
             var nativeUuid = UUID.FromString(uuid);
             var parcel = new ParcelUuid(nativeUuid);
             data = data!.AddServiceUuid(parcel);
         }
+
+        foreach (var sd in options.ServiceData)
+        {
+            var parcel = new ParcelUuid(UUID.FromString(sd.Uuid));
+            data = data!.AddServiceData(parcel, sd.Data);
+        }
+
+        if (options.ManufacturerData != null)
+            data = data!.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
 
         await this.DoAdvertise(settings, data);
 
@@ -238,7 +249,6 @@ public partial class BleHostingManager(AndroidPlatform platform) : IBleHostingMa
 
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
     {
-        //https://www.pubnub.com/blog/build-android-ibeacon-beacon-emitter/
         var settings = new AdvertiseSettings.Builder()!
             .SetAdvertiseMode(AdvertiseMode.LowPower)!
             .SetTimeout(0)!
@@ -246,23 +256,14 @@ public partial class BleHostingManager(AndroidPlatform platform) : IBleHostingMa
             .SetConnectable(false)!;
 
         var data = new AdvertiseData.Builder()!;
-        //.SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
 
-        var bytes = new List<byte>();
-
-        // beacon identifier
-        bytes.Add(0xBE);
-        bytes.Add(0xAC);
-
-        // beacon data
-        bytes.AddRange(uuid.ToByteArray());
-        bytes.AddRange(BitConverter.GetBytes(major));
-        bytes.AddRange(BitConverter.GetBytes(minor));
-        bytes.Add((byte)(txpower ?? -75));
-
-        // 224 - Google's Manufacturer ID
-        // 79 - Apple's manufacturer ID
-        data.AddManufacturerData(79, bytes.ToArray());
+        // Every multi-byte field in an iBeacon payload is big-endian. This used to build the packet
+        // from Guid.ToByteArray() and BitConverter.GetBytes(), both of which are little-endian here,
+        // so the UUID's first three fields and both the major and minor went out byte-swapped and no
+        // receiver could match the beacon. It also prefixed 0xBE 0xAC - AltBeacon's identifier -
+        // where iBeacon wants 0x02 0x15.
+        var bytes = IBeaconPacket.Build(uuid, major, minor, txpower ?? IBeaconPacket.DefaultTxPower);
+        data.AddManufacturerData(IBeaconPacket.AppleCompanyId, bytes);
 
         return this.DoAdvertise(settings, data);
     }

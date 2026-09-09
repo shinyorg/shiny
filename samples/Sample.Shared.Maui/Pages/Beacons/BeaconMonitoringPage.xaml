@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shiny="http://shiny.net/maui/controls"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Beacons"
+             x:Class="Sample.Shared.Maui.Pages.Beacons.BeaconMonitoringPage"
+             x:DataType="vm:BeaconMonitoringViewModel"
+             Title="Beacon Monitoring">
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Monitor a Region">
+                <shiny:EntryCell Title="Identifier" ValueText="{Binding Identifier, Mode=TwoWay}" Placeholder="auto-generated if blank" />
+                <shiny:EntryCell Title="UUID" ValueText="{Binding Uuid, Mode=TwoWay}" Placeholder="proximity UUID" />
+                <shiny:EntryCell Title="Major" ValueText="{Binding Major, Mode=TwoWay}" Keyboard="Numeric" Placeholder="optional" />
+                <shiny:EntryCell Title="Minor" ValueText="{Binding Minor, Mode=TwoWay}" Keyboard="Numeric" Placeholder="requires major" />
+                <shiny:SwitchCell Title="Notify on Entry" On="{Binding NotifyOnEntry, Mode=TwoWay}" />
+                <shiny:SwitchCell Title="Notify on Exit" On="{Binding NotifyOnExit, Mode=TwoWay}" />
+                <shiny:ButtonCell Title="Start Monitoring" Command="{Binding AddRegionCommand}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Status">
+                <shiny:LabelCell Title="Access" ValueText="{Binding AccessStatus}" />
+                <shiny:LabelCell Title="Result" ValueText="{Binding Status}" />
+                <shiny:ButtonCell Title="Stop All" Command="{Binding StopAllCommand}" ButtonTextColor="Red" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Monitored Regions (tap to remove)" ItemsSource="{Binding Regions}">
+                <shiny:TableSection.ItemTemplate>
+                    <DataTemplate x:DataType="vm:MonitoredBeaconRegionViewModel">
+                        <shiny:CommandCell Title="{Binding Identifier}" ValueText="{Binding CurrentState}" Description="{Binding Description}"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BeaconMonitoringViewModel}}, Path=RemoveRegionCommand}"
+                                           CommandParameter="{Binding Identifier}" ShowArrow="False" />
+                    </DataTemplate>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
+</ContentPage>

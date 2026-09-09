@@ -69,6 +69,16 @@ public partial class BleHostingManager : IBleHostingManager
     public Task StartAdvertising(AdvertisementOptions? options = null)
     {
         options ??= new AdvertisementOptions();
+
+        // CoreBluetooth's startAdvertising reads only CBAdvertisementDataLocalNameKey and
+        // CBAdvertisementDataServiceUUIDsKey - anything else in the dictionary is dropped without
+        // an error. Failing loudly beats advertising a payload that silently never goes out.
+        if (options.ServiceData.Count > 0)
+            throw new NotSupportedException("Apple platforms cannot advertise service data - CoreBluetooth only accepts a local name and service UUIDs. Eddystone broadcasting is not possible on iOS, Mac Catalyst or macOS.");
+
+        if (options.ManufacturerData != null)
+            throw new NotSupportedException("Apple platforms cannot advertise manufacturer data - use AdvertiseBeacon for iBeacon, which CoreBluetooth exposes through a dedicated key.");
+
         var opts = new StartAdvertisingOptions();
         if (options.LocalName != null)
             opts.LocalName = options.LocalName;
@@ -140,15 +150,18 @@ public partial class BleHostingManager : IBleHostingManager
     {
         NSMutableDictionary data = null!;
 #if MACCATALYST || MACOS
-            // CLBeaconRegion.GetPeripheralData is unavailable on MacCatalyst/macOS - build raw beacon advertisement
-            var bytes = new List<byte>();
-            bytes.AddRange(uuid.ToByteArray());
-            bytes.AddRange(BitConverter.GetBytes(major));
-            bytes.AddRange(BitConverter.GetBytes(minor));
-            bytes.Add((byte)(txpower ?? -75));
+        // CLBeaconRegion.GetPeripheralData is unavailable on Mac Catalyst/macOS, so the payload is
+        // assembled by hand. kCBAdvDataAppleBeaconKey takes the 21 bytes that follow the 0x02 0x15
+        // header - UUID, major, minor, measured power - all big-endian. This used to use
+        // Guid.ToByteArray() and BitConverter.GetBytes(), which are little-endian, and shipped a
+        // byte-swapped UUID, major and minor.
+        var payload = IBeaconPacket.Build(uuid, major, minor, txpower ?? IBeaconPacket.DefaultTxPower);
 
-            data = new NSMutableDictionary();
-            data.SetValueForKey(NSData.FromArray(bytes.ToArray()), new NSString("kCBAdvDataAppleBeaconKey"));
+        data = new NSMutableDictionary();
+        data.SetValueForKey(
+            NSData.FromArray(payload[2..]),
+            new NSString("kCBAdvDataAppleBeaconKey")
+        );
 #else
         var id = new CLBeaconIdentityConstraint(uuid.ToNSUuid(), major, minor);
         var beacon = new CLBeaconRegion(id, "ShinyBle");

@@ -23,6 +23,7 @@
         <Project Path="tests/Shiny.Notifications.Tests/Shiny.Notifications.Tests.csproj" />
         <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
         <Project Path="tests/Shiny.BluetoothLE.Common.Tests/Shiny.BluetoothLE.Common.Tests.csproj" />
+        <Project Path="tests/Shiny.Beacons.Tests/Shiny.Beacons.Tests.csproj" />
         <Project Path="tests/Shiny.BluetoothLE.Hosting.SourceGenerators.Tests/Shiny.BluetoothLE.Hosting.SourceGenerators.Tests.csproj" />
     </Folder>
     <Folder Name="/.Solution/">
@@ -50,6 +51,7 @@
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting.SourceGenerators\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj" />
     <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+    <Project Path="src\Shiny.Beacons\Shiny.Beacons.csproj" />
     <Project Path="src\Shiny.Contacts\Shiny.Contacts.csproj" />
     <Project Path="src\Shiny.Contacts.Extensions.AI\Shiny.Contacts.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Calendar\Shiny.Calendar.csproj" />

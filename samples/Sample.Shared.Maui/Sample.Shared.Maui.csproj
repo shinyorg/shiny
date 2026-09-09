@@ -48,6 +48,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
 
         <!--
             A ProjectReference does not carry the analyzers a PackageReference would, so the

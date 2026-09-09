@@ -120,7 +120,9 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
 
 
     public Task AdvertiseBeacon(Guid uuid, ushort major, ushort minor, sbyte? txpower = null)
-        => throw new NotSupportedException("iBeacon advertising is not supported on Linux/BlueZ.");
+        // BlueZ is perfectly capable of this - LEAdvertisement1 has a ManufacturerData property -
+        // but it needs the same D-Bus object export StartAdvertising above is still missing.
+        => throw new NotSupportedException("Beacon advertising needs LE advertising via BlueZ, which is not yet implemented. Beacon scanning and monitoring do work on Linux.");
 
 
     public Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)

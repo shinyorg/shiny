@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Beacons"
+             x:Class="Sample.Shared.Maui.Pages.Beacons.BeaconRangingPage"
+             x:DataType="vm:BeaconRangingViewModel"
+             Title="Beacon Ranging">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Padding="16" RowSpacing="6">
+        <Entry Grid.Row="0"
+               Text="{Binding Uuid, Mode=TwoWay}"
+               Placeholder="Proximity UUID" />
+
+        <HorizontalStackLayout Grid.Row="1" Spacing="8">
+            <Entry Text="{Binding Major, Mode=TwoWay}" Placeholder="Major (optional)" Keyboard="Numeric" WidthRequest="150" />
+            <Entry Text="{Binding Minor, Mode=TwoWay}" Placeholder="Minor (optional)" Keyboard="Numeric" WidthRequest="150" />
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout Grid.Row="2" Spacing="8">
+            <Button Text="{Binding ScanText}" Command="{Binding ToggleScanCommand}" />
+            <Button Text="Use Sample UUID" Command="{Binding UseSampleUuidCommand}" />
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="3" Text="{Binding Status}" FontAttributes="Italic" />
+
+        <CollectionView Grid.Row="4" ItemsSource="{Binding Beacons}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="No beacons in range" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:RangedBeaconViewModel">
+                    <Border Padding="8" Margin="0,4" StrokeThickness="1" Stroke="Gray">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding Identity}" FontAttributes="Bold" FontSize="13" />
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Proximity}" FontAttributes="Bold" />
+                            <Label Grid.Row="1" Grid.Column="0" Text="{Binding Distance}" />
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding Rssi}" />
+                            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding LastSeen}" FontSize="11" TextColor="Gray" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

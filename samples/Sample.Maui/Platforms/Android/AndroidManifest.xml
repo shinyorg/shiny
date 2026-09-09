@@ -16,6 +16,10 @@
     
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <!-- Shiny.Beacons: background region monitoring runs a BLE scan inside a foreground service.
+         Android 14 requires the declared type to match what the service does, and a BLE scan is
+         a connectedDevice activity - not location. The service itself merges in from the package. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <!-- Shiny.ScreenRecorder: MediaProjection needs a mediaProjection foreground service, which
          from Android 14 must already be running before getMediaProjection is called. RECORD_AUDIO
          covers both the microphone and app-audio playback capture. The service and the consent

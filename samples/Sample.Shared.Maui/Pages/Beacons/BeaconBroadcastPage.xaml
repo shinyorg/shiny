@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shiny="http://shiny.net/maui/controls"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Beacons"
+             x:Class="Sample.Shared.Maui.Pages.Beacons.BeaconBroadcastPage"
+             x:DataType="vm:BeaconBroadcastViewModel"
+             Title="Beacon Broadcast">
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="iBeacon">
+                <shiny:EntryCell Title="UUID" ValueText="{Binding Uuid, Mode=TwoWay}" />
+                <shiny:EntryCell Title="Major" ValueText="{Binding Major, Mode=TwoWay}" Keyboard="Numeric" />
+                <shiny:EntryCell Title="Minor" ValueText="{Binding Minor, Mode=TwoWay}" Keyboard="Numeric" />
+                <shiny:ButtonCell Title="Broadcast iBeacon" Command="{Binding BroadcastIBeaconCommand}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Eddystone (not available on Apple platforms)">
+                <shiny:EntryCell Title="Namespace" ValueText="{Binding EddystoneNamespace, Mode=TwoWay}" Placeholder="20 hex chars" />
+                <shiny:EntryCell Title="Instance" ValueText="{Binding EddystoneInstance, Mode=TwoWay}" Placeholder="12 hex chars" />
+                <shiny:ButtonCell Title="Broadcast Eddystone-UID" Command="{Binding BroadcastUidCommand}" />
+                <shiny:EntryCell Title="URL" ValueText="{Binding Url, Mode=TwoWay}" Placeholder="https://shinylib.net/" />
+                <shiny:ButtonCell Title="Broadcast Eddystone-URL" Command="{Binding BroadcastUrlCommand}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Status">
+                <shiny:LabelCell Title="Broadcasting" ValueText="{Binding IsBroadcastingText}" />
+                <shiny:LabelCell Title="Result" ValueText="{Binding Status}" />
+                <shiny:ButtonCell Title="Stop" Command="{Binding StopCommand}" ButtonTextColor="Red" />
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
+</ContentPage>
