@@ -1,6 +1,7 @@
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using AndroidX.Core.App;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.ScreenRecorder;
@@ -18,7 +19,9 @@ namespace Shiny.ScreenRecorder;
 /// life of the recording, and it stops as soon as the recording does.</para>
 /// <para>The persistent notification is not suppressible, and neither is the system's own screen
 /// cast indicator. That is deliberate on Android's part and this package does not try to work
-/// around it.</para>
+/// around it. What the notification says is up to the app: it defaults to a plain title, a line of
+/// text and a Stop action, and <see cref="IScreenRecordingNotificationDelegate"/> can change any of
+/// it.</para>
 /// </remarks>
 [Android.App.Service(
     Enabled = true,
@@ -27,7 +30,12 @@ namespace Shiny.ScreenRecorder;
 )]
 public class ScreenRecorderService : ShinyAndroidForegroundService
 {
+    internal const string ActionStopRecording = "SHINY_SCREEN_RECORDING_STOP";
+
     static TaskCompletionSource? ready;
+
+    // the recording the notification's Stop action ends - one at a time, like everything else here
+    static AndroidScreenRecording? recording;
 
     public static bool IsStarted { get; private set; }
 
@@ -76,6 +84,45 @@ public class ScreenRecorderService : ShinyAndroidForegroundService
     {
         if (IsStarted)
             platform.StopService(typeof(ScreenRecorderService));
+    }
+
+
+    internal static void Attach(AndroidScreenRecording active) => Interlocked.Exchange(ref recording, active);
+    internal static void Detach(AndroidScreenRecording active) => Interlocked.CompareExchange(ref recording, null, active);
+
+
+    public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
+    {
+        if (intent?.Action != ActionStopRecording)
+            return base.OnStartCommand(intent, flags, startId);
+
+        this.Logger.NotificationStopRequested();
+
+        // a Stop tapped on a notification that outlived its recording must not leave a started service behind
+        if (Volatile.Read(ref recording) is { } active)
+            active.StopFromNotification();
+        else
+            this.StopSelf(startId);
+
+        return StartCommandResult.NotSticky;
+    }
+
+
+    protected override NotificationCompat.Builder CreateNotificationBuilder()
+    {
+        var builder = base
+            .CreateNotificationBuilder()
+            .SetContentTitle("Screen recording")!
+            .SetContentText("Your screen is being recorded")!
+            .AddAction(0, "Stop", this.Platform.GetScreenRecordingStopIntent())!;
+
+        // the same hook the GPS, beacon and transfer services give their delegates - run after the defaults
+        // so an app only replaces what it wants to change
+        this.GetServices<IScreenRecordingNotificationDelegate>()
+            .ToList()
+            .ForEach(x => x.Configure(builder));
+
+        return builder;
     }
 
 

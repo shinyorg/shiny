@@ -73,12 +73,21 @@ public class ScreenCapturePermissionActivity : Activity
             return;
         }
 
+        // Android 14 put an app picker in front of this dialog and preselects "a single app" in it. A
+        // request without a Target is documented as the primary display and this module reports no
+        // WindowSelection on Android, so ask for exactly that. It also stops the picker relaunching the
+        // host app on top of this activity when the user picks the host itself - a second launcher
+        // activity that .NET MAUI rejects, taking the recording down with it
+        var intent = OperatingSystem.IsAndroidVersionAtLeast(34)
+            ? manager.CreateScreenCaptureIntent(MediaProjectionConfig.CreateConfigForDefaultDisplay())
+            : manager.CreateScreenCaptureIntent();
+
 #pragma warning disable CA1422 // StartActivityForResult is soft-deprecated in favour of the AndroidX
         // ActivityResultLauncher, which needs a ComponentActivity and a registration made before
         // onStart. This activity exists for exactly one result and is destroyed immediately after,
         // so the older API is the correct shape here and the replacement would only add a
         // Fragment/AndroidX dependency to a package that otherwise needs none.
-        this.StartActivityForResult(manager.CreateScreenCaptureIntent(), RequestCode);
+        this.StartActivityForResult(intent, RequestCode);
 #pragma warning restore CA1422
     }
 

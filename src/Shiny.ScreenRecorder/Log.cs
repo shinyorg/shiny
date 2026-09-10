@@ -204,6 +204,22 @@ internal static partial class AndroidPlatformLog
         Message = "Tearing down the media projection failed"
     )]
     public static partial void ProjectionTeardownFailed(this ILogger logger, Exception exception);
+
+
+    [LoggerMessage(
+        EventId = 124,
+        Level = LogLevel.Information,
+        Message = "Screen recording stop requested from the notification"
+    )]
+    public static partial void NotificationStopRequested(this ILogger logger);
+
+
+    [LoggerMessage(
+        EventId = 125,
+        Level = LogLevel.Warning,
+        Message = "Stopping the media projection from the notification failed"
+    )]
+    public static partial void NotificationStopFailed(this ILogger logger, Exception exception);
 }
 
 
