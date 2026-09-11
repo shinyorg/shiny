@@ -27,8 +27,8 @@ jobs:
 
     # macOS, not Windows: Shiny.iOS.LiveActivities.Binding builds the ActivityKit Swift shim
     # (native/ShinyLiveActivities) through Xcode, which only exists here.
-    # NOTE: Directory.Build.props drops $(WindowsTarget) on non-Windows hosts, so the
-    # net10.0-windows TFM is NOT produced by this job.
+    # Directory.Build.props only adds $(WindowsTarget) on Windows hosts, so the Build step passes
+    # EnableWindowsTargeting=true - drop it and every package silently loses its net10.0-windows lib.
     runs-on: macos-latest
 
     steps:
@@ -59,7 +59,7 @@ jobs:
         build CODE_SIGNING_ALLOWED=NO
 
     - name: Build
-      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true
+      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true -property:EnableWindowsTargeting=true
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v7

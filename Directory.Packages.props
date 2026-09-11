@@ -4,16 +4,16 @@
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
         <MsftExtensionVersion>10.0.7</MsftExtensionVersion>
         <MauiLabsVersion>0.1.0-preview.12.26368.2</MauiLabsVersion>
-        <MauiVersion>10.0.90</MauiVersion>
+        <MauiVersion>10.0.100</MauiVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Shiny.Maui.Shell" Version="6.3.2"/>
-        <PackageVersion Include="Shiny.Maui.Controls" Version="1.0.1-beta-0174"/>
-        <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="5.1.5"/>
-        <PackageVersion Include="Shiny.Extensions.Stores" Version="5.1.5"/>
-        <PackageVersion Include="Shiny.Extensions.Stores.Web" Version="5.1.5"/>
-        <PackageVersion Include="Shiny.Extensions.Serialization" Version="5.1.5"/>
+        <PackageVersion Include="Shiny.Maui.Shell" Version="7.0.0"/>
+        <PackageVersion Include="Shiny.Maui.Controls" Version="1.3.0"/>
+        <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="5.2.1"/>
+        <PackageVersion Include="Shiny.Extensions.Stores" Version="5.2.1"/>
+        <PackageVersion Include="Shiny.Extensions.Stores.Web" Version="5.2.1"/>
+        <PackageVersion Include="Shiny.Extensions.Serialization" Version="5.2.1"/>
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>

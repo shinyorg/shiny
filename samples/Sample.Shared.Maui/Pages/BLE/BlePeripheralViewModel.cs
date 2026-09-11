@@ -104,6 +104,8 @@ public partial class BlePeripheralViewModel(IBleManager bleManager, INavigator n
         await navigator.NavigateTo(
             "blecharacteristic",
             true,
+            false,
+            default,
             ("PeripheralUuid", this.peripheral.Uuid),
             ("ServiceUuid", svc.Uuid)
         );

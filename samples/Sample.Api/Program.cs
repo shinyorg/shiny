@@ -19,10 +19,13 @@ builder.Services.AddDocumentStore(opts =>
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters = { new JsonStringEnumConverter() }
     };
-    opts
-        .MapTypeToTable<TodoItem>("todos", t => t.Identifier)
-        .MapTypeToTable<SyncChange>("sync_changes")
-        .MapTypeToTable<FileRecord>("files");
+    opts.ConfigureDocument<TodoItem>(cfg =>
+    {
+        cfg.Table = "todos";
+        cfg.MapIdProperty(t => t.Identifier);
+    });
+    opts.ConfigureDocument<SyncChange>(cfg => cfg.Table = "sync_changes");
+    opts.ConfigureDocument<FileRecord>(cfg => cfg.Table = "files");
 });
 
 builder.Services.ConfigureHttpJsonOptions(o =>

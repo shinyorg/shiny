@@ -25,9 +25,13 @@
             Platform targets are dropped on hosts that cannot build them, the same way the Windows
             target is. The ios/maccatalyst/macos workloads refuse to install on Linux ("Workload ID
             ios isn't supported on this platform"), so leaving them in TargetFrameworks makes every
-            multi-targeted project unbuildable there. Windows and macOS hosts are unaffected - CI
-            builds and packs on windows-latest, so the shipped packages still carry every target.
-            Android installs everywhere, so it stays unconditional.
+            multi-targeted project unbuildable there. Android installs everywhere, so it stays
+            unconditional.
+
+            The Windows target is only on by default on Windows hosts. CI builds and packs on
+            macos-latest (the Live Activities binding needs Xcode), so it opts back in with
+            -p:EnableWindowsTargeting=true - without that the shipped packages silently lose their
+            net10.0-windows lib. The same switch compiles the Windows target on a Mac locally.
         -->
         <AppleTargetsSupported Condition="!$([MSBuild]::IsOSPlatform('linux'))">true</AppleTargetsSupported>
 
@@ -36,7 +40,7 @@
         <MacCatalystTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-maccatalyst</MacCatalystTarget>
         <MacOsTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-macos</MacOsTarget>
         <TvOsTarget Condition="'$(AppleTargetsSupported)' == 'true'">$(BaseTargetFramework)-tvos</TvOsTarget>
-        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows'))">$(BaseTargetFramework)-windows10.0.19041.0</WindowsTarget>
+        <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows')) OR '$(EnableWindowsTargeting)' == 'true'">$(BaseTargetFramework)-windows10.0.19041.0</WindowsTarget>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -84,5 +88,16 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
         <DefineConstants>$(DefineConstants);PLATFORM;WINDOWS</DefineConstants>
+    </PropertyGroup>
+
+    <!--
+        Cross-compiling the Windows target from macOS: WinAppSDK's PRI step shells out to makepri.exe,
+        which cannot run there, so the WinAppSDK projects (Shiny.Hosting.Maui) skip generating and
+        packing their project .pri. None of these libraries carry XAML or resources - a Windows-built
+        package's .pri is an empty resource index - so the app loses nothing without it.
+    -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('windows')) AND !$([MSBuild]::IsOSPlatform('windows'))">
+        <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
+        <IncludeProjectPriFile>false</IncludeProjectPriFile>
     </PropertyGroup>
 </Project>
