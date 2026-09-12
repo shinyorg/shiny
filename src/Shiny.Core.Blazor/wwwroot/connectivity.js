@@ -1,7 +1,12 @@
 var conn;
 var dotNetRef;
+var initialized = false;
 
+// Resolves navigator.connection once. Without it getConnType() only ever answers 'unknown'.
 export function init() {
+    if (initialized) return;
+    initialized = true;
+
     conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 }
 
@@ -20,6 +25,7 @@ export function getEffectiveType() {
 }
 
 export function startListener(objRef) {
+    init();
     dotNetRef = objRef;
     window.addEventListener('online', updateConnectionStatus);
     window.addEventListener('offline', updateConnectionStatus);

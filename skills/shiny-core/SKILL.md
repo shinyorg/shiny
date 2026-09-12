@@ -177,7 +177,7 @@ public class MainActivity : ShinyAndroidActivity { }
 
 ### Blazor WebAssembly Setup
 
-For Blazor WASM, reference `Shiny.Core.Blazor` and call `AddConnectivity()` / `AddBattery()` to wire navigator-based monitoring. Storage requires `Shiny.Extensions.Stores.Web` and a call to `host.Services.UseShinyStores()` after `Build()` so the static `Shiny.Stores` accessor snapshots the `IJSRuntime`-backed `LocalStorageKeyValueStore`.
+For Blazor WASM, reference `Shiny.Core.Blazor` and call `AddConnectivity()` / `AddBattery()` to wire navigator-based monitoring. Both monitors load a JS module before they can report anything, so they self-start on the first property read or `Changed` subscription and report `Unknown` until that completes; `await host.Services.UseShinyCore()` after `Build()` starts them up front when the first read must be accurate. Only Chromium-based browsers expose the Network Information and Battery Status APIs — elsewhere `ConnectionTypes` and `BatteryState` stay `Unknown` (`Access` still works, it is `navigator.onLine`). Storage requires `Shiny.Extensions.Stores.Web` and a call to `host.Services.UseShinyStores()` after `Build()` so the static `Shiny.Stores` accessor snapshots the `IJSRuntime`-backed `LocalStorageKeyValueStore`.
 
 ## Code Generation Instructions
 
@@ -243,3 +243,4 @@ global using Shiny.BluetoothLE;
 ## Reference Files
 
 - [API Reference](reference/api-reference.md)
+- Public docs: https://shinylib.net/core/ (platform, lifecycle hooks, startup tasks, device monitoring, access & permissions, utilities, release notes)

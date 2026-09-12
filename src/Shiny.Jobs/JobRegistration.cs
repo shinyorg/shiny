@@ -66,7 +66,7 @@ public sealed class JobRegistrar(IServiceCollection services)
     /// <typeparam name="TJob">The job type to register.</typeparam>
     /// <param name="configure">Optional fluent configuration.</param>
     /// <returns>This registrar, for fluent chaining.</returns>
-    public JobRegistrar Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TJob>(Func<JobRegistration, JobRegistration>? configure = null) where TJob : class, IJob
+    public JobRegistrar Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TJob>(Func<JobRegistration, JobRegistration>? configure = null) where TJob : class, IJob
     {
         var reg = new JobRegistration(typeof(TJob));
         if (configure != null)

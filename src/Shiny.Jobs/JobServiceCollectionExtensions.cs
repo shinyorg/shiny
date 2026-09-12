@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
     /// <example>
     /// <code>services.AddJob&lt;MyJob&gt;(r =&gt; r.WithForeground().WithInternet(InternetAccess.Any));</code>
     /// </example>
-    public static IServiceCollection AddJob<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
+    public static IServiceCollection AddJob<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
         where TJob : class, IJob
     {
 #if PLATFORM

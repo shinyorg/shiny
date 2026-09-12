@@ -1,10 +1,27 @@
 var battery;
 var dotNetRef;
+var initialized = false;
 
+// Must run before anything below reports a real value - navigator.getBattery() is a promise,
+// so it cannot be resolved from the synchronous getters the IBattery contract exposes.
 export async function init() {
+    if (initialized) return;
+    initialized = true;
+
     if (navigator.getBattery) {
-        battery = await navigator.getBattery();
+        try {
+            battery = await navigator.getBattery();
+        }
+        catch {
+            // Some browsers expose the function but reject the call (insecure context,
+            // permissions policy). Treat that as "no battery API".
+            battery = undefined;
+        }
     }
+}
+
+export function isSupported() {
+    return !!battery;
 }
 
 export function isCharging() {
@@ -17,7 +34,8 @@ export function getLevel() {
     return battery.level;
 }
 
-export function startListener(objRef) {
+export async function startListener(objRef) {
+    await init();
     dotNetRef = objRef;
     if (!battery) return;
 
