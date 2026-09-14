@@ -290,7 +290,15 @@ public partial class Peripheral
         if (!this.Native.CanSendWriteWithoutResponse)
         {
             this.logger.CanSendWriteWithoutResponse(nativeCh, false);
-            await this.WaitForOperation(this.readyWwrSubj, ct).ConfigureAwait(false);
+
+            // readyWwrSubj is hot and IsReadyToSendWriteWithoutResponse fires once, on CoreBluetooth's queue. Merge
+            // subscribes to it BEFORE the deferred re-check runs, so a callback that lands between the check above and
+            // the wait is still seen - otherwise the wait never completes and the operation lock is held until disconnect (#1657)
+            var ready = this.readyWwrSubj.Merge(Observable.Defer(() => this.Native.CanSendWriteWithoutResponse
+                ? Observable.Return(Unit.Default)
+                : Observable.Empty<Unit>()
+            ));
+            await this.WaitForOperation(ready, ct).ConfigureAwait(false);
             this.logger.CanSendWriteWithoutResponse(nativeCh, true);
         }
         this.logger.LogDebug("Writing characteristic without response");
