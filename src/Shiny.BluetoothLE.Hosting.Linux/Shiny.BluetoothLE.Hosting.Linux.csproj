@@ -13,4 +13,7 @@
     <ItemGroup>
         <PackageReference Include="Tmds.DBus.Protocol" />
     </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.BluetoothLE.Hosting.Linux.Tests" />
+    </ItemGroup>
 </Project>

@@ -26,7 +26,20 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     /// </summary>
     public string? ObjectPath { get; internal set; }
 
-    internal Func<byte[], IReadOnlyCollection<Peripheral>, Task>? NotifyDispatcher { get; set; }
+    /// <summary>
+    /// BlueZ object path of the service this characteristic belongs to.
+    /// </summary>
+    internal string? ServicePath { get; set; }
+
+    /// <summary>
+    /// Hands a value to BlueZ as a <c>PropertiesChanged</c> signal. Set while the parent service is registered.
+    /// </summary>
+    internal Action<byte[]>? NotifyDispatcher { get; set; }
+
+    /// <summary>
+    /// Whether BlueZ reports at least one central with notifications or indications enabled.
+    /// </summary>
+    internal bool IsNotifying { get; private set; }
 
 
     public GattCharacteristic(string uuid) => this.Uuid = uuid;
@@ -88,12 +101,53 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         if (this.NotifyDispatcher == null)
             throw new InvalidOperationException("Characteristic has not been registered with BlueZ yet");
 
-        IReadOnlyCollection<Peripheral> targets = centrals.Length == 0
-            ? this.subscribers.Values.ToList()
-            : centrals.OfType<Peripheral>().ToList();
+        // nobody has notifications enabled - there is nothing to send
+        if (!this.IsNotifying)
+            return Task.CompletedTask;
 
-        return this.NotifyDispatcher(data, targets);
+        // BlueZ fans a Value change out to every subscribed central and offers an external application no way
+        // to address one, so the centrals named here cannot narrow the recipients. The send is skipped only when
+        // none of them is subscribed
+        if (centrals.Length > 0 && !centrals.Any(this.IsSubscribed))
+            return Task.CompletedTask;
+
+        this.NotifyDispatcher(data);
+        return Task.CompletedTask;
     }
+
+
+    /// <summary>
+    /// BlueZ called StartNotify or StopNotify. It reports only that notifications are on for somebody, never
+    /// which central enabled them, so while they are on every connected central is treated as subscribed.
+    /// </summary>
+    internal void SetNotifying(bool notifying, IReadOnlyList<Peripheral> connected)
+    {
+        this.IsNotifying = notifying;
+        if (notifying)
+        {
+            foreach (var peripheral in connected)
+                this.AddSubscriber(peripheral);
+        }
+        else
+        {
+            foreach (var devicePath in this.subscribers.Keys.ToList())
+                this.RemoveSubscriber(devicePath);
+        }
+    }
+
+
+    internal void OnDeviceConnectionChanged(Peripheral peripheral, bool connected)
+    {
+        if (!connected)
+            this.RemoveSubscriber(peripheral.DevicePath);
+        else if (this.IsNotifying)
+            this.AddSubscriber(peripheral);
+    }
+
+
+    bool IsSubscribed(IPeripheral central) => central is Peripheral linux
+        ? this.subscribers.ContainsKey(linux.DevicePath)
+        : this.subscribers.Values.Any(x => x.Uuid.Equals(central.Uuid, StringComparison.OrdinalIgnoreCase));
 
 
     internal void AddSubscriber(Peripheral peripheral)

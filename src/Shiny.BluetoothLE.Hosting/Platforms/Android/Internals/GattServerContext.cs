@@ -1,4 +1,8 @@
-﻿using System.Reactive.Subjects;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Reactive;
+using System.Reactive.Subjects;
+using System.Threading;
 using Android.Bluetooth;
 using Android.Content;
 using AGattStatus = Android.Bluetooth.GattStatus;
@@ -34,7 +38,24 @@ public class GattServerContext : BluetoothGattServerCallback
     {
         this.server?.Close();
         this.server = null!;
+        this.ServerClosed.OnNext(Unit.Default);
     }
+
+
+    /// <summary>
+    /// Fires when the GATT server is closed - anything waiting on a server callback will never get one.
+    /// </summary>
+    public Subject<Unit> ServerClosed { get; } = new();
+
+
+    readonly ConcurrentDictionary<string, SemaphoreSlim> notificationGates = new();
+
+    /// <summary>
+    /// Android allows one notification in flight per remote device across the whole server; the next has to
+    /// wait for OnNotificationSent.
+    /// </summary>
+    public SemaphoreSlim GetNotificationGate(BluetoothDevice device)
+        => this.notificationGates.GetOrAdd(device.Address!, _ => new SemaphoreSlim(1, 1));
 
 
     public Subject<CharacteristicReadEventArgs> CharacteristicRead { get; } = new();
@@ -76,9 +97,9 @@ public class GattServerContext : BluetoothGattServerCallback
         => this.ConnectionStateChanged.OnNext(new ConnectionStateChangeEventArgs(device, status, newState));
 
 
-    public Subject<GattEventArgs> NotificationSent { get; } = new();
+    public Subject<NotificationSentEventArgs> NotificationSent { get; } = new();
     public override void OnNotificationSent(BluetoothDevice peripheral, AGattStatus status)
-        => this.NotificationSent.OnNext(new GattEventArgs(peripheral));
+        => this.NotificationSent.OnNext(new NotificationSentEventArgs(peripheral, status));
 
 
     public Subject<MtuChangedEventArgs> MtuChanged { get; } = new();

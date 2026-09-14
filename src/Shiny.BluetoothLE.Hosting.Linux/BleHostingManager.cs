@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,14 +15,22 @@ namespace Shiny.BluetoothLE.Hosting;
 /// BLE peripheral hosting via BlueZ on Linux. Talks to the system D-Bus and exposes
 /// services/characteristics/advertisements through BlueZ's GattManager1 / LEAdvertisingManager1.
 /// </summary>
-public class BleHostingManager : IBleHostingManager, IAsyncDisposable
+public class BleHostingManager : IBleHostingManager, IBluezGattHost, IAsyncDisposable
 {
     readonly ILogger<BleHostingManager> logger;
     readonly Dictionary<string, GattService> services = new();
+    readonly SemaphoreSlim gattLock = new(1, 1);
+    readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
+    readonly HashSet<string> connectedDevices = new();
     DBusConnection? connection;
     LEAdvertisement? advertisement;
     Task? pendingUnregister;
+    Task? pendingGattUpdate;
+    IDisposable? deviceWatch;
+    bool applicationExported;
+    bool applicationRegistered;
     int advertisementCounter;
+    int serviceCounter;
 
 
     public BleHostingManager(ILogger<BleHostingManager> logger)
@@ -33,7 +42,7 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     public AccessState AdvertisingAccessStatus { get; private set; } = AccessState.Unknown;
     public AccessState GattAccessStatus { get; private set; } = AccessState.Unknown;
     public bool IsAdvertising => this.advertisement != null;
-    public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
+    public IReadOnlyList<IGattService> Services => this.GetServiceSnapshot().Cast<IGattService>().ToList();
 
 
     public async Task<AccessState> RequestAccess(bool advertise = true, bool connect = true)
@@ -67,40 +76,103 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     {
         await this.EnsureConnectionAsync().ConfigureAwait(false);
 
-        var svc = new GattService(uuid, primary);
-        serviceBuilder(svc);
+        var service = new GattService(uuid, primary);
+        serviceBuilder(service);
 
-        // Assign object paths now so user code (e.g. Notify) can reason about them.
-        var index = this.services.Count;
-        svc.ObjectPath = $"{BluezConstants.ApplicationRootPath}/service{index}";
-        for (var i = 0; i < svc.NativeCharacteristics.Count; i++)
-            svc.NativeCharacteristics[i].ObjectPath = $"{svc.ObjectPath}/char{i}";
+        // a fresh path per service - numbering from the service count collides once one has been removed
+        service.ObjectPath = $"{BluezConstants.ApplicationRootPath}/service{Interlocked.Increment(ref this.serviceCounter)}";
+        for (var i = 0; i < service.NativeCharacteristics.Count; i++)
+        {
+            var characteristic = service.NativeCharacteristics[i];
+            characteristic.ObjectPath = $"{service.ObjectPath}/char{i}";
+            characteristic.ServicePath = service.ObjectPath;
+        }
 
-        this.services.Add(uuid, svc);
+        await this.gattLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            lock (this.services)
+            {
+                if (this.services.ContainsKey(uuid))
+                    throw new InvalidOperationException($"Service '{uuid}' is already registered");
+            }
 
-        // TODO: export GattService1/GattCharacteristic1 D-Bus objects via DBusConnection.AddMethodHandler
-        // and (re)call org.bluez.GattManager1.RegisterApplication on the adapter so BlueZ picks
-        // up the application root at BluezConstants.ApplicationRootPath.
-        throw new NotSupportedException(
-            "GATT server registration with BlueZ is not yet implemented. " +
-            "The service has been recorded but not exported over D-Bus."
-        );
+            await this.EnsureDeviceWatchAsync().ConfigureAwait(false);
+
+            // BlueZ reads the object tree once, during registration: objects added afterwards are ignored and
+            // removing one drops the whole application. Any change is unregister, change the tree, register again
+            await this.UnregisterApplication().ConfigureAwait(false);
+
+            if (!this.applicationExported)
+            {
+                this.connection!.AddMethodHandler(new GattApplicationObject(BluezConstants.ApplicationRootPath, this.GetServiceSnapshot));
+                this.applicationExported = true;
+            }
+
+            var handlers = this.CreateHandlers(service);
+            this.connection!.AddMethodHandlers(handlers);
+            foreach (var characteristic in service.NativeCharacteristics)
+                characteristic.NotifyDispatcher = data => this.EmitValueChanged(characteristic, data);
+
+            lock (this.services)
+                this.services.Add(uuid, service);
+
+            try
+            {
+                await this.RegisterApplication().ConfigureAwait(false);
+            }
+            catch
+            {
+                // BlueZ refused the tree - take this service back out and restore the ones that were running
+                lock (this.services)
+                    this.services.Remove(uuid);
+
+                Detach(service);
+                this.connection.RemoveMethodHandlers(HandlerPaths(service));
+                await this.TryRegisterApplication().ConfigureAwait(false);
+                throw;
+            }
+        }
+        finally
+        {
+            this.gattLock.Release();
+        }
+
+        this.logger.LogInformation("Registered GATT service {Uuid} at {Path}", uuid, service.ObjectPath);
+        return service;
     }
 
 
     public void RemoveService(string serviceUuid)
     {
-        if (this.services.Remove(serviceUuid))
+        GattService? service;
+        lock (this.services)
         {
-            // TODO: unregister application from BlueZ if no services remain, otherwise re-register.
+            if (!this.services.Remove(serviceUuid, out service))
+                return;
         }
+
+        Detach(service);
+        this.QueueApplicationRebuild(HandlerPaths(service));
     }
 
 
     public void ClearServices()
     {
-        this.services.Clear();
-        // TODO: call GattManager1.UnregisterApplication
+        List<GattService> removed;
+        lock (this.services)
+        {
+            removed = this.services.Values.ToList();
+            this.services.Clear();
+        }
+
+        if (removed.Count == 0)
+            return;
+
+        foreach (var service in removed)
+            Detach(service);
+
+        this.QueueApplicationRebuild(removed.SelectMany(HandlerPaths).ToList());
     }
 
 
@@ -109,7 +181,7 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
         options ??= new AdvertisementOptions();
 
         var serviceData = options.ServiceData.ToDictionary(
-            x => NormalizeUuid(x.Uuid),
+            x => BluezGatt.NormalizeUuid(x.Uuid),
             x => x.Data
         );
 
@@ -121,7 +193,7 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
         {
             Type = options.IsConnectable ? "peripheral" : "broadcast",
             LocalName = options.LocalName.IsEmpty() ? null : options.LocalName,
-            ServiceUuids = options.ServiceUuids.Select(NormalizeUuid).ToList(),
+            ServiceUuids = options.ServiceUuids.Select(BluezGatt.NormalizeUuid).ToList(),
             ServiceData = serviceData,
             ManufacturerData = manufacturerData,
             Includes = options.IncludeTxPower ? ["tx-power"] : []
@@ -263,18 +335,10 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     }
 
 
-    /// <summary>
-    /// BlueZ wants 128-bit UUIDs in the long lowercase form; callers routinely pass the 16-bit
-    /// short form that every other platform accepts.
-    /// </summary>
-    static string NormalizeUuid(string uuid)
-        => (uuid.Length == 4 ? $"0000{uuid}-0000-1000-8000-00805F9B34FB" : uuid).ToLowerInvariant();
-
-
     public Task<L2CapInstance> OpenL2Cap(bool secure, Action<L2CapChannel> onOpen)
     {
         // L2CAP CoC is independent of BlueZ's GATT surface — it goes straight to the kernel via
-        // AF_BLUETOOTH sockets, so this works even though the GATT server is still a stub.
+        // AF_BLUETOOTH sockets rather than through D-Bus.
         var (listener, psm) = L2CapSocket.Listen(secure);
         var cts = new CancellationTokenSource();
 
@@ -347,6 +411,295 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
     }
 
 
+    // ---- GATT application --------------------------------------------------------------------
+
+    ILogger IBluezGattHost.Logger => this.logger;
+    Peripheral IBluezGattHost.GetPeripheral(string? devicePath, ushort mtu) => this.GetPeripheral(devicePath, mtu);
+
+
+    void IBluezGattHost.SetNotifying(GattCharacteristic characteristic, bool notifying)
+    {
+        List<Peripheral> connected;
+        lock (this.connectedDevices)
+            connected = this.connectedDevices.Select(x => this.GetPeripheral(x)).ToList();
+
+        characteristic.SetNotifying(notifying, connected);
+    }
+
+
+    Peripheral GetPeripheral(string? devicePath, ushort mtu = 0)
+    {
+        // BlueZ versions that do not pass the device option share one anonymous central
+        var peripheral = this.peripherals.GetOrAdd(
+            devicePath ?? String.Empty,
+            static path => new Peripheral(path, BluezGatt.AddressFromDevicePath(path) ?? path)
+        );
+
+        // BlueZ reports the ATT MTU; IPeripheral.Mtu is the usable payload on every platform
+        if (mtu > BleConstants.AttHeaderSize)
+            peripheral.Mtu = mtu - BleConstants.AttHeaderSize;
+
+        return peripheral;
+    }
+
+
+    IReadOnlyList<GattService> GetServiceSnapshot()
+    {
+        lock (this.services)
+            return this.services.Values.ToList();
+    }
+
+
+    List<IPathMethodHandler> CreateHandlers(GattService service)
+    {
+        var handlers = new List<IPathMethodHandler> { new GattServiceObject(service) };
+        handlers.AddRange(service.NativeCharacteristics.Select(x => new GattCharacteristicObject(x, this)));
+        return handlers;
+    }
+
+
+    static List<string> HandlerPaths(GattService service) => service
+        .NativeCharacteristics
+        .Select(x => x.ObjectPath!)
+        .Prepend(service.ObjectPath!)
+        .ToList();
+
+
+    static void Detach(GattService service)
+    {
+        foreach (var characteristic in service.NativeCharacteristics)
+        {
+            characteristic.NotifyDispatcher = null;
+            characteristic.SetNotifying(false, []);
+        }
+    }
+
+
+    void QueueApplicationRebuild(List<string> removedPaths)
+    {
+        // Unregistering is a round trip to BlueZ but RemoveService/ClearServices are synchronous, so the
+        // rebuild runs as a task instead of being blocked on - the next AddService queues behind it on the lock
+        var previous = this.pendingGattUpdate ?? Task.CompletedTask;
+        this.pendingGattUpdate = Task.WhenAll(previous, this.RebuildApplication(removedPaths));
+    }
+
+
+    async Task RebuildApplication(List<string> removedPaths)
+    {
+        await this.gattLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            await this.UnregisterApplication().ConfigureAwait(false);
+            this.connection?.RemoveMethodHandlers(removedPaths);
+            await this.TryRegisterApplication().ConfigureAwait(false);
+        }
+        finally
+        {
+            this.gattLock.Release();
+        }
+    }
+
+
+    async Task TryRegisterApplication()
+    {
+        if (this.GetServiceSnapshot().Count == 0)
+            return;
+
+        try
+        {
+            await this.RegisterApplication().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Could not register the remaining GATT services with BlueZ");
+        }
+    }
+
+
+    async Task RegisterApplication()
+    {
+        var writer = this.connection!.GetMessageWriter();
+        writer.WriteMethodCallHeader(
+            destination: BluezConstants.Service,
+            path: BluezConstants.DefaultAdapterPath,
+            @interface: BluezConstants.GattManagerInterface,
+            member: "RegisterApplication",
+            signature: "oa{sv}"
+        );
+        writer.WriteObjectPath(BluezConstants.ApplicationRootPath);
+
+        // no registration options - BlueZ defines none for a GATT server
+        var dict = writer.WriteDictionaryStart();
+        writer.WriteDictionaryEnd(dict);
+
+        // BlueZ calls GetManagedObjects on the application root while this is in flight
+        await this.connection.CallMethodAsync(writer.CreateMessage()).ConfigureAwait(false);
+        this.applicationRegistered = true;
+    }
+
+
+    async Task UnregisterApplication()
+    {
+        if (!this.applicationRegistered || this.connection == null)
+            return;
+
+        this.applicationRegistered = false;
+        try
+        {
+            var writer = this.connection.GetMessageWriter();
+            writer.WriteMethodCallHeader(
+                destination: BluezConstants.Service,
+                path: BluezConstants.DefaultAdapterPath,
+                @interface: BluezConstants.GattManagerInterface,
+                member: "UnregisterApplication",
+                signature: "o"
+            );
+            writer.WriteObjectPath(BluezConstants.ApplicationRootPath);
+            await this.connection.CallMethodAsync(writer.CreateMessage()).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            // DoesNotExist means BlueZ already dropped it - bluetoothd restarted, say. It is gone either way
+            this.logger.LogDebug(ex, "Could not unregister the GATT application from BlueZ");
+        }
+    }
+
+
+    void EmitValueChanged(GattCharacteristic characteristic, byte[] value)
+    {
+        var connection = this.connection ?? throw new InvalidOperationException("Not connected to the system D-Bus");
+
+        // BlueZ turns a PropertiesChanged on Value into a notification or indication to every subscribed central
+        var writer = connection.GetMessageWriter();
+        writer.WriteSignalHeader(
+            path: characteristic.ObjectPath,
+            @interface: BluezConstants.PropertiesInterface,
+            member: "PropertiesChanged",
+            signature: "sa{sv}as"
+        );
+        writer.WriteString(BluezConstants.GattCharacteristicInterface);
+
+        var changed = writer.WriteDictionaryStart();
+        writer.WriteDictionaryEntryStart();
+        writer.WriteString("Value");
+        writer.WriteSignature("ay");
+        writer.WriteArray(value);
+        writer.WriteDictionaryEnd(changed);
+
+        writer.WriteArray(Array.Empty<string>());
+
+        if (!connection.TrySendMessage(writer.CreateMessage()))
+            throw new InvalidOperationException("The D-Bus connection is closed - the notification was not sent");
+    }
+
+
+    // ---- connected centrals ------------------------------------------------------------------
+
+    async Task EnsureDeviceWatchAsync()
+    {
+        if (this.deviceWatch != null)
+            return;
+
+        // watch first, then read the current state, so a connection that lands in between is not missed
+        this.deviceWatch = await this.connection!.WatchSignalAsync(
+            BluezConstants.Service,
+            null,
+            BluezConstants.PropertiesInterface,
+            "PropertiesChanged",
+            static (Message message, object? _) => ReadConnectionChange(message),
+            (Exception? ex, (string DevicePath, bool Connected)? change) =>
+            {
+                if (ex == null && change != null)
+                    this.OnDeviceConnectionChanged(change.Value.DevicePath, change.Value.Connected);
+            },
+            null,
+            false,
+            ObserverFlags.None
+        ).ConfigureAwait(false);
+
+        var writer = this.connection.GetMessageWriter();
+        writer.WriteMethodCallHeader(
+            destination: BluezConstants.Service,
+            path: "/",
+            @interface: BluezConstants.ObjectManagerInterface,
+            member: "GetManagedObjects"
+        );
+        var connected = await this.connection
+            .CallMethodAsync(writer.CreateMessage(), static (Message reply, object? _) => ReadConnectedDevices(reply))
+            .ConfigureAwait(false);
+
+        foreach (var devicePath in connected)
+            this.OnDeviceConnectionChanged(devicePath, true);
+    }
+
+
+    static (string DevicePath, bool Connected)? ReadConnectionChange(Message message)
+    {
+        var path = message.PathAsString;
+        if (path == null || !path.StartsWith(BluezConstants.DefaultAdapterPath + "/dev_", StringComparison.Ordinal))
+            return null;
+
+        var reader = message.GetBodyReader();
+        if (reader.ReadString() != BluezConstants.DeviceInterface)
+            return null;
+
+        var changed = reader.ReadDictionaryOfStringToVariantValue();
+        return changed.TryGetValue("Connected", out var connected)
+            ? (path, connected.GetBool())
+            : null;
+    }
+
+
+    static List<string> ReadConnectedDevices(Message reply)
+    {
+        var connected = new List<string>();
+        var reader = reply.GetBodyReader();
+
+        var objects = reader.ReadDictionaryStart();
+        while (reader.HasNext(objects))
+        {
+            reader.AlignStruct();
+            var path = reader.ReadObjectPathAsString();
+
+            var interfaces = reader.ReadDictionaryStart();
+            while (reader.HasNext(interfaces))
+            {
+                reader.AlignStruct();
+                var interfaceName = reader.ReadString();
+                var properties = reader.ReadDictionaryOfStringToVariantValue();
+
+                var isConnectedDevice =
+                    interfaceName == BluezConstants.DeviceInterface &&
+                    path.StartsWith(BluezConstants.DefaultAdapterPath + "/", StringComparison.Ordinal) &&
+                    properties.TryGetValue("Connected", out var value) &&
+                    value.GetBool();
+
+                if (isConnectedDevice)
+                    connected.Add(path);
+            }
+        }
+        return connected;
+    }
+
+
+    void OnDeviceConnectionChanged(string devicePath, bool connected)
+    {
+        bool changed;
+        lock (this.connectedDevices)
+            changed = connected ? this.connectedDevices.Add(devicePath) : this.connectedDevices.Remove(devicePath);
+
+        if (!changed)
+            return;
+
+        var peripheral = this.GetPeripheral(devicePath);
+        foreach (var service in this.GetServiceSnapshot())
+        {
+            foreach (var characteristic in service.NativeCharacteristics)
+                characteristic.OnDeviceConnectionChanged(peripheral, connected);
+        }
+    }
+
+
     async Task EnsureConnectionAsync(CancellationToken ct = default)
     {
         if (this.connection != null) return;
@@ -410,6 +763,24 @@ public class BleHostingManager : IBleHostingManager, IAsyncDisposable
             }
             this.pendingUnregister = null;
         }
+
+        // the same goes for the GATT application
+        var gattUpdate = this.pendingGattUpdate;
+        if (gattUpdate != null)
+            await gattUpdate.ConfigureAwait(false);
+
+        await this.gattLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            await this.UnregisterApplication().ConfigureAwait(false);
+        }
+        finally
+        {
+            this.gattLock.Release();
+        }
+
+        this.deviceWatch?.Dispose();
+        this.deviceWatch = null;
 
         this.connection?.Dispose();
         this.connection = null;

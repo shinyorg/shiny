@@ -314,6 +314,17 @@ and generated request/response replies already pass `BleHostToken`. An empty cen
 subscriber on all platforms; a named list goes only to those centrals. `SubscribedCentrals` is tracked whether
 or not `SetNotification` was given a subscribe hook, so never register a no-op hook just to populate it.
 
+**Android** paces `Notify` per central - it waits for `onNotificationSent` before sending that central the next
+value and throws if Android refuses the notification or reports a failed status. Do not add delays between
+notifications. A central that enabled indications receives indications.
+
+**Linux (BlueZ)** has two limits the code you generate must respect. BlueZ only tells the app whether *any*
+central has notifications enabled, so while one is subscribed every connected central appears in
+`SubscribedCentrals`. And every `Notify` reaches all subscribed centrals - the `centrals` argument cannot narrow
+it (the send is skipped only when none of the named centrals is subscribed). Never put per-central data on a
+notify characteristic that several centrals subscribe to on Linux; generated request/response replies fan out
+to every subscriber there. Adding or removing a service re-registers the whole GATT application with BlueZ.
+
 ```csharp
 [Notify]
 public async Task Push(BleServiceContext context, byte[] payload)

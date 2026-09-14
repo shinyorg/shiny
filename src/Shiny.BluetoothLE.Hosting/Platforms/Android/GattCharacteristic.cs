@@ -17,6 +17,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     readonly GattServerContext context;
     readonly CompositeDisposable disposer = new();
     readonly Dictionary<string, IPeripheral> subscribers = new();
+    readonly Dictionary<string, bool> indicating = new();
     Func<CharacteristicSubscription, Task>? onSubscribe;
     Func<WriteRequest, Task>? onWrite;
     Func<ReadRequest, Task<GattResult>>? onRead;
@@ -50,10 +51,9 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         => this.Notify(data, CancellationToken.None, centrals);
 
 
-    public Task Notify(byte[] data, CancellationToken cancellationToken, params IPeripheral[] centrals)
+    public async Task Notify(byte[] data, CancellationToken cancellationToken, params IPeripheral[] centrals)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        this.Native.SetValue(data);
 
         // an empty list means every subscriber - OfType never returns null, so a `??` fallback never ran
         // and a broadcast went to nobody
@@ -61,12 +61,77 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             ? this.SubscribedCentrals.OfType<Peripheral>().ToArray()
             : centrals.OfType<Peripheral>().ToArray();
 
-        foreach (var send in sendTo)
+        await Task
+            .WhenAll(sendTo.Select(x => this.NotifyDevice(x.Native, data, cancellationToken)))
+            .ConfigureAwait(false);
+    }
+
+
+    async Task NotifyDevice(BluetoothDevice device, byte[] data, CancellationToken cancellationToken)
+    {
+        // Android keeps one notification in flight per remote device and refuses the next until
+        // OnNotificationSent arrives - sending without waiting returned busy (or false) and the value was
+        // silently dropped (#1657). The gate is per device across the whole server, not per characteristic
+        var gate = this.context.GetNotificationGate(device);
+        await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
         {
-            // TODO: exception on false?
-            this.context.Server.NotifyCharacteristicChanged(send.Native, this.Native, false);
+            // null means the central went away before the stack reported the send - nothing to deliver to
+            var sent = new TaskCompletionSource<GattStatus?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            // everything that can end the wait is hooked BEFORE the notification goes out, so a callback
+            // that lands immediately cannot be missed
+            using var sentSub = this.context
+                .NotificationSent
+                .Where(x => x.Device.Address == device.Address)
+                .Take(1)
+                .Subscribe(x => sent.TrySetResult(x.Status));
+
+            using var disconnectSub = this.context
+                .ConnectionStateChanged
+                .Where(x => x.Device.Address == device.Address && x.NewState == ProfileState.Disconnected)
+                .Subscribe(_ => sent.TrySetResult(null));
+
+            using var closedSub = this.context.ServerClosed.Subscribe(_ => sent.TrySetResult(null));
+            using var registration = cancellationToken.Register(() => sent.TrySetCanceled(cancellationToken));
+
+            this.SendNotification(device, data);
+
+            var status = await sent.Task.ConfigureAwait(false);
+            if (status != null && status != GattStatus.Success)
+                throw new InvalidOperationException($"Notification to '{device.Address}' failed with status {status}");
         }
-        return Task.CompletedTask;
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+
+    void SendNotification(BluetoothDevice device, byte[] data)
+    {
+        // confirm = true makes it an indication, which is what the central asked for when it wrote the CCCD
+        bool confirm;
+        lock (this.subscribers)
+            confirm = this.indicating.TryGetValue(device.Address!, out var indicate) && indicate;
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
+        {
+            var status = this.context.Server.NotifyCharacteristicChanged(device, this.Native, confirm, data);
+            if (status != (int)CurrentBluetoothStatusCodes.Success)
+                throw new InvalidOperationException($"Notification to '{device.Address}' was refused - Android status code {status}");
+        }
+        else
+        {
+            // before API 33 the value travels on the shared characteristic, so setting it and sending must not
+            // interleave with a send to another central
+            lock (this.Native)
+            {
+                this.Native.SetValue(data);
+                if (!this.context.Server.NotifyCharacteristicChanged(device, this.Native, confirm))
+                    throw new InvalidOperationException($"Notification to '{device.Address}' was refused");
+            }
+        }
     }
 
 
@@ -161,6 +226,9 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
                 if (x.Value.SequenceEqual(Constants.IndicateEnableBytes) || x.Value.SequenceEqual(Constants.NotifyEnableBytes))
                 {
                     var peripheral = this.GetOrAdd(x.Device);
+                    lock (this.subscribers)
+                        this.indicating[x.Device.Address!] = x.Value.SequenceEqual(Constants.IndicateEnableBytes);
+
                     if (this.onSubscribe != null)
                         await this.onSubscribe(new CharacteristicSubscription(this, peripheral, true)).ConfigureAwait(false);
                 }
