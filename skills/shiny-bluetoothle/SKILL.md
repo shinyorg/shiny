@@ -331,6 +331,7 @@ unless you are talking to a non-Shiny peer.
 - For Android, consider `AndroidConnectionConfig` for connection priority settings.
 - Always check `CharacteristicProperties` before attempting read/write/notify operations using the convenience extensions (`CanRead()`, `CanWrite()`, `CanNotify()`, etc.).
 - Use `WriteCharacteristicBlob()` for writing large data streams that exceed MTU size -- it already chunks to `peripheral.Mtu` (the payload size), so do not pre-chunk.
+- On Apple platforms `WriteCharacteristic(..., withResponse: false)` is flow-controlled, not fire-and-forget: it waits on CoreBluetooth's `canSendWriteWithoutResponse` before handing the bytes over, so the observable settles when the OS accepts the write rather than instantly. Let that backpressure pace a high-rate stream - do not add your own inter-write delay, and do not treat a slow write as a hung one.
 - Use `NotifyCharacteristic()` for real-time data streaming from a peripheral -- it handles subscription lifecycle and auto-reconnection.
 - Buffer or throttle scan results in UI scenarios to avoid performance issues.
 - Use `WhenConnected()` and `WhenDisconnected()` convenience extensions for cleaner connection state handling.

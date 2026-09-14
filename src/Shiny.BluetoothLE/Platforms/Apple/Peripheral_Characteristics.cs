@@ -200,6 +200,33 @@ public partial class Peripheral
         this.logger.LogDebug("IsReadyToSendWriteWithoutResponse Fired");
         this.readyWwrSubj.OnNext(Unit.Default);
     }
+
+
+    /// <summary>
+    /// Fires as soon as the peripheral can take another write-without-response: either it already can,
+    /// or the next <c>peripheralIsReadyToSendWriteWithoutResponse</c> says so.
+    /// </summary>
+    /// <remarks>
+    /// The subscription to <see cref="readyWwrSubj"/> is established BEFORE
+    /// <c>CanSendWriteWithoutResponse</c> is read, and that ordering is the whole point - it is the same
+    /// arm-then-trigger shape every other operation in this class uses (see <c>WaitForOperation</c>).
+    /// CoreBluetooth raises the ready callback once each time the transmit queue drains, on its own
+    /// dispatch queue, and never repeats it; the subject is hot, so a callback landing between the flag
+    /// read and the subscribe is simply dropped. The wait runs while the operation queue lock is held,
+    /// so dropping one parks the write - and queues every later operation on this peripheral behind it -
+    /// until the peripheral disconnects. Synchronize keeps the delegate thread and this one from pushing
+    /// into the operator chain at the same time when both observe the peripheral going ready at once.
+    /// </remarks>
+    protected IObservable<Unit> WhenReadyToWriteWithoutResponse() => Observable
+        .Create<Unit>(ob =>
+        {
+            var sub = this.readyWwrSubj.Subscribe(ob);
+            if (this.Native.CanSendWriteWithoutResponse)
+                ob.OnNext(Unit.Default);
+
+            return sub;
+        })
+        .Synchronize();
     
 
     readonly Subject<(CBService Service, NSError? Error)> charDiscoverySubj = new();
@@ -292,10 +319,12 @@ public partial class Peripheral
 
     protected IObservable<BleCharacteristicResult> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => this.operations.QueueToObservable(async ct =>
     {
+        // Advisory fast path only: WhenReadyToWriteWithoutResponse re-reads the flag from inside an
+        // already-armed subscription, and that read is the one that decides whether this write waits.
         if (!this.Native.CanSendWriteWithoutResponse)
         {
             this.logger.CanSendWriteWithoutResponse(nativeCh, false);
-            await this.WaitForOperation(this.readyWwrSubj, ct).ConfigureAwait(false);
+            await this.WaitForOperation(this.WhenReadyToWriteWithoutResponse(), ct).ConfigureAwait(false);
             this.logger.CanSendWriteWithoutResponse(nativeCh, true);
         }
         this.logger.LogDebug("Writing characteristic without response");
