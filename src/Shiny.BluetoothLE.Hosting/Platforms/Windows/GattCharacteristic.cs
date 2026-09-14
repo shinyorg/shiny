@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -101,12 +102,23 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             this.native.ReadRequested += this.OnReadRequested;
         if (this.onWrite != null)
             this.native.WriteRequested += this.OnWriteRequested;
-        if (this.onSubscribe != null)
+        // subscriptions are tracked even without a hook - SubscribedCentrals and the generated
+        // request/response reply both depend on it
+        if (this.CanNotify)
             this.native.SubscribedClientsChanged += this.OnSubscribedClientsChanged;
     }
 
 
-    public async Task Notify(byte[] data, params IPeripheral[] centrals)
+    bool CanNotify =>
+        this.properties.HasFlag(GattCharacteristicProperties.Notify) ||
+        this.properties.HasFlag(GattCharacteristicProperties.Indicate);
+
+
+    public Task Notify(byte[] data, params IPeripheral[] centrals)
+        => this.Notify(data, CancellationToken.None, centrals);
+
+
+    public async Task Notify(byte[] data, CancellationToken cancellationToken, params IPeripheral[] centrals)
     {
         if (this.native == null)
             throw new InvalidOperationException("Characteristic has not been built");
@@ -117,7 +129,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
         if (centrals.Length == 0)
         {
-            await this.native.NotifyValueAsync(buffer);
+            await this.native.NotifyValueAsync(buffer).AsTask(cancellationToken).ConfigureAwait(false);
         }
         else
         {
@@ -127,7 +139,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
                     c => c.Session.DeviceId.Id == central.Uuid
                 );
                 if (client != null)
-                    await this.native.NotifyValueAsync(buffer, client);
+                    await this.native.NotifyValueAsync(buffer, client).AsTask(cancellationToken).ConfigureAwait(false);
             }
         }
     }
@@ -141,7 +153,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
                 this.native.ReadRequested -= this.OnReadRequested;
             if (this.onWrite != null)
                 this.native.WriteRequested -= this.OnWriteRequested;
-            if (this.onSubscribe != null)
+            if (this.CanNotify)
                 this.native.SubscribedClientsChanged -= this.OnSubscribedClientsChanged;
         }
     }

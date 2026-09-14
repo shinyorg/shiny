@@ -331,6 +331,7 @@ unless you are talking to a non-Shiny peer.
 - For Android, consider `AndroidConnectionConfig` for connection priority settings.
 - Always check `CharacteristicProperties` before attempting read/write/notify operations using the convenience extensions (`CanRead()`, `CanWrite()`, `CanNotify()`, etc.).
 - Use `WriteCharacteristicBlob()` for writing large data streams that exceed MTU size -- it already chunks to `peripheral.Mtu` (the payload size), so do not pre-chunk.
+- Writes without response (`withResponse: false`) on Apple already wait on CoreBluetooth's flow control (`CanSendWriteWithoutResponse` / `peripheralIsReadyToSendWriteWithoutResponse`) inside the operation queue -- never add `Task.Delay` pacing between writes or poll `CanSendWriteWithoutResponse` yourself; just await each write in turn.
 - Use `NotifyCharacteristic()` for real-time data streaming from a peripheral -- it handles subscription lifecycle and auto-reconnection.
 - Buffer or throttle scan results in UI scenarios to avoid performance issues.
 - Use `WhenConnected()` and `WhenDisconnected()` convenience extensions for cleaner connection state handling.

@@ -39,6 +39,7 @@ triggers:
   - Shiny.BluetoothLE.Hosting
   - ibeacon advertise
   - ble notify
+  - ble notify cancellation
   - ble indicate
   - ble read characteristic
   - ble write characteristic
@@ -293,6 +294,25 @@ await characteristic.Notify(data, specificPeripheral1, specificPeripheral2);
 `IPeripheral.Mtu` (and `BleServiceContext.Mtu`) is the usable payload -- the negotiated ATT MTU
 already minus the 3-byte ATT header. Cap a notification at `peripheral.Mtu` directly; do not
 subtract the header again. Anything larger is silently truncated by the platform.
+
+On iOS, Mac Catalyst and macOS `Notify` applies CoreBluetooth's back-pressure: when the transmit queue
+is full it waits for `peripheralManagerIsReadyToUpdateSubscribers` and retries, so the task completes
+only once the value is actually queued. Await each `Notify` before sending the next one -- do not fire
+many in parallel with `Task.WhenAll`, and do not add your own delay or retry loop around it.
+
+Pass a `CancellationToken` to bound that wait - it goes **before** the `params` centrals:
+
+```csharp
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+await characteristic.Notify(data, cts.Token);                  // all subscribers
+await characteristic.Notify(data, cts.Token, context.Peripheral); // one central
+```
+
+If Bluetooth powers off while an Apple `Notify` is waiting, the task faults with `InvalidOperationException`.
+Generated `[BleService]` classes get a matching `NotifyX(data, cancellationToken, params centrals)` overload,
+and generated request/response replies already pass `BleHostToken`. An empty centrals list means every
+subscriber on all platforms; a named list goes only to those centrals. `SubscribedCentrals` is tracked whether
+or not `SetNotification` was given a subscribe hook, so never register a no-op hook just to populate it.
 
 ```csharp
 [Notify]

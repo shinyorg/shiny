@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth;
 using Java.Lang.Annotation;
@@ -46,9 +47,19 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
 
     public Task Notify(byte[] data, params IPeripheral[] centrals)
+        => this.Notify(data, CancellationToken.None, centrals);
+
+
+    public Task Notify(byte[] data, CancellationToken cancellationToken, params IPeripheral[] centrals)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         this.Native.SetValue(data);
-        var sendTo = (centrals.OfType<Peripheral>() ?? this.SubscribedCentrals.OfType<Peripheral>()).ToArray();
+
+        // an empty list means every subscriber - OfType never returns null, so a `??` fallback never ran
+        // and a broadcast went to nobody
+        var sendTo = centrals.Length == 0
+            ? this.SubscribedCentrals.OfType<Peripheral>().ToArray()
+            : centrals.OfType<Peripheral>().ToArray();
 
         foreach (var send in sendTo)
         {
@@ -130,7 +141,9 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
     void SetupNotifications()
     {
-        if (this.onSubscribe == null)
+        // the CCCD and subscription tracking are needed whenever the characteristic can notify, hook or not -
+        // without the descriptor a central cannot subscribe at all
+        if (!this.properties.HasFlag(GattProperty.Notify) && !this.properties.HasFlag(GattProperty.Indicate))
             return;
 
         var ndesc = new BluetoothGattDescriptor(
@@ -148,12 +161,13 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
                 if (x.Value.SequenceEqual(Constants.IndicateEnableBytes) || x.Value.SequenceEqual(Constants.NotifyEnableBytes))
                 {
                     var peripheral = this.GetOrAdd(x.Device);
-                    await this.onSubscribe(new CharacteristicSubscription(this, peripheral, true)).ConfigureAwait(false);
+                    if (this.onSubscribe != null)
+                        await this.onSubscribe(new CharacteristicSubscription(this, peripheral, true)).ConfigureAwait(false);
                 }
                 else if (x.Value.SequenceEqual(Constants.NotifyDisableBytes))
                 {
                     var peripheral = this.Remove(x.Device);
-                    if (peripheral != null)
+                    if (peripheral != null && this.onSubscribe != null)
                         await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
                 }
                 else
@@ -179,7 +193,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             .Subscribe(async x =>
             {
                 var peripheral = this.Remove(x.Device);
-                if (peripheral != null)
+                if (peripheral != null && this.onSubscribe != null)
                     await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
             })
             .DisposedBy(this.disposer);

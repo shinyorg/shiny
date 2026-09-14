@@ -209,7 +209,7 @@ static class ServiceEmitter
                 writer.Line($"var characteristic = this.{characteristic.FieldName};");
                 using (writer.Block($"if ({Names.BleHostingRuntime}.IsSubscribed(characteristic, request.Peripheral))"))
                 {
-                    writer.Line("await characteristic!.Notify(result.Data, request.Peripheral).ConfigureAwait(false);");
+                    writer.Line("await characteristic!.Notify(result.Data, this.BleHostToken, request.Peripheral).ConfigureAwait(false);");
                 }
                 using (writer.Block("else"))
                 {
@@ -299,6 +299,14 @@ static class ServiceEmitter
             {
                 writer.Line($"var characteristic = this.{characteristic.FieldName};");
                 writer.Line($"return characteristic == null ? {Task()}.CompletedTask : characteristic.Notify(data, centrals);");
+            }
+            writer.Line();
+
+            writer.Line($"/// <summary>Pushes a value on characteristic {characteristic.Uuid} to subscribed centrals, or to the ones named, and stops waiting for room in the transmit queue when the token is cancelled.</summary>");
+            using (writer.Block($"public {Task()} Notify{name}(byte[] data, {Names.CancellationToken} cancellationToken, params {Names.Peripheral}[] centrals)"))
+            {
+                writer.Line($"var characteristic = this.{characteristic.FieldName};");
+                writer.Line($"return characteristic == null ? {Task()}.CompletedTask : characteristic.Notify(data, cancellationToken, centrals);");
             }
             writer.Line();
 

@@ -23,9 +23,10 @@ public class Peripheral : IPeripheral
                 .Select(x => Convert.ToByte(mac.Substring(x, 2), 16))
                 .ToArray();
 
+            // same encoding Shiny.BluetoothLE uses for the central role. This used to return
+            // macBytes.ToString() - "System.Byte[]" for every device - so no two centrals could be told apart
             macBytes.CopyTo(deviceGuid, 10);
-            //return new Guid(deviceGuid);
-            return macBytes.ToString();
+            return new Guid(deviceGuid).ToString();
         });
     }
 

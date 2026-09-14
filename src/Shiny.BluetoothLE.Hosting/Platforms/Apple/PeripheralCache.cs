@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CoreBluetooth;
@@ -7,42 +7,49 @@ using Foundation;
 namespace Shiny.BluetoothLE.Hosting;
 
 
+// written from CoreBluetooth's queue, read from whichever thread calls SubscribedCentrals or Notify
 class PeripheralCache
 {
-    readonly Dictionary<NSUuid, Peripheral> subscribed;
-    readonly Dictionary<NSUuid, Peripheral> peripherals;
+    readonly object syncLock = new();
+    readonly Dictionary<NSUuid, Peripheral> subscribed = new();
+    readonly Dictionary<NSUuid, Peripheral> peripherals = new();
 
 
-    public PeripheralCache()
+    public IReadOnlyList<Peripheral> Subscribed
     {
-        this.subscribed = new Dictionary<NSUuid, Peripheral>();
-        this.peripherals = new Dictionary<NSUuid, Peripheral>();
+        get
+        {
+            lock (this.syncLock)
+                return this.subscribed.Values.ToList();
+        }
     }
-
-
-    public IReadOnlyList<Peripheral> Subscribed => this.subscribed.Values.ToList();
 
 
     public Peripheral GetOrAdd(CBCentral central)
     {
-        if (!this.peripherals.ContainsKey(central.Identifier))
-            this.peripherals.Add(central.Identifier, new Peripheral(central));
-
-        return this.peripherals[central.Identifier];
+        lock (this.syncLock)
+        {
+            if (!this.peripherals.TryGetValue(central.Identifier, out var peripheral))
+            {
+                peripheral = new Peripheral(central);
+                this.peripherals.Add(central.Identifier, peripheral);
+            }
+            return peripheral;
+        }
     }
 
 
     public Peripheral SetSubscription(CBCentral central, bool subscribe)
     {
-        var peripheral = this.GetOrAdd(central);
-        if (subscribe)
+        lock (this.syncLock)
         {
-            this.subscribed.Add(central.Identifier, peripheral);
+            var peripheral = this.GetOrAdd(central);
+            if (subscribe)
+                this.subscribed[central.Identifier] = peripheral;
+            else
+                this.subscribed.Remove(central.Identifier);
+
+            return peripheral;
         }
-        else
-        {
-            this.subscribed.Remove(central.Identifier);
-        }
-        return peripheral;
     }
 }

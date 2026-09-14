@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
@@ -42,40 +43,66 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     public IReadOnlyList<IPeripheral> SubscribedCentrals => this.cache.Subscribed;
 
 
-    public async Task Notify(byte[] data, params IPeripheral[] centrals)
+    public Task Notify(byte[] data, params IPeripheral[] centrals)
+        => this.Notify(data, CancellationToken.None, centrals);
+
+
+    public async Task Notify(byte[] data, CancellationToken cancellationToken, params IPeripheral[] centrals)
     {
         if (this.native == null)
             throw new InvalidOperationException("Characteristic has not been built");
 
-        var success = this.manager.UpdateValue(
-            NSData.FromArray(data),
-            this.native,
-            null
-        );
-        if (!success)
+        // CoreBluetooth reads a null central list as "every subscriber" - an explicit list goes to just those centrals
+        CBCentral[]? targets = null;
+        if (centrals.Length > 0)
         {
-            var tcs = new TaskCompletionSource<bool>();
-            var handler = new EventHandler((sender, args) =>
+            targets = centrals.OfType<Peripheral>().Select(x => x.Central).ToArray();
+            if (targets.Length == 0)
+                return;
+        }
+
+        // UpdateValue returns false when the transmit queue is full, and CoreBluetooth then raises
+        // ReadyToUpdateSubscribers once. The handlers are attached BEFORE each attempt so that callback cannot
+        // fire in the gap between a failed attempt and the subscription, and a retry that finds the queue
+        // full again waits for the next callback rather than dropping the value. A power-down never drains
+        // the queue, so the wait also ends when the manager leaves PoweredOn or the token is cancelled (#1657)
+        var value = NSData.FromArray(data);
+        var sent = false;
+        while (!sent)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var ready = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var readyHandler = new EventHandler((_, _) => ready.TrySetResult());
+            var stateHandler = new EventHandler((_, _) =>
             {
-                this.manager.UpdateValue(
-                    NSData.FromArray(data),
-                    this.native,
-                    null
-                );
-                tcs.TrySetResult(true);
+                if (this.manager.State != CBManagerState.PoweredOn)
+                    ready.TrySetException(NotPoweredOn(this.manager.State));
             });
 
+            this.manager.ReadyToUpdateSubscribers += readyHandler;
+            this.manager.StateUpdated += stateHandler;
             try
             {
-                this.manager.ReadyToUpdateSubscribers += handler;
-                await tcs.Task.ConfigureAwait(false);
+                using var registration = cancellationToken.Register(() => ready.TrySetCanceled(cancellationToken));
+                if (this.manager.State != CBManagerState.PoweredOn)
+                    throw NotPoweredOn(this.manager.State);
+
+                sent = this.manager.UpdateValue(value, this.native, targets);
+                if (!sent)
+                    await ready.Task.ConfigureAwait(false);
             }
             finally
             {
-                this.manager.ReadyToUpdateSubscribers -= handler;
+                this.manager.ReadyToUpdateSubscribers -= readyHandler;
+                this.manager.StateUpdated -= stateHandler;
             }
         }
     }
+
+
+    static InvalidOperationException NotPoweredOn(CBManagerState state)
+        => new($"Bluetooth is not powered on (state: {state}) - the notification was not sent");
 
 
     public IGattCharacteristicBuilder SetNotification(Func<CharacteristicSubscription, Task>? onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
@@ -141,11 +168,10 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         if (this.onRead != null)
             this.manager.ReadRequestReceived += this.OnRead!;
 
-        if (this.onSubscribe != null)
-        {
-            this.manager.CharacteristicSubscribed += this.OnSubscribed!;
-            this.manager.CharacteristicUnsubscribed += this.OnUnSubscribed!;
-        }
+        // subscriptions are tracked even without a hook - SubscribedCentrals and the generated
+        // request/response reply both depend on it
+        this.manager.CharacteristicSubscribed += this.OnSubscribed!;
+        this.manager.CharacteristicUnsubscribed += this.OnUnSubscribed!;
 
         this.native = new CBMutableCharacteristic(
             CBUUID.FromString(this.Uuid),
@@ -184,8 +210,8 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             return;
 
         var peripheral = this.cache.SetSubscription(args.Central, subscribed);
-        var sub = new CharacteristicSubscription(this, peripheral, subscribed);
-        await this.onSubscribe!.Invoke(sub);
+        if (this.onSubscribe != null)
+            await this.onSubscribe.Invoke(new CharacteristicSubscription(this, peripheral, subscribed));
     }
 
 

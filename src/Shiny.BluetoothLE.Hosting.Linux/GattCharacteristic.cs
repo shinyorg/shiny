@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.Hosting;
@@ -78,7 +79,12 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
 
     public Task Notify(byte[] data, params IPeripheral[] centrals)
+        => this.Notify(data, CancellationToken.None, centrals);
+
+
+    public Task Notify(byte[] data, CancellationToken cancellationToken, params IPeripheral[] centrals)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (this.NotifyDispatcher == null)
             throw new InvalidOperationException("Characteristic has not been registered with BlueZ yet");
 

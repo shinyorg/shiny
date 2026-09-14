@@ -137,6 +137,7 @@ public class HandlerShapeTests
         var source = run.AllSource;
         // On/Async trimmed off the hook name
         Assert.Contains("public global::System.Threading.Tasks.Task NotifyHeartRate(byte[] data", source);
+        Assert.Contains("public global::System.Threading.Tasks.Task NotifyHeartRate(byte[] data, global::System.Threading.CancellationToken cancellationToken, params", source);
         Assert.Contains("HeartRateSubscribers", source);
         Assert.Contains("public bool HasHeartRateSubscribers", source);
         Assert.Contains("characteristic.SetNotification(this.__BleSubscription_2A37, global::Shiny.BluetoothLE.Hosting.NotificationOptions.Indicate);", source);
@@ -176,7 +177,8 @@ public class HandlerShapeTests
         Assert.Contains("characteristic.SetWrite(this.__BleWrite_2A3B", source);
         Assert.Contains("characteristic.SetNotification(null,", source);
         Assert.Contains("IsSubscribed(characteristic, request.Peripheral)", source);
-        Assert.Contains("await characteristic!.Notify(result.Data, request.Peripheral)", source);
+        // the reply is abandoned when the hosted service is torn down rather than waiting on a full transmit queue forever
+        Assert.Contains("await characteristic!.Notify(result.Data, this.BleHostToken, request.Peripheral)", source);
         Assert.Contains("this.OnBleResponseDropped(", source);
         Assert.Contains("NotifyCommand(byte[] data", source);
     }
