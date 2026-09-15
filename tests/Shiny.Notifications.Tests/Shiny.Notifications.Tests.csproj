@@ -18,6 +18,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
     </ItemGroup>
 
 </Project>

@@ -24,6 +24,10 @@ public class NotificationManager(
     // Maps the freedesktop daemon-assigned id (uint) to our Shiny notification id (int)
     readonly ConcurrentDictionary<uint, int> nativeToShinyId = new();
 
+    // Next fire time for each repeating notification. Held here rather than recalculated on every
+    // scheduler tick - a fresh calculation always lands in the future, so it would never come due.
+    readonly ConcurrentDictionary<int, DateTimeOffset> nextFire = new();
+
     int nextId;
     DBusConnection? connection;
     Timer? scheduler;
@@ -104,6 +108,11 @@ public class NotificationManager(
         }
         else
         {
+            if (notification.RepeatInterval == null)
+                this.nextFire.TryRemove(notification.Id, out _);
+            else
+                this.nextFire[notification.Id] = CalculateNextFire(notification.RepeatInterval);
+
             this.pending[notification.Id] = notification;
         }
     }
@@ -116,6 +125,7 @@ public class NotificationManager(
             _ = this.CloseNativeAsync(nativeId);
 
         this.pending.TryRemove(id, out _);
+        this.nextFire.TryRemove(id, out _);
         return Task.CompletedTask;
     }
 
@@ -129,7 +139,10 @@ public class NotificationManager(
         }
 
         if (scope == CancelScope.All || scope == CancelScope.Pending)
+        {
             this.pending.Clear();
+            this.nextFire.Clear();
+        }
 
         return Task.CompletedTask;
     }
@@ -246,7 +259,7 @@ public class NotificationManager(
     {
         try
         {
-            var now = DateTime.Now;
+            var now = DateTimeOffset.UtcNow;
             foreach (var n in this.pending.Values.ToList())
             {
                 var channel = Channel.Default;
@@ -261,11 +274,15 @@ public class NotificationManager(
                     await this.SendNativeAsync(n, channel).ConfigureAwait(false);
                     this.pending.TryRemove(n.Id, out _);
                 }
-                else if (n.RepeatInterval != null)
+                else if (
+                    n.RepeatInterval != null &&
+                    this.nextFire.TryGetValue(n.Id, out var due) &&
+                    due <= n.RepeatInterval.TimeProvider.GetUtcNow()
+                )
                 {
-                    var next = n.RepeatInterval.CalculateNextAlarm();
-                    if (next <= now)
-                        await this.SendNativeAsync(n, channel).ConfigureAwait(false);
+                    // advance before sending so a slow D-Bus call can't fire the same occurrence twice
+                    this.nextFire[n.Id] = CalculateNextFire(n.RepeatInterval);
+                    await this.SendNativeAsync(n, channel).ConfigureAwait(false);
                 }
             }
         }
@@ -273,5 +290,37 @@ public class NotificationManager(
         {
             logger.LogError(ex, "Scheduled notifications run failed");
         }
+    }
+
+
+    /// <summary>
+    /// The next time a repeating trigger is due, strictly after the trigger's current clock time.
+    /// Interval triggers fire every Interval from now; TimeOfDay triggers fire at that local time -
+    /// today if it is still ahead, otherwise the next day (matching DayOfWeek when one is set).
+    /// </summary>
+    internal static DateTimeOffset CalculateNextFire(IntervalTrigger trigger)
+    {
+        var now = trigger.TimeProvider.GetUtcNow();
+        if (trigger.Interval != null)
+            return now.Add(trigger.Interval.Value);
+
+        var tz = trigger.TimeProvider.LocalTimeZone;
+        var time = trigger.TimeOfDay!.Value;
+        var day = TimeZoneInfo.ConvertTime(now, tz).Date;
+        var next = AtLocal(day, time, tz);
+
+        while (next <= now || (trigger.DayOfWeek != null && day.DayOfWeek != trigger.DayOfWeek.Value))
+        {
+            day = day.AddDays(1);
+            next = AtLocal(day, time, tz);
+        }
+        return next;
+    }
+
+
+    static DateTimeOffset AtLocal(DateTime day, TimeSpan time, TimeZoneInfo tz)
+    {
+        var local = DateTime.SpecifyKind(day.Add(time), DateTimeKind.Unspecified);
+        return new DateTimeOffset(local, tz.GetUtcOffset(local));
     }
 }
