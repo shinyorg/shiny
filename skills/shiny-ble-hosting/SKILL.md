@@ -76,6 +76,26 @@ triggers:
   - ble source generator
   - ble hosting source generator
   - generated gatt service
+  - Framed
+  - MaxMessageBytes
+  - ble message framing
+  - large gatt message
+  - BleMessageFraming
+  - BleMessageReassembler
+  - BleMessageFrameResult
+  - GattMessageExtensions
+  - NotifyMessage
+  - GetMessageReassembler
+  - L2CapTicketBroker
+  - L2CapTicket
+  - L2CapTicketBrokerOptions
+  - AddL2CapTicketBroker
+  - L2CapTickets
+  - L2CapTicketStatus
+  - l2cap ticket
+  - shared psm
+  - L2CapChannelStream
+  - AsStream
 ---
 
 # Shiny.BluetoothLE.Hosting Skill
@@ -106,6 +126,8 @@ Invoke this skill when the user wants to:
 - Serve file uploads/downloads to connected centrals over L2CAP, with progress and throughput metrics
 - Declare a GATT service or L2CAP listener with attributes on a partial class instead of builder lambdas
 - Keep per-connected-central state (a SignalR-style context) across requests on a hosted service
+- Exchange requests, replies or notifications longer than one GATT operation (message framing)
+- Share one L2CAP PSM between many authorised transfers with single-use tickets, or use a channel as a `Stream`
 
 ## Library Overview
 
@@ -224,6 +246,34 @@ public partial class HeartRateServiceContext
 Handler parameters bind **by type, in any order, any subset** - none are required. See
 `reference/api-reference.md` for the full binding table and the `SBH001`-`SBH014` diagnostics.
 
+#### Requests and replies longer than one GATT operation
+
+A write or notification carries at most `Mtu` bytes - 20 on a link that never negotiated more. When a
+request or reply can be longer (JSON, a certificate, a scan result), set `Framed = true` rather than
+inventing a chunking protocol:
+
+```csharp
+[RequestResponseCharacteristic("2A3B", Name = "Command", Framed = true, MaxMessageBytes = 16 * 1024)]
+async Task<byte[]> Exchange(byte[] message, HeartRateServiceContext context, CancellationToken cancellationToken)
+{
+    var command = JsonSerializer.Deserialize(message, AppJsonContext.Default.Command)!;
+    return JsonSerializer.SerializeToUtf8Bytes(await Run(command, cancellationToken), AppJsonContext.Default.Result);
+}
+```
+
+The generator treats each write as one fragment, reassembles per central (the reassembler lives on that
+central's context, so two centrals never interleave), and runs the handler **once** with the whole
+message - `byte[]` and `WriteRequest.Data` are both the full message. Intermediate fragments are answered
+`GattState.Success` without running the handler. The reply is split to the writing central's MTU with
+`NotifyMessage`. A message over `MaxMessageBytes` (default 64 KB), or one with a dropped or reordered
+fragment, is discarded, answered `GattState.Failure`, and reported to `OnBleHandlerError` as an
+`InvalidDataException`.
+
+The central **must** speak the same format - `WriteCharacteristicMessageAsync` to send and
+`NotifyCharacteristicMessages` to receive, in `Shiny.BluetoothLE` (see the `shiny-bluetoothle` skill). A
+plain `WriteCharacteristicAsync` against a framed characteristic is not a valid fragment. As with any
+request/response characteristic, the central subscribes before it writes.
+
 Wire it up:
 
 ```csharp
@@ -333,6 +383,50 @@ public async Task Push(BleServiceContext context, byte[] payload)
     await this.Characteristic.Notify(payload.Take(max).ToArray(), context.Peripheral);
 }
 ```
+
+#### Messages longer than one notification
+
+Do not truncate a payload that has to arrive whole, and do not hand-roll chunking. `NotifyMessage` (in
+`GattMessageExtensions`) splits it with `BleMessageFraming` - a one-byte header per fragment: bit 7 START,
+bit 6 END, bits 0-5 a sequence number - sized to that central's MTU, and awaits each notification in turn:
+
+```csharp
+await characteristic.NotifyMessage(bigPayload, context.Peripheral, cancellationToken);
+```
+
+It addresses **one** central, because fragments are sized per central. Never send two messages to the same
+central on the same characteristic concurrently - the fragments interleave and the central discards both.
+The central receives with `NotifyCharacteristicMessages` (`Shiny.BluetoothLE`).
+
+For framed **writes** outside `[RequestResponseCharacteristic(Framed = true)]` - a `[WriteCharacteristic]`
+handler, say - feed each write into the reassembler kept on the central's context:
+
+```csharp
+[WriteCharacteristic("2A3C")]
+async Task<GattState> Upload(WriteRequest request, HeartRateServiceContext context)
+{
+    var reassembler = context.GetMessageReassembler("2A3C", maxMessageBytes: 32 * 1024);
+
+    BleMessageFrameResult frame;
+    byte[]? message;
+    lock (reassembler)
+        frame = reassembler.Push(request.Data, out message);
+
+    if (frame == BleMessageFrameResult.Partial)
+        return GattState.Success;
+
+    if (frame != BleMessageFrameResult.Complete)
+        return GattState.Failure;          // Malformed / OutOfSequence / TooLarge - already reset
+
+    await this.Store(message!);
+    return GattState.Success;
+}
+```
+
+`GetMessageReassembler` is one instance per context and characteristic UUID (case-insensitive), created on
+first use and gone with the central's context. With the imperative `SetWrite` API there is no context - keep
+a `BleMessageReassembler` per central yourself (keyed by `request.Peripheral.Uuid`), never one shared across
+centrals.
 
 ### 6. Responding to Write Requests
 
@@ -468,6 +562,88 @@ Progress on the hosting side uses the same `TransferProgress` shape as the clien
 progress, no handshake, receiver must already know the length and framing. Use the file server unless
 you are talking to a non-Shiny central.
 
+#### A channel as a `Stream`
+
+`channel.AsStream()` (`L2CapChannelStream`, namespace `Shiny.BluetoothLE`) wraps an open channel as a
+`System.IO.Stream` for anything that reads or writes streams - `CopyToAsync`, `JsonSerializer`, a hash:
+
+```csharp
+await using var stream = channel.AsStream(maxWriteSize: 4096);   // disposing closes the channel unless leaveOpen: true
+await source.CopyToAsync(stream, cancellationToken);
+```
+
+- **Async only** - synchronous `Read`/`Write` throw `NotSupportedException`. Not seekable.
+- Create it **as soon as the channel opens**: it subscribes to `DataReceived` on construction, and bytes the
+  peer sends before anything is subscribed are lost.
+- Writes larger than `MaxWriteSize` (default 4096, settable after creation) are split. A read returns 0 when
+  the peer closes the channel.
+- It shares the buffered reader the file-transfer helpers use, so a stream and `UploadFile`/`ReadFileRequest`
+  can take turns on one channel without losing bytes.
+
+#### One PSM, many transfers (`L2CapTicketBroker`)
+
+Do **not** open a PSM per transfer - PSMs come from a small dynamic range, and a released one can be handed
+straight to another process, so a PSM you gave a central can go stale before it connects. When a device offers
+several bulk transfers (a camera frame, a log dump, a firmware image) use the ticket broker: one listener, and
+each channel claims its transfer with a single-use token.
+
+```csharp
+builder.Services.AddBluetoothLeHosting();
+builder.Services.AddL2CapTicketBroker(o =>
+{
+    o.Secure = true;                                  // default; the central must open with the same setting
+    o.HandshakeTimeout = TimeSpan.FromSeconds(15);    // default; a silent channel is closed after this
+    o.MaxWriteSize = 4096;                            // default per-write size on claimed channels
+});
+```
+
+Reserve a ticket from an **authenticated** route - typically a GATT command - and return `ticket.Psm` and
+`ticket.Token` to that central only:
+
+```csharp
+[BleService("7a5e0000-5c2d-4f5e-9b1a-3c6d2e8f1a00")]
+public partial class CameraService(L2CapTicketBroker broker, ICamera camera)
+{
+    [RequestResponseCharacteristic("7a5e0001-5c2d-4f5e-9b1a-3c6d2e8f1a00", Name = "Capture", Framed = true)]
+    async Task<byte[]> RequestCapture(CameraServiceContext context, CancellationToken ct)
+    {
+        if (!context.IsAuthenticated)                     // your own property on the partial context
+            return Error("not authorised");                 // Error/Encode: your reply format
+
+        var ticket = await broker.Reserve(
+            label: "capture",
+            lifetime: TimeSpan.FromSeconds(30),               // unclaimed token expires after this
+            handler: async (stream, token) =>
+            {
+                // stream is an L2CapChannelStream; it is closed when this returns, which ends the transfer
+                await using var jpeg = await camera.Capture(token);
+                await jpeg.CopyToAsync(stream, token);
+            },
+            maxWriteSize: 8192                                // optional, overrides the broker default
+        );
+
+        return Encode(ticket.Psm, ticket.Token);
+    }
+}
+```
+
+- `Reserve` opens the listener on first use; `broker.Psm` is 0 until then. Every ticket shares the same PSM.
+- The first channel to present the token gets the handler. A wrong, expired or already-claimed token - or a
+  channel that sends nothing within `HandshakeTimeout` - is answered (`UnknownTicket`, `AlreadyClaimed`,
+  `Malformed`, `VersionMismatch`) and closed without reaching any handler.
+- `broker.Release(token)` withdraws an unclaimed ticket **and** cancels the handler's token if one is running -
+  call it when the central abandons the transfer (a cancel command, a disconnect).
+- Handler exceptions and cancellations are logged by the broker, not rethrown - report failures to the central
+  yourself before returning.
+- `PendingTickets` counts issued tickets not yet finished, released or expired. Disposing the broker cancels
+  every ticket and closes the listener.
+- The token is the only thing that authorises the channel. Never advertise it or put it on a readable
+  characteristic.
+
+The central claims it with `peripheral.OpenL2CapTicketChannel(psm, token)` (see the `shiny-bluetoothle`
+skill). The wire format is `L2CapTickets`: the central sends `"SL2T" [version:1] [length:1] [token:32 ASCII]`,
+the host answers `"SL2T" [version:1] [status:1]`, and only after `Accepted` does the channel carry the transfer.
+
 ### 8. File Organization
 
 - Group hosting services in a `BleHosting/` folder, one class per GATT service
@@ -490,6 +666,8 @@ you are talking to a non-Shiny central.
 9. **Keep the `BleHostedServiceSession` alive** -- `AttachBleHostedServices` returns it, and disposing it cancels in-flight handlers, closes L2CAP listeners, and removes the GATT services
 10. **Size notifications with `Mtu` as-is** -- `IPeripheral.Mtu`/`BleServiceContext.Mtu` is the payload (ATT MTU minus `BleConstants.AttHeaderSize`), not the ATT MTU. Add the header back with `+ BleConstants.AttHeaderSize` only when feeding an API that genuinely wants an ATT MTU
 11. **Never register the same service UUID twice** -- `BleHostingManager` keys services by UUID. Several `[BleService]` classes may share one UUID; the generator merges them into a single `AddService` call
+12. **Frame anything that may not fit in `Mtu`** -- `[RequestResponseCharacteristic(Framed = true)]`, `NotifyMessage`, or `GetMessageReassembler`, paired with `WriteCharacteristicMessageAsync` / `NotifyCharacteristicMessages` on the central. Never truncate, and never hand-roll a chunk counter
+13. **Share one PSM through `L2CapTicketBroker`** -- one `Reserve` per transfer, the token handed out over an authenticated GATT route, instead of an `OpenL2Cap` per transfer
 
 ## Reference Files
 

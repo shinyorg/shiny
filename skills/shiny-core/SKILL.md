@@ -126,6 +126,7 @@ public static class MauiProgram
         builder.Services.AddGeneratedServices();
 
         // Add device monitoring (these are no-ops if already registered)
+        // Optional on platform TFMs: AddJob / AddHttpTransfers / AddDataSync add them automatically.
         builder.Services.AddConnectivity();
         builder.Services.AddBattery();
 
@@ -173,11 +174,23 @@ public class MainActivity : ShinyAndroidActivity { }
 
 ### Linux / macOS / plain .NET Setup
 
-`Shiny.Core.Linux` provides the Linux `IPlatform`, `IConnectivity`, and `IBattery` implementations and is targeted at console / GTK apps. Use the same `HostBuilder.Create()` flow and call `AddConnectivity()` / `AddBattery()` from `Shiny.Core.Linux` if you need device monitoring.
+`Shiny.Core.Linux` provides the Linux `IConnectivity` and `IBattery` implementations and is targeted at console / GTK apps. Use the same `HostBuilder.Create()` flow and call `AddConnectivity()` / `AddBattery()` from `Shiny.Core.Linux` if you need device monitoring. On plain .NET, modules that need them (`AddJob`, `AddHttpClientTransfers`, `AddDataSync`) can't reference the Linux package and do **not** add them — you must call these yourself.
 
 ### Blazor WebAssembly Setup
 
 For Blazor WASM, reference `Shiny.Core.Blazor` and call `AddConnectivity()` / `AddBattery()` to wire navigator-based monitoring. Both monitors load a JS module before they can report anything, so they self-start on the first property read or `Changed` subscription and report `Unknown` until that completes; `await host.Services.UseShinyCore()` after `Build()` starts them up front when the first read must be accurate. Only Chromium-based browsers expose the Network Information and Battery Status APIs — elsewhere `ConnectionTypes` and `BatteryState` stay `Unknown` (`Access` still works, it is `navigator.onLine`). Storage requires `Shiny.Extensions.Stores.Web` and a call to `host.Services.UseShinyStores()` after `Build()` so the static `Shiny.Stores` accessor snapshots the `IJSRuntime`-backed `LocalStorageKeyValueStore`.
+
+### Replacing IConnectivity / IBattery
+
+Modules that depend on device monitoring add it for you: on the platform TFMs (Android, iOS, tvOS, Mac Catalyst, macOS, Windows) `AddJob` adds both, and `AddHttpTransfers` / `AddHttpClientTransfers` / `AddDataSync` add `IConnectivity`; the Blazor `AddBlazorHttpTransfers` / `AddBlazorDataSync` add both from `Shiny.Core.Blazor`. Every one of these registrations is a `TryAdd`, so to substitute your own implementation register it **before** the module call:
+
+```csharp
+builder.Services.AddSingleton<Shiny.Net.IConnectivity, MyConnectivity>(); // first - wins
+builder.Services.AddSingleton<Shiny.Power.IBattery, MyBattery>();
+builder.Services.AddJob<MyJob>();                                          // TryAdd skips its defaults
+```
+
+Registering yours after the module call adds a second descriptor; `GetService` returns the last one, but anything enumerating `IEnumerable<IConnectivity>` sees both, so always register first.
 
 ## Code Generation Instructions
 
@@ -243,4 +256,4 @@ global using Shiny.BluetoothLE;
 ## Reference Files
 
 - [API Reference](reference/api-reference.md)
-- Public docs: https://shinylib.net/core/ (platform, lifecycle hooks, startup tasks, device monitoring, access & permissions, utilities, release notes)
+- Public docs: https://shinylib.net/client/core/ (platform, lifecycle hooks, startup tasks, device monitoring, access & permissions, utilities, release notes)

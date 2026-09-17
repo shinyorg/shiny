@@ -54,6 +54,22 @@ triggers:
   - L2CapTransferResult
   - L2CapTransferException
   - TransferProgress
+  - WriteCharacteristicMessageAsync
+  - NotifyCharacteristicMessages
+  - MessageExtensions
+  - ble message framing
+  - large gatt message
+  - BleMessageFraming
+  - BleMessageReassembler
+  - BleMessageFrameResult
+  - OpenL2CapTicketChannel
+  - ClaimTicket
+  - L2CapTickets
+  - L2CapTicketStatus
+  - L2CapTicketException
+  - l2cap ticket
+  - L2CapChannelStream
+  - AsStream
 ---
 
 # Shiny BluetoothLE (Client/Central)
@@ -71,6 +87,8 @@ Use this skill when the user needs to:
 - Work with BLE advertisement data
 - Open L2CAP CoC channels to a peripheral that has published a PSM
 - Upload or download files over L2CAP with percent-complete / throughput / ETA metrics
+- Write or receive messages longer than one GATT operation (message framing)
+- Claim a ticketed L2CAP channel from a host that shares one PSM, or use a channel as a `Stream`
 
 Do NOT use this skill for BLE hosting/peripheral mode (advertising, GATT server). That is a separate library (`Shiny.BluetoothLE.Hosting`).
 
@@ -191,6 +209,47 @@ When generating BLE client code, follow these conventions:
 
 12. **Never build your own "wait for the adapter, then scan" wrapper on Apple (5.6+)**: `Scan()` parks itself. A `CBCentralManager` reports `Unknown` for a moment after construction — and `IBleManager` builds it lazily, so on a cold start that moment *is* the `Scan()` call — and CoreBluetooth silently discards any scan issued below `PoweredOn`. Shiny holds the request and issues it the instant the central powers on, and re-issues it after an adapter power cycle. Do not write `RequestAccess().Where(x => x == AccessState.Available).SelectMany(_ => Scan())`, do not retry `Scan()` on a timer, and do not call `Scan()` from `IBleDelegate.OnAdapterStateChanged` — all three now race Shiny's own replay and will throw `There is already an existing scan`. Applies to iOS, tvOS, Mac Catalyst and macOS; Android and Windows never had the problem.
 
+## Messages Longer Than One GATT Operation
+
+A single write or notification carries at most `peripheral.Mtu` bytes - 20 until a larger MTU is negotiated. When a
+command, reply or event can be longer (JSON, a certificate, a scan result) and the peripheral is a
+`Shiny.BluetoothLE.Hosting` service using `[RequestResponseCharacteristic(Framed = true)]` or `NotifyMessage`, use the
+message helpers (`MessageExtensions`). Do not hand-roll a chunking protocol, and do not use `WriteCharacteristicBlob`
+for this - the blob write has no message boundaries.
+
+```csharp
+using Shiny.BluetoothLE;
+
+// subscribe FIRST - a request/response reply travels as notifications to a subscribed central
+using var sub = peripheral
+    .NotifyCharacteristicMessages(serviceUuid, commandUuid, maxMessageBytes: 64 * 1024)
+    .Subscribe(message => this.OnReply(message));   // one emission per complete message
+
+await peripheral.WriteCharacteristicMessageAsync(
+    serviceUuid,
+    commandUuid,
+    JsonSerializer.SerializeToUtf8Bytes(command, AppJsonContext.Default.Command),
+    withResponse: true,       // default; each fragment is written with response
+    cancellationToken: ct,
+    timeoutMs: 3000           // per fragment, not for the whole message
+);
+```
+
+- `WriteCharacteristicMessageAsync` splits the message with `BleMessageFraming` - one header byte per fragment: bit 7
+  START, bit 6 END, bits 0-5 sequence - sized from `peripheral.Mtu`, and writes the fragments in order. Messages to the
+  same characteristic on the same peripheral are serialised, so concurrent callers never interleave.
+- `NotifyCharacteristicMessages` is cold; each subscription subscribes to the characteristic and gets its own
+  `BleMessageReassembler`. A message with a dropped or reordered fragment, or over `maxMessageBytes` (default 64 KB),
+  is discarded and the stream carries on with the next one - it does not error.
+- Against a framed request/response host, the final fragment's write response waits for the host's handler, so keep
+  `timeoutMs` above how long that handler takes.
+- Both ends must speak the format. Never mix these with a plain `WriteCharacteristicAsync` / `NotifyCharacteristic`
+  on the same framed characteristic.
+
+`BleMessageFraming.Encode(message, mtu)` and `BleMessageReassembler.Push(fragment, out message)` are public in
+`Shiny.BluetoothLE.Common` for the rare case of framing over some other transport - one reassembler per link and
+direction, never shared.
+
 ## L2CAP Channels
 
 Some platforms support L2CAP Connection-Oriented Channels for streaming data without going through GATT. This is exposed as an optional capability — `ICanL2Cap` — on the platform `Peripheral` types.
@@ -303,6 +362,55 @@ await channel.DownloadFile("b.bin", "/local/b.bin", onProgress: OnProgress);
 
 Tuning is via `L2CapTransferOptions` (`BufferSize`, `ProgressInterval`, `IdleTimeout`).
 
+### A channel as a `Stream`
+
+`channel.AsStream()` returns an `L2CapChannelStream` - a `System.IO.Stream` over the channel for `CopyToAsync`,
+serializers, hashes, decoders:
+
+```csharp
+using var channel = await peripheral.OpenL2CapChannelAsync(psm, secure: false, cancellationToken: ct);
+await using var stream = channel.AsStream();          // disposing it closes the channel unless leaveOpen: true
+
+await using var file = File.Create(localPath);
+await stream.CopyToAsync(file, ct);                   // ends when the peer closes the channel
+```
+
+Async only - synchronous `Read`/`Write` throw `NotSupportedException`, and it is not seekable. Create it as soon as the
+channel opens: it subscribes to `DataReceived` on construction, and bytes that arrive before that are lost. Writes
+over `MaxWriteSize` (default 4096) are split. It shares the buffered reader the file-transfer helpers use, so it can
+take turns with `UploadFile`/`DownloadFile` on one channel.
+
+### Ticketed channels (`OpenL2CapTicketChannel`)
+
+A host running `L2CapTicketBroker` (see the `shiny-ble-hosting` skill) listens on **one** PSM for every transfer.
+It hands out a PSM and a single-use 32-character token over some authenticated route - typically the reply to a GATT
+command - and the channel has to present that token before it carries anything:
+
+```csharp
+var (psm, token) = ParseCaptureReply(reply);          // however your GATT command returns them
+
+await using var stream = await peripheral.OpenL2CapTicketChannel(
+    psm,
+    token,
+    secure: true,              // default - must match the broker's L2CapTicketBrokerOptions.Secure (default true)
+    maxWriteSize: 4096,
+    cancellationToken: ct
+);
+
+await using var file = File.Create(localPath);
+await stream.CopyToAsync(file, ct);                   // the host closes the channel when its handler returns
+```
+
+- Returns only once the host accepts the ticket; the handshake is `"SL2T" [version] [length] [token]` answered by
+  `"SL2T" [version] [status]` (`L2CapTickets`).
+- A refusal throws `L2CapTicketException` - `Status` is `UnknownTicket` (expired or never issued: request the transfer
+  again), `AlreadyClaimed`, `VersionMismatch`, `Malformed` or `Busy` - and the channel is already closed.
+- Throws `NotSupportedException` where the platform has no L2CAP.
+- A token is single use. Never retry the same token after a refusal; ask the host for a new one.
+
+With a channel you opened yourself, `channel.ClaimTicket(token, maxWriteSize, timeout, ct)` does the same handshake
+(20 second default timeout) and returns the stream; on failure it disposes the channel.
+
 **Progress metrics** are `TransferProgress` — identical in shape to `Shiny.Net.Http.TransferProgress`:
 `PercentComplete`, `BytesPerSecond`, `BytesTransferred`, `BytesToTransfer`, `EstimatedTimeRemaining`,
 `IsDeterministic`. Because the peer agrees the exact byte count up front, percent complete and ETA are
@@ -331,6 +439,7 @@ unless you are talking to a non-Shiny peer.
 - For Android, consider `AndroidConnectionConfig` for connection priority settings.
 - Always check `CharacteristicProperties` before attempting read/write/notify operations using the convenience extensions (`CanRead()`, `CanWrite()`, `CanNotify()`, etc.).
 - Use `WriteCharacteristicBlob()` for writing large data streams that exceed MTU size -- it already chunks to `peripheral.Mtu` (the payload size), so do not pre-chunk.
+- Use `WriteCharacteristicMessageAsync()` / `NotifyCharacteristicMessages()` when the peripheral needs to know where a message ends (a framed Shiny hosting characteristic) -- never mix them with plain writes/notifications on the same characteristic.
 - Writes without response (`withResponse: false`) on Apple already wait on CoreBluetooth's flow control (`CanSendWriteWithoutResponse` / `peripheralIsReadyToSendWriteWithoutResponse`) inside the operation queue -- never add `Task.Delay` pacing between writes or poll `CanSendWriteWithoutResponse` yourself; just await each write in turn.
 - Use `NotifyCharacteristic()` for real-time data streaming from a peripheral -- it handles subscription lifecycle and auto-reconnection.
 - Buffer or throttle scan results in UI scenarios to avoid performance issues.

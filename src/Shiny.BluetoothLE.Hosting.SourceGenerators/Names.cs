@@ -34,7 +34,10 @@ static class Names
     public const string NotificationOptions = "global::" + Namespace + ".NotificationOptions";
     public const string L2CapInstance = "global::" + Namespace + ".L2CapInstance";
 
+    public const string GattMessageExtensions = "global::" + Namespace + ".GattMessageExtensions";
+
     public const string L2CapChannel = "global::Shiny.BluetoothLE.L2CapChannel";
+    public const string BleMessageFrameResult = "global::Shiny.BluetoothLE.BleMessageFrameResult";
 
     public const string CancellationToken = "global::System.Threading.CancellationToken";
     public const string Task = "global::System.Threading.Tasks.Task";

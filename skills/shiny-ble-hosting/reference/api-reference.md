@@ -366,6 +366,177 @@ public sealed class L2CapFileRequest
 `Shiny.BluetoothLE.Common` and are shared with the client library — see the `shiny-bluetoothle` skill
 reference for their shapes.
 
+### L2CapChannelStream (class, namespace `Shiny.BluetoothLE`)
+
+An open `L2CapChannel` as a `System.IO.Stream`. Lives in `Shiny.BluetoothLE.Common`, so it is the same type on
+both sides of a channel.
+
+```csharp
+public sealed class L2CapChannelStream : Stream
+{
+    public const int DefaultMaxWriteSize = 4096;
+
+    public L2CapChannelStream(L2CapChannel channel, int maxWriteSize = DefaultMaxWriteSize, bool leaveOpen = false);
+
+    public L2CapChannel Channel { get; }
+    public int MaxWriteSize { get; set; }       // larger writes are split; settable after creation
+    public long BytesRead { get; }
+    public long BytesWritten { get; }
+
+    // ReadAsync / WriteAsync only - Read / Write throw NotSupportedException
+    // CanRead = CanWrite = true, CanSeek = false; Length / Position / Seek / SetLength throw
+    // Dispose closes the channel unless leaveOpen
+}
+
+public static class L2CapChannelStreamExtensions
+{
+    static L2CapChannelStream AsStream(this L2CapChannel channel, int maxWriteSize = L2CapChannelStream.DefaultMaxWriteSize, bool leaveOpen = false);
+}
+```
+
+The stream subscribes to `DataReceived` when it is created - create it as soon as the channel opens, or bytes
+the peer sends first are lost. It reads through the same buffered reader as the file-transfer helpers, so the two
+can take turns on one channel. A read returns 0 once the peer closes the channel.
+
+### L2CapTicketBroker (class, namespace `Shiny.BluetoothLE.Hosting`)
+
+One L2CAP listener shared by every bulk transfer, each channel claimed with a single-use ticket.
+
+```csharp
+public sealed class L2CapTicketBroker : IDisposable
+{
+    public L2CapTicketBroker(IBleHostingManager hosting, L2CapTicketBrokerOptions? options = null, ILogger<L2CapTicketBroker>? logger = null);
+
+    public ushort Psm { get; }                  // 0 until the first Reserve opens the listener
+    public int PendingTickets { get; }          // issued, not yet finished / released / expired
+
+    // opens the listener on first use; cancellationToken cancels opening it, not the transfer
+    public Task<L2CapTicket> Reserve(
+        string label,                                               // for logs
+        TimeSpan lifetime,                                          // must be positive; unclaimed token expires after it
+        Func<L2CapChannelStream, CancellationToken, Task> handler,  // stream closed when it returns; token cancels on Release/Dispose
+        int? maxWriteSize = null,                                   // defaults to options.MaxWriteSize
+        CancellationToken cancellationToken = default
+    );
+
+    public void Release(string token);          // withdraws the ticket AND cancels a running handler
+    public void Dispose();                      // cancels every ticket, closes the listener
+}
+
+public class L2CapTicketBrokerOptions
+{
+    public bool Secure { get; set; }                    // true - the central must open with the same setting
+    public TimeSpan HandshakeTimeout { get; set; }      // 15s - how long an arriving channel has to present its ticket
+    public int MaxWriteSize { get; set; }               // 4096
+}
+
+public sealed class L2CapTicket : IDisposable
+{
+    public string Token { get; }                // 32 chars, single use - give it only to the central the transfer is for
+    public string Label { get; }
+    public DateTimeOffset ExpiresUtc { get; }
+    public ushort Psm { get; }
+    public int MaxWriteSize { get; }            // worth passing to the central too
+    public bool IsClaimed { get; }
+    public bool HasExpired { get; }             // says nothing about a claimed transfer still running
+    public CancellationToken CancellationToken { get; }
+    public void Cancel();
+}
+
+public static class L2CapTicketBrokerServiceCollectionExtensions
+{
+    // singleton; needs AddBluetoothLeHosting()
+    static IServiceCollection AddL2CapTicketBroker(this IServiceCollection services, Action<L2CapTicketBrokerOptions>? configure = null);
+}
+```
+
+A channel that presents an unknown or expired token is answered `UnknownTicket`, one that presents a claimed token
+`AlreadyClaimed`, anything that is not a hello `Malformed` (or `VersionMismatch`), and a channel silent past
+`HandshakeTimeout` is closed - none of them reach a handler. Handler exceptions and `OperationCanceledException`
+are logged, not rethrown.
+
+### L2CapTickets (static class, namespace `Shiny.BluetoothLE`)
+
+The handshake, in `Shiny.BluetoothLE.Common`. The broker and the central's `ClaimTicket` /
+`OpenL2CapTicketChannel` use it for you - call it directly only to speak the protocol from something else.
+
+```
+central -> host   hello   "SL2T" [version:1] [length:1] [token:32 ASCII]
+host -> central   accept  "SL2T" [version:1] [status:1]
+```
+
+```csharp
+public static class L2CapTickets
+{
+    public const byte ProtocolVersion = 1;
+    public const int TokenLength = 32;
+    public const int HelloLength = 38;
+    public const int AcceptLength = 6;
+
+    static string CreateToken();
+    static byte[] CreateHello(string token);
+    static L2CapTicketStatus ReadHello(ReadOnlySpan<byte> frame, out string token);
+    static byte[] CreateAccept(L2CapTicketStatus status);
+    static L2CapTicketStatus ReadAccept(ReadOnlySpan<byte> frame);
+
+    // central side - see the shiny-bluetoothle skill
+    static Task<L2CapChannelStream> ClaimTicket(this L2CapChannel channel, string token, int maxWriteSize = 4096, TimeSpan? timeout = null, CancellationToken cancellationToken = default);
+}
+
+public enum L2CapTicketStatus : byte
+{
+    Accepted = 0, UnknownTicket = 1, VersionMismatch = 2, Malformed = 3, AlreadyClaimed = 4, Busy = 5
+}
+```
+
+### Message framing (BleMessageFraming / BleMessageReassembler, namespace `Shiny.BluetoothLE`)
+
+Carries messages longer than one GATT operation. Lives in `Shiny.BluetoothLE.Common`; the central side is
+`WriteCharacteristicMessageAsync` / `NotifyCharacteristicMessages` in `Shiny.BluetoothLE`.
+
+Every fragment starts with one header byte - bit 7 START, bit 6 END, bits 0-5 a sequence number wrapping at 64.
+A message that fits in one fragment has both flags set, so a short message costs one byte.
+
+```csharp
+public static class BleMessageFraming
+{
+    public const int MinimumPayload = 20;
+    public const int HeaderSize = 1;
+    public const int DefaultMaxMessageBytes = 64 * 1024;
+
+    static int PayloadPerFragment(int mtu);                                 // max(20, mtu) - 1; mtu is IPeripheral.Mtu
+    static IReadOnlyList<byte[]> Encode(ReadOnlySpan<byte> message, int mtu); // empty message -> one fragment
+}
+
+// one per link, per characteristic, per direction - never shared. Not thread-safe; lock around Push
+public sealed class BleMessageReassembler
+{
+    public BleMessageReassembler(int maxMessageBytes = BleMessageFraming.DefaultMaxMessageBytes);
+    public bool IsInMessage { get; }
+    public void Reset();
+    public BleMessageFrameResult Push(ReadOnlySpan<byte> fragment, out byte[]? message);
+}
+
+public enum BleMessageFrameResult { Partial, Complete, Malformed, OutOfSequence, TooLarge }
+```
+
+Every error result has already reset the reassembler, so the next START fragment begins cleanly. A START that
+arrives mid-message discards the partial one.
+
+### GattMessageExtensions (namespace `Shiny.BluetoothLE.Hosting`)
+
+```csharp
+public static class GattMessageExtensions
+{
+    // split to the central's MTU, each notification awaited in turn. One central; never two concurrent
+    // messages to the same central on the same characteristic
+    static Task NotifyMessage(this IGattCharacteristic characteristic, byte[] message, IPeripheral central, CancellationToken cancellationToken = default);
+
+    // one reassembler per central context + characteristic UUID (case-insensitive), held in context.Items
+    static BleMessageReassembler GetMessageReassembler(this BleServiceContext context, string characteristicUuid, int maxMessageBytes = BleMessageFraming.DefaultMaxMessageBytes);
+}
+```
+
 ### TransferProgress (record, namespace `Shiny.BluetoothLE`)
 
 Reports transfer metrics for the L2CAP file server and `L2CapChannelExtensions.SendFile(...)`. Intentionally identical in shape to `Shiny.Net.Http.TransferProgress`.
@@ -553,6 +724,8 @@ public sealed class RequestResponseCharacteristicAttribute(string uuid) : Attrib
     public bool Indicate { get; set; }
     public bool EncryptionRequired { get; set; }
     public string? Name { get; set; }
+    public bool Framed { get; set; }            // BleMessageFraming: reassemble per central, run the handler once, split the reply
+    public int MaxMessageBytes { get; set; }    // 64 * 1024; a larger framed request is discarded -> OnBleHandlerError
 }
 
 [AttributeUsage(AttributeTargets.Class)]
@@ -664,6 +837,11 @@ in `Task<>` or `ValueTask<>`.
 - Write returning nothing responds `GattState.Success` (or `Failure` on a throw), **only when
   `WriteRequest.IsReplyNeeded`**. Returning `GattState` responds that value. Set `ManualRespond` and
   take a `WriteRequest` to answer the central yourself.
+- RequestResponse with `Framed = true`: each write is one fragment. Fragments that do not finish a message
+  are answered `Success` and the handler does not run; a malformed, out-of-sequence or oversized message is
+  answered `Failure` and reported to `OnBleHandlerError` as `InvalidDataException`. Once the message is whole
+  the handler runs with `byte[]` and `WriteRequest.Data` set to the full message, and a `byte[]` reply goes out
+  through `NotifyMessage`.
 - Every UUID is normalized to the full 128-bit form. Short forms work on Apple (`CBUUID.FromString`)
   but throw on Android (`java.util.UUID.fromString`), so never hand a short UUID to `AddService`
   directly - only the generator normalizes for you.
@@ -695,6 +873,13 @@ public static class ServiceCollectionExtensions
 {
     // Registers IBleHostingManager in the DI container
     public static IServiceCollection AddBluetoothLeHosting(this IServiceCollection services);
+}
+
+// namespace Shiny.BluetoothLE.Hosting
+public static class L2CapTicketBrokerServiceCollectionExtensions
+{
+    // Registers a singleton L2CapTicketBroker; needs AddBluetoothLeHosting()
+    public static IServiceCollection AddL2CapTicketBroker(this IServiceCollection services, Action<L2CapTicketBrokerOptions>? configure = null);
 }
 ```
 
@@ -953,3 +1138,16 @@ public static MauiApp CreateMauiApp()
 - The writing central must be subscribed to the characteristic before it writes - a GATT write
   response cannot carry a payload, so the reply travels as a notification. Implement
   `OnBleResponseDropped` to observe the case where it was not subscribed
+
+### Framed reply or request never completes
+- The central must use `WriteCharacteristicMessageAsync` / `NotifyCharacteristicMessages` - a plain
+  `WriteCharacteristicAsync` payload is not a valid fragment, and a plain `NotifyCharacteristic` subscriber
+  sees raw fragments with header bytes
+- Implement `OnBleHandlerError`: a discarded message arrives there as `InvalidDataException` naming
+  `Malformed`, `OutOfSequence` or `TooLarge`. Raise `MaxMessageBytes` if the request is legitimately larger
+
+### Ticketed L2CAP channel refused
+- `UnknownTicket` - the token expired (`lifetime` passed) or was released; reserve a new one
+- `AlreadyClaimed` - a second channel presented a token that is single-use
+- The central's `secure` flag must match `L2CapTicketBrokerOptions.Secure` (default `true`), or the connect
+  itself fails before any handshake

@@ -89,6 +89,8 @@ sealed record CharacteristicModel(
     string WriteOptionsExpression,
     bool ManualRespond,
     HandlerModel? RequestResponse,
+    bool Framed,
+    int MaxMessageBytes,
     bool HasNotify,
     HandlerModel? NotifyHook,
     string? NotifyName,

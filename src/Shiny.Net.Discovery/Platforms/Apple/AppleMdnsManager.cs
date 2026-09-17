@@ -202,7 +202,13 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
     }
 
 
-    public Task<IMdnsPublication> Publish(MdnsServiceRegistration registration, CancellationToken ct = default)
+    // Until Bonjour calls back, nothing but the service's own event handlers references a publishing
+    // NSNetService - the same trap as a resolve in flight - so the GC collects it and neither Published
+    // nor PublishFailure ever fires. Root each one here until it reports back or is cancelled.
+    static readonly HashSet<NSNetService> publishing = [];
+
+
+    public async Task<IMdnsPublication> Publish(MdnsServiceRegistration registration, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(registration);
         ServiceTypeParser.ValidateInstanceName(registration.InstanceName);
@@ -212,12 +218,19 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
 
         var serviceType = ServiceTypeParser.Parse(registration.ServiceType, registration.Domain);
         var tcs = new TaskCompletionSource<IMdnsPublication>(TaskCreationOptions.RunContinuationsAsynchronously);
+        NSNetService? service = null;
 
         DispatchQueue.MainQueue.DispatchAsync(() =>
         {
+            if (ct.IsCancellationRequested)
+            {
+                tcs.TrySetCanceled(ct);
+                return;
+            }
+
             try
             {
-                var service = new NSNetService(
+                service = new NSNetService(
                     serviceType.Domain.ToBonjour(),
                     serviceType.ServiceType.ToBonjour(),
                     registration.InstanceName,
@@ -227,12 +240,23 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
                 if (registration.TxtRecords?.Count > 0)
                     service.SetTxtRecordData(registration.TxtRecords.ToTxtRecordData());
 
-                service.Published += (_, _) => tcs.TrySetResult(
-                    new ApplePublication(service, serviceType, registration.Port)
-                );
-                service.PublishFailure += (_, args) => tcs.TrySetException(
-                    new MdnsException($"Bonjour refused to publish '{registration.InstanceName}' - {Describe(args.Errors)}")
-                );
+                var published = service;
+                service.Published += (_, _) =>
+                {
+                    Unroot(published);
+                    tcs.TrySetResult(new ApplePublication(published, serviceType, registration.Port));
+                };
+                service.PublishFailure += (_, args) =>
+                {
+                    Unroot(published);
+                    published.Dispose();
+                    tcs.TrySetException(
+                        new MdnsException($"Bonjour refused to publish '{registration.InstanceName}' - {Describe(args.Errors)}")
+                    );
+                };
+
+                lock (publishing)
+                    publishing.Add(service);
 
                 // the default (no NoAutoRename option) lets Bonjour resolve name conflicts by
                 // appending " (2)", which is exactly the contract IMdnsPublication documents
@@ -240,11 +264,35 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
             }
             catch (Exception ex)
             {
+                if (service != null)
+                {
+                    Unroot(service);
+                    service.Dispose();
+                }
                 tcs.TrySetException(new MdnsException($"Failed to publish '{registration.InstanceName}'", ex));
             }
         });
 
-        return tcs.Task.WaitAsync(ct);
+        // cancelling a publish still in flight must withdraw it, not just stop waiting - otherwise
+        // the service is advertised with nothing holding a publication to take it down
+        await using var cancellation = ct.Register(() => DispatchQueue.MainQueue.DispatchAsync(() =>
+        {
+            if (service == null || !tcs.TrySetCanceled(ct))
+                return;
+
+            Unroot(service);
+            service.Stop();
+            service.Dispose();
+        }));
+
+        return await tcs.Task.ConfigureAwait(false);
+    }
+
+
+    static void Unroot(NSNetService service)
+    {
+        lock (publishing)
+            publishing.Remove(service);
     }
 
 

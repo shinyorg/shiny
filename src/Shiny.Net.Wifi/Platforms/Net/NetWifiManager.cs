@@ -14,8 +14,8 @@ namespace Shiny.Net.Wifi;
 /// all comes from the managed network stack. Everything Wi-Fi specific (SSID, signal, scanning,
 /// joining) needs native code and throws.</para>
 /// <para>On Linux, reference <c>Shiny.Net.Wifi.Linux</c> instead: it talks to NetworkManager over
-/// D-Bus and supports the whole API. This type is what a Windows or macOS console app that
-/// referenced the base package gets, and it is deliberately a stub rather than a lie.</para>
+/// D-Bus and supports the whole API. Nothing registers this type - a Windows or macOS console app
+/// that wants it registers it itself - and it is deliberately a stub rather than a lie.</para>
 /// </remarks>
 public class NetWifiManager(ILogger<NetWifiManager> logger) : AbstractWifiManager(logger)
 {

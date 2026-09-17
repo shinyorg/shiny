@@ -5,6 +5,10 @@ using Shiny.Net.Wifi;
 namespace Shiny;
 
 
+// Platform targets only. The plain .NET target is what Shiny.Net.Wifi.Linux builds against, and it
+// declares AddWifi/AddWifiHotspot itself - declaring them here too made every call ambiguous there.
+// The same split as Shiny.BluetoothLE / Shiny.BluetoothLE.Linux.
+#if PLATFORM
 public static class WifiServiceCollectionExtensions
 {
     /// <summary>
@@ -23,7 +27,8 @@ public static class WifiServiceCollectionExtensions
     /// <c>com.apple.security.network.client</c> when sandboxed.</para>
     /// <para>Windows: needs the <c>wiFiControl</c> capability, and <c>radios</c> to power the
     /// adapter.</para>
-    /// <para>Linux: reference <c>Shiny.Net.Wifi.Linux</c> instead of this package - it registers a
+    /// <para>Linux and plain .NET: this method does not exist on the plain <c>net10.0</c> target.
+    /// Reference <c>Shiny.Net.Wifi.Linux</c>, which declares <c>AddWifi</c> with a
     /// NetworkManager-backed implementation of the same interfaces.</para>
     /// </remarks>
     public static IServiceCollection AddWifi(this IServiceCollection services)
@@ -45,10 +50,6 @@ public static class WifiServiceCollectionExtensions
 #elif WINDOWS
         services.AddSingleton<IWifiManager>(sp => new WindowsWifiManager(
             sp.GetRequiredService<ILogger<WindowsWifiManager>>()
-        ));
-#else
-        services.AddSingleton<IWifiManager>(sp => new NetWifiManager(
-            sp.GetRequiredService<ILogger<NetWifiManager>>()
         ));
 #endif
         return services;
@@ -80,9 +81,8 @@ public static class WifiServiceCollectionExtensions
         services.AddSingleton<IWifiHotspot>(sp => new WindowsWifiHotspot(
             sp.GetRequiredService<ILogger<WindowsWifiHotspot>>()
         ));
-#else
-        services.AddSingleton<IWifiHotspot>(_ => new NetWifiHotspot());
 #endif
         return services;
     }
 }
+#endif

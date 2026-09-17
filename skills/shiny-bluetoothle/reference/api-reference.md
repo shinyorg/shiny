@@ -778,6 +778,67 @@ public static class CharacteristicExtensions
 }
 ```
 
+### Message Extensions (MessageExtensions)
+
+Messages longer than one GATT operation, framed with `BleMessageFraming`. The peripheral must speak the same format -
+a `Shiny.BluetoothLE.Hosting` `[RequestResponseCharacteristic(Framed = true)]`, or one using `NotifyMessage` and a
+`BleMessageReassembler`.
+
+```csharp
+public static class MessageExtensions
+{
+    // splits to peripheral.Mtu and writes each fragment in order; calls for the same peripheral + characteristic
+    // are serialised. timeoutMs applies to each fragment's write
+    static Task WriteCharacteristicMessageAsync(
+        this IPeripheral peripheral,
+        string serviceUuid,
+        string characteristicUuid,
+        byte[] message,
+        bool withResponse = true,
+        CancellationToken cancellationToken = default,
+        int timeoutMs = 3000
+    );
+
+    // cold; each subscription subscribes to the characteristic and owns a reassembler. Emits one byte[] per complete
+    // message; a broken or oversized message is dropped silently and the stream continues
+    static IObservable<byte[]> NotifyCharacteristicMessages(
+        this IPeripheral peripheral,
+        string serviceUuid,
+        string characteristicUuid,
+        bool useIndicationsIfAvailable = true,
+        int maxMessageBytes = BleMessageFraming.DefaultMaxMessageBytes   // 64 KB
+    );
+}
+```
+
+### BleMessageFraming / BleMessageReassembler (namespace `Shiny.BluetoothLE`)
+
+The format, in `Shiny.BluetoothLE.Common` and shared with the hosting library. One header byte per fragment:
+bit 7 START, bit 6 END, bits 0-5 sequence number (wraps at 64). A message that fits in one fragment has both flags set.
+
+```csharp
+public static class BleMessageFraming
+{
+    public const int MinimumPayload = 20;
+    public const int HeaderSize = 1;
+    public const int DefaultMaxMessageBytes = 64 * 1024;
+
+    static int PayloadPerFragment(int mtu);                                    // max(20, mtu) - 1; mtu is IPeripheral.Mtu
+    static IReadOnlyList<byte[]> Encode(ReadOnlySpan<byte> message, int mtu);
+}
+
+// one per link and direction, never shared; not thread-safe
+public sealed class BleMessageReassembler
+{
+    public BleMessageReassembler(int maxMessageBytes = BleMessageFraming.DefaultMaxMessageBytes);
+    public bool IsInMessage { get; }
+    public void Reset();
+    public BleMessageFrameResult Push(ReadOnlySpan<byte> fragment, out byte[]? message);   // error results have already reset
+}
+
+public enum BleMessageFrameResult { Partial, Complete, Malformed, OutOfSequence, TooLarge }
+```
+
 ### Feature Extensions (MTU)
 
 ```csharp
@@ -840,8 +901,98 @@ public static class FeatureL2Cap
 
     // Opens an L2CAP channel if supported; emits Empty otherwise
     static IObservable<L2CapChannel> TryOpenL2CapChannel(this IPeripheral peripheral, ushort psm, bool secure);
+
+    // Opens a channel to a host running L2CapTicketBroker and claims the ticket on it.
+    // Throws NotSupportedException without L2CAP, L2CapTicketException when the host refuses the ticket
+    static Task<L2CapChannelStream> OpenL2CapTicketChannel(
+        this IPeripheral peripheral,
+        ushort psm,
+        string token,
+        bool secure = true,                                        // must match the broker's Secure (default true)
+        int maxWriteSize = L2CapChannelStream.DefaultMaxWriteSize, // 4096
+        CancellationToken cancellationToken = default
+    );
 }
 ```
+
+### L2CAP Tickets (L2CapTickets, namespace `Shiny.BluetoothLE`)
+
+The handshake that lets a host share one PSM between many authorised transfers. The host issues a single-use token
+over an authenticated route; the first thing the central writes on the channel is that token.
+
+```
+central -> host   hello   "SL2T" [version:1] [length:1] [token:32 ASCII]
+host -> central   accept  "SL2T" [version:1] [status:1]
+```
+
+```csharp
+public static class L2CapTickets
+{
+    public const byte ProtocolVersion = 1;
+    public const int TokenLength = 32;
+    public const int HelloLength = 38;
+    public const int AcceptLength = 6;
+
+    // present a ticket on a channel you opened; returns the channel as a stream once accepted.
+    // timeout defaults to 20s. On any failure the channel is disposed
+    static Task<L2CapChannelStream> ClaimTicket(
+        this L2CapChannel channel,
+        string token,
+        int maxWriteSize = L2CapChannelStream.DefaultMaxWriteSize,
+        TimeSpan? timeout = null,
+        CancellationToken cancellationToken = default
+    );
+
+    // frame helpers - only needed to speak the protocol without ClaimTicket / L2CapTicketBroker
+    static string CreateToken();
+    static byte[] CreateHello(string token);
+    static L2CapTicketStatus ReadHello(ReadOnlySpan<byte> frame, out string token);
+    static byte[] CreateAccept(L2CapTicketStatus status);
+    static L2CapTicketStatus ReadAccept(ReadOnlySpan<byte> frame);
+}
+
+public enum L2CapTicketStatus : byte
+{
+    Accepted = 0,
+    UnknownTicket = 1,     // never issued, or expired - request the transfer again
+    VersionMismatch = 2,
+    Malformed = 3,
+    AlreadyClaimed = 4,    // tokens are single use
+    Busy = 5
+}
+
+public class L2CapTicketException : BleException
+{
+    L2CapTicketStatus Status { get; }
+}
+```
+
+### L2CapChannelStream (class, namespace `Shiny.BluetoothLE`)
+
+An open `L2CapChannel` as a `System.IO.Stream`.
+
+```csharp
+public sealed class L2CapChannelStream : Stream
+{
+    public const int DefaultMaxWriteSize = 4096;
+    public L2CapChannelStream(L2CapChannel channel, int maxWriteSize = DefaultMaxWriteSize, bool leaveOpen = false);
+
+    public L2CapChannel Channel { get; }
+    public int MaxWriteSize { get; set; }      // larger writes are split
+    public long BytesRead { get; }
+    public long BytesWritten { get; }
+    // async only: Read/Write throw NotSupportedException; CanSeek = false; ReadAsync returns 0 once the peer closes
+    // Dispose closes the channel unless leaveOpen
+}
+
+public static class L2CapChannelStreamExtensions
+{
+    static L2CapChannelStream AsStream(this L2CapChannel channel, int maxWriteSize = L2CapChannelStream.DefaultMaxWriteSize, bool leaveOpen = false);
+}
+```
+
+Create the stream as soon as the channel opens - it subscribes to `DataReceived` on construction, and earlier bytes
+are lost. It reads through the same buffered reader as the file-transfer helpers, so the two can share a channel in turn.
 
 ### L2CAP File Transfer — peripheral one-liners (PeripheralL2CapFileTransferExtensions)
 
@@ -1156,6 +1307,46 @@ public void WriteLargeData(IPeripheral peripheral, Stream dataStream)
 }
 ```
 
+### Writing and Receiving Framed Messages
+
+```csharp
+public async Task<Reply> SendCommand(IPeripheral peripheral, Command command, CancellationToken ct)
+{
+    // subscribe before writing - the reply comes back as notifications
+    var reply = peripheral
+        .NotifyCharacteristicMessages("service-uuid", "command-uuid")
+        .Take(1)
+        .ToTask(ct);
+
+    await peripheral.WriteCharacteristicMessageAsync(
+        "service-uuid",
+        "command-uuid",
+        JsonSerializer.SerializeToUtf8Bytes(command, AppJsonContext.Default.Command),
+        cancellationToken: ct
+    );
+
+    return JsonSerializer.Deserialize(await reply, AppJsonContext.Default.Reply)!;
+}
+```
+
+### Downloading Over a Ticketed L2CAP Channel
+
+```csharp
+public async Task Download(IPeripheral peripheral, ushort psm, string token, string localPath, CancellationToken ct)
+{
+    try
+    {
+        await using var stream = await peripheral.OpenL2CapTicketChannel(psm, token, cancellationToken: ct);
+        await using var file = File.Create(localPath);
+        await stream.CopyToAsync(file, ct);
+    }
+    catch (L2CapTicketException ex) when (ex.Status == L2CapTicketStatus.UnknownTicket)
+    {
+        // the ticket expired before the channel opened - ask the host for a new one
+    }
+}
+```
+
 ### Feature Detection and MTU Request
 
 ```csharp
@@ -1294,3 +1485,13 @@ bleManager
 8. **MTU negotiation returns same value**
    - MTU requests are only supported on Android (`ICanRequestMtu`). On iOS/Windows, the OS handles MTU negotiation automatically.
    - Use `CanRequestMtu()` to check support, or `TryRequestMtu()` which gracefully falls back.
+
+9. **Framed messages never arrive**
+   - The peripheral must frame too (`[RequestResponseCharacteristic(Framed = true)]` or `NotifyMessage`). Against a plain characteristic `NotifyCharacteristicMessages` treats the first byte as a header and discards most messages.
+   - Subscribe with `NotifyCharacteristicMessages` *before* `WriteCharacteristicMessageAsync` when the reply is a notification.
+   - A message larger than `maxMessageBytes` (default 64 KB) is dropped without an error - raise it.
+
+10. **`OpenL2CapTicketChannel` throws `L2CapTicketException`**
+    - `UnknownTicket` - the ticket expired or was released on the host; request the transfer again for a fresh token.
+    - `AlreadyClaimed` - tokens are single use; do not retry with the same one.
+    - A connect failure *before* the handshake usually means `secure` does not match the host broker's `Secure` setting.

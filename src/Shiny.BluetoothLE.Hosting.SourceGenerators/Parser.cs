@@ -270,6 +270,8 @@ static class Parser
 
                         builder.NotifyName = Identifier(Named<string?>(attribute, "Name", null) ?? StripAffixes(method.Name));
                         builder.NotificationOptions = NotificationOptionsFor(attribute, method.Name, diagnostics, location);
+                        builder.Framed = Named(attribute, "Framed", false);
+                        builder.MaxMessageBytes = Math.Max(1, Named(attribute, "MaxMessageBytes", DefaultMaxMessageBytes));
                         builder.RequestResponse = SignatureBinder.Bind(
                             method, "request/response", WriteBindings(contextFullName), AllowedResults.Bytes | AllowedResults.GattResult, diagnostics, contextFullName
                         );
@@ -402,6 +404,10 @@ static class Parser
     }
 
 
+    // mirrors BleMessageFraming.DefaultMaxMessageBytes - the generator cannot reference the runtime assembly
+    const int DefaultMaxMessageBytes = 64 * 1024;
+
+
     static T Named<T>(AttributeData attribute, string name, T fallback)
     {
         foreach (var argument in attribute.NamedArguments)
@@ -472,6 +478,8 @@ static class Parser
         public string WriteOptions { get; set; } = $"{Names.WriteOptions}.Write";
         public bool ManualRespond { get; set; }
         public HandlerModel? RequestResponse { get; set; }
+        public bool Framed { get; set; }
+        public int MaxMessageBytes { get; set; } = DefaultMaxMessageBytes;
         public HandlerModel? NotifyHook { get; set; }
         public string? NotifyName { get; set; }
         public string NotificationOptions { get; set; } = $"{Names.NotificationOptions}.Notify";
@@ -542,6 +550,8 @@ static class Parser
             WriteOptionsExpression: this.WriteOptions,
             ManualRespond: this.ManualRespond,
             RequestResponse: this.RequestResponse,
+            Framed: this.Framed,
+            MaxMessageBytes: this.MaxMessageBytes,
             HasNotify: this.hasNotify || this.hasRequestResponse,
             NotifyHook: this.NotifyHook,
             NotifyName: this.NotifyName,

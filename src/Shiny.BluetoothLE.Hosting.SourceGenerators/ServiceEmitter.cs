@@ -186,6 +186,25 @@ static class ServiceEmitter
 
         using (writer.Block($"async {Task()} {name}({Names.WriteRequest} request)"))
         {
+            if (characteristic.Framed)
+            {
+                writer.Line("// Framed: each write is one fragment of a message; the handler runs once the message is whole");
+                writer.Line($"var reassembler = {Names.GattMessageExtensions}.GetMessageReassembler(this.GetContext(request.Peripheral), \"{characteristic.Uuid}\", {characteristic.MaxMessageBytes});");
+                writer.Line($"{Names.BleMessageFrameResult} frame;");
+                writer.Line("byte[]? message;");
+                writer.Line("lock (reassembler) frame = reassembler.Push(request.Data, out message);");
+                writer.Line();
+                using (writer.Block($"if (frame != {Names.BleMessageFrameResult}.Complete)"))
+                {
+                    writer.Line($"if (request.IsReplyNeeded) request.Respond(frame == {Names.BleMessageFrameResult}.Partial ? {Names.GattState}.Success : {Names.GattState}.Failure);");
+                    using (writer.Block($"if (frame != {Names.BleMessageFrameResult}.Partial)"))
+                        writer.Line($"this.OnBleHandlerError(\"{characteristic.Uuid}\", new global::System.IO.InvalidDataException(\"Discarded a framed message: \" + frame));");
+                    writer.Line("return;");
+                }
+                writer.Line("request = request with { Data = message! };");
+                writer.Line();
+            }
+
             writer.Line($"{Names.GattResult} result;");
             using (writer.Block("try"))
             {
@@ -209,7 +228,9 @@ static class ServiceEmitter
                 writer.Line($"var characteristic = this.{characteristic.FieldName};");
                 using (writer.Block($"if ({Names.BleHostingRuntime}.IsSubscribed(characteristic, request.Peripheral))"))
                 {
-                    writer.Line("await characteristic!.Notify(result.Data, this.BleHostToken, request.Peripheral).ConfigureAwait(false);");
+                    writer.Line(characteristic.Framed
+                        ? $"await {Names.GattMessageExtensions}.NotifyMessage(characteristic!, result.Data, request.Peripheral, this.BleHostToken).ConfigureAwait(false);"
+                        : "await characteristic!.Notify(result.Data, this.BleHostToken, request.Peripheral).ConfigureAwait(false);");
                 }
                 using (writer.Block("else"))
                 {

@@ -13,15 +13,23 @@ public static class BlazorServiceCollectionExtensions
 {
     public static IServiceCollection AddConnectivity(this IServiceCollection services)
     {
-        services.TryAddSingleton<ConnectivityManager>();
-        services.TryAddSingleton<IConnectivity>(sp => sp.GetRequiredService<ConnectivityManager>());
+        // a custom IConnectivity registered earlier wins - don't register (and later start) the JS monitor behind it
+        if (!services.HasService<IConnectivity>())
+        {
+            services.TryAddSingleton<ConnectivityManager>();
+            services.AddSingleton<IConnectivity>(sp => sp.GetRequiredService<ConnectivityManager>());
+        }
         return services;
     }
 
     public static IServiceCollection AddBattery(this IServiceCollection services)
     {
-        services.TryAddSingleton<BatteryManager>();
-        services.TryAddSingleton<IBattery>(sp => sp.GetRequiredService<BatteryManager>());
+        // a custom IBattery registered earlier wins - don't register (and later start) the JS monitor behind it
+        if (!services.HasService<IBattery>())
+        {
+            services.TryAddSingleton<BatteryManager>();
+            services.AddSingleton<IBattery>(sp => sp.GetRequiredService<BatteryManager>());
+        }
         return services;
     }
 

@@ -185,6 +185,40 @@ public class HandlerShapeTests
 
 
     [Fact]
+    public void RequestResponse_Framed_ReassemblesPerCentral_AndSplitsTheReply()
+    {
+        var run = GeneratorHarness.Run(Snippets.Service("""
+                [RequestResponseCharacteristic("2A3B", Name = "Command", Framed = true, MaxMessageBytes = 4096)]
+                Task<byte[]> Exchange(byte[] data, WriteRequest request) => Task.FromResult(data);
+            """));
+
+        Assert.Empty(run.Ids());
+        var source = run.AllSource;
+        // the reassembler lives on the writing central's context, so two centrals never share one
+        Assert.Contains("GattMessageExtensions.GetMessageReassembler(this.GetContext(request.Peripheral), \"00002A3B-0000-1000-8000-00805F9B34FB\", 4096)", source);
+        // a fragment that does not finish the message is acknowledged without running the handler
+        Assert.Contains("if (frame != global::Shiny.BluetoothLE.BleMessageFrameResult.Complete)", source);
+        // and the handler - including a WriteRequest parameter - sees the whole message
+        Assert.Contains("request = request with { Data = message! };", source);
+        Assert.Contains("GattMessageExtensions.NotifyMessage(characteristic!, result.Data, request.Peripheral, this.BleHostToken)", source);
+    }
+
+
+    [Fact]
+    public void RequestResponse_Unframed_DoesNotReassemble()
+    {
+        var run = GeneratorHarness.Run(Snippets.Service("""
+                [RequestResponseCharacteristic("2A3B")]
+                Task<byte[]> Exchange(byte[] data) => Task.FromResult(data);
+            """));
+
+        Assert.Empty(run.Ids());
+        Assert.DoesNotContain("GetMessageReassembler", run.AllSource);
+        Assert.DoesNotContain("NotifyMessage", run.AllSource);
+    }
+
+
+    [Fact]
     public void Uuids_AreNormalizedToTheFull128BitForm()
     {
         // java.util.UUID.fromString on Android rejects short forms, so everything must be expanded

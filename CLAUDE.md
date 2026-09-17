@@ -10,15 +10,25 @@ to https://shinylib.net).
 ## Documentation site
 
 The public docs live in a **separate repo**: `~/Desktop/dev/documentation` (Astro / Starlight).
-Because this is a monorepo, **each module has its own docs folder** — pick the one that matches the
-module you changed:
+Every module in this monorepo lives under **one docs folder**, `src/content/docs/client/`, with one
+subfolder per module (URLs are `/client/<module>/...`):
 
-- Feature pages: `src/content/docs/<module>/*.mdx` — e.g. `foundation/`, `jobs/`, `locations/`,
-  `notifications/`, `push/`, `ble/`, `blehosting/`, `httptransfers/`, `stores/`, `configuration/`,
-  `di/`, `permissions/`, `datasync/`.
-- Release notes: `src/content/docs/<module>/release-notes.mdx` (one per module).
-- Menu (sidebar): `src/sidebar-topics.mjs` — most modules sit under the **App Essentials** topic
-  (core lives under **Foundation**); add/update the relevant node when you add a feature page.
+- Feature pages: `src/content/docs/client/<module>/*.mdx` — `core/`, `ble/`, `blehosting/`,
+  `beacons/`, `locations/`, `discovery/`, `wifi/`, `screenrecorder/`, `contactstore/`,
+  `calendarstore/`, `jobs/`, `notifications/`, `push/`, `liveactivities/`, `httptransfers/`,
+  `datasync/`, `configuration/`.
+- Release notes: **one shared file**, `src/content/docs/client/release-notes.mdx`. Every package
+  ships under the same version, so notes are grouped `## v<major>` → `### <version> - <date>` →
+  `#### <Component>` (e.g. `#### BluetoothLE`, `#### Push Notifications`). Add your note under the
+  right component heading in the current version, creating either heading if it isn't there yet.
+- Menu (sidebar): `src/sidebar-topics.mjs` — the modules stay spread across their topics
+  (Foundation, Hardware & Connectivity, Device Data, Background & Delivery, MAUI App, Data &
+  Storage), and every module's **Release Notes** item links to the same `client/release-notes`
+  page. Add/update the relevant node when you add a feature page.
+- Moving or renaming a page needs a redirect in `astro.config.mjs`.
+
+Docs folders outside `client/` (e.g. `foundation/`, `stores/`, `di/`, `mauihost/`, `permissions/`)
+belong to other repos.
 
 ### Required updates for EVERY fix & feature
 
@@ -27,8 +37,8 @@ A change is not "done" until these are in sync:
 1. **readme.md** (repo root) — reflect new/changed behavior.
 2. **Skill** (`skills/<shiny-module>/`) — the agent-facing "how to generate correct code" doc for
    that module; update the trigger keyword list when a new public API is introduced.
-3. **Docs site** — update the relevant module's feature page and add a **release note** to that
-   module's `release-notes.mdx`.
+3. **Docs site** — update the relevant module's feature page and add a **release note** under that
+   module's component heading in `client/release-notes.mdx`.
 
 ### Release notes
 

@@ -176,10 +176,18 @@ throws `WifiNotSupportedException` with a message naming the exact limit.
 | Linux | NetworkManager / D-Bus | `Settings.ListConnections` (UUID-keyed) | NetworkManager AP mode + `ipv4.method=shared` |
 | plain .NET | `System.Net.NetworkInformation` (addressing only) | none | none |
 
-**On Linux, reference `Shiny.Net.Wifi.Linux` instead of the base package.** It registers
-NetworkManager-backed implementations of the same interfaces. The base package's plain .NET
-target reports IP/DNS off the wireless interface and raises `Changed`, but every Wi-Fi-specific call
-throws - it is a deliberate stub, not a fallback.
+**On Linux, reference `Shiny.Net.Wifi.Linux` instead of the base package.** It declares
+`AddWifi()`/`AddWifiHotspot()` with NetworkManager-backed implementations of the same interfaces.
+The base package declares those two methods **only on its platform targets** (Android, Apple,
+Windows) - on plain `net10.0` they come from the Linux package, so the call is never ambiguous.
+The plain .NET stub (`NetWifiManager` / `NetWifiHotspot`) is not registered by anything: a Windows or
+macOS console app that wants addressing-only Wi-Fi info registers it itself, and every Wi-Fi-specific
+call on it throws - it is a deliberate stub, not a fallback.
+
+```csharp
+// plain net10.0 on Windows/macOS only - there is no AddWifi() there
+services.AddSingleton<IWifiManager>(sp => new NetWifiManager(sp.GetRequiredService<ILogger<NetWifiManager>>()));
+```
 
 ## Registration
 
@@ -481,4 +489,6 @@ and in a headless session needing rules for
 11. **Handle `WifiSecurity.Psk`.** iOS reports "personal" without naming the WPA generation, so a
     `switch` over `WifiSecurity` that only lists `Wpa2Psk`/`Wpa3Psk` will miss iOS entirely.
    `SignalStrengthPercent` is populated everywhere and is the safe one to display.
-10. **On Linux, reference `Shiny.Net.Wifi.Linux`,** not just the base package.
+10. **On Linux, reference `Shiny.Net.Wifi.Linux`,** not just the base package. Never call
+    `LinuxWifiServiceCollectionExtensions.AddWifi(services)` by class name to dodge an ambiguity -
+    `services.AddWifi()` resolves to the Linux method.

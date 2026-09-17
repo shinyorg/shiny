@@ -217,6 +217,24 @@ public sealed class RequestResponseCharacteristicAttribute : Attribute
     /// trailing <c>Async</c> stripped.
     /// </summary>
     public string? Name { get; set; }
+
+    /// <summary>
+    /// Carries requests and replies longer than one GATT operation, using <see cref="BleMessageFraming"/>.
+    /// Defaults to false.
+    /// </summary>
+    /// <remarks>
+    /// Each write is treated as one fragment, reassembled per central, and the handler runs once with the
+    /// whole message. The reply is split to fit the writing central's MTU. The central must speak the same
+    /// format - <c>WriteCharacteristicMessageAsync</c> and <c>NotifyCharacteristicMessages</c> in
+    /// Shiny.BluetoothLE.
+    /// </remarks>
+    public bool Framed { get; set; }
+
+    /// <summary>
+    /// The largest request a <see cref="Framed"/> characteristic accepts from one central, in bytes. A larger
+    /// one is discarded and reported to <c>OnBleHandlerError</c>. Defaults to 64 KB.
+    /// </summary>
+    public int MaxMessageBytes { get; set; } = BleMessageFraming.DefaultMaxMessageBytes;
 }
 
 

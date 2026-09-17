@@ -95,14 +95,16 @@ Windows uses COM-activated in-process background tasks. Call `ShinyJobsBackgroun
 
 On the base .NET TFM there is no native OS scheduler — Shiny runs an in-process managed `JobManager` on a recurring timer (default 30s; configurable via the static `JobManager.Interval` property, minimum 15s, maximum 5 minutes). Jobs only execute while the host process is alive.
 
-There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` directly on all plain .NET targets (Blazor WASM included). You must register an `IBattery` and `IConnectivity` implementation; `AddJob<TJob>(...)` auto-registers them via `AddConnectivity()`/`AddBattery()` from the appropriate platform support package if present.
+There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` directly on all plain .NET targets (Blazor WASM included). You must register an `IBattery` and `IConnectivity` implementation yourself on these targets — `AddJob` cannot reference the Linux/Blazor support packages, so it only auto-adds them on the platform TFMs (Android, iOS, tvOS, Mac Catalyst, Windows). Registration order does not matter for the support-package calls. To replace the defaults with your own implementation on any target, register yours **before** `AddJob` — the auto-registration uses `TryAdd`.
 
 ```csharp
 using Shiny;
 using Shiny.Jobs;
 
-// Linux / console — battery + connectivity come from Shiny.Core.Linux (via AddConnectivity/AddBattery)
-// Blazor WASM — from Shiny.Support.DeviceMonitoring.Blazor
+// Linux / console — battery + connectivity come from Shiny.Core.Linux
+services.AddConnectivity();
+services.AddBattery();
+// Blazor WASM — the same two calls from Shiny.Core.Blazor
 services.AddJob<MySyncJob>(r => r
     .WithForeground()
     .WithInternet(InternetAccess.Any)
