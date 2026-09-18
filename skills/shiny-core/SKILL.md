@@ -231,6 +231,7 @@ When using Shiny in a MAUI app, several Shiny types collide with MAUI implicit u
 |------|----------------|----------------|------------|
 | `IConnectivity` | `Shiny.Net` | `Microsoft.Maui.Networking` | Use `Shiny.Net.IConnectivity` FQN |
 | `IBattery` | `Shiny.Power` | `Microsoft.Maui.Devices` | Use `Shiny.Power.IBattery` FQN |
+| `BatteryState`, `BatteryPowerSource`, `EnergySaverStatus` | `Shiny.Power` | `Microsoft.Maui.Devices` | Use `Shiny.Power.*` FQN (in the global namespace in 5.7.1 only — see below) |
 | `DeviceInfo` | `Shiny.BluetoothLE` | `Microsoft.Maui.Devices` | Use FQN for whichever you need |
 
 **Safe global usings** (won't conflict with MAUI):
@@ -242,6 +243,8 @@ global using Shiny.Locations;
 global using Shiny.BluetoothLE;
 // Do NOT globally use: Shiny.Net, Shiny.Power, Shiny.Notifications, Shiny.Push, Shiny.BluetoothLE.Hosting
 ```
+
+**Shiny 5.7.1 only:** `BatteryState`, `BatteryPowerSource`, `EnergySaverStatus` (Core), `AccessRequestFlags` (Notifications) and `GeofenceServiceCollectionExtensions` (Locations) shipped in the global namespace by mistake. A global type beats one imported by `using`, so in a MAUI app an unqualified `BatteryState` resolved to Shiny's enum instead of `Microsoft.Maui.Devices.BatteryState`. From 5.7.2 they are back in `Shiny.Power`, `Shiny.Notifications` and `Shiny` — always write the namespace import or FQN, never rely on the global resolution.
 
 ## Best Practices
 

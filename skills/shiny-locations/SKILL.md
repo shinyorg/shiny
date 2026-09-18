@@ -108,6 +108,8 @@ server-side from GPS reports and notify the client via `Shiny.Push.Blazor`.
 Register geofencing in `MauiProgram.cs`:
 
 ```csharp
+using Shiny; // AddGeofencing / AddGpsDirectGeofencing live here
+
 // Standard geofencing with a delegate
 services.AddGeofencing<MyGeofenceDelegate>();
 

@@ -1,3 +1,4 @@
+namespace Shiny.Power;
 
 /// <summary>
 /// Describes the current charging state of the device battery.

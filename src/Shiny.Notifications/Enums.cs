@@ -1,5 +1,7 @@
 using System;
 
+namespace Shiny.Notifications;
+
 /// <summary>
 /// Capabilities that can be requested or queried when checking notification permissions.
 /// </summary>

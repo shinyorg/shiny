@@ -782,6 +782,8 @@ public interface IBattery
 ### BatteryState
 
 ```csharp
+namespace Shiny.Power;
+
 public enum BatteryState
 {
     Unknown,

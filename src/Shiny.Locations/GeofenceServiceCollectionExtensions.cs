@@ -8,7 +8,7 @@ using Android.App;
 using Android.Gms.Common;
 #endif
 
-
+namespace Shiny;
 
 public static class GeofenceServiceCollectionExtensions
 {

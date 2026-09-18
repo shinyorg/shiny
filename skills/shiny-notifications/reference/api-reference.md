@@ -211,6 +211,8 @@ public record IosConfiguration(
 ### AccessRequestFlags
 
 ```csharp
+namespace Shiny.Notifications;
+
 [Flags]
 public enum AccessRequestFlags
 {
