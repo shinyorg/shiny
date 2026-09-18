@@ -30,6 +30,9 @@ triggers:
   - CaptureTarget
   - ScreenRecorderNotSupportedException
   - ScreenRecorderPermissionException
+  - IScreenRecordingNotificationDelegate
+  - GetScreenRecordingStopIntent
+  - screen recording notification
   - AddScreenRecorder
   - Shiny.ScreenRecorder
   - ReplayKit
@@ -197,6 +200,33 @@ The foreground service and the consent activity are in the package and merge int
 automatically. From Android 14 the service **must** be running before the projection is obtained;
 the library does that ordering for you.
 
+The consent dialog asks for the **entire screen**. From Android 14 the system can offer "a single
+app" instead and preselects it; with no `Target` set the request is documented as the primary
+display, so the library asks Android for exactly that and the app picker never appears.
+
+The foreground service shows a notification for the whole recording - "Screen recording" with a
+**Stop** action by default. Stop ends the recording exactly like the system's own stop control:
+`Faulted` fires with `RevokedByUser` and carries the finished file, so handle it the same way.
+To reword it (for example into the app's language), register an
+`IScreenRecordingNotificationDelegate` - it receives the builder with the defaults already applied:
+
+```csharp
+#if ANDROID
+public class RecordingNotification(AndroidPlatform platform) : IScreenRecordingNotificationDelegate
+{
+    // relabelling Stop means dropping the default action and adding your own with the library's intent
+    public void Configure(NotificationCompat.Builder builder) => builder
+        .SetContentTitle("Bildschirmaufnahme")!
+        .SetContentText("Die Aufnahme läuft")!
+        .ClearActions()!
+        .AddAction(0, "Beenden", platform.GetScreenRecordingStopIntent());
+}
+
+// next to AddScreenRecorder()
+builder.Services.AddSingleton<IScreenRecordingNotificationDelegate, RecordingNotification>();
+#endif
+```
+
 **iOS / Mac Catalyst** - no entitlement to record your own app. Add
 `NSMicrophoneUsageDescription` to `Info.plist` if using the microphone. The app must be in the
 **foreground**.
@@ -341,7 +371,8 @@ session.Faulted += (_, e) =>
     switch (e.Reason)
     {
         case ScreenRecordingFaultReason.RevokedByUser:
-            // Android's cast notification, the browser's "Stop sharing" bar, macOS's menu-bar stop
+            // Android's cast notification or the recording notification's Stop action, the
+            // browser's "Stop sharing" bar, macOS's menu-bar stop
             break;
 
         case ScreenRecordingFaultReason.InterruptedBySystem:

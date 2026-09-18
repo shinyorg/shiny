@@ -770,10 +770,12 @@ namespace Shiny.Power;
 
 public interface IBattery
 {
-    // Fires when the battery status or level changes; read Status / Level in the handler
+    // Fires when the status, level, power source or energy saver changes; read the properties in the handler
     event EventHandler? Changed;
     BatteryState Status { get; }
     double Level { get; }
+    BatteryPowerSource PowerSource { get; }       // external power reads AC except on Android and Linux
+    EnergySaverStatus EnergySaverStatus { get; }  // Low Power Mode / Battery Saver / Energy Saver / power-saver profile
 }
 ```
 
@@ -788,6 +790,22 @@ public enum BatteryState
     Full,
     NotCharging,
     Discharging
+}
+
+public enum BatteryPowerSource
+{
+    Unknown,
+    Battery,
+    AC,
+    Usb,
+    Wireless
+}
+
+public enum EnergySaverStatus
+{
+    Unknown,
+    On,
+    Off
 }
 ```
 

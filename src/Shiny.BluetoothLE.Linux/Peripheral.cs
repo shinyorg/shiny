@@ -267,35 +267,45 @@ public partial class Peripheral : IPeripheral
                     static (Message msg, object? _) => msg,
                     static (MessageNotification n) =>
                     {
-                        if (n.Exception != null) return;
+                        // IsCompletion first: on a value notification, reading Exception throws, and a
+                        // handler that throws makes Tmds disconnect the whole connection.
+                        if (n.IsCompletion) return;
                         var ctx = (NotifyContext)n.State!;
 
-                        var reader = n.Value.GetBodyReader();
-                        var iface = reader.ReadString();
-                        if (iface != BluezConstants.GattCharacteristicInterface)
-                            return;
-
-                        // Read the changed properties dict a{sv}
-                        var arrayEnd = reader.ReadArrayStart(DBusType.DictEntry);
-                        while (reader.HasNext(arrayEnd))
+                        try
                         {
-                            var propName = reader.ReadString();
-                            if (propName == "Value")
+                            var reader = n.Value.GetBodyReader();
+                            var iface = reader.ReadString();
+                            if (iface != BluezConstants.GattCharacteristicInterface)
+                                return;
+
+                            // Read the changed properties dict a{sv}
+                            var arrayEnd = reader.ReadArrayStart(DBusType.DictEntry);
+                            while (reader.HasNext(arrayEnd))
                             {
-                                var data = reader.ReadByteArrayVariant();
-                                var info = new BleCharacteristicInfo(
-                                    new BleServiceInfo(ctx.ServiceUuid),
-                                    ctx.CharacteristicUuid,
-                                    true,
-                                    (CharacteristicProperties)0
-                                );
-                                ctx.Observer.OnNext(new BleCharacteristicResult(info, BleCharacteristicEvent.Notification, data));
+                                var propName = reader.ReadString();
+                                if (propName == "Value")
+                                {
+                                    var data = reader.ReadByteArrayVariant();
+                                    var info = new BleCharacteristicInfo(
+                                        new BleServiceInfo(ctx.ServiceUuid),
+                                        ctx.CharacteristicUuid,
+                                        true,
+                                        (CharacteristicProperties)0
+                                    );
+                                    ctx.Observer.OnNext(new BleCharacteristicResult(info, BleCharacteristicEvent.Notification, data));
+                                }
+                                else
+                                {
+                                    reader.SkipVariant();
+                                }
                             }
-                            else
-                            {
-                                reader.ReadSignature();
-                                reader.ReadVariantValue();
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Reported to this subscriber rather than thrown, which would take the
+                            // connection - and every other subscriber on it - down with it.
+                            ctx.Observer.OnError(ex);
                         }
                     },
                     emitOnCapturedContext: false,
@@ -441,8 +451,7 @@ public partial class Peripheral : IPeripheral
                                     uuid = reader.ReadStringVariant();
                                 else
                                 {
-                                    reader.ReadSignature();
-                                    reader.ReadVariantValue();
+                                    reader.SkipVariant();
                                 }
                             }
                             if (uuid != null)
@@ -453,8 +462,7 @@ public partial class Peripheral : IPeripheral
                             while (reader.HasNext(propsEnd))
                             {
                                 reader.ReadString();
-                                reader.ReadSignature();
-                                reader.ReadVariantValue();
+                                reader.SkipVariant();
                             }
                         }
                     }
@@ -515,8 +523,7 @@ public partial class Peripheral : IPeripheral
                                         flags = reader.ReadStringArrayVariant();
                                         break;
                                     default:
-                                        reader.ReadSignature();
-                                        reader.ReadVariantValue();
+                                        reader.SkipVariant();
                                         break;
                                 }
                             }
@@ -528,8 +535,7 @@ public partial class Peripheral : IPeripheral
                             while (reader.HasNext(propsEnd))
                             {
                                 reader.ReadString();
-                                reader.ReadSignature();
-                                reader.ReadVariantValue();
+                                reader.SkipVariant();
                             }
                         }
                     }
@@ -579,8 +585,7 @@ public partial class Peripheral : IPeripheral
                                     uuid = reader.ReadStringVariant();
                                 else
                                 {
-                                    reader.ReadSignature();
-                                    reader.ReadVariantValue();
+                                    reader.SkipVariant();
                                 }
                             }
                             if (uuid != null)
@@ -591,8 +596,7 @@ public partial class Peripheral : IPeripheral
                             while (reader.HasNext(propsEnd))
                             {
                                 reader.ReadString();
-                                reader.ReadSignature();
-                                reader.ReadVariantValue();
+                                reader.SkipVariant();
                             }
                         }
                     }

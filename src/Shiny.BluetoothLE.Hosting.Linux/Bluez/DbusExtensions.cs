@@ -26,7 +26,7 @@ internal static class DbusExtensions
     }
 
 
-    public static bool ReadBoolVariant(this Reader reader)
+    public static bool ReadBoolVariant(this ref Reader reader)
     {
         reader.ReadSignature();
         return reader.ReadBool();

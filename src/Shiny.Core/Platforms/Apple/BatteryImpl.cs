@@ -20,10 +20,13 @@ public class BatteryImpl : IBattery
 
     public BatteryState Status => BatteryState.Full;
     public double Level => 1.0;
+    public BatteryPowerSource PowerSource => BatteryPowerSource.AC;
+    public EnergySaverStatus EnergySaverStatus => EnergySaverStatus.Off;
 }
 #else
 using System;
 using System.Threading;
+using Foundation;
 using UIKit;
 using Shiny.Power;
 
@@ -34,6 +37,7 @@ public class BatteryImpl : IBattery
 {
     IDisposable? levelObs;
     IDisposable? stateObs;
+    IDisposable? powerStateObs;
     int subscriberCount;
 
 
@@ -60,6 +64,7 @@ public class BatteryImpl : IBattery
         UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
         this.levelObs = UIDevice.Notifications.ObserveBatteryLevelDidChange((_, _) => this.changed?.Invoke(this, EventArgs.Empty));
         this.stateObs = UIDevice.Notifications.ObserveBatteryStateDidChange((_, _) => this.changed?.Invoke(this, EventArgs.Empty));
+        this.powerStateObs = NSProcessInfo.Notifications.ObservePowerStateDidChange((_, _) => this.changed?.Invoke(this, EventArgs.Empty));
     }
 
 
@@ -70,6 +75,8 @@ public class BatteryImpl : IBattery
         this.stateObs = null;
         this.levelObs?.Dispose();
         this.levelObs = null;
+        this.powerStateObs?.Dispose();
+        this.powerStateObs = null;
     }
 
 
@@ -105,5 +112,30 @@ public class BatteryImpl : IBattery
             return result;
         }
     }
+
+
+    public BatteryPowerSource PowerSource
+    {
+        get
+        {
+            var dev = UIDevice.CurrentDevice;
+            var origState = dev.BatteryMonitoringEnabled;
+            dev.BatteryMonitoringEnabled = true;
+            var result = dev.BatteryState switch
+            {
+                // iOS does not say whether the cable is mains or USB
+                UIDeviceBatteryState.Charging or UIDeviceBatteryState.Full => BatteryPowerSource.AC,
+                UIDeviceBatteryState.Unplugged => BatteryPowerSource.Battery,
+                _ => BatteryPowerSource.Unknown
+            };
+            dev.BatteryMonitoringEnabled = origState;
+            return result;
+        }
+    }
+
+
+    public EnergySaverStatus EnergySaverStatus => NSProcessInfo.ProcessInfo.LowPowerModeEnabled
+        ? EnergySaverStatus.On
+        : EnergySaverStatus.Off;
 }
 #endif

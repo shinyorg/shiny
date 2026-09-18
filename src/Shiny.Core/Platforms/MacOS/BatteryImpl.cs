@@ -60,6 +60,7 @@ public class BatteryImpl : IBattery
 
     IOPSCallback? callback;
     IntPtr source;
+    NSObject? powerStateObserver;
     int subscriberCount;
 
 
@@ -88,6 +89,9 @@ public class BatteryImpl : IBattery
         var runLoop = CFRunLoopGetMain();
         if (this.source != IntPtr.Zero && runLoop != IntPtr.Zero)
             CFRunLoopAddSource(runLoop, this.source, kCFRunLoopDefaultMode);
+
+        // Low Power Mode is not a power source change, so IOKit does not report it
+        this.powerStateObserver = NSProcessInfo.Notifications.ObservePowerStateDidChange((_, _) => this.changed?.Invoke(this, EventArgs.Empty));
     }
 
 
@@ -103,6 +107,9 @@ public class BatteryImpl : IBattery
         }
         GC.KeepAlive(this.callback);
         this.callback = null;
+
+        this.powerStateObserver?.Dispose();
+        this.powerStateObserver = null;
     }
 
 
@@ -126,6 +133,23 @@ public class BatteryImpl : IBattery
 
 
     public double Level => ReadPowerSource(fallback: 1.0, reader: ReadLevel);
+
+
+    // A Mac with no battery is on mains power. macOS does not say whether that arrives over USB-C.
+    public BatteryPowerSource PowerSource => ReadPowerSource(
+        fallback: BatteryPowerSource.AC,
+        reader: ps => (ps.ObjectForKey((NSString)"Power Source State") as NSString)?.ToString() switch
+        {
+            "AC Power" => BatteryPowerSource.AC,
+            "Battery Power" => BatteryPowerSource.Battery,
+            _ => BatteryPowerSource.Unknown
+        }
+    );
+
+
+    public EnergySaverStatus EnergySaverStatus => !OperatingSystem.IsMacOSVersionAtLeast(12)
+        ? EnergySaverStatus.Unknown
+        : NSProcessInfo.ProcessInfo.LowPowerModeEnabled ? EnergySaverStatus.On : EnergySaverStatus.Off;
 
 
     static double ReadLevel(NSDictionary ps)

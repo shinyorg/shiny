@@ -16,7 +16,8 @@ public static class ScreenRecorderServiceCollectionExtensions
     /// <c>FOREGROUND_SERVICE_MEDIA_PROJECTION</c>, plus <c>RECORD_AUDIO</c> when capturing audio.
     /// The <c>ScreenRecorderService</c> and <c>ScreenCapturePermissionActivity</c> in this package
     /// are merged into your manifest automatically. Recording always shows the OS cast indicator -
-    /// there is no way to suppress it, and there should not be.</para>
+    /// there is no way to suppress it, and there should not be. The recording's own notification
+    /// is yours to word: register an <c>IScreenRecordingNotificationDelegate</c>.</para>
     /// <para>iOS/Mac Catalyst: no entitlement is needed to record your own app, but
     /// <c>NSMicrophoneUsageDescription</c> is required in Info.plist when
     /// <see cref="ScreenRecordingRequest.IncludeMicrophone"/> is used. ReplayKit records the app's

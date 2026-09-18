@@ -48,7 +48,9 @@ internal sealed class PortalRequestWatcher : IAsyncDisposable
             static (Message message, object? _) => message,
             static (MessageNotification notification) =>
             {
-                if (notification.Exception != null)
+                // IsCompletion first: on a value notification, reading Exception throws, and a
+                // handler that throws makes Tmds disconnect the connection.
+                if (notification.IsCompletion)
                     return;
 
                 ((PortalRequestWatcher)notification.State!).Dispatch(notification.Value);

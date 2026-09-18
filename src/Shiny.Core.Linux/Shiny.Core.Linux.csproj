@@ -5,6 +5,9 @@
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Tests" />
+    </ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 </Project>

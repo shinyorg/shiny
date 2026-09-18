@@ -11,6 +11,7 @@ public class BatteryImpl : IBattery
 {
     readonly AndroidPlatform platform;
     ActionBroadcastReceiver? receiver;
+    ActionBroadcastReceiver? powerSaveReceiver;
     int subscriberCount;
 
     public BatteryImpl(AndroidPlatform platform) => this.platform = platform;
@@ -41,6 +42,11 @@ public class BatteryImpl : IBattery
             Intent.ActionBatteryChanged,
             _ => this.changed?.Invoke(this, EventArgs.Empty)
         );
+        this.powerSaveReceiver = ActionBroadcastReceiver.Register(
+            this.platform,
+            PowerManager.ActionPowerSaveModeChanged!,
+            _ => this.changed?.Invoke(this, EventArgs.Empty)
+        );
     }
 
 
@@ -50,6 +56,11 @@ public class BatteryImpl : IBattery
         {
             ActionBroadcastReceiver.UnRegister(this.platform, this.receiver);
             this.receiver = null;
+        }
+        if (this.powerSaveReceiver != null)
+        {
+            ActionBroadcastReceiver.UnRegister(this.platform, this.powerSaveReceiver);
+            this.powerSaveReceiver = null;
         }
     }
 
@@ -87,4 +98,27 @@ public class BatteryImpl : IBattery
             return (double)values.Level / (double)values.Scale;
         }
     }
+
+
+    public BatteryPowerSource PowerSource
+    {
+        get
+        {
+            var plugged = this.platform.GetIntentValue(Intent.ActionBatteryChanged, x => x.GetIntExtra(BatteryManager.ExtraPlugged, -1));
+            return plugged switch
+            {
+                0 => BatteryPowerSource.Battery,
+                (int)BatteryPlugged.Ac => BatteryPowerSource.AC,
+                (int)BatteryPlugged.Usb => BatteryPowerSource.Usb,
+                (int)BatteryPlugged.Wireless => BatteryPowerSource.Wireless,
+                _ => BatteryPowerSource.Unknown
+            };
+        }
+    }
+
+
+    public EnergySaverStatus EnergySaverStatus => this.platform.GetSystemServiceValue<EnergySaverStatus, PowerManager>(
+        Context.PowerService,
+        pm => pm.IsPowerSaveMode ? EnergySaverStatus.On : EnergySaverStatus.Off
+    );
 }

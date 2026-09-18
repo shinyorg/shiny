@@ -11,6 +11,7 @@ namespace Shiny.Power;
 public class BatteryImpl : IBattery
 {
     TypedEventHandler<Battery, object>? handler;
+    EventHandler<object>? powerHandler;
     int subscriberCount;
 
 
@@ -24,6 +25,10 @@ public class BatteryImpl : IBattery
             {
                 this.handler = (_, _) => this.changed?.Invoke(this, EventArgs.Empty);
                 Battery.AggregateBattery.ReportUpdated += this.handler;
+
+                this.powerHandler = (_, _) => this.changed?.Invoke(this, EventArgs.Empty);
+                PowerManager.PowerSupplyStatusChanged += this.powerHandler;
+                PowerManager.EnergySaverStatusChanged += this.powerHandler;
             }
         }
         remove
@@ -33,6 +38,10 @@ public class BatteryImpl : IBattery
             {
                 Battery.AggregateBattery.ReportUpdated -= this.handler;
                 this.handler = null;
+
+                PowerManager.PowerSupplyStatusChanged -= this.powerHandler;
+                PowerManager.EnergySaverStatusChanged -= this.powerHandler;
+                this.powerHandler = null;
             }
         }
     }
@@ -62,4 +71,21 @@ public class BatteryImpl : IBattery
             return remain.Value / (double)full.Value;
         }
     }
+
+
+    // Windows does not say whether mains power arrives over AC or USB-C
+    public BatteryPowerSource PowerSource => PowerManager.PowerSupplyStatus switch
+    {
+        PowerSupplyStatus.NotPresent => BatteryPowerSource.Battery,
+        PowerSupplyStatus.Adequate or PowerSupplyStatus.Inadequate => BatteryPowerSource.AC,
+        _ => BatteryPowerSource.Unknown
+    };
+
+
+    public EnergySaverStatus EnergySaverStatus => PowerManager.EnergySaverStatus switch
+    {
+        global::Windows.System.Power.EnergySaverStatus.On => EnergySaverStatus.On,
+        global::Windows.System.Power.EnergySaverStatus.Off or global::Windows.System.Power.EnergySaverStatus.Disabled => EnergySaverStatus.Off,
+        _ => EnergySaverStatus.Unknown
+    };
 }

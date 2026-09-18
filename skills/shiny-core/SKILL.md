@@ -36,6 +36,8 @@ triggers:
   - connectivity
   - IConnectivity
   - IBattery
+  - BatteryPowerSource
+  - EnergySaverStatus
   - AddConnectivity
   - AddBattery
   - IRepository
@@ -84,7 +86,7 @@ tvOS reuses the iOS platform layer wholesale — the same `ShinyAppDelegate` (fr
 Two Core APIs differ on tvOS:
 
 - **`IIosLifecycle.INotificationHandler` does not exist on tvOS.** A tvOS notification can only change the app icon badge, so there is no `UNNotificationResponse` and nothing is presented in the foreground. Code implementing it must be inside `#if !TVOS`.
-- **`IBattery` reports `BatteryState.Full` / `Level` 1.0 permanently.** An Apple TV is mains powered and `UIDevice` carries no battery API on tvOS. `IBattery.Changed` never fires there.
+- **`IBattery` reports `BatteryState.Full` / `Level` 1.0 / `PowerSource` AC / `EnergySaverStatus` Off permanently.** An Apple TV is mains powered and `UIDevice` carries no battery API on tvOS. `IBattery.Changed` never fires there.
 
 A complete UIKit tvOS host is in `samples/Sample.tvOS` — use its `AppDelegate` as the shape for tvOS hosting guidance.
 
@@ -217,6 +219,7 @@ When generating code that uses Shiny.Core, follow these conventions:
 - Place startup tasks in a `Tasks/` or `Infrastructure/` folder.
 - Place settings classes in a `Settings/` or `Models/` folder.
 - Always handle `AccessState.Denied`, `AccessState.Disabled`, and `AccessState.NotSetup` gracefully.
+- `IBattery` covers what .NET MAUI Essentials' `IBattery` does — `PowerSource` and `EnergySaverStatus` alongside `Status` / `Level` — so prefer it over Essentials when you want battery state without a MAUI dependency (a Linux or console host, a library).
 - Prefer C# events on Shiny.Core abstractions (`IConnectivity.Changed`, `IBattery.Changed`) over Rx — Rx is intentionally absent from Core.
 - Extension methods in `Shiny` namespace are available when the appropriate package is referenced.
 

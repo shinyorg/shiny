@@ -9,7 +9,7 @@ namespace Shiny.Power;
 public interface IBattery
 {
     /// <summary>
-    /// Fires when the battery status or level changes.
+    /// Fires when the battery status, level, power source or energy saver changes.
     /// </summary>
     event EventHandler? Changed;
 
@@ -22,4 +22,14 @@ public interface IBattery
     /// Gets the current battery charge level as a value between 0.0 and 1.0.
     /// </summary>
     double Level { get; }
+
+    /// <summary>
+    /// Gets where the device is currently drawing its power from.
+    /// </summary>
+    BatteryPowerSource PowerSource { get; }
+
+    /// <summary>
+    /// Gets whether the operating system's energy saver is on.
+    /// </summary>
+    EnergySaverStatus EnergySaverStatus { get; }
 }

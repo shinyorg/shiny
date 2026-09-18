@@ -52,6 +52,52 @@ heading when cutting the release.
 Changes confined to `samples/` get no note — fix the sample, and only add a note if the same change
 also altered library behavior or documented guidance (write the note about *that*, not the sample).
 
+## Linux / D-Bus (Tmds.DBus.Protocol)
+
+The Linux packages that reference `Tmds.DBus.Protocol` (`Shiny.BluetoothLE.Linux`,
+`Shiny.BluetoothLE.Hosting.Linux`, `Shiny.Net.Wifi.Linux`, `Shiny.Notifications.Linux`,
+`Shiny.ScreenRecorder.Linux`) talk to BlueZ, NetworkManager, the notification service and the
+portals through it. Its low-level API fails in ways that
+compile cleanly, pass on a dev machine, and only break against a real system bus. Three of these shipped
+in `Shiny.BluetoothLE.Linux` 5.7.0 and made every scan fail on any machine where BlueZ already knew a
+device. Hold these rules:
+
+1. **`Reader` and `MessageWriter` are `ref struct`s — pass them by `ref`.** A helper declared
+   `this Reader reader` advances a *copy*: the caller's position never moves, the next read takes a
+   value as a property name, and parsing throws `DBusReadException: Invalid variant signature`.
+   Helpers are `this ref Reader reader` (see `Bluez/DbusExtensions.cs`), and writer helpers take
+   `ref MessageWriter` (as `Hosting.Linux`'s `GattObjects` already do).
+2. **Skip a variant with `ReadVariantValue()` alone** — use the `SkipVariant()` extension. It reads
+   the variant's own signature, so `ReadSignature()` before it reads the signature twice. The typed
+   readers (`ReadStringVariant`, `ReadInt16Variant`, …) are the opposite: `ReadSignature()` then the
+   raw value. Don't mix the two.
+3. **In an `AddMatchAsync` / `Watch*Async` handler, check `IsCompletion` before anything else —
+   never `n.Exception != null`.** On a value notification, reading `Exception` *throws*
+   (`Check IsCompletion before accessing Exception`), and **a handler that throws disconnects the whole
+   connection**. For BlueZ that silently ends discovery, notifications and every other call on that
+   connection, a few milliseconds after it starts. Any parsing in a handler goes inside `try` and
+   reports to the subscriber (`ob.OnError`) rather than throwing.
+
+### Verifying a Linux change
+
+Unit tests and a macOS build prove none of the above — the first hardware run does. Check against a
+real bus (a Pi is the usual target):
+
+- **Test the package, not a swapped DLL.** Dropping one rebuilt assembly into a published app fails
+  with `BadImageFormatException` whenever the working tree differs from the published package's
+  commit. Instead, clone the release commit into a scratch directory, apply only the fix, and pack it
+  with `-p:PublicRelease=true` (Nerdbank ignores `-p:PackageVersion`) so it is exactly the released
+  version. Then restore the consumer against a scratch feed, using `RestoreConfigFile` and
+  `NUGET_PACKAGES` environment variables so no real `NuGet.config` or package cache changes.
+- **A small file-based console app** (`#:package`, `#:property PublishAot=false`, `SelfContained`,
+  `PublishSingleFile`, `dotnet publish -r linux-arm64`) copied to the device exercises the library
+  with nothing else in the way.
+- **Ask the connection why it died:** `DBusConnection.DisconnectedAsync()` completes with the reason
+  — that is what named rule 3. `dbus-monitor --system` shows the calls and a client's `NameLost`, and
+  `btmon` shows BlueZ's own management commands (such as a `Stop Discovery` nobody asked for).
+- **Compare against the system tool** (`bluetoothctl scan on`, `nmcli`, `busctl`) to separate "the
+  hardware can't" from "the library doesn't".
+
 ## Blog posts (only when explicitly requested)
 
 Do **not** write blog posts automatically as part of a fix/feature. Write them **only when the user asks**. When asked to blog a feature, produce **two** posts — first the docs-site version, then adapt it for the personal blog.

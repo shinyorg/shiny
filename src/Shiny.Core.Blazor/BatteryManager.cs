@@ -69,6 +69,29 @@ public class BatteryManager(IJSRuntime jsRuntime, ILogger<BatteryManager> logger
 
 
     /// <summary>
+    /// The Battery Status API only says whether the device is charging, so plugged in reads as
+    /// <see cref="BatteryPowerSource.AC"/>, whatever the cable.
+    /// </summary>
+    public BatteryPowerSource PowerSource
+    {
+        get
+        {
+            this.EnsureStarted();
+            if (this.inProcess == null || !this.inProcess.Invoke<bool>("isSupported"))
+                return BatteryPowerSource.Unknown;
+
+            return this.inProcess.Invoke<bool>("isCharging")
+                ? BatteryPowerSource.AC
+                : BatteryPowerSource.Battery;
+        }
+    }
+
+
+    /// <summary>Browsers do not expose the operating system's energy saver.</summary>
+    public EnergySaverStatus EnergySaverStatus => EnergySaverStatus.Unknown;
+
+
+    /// <summary>
     /// Imports the JS module, initializes the browser battery object, and starts listening for
     /// changes. Safe to call more than once - subsequent calls await the same operation.
     /// </summary>

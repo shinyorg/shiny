@@ -129,7 +129,10 @@ public class BleManager : IBleManager, IAsyncDisposable
                     static (Message msg, object? _) => msg,
                     static (MessageNotification n) =>
                     {
-                        if (n.Exception != null) return;
+                        // IsCompletion first: on a value notification, reading Exception throws, and a
+                        // handler that throws makes Tmds disconnect the whole connection - which ends
+                        // BlueZ discovery, notifications and every other call on it.
+                        if (n.IsCompletion) return;
                         var ctx = (ScanContext)n.State!;
                         try
                         {
@@ -159,7 +162,10 @@ public class BleManager : IBleManager, IAsyncDisposable
                     static (Message msg, object? _) => msg,
                     static (MessageNotification n) =>
                     {
-                        if (n.Exception != null) return;
+                        // IsCompletion first: on a value notification, reading Exception throws, and a
+                        // handler that throws makes Tmds disconnect the whole connection - which ends
+                        // BlueZ discovery, notifications and every other call on it.
+                        if (n.IsCompletion) return;
                         var ctx = (ScanContext)n.State!;
                         try
                         {
@@ -261,8 +267,7 @@ public class BleManager : IBleManager, IAsyncDisposable
                             txPower = reader.ReadInt16Variant();
                             break;
                         default:
-                            reader.ReadSignature();
-                            reader.ReadVariantValue();
+                            reader.SkipVariant();
                             break;
                     }
                 }
@@ -279,8 +284,7 @@ public class BleManager : IBleManager, IAsyncDisposable
                 while (reader.HasNext(propsEnd))
                 {
                     reader.ReadString();
-                    reader.ReadSignature();
-                    reader.ReadVariantValue();
+                    reader.SkipVariant();
                 }
             }
         }
@@ -326,8 +330,7 @@ public class BleManager : IBleManager, IAsyncDisposable
                     peripheral.ReceiveConnectionChange(connected);
                     break;
                 default:
-                    reader.ReadSignature();
-                    reader.ReadVariantValue();
+                    reader.SkipVariant();
                     break;
             }
         }
@@ -399,8 +402,7 @@ public class BleManager : IBleManager, IAsyncDisposable
                                         txPower = reader.ReadInt16Variant();
                                         break;
                                     default:
-                                        reader.ReadSignature();
-                                        reader.ReadVariantValue();
+                                        reader.SkipVariant();
                                         break;
                                 }
                             }
@@ -410,8 +412,7 @@ public class BleManager : IBleManager, IAsyncDisposable
                             while (reader.HasNext(propsEnd))
                             {
                                 reader.ReadString();
-                                reader.ReadSignature();
-                                reader.ReadVariantValue();
+                                reader.SkipVariant();
                             }
                         }
                     }

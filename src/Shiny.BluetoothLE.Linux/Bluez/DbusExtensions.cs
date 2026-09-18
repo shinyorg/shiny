@@ -67,28 +67,44 @@ internal static class DbusExtensions
     }
 
 
-    public static string? ReadStringVariant(this Reader reader)
+    /// <summary>
+    /// Skips a variant whose value is not needed - any property the caller does not handle.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Reader.ReadVariantValue()"/> reads the variant's own signature, so unlike the
+    /// typed readers below it must not be preceded by <see cref="Reader.ReadSignature"/>.
+    /// <para>
+    /// Every helper here takes the reader by <c>ref</c>. <see cref="Reader"/> is a ref struct, so
+    /// a helper taking it by value advances a copy and leaves the caller where it was - the next
+    /// read then takes a property's value for its name, and the parse throws
+    /// <c>DBusReadException: Invalid variant signature</c> on the first device BlueZ already knows.
+    /// </para>
+    /// </remarks>
+    public static void SkipVariant(this ref Reader reader) => reader.ReadVariantValue();
+
+
+    public static string? ReadStringVariant(this ref Reader reader)
     {
         reader.ReadSignature(); // variant signature
         return reader.ReadString();
     }
 
 
-    public static bool ReadBoolVariant(this Reader reader)
+    public static bool ReadBoolVariant(this ref Reader reader)
     {
         reader.ReadSignature();
         return reader.ReadBool();
     }
 
 
-    public static short ReadInt16Variant(this Reader reader)
+    public static short ReadInt16Variant(this ref Reader reader)
     {
         reader.ReadSignature();
         return reader.ReadInt16();
     }
 
 
-    public static string[] ReadStringArrayVariant(this Reader reader)
+    public static string[] ReadStringArrayVariant(this ref Reader reader)
     {
         reader.ReadSignature();
         var list = new List<string>();
@@ -101,14 +117,14 @@ internal static class DbusExtensions
     }
 
 
-    public static byte[] ReadByteArrayVariant(this Reader reader)
+    public static byte[] ReadByteArrayVariant(this ref Reader reader)
     {
         reader.ReadSignature();
         return reader.ReadArrayOfByte();
     }
 
 
-    public static Dictionary<ushort, byte[]> ReadManufacturerDataVariant(this Reader reader)
+    public static Dictionary<ushort, byte[]> ReadManufacturerDataVariant(this ref Reader reader)
     {
         var result = new Dictionary<ushort, byte[]>();
         reader.ReadSignature(); // a{qv}
@@ -124,7 +140,7 @@ internal static class DbusExtensions
     }
 
 
-    public static Dictionary<string, byte[]> ReadServiceDataVariant(this Reader reader)
+    public static Dictionary<string, byte[]> ReadServiceDataVariant(this ref Reader reader)
     {
         var result = new Dictionary<string, byte[]>();
         reader.ReadSignature(); // a{sv}

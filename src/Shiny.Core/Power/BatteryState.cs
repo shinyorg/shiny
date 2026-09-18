@@ -34,3 +34,51 @@ public enum BatteryState
     /// </summary>
     Discharging
 }
+
+
+/// <summary>
+/// Where the device is drawing its power from.
+/// </summary>
+public enum BatteryPowerSource
+{
+    /// <summary>
+    /// The power source could not be determined
+    /// </summary>
+    Unknown,
+
+    /// <summary>
+    /// Running on the battery
+    /// </summary>
+    Battery,
+
+    /// <summary>
+    /// Plugged into mains power
+    /// </summary>
+    AC,
+
+    /// <summary>
+    /// Powered over USB
+    /// </summary>
+    Usb,
+
+    /// <summary>
+    /// Charging wirelessly
+    /// </summary>
+    Wireless
+}
+
+
+/// <summary>
+/// Whether the operating system's energy saver (Low Power Mode, Battery Saver, the power-saver profile) is on.
+/// </summary>
+public enum EnergySaverStatus
+{
+    /// <summary>
+    /// The platform does not report it, or it could not be read
+    /// </summary>
+    Unknown,
+
+    On,
+
+    Off
+}

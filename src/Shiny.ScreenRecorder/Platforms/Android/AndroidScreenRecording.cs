@@ -60,6 +60,7 @@ class AndroidScreenRecording : AbstractScreenRecording
         // registering before the projection is used at all - a projection revoked between here and
         // the first frame otherwise goes unnoticed
         this.projection.RegisterCallback(this.projectionCallback, null);
+        ScreenRecorderService.Attach(this);
 
         this.muxer = new MediaMuxerSink(this.outputPath, withAudio ? 2 : 1, this.Logger);
         this.video = new VideoSurfaceEncoder(this.dimensions, this.muxer, this.Logger);
@@ -158,8 +159,25 @@ class AndroidScreenRecording : AbstractScreenRecording
     }
 
 
+    // stopping the projection is exactly what the system's own stop control does, so ProjectionCallback
+    // reports RevokedByUser and the finished file comes back through Faulted - no second stop path
+    internal void StopFromNotification()
+    {
+        try
+        {
+            this.projection.Stop();
+        }
+        catch (Exception ex)
+        {
+            this.Logger.NotificationStopFailed(ex);
+        }
+    }
+
+
     void Teardown()
     {
+        ScreenRecorderService.Detach(this);
+
         this.video?.Dispose();
         this.video = null;
         this.audio?.Dispose();
