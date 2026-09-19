@@ -16,7 +16,7 @@ subfolder per module (URLs are `/client/<module>/...`):
 - Feature pages: `src/content/docs/client/<module>/*.mdx` — `core/`, `ble/`, `blehosting/`,
   `beacons/`, `locations/`, `discovery/`, `wifi/`, `screenrecorder/`, `contactstore/`,
   `calendarstore/`, `jobs/`, `notifications/`, `push/`, `liveactivities/`, `httptransfers/`,
-  `datasync/`, `configuration/`.
+  `datasync/`, `wearables/`, `configuration/`.
 - Release notes: **one shared file**, `src/content/docs/client/release-notes.mdx`. Every package
   ships under the same version, so notes are grouped `## v<major>` → `### <version> - <date>` →
   `#### <Component>` (e.g. `#### BluetoothLE`, `#### Push Notifications`). Add your note under the

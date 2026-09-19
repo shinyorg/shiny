@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            WatchConnectivity is iPhone-only (Mac Catalyst, macOS and tvOS have no paired watch) and the Wear OS Data Layer
+            is Android-only. The base target carries the contracts so a library that multi-targets further still resolves
+            this package; no manager is registered there.
+        -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.Wearables</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny Wearables - talk to a companion Apple Watch (WatchConnectivity) or Wear OS (Data Layer) app: live messages with replies, the latest shared context, queued data transfers and file transfers, with background delivery through a delegate</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Xamarin.GooglePlayServices.Wearable" />
+    </ItemGroup>
+
+</Project>

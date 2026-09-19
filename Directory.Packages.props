@@ -70,6 +70,7 @@
         <PackageVersion Include="Xamarin.AndroidX.SavedState.SavedState.Ktx" Version="1.5.0.1"/>
         <PackageVersion Include="Xamarin.AndroidX.AppCompat" Version="1.7.1.4"/>
         <PackageVersion Include="Xamarin.GooglePlayServices.Location" Version="121.3.0.9"/>
+        <PackageVersion Include="Xamarin.GooglePlayServices.Wearable" Version="120.0.1.1"/>
         <PackageVersion Include="Xamarin.AndroidX.Preference" Version="1.2.1.18"/>
         <PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.0.1.2"/>
         <PackageVersion Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1"/>
