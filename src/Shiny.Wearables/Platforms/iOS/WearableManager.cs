@@ -219,8 +219,11 @@ public class WearableManager(
 
     static WearableStatus ToStatus(WCSession s)
     {
+        // a paired watch is listed even while it is away - WCSession.Paired and WatchAppInstalled are persistent
+        // configuration, and only Reachable says whether it is here. WatchConnectivity has no cloud route, so a watch
+        // is either directly connected or it is not: IsConnected and IsNearby are the same flag on Apple.
         IReadOnlyList<WearableNode> nodes = s.Paired
-            ? [new WearableNode(WatchNodeId, "Apple Watch", s.Reachable, s.WatchAppInstalled)]
+            ? [new WearableNode(WatchNodeId, "Apple Watch", s.Reachable, s.Reachable, s.WatchAppInstalled)]
             : [];
 
         return new WearableStatus(true, s.Paired, s.WatchAppInstalled, s.Reachable, nodes);

@@ -1,4 +1,5 @@
 using Android.Gms.Common.Apis;
+using Shiny.Wearables.Infrastructure;
 using Android.Gms.Extensions;
 using Android.Gms.Wearable;
 using Android.Runtime;
@@ -60,23 +61,30 @@ public class WearableManager(
 
 
     /// <inheritdoc />
+    /// <remarks>
+    /// <para>The node list is the <b>union</b> of two lists the Data Layer answers separately, because neither alone
+    /// gives the right status.</para>
+    /// <para><c>GetConnectedNodes</c> reports only what is reachable this instant, so a watch charging in another room
+    /// disappears from it entirely - taking <see cref="WearableStatus.IsPaired"/> and
+    /// <see cref="WearableStatus.IsAppInstalled"/> with it, and leaving "the user has a watch, it is just not here"
+    /// indistinguishable from "the user has no watch". An app gating a "send to watch" feature on that would show and
+    /// hide the feature as the user walked around the house.</para>
+    /// <para><c>CapabilityClient</c> with <c>FilterAll</c> reports every node in the user's Wear network advertising
+    /// the companion app's capability, connected or not - the persistent half - but says nothing about which are
+    /// reachable now, and cannot see a paired watch that never had the app installed.</para>
+    /// <para>So both are read and merged by <see cref="WearableNodeMerge"/>: the capability list supplies the
+    /// paired-but-away watches, the connected list supplies liveness.</para>
+    /// </remarks>
     public async Task<WearableStatus> GetStatus(CancellationToken cancelToken = default)
     {
         try
         {
             var connected = await this.Nodes.GetConnectedNodesAsync().WaitAsync(cancelToken).ConfigureAwait(false);
-            var capable = await this.GetCapableNodeIds(cancelToken).ConfigureAwait(false);
+            var capable = await this.GetCapableNodes(cancelToken).ConfigureAwait(false);
 
-            var nodes = connected
-                .Select(n => new WearableNode(n.Id, n.DisplayName, n.IsNearby, capable.Contains(n.Id)))
-                .ToList();
-
-            return new WearableStatus(
-                true,
-                nodes.Count > 0,
-                nodes.Any(x => x.HasApp),
-                nodes.Any(x => x.HasApp && x.IsNearby),
-                nodes
+            return WearableNodeMerge.Build(
+                connected.Where(x => x?.Id != null).Select(x => new RawWearableNode(x.Id, x.DisplayName, x.IsNearby)),
+                capable.Where(x => x?.Id != null).Select(x => new RawWearableNode(x.Id, x.DisplayName, false))
             );
         }
         catch (Exception ex) when (IsUnavailable(ex))
@@ -407,19 +415,29 @@ public class WearableManager(
         if (!status.IsSupported)
             throw new WearableException(WearableErrorCode.NotSupported, "The Wear OS Data Layer is not available on this device");
 
-        var node = status.Nodes.FirstOrDefault(x => x.HasApp && x.IsNearby) ?? status.Nodes.FirstOrDefault(x => x.HasApp);
+        var node = WearableNodeMerge.FindTarget(status);
+
         return node?.Id ?? throw new WearableException(WearableErrorCode.NotReachable, "No connected Wear OS device runs the companion app");
     }
 
 
-    async Task<HashSet<string>> GetCapableNodeIds(CancellationToken cancelToken)
+    /// <summary>
+    /// Every node in the user's Wear network advertising the companion app's capability, whether or not it is connected
+    /// right now.
+    /// </summary>
+    /// <remarks>
+    /// <c>FilterAll</c> rather than <c>FilterReachable</c> is the whole point: the reachable filter answers the question
+    /// <c>GetConnectedNodes</c> already answers and loses the paired-but-away watches this exists to find. The nodes
+    /// carry their display names, so a watch that is away can still be named in the UI.
+    /// </remarks>
+    async Task<ICollection<INode>> GetCapableNodes(CancellationToken cancelToken)
     {
         var info = await this.Capabilities
             .GetCapabilityAsync(WearableProtocol.Capability, CapabilityClient.FilterAll)
             .WaitAsync(cancelToken)
             .ConfigureAwait(false);
 
-        return info?.Nodes?.Select(x => x.Id).ToHashSet() ?? [];
+        return info?.Nodes ?? [];
     }
 
 

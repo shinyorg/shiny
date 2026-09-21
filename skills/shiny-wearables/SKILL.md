@@ -3,6 +3,18 @@ name: shiny-wearables
 description: Guide for talking to a companion Apple Watch (WatchConnectivity) or Wear OS (Data Layer) app from .NET MAUI / .NET using Shiny.Wearables - live messages with replies, shared context, queued data and file transfers, and background delivery through a delegate
 auto_invoke: true
 triggers:
+  - watch paired
+  - watch connected
+  - is the watch connected
+  - watch reachable
+  - watch out of range
+  - paired but disconnected
+  - watch status indicator
+  - IsConfigured
+  - IsConnected
+  - WearableNode
+  - WearableStatus
+  - OnStatusChanged
   - wearable
   - wearables
   - apple watch
@@ -90,7 +102,64 @@ builder.Services.AddWearables();                       // manager only
 - The companion is discovered by the **`shiny_wearable` capability** (`WearableProtocol.Capability`). Shiny advertises it for this app at startup; a Kotlin companion declares it in `res/values/wear.xml` (`android_wear_capabilities`). A .NET Wear OS app using Shiny.Wearables advertises it automatically too.
 - Inbound traffic arrives through `ShinyWearableListenerService` (declared by attributes; no manifest edits), bound by Play services for `wear://*/shiny...` - also when the app is not running.
 - No Wear OS app / Play services → `IsSupported` is false.
-- `IsPaired` means "a node is connected" - the Data Layer does not report paired-but-disconnected watches.
+- `IsPaired` and `IsAppInstalled` **survive the watch going away** - a paired watch that is off or out of range is still listed (`IsConnected = false`), found through the capability rather than the connected-node list. The one thing Wear OS cannot see is a paired watch that has **never** had the companion app installed *and* is currently away - the Data Layer exposes nothing that reports it.
+- A Wear OS node can be connected **through the cloud** when Bluetooth is out of range: `IsConnected = true`, `IsNearby = false`. Transfers and context still go through; it does not count toward `IsReachable`, because a live message would take seconds.
+
+## Showing watch status - paired vs. connected
+
+Two different questions, and a UI needs both. **Never use one flag for both.**
+
+| Question | Flag | Survives the watch being off / out of range? |
+|---|---|---|
+| Does this user have a watch set up? (show the "send to watch" feature at all) | `status.IsConfigured` (= `IsPaired && IsAppInstalled`) | **Yes** |
+| Is the watch here right now? (a "connected" dot, live messages) | `status.IsReachable` | No |
+| Does this platform have a wearable API at all? | `status.IsSupported` | n/a - fixed per device |
+
+**`IsSupported` is not "a watch is set up".** It is false only where there is no wearable API (not iOS/Android, an iPad, Android without Play services). A phone with no watch reports `IsSupported = true`. Gate features on `IsConfigured`.
+
+Gating a feature on `IsReachable` makes it appear and disappear as the user walks around the house. Gating a "connected" indicator on `IsConfigured` claims the watch is receiving while it is charging in another room.
+
+`GetStatus()` is async and there is no event on `IWearableManager` - changes arrive through `IWearableDelegate.OnStatusChanged`, raised on pair/unpair, app installed/removed, and reachability changes. Cache the last status there and bind to that:
+
+```csharp
+public class WatchStatusDelegate(WatchStatusState state) : WearableDelegate
+{
+    public override Task OnStatusChanged(WearableStatus status)
+    {
+        state.Update(status);   // the delegate runs off the UI thread - marshal inside Update
+        return Task.CompletedTask;
+    }
+}
+
+public class WatchStatusState : INotifyPropertyChanged
+{
+    public bool HasWatch { get; private set; }      // IsConfigured - stays true while away
+    public bool IsConnected { get; private set; }   // IsReachable - live
+    public string? WatchName { get; private set; }
+
+    public void Update(WearableStatus status) => MainThread.BeginInvokeOnMainThread(() =>
+    {
+        this.HasWatch = status.IsConfigured;
+        this.IsConnected = status.IsReachable;
+
+        // a paired-but-away watch is still listed, so it can still be named
+        this.WatchName = status.Nodes.FirstOrDefault(x => x.HasApp)?.DisplayName;
+
+        this.PropertyChanged?.Invoke(this, new(null));
+    });
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+}
+
+// register both
+services.AddSingleton<WatchStatusState>();
+services.AddWearables<WatchStatusDelegate>();
+
+// seed once at startup - OnStatusChanged fires on change, and on Android nothing changes until a capability does
+state.Update(await wearables.GetStatus());
+```
+
+Per node, `WearableNode` carries `IsConnected` (reachable at all - Bluetooth or cloud), `IsNearby` (direct Bluetooth) and `HasApp`. On iOS `IsConnected` and `IsNearby` are the same flag - WatchConnectivity has no cloud route.
 
 ## Code Generation Instructions and Conventions
 
@@ -197,6 +266,7 @@ class PhoneListener : WearableListenerService() {
 ## Best Practices
 
 - Check `GetStatus()` before live messages; prefer `Transfer`/`UpdateContext` for anything that must arrive eventually.
+- Gate features on `IsConfigured` and a "connected" indicator on `IsReachable` - never `IsSupported` for either.
 - Use `UpdateContext` for state, not events - intermediate values are dropped.
 - Keep message payloads small; use `TransferFile` for anything large.
 - Don't delete a file passed to `TransferFile` until `OnTransferCompleted` reports its id.

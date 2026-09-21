@@ -2,24 +2,49 @@ namespace Shiny.Wearables;
 
 
 /// <summary>
-/// A connected wearable. On iOS this is the active Apple Watch; on Android it is a Wear OS node (or, in a Wear OS app,
-/// the phone).
+/// A wearable the platform knows about. On iOS this is the active Apple Watch; on Android it is a Wear OS node (or, in
+/// a Wear OS app, the phone).
+/// <para>
+/// Being listed does not mean it can be reached: a watch that is paired but switched off, charging in another room or
+/// out of Bluetooth range is still listed, with <see cref="IsConnected"/> false. That is the point — it is how
+/// "the user has a watch, it just is not here" is told apart from "the user has no watch".
+/// </para>
 /// </summary>
 /// <param name="Id">The node id. iOS has one active watch, so it is always <c>watch</c> there.</param>
 /// <param name="DisplayName">The name the platform gives the node.</param>
-/// <param name="IsNearby">Whether the node is directly connected (Bluetooth) rather than reached through the cloud.</param>
+/// <param name="IsConnected">
+/// Whether the platform can reach the node at all — over Bluetooth, or through the cloud on Wear OS. False for a
+/// wearable that is paired but away. Anything sent to a node that is not connected fails or waits in the queue.
+/// </param>
+/// <param name="IsNearby">
+/// Whether the node is directly connected (Bluetooth) rather than reached through the cloud. Always false when
+/// <see cref="IsConnected"/> is false. A cloud-connected Wear OS node can receive transfers but is far slower, which is
+/// why live messages need this rather than <see cref="IsConnected"/>.
+/// </param>
 /// <param name="HasApp">Whether the node runs the companion app — on Wear OS, whether it advertises <see cref="WearableProtocol.Capability"/>.</param>
-public sealed record WearableNode(string Id, string DisplayName, bool IsNearby, bool HasApp);
+public sealed record WearableNode(string Id, string DisplayName, bool IsConnected, bool IsNearby, bool HasApp);
 
 
 /// <summary>
 /// Whether a companion wearable is there to talk to.
 /// </summary>
-/// <param name="IsSupported">False where the platform has no wearable API: not iOS or Android, an iPad, or an Android device without the Wear OS app / Google Play services.</param>
-/// <param name="IsPaired">A wearable is paired (iOS) or connected (Android — the Data Layer does not report paired-but-disconnected watches).</param>
-/// <param name="IsAppInstalled">The companion app is installed on the wearable.</param>
+/// <param name="IsSupported">
+/// Whether this platform has a wearable API at all — false when it is not iOS or Android, on an iPad, or on an Android
+/// device without the Wear OS app or Google Play services. <b>Not</b> "a watch is set up": that is
+/// <see cref="IsPaired"/> and <see cref="IsAppInstalled"/>.
+/// </param>
+/// <param name="IsPaired">
+/// A wearable is paired. This survives the wearable being switched off or out of range, so it is the flag for "this
+/// user has a watch" rather than "the watch is here".
+/// <para>
+/// On Wear OS a watch is only known while it is connected <i>or</i> has previously advertised the companion app's
+/// capability, so a paired watch that has never had the app installed and is currently away cannot be seen at all. The
+/// Data Layer exposes nothing that would report it.
+/// </para>
+/// </param>
+/// <param name="IsAppInstalled">The companion app is installed on the wearable. Like <see cref="IsPaired"/>, this survives the wearable being away.</param>
 /// <param name="IsReachable">A live message can be sent right now. Context, transfers and files do not need this; they queue.</param>
-/// <param name="Nodes">The wearables the platform reports.</param>
+/// <param name="Nodes">The wearables the platform knows about, connected or not.</param>
 public sealed record WearableStatus(
     bool IsSupported,
     bool IsPaired,
@@ -30,6 +55,16 @@ public sealed record WearableStatus(
 {
     /// <summary>The status on a platform with no wearable API.</summary>
     public static WearableStatus NotSupported { get; } = new(false, false, false, false, []);
+
+    /// <summary>
+    /// A wearable is set up to talk to: paired, with the companion app installed. Says nothing about whether it is
+    /// here right now — check <see cref="IsReachable"/> for that.
+    /// </summary>
+    /// <remarks>
+    /// The flag to drive a "send to watch" feature being offered at all. It stays true while the watch is off or out
+    /// of range, so the feature does not appear and disappear as the user moves around.
+    /// </remarks>
+    public bool IsConfigured => this.IsPaired && this.IsAppInstalled;
 }
 
 

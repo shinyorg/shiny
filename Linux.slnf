@@ -31,7 +31,10 @@
       "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj",
       "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
       "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
-      "src\\Shiny.ScreenRecorder.Blazor\\Shiny.ScreenRecorder.Blazor.csproj"
+      "src\\Shiny.ScreenRecorder.Blazor\\Shiny.ScreenRecorder.Blazor.csproj",
+      "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
+      "src\\Shiny.Gamepad.Linux\\Shiny.Gamepad.Linux.csproj",
+      "src\\Shiny.Gamepad.Blazor\\Shiny.Gamepad.Blazor.csproj"
     ]
   }
 }

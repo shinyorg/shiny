@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny Gamepad for Linux - reads game controllers straight from evdev, with force-feedback rumble, sysfs battery and light-bar support, and motion sensors on controllers that expose them</Description>
+        <RootNamespace>Shiny.Gamepad</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+
+        <!--
+            evdev is an ioctl interface and nothing else: capabilities, axis ranges and force-feedback
+            uploads are all fixed-layout structs passed by pointer, and ioctl(2) is variadic, so there is
+            no signature LibraryImport can marshal without one. Same reason Shiny.Net.Wifi turns this on
+            for wlanapi.dll.
+        -->
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Gamepad\Shiny.Gamepad.csproj" />
+    </ItemGroup>
+</Project>
