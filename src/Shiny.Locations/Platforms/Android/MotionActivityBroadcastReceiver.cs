@@ -13,13 +13,13 @@ namespace Shiny.Locations;
 )]
 public class MotionActivityBroadcastReceiver : ShinyBroadcastReceiver
 {
-    public static Func<ActivityTransitionResult, Task>? Process { get; set; }
+    public static Func<ActivityRecognitionResult, Task>? Process { get; set; }
 
     protected override async Task OnReceiveAsync(Context? context, Intent? intent)
     {
-        if (intent != null && ActivityTransitionResult.HasResult(intent))
+        if (intent != null && ActivityRecognitionResult.HasResult(intent))
         {
-            var result = ActivityTransitionResult.ExtractResult(intent);
+            var result = ActivityRecognitionResult.ExtractResult(intent);
             if (result != null && Process != null)
                 await Process(result);
         }
