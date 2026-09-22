@@ -19,6 +19,7 @@ public class MotionActivityManager(
 
     PendingIntent? pendingIntent;
 
+
     bool isListening;
     public bool IsListening
     {
@@ -64,23 +65,11 @@ public class MotionActivityManager(
         if (this.IsListening)
             throw new InvalidOperationException("Motion activity listener is already running");
 
-        var transitions = new List<ActivityTransition>
-        {
-            BuildTransition(DetectedActivity.InVehicle),
-            BuildTransition(DetectedActivity.OnBicycle),
-            BuildTransition(DetectedActivity.OnFoot),
-            BuildTransition(DetectedActivity.Running),
-            BuildTransition(DetectedActivity.Still),
-            BuildTransition(DetectedActivity.Walking)
-        };
-
-        var request = new ActivityTransitionRequest(transitions);
         var client = ActivityRecognition.GetClient(platform.AppContext);
-
-        await client.RequestActivityTransitionUpdates(request, this.GetPendingIntent()).ToTask();
+        await client.RequestActivityUpdates(60000, this.GetPendingIntent()).ToTask();
         this.IsListening = true;
     }
-
+    
 
     public async Task StopListener()
     {
@@ -88,7 +77,7 @@ public class MotionActivityManager(
             return;
 
         var client = ActivityRecognition.GetClient(platform.AppContext);
-        await client.RemoveActivityTransitionUpdates(this.GetPendingIntent()).ToTask();
+        await client.RemoveActivityUpdates(this.GetPendingUpdateIntent()).ToTask();
 
         this.pendingIntent = null;
         this.IsListening = false;
@@ -99,28 +88,23 @@ public class MotionActivityManager(
     {
         MotionActivityBroadcastReceiver.Process = async result =>
         {
-            foreach (var e in result.TransitionEvents)
-            {
-                if (e.TransitionType != ActivityTransition.ActivityTransitionEnter)
-                    continue;
+            var activityType = ToMotionActivityType((int)result.MostProbableActivity.Type);
+            var confidence = ToMotionActivityConfidence(result.MostProbableActivity.Confidence);
+            var reading = new MotionActivityReading(
+                activityType,
+                confidence,
+                DateTimeOffset.UnixEpoch.AddMilliseconds(result.Time)
+            );
 
-                var activityType = ToMotionActivityType(e.ActivityType);
-                var reading = new MotionActivityReading(
-                    activityType,
-                    MotionActivityConfidence.High,
-                    DateTimeOffset.UtcNow
-                );
+            this.lastReading = reading;
+            this.MotionActivityReadingReceived?.Invoke(this, reading);
 
-                this.lastReading = reading;
-                this.MotionActivityReadingReceived?.Invoke(this, reading);
-
-                await services
-                    .RunDelegates<IMotionActivityDelegate>(
-                        x => x.OnReading(reading),
-                        logger
-                    )
-                    .ConfigureAwait(false);
-            }
+            await services
+                .RunDelegates<IMotionActivityDelegate>(
+                    x => x.OnReading(reading),
+                    logger
+                )
+                .ConfigureAwait(false);
         };
 
         if (!this.IsListening)
@@ -138,20 +122,11 @@ public class MotionActivityManager(
         }
     }
 
-
     PendingIntent GetPendingIntent()
         => this.pendingIntent ??= platform.GetBroadcastPendingIntent<MotionActivityBroadcastReceiver>(
             IntentAction,
             PendingIntentFlags.UpdateCurrent
         );
-
-
-    static ActivityTransition BuildTransition(int activityType)
-        => new ActivityTransition.Builder()
-            .SetActivityType(activityType)
-            .SetActivityTransition(ActivityTransition.ActivityTransitionEnter)
-            .Build();
-
 
     static MotionActivityType ToMotionActivityType(int activityType) => activityType switch
     {
@@ -162,5 +137,12 @@ public class MotionActivityManager(
         DetectedActivity.OnFoot => MotionActivityType.Walking,
         DetectedActivity.Still => MotionActivityType.Stationary,
         _ => MotionActivityType.Unknown
+    };
+
+    static MotionActivityConfidence ToMotionActivityConfidence(int confidence) => confidence switch
+    {
+        > 60 => MotionActivityConfidence.High,
+        < 40 => MotionActivityConfidence.Low,
+        _ => MotionActivityConfidence.Medium,
     };
 }
