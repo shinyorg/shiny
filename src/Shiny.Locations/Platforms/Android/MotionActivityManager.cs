@@ -77,7 +77,7 @@ public class MotionActivityManager(
             return;
 
         var client = ActivityRecognition.GetClient(platform.AppContext);
-        await client.RemoveActivityUpdates(this.GetPendingUpdateIntent()).ToTask();
+        await client.RemoveActivityUpdates(this.GetPendingIntent()).ToTask();
 
         this.pendingIntent = null;
         this.IsListening = false;
