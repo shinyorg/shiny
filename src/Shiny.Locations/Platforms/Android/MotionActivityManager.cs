@@ -15,9 +15,12 @@ public class MotionActivityManager(
 ) : IMotionActivityManager, IShinyStartupTask
 {
     public const string ReceiverName = "com.shiny.locations." + nameof(MotionActivityBroadcastReceiver);
-    public const string IntentAction = ReceiverName + ".INTENT_ACTION";
+    public const string TransitionIntentAction = ReceiverName + ".TRANSITION_ACTION";
+    public const string UpdateIntentAction = ReceiverName + ".UPDATE_ACTION";
 
-    PendingIntent? pendingIntent;
+    PendingIntent? pendingTransitionIntent;
+    PendingIntent? pendingUpdateIntent;
+
 
     bool isListening;
     public bool IsListening
@@ -59,28 +62,43 @@ public class MotionActivityManager(
     public event EventHandler<MotionActivityReading>? MotionActivityReadingReceived;
 
 
-    public async Task StartListener()
+    public Task StartListener() => StartListener(detailed: true);
+
+    public async Task StartListener(bool detailed)
     {
         if (this.IsListening)
             throw new InvalidOperationException("Motion activity listener is already running");
 
-        var transitions = new List<ActivityTransition>
-        {
-            BuildTransition(DetectedActivity.InVehicle),
-            BuildTransition(DetectedActivity.OnBicycle),
-            BuildTransition(DetectedActivity.OnFoot),
-            BuildTransition(DetectedActivity.Running),
-            BuildTransition(DetectedActivity.Still),
-            BuildTransition(DetectedActivity.Walking)
-        };
-
-        var request = new ActivityTransitionRequest(transitions);
         var client = ActivityRecognition.GetClient(platform.AppContext);
+        if (detailed)
+        {
+            await client.RequestActivityUpdates(60000, this.GetPendingUpdateIntent()).ToTask();
+        }
+        else
+        {
+            var transitions = new List<ActivityTransition>
+                {
+                    BuildTransition(DetectedActivity.InVehicle, ActivityTransition.ActivityTransitionEnter),
+                    BuildTransition(DetectedActivity.InVehicle, ActivityTransition.ActivityTransitionExit),
+                    BuildTransition(DetectedActivity.OnBicycle, ActivityTransition.ActivityTransitionEnter),
+                    BuildTransition(DetectedActivity.OnBicycle, ActivityTransition.ActivityTransitionExit),
+                    BuildTransition(DetectedActivity.OnFoot, ActivityTransition.ActivityTransitionEnter),
+                    BuildTransition(DetectedActivity.OnFoot, ActivityTransition.ActivityTransitionExit),
+                    BuildTransition(DetectedActivity.Running, ActivityTransition.ActivityTransitionEnter),
+                    BuildTransition(DetectedActivity.Running, ActivityTransition.ActivityTransitionExit),
+                    BuildTransition(DetectedActivity.Still, ActivityTransition.ActivityTransitionEnter),
+                    BuildTransition(DetectedActivity.Still, ActivityTransition.ActivityTransitionExit),
+                    BuildTransition(DetectedActivity.Walking, ActivityTransition.ActivityTransitionEnter),
+                    BuildTransition(DetectedActivity.Walking, ActivityTransition.ActivityTransitionExit),
+                };
 
-        await client.RequestActivityTransitionUpdates(request, this.GetPendingIntent()).ToTask();
+            var request = new ActivityTransitionRequest(transitions);
+            await client.RequestActivityTransitionUpdates(request, this.GetPendingTransitionIntent()).ToTask();
+        }
+
         this.IsListening = true;
     }
-
+    
 
     public async Task StopListener()
     {
@@ -88,27 +106,41 @@ public class MotionActivityManager(
             return;
 
         var client = ActivityRecognition.GetClient(platform.AppContext);
-        await client.RemoveActivityTransitionUpdates(this.GetPendingIntent()).ToTask();
+        await client.RemoveActivityUpdates(this.GetPendingUpdateIntent()).ToTask();
+        await client.RemoveActivityTransitionUpdates(this.GetPendingTransitionIntent()).ToTask();
 
-        this.pendingIntent = null;
+        this.pendingTransitionIntent = null;
         this.IsListening = false;
     }
 
 
     public async void Start()
     {
-        MotionActivityBroadcastReceiver.Process = async result =>
+        MotionActivityBroadcastReceiver.ProcessTransitions = async result =>
         {
-            foreach (var e in result.TransitionEvents)
+            for (var i = 0; i < result.TransitionEvents.Count; i++)
             {
-                if (e.TransitionType != ActivityTransition.ActivityTransitionEnter)
-                    continue;
+                var e = result.TransitionEvents[i];
 
-                var activityType = ToMotionActivityType(e.ActivityType);
+                MotionActivityType activityType;
+                if (e.TransitionType == ActivityTransition.ActivityTransitionExit)
+                {
+                    //If there is a next transition at the same time that is the start of a new state, we can skip this 'unknown' state
+                    var nextTransitionIdx = i + 1;
+                    if (nextTransitionIdx < result.TransitionEvents.Count && result.TransitionEvents[nextTransitionIdx].ElapsedRealTimeNanos == e.ElapsedRealTimeNanos)
+                        continue;
+
+                    activityType = MotionActivityType.Unknown;
+                }
+                else
+                {
+                    activityType = ToMotionActivityType(e.ActivityType);
+                }
+
                 var reading = new MotionActivityReading(
                     activityType,
                     MotionActivityConfidence.High,
-                    DateTimeOffset.UtcNow
+                    GetTimeFromElapsedRealtimeNanos(e.ElapsedRealTimeNanos)
                 );
 
                 this.lastReading = reading;
@@ -121,6 +153,27 @@ public class MotionActivityManager(
                     )
                     .ConfigureAwait(false);
             }
+        };
+
+        MotionActivityBroadcastReceiver.ProcessUpdate = async result =>
+        {
+            var activityType = ToMotionActivityType((int)result.MostProbableActivity.Type);
+            var confidence = ToMotionActivityConfidence(result.MostProbableActivity.Confidence);
+            var reading = new MotionActivityReading(
+                activityType,
+                confidence,
+                DateTimeOffset.UnixEpoch.AddMilliseconds(result.Time)
+            );
+
+            this.lastReading = reading;
+            this.MotionActivityReadingReceived?.Invoke(this, reading);
+
+            await services
+                .RunDelegates<IMotionActivityDelegate>(
+                    x => x.OnReading(reading),
+                    logger
+                )
+                .ConfigureAwait(false);
         };
 
         if (!this.IsListening)
@@ -138,20 +191,23 @@ public class MotionActivityManager(
         }
     }
 
-
-    PendingIntent GetPendingIntent()
-        => this.pendingIntent ??= platform.GetBroadcastPendingIntent<MotionActivityBroadcastReceiver>(
-            IntentAction,
+    PendingIntent GetPendingTransitionIntent()
+        => this.pendingTransitionIntent ??= platform.GetBroadcastPendingIntent<MotionActivityBroadcastReceiver>(
+            TransitionIntentAction,
             PendingIntentFlags.UpdateCurrent
         );
 
+    PendingIntent GetPendingUpdateIntent()
+        => this.pendingUpdateIntent ??= platform.GetBroadcastPendingIntent<MotionActivityBroadcastReceiver>(
+            UpdateIntentAction,
+            PendingIntentFlags.UpdateCurrent
+        );
 
-    static ActivityTransition BuildTransition(int activityType)
+    static ActivityTransition BuildTransition(int activityType, int transitionType)
         => new ActivityTransition.Builder()
             .SetActivityType(activityType)
-            .SetActivityTransition(ActivityTransition.ActivityTransitionEnter)
+            .SetActivityTransition(transitionType)
             .Build();
-
 
     static MotionActivityType ToMotionActivityType(int activityType) => activityType switch
     {
@@ -163,4 +219,14 @@ public class MotionActivityManager(
         DetectedActivity.Still => MotionActivityType.Stationary,
         _ => MotionActivityType.Unknown
     };
+
+    static MotionActivityConfidence ToMotionActivityConfidence(int confidence) => confidence switch
+    {
+        > 60 => MotionActivityConfidence.High,
+        < 40 => MotionActivityConfidence.Low,
+        _ => MotionActivityConfidence.Medium,
+    };
+
+    static DateTimeOffset GetTimeFromElapsedRealtimeNanos(long elapsedRealTimeNanos) =>
+        DateTimeOffset.UtcNow.AddTicks((elapsedRealTimeNanos - Android.OS.SystemClock.ElapsedRealtimeNanos()) / TimeSpan.NanosecondsPerTick);
 }
