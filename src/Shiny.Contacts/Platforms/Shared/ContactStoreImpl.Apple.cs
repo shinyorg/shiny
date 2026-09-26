@@ -1,15 +1,27 @@
+#if APPLE
 using Contacts;
 using Foundation;
 using Shiny.Contacts.Internals;
 
 namespace Shiny.Contacts;
 
+/// <summary>
+/// Contacts framework-backed contact store shared across iOS, Mac Catalyst, and macOS.
+/// </summary>
+/// <remarks>
+/// This lives under Platforms/Shared (not Platforms/Apple) because Directory.Build.targets only
+/// compiles Platforms/Apple for the ios/maccatalyst TFMs - Platforms/Shared is the only folder
+/// that also flows into net10.0-macos. The #if APPLE guard compiles it away on Android.
+/// </remarks>
 public class ContactStoreImpl : IContactStore
 {
     public AccessState GetCurrentAccess()
     {
         var status = CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts);
-        if (OperatingSystem.IsIOSVersionAtLeast(18) && status == CNAuthorizationStatus.Limited)
+        // Limited access (the user picks which contacts the app sees) is iOS 18+ only - the binding
+        // marks it unsupported on Mac Catalyst and macOS, where access is all-or-nothing.
+        // IsIOSVersionAtLeast is also true on Mac Catalyst, hence the explicit exclusion.
+        if (OperatingSystem.IsIOSVersionAtLeast(18) && !OperatingSystem.IsMacCatalyst() && status == CNAuthorizationStatus.Limited)
             return AccessState.Restricted;
 
         return FromNative(status);
@@ -572,3 +584,4 @@ public class ContactStoreImpl : IContactStore
         Day = date.Day
     };
 }
+#endif

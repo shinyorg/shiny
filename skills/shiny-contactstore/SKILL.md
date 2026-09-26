@@ -24,11 +24,14 @@ triggers:
   - AddContactsAITools
   - ContactAITools
   - ContactAICapabilities
+  - macOS contacts
+  - Mac Catalyst contacts
 ---
 
 # Shiny.Contacts Skill
 
-You are an expert in Shiny.Contacts, a cross-platform library for accessing device contacts on Android and iOS.
+You are an expert in Shiny.Contacts, a cross-platform library for accessing device contacts on
+iOS, Mac Catalyst, macOS, and Android.
 
 ## When to Use This Skill
 
@@ -47,10 +50,13 @@ Invoke this skill when the user wants to:
 
 Shiny.Contacts provides:
 - Full CRUD operations on device contacts
-- A fluent async query builder with native translation (Android content provider queries, iOS CNContact predicates)
+- A fluent async query builder with native translation (Android content provider queries, CNContact predicates on Apple)
 - Permission handling via Shiny.Core's `AccessState` model
 - Dependency injection integration
 - AOT and trimmer compatible
+
+**Platform backends:** the Contacts framework (`CNContactStore`) on iOS, Mac Catalyst, and macOS -
+one shared implementation - and the `ContactsContract` content provider on Android.
 
 ## Setup
 
@@ -76,10 +82,18 @@ builder.Services.AddContactStore();
 <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 ```
 
-**iOS** — Add to `Info.plist`:
+**iOS / Mac Catalyst / macOS** — Add to `Info.plist`:
 ```xml
 <key>NSContactsUsageDescription</key>
 <string>This app needs access to your contacts.</string>
+```
+
+**Mac Catalyst / sandboxed macOS** — the `Info.plist` key is not enough. The App Sandbox (which
+Mac Catalyst enables by default) also requires the address book entitlement, or `RequestAccess`
+returns `Denied` with no prompt ever appearing:
+```xml
+<CustomEntitlements Include="com.apple.security.personal-information.addressbook"
+                    Type="Boolean" Value="true" />
 ```
 
 ## Permissions
@@ -104,11 +118,13 @@ var current = contactStore.GetCurrentAccess();
 - `AccessState.Restricted` — only read or only write granted (not both)
 - `AccessState.Denied` — neither read nor write granted
 
-### iOS Access Results
+### iOS / Mac Catalyst / macOS Access Results
 - `AccessState.Available` — contacts access authorized
 - `AccessState.Denied` — contacts access denied
-- `AccessState.Restricted` — contacts access restricted or limited
+- `AccessState.Restricted` — contacts access restricted, or (iOS 18+ only) limited to the contacts the user picked
 - `AccessState.Unknown` — not yet determined
+
+Limited access does not exist on Mac Catalyst or macOS — access there is all-or-nothing.
 
 ## API Reference
 
@@ -199,7 +215,7 @@ var page = await contactStore.Query()
 
 **`ContactSortField`:** `GivenName`, `FamilyName`, `DisplayName`, `Company`
 
-**Natively translated:** name fields, `Phone` and `Email` on Android; `StartsWith`/`Equals` on given/family/display name on iOS (in `Match.All` mode only). Everything else reads the full contact list and filters in-memory — correct, just slower. Field filters are always re-applied in-memory, so a filter never silently goes missing.
+**Natively translated:** name fields, `Phone` and `Email` on Android; `StartsWith`/`Equals` on given/family/display name on Apple (in `Match.All` mode only). Everything else reads the full contact list and filters in-memory — correct, just slower. Field filters are always re-applied in-memory, so a filter never silently goes missing.
 
 ### Create a Contact
 
@@ -271,16 +287,17 @@ await contactStore.Delete(contactId);
 
 `GetAll()` and `Query()` populate **`Thumbnail`** only; **`Photo` (the full-resolution image) is `null`** on these bulk reads. Decoding every contact's full photo into a `byte[]` at once spikes memory and can get the app OOM/jetsam-killed on a real device with many photo contacts. To get the full `Photo`, fetch the single contact with **`GetById(id)`** (which populates both `Thumbnail` and `Photo`). Bind list rows to `Thumbnail` and load `Photo` on a detail screen.
 
-## iOS Notes & Relations Entitlement
+## Apple Notes & Relations Entitlement
 
-Reading `Note` and `Relationships` on iOS requires the `com.apple.developer.contacts.notes` entitlement. The library auto-detects this at runtime. If absent, `Note` returns `null` and `Relationships` is empty.
+Reading `Note` and `Relationships` on iOS requires the `com.apple.developer.contacts.notes` entitlement. The library probes for access at runtime on every Apple platform, so
+the same code runs unchanged on Mac Catalyst and macOS. If the probe fails, `Note` returns `null` and `Relationships` is empty.
 
 ## Best Practices
 
 1. **Always request access first** — use `await contactStore.RequestAccess()` and check for `AccessState.Available` before any CRUD operation
 2. **Use `Query()` for filtering** — prefer `Query().Where(ContactField.…, …).ToListAsync(ct)` (or `.Search(text)`) over `GetAll()` + LINQ, as it narrows the native read
 3. **Check for Restricted on Android** — `AccessState.Restricted` means partial access (read-only or write-only)
-4. **Handle iOS entitlements gracefully** — Notes and Relations silently return empty without the entitlement
+4. **Handle Apple entitlements gracefully** — Notes and Relations silently return empty without the entitlement
 5. **Bind lists to `Thumbnail`, not `Photo`** — bulk reads (`GetAll`/`Query`) only load `Thumbnail`; get the full `Photo` from `GetById` on a detail screen
 6. **Use primary constructors** — inject `IContactStore` via primary constructor
 

@@ -43,7 +43,8 @@ static class PlatformExtensions
             region.Identifier
         )
         {
-            NotifyOnEntry = region.NotifyOnEntry,
-            NotifyOnExit = region.NotifyOnExit
+            // dwell needs the entry to start its timer and the exit to cancel it
+            NotifyOnEntry = region.NotifyOnEntry || region.DwellTime != null,
+            NotifyOnExit = region.NotifyOnExit || region.DwellTime != null
         };
 }

@@ -16,4 +16,7 @@ namespace Shiny.Locations;
 [JsonSerializable(typeof(GeofenceRegion))]
 [JsonSerializable(typeof(List<GeofenceRegion>))]
 [JsonSerializable(typeof(GeofenceRegion[]))]
+[JsonSerializable(typeof(GeofenceDwellEntry))]
+[JsonSerializable(typeof(List<GeofenceDwellEntry>))]
+[JsonSerializable(typeof(GeofenceDwellEntry[]))]
 internal partial class ShinyLocationsJsonContext : JsonSerializerContext;

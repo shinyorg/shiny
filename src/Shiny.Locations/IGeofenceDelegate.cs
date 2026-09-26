@@ -21,7 +21,13 @@ public enum GeofenceState
     /// <summary>
     /// The device is currently outside the region.
     /// </summary>
-    Exited = 2
+    Exited = 2,
+
+    /// <summary>
+    /// The device has remained inside the region for its <see cref="GeofenceRegion.DwellTime"/>.
+    /// Only reported for regions that set a dwell time.
+    /// </summary>
+    Dwelling = 3
 }
 
 

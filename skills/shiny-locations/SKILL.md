@@ -1,6 +1,6 @@
 ---
 name: shiny-locations
-description: GPS tracking, geofence monitoring, and motion activity recognition for .NET MAUI, iOS, and Android using Shiny.Locations
+description: GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, and Android using Shiny.Locations
 auto_invoke: true
 triggers:
   - gps
@@ -29,6 +29,19 @@ triggers:
   - IGeofenceManager
   - AddGps
   - AddGeofencing
+  - dwell
+  - geofence dwell
+  - loitering
+  - DwellTime
+  - GeofenceState.Dwelling
+  - reverse geocoding
+  - geocoding
+  - geocoder
+  - address from coordinates
+  - IGeocoder
+  - AddGeocoding
+  - Placemark
+  - ReverseGeocode
   - motion activity
   - activity recognition
   - walking
@@ -46,7 +59,7 @@ triggers:
 
 # Shiny Locations
 
-GPS tracking, geofence monitoring, and motion activity recognition for .NET MAUI, iOS, and Android applications with full foreground and background support.
+GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, and Android applications with full foreground and background support.
 
 ## When to Use This Skill
 
@@ -54,6 +67,8 @@ Use this skill when the user needs to:
 
 - Track the device GPS position (foreground or background)
 - Monitor geofence regions (enter/exit events)
+- Detect when the user stays inside a geofence for a period of time (dwell)
+- Turn coordinates into a street address (reverse geocoding)
 - Calculate distances between geographic positions
 - Request location permissions
 - Get a single current position reading
@@ -117,6 +132,12 @@ services.AddGeofencing<MyGeofenceDelegate>();
 services.AddGpsDirectGeofencing<MyGeofenceDelegate>();
 ```
 
+### Geocoding Registration
+
+```csharp
+services.AddGeocoding(); // IGeocoder - iOS, Mac Catalyst, Android; no-op on Windows/Blazor
+```
+
 ### Motion Activity Registration
 
 Register motion activity recognition in `MauiProgram.cs`:
@@ -150,6 +171,8 @@ When generating code for Shiny.Locations:
 9. **Subscribe to the `GpsReadingReceived` C# event on `IGpsManager` (or `MotionActivityReadingReceived` on `IMotionActivityManager`) for foreground UI updates.** Rx has been removed from Shiny.Locations — use `event EventHandler<GpsReading>` / `event EventHandler<MotionActivityReading>` and always unsubscribe on disappear/dispose to avoid leaks. Delegates remain the way to handle readings while the app is backgrounded.
 10. **For `GeofenceRegion`**, always provide a unique `Identifier` string. The `SingleUse` parameter removes the region after the first trigger. To register a region idempotently, use the `TryStartMonitoring(region, replaceIfExists)` extension on `IGeofenceManager` — it only starts monitoring if a region with the same identifier isn't already being monitored, and (when `replaceIfExists` is `true`, the default) stops and restarts an existing region so changed position/notification settings take effect. It returns `true` when the region already existed, `false` when it was newly added.
 11. **Inject `IMotionActivityManager`** via constructor injection for motion activity features. Call `RequestAccess()` before `StartListener()`, then subscribe to `MotionActivityReadingReceived` for foreground updates or register `IMotionActivityDelegate` for background processing.
+12. **For geofence dwell, set `DwellTime` with an object initializer** - `new GeofenceRegion("id", center, radius) { DwellTime = TimeSpan.FromMinutes(5) }` - and handle `GeofenceState.Dwelling` in `IGeofenceDelegate.OnStatusChanged`. `DwellTime` is not a constructor parameter. Entry and exit are always tracked internally; `NotifyOnEntry`/`NotifyOnExit` only filter what reaches the delegate (set both false for dwell-only). A `SingleUse` region with a `DwellTime` is removed after the dwell, not the entry. No GPS, background mode or extra permission is needed. **Timing differs on iOS:** Android (native loitering delay) and Windows (timer) report `Dwelling` while the user is still inside, but iOS usually reports it at exit, just before `Exited`, because iOS suspends the app between region events. When generating dwell code, don't assume the user is still inside on iOS, and say so if the user's scenario needs an in-place action.
+13. **For reverse geocoding, inject `IGeocoder`** (registered by `AddGeocoding()`), check `IsSupported`, then `await geocoder.ReverseGeocode(position, ct)` - it returns `IReadOnlyList<Placemark>` (empty when nothing matched) with `FormattedAddress`, `Thoroughfare`, `Locality`, `AdministrativeArea`, `PostalCode`, `CountryCode`, etc. It needs network access and is not available on Windows or Blazor.
 
 ## Conventions
 
@@ -157,7 +180,7 @@ When generating code for Shiny.Locations:
 - The convenience extension methods live on `Shiny.Locations.LocationExtensions` (renamed from `Extensions` in 5.2.5 — a type named `Shiny.Locations.Extensions` collides with the `Shiny.Locations.Extensions.AI` namespace and produces CS0434 in consuming projects). They are extension methods, so call sites are unaffected.
 - Foreground observation uses C# `event EventHandler<T>` on the managers (`GpsReadingReceived`, `MotionActivityReadingReceived`) — Rx is no longer used in Shiny.Locations.
 - The `GpsBackgroundMode` enum controls background behavior: `None` (foreground), `Standard` (periodic), `Realtime` (continuous).
-- `GeofenceState` enum values: `Unknown`, `Entered`, `Exited`.
+- `GeofenceState` enum values: `Unknown`, `Entered`, `Exited`, `Dwelling` (only for regions with a `DwellTime`).
 - `AccessState` is from Shiny.Core and includes `Available`, `Denied`, `Disabled`, `Restricted`, `NotSupported`, `Unknown`.
 
 ## Best Practices

@@ -140,6 +140,13 @@ public static class LocationExtensions
 
 
     /// <summary>
+    /// A single-use region is removed after its first transition - unless it has a dwell time, then after the dwell.
+    /// </summary>
+    internal static bool IsSingleUseComplete(this GeofenceRegion region, GeofenceState state)
+        => region.SingleUse && (region.DwellTime == null || state == GeofenceState.Dwelling);
+
+
+    /// <summary>
     /// Returns null if current position could not be determined - else returns true if in region, false otherwise.
     /// </summary>
     /// <param name="gpsManager"></param>

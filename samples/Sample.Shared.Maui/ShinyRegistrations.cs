@@ -89,8 +89,8 @@ public static class ShinyRegistrations
         s.AddMotionActivity<SampleMotionActivityDelegate>();
 #endif
 
-#if IOS || ANDROID
-        // Contacts: Shiny.Contacts has native implementations for iOS and Android.
+#if IOS || ANDROID || MACCATALYST
+        // Contacts: Shiny.Contacts has native implementations for iOS, Mac Catalyst, macOS and Android.
         s.AddContactStore();
         s.AddSingleton(MediaPicker.Default);
 #endif
@@ -110,7 +110,7 @@ public static class ShinyRegistrations
         s.AddCalendarAITools(b => b.AddCalendar(CalendarAICapabilities.All));
         s.AddNotificationAITools(b => b.AddReminders(ReminderAICapabilities.ReadWrite));
 #endif
-#if IOS || ANDROID
+#if IOS || ANDROID || MACCATALYST
         s.AddContactsAITools(b => b.AddContacts(ContactAICapabilities.ReadWrite));
 #endif
 #if IOS || ANDROID || MACCATALYST

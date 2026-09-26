@@ -5,7 +5,7 @@ namespace Shiny;
 
 public static class ContactStoreExtensions
 {
-#if ANDROID || IOS
+#if ANDROID || APPLE
     /// <summary>
     /// Registers the platform contact store implementation with the Shiny container.
     /// </summary>

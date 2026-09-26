@@ -6,18 +6,20 @@ using System.Threading.Tasks;
 using CoreFoundation;
 using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores.Repositories;
+using Shiny.Hosting;
 using CoreLocation;
 
 namespace Shiny.Locations;
 
 
-public class CLLocationGeofenceManager : IGeofenceManager
+public class CLLocationGeofenceManager : IGeofenceManager, IShinyStartupTask, IIosLifecycle.IApplicationLifecycle
 {
     readonly CLLocationManager locationManager;
     readonly IPlatform platform;
     readonly IServiceProvider services;
     readonly ILogger logger;
     readonly IRepository repository;
+    readonly GeofenceDwellTracker dwell;
 
 
     public CLLocationGeofenceManager(
@@ -35,41 +37,117 @@ public class CLLocationGeofenceManager : IGeofenceManager
         {
             Delegate = new GeofenceManagerDelegate(this)
         };
+
+        this.dwell = new GeofenceDwellTracker(
+            repository,
+            logger,
+            this.RequestState,
+            r => this.FireDelegate(r, GeofenceState.Dwelling)
+        );
+    }
+
+
+    public void Start()
+    {
+        try
+        {
+            this.dwell.Restore();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Failed to restore pending geofence dwells");
+        }
     }
 
 
     readonly System.Collections.Concurrent.ConcurrentDictionary<string, TaskCompletionSource<(CLCircularRegion Region, CLRegionState State)>> regionStateTcs = new();
 
+    public void OnForeground()
+    {
+        try
+        {
+            // dwell timers don't advance while iOS has the app suspended - catch up on any that came due
+            this.dwell.Reevaluate();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Failed to re-evaluate geofence dwells");
+        }
+    }
+
+
+    public void OnBackground() { }
+
+
     internal void OnStateDetermined(CLRegionState state, CLRegion region)
     {
-        if (region is CLCircularRegion native && this.regionStateTcs.TryGetValue(native.Identifier, out var tcs))
-            tcs.TrySetResult((native, state));
+        if (region is CLCircularRegion native)
+        {
+            if (this.regionStateTcs.TryGetValue(native.Identifier, out var tcs))
+                tcs.TrySetResult((native, state));
+
+            // starts the dwell clock for a region the device was already inside when monitoring began
+            // (a stay already being timed is kept) - never reported to the delegate as an entry
+            if (state == CLRegionState.Inside)
+            {
+                var geofence = this.repository.Get<GeofenceRegion>(native.Identifier);
+                if (geofence?.DwellTime != null)
+                    this.dwell.Entered(geofence);
+            }
+        }
     }
 
 
     internal async void OnRegionChanged(CLRegion region, bool entered)
     {
-        if (region is CLCircularRegion native)
+        try
         {
-            var geofence = this.repository.Get<GeofenceRegion>(native.Identifier);
-
-            if (geofence != null)
+            if (region is CLCircularRegion native)
             {
-                var status = entered ? GeofenceState.Entered : GeofenceState.Exited;
-                await this.services
-                    .RunDelegates<IGeofenceDelegate>(
-                        x => x.OnStatusChanged(status, geofence),
-                        this.logger
-                    )
-                    .ConfigureAwait(false);
+                var geofence = this.repository.Get<GeofenceRegion>(native.Identifier);
 
-                if (geofence.SingleUse)
+                if (geofence != null)
                 {
-                    await this
-                        .StopMonitoring(geofence.Identifier)
-                        .ConfigureAwait(false);
+                    // the native region also watches entry/exit when only a dwell was asked for - filter by the flags here
+                    if (entered)
+                    {
+                        this.dwell.Entered(geofence);
+                        if (geofence.NotifyOnEntry)
+                            await this.FireDelegate(geofence, GeofenceState.Entered).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        // reports Dwelling first if the stay lasted the dwell time
+                        await this.dwell.Exited(geofence).ConfigureAwait(false);
+
+                        // a single-use region is gone once its dwell fired
+                        if (geofence.NotifyOnExit && this.repository.Exists<GeofenceRegion>(geofence.Identifier))
+                            await this.FireDelegate(geofence, GeofenceState.Exited).ConfigureAwait(false);
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Error handling geofence event for {Identifier}", region.Identifier);
+        }
+    }
+
+
+    async Task FireDelegate(GeofenceRegion geofence, GeofenceState status)
+    {
+        await this.services
+            .RunDelegates<IGeofenceDelegate>(
+                x => x.OnStatusChanged(status, geofence),
+                this.logger
+            )
+            .ConfigureAwait(false);
+
+        if (geofence.IsSingleUseComplete(status))
+        {
+            await this
+                .StopMonitoring(geofence.Identifier)
+                .ConfigureAwait(false);
         }
     }
 
@@ -130,6 +208,10 @@ public class CLLocationGeofenceManager : IGeofenceManager
         await tcs.Task.ConfigureAwait(false);
 
         this.repository.Set(region);
+
+        // no entry event comes for a region the device is already inside - ask, so a dwell can start timing
+        if (region.DwellTime != null)
+            this.platform.InvokeOnMainThread(() => this.locationManager.RequestState(native));
     }
 
 
@@ -137,6 +219,7 @@ public class CLLocationGeofenceManager : IGeofenceManager
     {
         var region = this.repository.Get<GeofenceRegion>(identifier);
 
+        this.dwell.Remove(identifier);
         if (region != null)
         {
             this.repository.Remove<GeofenceRegion>(region.Identifier);
@@ -148,6 +231,7 @@ public class CLLocationGeofenceManager : IGeofenceManager
 
     public Task StopAllMonitoring()
     {
+        this.dwell.Clear();
         this.repository.Clear<GeofenceRegion>();
 
         var natives = this

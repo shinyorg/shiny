@@ -53,9 +53,9 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                 }
                 else if (e.TriggeringGeofences != null)
                 {
+                    var state = FromNativeTransition(e.GeofenceTransition);
                     foreach (var triggeringGeofence in e.TriggeringGeofences)
                     {
-                        var state = (GeofenceState)e.GeofenceTransition;
                         var region = this.repository.Get<GeofenceRegion>(triggeringGeofence.RequestId);
 
                         if (region == null)
@@ -70,13 +70,16 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                                     this.logger
                                 )
                                 .ConfigureAwait(false);
+
+                            if (region.IsSingleUseComplete(state))
+                                await this.StopMonitoring(region.Identifier).ConfigureAwait(false);
                         }
                     }
                 }
             };
             var regions = this.repository.GetAll<GeofenceRegion>();
             foreach (var region in regions)
-                await this.Create(region);
+                await this.Create(region, true);
         }
         catch (Exception ex)
         {
@@ -172,11 +175,15 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     }
 
 
-    protected virtual Task Create(GeofenceRegion region)
+    /// <param name="region">The region to register with the OS.</param>
+    /// <param name="restoring">
+    /// True when re-registering at startup - the device's state was already reported for this region, so no initial trigger.
+    /// </param>
+    protected virtual Task Create(GeofenceRegion region, bool restoring = false)
     {
         var transitions = this.GetTransitions(region);
 
-        var geofence = new GeofenceBuilder()
+        var builder = new GeofenceBuilder()
             .SetRequestId(region.Identifier)
             .SetExpirationDuration(Geofence.NeverExpire)
             .SetCircularRegion(
@@ -184,11 +191,15 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                 region.Center.Longitude,
                 Convert.ToSingle(region.Radius.TotalMeters)
             )
-            .SetTransitionTypes(transitions)
-            .Build();
+            .SetTransitionTypes(transitions);
+
+        if (region.DwellTime is { } dwell)
+            builder.SetLoiteringDelay(Convert.ToInt32(Math.Min(dwell.TotalMilliseconds, int.MaxValue)));
+
+        var geofence = builder.Build();
 
         var request = new GeofencingRequest.Builder()
-            .SetInitialTrigger(0)
+            .SetInitialTrigger(this.GetInitialTrigger(region, restoring))
             .AddGeofence(geofence)
             .Build();
 
@@ -208,8 +219,29 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         if (region.NotifyOnExit)
             i += Geofence.GeofenceTransitionExit;
 
+        if (region.DwellTime != null)
+            i += Geofence.GeofenceTransitionDwell;
+
         return i;
     }
+
+
+    // Matches iOS: already being inside when monitoring starts never reports Entered, but it does count toward a
+    // dwell - INITIAL_TRIGGER_DWELL reports Dwelling once the device has been inside for the loitering delay.
+    // Not on restore: re-registering at startup would report the dwell again for a stay that already had one.
+    protected virtual int GetInitialTrigger(GeofenceRegion region, bool restoring)
+        => region.DwellTime != null && !restoring
+            ? GeofencingRequest.InitialTriggerDwell
+            : 0;
+
+
+    static GeofenceState FromNativeTransition(int transition) => transition switch
+    {
+        Geofence.GeofenceTransitionEnter => GeofenceState.Entered,
+        Geofence.GeofenceTransitionExit => GeofenceState.Exited,
+        Geofence.GeofenceTransitionDwell => GeofenceState.Dwelling,
+        _ => GeofenceState.Unknown
+    };
 
 
     protected virtual PendingIntent GetPendingIntent()

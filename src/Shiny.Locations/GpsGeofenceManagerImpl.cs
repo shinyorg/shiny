@@ -85,6 +85,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     public async Task StopAllMonitoring()
     {
         this.repository.Clear<GeofenceRegion>();
+        this.repository.Clear<GeofenceDwellEntry>();
         await this.gpsManager.StopListener().ConfigureAwait(false);
     }
 
@@ -92,6 +93,7 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     public async Task StopMonitoring(string identifier)
     {
         this.repository.Remove<GeofenceRegion>(identifier);
+        this.repository.Remove<GeofenceDwellEntry>(identifier); // a pending dwell timer finds no stay and reports nothing
         var geofences = this.repository.GetAll<GeofenceRegion>();
 
         if (geofences.Count == 0)

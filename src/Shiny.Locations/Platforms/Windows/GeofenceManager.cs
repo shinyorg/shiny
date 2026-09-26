@@ -19,6 +19,9 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     readonly ILogger logger;
 
 
+    readonly GeofenceDwellTracker dwell;
+
+
     public GeofenceManager(
         IServiceProvider services,
         IRepository repository,
@@ -28,6 +31,12 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
         this.services = services;
         this.repository = repository;
         this.logger = logger;
+        this.dwell = new GeofenceDwellTracker(
+            repository,
+            logger,
+            this.RequestState,
+            r => this.FireDelegate(r, GeofenceState.Dwelling)
+        );
     }
 
 
@@ -52,6 +61,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
                     this.logger.LogWarning(ex, "Failed to restore geofence: {Identifier}", region.Identifier);
                 }
             }
+            this.dwell.Restore();
         }
         catch (Exception ex)
         {
@@ -91,6 +101,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
     public Task StopMonitoring(string identifier)
     {
+        this.dwell.Remove(identifier);
         this.repository.Remove<GeofenceRegion>(identifier);
         this.RemoveNativeGeofence(identifier);
 
@@ -109,6 +120,7 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     {
         GeofenceMonitor.Current.GeofenceStateChanged -= this.OnGeofenceStateChanged;
         this.eventSubscribed = false;
+        this.dwell.Clear();
 
         var regions = this.repository.GetAll<GeofenceRegion>();
         foreach (var region in regions)
@@ -160,17 +172,21 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
 
         var geocircle = new Geocircle(position, region.Radius.TotalMeters);
 
+        // dwell needs the entry to start its timer and the exit to cancel it
+        var hasDwell = region.DwellTime != null;
         var states = (MonitoredGeofenceStates)0;
-        if (region.NotifyOnEntry)
+        if (region.NotifyOnEntry || hasDwell)
             states |= MonitoredGeofenceStates.Entered;
-        if (region.NotifyOnExit)
+        if (region.NotifyOnExit || hasDwell)
             states |= MonitoredGeofenceStates.Exited;
 
+        // Windows' own dwellTime only delays the Entered report - Shiny's dwell is a separate transition,
+        // and a native single-use fence would be removed on entry before the dwell could fire
         var geofence = new Geofence(
             region.Identifier,
             geocircle,
             states,
-            region.SingleUse
+            region.SingleUse && !hasDwell
         );
 
         GeofenceMonitor.Current.Geofences.Add(geofence);
@@ -195,34 +211,49 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
             foreach (var report in reports)
             {
                 var region = this.repository.Get<GeofenceRegion>(report.Geofence.Id);
-                if (region == null)
-                    continue;
-
-                var state = report.NewState switch
+                if (region != null)
                 {
-                    WinGeofenceState.Entered => GeofenceState.Entered,
-                    WinGeofenceState.Exited => GeofenceState.Exited,
-                    _ => GeofenceState.Unknown
-                };
+                    // when the position that crossed the boundary was taken, not when the report was read
+                    DateTimeOffset? at = report.Geoposition?.Coordinate?.Timestamp;
 
-                if (state == GeofenceState.Unknown)
-                    continue;
+                    switch (report.NewState)
+                    {
+                        case WinGeofenceState.Entered:
+                            this.dwell.Entered(region, at);
+                            if (region.NotifyOnEntry)
+                                await this.FireDelegate(region, GeofenceState.Entered).ConfigureAwait(false);
+                            break;
 
-                await this.services
-                    .RunDelegates<IGeofenceDelegate>(
-                        x => x.OnStatusChanged(state, region),
-                        this.logger
-                    )
-                    .ConfigureAwait(false);
+                        case WinGeofenceState.Exited:
+                            // reports Dwelling first if the stay lasted the dwell time and the timer didn't already
+                            await this.dwell.Exited(region, at).ConfigureAwait(false);
 
-                if (region.SingleUse)
-                    await this.StopMonitoring(region.Identifier).ConfigureAwait(false);
+                            // a single-use region is gone once its dwell fired
+                            if (region.NotifyOnExit && this.repository.Exists<GeofenceRegion>(region.Identifier))
+                                await this.FireDelegate(region, GeofenceState.Exited).ConfigureAwait(false);
+                            break;
+                    }
+                }
             }
         }
         catch (Exception ex)
         {
             this.logger.LogError(ex, "Error processing geofence state change");
         }
+    }
+
+
+    async Task FireDelegate(GeofenceRegion region, GeofenceState state)
+    {
+        await this.services
+            .RunDelegates<IGeofenceDelegate>(
+                x => x.OnStatusChanged(state, region),
+                this.logger
+            )
+            .ConfigureAwait(false);
+
+        if (region.IsSingleUseComplete(state))
+            await this.StopMonitoring(region.Identifier).ConfigureAwait(false);
     }
 
 

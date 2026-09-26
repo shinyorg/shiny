@@ -38,7 +38,8 @@ public enum GeofenceState
 {
     Unknown = 0,
     Entered = 1,
-    Exited = 2
+    Exited = 2,
+    Dwelling = 3   // only for regions with a DwellTime
 }
 ```
 
@@ -193,7 +194,46 @@ public record GeofenceRegion(
     bool SingleUse = false,
     bool NotifyOnEntry = true,
     bool NotifyOnExit = true
-) : IRepositoryEntity;
+) : IRepositoryEntity
+{
+    // optional - fires GeofenceState.Dwelling once the device has stayed inside this long (must be > 0)
+    TimeSpan? DwellTime { get; init; }
+}
+```
+
+`DwellTime` is an `init` property, not a constructor parameter: `new GeofenceRegion("id", center, radius) { DwellTime = TimeSpan.FromMinutes(5) }`.
+Entry and exit are always tracked; `NotifyOnEntry`/`NotifyOnExit` only filter what reaches the delegate, so a region can report
+only dwell. With `SingleUse`, a region that has a `DwellTime` is removed after the dwell fires rather than after the entry.
+Already inside when monitoring starts (Android, iOS, GPS-direct): no `Entered`, but the time counts toward the dwell.
+
+| Platform | Dwell implementation | `Dwelling` arrives |
+|----------|----------------------|--------------------|
+| Android | Native - `GEOFENCE_TRANSITION_DWELL` with the loitering delay (`INITIAL_TRIGGER_DWELL` on first registration) | While still inside |
+| Windows | Shiny timer | While still inside |
+| iOS | Shiny: entry time persisted, stay calculated when the exit wakes the app (iOS 18+ uses the event times); a timer fires it on time only if the app is running; foregrounding catches up | Usually at exit, just before `Exited` |
+| GPS-direct | Shiny timer, plus the exit calculation | While still inside |
+
+No GPS, background mode or extra permission is involved on any platform.
+
+### Placemark
+
+```csharp
+namespace Shiny.Locations;
+
+public record Placemark(
+    Position Position,
+    string? Name,
+    string? SubThoroughfare,        // street number
+    string? Thoroughfare,           // street
+    string? SubLocality,            // neighbourhood
+    string? Locality,               // city
+    string? SubAdministrativeArea,  // county
+    string? AdministrativeArea,     // state/province
+    string? PostalCode,
+    string? CountryCode,            // ISO 3166-1 alpha-2
+    string? CountryName,
+    string? FormattedAddress        // single line, platform formatted
+);
 ```
 
 ### MotionActivityReading
@@ -283,6 +323,24 @@ public interface IGeofenceManager
     Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default);
 }
 ```
+
+### IGeocoder
+
+Reverse geocoding through the platform geocoder. iOS/Mac Catalyst 26+ use MapKit `MKReverseGeocodingRequest`
+(`CLGeocoder` below 26); Android uses `android.location.Geocoder` (listener API on 33+). Needs network access.
+Not registered on Windows or Blazor.
+
+```csharp
+namespace Shiny.Locations;
+
+public interface IGeocoder
+{
+    bool IsSupported { get; }   // Android: false when the device has no geocoder backend
+    Task<IReadOnlyList<Placemark>> ReverseGeocode(Position position, CancellationToken cancelToken = default);
+}
+```
+
+Returns an empty list when nothing matched. On Android, calling it when `IsSupported` is false throws `InvalidOperationException`.
 
 ### IGpsDelegate
 
@@ -394,12 +452,13 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
 
 ### GpsGeofenceDelegate
 
-Uses GPS readings to drive geofence state changes. Registered automatically when using `AddGpsDirectGeofencing`.
+Uses GPS readings to drive geofence state changes (entry, exit and dwell), respecting `NotifyOnEntry`/`NotifyOnExit`/`SingleUse`.
+Registered automatically by `AddGpsDirectGeofencing`, which also registers the GPS manager if `AddGps` was not called.
 
 ```csharp
 namespace Shiny.Locations;
 
-public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
+public class GpsGeofenceDelegate : IGpsDelegate, IShinyStartupTask
 {
     Dictionary<string, GeofenceState> CurrentStates { get; }
 
@@ -513,6 +572,12 @@ services.AddGpsDirectGeofencing<MyGeofenceDelegate>();
 
 // Non-generic version
 services.AddGpsDirectGeofencing(typeof(MyGeofenceDelegate));
+```
+
+### Geocoding Registration
+
+```csharp
+services.AddGeocoding(); // registers IGeocoder on iOS, Mac Catalyst and Android - no-op elsewhere
 ```
 
 ### Motion Activity Registration
@@ -691,6 +756,53 @@ var region = new GeofenceRegion(
 bool alreadyExisted = await geofenceManager.TryStartMonitoring(region);
 ```
 
+### Geofence Dwell
+
+```csharp
+await geofenceManager.StartMonitoring(new GeofenceRegion(
+    "coffee-shop",
+    new Position(43.6532, -79.3832),
+    Distance.FromMeters(100),
+    NotifyOnEntry: false,
+    NotifyOnExit: false
+)
+{
+    DwellTime = TimeSpan.FromMinutes(5)
+});
+
+public class MyGeofenceDelegate : IGeofenceDelegate
+{
+    public Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
+    {
+        if (newStatus == GeofenceState.Dwelling)
+        {
+            // the user has been inside for 5 minutes
+        }
+        return Task.CompletedTask;
+    }
+}
+```
+
+### Reverse Geocoding
+
+```csharp
+public class AddressService(IGeocoder geocoder, IGpsManager gps)
+{
+    public async Task<string?> GetCurrentAddress(CancellationToken ct)
+    {
+        if (!geocoder.IsSupported)
+            return null;
+
+        var reading = await gps.GetLastReadingOrCurrentPosition(cancellationToken: ct);
+        if (reading == null)
+            return null;
+
+        var placemarks = await geocoder.ReverseGeocode(reading.Position, ct);
+        return placemarks.FirstOrDefault()?.FormattedAddress;
+    }
+}
+```
+
 ### Distance Calculations
 
 ```csharp
@@ -808,6 +920,12 @@ if (access == AccessState.Available)
 - Verify `RequestAccess` returns `AccessState.Available`.
 - On iOS, the system limits the number of monitored regions to 20. Check `GetMonitorRegions()` count.
 - On Android without Google Play Services, geofencing falls back to GPS-direct mode automatically.
+
+### Geofence dwell arrives late on iOS
+
+- Expected: iOS suspends the app between region events, so the dwell is usually calculated when the exit wakes the app and
+  reported just before `Exited`. It is reported on time only if the app is running when the dwell time elapses.
+- `Dwelling` requires the stay (entry to exit) to reach `DwellTime` - leaving earlier reports nothing.
 
 ### Permission denied on iOS
 

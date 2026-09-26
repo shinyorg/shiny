@@ -62,9 +62,23 @@ public static class GeofenceServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddGpsDirectGeofencing<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGeofenceDelegate
     {
+        services.AddDefaultRepository();
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         if (!services.HasService<IGeofenceManager>())
+        {
             services.AddSingletonAsImplementedInterfaces<GpsGeofenceManagerImpl>();
+
+            // readings from the GPS listener are what drive the geofence transitions
+            services.AddSingletonAsImplementedInterfaces<GpsGeofenceDelegate>();
+            if (!services.HasService<IGpsManager>())
+            {
+#if WINDOWS
+                services.AddSingletonAsImplementedInterfaces<GpsManager>();
+#else
+                services.AddGps();
+#endif
+            }
+        }
         
         return services;
     }
