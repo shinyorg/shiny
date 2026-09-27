@@ -27,7 +27,7 @@ public abstract class ShinyBeaconLocationDelegate : CLLocationManagerDelegate
 /// Location permission plumbing for the beacon managers.
 /// </summary>
 /// <remarks>
-/// Deliberately a local copy of what Shiny.Locations does rather than a reference to it - beacons
+/// Deliberately a local copy of what Shiny.Geofencing does rather than a reference to it - beacons
 /// would otherwise drag Google Play Services and a stack of AndroidX packages into every app that
 /// only wanted to read a beacon.
 /// </remarks>

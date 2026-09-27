@@ -8,7 +8,7 @@
 
 **Supported Platforms:** iOS, Mac Catalyst, Android
 
-**Dependencies:** Shiny.Core, Shiny.Locations, Shiny.Support.Repositories
+**Dependencies:** Shiny.Core, Shiny.Geofencing (Android only - geofence-triggered notifications), Shiny.Support.Repositories
 
 ## Namespace
 
@@ -164,8 +164,8 @@ public class ChannelAction
 public class GeofenceTrigger
 {
     public bool Repeat { get; set; }
-    public Position? Center { get; set; }                          // Required (from Shiny.Locations)
-    public Distance? Radius { get; set; }                          // Required (from Shiny.Locations)
+    public Position? Center { get; set; }                          // Required (from Shiny.Core)
+    public Distance? Radius { get; set; }                          // Required (from Shiny.Core)
 }
 ```
 

@@ -66,6 +66,8 @@
     <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
     <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" />
     <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" />
+    <Project Path="src\Shiny.Gps\Shiny.Gps.csproj" />
+    <Project Path="src\Shiny.Geofencing\Shiny.Geofencing.csproj" />
     <Project Path="src\Shiny.Locations\Shiny.Locations.csproj" />
     <Project Path="src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Mobile.LiveActivities\Shiny.Mobile.LiveActivities.csproj" />

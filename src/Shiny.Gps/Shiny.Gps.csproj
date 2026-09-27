@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -6,20 +6,18 @@
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
-        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
-        
-        <Description>Shiny addon for all your notification needs</Description>
+
+        <Description>Shiny GPS - foreground and background GPS, motion activity recognition and reverse geocoding</Description>
+        <RootNamespace>Shiny.Locations</RootNamespace>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Shiny.Extensions.Serialization" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="$(TargetFramework.Contains('android'))">
-        <!-- geofence-triggered notifications run through IGeofenceManager only on Android - Apple uses UNLocationNotificationTrigger, Windows/macOS don't support them -->
-        <ProjectReference Include="..\Shiny.Geofencing\Shiny.Geofencing.csproj" />
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" />
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Xamarin.GooglePlayServices.Location" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Android" />
@@ -28,5 +26,4 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" />
     </ItemGroup>
-
 </Project>

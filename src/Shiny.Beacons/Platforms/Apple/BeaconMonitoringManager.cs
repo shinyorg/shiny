@@ -20,7 +20,7 @@ namespace Shiny.Beacons;
 /// <remarks>
 /// <para>
 /// This is the modern path - iOS 18, Mac Catalyst 18 and macOS 15 - and it mirrors what
-/// Shiny.Locations already does for geofences, right down to needing a CLServiceSession before
+/// Shiny.Geofencing already does for geofences, right down to needing a CLServiceSession before
 /// CoreLocation will deliver anything to a backgrounded app.
 /// </para>
 /// <para>

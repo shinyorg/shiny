@@ -90,7 +90,7 @@ Two Core APIs differ on tvOS:
 
 A complete UIKit tvOS host is in `samples/Sample.tvOS` — use its `AppDelegate` as the shape for tvOS hosting guidance.
 
-Modules with a `net10.0-tvos` target: `Shiny.Core`, `Shiny.Hosting.Native`, `Shiny.BluetoothLE`, `Shiny.Net.Discovery`, `Shiny.Jobs`, `Shiny.Net.Http`, `Shiny.Push`, `Shiny.ScreenRecorder`, `Shiny.Data.Sync`. Modules with **no** tvOS target, because Apple withholds the underlying API: `Shiny.BluetoothLE.Hosting` (no peripheral role), `Shiny.Net.Wifi` (no NetworkExtension hotspot APIs), `Shiny.Locations` (no `CLMonitor` geofencing), `Shiny.Notifications`, `Shiny.Contacts`, `Shiny.Calendar`.
+Modules with a `net10.0-tvos` target: `Shiny.Core`, `Shiny.Hosting.Native`, `Shiny.BluetoothLE`, `Shiny.Net.Discovery`, `Shiny.Jobs`, `Shiny.Net.Http`, `Shiny.Push`, `Shiny.ScreenRecorder`, `Shiny.Data.Sync`. Modules with **no** tvOS target, because Apple withholds the underlying API: `Shiny.BluetoothLE.Hosting` (no peripheral role), `Shiny.Net.Wifi` (no NetworkExtension hotspot APIs), `Shiny.Gps` / `Shiny.Geofencing` / `Shiny.Locations` (no `CLMonitor` geofencing), `Shiny.Notifications`, `Shiny.Contacts`, `Shiny.Calendar`.
 
 ### Companion Libraries
 
@@ -257,7 +257,7 @@ global using Shiny.BluetoothLE;
 - **Third-party containers and keyed services** -- Prism/DryIoc and other adapters that predate .NET 8 keyed services silently ignore `[FromKeyedServices]` and resolve the plain service type instead. `AddShinyStores()` registers the default `IKeyValueStore` unkeyed as well, so Shiny's own platform types still build on those containers. In *your* code, use the static `Shiny.Stores.Secure` / `Shiny.Stores.Keyed(...)` accessor rather than `[FromKeyedServices]` for non-default stores when the app uses a non-Microsoft container — a container that drops the key will inject the wrong store (or fail with `UnableToFindCtorWithAllResolvableArgs`).
 - **Check `Host.IsInitialized`** before accessing `Host.Current` in code that may run before initialization.
 - **Use `BindingList<T>`** for thread-safe observable collections that can be bound to UI.
-- **Use the JSON contexts emitted by Shiny modules** if you mix `Shiny.Extensions.Serialization` with your own — Shiny.Jobs, Shiny.Locations, Shiny.Notifications, and Shiny.Net.Http each ship their own `JsonSerializerContext` for AOT safety.
+- **Use the JSON contexts emitted by Shiny modules** if you mix `Shiny.Extensions.Serialization` with your own — Shiny.Jobs, Shiny.Gps, Shiny.Geofencing, Shiny.Notifications, and Shiny.Net.Http each ship their own `JsonSerializerContext` for AOT safety.
 
 ## Reference Files
 

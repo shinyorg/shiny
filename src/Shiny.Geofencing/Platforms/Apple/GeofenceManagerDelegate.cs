@@ -3,7 +3,7 @@
 namespace Shiny.Locations;
 
 
-class GeofenceManagerDelegate(CLLocationGeofenceManager geofenceManager) : ShinyLocationDelegate
+class GeofenceManagerDelegate(CLLocationGeofenceManager geofenceManager) : GeofenceLocationDelegate
 {
     public override void RegionEntered(CLLocationManager manager, CLRegion region)
         => geofenceManager.OnRegionChanged(region, true);

@@ -21,6 +21,8 @@
             "src\\Shiny.Calendar.Extensions.AI\\Shiny.Calendar.Extensions.AI.csproj",
             "src\\Shiny.BluetoothLE.Blazor\\Shiny.BluetoothLE.Blazor.csproj",
             "src\\Shiny.Jobs\\Shiny.Jobs.csproj",
+            "src\\Shiny.Gps\\Shiny.Gps.csproj",
+            "src\\Shiny.Geofencing\\Shiny.Geofencing.csproj",
             "src\\Shiny.Locations\\Shiny.Locations.csproj",
             "src\\Shiny.Locations.Extensions.AI\\Shiny.Locations.Extensions.AI.csproj",
             "src\\Shiny.Locations.Blazor\\Shiny.Locations.Blazor.csproj",

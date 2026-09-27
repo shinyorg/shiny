@@ -60,7 +60,8 @@
                           ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\..\src\Shiny.Contacts\Shiny.Contacts.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Calendar\Shiny.Calendar.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Gps\Shiny.Gps.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Geofencing\Shiny.Geofencing.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
 
         <!-- AI tool surfaces (Microsoft.Extensions.AI) for the AI Assistant sample page -->

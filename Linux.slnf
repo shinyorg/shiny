@@ -16,6 +16,8 @@
       "src\\Shiny.Hosting.Native\\Shiny.Hosting.Native.csproj",
       "src\\Shiny.Jobs\\Shiny.Jobs.csproj",
       "src\\Shiny.Locations.Blazor\\Shiny.Locations.Blazor.csproj",
+      "src\\Shiny.Gps\\Shiny.Gps.csproj",
+      "src\\Shiny.Geofencing\\Shiny.Geofencing.csproj",
       "src\\Shiny.Locations\\Shiny.Locations.csproj",
       "src\\Shiny.Net.Http.Blazor\\Shiny.Net.Http.Blazor.csproj",
       "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",

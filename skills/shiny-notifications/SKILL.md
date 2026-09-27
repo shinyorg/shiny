@@ -47,7 +47,7 @@ Use this skill when the user needs to:
 | **Primary Namespace** | `Shiny.Notifications` |
 | **Registration Namespace** | `Shiny` (extension methods on `IServiceCollection`) |
 | **Platforms** | iOS, Mac Catalyst, Android, macOS, Windows, Linux |
-| **Dependencies** | `Shiny.Core`, `Shiny.Locations`, `Shiny.Support.Repositories` |
+| **Dependencies** | `Shiny.Core`, `Shiny.Geofencing` (Android only - geofence-triggered notifications), `Shiny.Support.Repositories` |
 
 ### Linux
 

@@ -1,20 +1,25 @@
-# Shiny.Locations API Reference
+# Shiny.Gps / Shiny.Geofencing API Reference
 
 ## Installation
 
 For MAUI / native targets:
 
 ```xml
-<PackageReference Include="Shiny.Locations" Version="4.*" />
+<!-- GPS, motion activity, geocoding -->
+<PackageReference Include="Shiny.Gps" Version="5.*" />
+<!-- geofencing (independent of Shiny.Gps) -->
+<PackageReference Include="Shiny.Geofencing" Version="5.*" />
+<!-- or both at once - meta-package with no code of its own -->
+<PackageReference Include="Shiny.Locations" Version="5.*" />
 ```
 
 For Blazor WebAssembly:
 
 ```xml
-<PackageReference Include="Shiny.Locations.Blazor" Version="4.*" />
+<PackageReference Include="Shiny.Locations.Blazor" Version="5.*" />
 ```
 
-The support library `Shiny.Support.Locations` is included transitively and provides the `Position` and `Distance` types.
+`Position` and `Distance` live in `Shiny.Core`, which both packages depend on. All types keep the `Shiny.Locations` namespace.
 
 > **Blazor / Web limitations.** `Shiny.Locations.Blazor` only implements `IGpsManager`, and only for foreground use via `navigator.geolocation`. There is no `IGeofenceManager` (the browser has no Geofence API), no significant-location-change API, and no way to keep the page alive in the background. Background modes on a `GpsRequest` are accepted but logged and treated as foreground; `IGpsDelegate` is invoked but only while the tab is alive.
 
@@ -450,22 +455,6 @@ public abstract class GpsDelegate(ILogger logger) : NotifyPropertyChanged, IGpsD
 - **Maximums (OR):** When `MaximumDistance` or `MaximumTime` is set, crossing *either* threshold always fires `OnGpsReading`, regardless of whether minimum thresholds are met. This is useful as a safety net to ensure readings are never suppressed for too long.
 - **Priority:** Maximum thresholds are evaluated first. If a maximum fires, minimum checks are skipped entirely.
 
-### GpsGeofenceDelegate
-
-Uses GPS readings to drive geofence state changes (entry, exit and dwell), respecting `NotifyOnEntry`/`NotifyOnExit`/`SingleUse`.
-Registered automatically by `AddGpsDirectGeofencing`, which also registers the GPS manager if `AddGps` was not called.
-
-```csharp
-namespace Shiny.Locations;
-
-public class GpsGeofenceDelegate : IGpsDelegate, IShinyStartupTask
-{
-    Dictionary<string, GeofenceState> CurrentStates { get; }
-
-    Task OnReading(GpsReading reading);
-}
-```
-
 ---
 
 ## Extension Methods
@@ -508,7 +497,7 @@ public static class LocationExtensions
 ```csharp
 namespace Shiny.Locations;
 
-public static class LocationExtensions
+public static class GeofenceExtensions   // Shiny.Geofencing
 {
     /// Starts monitoring a region only if its identifier isn't already monitored.
     /// When replaceIfExists is true (default), an existing region with the same
@@ -528,7 +517,7 @@ public static class LocationExtensions
 ```csharp
 namespace Shiny.Locations;
 
-public static class LocationExtensions
+public static class GeofenceExtensions   // Shiny.Geofencing
 {
     /// Determines if the provided position is inside the geofence region
     static bool IsPositionInside(this GeofenceRegion region, Position position);
@@ -566,12 +555,6 @@ services.AddGeofencing<MyGeofenceDelegate>();
 
 // Non-generic version
 services.AddGeofencing(typeof(MyGeofenceDelegate));
-
-// GPS-direct geofencing (uses realtime GPS, battery intensive)
-services.AddGpsDirectGeofencing<MyGeofenceDelegate>();
-
-// Non-generic version
-services.AddGpsDirectGeofencing(typeof(MyGeofenceDelegate));
 ```
 
 ### Geocoding Registration
@@ -919,7 +902,7 @@ if (access == AccessState.Available)
 - Ensure `AddGeofencing<T>()` is called in `MauiProgram.cs`.
 - Verify `RequestAccess` returns `AccessState.Available`.
 - On iOS, the system limits the number of monitored regions to 20. Check `GetMonitorRegions()` count.
-- On Android without Google Play Services, geofencing falls back to GPS-direct mode automatically.
+- On Android, geofencing requires Google Play Services - there is no GPS-direct fallback any more (`AddGpsDirectGeofencing` was removed).
 
 ### Geofence dwell arrives late on iOS
 
@@ -945,7 +928,6 @@ if (access == AccessState.Available)
 
 ### Battery drain with geofencing
 
-- Prefer `AddGeofencing<T>()` over `AddGpsDirectGeofencing<T>()`. The GPS-direct approach uses realtime GPS which is battery intensive.
 - Use `GpsBackgroundMode.Standard` instead of `Realtime` when possible. Standard mode provides 3-4 updates per hour on Android and uses significant location changes on iOS.
 
 ### Distance or Position throws on construction

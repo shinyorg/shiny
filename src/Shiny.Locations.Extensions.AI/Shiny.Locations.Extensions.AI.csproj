@@ -12,7 +12,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
-        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\Shiny.Gps\Shiny.Gps.csproj" />
+        <ProjectReference Include="..\Shiny.Geofencing\Shiny.Geofencing.csproj" />
     </ItemGroup>
 
 </Project>

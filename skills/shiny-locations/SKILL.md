@@ -1,6 +1,6 @@
 ---
 name: shiny-locations
-description: GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, and Android using Shiny.Locations
+description: GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, and Android using Shiny.Gps and Shiny.Geofencing (Shiny.Locations meta-package)
 auto_invoke: true
 triggers:
   - gps
@@ -55,6 +55,10 @@ triggers:
   - MotionActivityType
   - MotionActivityConfidence
   - AddMotionActivity
+  - Shiny.Gps
+  - Shiny.Geofencing
+  - Shiny.Locations
+  - GeofenceExtensions
 ---
 
 # Shiny Locations
@@ -81,11 +85,15 @@ Use this skill when the user needs to:
 
 | Property   | Value                        |
 |------------|------------------------------|
-| NuGet      | `Shiny.Locations` (MAUI), `Shiny.Locations.Blazor` (Blazor WASM) |
+| NuGet      | `Shiny.Gps` (GPS, motion activity, geocoding), `Shiny.Geofencing` (geofences), `Shiny.Locations` (meta-package referencing both - no code of its own), `Shiny.Locations.Blazor` (Blazor WASM GPS, depends on `Shiny.Gps`) |
 | Namespace  | `Shiny.Locations`            |
 | Platforms  | iOS, Android, Windows, Blazor WebAssembly (foreground GPS only). **No tvOS target** — `CLMonitor`, `CLMonitorConfiguration` and `CLRegionState` are absent on tvOS, so geofencing cannot be implemented there |
 | DI Namespace | `Shiny` (extension methods on `IServiceCollection`) |
-| Support Library | `Shiny.Support.Locations` (provides `Position` and `Distance`) |
+| Shared types | `Position` and `Distance` live in `Shiny.Core` (same namespaces as before: `Shiny.Locations.Position`, `Shiny.Distance`) |
+
+`Shiny.Gps` and `Shiny.Geofencing` are independent - neither references the other. Reference only the one
+you need; reference `Shiny.Locations` (or both) when you need GPS and geofencing. Every type kept the
+`Shiny.Locations` namespace, so no `using` changes are needed after switching packages.
 
 ## Setup
 
@@ -114,23 +122,24 @@ builder.Services.AddGps();
 builder.Services.AddGps<MyGpsDelegate>();
 ```
 
-Geofencing (`AddGeofencing`, `AddGpsDirectGeofencing`) is **not** available in
+Geofencing (`AddGeofencing`) is **not** available in
 `Shiny.Locations.Blazor`. For region-entry behavior on the web, evaluate regions
 server-side from GPS reports and notify the client via `Shiny.Push.Blazor`.
 
 ### Geofence Registration
 
-Register geofencing in `MauiProgram.cs`:
+Register geofencing in `MauiProgram.cs` (package `Shiny.Geofencing`):
 
 ```csharp
-using Shiny; // AddGeofencing / AddGpsDirectGeofencing live here
+using Shiny; // AddGeofencing lives here
 
 // Standard geofencing with a delegate
 services.AddGeofencing<MyGeofenceDelegate>();
-
-// GPS-direct geofencing (uses realtime GPS - battery intensive)
-services.AddGpsDirectGeofencing<MyGeofenceDelegate>();
 ```
+
+`AddGpsDirectGeofencing` is **gone** - never generate it. It was removed when geofencing moved out of the GPS
+package (the code is parked, commented out, in `Shiny.Gps`). On Android without Google Play Services there is
+no longer an automatic GPS-direct fallback.
 
 ### Geocoding Registration
 
@@ -177,7 +186,7 @@ When generating code for Shiny.Locations:
 ## Conventions
 
 - All async operations return `Task` or `Task<T>`.
-- The convenience extension methods live on `Shiny.Locations.LocationExtensions` (renamed from `Extensions` in 5.2.5 — a type named `Shiny.Locations.Extensions` collides with the `Shiny.Locations.Extensions.AI` namespace and produces CS0434 in consuming projects). They are extension methods, so call sites are unaffected.
+- The convenience extension methods live on `Shiny.Locations.LocationExtensions` (renamed from `Extensions` in 5.2.5 — a type named `Shiny.Locations.Extensions` collides with the `Shiny.Locations.Extensions.AI` namespace and produces CS0434 in consuming projects). They are extension methods, so call sites are unaffected. Since the package split, the geofence ones (`TryStartMonitoring`, `IsPositionInside`) live on `Shiny.Locations.GeofenceExtensions` in `Shiny.Geofencing`; the GPS ones stay on `LocationExtensions` in `Shiny.Gps`.
 - Foreground observation uses C# `event EventHandler<T>` on the managers (`GpsReadingReceived`, `MotionActivityReadingReceived`) — Rx is no longer used in Shiny.Locations.
 - The `GpsBackgroundMode` enum controls background behavior: `None` (foreground), `Standard` (periodic), `Realtime` (continuous).
 - `GeofenceState` enum values: `Unknown`, `Entered`, `Exited`, `Dwelling` (only for regions with a `DwellTime`).

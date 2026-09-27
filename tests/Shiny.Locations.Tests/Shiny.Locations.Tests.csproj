@@ -17,7 +17,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Gps\Shiny.Gps.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Geofencing\Shiny.Geofencing.csproj" />
     </ItemGroup>
 
 </Project>

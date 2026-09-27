@@ -1,28 +1,29 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
+    <!--
+        Meta-package: Shiny.Locations was split into Shiny.Gps (GPS, motion activity, geocoding) and
+        Shiny.Geofencing. This package ships no assembly of its own - it only depends on both, so existing
+        apps keep working by updating the version. The types kept the Shiny.Locations namespace.
+    -->
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
-        
-        <Description>Shiny Locations - bringing geofencing and GPS to a background service near you!</Description>
+
+        <Description>Shiny Locations - meta-package that brings in Shiny.Gps (GPS, motion activity, geocoding) and Shiny.Geofencing</Description>
+        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeSymbols>false</IncludeSymbols>
+        <IncludeSource>false</IncludeSource>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <!-- NU5128: dependency groups with no matching lib folder - expected for a meta-package -->
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Shiny.Extensions.Serialization" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-        <PackageReference Include="Xamarin.GooglePlayServices.Location" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Android" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx.Android" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" />
+        <ProjectReference Include="..\Shiny.Gps\Shiny.Gps.csproj" />
+        <ProjectReference Include="..\Shiny.Geofencing\Shiny.Geofencing.csproj" />
     </ItemGroup>
 </Project>

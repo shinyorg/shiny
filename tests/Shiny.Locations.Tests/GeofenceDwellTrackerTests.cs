@@ -368,13 +368,13 @@ public class GeofenceDwellTrackerTests
     public void DwellTime_RoundTripsThroughJsonContext()
     {
         var region = new GeofenceRegion("x", new Position(1, 2), Distance.FromMeters(100), true, false, true) { DwellTime = Dwell };
-        var json = JsonSerializer.Serialize(region, ShinyLocationsJsonContext.Default.GeofenceRegion);
-        var back = JsonSerializer.Deserialize(json, ShinyLocationsJsonContext.Default.GeofenceRegion);
+        var json = JsonSerializer.Serialize(region, ShinyGeofencingJsonContext.Default.GeofenceRegion);
+        var back = JsonSerializer.Deserialize(json, ShinyGeofencingJsonContext.Default.GeofenceRegion);
 
         Assert.Equal(region, back);
         Assert.Equal(Dwell, back!.DwellTime);
 
-        var legacy = JsonSerializer.Deserialize("""{"Identifier":"old","Center":{"Latitude":1,"Longitude":2},"Radius":{"TotalMeters":100}}""", ShinyLocationsJsonContext.Default.GeofenceRegion);
+        var legacy = JsonSerializer.Deserialize("""{"Identifier":"old","Center":{"Latitude":1,"Longitude":2},"Radius":{"TotalMeters":100}}""", ShinyGeofencingJsonContext.Default.GeofenceRegion);
         Assert.Null(legacy!.DwellTime);
     }
 
