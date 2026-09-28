@@ -37,6 +37,19 @@ public record HttpTransferRequest(
     /// </summary>
     public string FileFormDataName { get; set; } = "file";
 
+    /// <summary>
+    /// tus only (<see cref="TransferType.UploadTus"/>) - metadata sent in the <c>Upload-Metadata</c> header
+    /// when the upload is created. Keys must not contain spaces or commas; values are base64-encoded for you.
+    /// </summary>
+    public IDictionary<string, string>? TusMetadata { get; set; }
+
+    /// <summary>
+    /// tus only (<see cref="TransferType.UploadTus"/>) - the maximum number of bytes sent in one <c>PATCH</c>.
+    /// Null sends the rest of the file in a single request. Smaller chunks mean less is re-sent after an
+    /// interruption, at the cost of one round trip per chunk.
+    /// </summary>
+    public long? TusChunkSize { get; set; }
+
     //public void SetAuthHeader(string authType, string authValue)
     //    this.Headers.Add("Authentication", $"{authType} {authValue}");
 
@@ -63,7 +76,12 @@ public enum TransferType
     /// <summary>Upload sent as a raw request body.</summary>
     UploadRaw,
     /// <summary>Download from a remote endpoint into a local file.</summary>
-    Download
+    Download,
+    /// <summary>
+    /// Resumable upload using the tus protocol (https://tus.io). <see cref="HttpTransferRequest.Uri"/> is the
+    /// server's creation endpoint; interrupted or paused uploads continue from the offset the server reports.
+    /// </summary>
+    UploadTus
 }
 
 /// <summary>
@@ -84,6 +102,12 @@ public record HttpTransfer(
 {
     /// <inheritdoc />
     public string Identifier => this.Request.Identifier;
+
+    /// <summary>
+    /// tus only - the upload URL the server returned when the upload was created. Persisted so an
+    /// interrupted upload continues against the same server-side resource instead of starting over.
+    /// </summary>
+    public string? TusUploadUri { get; init; }
 };
 
 /// <summary>

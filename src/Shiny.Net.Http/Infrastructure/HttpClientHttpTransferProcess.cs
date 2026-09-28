@@ -200,6 +200,12 @@ public class HttpClientHttpTransferProcess(
             ));
             repository.Remove(transfer);
         }
+        catch (HttpRequestException ex) when (transfer.Request.Type == TransferType.UploadTus && ex.StatusCode == null)
+        {
+            // no HTTP status means the connection failed, not the server - a tus upload resumes from the
+            // server's offset on the next pass instead of failing
+            this.PauseTransfer(transfer, "Network Disconnected", ex);
+        }
         catch (HttpRequestException ex)
         {
             repository.Remove(transfer);
@@ -240,9 +246,12 @@ public class HttpClientHttpTransferProcess(
     void PauseTransfer(HttpTransfer transfer, string reason, Exception exception)
     {
         logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
-        if (repository.Exists<HttpTransfer>(transfer.Identifier))
+
+        // re-read so state persisted during the attempt (such as a tus upload URL) isn't overwritten
+        var current = repository.Get<HttpTransfer>(transfer.Identifier);
+        if (current != null)
         {
-            repository.Set(transfer with
+            repository.Set(current with
             {
                 Status = HttpTransferState.PausedByNoNetwork
             });
@@ -255,6 +264,10 @@ public class HttpClientHttpTransferProcess(
         if (transfer.Request.Type == TransferType.Download)
         {
             await this.DoDownload(transfer, cancelToken).ConfigureAwait(false);
+        }
+        else if (transfer.Request.Type == TransferType.UploadTus)
+        {
+            await this.DoTusUpload(transfer, cancelToken).ConfigureAwait(false);
         }
         else
         {
@@ -290,6 +303,99 @@ public class HttpClientHttpTransferProcess(
             x => this.PublishProgress(transfer, x),
             cancelToken
         ).ConfigureAwait(false);
+    }
+
+
+    async Task DoTusUpload(HttpTransfer transfer, CancellationToken cancelToken)
+    {
+        var request = transfer.Request;
+        var uploadLength = new FileInfo(request.LocalFilePath).Length;
+        var uploadUri = transfer.TusUploadUri;
+        long offset = 0;
+
+        if (uploadUri != null)
+        {
+            var serverOffset = await TusProtocol
+                .GetOffset(this.httpClient, request, uploadUri, cancelToken)
+                .ConfigureAwait(false);
+
+            if (serverOffset == null)
+            {
+                logger.StandardInfo(request.Identifier, "tus upload no longer exists on the server - creating it again");
+                uploadUri = null;
+            }
+            else
+            {
+                offset = serverOffset.Value;
+                logger.StandardInfo(request.Identifier, $"Resuming tus upload from byte {offset}");
+            }
+        }
+
+        if (uploadUri == null)
+        {
+            uploadUri = await TusProtocol
+                .Create(this.httpClient, request, uploadLength, cancelToken)
+                .ConfigureAwait(false);
+
+            logger.StandardInfo(request.Identifier, $"Created tus upload {uploadUri}");
+            var current = repository.Get<HttpTransfer>(request.Identifier);
+            if (current == null)
+                throw new OperationCanceledException("Transfer was removed");
+
+            transfer = current with { TusUploadUri = uploadUri };
+            repository.Set(transfer);
+        }
+
+        var stop = Stopwatch.StartNew();
+        var totalSince = 0L;
+        var conflicts = 0;
+        this.PublishProgress(transfer, new TransferProgress(0, uploadLength, offset));
+
+        while (offset < uploadLength)
+        {
+            var chunkStart = offset;
+            var chunkSent = 0L;
+            var count = TusProtocol.GetChunkLength(request, offset, uploadLength);
+
+            var newOffset = await TusProtocol.Patch(
+                this.httpClient,
+                request,
+                uploadUri,
+                offset,
+                count,
+                sent =>
+                {
+                    chunkSent += sent;
+                    totalSince += sent;
+                    if (stop.Elapsed.TotalSeconds > 2)
+                    {
+                        var bps = Convert.ToInt64(totalSince / stop.Elapsed.TotalSeconds);
+                        this.PublishProgress(transfer, new TransferProgress(bps, uploadLength, chunkStart + chunkSent));
+                        totalSince = 0;
+                        stop.Restart();
+                    }
+                },
+                cancelToken
+            ).ConfigureAwait(false);
+
+            if (newOffset == null)
+            {
+                // 409 - the server's offset differs from ours (e.g. a previous PATCH landed after we gave up on it)
+                conflicts++;
+                if (conflicts > 3)
+                    throw new HttpRequestException("tus server kept rejecting the upload offset", null, HttpStatusCode.Conflict);
+
+                offset = await TusProtocol
+                    .GetOffset(this.httpClient, request, uploadUri, cancelToken)
+                    .ConfigureAwait(false) ?? throw new HttpRequestException("tus upload no longer exists on the server", null, HttpStatusCode.NotFound);
+            }
+            else
+            {
+                conflicts = 0;
+                offset = newOffset.Value;
+            }
+        }
+        this.PublishProgress(transfer, new TransferProgress(0, uploadLength, uploadLength));
     }
 
 
@@ -397,7 +503,7 @@ public class HttpClientHttpTransferProcess(
         if (current == null || current.Status == HttpTransferState.Paused)
             return;
 
-        repository.Set(transfer with
+        repository.Set(current with
         {
             Status = HttpTransferState.InProgress,
             BytesToTransfer = progress.BytesToTransfer,

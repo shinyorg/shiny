@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Foundation;
@@ -31,12 +32,17 @@ static class PlatformExtensions
         => (int)((task.Response as NSHttpUrlResponse)?.StatusCode ?? 0);
 
 
-    public static NSMutableUrlRequest ToNative(this HttpTransferRequest request)
+    public static NSMutableUrlRequest ToNative(
+        this HttpTransferRequest request,
+        string? uri = null,
+        string? httpMethod = null,
+        IDictionary<string, string>? extraHeaders = null
+    )
     {
-        var url = NSUrl.FromString(request.Uri)!;
+        var url = NSUrl.FromString(uri ?? request.Uri)!;
         var native = new NSMutableUrlRequest(url)
         {
-            HttpMethod = request.GetHttpMethod().Method,
+            HttpMethod = httpMethod ?? request.GetHttpMethod().Method,
             AllowsExpensiveNetworkAccess = request.UseMeteredConnection
         };
 
@@ -53,14 +59,62 @@ static class PlatformExtensions
             native.Body = NSData.FromString(request.HttpContent.Content); //, NSStringEncoding.UTF8);
         }
 
-        if (request.Headers?.Any() ?? false)
+        var headers = new Dictionary<string, string>();
+        if (request.Headers != null)
+        {
+            foreach (var header in request.Headers)
+                headers[header.Key] = header.Value;
+        }
+        if (extraHeaders != null)
+        {
+            foreach (var header in extraHeaders)
+                headers[header.Key] = header.Value;
+        }
+
+        if (headers.Count > 0)
         {
             native.Headers = NSDictionary.FromObjectsAndKeys(
-                request.Headers.Values.ToArray(),
-                request.Headers.Keys.ToArray()
+                headers.Values.ToArray(),
+                headers.Keys.ToArray()
             );
         }
         return native;
+    }
+
+
+    /// <summary>
+    /// Reads a header from a task's response (case-insensitive, as HTTP headers are).
+    /// </summary>
+    public static string? GetResponseHeader(this NSUrlSessionTask task, string name)
+    {
+        var fields = (task.Response as NSHttpUrlResponse)?.AllHeaderFields;
+        if (fields == null)
+            return null;
+
+        foreach (var key in fields.Keys)
+        {
+            if (String.Equals(key.ToString(), name, StringComparison.OrdinalIgnoreCase))
+                return fields[key]?.ToString();
+        }
+        return null;
+    }
+
+
+    /// <summary>
+    /// Reads a header this task was sent with.
+    /// </summary>
+    public static string? GetRequestHeader(this NSUrlSessionTask task, string name)
+    {
+        var headers = task.OriginalRequest?.Headers;
+        if (headers == null)
+            return null;
+
+        foreach (var key in headers.Keys)
+        {
+            if (String.Equals(key.ToString(), name, StringComparison.OrdinalIgnoreCase))
+                return headers[key]?.ToString();
+        }
+        return null;
     }
 
 

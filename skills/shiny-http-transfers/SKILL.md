@@ -19,6 +19,11 @@ triggers:
   - aws s3 upload
   - s3 upload
   - AwsS3UploadRequest
+  - tus
+  - tus upload
+  - resumable upload
+  - TusUploadRequest
+  - UploadTus
   - multipart upload
   - download file
   - upload file
@@ -208,7 +213,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 ### Pausing & Resuming
 
 - Call `transferManager.Pause(identifier)` to stop a transfer **without cancelling it**. The transfer stays in the queue and reports `HttpTransferState.Paused`. Use this instead of `Cancel(identifier)` (which removes the transfer and deletes a download's partial file) when the user may want to continue later.
-- Call `transferManager.Resume(identifier)` to continue a paused transfer. **Downloads** resume from where they left off (HTTP Range on managed platforms; native `NSUrlSessionTask.Resume()` on iOS/Mac Catalyst). **Uploads** are not resumable — resuming an upload restarts it from the beginning.
+- Call `transferManager.Resume(identifier)` to continue a paused transfer. **Downloads** resume from where they left off (HTTP Range on managed platforms; native `NSUrlSessionTask.Resume()` on iOS/Mac Catalyst). **Uploads** are not resumable — resuming an upload restarts it from the beginning — **except tus uploads** (`TransferType.UploadTus`), which continue from the offset the server reports.
 - A user-paused transfer is not auto-resumed when the app relaunches or when connectivity returns; it stays paused until you call `Resume`.
 
 ### Building Requests
@@ -217,6 +222,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 - Use `TransferHttpContent.FromFormData(...)` to attach form-encoded data.
 - Use `AzureBlobStorageUploadRequest` for Azure Blob Storage uploads -- call `.WithBlobContainer(tenant, container)` or `.WithCustomUri(uri)`, configure auth via `.WithSasToken()` or `.WithSharedKeyAuthorization()`, then call `.Build()` to get an `HttpTransferRequest`.
 - Use `AwsS3UploadRequest` for AWS S3 uploads -- call `.WithBucket(bucket, region)`, configure auth via `.WithPresignedUrl()` or `.WithCredentials(accessKeyId, secretAccessKey)`, optionally set `.WithObjectKey()`, `.WithContentType()`, `.WithStorageClass()`, then call `.Build()` to get an `HttpTransferRequest`. Uses AWS Signature V4 signing with `UNSIGNED-PAYLOAD` -- no AWS SDK required.
+- Use `TusUploadRequest` for **resumable uploads** to a tus server -- `.WithEndpoint(creationUri)`, optionally `.WithMetadata(key, value)`, `.WithBearerToken(token)` / `.WithHeader(...)`, `.WithChunkSize(bytes)`, then `.Build()`. Queue it like any transfer; no extra registration. Pauses, network drops and app restarts resume from the server's `Upload-Offset` (a dropped connection reports `PausedByNoNetwork`, not an error). Don't set `HttpContent` on a tus request (it throws) -- send values as metadata. Not supported on Blazor WASM. On iOS each chunk is a background upload task copied to a temp file, so recommend `WithChunkSize` for very large files. Prefer tus over `UploadRaw`/`UploadMultipart` whenever the server supports it and files are large or connections unreliable.
 - Use `AppleHttpTransferRequest` (inherits `HttpTransferRequest`) when Apple-specific options are needed (e.g., `AllowsConstrainedNetworkAccess`, `AllowsCellularAccess`, `AssumesHttp3Capable`).
 
 ### Foreground (Non-Background) Transfers

@@ -120,7 +120,8 @@ public enum TransferType
 {
     UploadMultipart,  // Upload as multipart/form-data
     UploadRaw,        // Upload the file body directly (raw stream)
-    Download           // Download a file
+    Download,          // Download a file
+    UploadTus          // Resumable upload via the tus protocol - Uri is the server's creation endpoint
 }
 ```
 
@@ -166,6 +167,12 @@ public record HttpTransferRequest(
     // The form data field name for the file in multipart uploads (default: "file")
     public string FileFormDataName { get; set; } = "file";
 
+    // tus only - Upload-Metadata sent when the upload is created (values are base64-encoded for you)
+    public IDictionary<string, string>? TusMetadata { get; set; }
+
+    // tus only - max bytes per PATCH; null sends the rest of the file in one request
+    public long? TusChunkSize { get; set; }
+
     // Returns the resolved HttpMethod based on Type and HttpMethod property
     public HttpMethod GetHttpMethod();
 }
@@ -185,6 +192,9 @@ public record HttpTransfer(
 ) : IRepositoryEntity
 {
     public string Identifier => this.Request.Identifier;
+
+    // tus only - the upload URL the server returned on creation; persisted so a resume continues the same upload
+    public string? TusUploadUri { get; init; }
 }
 ```
 
@@ -505,6 +515,44 @@ public class AwsS3UploadRequest(string localFilePath)
 
 ---
 
+## tus Resumable Upload Helper
+
+### TusUploadRequest
+
+Fluent builder for a resumable upload to any tus 1.0.0 server with the creation extension (tusd, tusdotnet,
+Cloudflare Stream, Vimeo, Supabase). Produces an `HttpTransferRequest` of type `TransferType.UploadTus`.
+
+```csharp
+public class TusUploadRequest(string localFilePath)
+{
+    public string LocalFilePath { get; }
+    public string? Identifier { get; set; }
+    public string? Endpoint { get; set; }
+    public bool UseMeteredConnection { get; set; }
+    public long? ChunkSize { get; set; }
+    public bool IncludeFileName { get; set; } = true;      // sends "filename" metadata
+    public Dictionary<string, string> Metadata { get; }
+    public Dictionary<string, string> Headers { get; }       // sent on every tus request
+
+    public TusUploadRequest WithEndpoint(string endpoint);  // required - the creation endpoint
+    public TusUploadRequest WithMetadata(string key, string value); // keys: no spaces/commas
+    public TusUploadRequest WithChunkSize(long bytes);
+    public TusUploadRequest WithoutFileName();
+    public TusUploadRequest WithMeteredConnection();
+    public TusUploadRequest WithHeader(string key, string value);
+    public TusUploadRequest WithBearerToken(string token);
+
+    public HttpTransferRequest Build();                     // throws if endpoint invalid or file missing
+}
+```
+
+Behaviour: POST creates the upload (Location saved to `HttpTransfer.TusUploadUri`), PATCH sends the file,
+and after a pause/network drop/restart a HEAD reads `Upload-Offset` and sending continues from there. Network
+drops set `PausedByNoNetwork` (not an error); HTTP 4xx/5xx fail via `OnError`; an expired upload (404/410/403)
+is recreated. Blazor WASM throws `NotSupportedException`.
+
+---
+
 ## Extension Methods
 
 ### HttpTransferExtensions
@@ -516,7 +564,7 @@ public static class HttpTransferExtensions
     // Throws InvalidOperationException or ArgumentException on failure
     public static void AssertValid(this HttpTransferRequest request);
 
-    // Returns true if the TransferType is an upload (UploadMultipart or UploadRaw)
+    // Returns true if the TransferType is an upload (UploadMultipart, UploadRaw or UploadTus)
     public static bool IsUpload(this TransferType type);
 
     // Awaits a specific transfer by identifier to completion and returns the final result.

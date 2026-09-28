@@ -65,6 +65,8 @@ public class HttpTransferManager(
     public async Task<HttpTransfer> Queue(HttpTransferRequest request)
     {
         request.AssertValid();
+        if (request.Type == TransferType.UploadTus)
+            throw new NotSupportedException("tus uploads are not supported on Blazor WebAssembly - the Service Worker sends each transfer as a single request");
 
         var mod = await this.EnsureInit().ConfigureAwait(false);
 

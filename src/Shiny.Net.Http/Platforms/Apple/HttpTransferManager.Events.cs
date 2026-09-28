@@ -20,6 +20,12 @@ public partial class HttpTransferManager
         }
         else
         {
+            if (ht.Request.Type == TransferType.UploadTus)
+            {
+                // the task only knows about its own chunk - place it within the whole file
+                totalBytesSent += GetTusChunkOffset(task);
+                totalBytesExpectedToSend = ht.BytesToTransfer ?? totalBytesExpectedToSend;
+            }
             logger.TransferProgress(id, totalBytesSent, totalBytesExpectedToSend);
 
             ht = ht with
@@ -193,6 +199,9 @@ public partial class HttpTransferManager
 
             case NSUrlSessionTaskState.Completed:
             default:
+                if (this.TryCompleteTusChunk(ht, task))
+                    break;
+
                 var statusCode = task.GetStatusCode();
 
                 if (task.Error != null)

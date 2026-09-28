@@ -12,8 +12,8 @@ namespace Shiny.Net.Http;
 public static class HttpTransferExtensions
 {
     /// <summary>
-    /// Throws if the given <see cref="HttpTransferRequest"/> is missing an identifier
-    /// or, for uploads, the local file does not exist.
+    /// Throws if the given <see cref="HttpTransferRequest"/> is missing an identifier,
+    /// for uploads, the local file does not exist, or a tus upload carries <see cref="HttpTransferRequest.HttpContent"/>.
     /// </summary>
     /// <param name="request">The request to validate.</param>
     public static void AssertValid(this HttpTransferRequest request)
@@ -26,6 +26,9 @@ public static class HttpTransferExtensions
             if (!File.Exists(request.LocalFilePath))
                 throw new ArgumentException($"{request.LocalFilePath} does not exist");
         }
+
+        if (request.Type == TransferType.UploadTus && request.HttpContent != null)
+            throw new InvalidOperationException("HttpContent cannot be sent for tus uploads - use TusMetadata");
     }
 
 

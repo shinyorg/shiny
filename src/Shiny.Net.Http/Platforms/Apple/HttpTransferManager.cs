@@ -50,6 +50,24 @@ public partial class HttpTransferManager(
                 if (ht?.Status != HttpTransferState.Paused)
                     task.Resume();
             }
+
+            // a tus upload between chunks (or waiting out a network drop) has no native task - pick it back up
+            var running = tasks
+                .Select(x => x.TaskDescription)
+                .Where(x => x != null)
+                .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+
+            var tusTransfers = repository
+                .GetAll<HttpTransfer>()
+                .Where(x =>
+                    x.Request.Type == TransferType.UploadTus &&
+                    x.Status != HttpTransferState.Paused &&
+                    !running.Contains(x.Identifier)
+                )
+                .ToList();
+
+            foreach (var ht in tusTransfers)
+                _ = this.ContinueTus(ht.Identifier);
         }
         catch (Exception ex)
         {
@@ -107,6 +125,17 @@ public partial class HttpTransferManager(
         request.AssertValid();
         try
         {
+            if (request.Type == TransferType.UploadTus)
+            {
+                if (request.HttpContent != null)
+                    throw new InvalidOperationException("HttpContent cannot be sent for tus uploads");
+
+                var tus = new HttpTransfer(request, new FileInfo(request.LocalFilePath).Length, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
+                repository.Insert(tus);
+                _ = this.ContinueTus(request.Identifier);
+                return tus;
+            }
+
             var transfer = new HttpTransfer(request, 0, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
             repository.Insert(transfer);
 
@@ -146,7 +175,14 @@ public partial class HttpTransferManager(
             );
 
         if (task != null)
+        {
             task.Cancel();
+        }
+        else if (repository.Get<HttpTransfer>(identifier) is { Request.Type: TransferType.UploadTus } tus)
+        {
+            // between tus chunks there is no native task to cancel
+            this.OnCancel(tus);
+        }
     }
 
 
@@ -176,14 +212,29 @@ public partial class HttpTransferManager(
     public async Task Resume(string identifier)
     {
         var ht = repository.Get<HttpTransfer>(identifier);
-        if (ht == null || ht.Status != HttpTransferState.Paused)
+        if (ht == null)
+            return;
+
+        var isTus = ht.Request.Type == TransferType.UploadTus;
+        if (ht.Status != HttpTransferState.Paused && !(isTus && ht.Status == HttpTransferState.PausedByNoNetwork))
             return;
 
         var task = await this.GetTask(identifier).ConfigureAwait(false);
         if (task != null && task.State == NSUrlSessionTaskState.Suspended)
+        {
             task.Resume();
-
-        repository.Set(ht with { Status = HttpTransferState.InProgress });
+            repository.Set(ht with { Status = HttpTransferState.InProgress });
+        }
+        else if (isTus && task == null)
+        {
+            // paused between chunks - ask the server where it got to and continue
+            repository.Set(ht with { Status = HttpTransferState.Pending });
+            await this.ContinueTus(identifier).ConfigureAwait(false);
+        }
+        else
+        {
+            repository.Set(ht with { Status = HttpTransferState.InProgress });
+        }
     }
 
 
@@ -200,6 +251,20 @@ public partial class HttpTransferManager(
         var tasks = await this.Session.GetAllTasksAsync();
         foreach (var task in tasks)
             task.Cancel();
+
+        // tus uploads between chunks have no native task to cancel
+        var running = tasks
+            .Select(x => x.TaskDescription)
+            .Where(x => x != null)
+            .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+
+        var idleTus = repository
+            .GetAll<HttpTransfer>()
+            .Where(x => x.Request.Type == TransferType.UploadTus && !running.Contains(x.Identifier))
+            .ToList();
+
+        foreach (var ht in idleTus)
+            this.OnCancel(ht);
     }
 
 
