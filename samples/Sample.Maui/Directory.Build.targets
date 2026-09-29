@@ -1,0 +1,22 @@
+<Project>
+    <!-- keep the repo-wide targets (versioning, Platforms/ compile items) -->
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+
+    <!--
+        NuGet consumers of Shiny.AppFunctions get Shiny.AppFunctions.targets from buildTransitive/ and the MSBuild task
+        from tasks/. This app uses project references, so both are wired up here instead - imported after the project,
+        like NuGet's targets, because they read properties (AndroidApplication) the platform SDKs set.
+    -->
+    <PropertyGroup>
+        <ShinyAppFunctionsTasksDir>$(MSBuildThisFileDirectory)../../src/Shiny.AppFunctions.Build/bin/$(Configuration)/</ShinyAppFunctionsTasksDir>
+    </PropertyGroup>
+    <Import Project="$(MSBuildThisFileDirectory)../../src/Shiny.AppFunctions/buildTransitive/Shiny.AppFunctions.targets" />
+
+    <!-- a ProjectReference to the task would break the iOS SDK's publish step, so it is built on demand -->
+    <Target Name="_BuildShinyAppFunctionsTask" BeforeTargets="ShinyAppFunctionsExtract" Condition="'$(_ShinyAFIsApp)' == 'true'">
+        <MSBuild Projects="$(MSBuildThisFileDirectory)../../src/Shiny.AppFunctions.Build/Shiny.AppFunctions.Build.csproj"
+                 Targets="Restore;Build"
+                 Properties="Configuration=$(Configuration)"
+                 RemoveProperties="TargetFramework;RuntimeIdentifier" />
+    </Target>
+</Project>

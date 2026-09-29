@@ -120,6 +120,16 @@
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
         <ProjectReference Include="..\Sample.Shared.Maui\Sample.Shared.Maui.csproj" />
+
+        <!--
+            App Functions: [AppFunction] records must live in the app project, because that is the only one the
+            generator scans. A ProjectReference does not carry the analyzer a PackageReference would, so it is wired
+            up explicitly; the build targets and task come in through Directory.Build.targets next to this file.
+        -->
+        <ProjectReference Include="..\..\src\Shiny.AppFunctions\Shiny.AppFunctions.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AppFunctions.SourceGenerators\Shiny.AppFunctions.SourceGenerators.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

@@ -48,7 +48,10 @@
             "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
             "src\\Shiny.Gamepad.Linux\\Shiny.Gamepad.Linux.csproj",
             "src\\Shiny.Gamepad.Blazor\\Shiny.Gamepad.Blazor.csproj",
-            "src\\Shiny.Wearables\\Shiny.Wearables.csproj"
+            "src\\Shiny.Wearables\\Shiny.Wearables.csproj",
+            "src\\Shiny.AppFunctions\\Shiny.AppFunctions.csproj",
+            "src\\Shiny.AppFunctions.SourceGenerators\\Shiny.AppFunctions.SourceGenerators.csproj",
+            "src\\Shiny.AppFunctions.Build\\Shiny.AppFunctions.Build.csproj"
         ]
     }
 }

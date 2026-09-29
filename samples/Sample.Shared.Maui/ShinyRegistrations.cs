@@ -126,6 +126,14 @@ public static class ShinyRegistrations
         s.AddSsdp();
         s.AddWsDiscovery();
 
+#if IOS || ANDROID
+        // App Functions: the orders "backend" behind the functions Siri and Gemini call. The functions themselves,
+        // and AddAppFunctions(), live in the app head (Sample.Maui) - the generator only scans the app project.
+        s.AddSingleton<Sample.Shared.Maui.Services.Orders.OrderStore>();
+        s.AddSingleton<Sample.Shared.Maui.Services.Orders.SignInState>();
+        s.AddSingleton<Sample.Shared.Maui.Services.Orders.InvocationLog>();
+#endif
+
 #if !(PLATFORM && MACOS)
         // Jobs: iOS, Android, MacCatalyst, Windows (in-proc COM-activated), and bare .NET (in-proc).
         // MacOS does not expose a background-task scheduler we wrap today.

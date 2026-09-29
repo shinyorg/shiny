@@ -75,6 +75,8 @@
         <ProjectReference Include="..\..\src\Shiny.Net.Wifi\Shiny.Net.Wifi.csproj" />
         <ProjectReference Include="..\..\src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
+        <!-- the App Functions page reads the registry and runs functions through the dispatcher; the functions are in Sample.Maui -->
+        <ProjectReference Include="..\..\src\Shiny.AppFunctions\Shiny.AppFunctions.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
     </ItemGroup>
 

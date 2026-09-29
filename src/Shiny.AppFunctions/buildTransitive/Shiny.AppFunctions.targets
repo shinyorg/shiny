@@ -1,0 +1,153 @@
+<Project>
+  <!--
+    Shiny.AppFunctions build integration (apps only; libraries that reference Shiny.AppFunctions are left alone).
+
+    1. After CoreCompile, the ExtractAppFunctionsManifest task reads the generator's constants from the compiled
+       assembly and writes the Swift intents and the Android schema into obj/.../shinyaf/.
+    2. iOS:     swiftc compiles them with the runtime (swift/ShinyAppFunctions.swift) into a static lib, force-loaded
+                through NativeReference; before codesign, appintentsmetadataprocessor + appintentsnltrainingprocessor
+                write Metadata.appintents (actions, entities, App Shortcuts, Siri phrases) into the .app.
+                Flags were taken from an Xcode 27 build log of an equivalent Swift app.
+    3. Android: the two generated XML files and the schema XSD become assets; the service itself comes from
+                Shiny.AppFunctions' own AndroidManifest.xml through the manifest merger.
+
+    Properties:
+      ShinyAppFunctionsEnabled=false             skip all of this
+      ShinyAppFunctionsMinimumOSVersion          iOS deployment target for the Swift (default: SupportedOSPlatformVersion, at least 16.0)
+      ShinyAppFunctionsConstProtocolsFile        swiftc's const-extraction protocol list (default: the Xcode 27 list shipped here)
+      ShinyAppFunctionsDevelopmentRegion         added to Info.plist when it has no CFBundleDevelopmentRegion (default: en)
+  -->
+  <PropertyGroup>
+    <_ShinyAFPlatform>$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))</_ShinyAFPlatform>
+    <!-- the Android SDK turns an app's OutputType into Library and marks it with AndroidApplication -->
+    <_ShinyAFIsApp Condition="'$(_ShinyAFPlatform)' == 'ios' and '$(OutputType)' == 'Exe'">true</_ShinyAFIsApp>
+    <_ShinyAFIsApp Condition="'$(_ShinyAFPlatform)' == 'android' and '$(AndroidApplication)' == 'true'">true</_ShinyAFIsApp>
+    <_ShinyAFIsApp Condition="'$(ShinyAppFunctionsEnabled)' == 'false'"></_ShinyAFIsApp>
+    <ShinyAppFunctionsTasksDir Condition="'$(ShinyAppFunctionsTasksDir)' == ''">$(MSBuildThisFileDirectory)../tasks/</ShinyAppFunctionsTasksDir>
+    <_ShinyAFTaskAssembly Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ShinyAppFunctionsTasksDir)net8.0/Shiny.AppFunctions.Build.dll</_ShinyAFTaskAssembly>
+    <_ShinyAFTaskAssembly Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ShinyAppFunctionsTasksDir)net472/Shiny.AppFunctions.Build.dll</_ShinyAFTaskAssembly>
+  </PropertyGroup>
+
+  <!-- computed at build time: RuntimeIdentifier and IntermediateOutputPath are not final when this file is evaluated -->
+  <Target Name="_ShinyAppFunctionsPaths" Condition="'$(_ShinyAFIsApp)' == 'true'">
+    <PropertyGroup>
+      <_ShinyAFDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(IntermediateOutputPath)shinyaf/'))</_ShinyAFDir>
+      <_ShinyAFSwiftFile>$(_ShinyAFDir)ShinyAppFunctions.Generated.swift</_ShinyAFSwiftFile>
+      <_ShinyAFAndroidV1>$(_ShinyAFDir)app_functions.xml</_ShinyAFAndroidV1>
+      <_ShinyAFAndroidV2>$(_ShinyAFDir)app_functions_v2.xml</_ShinyAFAndroidV2>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(_ShinyAFPlatform)' == 'ios'">
+      <_ShinyAFIsSimulator Condition="$(RuntimeIdentifier.StartsWith('iossimulator'))">true</_ShinyAFIsSimulator>
+      <_ShinyAFSdk Condition="'$(_ShinyAFIsSimulator)' == 'true'">iphonesimulator</_ShinyAFSdk>
+      <_ShinyAFSdk Condition="'$(_ShinyAFIsSimulator)' != 'true'">iphoneos</_ShinyAFSdk>
+      <_ShinyAFArch Condition="$(RuntimeIdentifier.EndsWith('x64'))">x86_64</_ShinyAFArch>
+      <_ShinyAFArch Condition="'$(_ShinyAFArch)' == ''">arm64</_ShinyAFArch>
+      <_ShinyAFTriple>$(_ShinyAFArch)-apple-ios$(ShinyAppFunctionsMinimumOSVersion)</_ShinyAFTriple>
+      <_ShinyAFTriple Condition="'$(_ShinyAFIsSimulator)' == 'true'">$(_ShinyAFTriple)-simulator</_ShinyAFTriple>
+      <_ShinyAFLib>$(_ShinyAFDir)lib$(_ShinyAFModule).a</_ShinyAFLib>
+      <_ShinyAFConstValues>$(_ShinyAFDir)$(_ShinyAFModule).swiftconstvalues</_ShinyAFConstValues>
+    </PropertyGroup>
+  </Target>
+
+  <UsingTask TaskName="Shiny.AppFunctions.Build.ExtractAppFunctionsManifest" AssemblyFile="$(_ShinyAFTaskAssembly)" Condition="'$(_ShinyAFIsApp)' == 'true'" />
+
+  <Target Name="ShinyAppFunctionsExtract"
+          AfterTargets="CoreCompile"
+          DependsOnTargets="_ShinyAppFunctionsPaths"
+          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <ExtractAppFunctionsManifest Assembly="@(IntermediateAssembly->'%(FullPath)')" OutputDirectory="$(_ShinyAFDir)">
+      <Output TaskParameter="HasFunctions" PropertyName="ShinyAppFunctionsHasFunctions" />
+    </ExtractAppFunctionsManifest>
+  </Target>
+
+  <!-- ============================== Android ============================== -->
+
+  <Target Name="ShinyAppFunctionsAndroidAssets"
+          AfterTargets="ShinyAppFunctionsExtract"
+          DependsOnTargets="_ShinyAppFunctionsPaths"
+          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'android' and '$(DesignTimeBuild)' != 'true'">
+    <!-- collected by UpdateAndroidAssets during packaging (_CreateBaseApk), which runs after compile -->
+    <ItemGroup>
+      <AndroidAsset Include="$(_ShinyAFAndroidV1)" Link="app_functions.xml" />
+      <AndroidAsset Include="$(_ShinyAFAndroidV2)" Link="app_functions_v2.xml" />
+      <AndroidAsset Include="$(MSBuildThisFileDirectory)app_functions_schema.xsd" Link="app_functions_schema.xsd" />
+    </ItemGroup>
+  </Target>
+
+  <!-- ================================ iOS ================================ -->
+
+  <PropertyGroup Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios'">
+    <ShinyAppFunctionsMinimumOSVersion Condition="'$(ShinyAppFunctionsMinimumOSVersion)' == '' and '$(SupportedOSPlatformVersion)' != '' and $([MSBuild]::VersionGreaterThanOrEquals('$(SupportedOSPlatformVersion)', '16.0'))">$(SupportedOSPlatformVersion)</ShinyAppFunctionsMinimumOSVersion>
+    <ShinyAppFunctionsMinimumOSVersion Condition="'$(ShinyAppFunctionsMinimumOSVersion)' == ''">16.0</ShinyAppFunctionsMinimumOSVersion>
+    <ShinyAppFunctionsConstProtocolsFile Condition="'$(ShinyAppFunctionsConstProtocolsFile)' == ''">$(MSBuildThisFileDirectory)swift/const_extract_protocols.json</ShinyAppFunctionsConstProtocolsFile>
+    <ShinyAppFunctionsDevelopmentRegion Condition="'$(ShinyAppFunctionsDevelopmentRegion)' == ''">en</ShinyAppFunctionsDevelopmentRegion>
+    <!-- must match between swiftc and the metadata processor -->
+    <_ShinyAFModule>ShinyAppFunctions</_ShinyAFModule>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios'">
+    <_ShinyAFRuntimeSwift Include="$(MSBuildThisFileDirectory)swift/*.swift" />
+  </ItemGroup>
+
+  <!-- the lib is built after CoreCompile; the SDK only lists NativeReferences here and reads the file at native link time -->
+  <Target Name="_ShinyAppFunctionsNativeReference"
+          BeforeTargets="_ExpandNativeReferences"
+          DependsOnTargets="_ShinyAppFunctionsPaths"
+          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and '$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <NativeReference Include="$(_ShinyAFLib)" Kind="Static" ForceLoad="true" SmartLink="false" IsCxx="false" LinkWithSwiftSystemLibraries="true" Frameworks="AppIntents Foundation" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_ShinyAppFunctionsXcode" DependsOnTargets="_ShinyAppFunctionsPaths" Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios'">
+    <Exec Command="xcrun --sdk $(_ShinyAFSdk) --show-sdk-path" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyAFSdkPath" />
+    </Exec>
+    <Exec Command="xcode-select -p" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyAFDeveloperDir" />
+    </Exec>
+    <Exec Command="xcodebuild -version | tail -1 | awk '{print $3}'" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyAFXcodeBuild" />
+    </Exec>
+    <PropertyGroup>
+      <_ShinyAFToolchain>$(_ShinyAFDeveloperDir)/Toolchains/XcodeDefault.xctoolchain</_ShinyAFToolchain>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="ShinyAppFunctionsCompileSwift"
+          AfterTargets="ShinyAppFunctionsExtract"
+          DependsOnTargets="_ShinyAppFunctionsXcode"
+          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and '$(DesignTimeBuild)' != 'true'"
+          Inputs="$(_ShinyAFSwiftFile);@(_ShinyAFRuntimeSwift);$(ShinyAppFunctionsConstProtocolsFile);$(MSBuildThisFileFullPath)"
+          Outputs="$(_ShinyAFLib);$(_ShinyAFConstValues)">
+    <Exec Command="xcrun --sdk $(_ShinyAFSdk) swiftc -c -wmo -parse-as-library -swift-version 5 -O -g -module-name $(_ShinyAFModule) -target $(_ShinyAFTriple) -sdk &quot;$(_ShinyAFSdkPath)&quot; @(_ShinyAFRuntimeSwift->'&quot;%(FullPath)&quot;', ' ') &quot;$(_ShinyAFSwiftFile)&quot; -emit-const-values-path &quot;$(_ShinyAFConstValues)&quot; -Xfrontend -const-gather-protocols-file -Xfrontend &quot;$(ShinyAppFunctionsConstProtocolsFile)&quot; -o &quot;$(_ShinyAFDir)$(_ShinyAFModule).o&quot;" />
+    <Exec Command="xcrun libtool -static -o &quot;$(_ShinyAFLib)&quot; &quot;$(_ShinyAFDir)$(_ShinyAFModule).o&quot;" />
+  </Target>
+
+  <Target Name="ShinyAppFunctionsIntentsMetadata"
+          BeforeTargets="BeforeCodesign"
+          DependsOnTargets="_ShinyAppFunctionsXcode"
+          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and '$(DesignTimeBuild)' != 'true' and '$(AppBundleDir)' != ''">
+    <PropertyGroup>
+      <_ShinyAFApp>$([System.IO.Path]::GetFullPath('$(AppBundleDir)'))</_ShinyAFApp>
+    </PropertyGroup>
+
+    <!-- Siri phrase training needs a development region; Xcode always sets one, MAUI templates do not. The app's own value wins. -->
+    <Exec Command="/usr/libexec/PlistBuddy -c 'Print :CFBundleDevelopmentRegion' &quot;$(_ShinyAFApp)/Info.plist&quot; >/dev/null 2>&amp;1" IgnoreExitCode="true" StandardOutputImportance="low">
+      <Output TaskParameter="ExitCode" PropertyName="_ShinyAFRegionExit" />
+    </Exec>
+    <Exec Condition="'$(_ShinyAFRegionExit)' != '0'" Command="/usr/libexec/PlistBuddy -c 'Add :CFBundleDevelopmentRegion string $(ShinyAppFunctionsDevelopmentRegion)' &quot;$(_ShinyAFApp)/Info.plist&quot;" />
+    <Message Condition="'$(_ShinyAFRegionExit)' != '0'" Importance="high" Text="Shiny.AppFunctions: Info.plist had no CFBundleDevelopmentRegion; added '$(ShinyAppFunctionsDevelopmentRegion)' (needed for Siri phrases). Set it in Info.plist to choose another." />
+
+    <WriteLinesToFile File="$(_ShinyAFDir)SwiftFileList" Lines="@(_ShinyAFRuntimeSwift->'%(FullPath)');$(_ShinyAFSwiftFile)" Overwrite="true" />
+    <WriteLinesToFile File="$(_ShinyAFDir)SwiftConstValuesFileList" Lines="$(_ShinyAFConstValues)" Overwrite="true" />
+    <WriteLinesToFile File="$(_ShinyAFDir)DependencyMetadataFileList" Lines="" Overwrite="true" />
+    <WriteLinesToFile File="$(_ShinyAFDir)DependencyStaticMetadataFileList" Lines="" Overwrite="true" />
+    <RemoveDir Directories="$(_ShinyAFApp)/Metadata.appintents" />
+    <Exec Command="xcrun appintentsmetadataprocessor --toolchain-dir &quot;$(_ShinyAFToolchain)&quot; --module-name $(_ShinyAFModule) --sdk-root &quot;$(_ShinyAFSdkPath)&quot; --xcode-version $(_ShinyAFXcodeBuild) --platform-family iOS --deployment-target $(ShinyAppFunctionsMinimumOSVersion) --bundle-identifier $(ApplicationId) --output &quot;$(_ShinyAFApp)&quot; --target-triple $(_ShinyAFTriple) --binary-file &quot;$(_ShinyAFApp)/$(_NativeExecutableName)&quot; --dependency-file &quot;$(_ShinyAFDir)dependency_info.dat&quot; --stringsdata-file &quot;$(_ShinyAFDir)ExtractedAppShortcutsMetadata.stringsdata&quot; --source-file-list &quot;$(_ShinyAFDir)SwiftFileList&quot; --metadata-file-list &quot;$(_ShinyAFDir)DependencyMetadataFileList&quot; --static-metadata-file-list &quot;$(_ShinyAFDir)DependencyStaticMetadataFileList&quot; --swift-const-vals-list &quot;$(_ShinyAFDir)SwiftConstValuesFileList&quot; --compile-time-extraction --deployment-aware-processing --no-app-shortcuts-localization --force" StandardOutputImportance="low" />
+    <Exec Command="xcrun appintentsnltrainingprocessor --infoplist-path &quot;$(_ShinyAFApp)/Info.plist&quot; --temp-dir-path &quot;$(_ShinyAFDir)ssu&quot; --bundle-id $(ApplicationId) --product-path &quot;$(_ShinyAFApp)&quot; --extracted-metadata-path &quot;$(_ShinyAFApp)/Metadata.appintents&quot; --metadata-file-list &quot;$(_ShinyAFDir)DependencyMetadataFileList&quot; --source-file &quot;$(_ShinyAFApp)/Info.plist&quot; --archive-ssu-assets" StandardOutputImportance="low" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" ItemName="_ShinyAFTrainingOutput" />
+    </Exec>
+    <Warning Condition="$([System.String]::Copy('@(_ShinyAFTrainingOutput)').Contains('error:'))" Text="Shiny.AppFunctions: Siri phrase training reported an error; App Shortcut phrases may not work. See the build log (appintentsnltrainingprocessor)." />
+  </Target>
+</Project>

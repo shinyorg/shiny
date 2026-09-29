@@ -28,6 +28,8 @@
         <Project Path="tests/Shiny.Beacons.Tests/Shiny.Beacons.Tests.csproj" />
         <Project Path="tests/Shiny.BluetoothLE.Hosting.SourceGenerators.Tests/Shiny.BluetoothLE.Hosting.SourceGenerators.Tests.csproj" />
         <Project Path="tests/Shiny.BluetoothLE.Hosting.Linux.Tests/Shiny.BluetoothLE.Hosting.Linux.Tests.csproj" />
+        <Project Path="tests/Shiny.AppFunctions.Tests/Shiny.AppFunctions.Tests.csproj" />
+        <Project Path="tests/Shiny.AppFunctions.SourceGenerators.Tests/Shiny.AppFunctions.SourceGenerators.Tests.csproj" />
     </Folder>
     <Folder Name="/.Solution/">
         <File Path=".editorconfig" />
@@ -50,6 +52,9 @@
         <File Path="nuget.txt" />
         <File Path="version.json" />
     </Folder>
+    <Project Path="src\Shiny.AppFunctions\Shiny.AppFunctions.csproj" />
+    <Project Path="src\Shiny.AppFunctions.SourceGenerators\Shiny.AppFunctions.SourceGenerators.csproj" />
+    <Project Path="src\Shiny.AppFunctions.Build\Shiny.AppFunctions.Build.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting.SourceGenerators\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj" />

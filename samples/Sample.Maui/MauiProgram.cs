@@ -15,6 +15,11 @@ public static class MauiProgram
             .UseShiny()
             .UseSampleShiny();
 
+#if IOS || ANDROID
+        // generated: every handler, entity query and delegate in this project (see AppFunctions/) + the runtime
+        builder.Services.AddAppFunctions();
+#endif
+
 #if DEBUG
         builder.AddMauiDevFlowAgent();
 #endif

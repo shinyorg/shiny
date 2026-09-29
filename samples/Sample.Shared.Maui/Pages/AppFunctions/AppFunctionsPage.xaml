@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.AppFunctions"
+             xmlns:orders="clr-namespace:Sample.Shared.Maui.Services.Orders"
+             x:Class="Sample.Shared.Maui.Pages.AppFunctions.AppFunctionsPage"
+             x:DataType="vm:AppFunctionsViewModel"
+             Title="App Functions">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,*" Padding="16" RowSpacing="8">
+        <Label Grid.Row="0" Text="{Binding Help}" FontSize="13" />
+
+        <Label Grid.Row="1" Text="{Binding Functions}" FontSize="12" TextColor="Gray" />
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Label Grid.Column="0" Text="Signed in (needed to cancel orders)" VerticalOptions="Center" />
+            <Switch Grid.Column="1" IsToggled="{Binding IsSignedIn}" />
+        </Grid>
+
+        <FlexLayout Grid.Row="3" Wrap="Wrap" JustifyContent="Start">
+            <Button Text="Create" Command="{Binding CreateTestOrderCommand}" Margin="0,0,8,8" />
+            <Button Text="Count Open" Command="{Binding CountOpenOrdersCommand}" Margin="0,0,8,8" />
+            <Button Text="Cancel Newest" Command="{Binding CancelNewestOrderCommand}" Margin="0,0,8,8" />
+        </FlexLayout>
+
+        <Label Grid.Row="4" Text="{Binding Status}" FontAttributes="Italic" />
+
+        <CollectionView Grid.Row="5" ItemsSource="{Binding Orders}">
+            <CollectionView.Header>
+                <Label Text="Orders" FontAttributes="Bold" />
+            </CollectionView.Header>
+            <CollectionView.EmptyView>
+                <Label Text="No orders yet - ask Siri or Gemini to create one" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="orders:Order">
+                    <Grid Padding="0,4" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Number}" />
+                                    <Span Text=" · " />
+                                    <Span Text="{Binding CustomerName}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Status}" />
+                        <Label Grid.Row="1" Grid.Column="0" FontSize="12" TextColor="Gray">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Quantity, StringFormat='{0} units'}" />
+                                    <Span Text=" · " />
+                                    <Span Text="{Binding Priority}" />
+                                    <Span Text=" · " />
+                                    <Span Text="{Binding Note}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Total, StringFormat='{0:C}'}" FontSize="12" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="6" ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0" Text="Assistant Calls" FontAttributes="Bold" VerticalOptions="Center" />
+            <Button Grid.Column="1" Text="Clear" Command="{Binding ClearLogCommand}" />
+        </Grid>
+        <CollectionView Grid.Row="7" ItemsSource="{Binding Calls}">
+            <CollectionView.EmptyView>
+                <Label Text="No calls yet" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="orders:InvocationEntry">
+                    <Grid Padding="0,4" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding Timestamp, StringFormat='{0:HH:mm:ss}'}" FontSize="12" TextColor="Gray" />
+                        <Label Grid.Column="1" Text="{Binding Text}" FontSize="12" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

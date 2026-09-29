@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- net472 loads in Visual Studio / MSBuild.exe (Android builds on Windows), net8.0 in `dotnet build` -->
+        <TargetFrameworks>net472;net8.0</TargetFrameworks>
+        <RootNamespace>Shiny.AppFunctions.Build</RootNamespace>
+        <!-- ships inside the Shiny.AppFunctions package (tasks/), not on its own -->
+        <IsPackable>false</IsPackable>
+        <GenerateDependencyFile>false</GenerateDependencyFile>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- compile-time only: the task runs against whatever MSBuild loads it, which ships both -->
+        <PackageReference Include="Microsoft.Build.Utilities.Core" PrivateAssets="all" ExcludeAssets="runtime" />
+        <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-w3q9-fxm7-j8fq" />
+    </ItemGroup>
+
+    <!--
+        Kept off Directory.Packages.props on purpose: with transitive pinning a central 8.0.1 would downgrade the
+        9.x that Roslyn needs elsewhere. 8.x is what MSBuild.exe binds, so the task must compile against it.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+        <PackageReference Include="System.Reflection.Metadata" VersionOverride="8.0.1" PrivateAssets="all" ExcludeAssets="runtime" />
+    </ItemGroup>
+
+</Project>

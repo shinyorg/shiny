@@ -75,6 +75,10 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         // --- AI Assistant (GitHub Copilot + Shiny *.Extensions.AI tools) ---
         list.Add(new("🤖 AI Assistant", "Chat with your device via GitHub Copilot", "ai"));
 
+        // --- App Functions (Siri / App Intents on iOS, Gemini / AppFunctions on Android 16+; not Mac Catalyst) ---
+        if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
+            list.Add(new("🗣️ App Functions", "Orders app driven by Siri & Gemini", "appfunctions"));
+
         // --- Jobs (Android, iOS, Linux) ---
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsLinux())
             list.Add(new("⏰ Jobs", "Background job scheduling", "jobs"));

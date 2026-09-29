@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            App Intents are iPhone/iPad only here (the Swift build targets the iOS SDK) and AppFunctions are Android 16+.
+            The base target carries the attributes, contracts and dispatcher, so a class library or an in-process
+            caller (tests, AI tool adapters) can use them; no platform bridge runs there.
+        -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.AppFunctions</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny App Functions - declare app functions once in C# and expose them to Siri, Spotlight, Shortcuts and Apple Intelligence (App Intents) and to Gemini and other agents (Android AppFunctions)</Description>
+        <!-- NU5100: tasks/ holds the MSBuild task assemblies on purpose -->
+        <NoWarn>$(NoWarn);CS1591;NU5100</NoWarn>
+    </PropertyGroup>
+
+    <!-- the library's manifest carries the AppFunctionService declaration; the Android manifest merger adds it to the app -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+        <AndroidManifest>Platforms/Android/AndroidManifest.xml</AndroidManifest>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <InternalsVisibleTo Include="Shiny.AppFunctions.Tests" />
+    </ItemGroup>
+
+    <!--
+        The source generator and the MSBuild task ship inside this package. Both are built but not referenced
+        for compilation - they never run against this project, only against the consuming app.
+    -->
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.AppFunctions.SourceGenerators\Shiny.AppFunctions.SourceGenerators.csproj"
+                          ReferenceOutputAssembly="false"
+                          PrivateAssets="all" />
+        <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive\" />
+    </ItemGroup>
+
+    <!--
+        Asks the generator and task projects where their assemblies landed rather than hardcoding bin/$(Configuration),
+        which is evaluated before they are built. The task is multi-targeted (net472 for Visual Studio / MSBuild.exe,
+        net8.0 for dotnet) independently of this library, so it is built per target framework here.
+    -->
+    <Target Name="_PackShinyAppFunctionsTooling" BeforeTargets="_GetPackageFiles">
+        <MSBuild Projects="..\Shiny.AppFunctions.SourceGenerators\Shiny.AppFunctions.SourceGenerators.csproj"
+                 Targets="Build"
+                 Properties="Configuration=$(Configuration);TargetFramework=netstandard2.0">
+            <Output TaskParameter="TargetOutputs" ItemName="_ShinyAppFunctionsGenerator" />
+        </MSBuild>
+        <MSBuild Projects="..\Shiny.AppFunctions.Build\Shiny.AppFunctions.Build.csproj"
+                 Targets="Restore"
+                 Properties="Configuration=$(Configuration)"
+                 RemoveProperties="TargetFramework;RuntimeIdentifier" />
+        <MSBuild Projects="..\Shiny.AppFunctions.Build\Shiny.AppFunctions.Build.csproj"
+                 Targets="Build"
+                 Properties="Configuration=$(Configuration);TargetFramework=net472">
+            <Output TaskParameter="TargetOutputs" ItemName="_ShinyAppFunctionsTaskNet472" />
+        </MSBuild>
+        <MSBuild Projects="..\Shiny.AppFunctions.Build\Shiny.AppFunctions.Build.csproj"
+                 Targets="Build"
+                 Properties="Configuration=$(Configuration);TargetFramework=net8.0">
+            <Output TaskParameter="TargetOutputs" ItemName="_ShinyAppFunctionsTaskNet8" />
+        </MSBuild>
+
+        <Error Condition="'@(_ShinyAppFunctionsGenerator)' == '' OR '@(_ShinyAppFunctionsTaskNet472)' == '' OR '@(_ShinyAppFunctionsTaskNet8)' == ''"
+               Text="The App Functions generator or build task produced no output - the package would ship without it." />
+
+        <ItemGroup>
+            <None Include="@(_ShinyAppFunctionsGenerator)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+            <None Include="@(_ShinyAppFunctionsTaskNet472)" Pack="true" PackagePath="tasks/net472" Visible="false" />
+            <None Include="@(_ShinyAppFunctionsTaskNet8)" Pack="true" PackagePath="tasks/net8.0" Visible="false" />
+        </ItemGroup>
+    </Target>
+
+</Project>
