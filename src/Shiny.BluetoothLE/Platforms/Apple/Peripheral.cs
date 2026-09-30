@@ -310,13 +310,17 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
         }
         this.pendingAdapterConnect = false;
 
+        // From AppleBleConfiguration rather than hard-coded: each of these asks iOS to put a system alert in
+        // front of the user whenever the event happens with the app out of the foreground, which is noise for
+        // an app that connects from the background deliberately.
+        var config = this.manager.Configuration;
         this.manager
             .Manager
             .ConnectPeripheral(this.Native, new PeripheralConnectionOptions
             {
-                NotifyOnDisconnection = true,
-                NotifyOnConnection = true,
-                NotifyOnNotification = true
+                NotifyOnDisconnection = config.NotifyOnDisconnection,
+                NotifyOnConnection = config.NotifyOnConnection,
+                NotifyOnNotification = config.NotifyOnNotification
             });
     }
 

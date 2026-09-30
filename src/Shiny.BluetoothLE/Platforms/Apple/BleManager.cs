@@ -37,6 +37,9 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
     public bool IsScanning { get; private set; }
 
+    /// <summary>What each peripheral's connect reads its <c>PeripheralConnectionOptions</c> from.</summary>
+    internal AppleBleConfiguration Configuration => this.config;
+
 
     CBCentralManager? manager;
     public CBCentralManager Manager

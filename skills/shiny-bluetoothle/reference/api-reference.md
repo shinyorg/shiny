@@ -28,6 +28,17 @@ services.AddBluetoothLE<MyBleDelegate>(new AppleBleConfiguration(
     ShowPowerAlert: true,
     RestoreIdentifier: "my-ble-app"
 ));
+
+// iOS/Mac Catalyst - stop CoreBluetooth putting "accessory would like to open app" alerts in front of the
+// user when a connect, disconnect or notification happens with the app in the background. All three default
+// to true. Turn them off when the app connects from the background on purpose (kept running by location
+// updates, say) - NotifyOnNotification in particular is an alert per packet for a streaming device.
+services.AddBluetoothLE(new AppleBleConfiguration
+{
+    NotifyOnConnection = false,
+    NotifyOnDisconnection = false,
+    NotifyOnNotification = false
+});
 ```
 
 ---
@@ -191,7 +202,14 @@ public record AppleBleConfiguration(
     bool ShowPowerAlert = false,           // Show alert when Bluetooth is powered off
     string? RestoreIdentifier = null,      // Restoration key for background restoration
     DispatchQueue? DispatchQueue = null     // Dispatch queue for CBCentralManager
-);
+)
+{
+    // iOS/Mac Catalyst PeripheralConnectionOptions passed on every connect (5.8.1+). Each asks the system to
+    // show an "accessory would like to open app" alert when the event happens with the app out of the foreground.
+    public bool NotifyOnConnection { get; init; } = true;
+    public bool NotifyOnDisconnection { get; init; } = true;
+    public bool NotifyOnNotification { get; init; } = true;   // an alert per notification while backgrounded
+}
 ```
 
 ### BleServiceInfo

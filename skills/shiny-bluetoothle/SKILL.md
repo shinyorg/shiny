@@ -10,6 +10,9 @@ triggers:
   - bluetooth low energy
   - peripheral
   - gatt
+  - would like to open
+  - NotifyOnConnection
+  - NotifyOnNotification
   - characteristic
   - scan ble
   - ble scan
@@ -138,6 +141,17 @@ services.AddBluetoothLE<MyBleDelegate>(new AppleBleConfiguration(
     ShowPowerAlert: true,
     RestoreIdentifier: "my-ble-app"
 ));
+
+// iOS/Mac Catalyst - stop CoreBluetooth putting "accessory would like to open app" alerts in front of the
+// user when a connect, disconnect or notification happens with the app in the background. All three default
+// to true. Turn them off when the app connects from the background on purpose (kept running by location
+// updates, say) - NotifyOnNotification in particular is an alert per packet for a streaming device.
+services.AddBluetoothLE(new AppleBleConfiguration
+{
+    NotifyOnConnection = false,
+    NotifyOnDisconnection = false,
+    NotifyOnNotification = false
+});
 ```
 
 The delegate class:
