@@ -190,6 +190,8 @@ Generated tools (only for opted-in capabilities): `list_reminders` (pending/sche
 
 > The AI tools assume permissions are already granted — they do **not** trigger the platform permission UI (needs a foreground activity). Call `INotificationManager.RequestAccess(...)` from the app before invoking the agent.
 
+> Combine with the app's own functions: `Shiny.AppFunctions.Extensions.AI` (`AddAppFunctionAITools`, see the **shiny-appfunctions** skill) exposes the `[AppFunction]`s Siri and Gemini call as tools in the same `*AITools` bundle shape - concatenate the `.Tools` lists into one `ChatOptions.Tools`.
+
 ## Reference Files
 
 - [API Reference](reference/api-reference.md)

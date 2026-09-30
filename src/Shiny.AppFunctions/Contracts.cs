@@ -69,8 +69,9 @@ public sealed class AppFunctionGate
     public static AppFunctionGate Deny(string message) => new(AppFunctionGateKind.Deny, message);
 
     /// <summary>
-    /// iOS: asks the user to continue in the app, then runs the handler again in the foreground
-    /// (<see cref="AppFunctionContext.IsForeground"/> is true). Android: refuses the call with the message.
+    /// Passes when the app is already on screen (<see cref="AppFunctionContext.IsForeground"/>). Otherwise, iOS: asks
+    /// the user to continue in the app, then runs the handler again in the foreground. Android: refuses the call with
+    /// the message.
     /// </summary>
     public static AppFunctionGate OpenApp(string message) => new(AppFunctionGateKind.OpenApp, message);
 }

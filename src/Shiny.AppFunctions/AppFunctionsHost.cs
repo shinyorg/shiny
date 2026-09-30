@@ -68,6 +68,8 @@ sealed class AppFunctionsStartupTask(AppFunctionDispatcher dispatcher) : Shiny.I
         AppFunctionsHost.SetReady(dispatcher);
 #if IOS
         Platforms.iOS.AppleBridge.Register();
+#elif ANDROID
+        AppVisibility.Install();
 #endif
     }
 }

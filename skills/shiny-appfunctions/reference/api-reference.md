@@ -108,7 +108,7 @@ public sealed class AppFunctionGate
     public string? Message { get; }
     public static AppFunctionGate Allow { get; }
     public static AppFunctionGate Deny(string message);
-    public static AppFunctionGate OpenApp(string message);   // iOS: continue in foreground and re-run; Android: Denied
+    public static AppFunctionGate OpenApp(string message);   // passes if IsForeground; else iOS: continue in foreground and re-run; Android: Denied
 }
 ```
 
@@ -130,7 +130,7 @@ public sealed class AppFunctionContext
     public AppFunctionInvocation Invocation { get; }
     public string FunctionId { get; }
     public AppFunctionPlatform Platform { get; }
-    public bool IsForeground { get; }
+    public bool IsForeground { get; }                   // app on screen: user asked from inside it, or iOS OpensApp/OpenApp
     public string? CallerPackage { get; }               // Android: calling agent's package
     public object? Request { get; }                     // null for entity lookups
     public IServiceProvider Services { get; }           // the call's DI scope
@@ -226,3 +226,40 @@ Generated assets: `app_functions.xml`, `app_functions_v2.xml`, `app_functions_sc
 - `DateTimeOffset`: ISO 8601 (epoch milliseconds also accepted).
 - Numbers and booleans are also accepted as strings.
 - Entities: the entity id as a string.
+
+## AI tools (Shiny.AppFunctions.Extensions.AI)
+
+```xml
+<PackageReference Include="Shiny.AppFunctions.Extensions.AI" Version="5.*" />
+```
+
+Target: `net10.0` (usable from the iOS and Android heads). Depends on `Microsoft.Extensions.AI.Abstractions`.
+
+```csharp
+namespace Shiny;
+public static class AppFunctionsAiServiceCollectionExtensions
+{
+    // requires AddAppFunctions(); throws if the builder added nothing
+    public static IServiceCollection AddAppFunctionAITools(this IServiceCollection services, Action<IAppFunctionAIToolBuilder> configure);
+}
+
+namespace Shiny.AppFunctions.Extensions.AI;
+public interface IAppFunctionAIToolBuilder
+{
+    IAppFunctionAIToolBuilder AddAllFunctions();                        // includes search_{entity}
+    IAppFunctionAIToolBuilder AddFunction(string functionId);            // + search_{entity} for entity parameters
+    IAppFunctionAIToolBuilder AddFunctions(IEnumerable<string> functionIds);
+    IAppFunctionAIToolBuilder ExcludeFunction(string functionId);        // wins over All and entity searches
+}
+
+public sealed class AppFunctionAITools                                  // singleton; unknown ids throw on first resolve
+{
+    public IReadOnlyList<AITool> Tools { get; }                          // AIFunction per function, registry order
+}
+```
+
+Tool results (`JsonObject`):
+- success: `{ "success": true, "result": <value>?, "message": "<dialog>"? }`
+- failure: `{ "error": "<message>", "code": "<AppFunctionErrorCode>" }`
+
+Calls run as `AppFunctionInvocation(id)` - `AppFunctionPlatform.Other`, `IsForeground = false`.

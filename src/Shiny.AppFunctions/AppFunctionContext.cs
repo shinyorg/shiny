@@ -33,7 +33,11 @@ public sealed class AppFunctionContext
     public string FunctionId => this.Function.Id;
     public AppFunctionPlatform Platform => this.Invocation.Platform;
 
-    /// <summary>iOS: the app is in the foreground for this run (<see cref="AppFunctionAttribute.OpensApp"/> or <see cref="AppFunctionGate.OpenApp"/>).</summary>
+    /// <summary>
+    /// The app is on screen for this run: the user was already in it when they asked Siri or Gemini, or (iOS) it was
+    /// brought forward by <see cref="AppFunctionAttribute.OpensApp"/> or <see cref="AppFunctionGate.OpenApp"/>.
+    /// The handler still runs off the main thread, so dispatch UI work to it.
+    /// </summary>
     public bool IsForeground => this.Invocation.IsForeground;
 
     /// <summary>Android: the package name of the calling agent. Empty when called from the shell.</summary>

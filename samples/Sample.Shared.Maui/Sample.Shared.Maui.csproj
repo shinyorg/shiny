@@ -69,6 +69,7 @@
         <ProjectReference Include="..\..\src\Shiny.Contacts.Extensions.AI\Shiny.Contacts.Extensions.AI.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications.Extensions.AI\Shiny.Notifications.Extensions.AI.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AppFunctions.Extensions.AI\Shiny.AppFunctions.Extensions.AI.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />

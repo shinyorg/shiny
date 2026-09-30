@@ -49,6 +49,13 @@ triggers:
   - ShinyAppFunctionsEnabled
   - SHAF001
   - Shiny.AppFunctions
+  - Shiny.AppFunctions.Extensions.AI
+  - AddAppFunctionAITools
+  - AppFunctionAITools
+  - IAppFunctionAIToolBuilder
+  - app functions ai tools
+  - app functions IChatClient
+  - app functions AIFunction
   - shiny app functions
 ---
 
@@ -62,13 +69,14 @@ Use this skill when the user needs to:
 - Add Siri phrases / App Shortcuts that work without the user setting anything up
 - Let the assistant pick an app object (a customer, a playlist) as a parameter
 - Gate assistant calls (sign-in, feature flags) or log/telemetry every call
-- Call the same functions in-process (tests, an in-app AI tool, MCP) with a JSON schema
+- Call the same functions in-process (tests, MCP) with a JSON schema
+- Give an in-app LLM (`IChatClient`) the same functions as tools - `Shiny.AppFunctions.Extensions.AI`
 
 ## Library Overview
 
 | Item | Value |
 |------|-------|
-| **NuGet** | `Shiny.AppFunctions` (the source generator and the MSBuild task ship inside it) |
+| **NuGet** | `Shiny.AppFunctions` (the source generator and the MSBuild task ship inside it); optional `Shiny.AppFunctions.Extensions.AI` for LLM tools |
 | **Namespace** | `Shiny.AppFunctions` |
 | **Registration** | `services.AddAppFunctions()` - **source-generated** into the app, in `Microsoft.Extensions.DependencyInjection` |
 | **Host** | Shiny.Core (`.UseShiny()` on MAUI) - no MAUI dependency |
@@ -192,10 +200,11 @@ public class TelemetryDelegate(ILogger<TelemetryDelegate> logger) : IAppFunction
 
 - Delegates are **found and registered by the generator** - never register them yourself. Both methods have default implementations; override only what you need.
 - They are scoped to the call and run in the order `AddAppFunctions()` registers them; the first `OnInvoking` that does not return `Allow` wins. Don't make one delegate depend on another having run first.
-- `AppFunctionGate.Deny(message)` refuses (`Denied`). `AppFunctionGate.OpenApp(message)`: **iOS** asks the user to continue in the app, then runs the call again in the foreground (`context.IsForeground == true`); **Android** refuses with the message. Anything already foreground passes an `OpenApp` gate.
+- `AppFunctionGate.Deny(message)` refuses (`Denied`). `AppFunctionGate.OpenApp(message)`: **iOS** asks the user to continue in the app, then runs the call again in the foreground (`context.IsForeground == true`); **Android** refuses with the message. Anything already foreground passes an `OpenApp` gate - including a call made while the user is in the app (Siri/Gemini over it), on both platforms.
 - A refusal reaches `OnInvoked` as `AppFunctionException(Denied, message)`. Exceptions thrown from `OnInvoked` are logged and ignored.
 - `AppFunctionContext`: `FunctionId`, `Function` (descriptor), `Platform` (`Apple`/`Android`/`Other`), `IsForeground`, `CallerPackage` (Android caller), `Request`, `Services` (the call's scope), `Items` (shared with the handler), `Say(dialog)` / `Dialog`.
 - `[AppFunction(OpensApp = true)]` brings the app to the foreground before the handler runs on iOS (Android runs it in the background).
+- `context.IsForeground` is true when the app is on screen: the user asked Siri/Gemini from inside the app (iOS: any state but `background`; Android: any started activity), or iOS foregrounded it. The handler runs in the app's own process and container, so it may navigate or update view models - but **only after checking `IsForeground`, and on the main thread** (`MainThread.InvokeOnMainThreadAsync`); handlers never run on it.
 
 ## Errors
 
@@ -230,7 +239,35 @@ public class MyViewModel(AppFunctionDispatcher dispatcher)
 }
 ```
 
-`dispatcher.Registry.Functions` lists every function (declared ones, then the generated `search_*`), each with `GetParametersJsonSchema()` (JSON schema draft 2020-12) - the hook for an in-app AI tool or MCP adapter.
+`dispatcher.Registry.Functions` lists every function (declared ones, then the generated `search_*`), each with `GetParametersJsonSchema()` (JSON schema draft 2020-12) - the hook for an MCP adapter.
+
+## AI tools (Shiny.AppFunctions.Extensions.AI)
+
+The optional `Shiny.AppFunctions.Extensions.AI` package hands the same functions to an in-app LLM as `Microsoft.Extensions.AI` tools (`AIFunction`s). **Don't hand-write `AIFunction`s for app functions** - use this.
+
+```csharp
+builder.Services.AddAppFunctions();                                   // generated - required
+builder.Services.AddAppFunctionAITools(b => b
+    .AddAllFunctions()                                                // or .AddFunction("create_order")
+    .ExcludeFunction("cancel_order")                                  // optional
+);
+
+// resolve the bundle and pass the tools to any IChatClient - combine freely with the other Shiny AI tool bundles
+var tools = sp.GetRequiredService<AppFunctionAITools>().Tools
+    .Concat(sp.GetRequiredService<CalendarAITools>().Tools)
+    .ToList();
+var response = await chatClient.GetResponseAsync(messages, new ChatOptions { Tools = tools });
+```
+
+- `AddAppFunctionAITools(Action<IAppFunctionAIToolBuilder>)` (namespace `Shiny`) - throws at registration if nothing was added. Ids are checked when `AppFunctionAITools` is first resolved; an unknown id throws.
+- `IAppFunctionAIToolBuilder` - `AddAllFunctions()`, `AddFunction(id)`, `AddFunctions(ids)`, `ExcludeFunction(id)`. A function with an `[AppEntity]` parameter brings its `search_{entity}` tool along so the model can find ids; `ExcludeFunction` wins over both.
+- `AppFunctionAITools` - resolve from DI (singleton); `.Tools` is `IReadOnlyList<AITool>`, in registry order.
+- Tool name = function id, description = `Description`, schema = `GetParametersJsonSchema()` (entity parameters are described as ids found with `search_{entity}`).
+- Every call goes through `AppFunctionDispatcher.Execute` with `AppFunctionPlatform.Other`, not foreground: same binding, **same delegates**, same handler. A delegate's `OpenApp` gate is refused with its message (as on Android) - it is not bypassed because the app happens to be open. Check `context.Platform == AppFunctionPlatform.Other` in a delegate to treat AI calls differently.
+- Results: success → `{ "success": true, "result": <function result>, "message": "<context.Say text>" }` (`result` omitted for `IAppFunction`, `message` when not set); failure → `{ "error": "<message>", "code": "InvalidArgument|NotFound|Denied|Cancelled|AppError" }`. Nothing throws to the chat client.
+- AOT-compatible: arguments are written to JSON without reflection, results are `JsonNode`s.
+
+Related AI tool packages (same `*AITools` bundle pattern, see their skills): `Shiny.Calendar.Extensions.AI` (shiny-calendarstore), `Shiny.Contacts.Extensions.AI` (shiny-contactstore), `Shiny.Notifications.Extensions.AI` (shiny-notifications), `Shiny.Locations.Extensions.AI` (shiny-locations).
 
 ## Build properties (all optional)
 

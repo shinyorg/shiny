@@ -42,7 +42,7 @@ public class ShinyAppFunctionService : AppFunctionService
                 }
 
                 var json = GenericDocumentJson.ToJson(parameters, function);
-                var invocation = new AppFunctionInvocation(functionId, AppFunctionPlatform.Android, false, callingPackage);
+                var invocation = new AppFunctionInvocation(functionId, AppFunctionPlatform.Android, AppVisibility.IsVisible, callingPackage);
                 var outcome = await dispatcher.Execute(invocation, json, cts.Token).ConfigureAwait(false);
 
                 if (outcome.Status == AppFunctionStatus.Success)

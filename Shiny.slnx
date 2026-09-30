@@ -55,6 +55,7 @@
     <Project Path="src\Shiny.AppFunctions\Shiny.AppFunctions.csproj" />
     <Project Path="src\Shiny.AppFunctions.SourceGenerators\Shiny.AppFunctions.SourceGenerators.csproj" />
     <Project Path="src\Shiny.AppFunctions.Build\Shiny.AppFunctions.Build.csproj" />
+    <Project Path="src\Shiny.AppFunctions.Extensions.AI\Shiny.AppFunctions.Extensions.AI.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting.SourceGenerators\Shiny.BluetoothLE.Hosting.SourceGenerators.csproj" />

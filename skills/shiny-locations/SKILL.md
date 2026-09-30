@@ -234,6 +234,8 @@ Generated tools: `get_current_location` (last cached fix — lat/lng, accuracy, 
 
 > The tools read the **last cached GPS reading**; start a listener or ensure a recent fix exists first. Distances and travel times are **great-circle (straight-line) estimates** — not routed ETAs with roads/traffic — and the tool results say so. Location permission should already be granted before invoking the agent.
 
+> Combine with the app's own functions: `Shiny.AppFunctions.Extensions.AI` (`AddAppFunctionAITools`, see the **shiny-appfunctions** skill) exposes the `[AppFunction]`s Siri and Gemini call as tools in the same `*AITools` bundle shape - concatenate the `.Tools` lists into one `ChatOptions.Tools`.
+
 ## Reference Files
 
 - [API Reference](reference/api-reference.md)

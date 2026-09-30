@@ -51,7 +51,8 @@
             "src\\Shiny.Wearables\\Shiny.Wearables.csproj",
             "src\\Shiny.AppFunctions\\Shiny.AppFunctions.csproj",
             "src\\Shiny.AppFunctions.SourceGenerators\\Shiny.AppFunctions.SourceGenerators.csproj",
-            "src\\Shiny.AppFunctions.Build\\Shiny.AppFunctions.Build.csproj"
+            "src\\Shiny.AppFunctions.Build\\Shiny.AppFunctions.Build.csproj",
+            "src\\Shiny.AppFunctions.Extensions.AI\\Shiny.AppFunctions.Extensions.AI.csproj"
         ]
     }
 }

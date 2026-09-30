@@ -331,3 +331,5 @@ Key types:
 Generated tools (only for opted-in capabilities): `search_contacts` (free-text over name/phone/email), `get_contact` (by id), `create_contact`, `update_contact`, `delete_contact`.
 
 > The AI tools assume permissions are already granted — they do **not** trigger the platform permission UI (needs a foreground activity). Call `IContactStore.RequestAccess(...)` from the app before invoking the agent. `delete_contact` is irreversible — instruct the model to confirm with the user first.
+
+> Combine with the app's own functions: `Shiny.AppFunctions.Extensions.AI` (`AddAppFunctionAITools`, see the **shiny-appfunctions** skill) exposes the `[AppFunction]`s Siri and Gemini call as tools in the same `*AITools` bundle shape - concatenate the `.Tools` lists into one `ChatOptions.Tools`.

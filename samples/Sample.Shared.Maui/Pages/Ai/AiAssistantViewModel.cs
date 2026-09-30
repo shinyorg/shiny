@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Sample.Shared.Maui.Ai;
+using Shiny.AppFunctions.Extensions.AI;
 using Shiny.Calendar.Extensions.AI;
 using Shiny.Contacts.Extensions.AI;
 using Shiny.Locations.Extensions.AI;
@@ -13,7 +14,7 @@ namespace Sample.Shared.Maui.Pages.Ai;
 
 /// <summary>
 /// A chat screen that drives whichever Shiny <c>*.Extensions.AI</c> tool surfaces are registered on
-/// this platform (calendar, contacts, reminders, location) against a GitHub Copilot
+/// this platform (calendar, contacts, reminders, location, and the app functions Siri and Gemini call) against a GitHub Copilot
 /// <see cref="IChatClient"/>. Ask it to add a meeting, find a contact, set a reminder, etc. — the model
 /// calls the Shiny tools to do it.
 /// </summary>
@@ -23,7 +24,8 @@ public partial class AiAssistantViewModel : ObservableObject
     const string SystemPrompt =
         "You are a helpful personal-assistant embedded in a phone app. You have tools to work with the " +
         "user's device calendar (list calendars, search/create/update/delete events), contacts, reminders, " +
-        "and current location. Use the tools to fulfil requests such as scheduling a meeting, finding a " +
+        "current location, and the app's own orders (create, count, look up and cancel - find a customer's id " +
+        "with search_customer first). Use the tools to fulfil requests such as scheduling a meeting, finding a " +
         "contact's number, or setting a reminder. All device permissions are already granted. When creating " +
         "events use ISO-8601 date-times. Confirm before deleting anything. Keep replies short.";
 
@@ -67,6 +69,7 @@ public partial class AiAssistantViewModel : ObservableObject
         if (sp.GetService<ContactAITools>() is { } con) list.AddRange(con.Tools);
         if (sp.GetService<NotificationAITools>() is { } note) list.AddRange(note.Tools);
         if (sp.GetService<LocationAITools>() is { } loc) list.AddRange(loc.Tools);
+        if (sp.GetService<AppFunctionAITools>() is { } fn) list.AddRange(fn.Tools);
         return list;
     }
 

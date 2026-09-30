@@ -2,11 +2,12 @@
 // Compiled together with the generated intents into the app by Shiny.AppFunctions.targets.
 import AppIntents
 import Foundation
+import UIKit
 
 public typealias ShinyAFHandler = @convention(c) (
     UnsafePointer<CChar>,       // function id
     UnsafePointer<CChar>,       // arguments json
-    Int32,                      // flags (1 = running in the foreground)
+    Int32,                      // flags (1 = the app is on screen for this run)
     UnsafeMutableRawPointer     // completion (a retained ShinyAFCompletion)
 ) -> Void
 
@@ -82,10 +83,12 @@ enum ShinyAF {
     }
 
     /// Runs an app function. If a delegate asks for the app (AppFunctionGate.OpenApp), continues in the
-    /// foreground and runs it again with the foreground flag.
+    /// foreground and runs it again with the foreground flag. An app the user is already in (Siri over it)
+    /// counts as foreground, so it passes the gate without a "continue in the app" prompt.
     static func invoke<I: AppIntent>(_ intent: I, _ functionId: String, _ args: [String: Any], foreground: Bool) async throws -> ShinyAFReply {
         let json = encode(args)
-        var (status, reply) = try await call(functionId, json, flags: foreground ? 1 : 0)
+        let onScreen = await isOnScreen()
+        var (status, reply) = try await call(functionId, json, flags: foreground || onScreen ? 1 : 0)
         if status == statusNeedsForeground {
             try await continueInForeground(intent, message(reply, "Continue in the app"))
             (status, reply) = try await call(functionId, json, flags: 1)
@@ -127,6 +130,12 @@ enum ShinyAF {
         }
         let obj = (try? JSONSerialization.jsonObject(with: Data(text.utf8), options: [.fragmentsAllowed])) as? [String: Any] ?? [:]
         return (status, ShinyAFReply(json: obj))
+    }
+
+    /// Siri and Spotlight overlays leave the app .inactive rather than .background, so anything but
+    /// .background means the user is looking at the app.
+    @MainActor private static func isOnScreen() -> Bool {
+        UIApplication.shared.applicationState != .background
     }
 
     private static func continueInForeground<I: AppIntent>(_ intent: I, _ message: String) async throws {

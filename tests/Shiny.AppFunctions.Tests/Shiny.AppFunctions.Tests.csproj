@@ -17,6 +17,7 @@
     <ItemGroup>
         <Using Include="Xunit" />
         <ProjectReference Include="..\..\src\Shiny.AppFunctions\Shiny.AppFunctions.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AppFunctions.Extensions.AI\Shiny.AppFunctions.Extensions.AI.csproj" />
     </ItemGroup>
 
 </Project>
