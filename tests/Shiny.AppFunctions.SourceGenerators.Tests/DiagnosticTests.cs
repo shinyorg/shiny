@@ -45,6 +45,18 @@ public class DiagnosticTests
     }
 
     [Theory]
+    [InlineData("Title", "title")]
+    [InlineData("Description", "description")]
+    [InlineData("Default", "default")]
+    public void ParameterSummary_NeverBackticksProjectedValue(string property, string wireName)
+    {
+        var (diagnostics, generated) = Run($"[AppFunction(\"do_it\")] public record F(string {property}) : IAppFunction<string>; {Handler}");
+        Assert.Empty(diagnostics);
+        Assert.Contains($"\\(\\.${wireName})", generated);
+        Assert.DoesNotContain("$`", generated);
+    }
+
+    [Theory]
     [InlineData("DoIt")]
     [InlineData("1abc")]
     [InlineData("do-it")]

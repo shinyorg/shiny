@@ -89,7 +89,11 @@ public sealed class AppFunctionDispatcher(
         {
             context.Request = await registry.CreateRequest(function.Id, arguments, scope.ServiceProvider, cancellationToken).ConfigureAwait(false);
 
-            var gate = await Gate(delegates, context, cancellationToken).ConfigureAwait(false);
+            // OpensApp is an OpenApp gate the function declares itself: on iOS openAppWhenRun has already
+            // foregrounded it, anywhere else (Android, a direct caller) it only runs while the app is on screen
+            var gate = function.OpensApp && !context.IsForeground
+                ? NotForeground(context, null)
+                : await Gate(delegates, context, cancellationToken).ConfigureAwait(false);
             if (gate != null)
             {
                 failure = Blocked(gate);
@@ -207,13 +211,16 @@ public sealed class AppFunctionDispatcher(
                     return AppFunctionOutcome.Failed(AppFunctionErrorCode.Denied, gate.Message ?? "Not allowed");
 
                 case AppFunctionGateKind.OpenApp when !context.IsForeground:
-                    return context.Platform == AppFunctionPlatform.Apple
-                        ? new AppFunctionOutcome(AppFunctionStatus.NeedsForeground, Message: gate.Message ?? "Continue in the app")
-                        : AppFunctionOutcome.Failed(AppFunctionErrorCode.Denied, gate.Message ?? "Open the app to continue");
+                    return NotForeground(context, gate.Message);
             }
         }
         return null;
     }
+
+    static AppFunctionOutcome NotForeground(AppFunctionContext context, string? message)
+        => context.Platform == AppFunctionPlatform.Apple
+            ? new AppFunctionOutcome(AppFunctionStatus.NeedsForeground, Message: message ?? "Continue in the app")
+            : AppFunctionOutcome.Failed(AppFunctionErrorCode.Denied, message ?? "Open the app to continue");
 
     /// <summary>What OnInvoked sees when a delegate stopped the call.</summary>
     static AppFunctionException Blocked(AppFunctionOutcome gate)

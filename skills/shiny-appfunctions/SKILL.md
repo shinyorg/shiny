@@ -57,6 +57,10 @@ triggers:
   - app functions IChatClient
   - app functions AIFunction
   - shiny app functions
+  - OpensApp
+  - AppFunctionGate.OpenApp
+  - app function foreground only
+  - app function needs the app open
 ---
 
 # Shiny App Functions
@@ -183,9 +187,11 @@ iOS: a primitive result is returned typed; an object or list result is returned 
 public class SignInDelegate(IAuth auth) : IAppFunctionDelegate
 {
     public Task<AppFunctionGate> OnInvoking(AppFunctionContext context, CancellationToken ct)
-        => Task.FromResult(context.FunctionId == "cancel_order" && !auth.IsSignedIn
-            ? AppFunctionGate.OpenApp("Sign in to cancel orders.")
-            : AppFunctionGate.Allow);
+        => Task.FromResult(context.FunctionId != "cancel_order" || auth.IsSignedIn
+            ? AppFunctionGate.Allow
+            : context.IsForeground
+                ? AppFunctionGate.Deny("Sign in to cancel orders.")      // already in the app - OpenApp would pass
+                : AppFunctionGate.OpenApp("Sign in to cancel orders."));
 }
 
 public class TelemetryDelegate(ILogger<TelemetryDelegate> logger) : IAppFunctionDelegate
@@ -200,11 +206,11 @@ public class TelemetryDelegate(ILogger<TelemetryDelegate> logger) : IAppFunction
 
 - Delegates are **found and registered by the generator** - never register them yourself. Both methods have default implementations; override only what you need.
 - They are scoped to the call and run in the order `AddAppFunctions()` registers them; the first `OnInvoking` that does not return `Allow` wins. Don't make one delegate depend on another having run first.
-- `AppFunctionGate.Deny(message)` refuses (`Denied`). `AppFunctionGate.OpenApp(message)`: **iOS** asks the user to continue in the app, then runs the call again in the foreground (`context.IsForeground == true`); **Android** refuses with the message. Anything already foreground passes an `OpenApp` gate - including a call made while the user is in the app (Siri/Gemini over it), on both platforms.
+- `AppFunctionGate.Deny(message)` refuses (`Denied`). `AppFunctionGate.OpenApp(message)`: **iOS** asks the user to continue in the app, then runs the call again in the foreground (`context.IsForeground == true`); **Android** refuses with the message. Anything already foreground passes an `OpenApp` gate - including a call made while the user is in the app (Siri/Gemini over it, or an in-app AI chat), on both platforms. **`OpenApp` means "needs the app on screen", not "needs sign-in"**: for a state check, return `OpenApp` only when `!context.IsForeground` and `Deny` otherwise (as above), or a foreground call runs signed out.
 - A refusal reaches `OnInvoked` as `AppFunctionException(Denied, message)`. Exceptions thrown from `OnInvoked` are logged and ignored.
 - `AppFunctionContext`: `FunctionId`, `Function` (descriptor), `Platform` (`Apple`/`Android`/`Other`), `IsForeground`, `CallerPackage` (Android caller), `Request`, `Services` (the call's scope), `Items` (shared with the handler), `Say(dialog)` / `Dialog`.
-- `[AppFunction(OpensApp = true)]` brings the app to the foreground before the handler runs on iOS (Android runs it in the background).
-- `context.IsForeground` is true when the app is on screen: the user asked Siri/Gemini from inside the app (iOS: any state but `background`; Android: any started activity), or iOS foregrounded it. The handler runs in the app's own process and container, so it may navigate or update view models - but **only after checking `IsForeground`, and on the main thread** (`MainThread.InvokeOnMainThreadAsync`); handlers never run on it.
+- `[AppFunction(OpensApp = true)]` = the function needs the app on screen (UI work, navigation) - a built-in `OpenApp` gate checked before any delegate. **iOS** brings the app to the foreground before the handler runs; **Android** (which cannot bring an app forward from the background) runs it only while the app is visible and otherwise refuses it (`Denied`, "Open the app to continue"); direct `AppFunctionDispatcher` calls that aren't foreground are refused the same way. Prefer it over writing a delegate for "foreground only".
+- `context.IsForeground` is true when the app is on screen: the user asked Siri/Gemini from inside the app (iOS: any state but `background`; Android: any started activity), the call came from the in-app AI tools, or iOS foregrounded it. The handler runs in the app's own process and container, so it may navigate or update view models - but **only after checking `IsForeground`, and on the main thread** (`MainThread.InvokeOnMainThreadAsync`); handlers never run on it.
 
 ## Errors
 
@@ -263,7 +269,7 @@ var response = await chatClient.GetResponseAsync(messages, new ChatOptions { Too
 - `IAppFunctionAIToolBuilder` - `AddAllFunctions()`, `AddFunction(id)`, `AddFunctions(ids)`, `ExcludeFunction(id)`. A function with an `[AppEntity]` parameter brings its `search_{entity}` tool along so the model can find ids; `ExcludeFunction` wins over both.
 - `AppFunctionAITools` - resolve from DI (singleton); `.Tools` is `IReadOnlyList<AITool>`, in registry order.
 - Tool name = function id, description = `Description`, schema = `GetParametersJsonSchema()` (entity parameters are described as ids found with `search_{entity}`).
-- Every call goes through `AppFunctionDispatcher.Execute` with `AppFunctionPlatform.Other`, not foreground: same binding, **same delegates**, same handler. A delegate's `OpenApp` gate is refused with its message (as on Android) - it is not bypassed because the app happens to be open. Check `context.Platform == AppFunctionPlatform.Other` in a delegate to treat AI calls differently.
+- Every call goes through `AppFunctionDispatcher.Execute` with `AppFunctionPlatform.Other` and **`IsForeground = true`** (the chat is running in the app): same binding, **same delegates**, same handler. `OpensApp` functions run and `OpenApp` gates pass; a sign-in check must `Deny` when `IsForeground` (see Delegates) or the model can call the function signed out. Check `context.Platform == AppFunctionPlatform.Other` in a delegate to treat AI calls differently.
 - Results: success → `{ "success": true, "result": <function result>, "message": "<context.Say text>" }` (`result` omitted for `IAppFunction`, `message` when not set); failure → `{ "error": "<message>", "code": "InvalidArgument|NotFound|Denied|Cancelled|AppError" }`. Nothing throws to the chat client.
 - AOT-compatible: arguments are written to JSON without reflection, results are `JsonNode`s.
 

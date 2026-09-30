@@ -140,23 +140,22 @@ public class AIToolTests
     }
 
     [Fact]
-    public async Task DelegateOpenApp_IsDeniedWithItsMessage()
+    public async Task DelegateOpenApp_PassesBecauseTheChatIsInTheApp()
     {
-        var tools = Create(x => x.AddFunction("greet"), new Gate(AppFunctionGate.OpenApp("Sign in to greet.")));
+        var tools = Create(x => x.AddFunction("greet"), new Gate(AppFunctionGate.OpenApp("Open the app to greet.")));
         var result = await Invoke(Tool(tools, "greet"), new AIFunctionArguments { ["name"] = "Bob", ["times"] = 1 });
 
-        Assert.Equal("Denied", result["code"]!.GetValue<string>());
-        Assert.Equal("Sign in to greet.", result["error"]!.GetValue<string>());
+        Assert.True(result["success"]!.GetValue<bool>());
     }
 
     [Fact]
-    public async Task DelegateSeesOtherPlatform()
+    public async Task DelegateSeesOtherPlatformInTheForeground()
     {
         var gate = new Gate(AppFunctionGate.Allow);
         await Invoke(Tool(Create(x => x.AddFunction("greet"), gate), "greet"), new AIFunctionArguments { ["name"] = "Bob", ["times"] = 1 });
 
         Assert.Equal(AppFunctionPlatform.Other, gate.Platform);
-        Assert.False(gate.IsForeground);
+        Assert.True(gate.IsForeground);
     }
 
     [Fact]

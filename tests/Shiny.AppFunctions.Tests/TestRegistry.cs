@@ -123,3 +123,37 @@ public class TestRegistry : IAppFunctionRegistry
         return found.Select(x => new AppEntityItem(x.Id, x.Name)).ToList();
     }
 }
+
+/// <summary><see cref="TestRegistry"/> with <c>greet</c> declared <see cref="AppFunctionAttribute.OpensApp"/>.</summary>
+public class OpensAppTestRegistry : IAppFunctionRegistry
+{
+    readonly TestRegistry inner = new();
+
+    public OpensAppTestRegistry()
+        => this.Functions = this.inner.Functions
+            .Select(f => f.Id != "greet" ? f : new AppFunctionDescriptor
+            {
+                Id = f.Id,
+                Title = f.Title,
+                Description = f.Description,
+                OpensApp = true,
+                Parameters = f.Parameters,
+                Result = f.Result
+            })
+            .ToList();
+
+    public IReadOnlyList<AppFunctionDescriptor> Functions { get; }
+    public IReadOnlyList<AppEntityDescriptor> Entities => this.inner.Entities;
+
+    public ValueTask<object> CreateRequest(string functionId, JsonElement arguments, IServiceProvider services, CancellationToken cancellationToken)
+        => this.inner.CreateRequest(functionId, arguments, services, cancellationToken);
+
+    public Task<object?> Invoke(object request, AppFunctionContext context, CancellationToken cancellationToken)
+        => this.inner.Invoke(request, context, cancellationToken);
+
+    public void WriteResult(string functionId, object? result, Utf8JsonWriter writer)
+        => this.inner.WriteResult(functionId, result, writer);
+
+    public Task<IReadOnlyList<AppEntityItem>> QueryEntities(string entityId, AppEntityQueryKind kind, IReadOnlyList<string> arguments, IServiceProvider services, CancellationToken cancellationToken)
+        => this.inner.QueryEntities(entityId, kind, arguments, services, cancellationToken);
+}

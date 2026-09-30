@@ -9,7 +9,9 @@ public class DispatcherTests
 {
     readonly List<string> log = [];
 
-    AppFunctionDispatcher Create(params IAppFunctionDelegate[] delegates)
+    AppFunctionDispatcher Create(params IAppFunctionDelegate[] delegates) => this.Create<TestRegistry>(delegates);
+
+    AppFunctionDispatcher Create<TRegistry>(params IAppFunctionDelegate[] delegates) where TRegistry : class, IAppFunctionRegistry
     {
         var services = new ServiceCollection();
         services.AddSingleton<ILogger<AppFunctionDispatcher>>(NullLogger<AppFunctionDispatcher>.Instance);
@@ -19,7 +21,7 @@ public class DispatcherTests
         services.AddScoped<IAppEntityQuery<Customer>, CustomerQuery>();
         foreach (var d in delegates)
             services.AddSingleton(d);
-        services.AddAppFunctionsRuntime<TestRegistry>();
+        services.AddAppFunctionsRuntime<TRegistry>();
         return services.BuildServiceProvider().GetRequiredService<AppFunctionDispatcher>();
     }
 
@@ -157,6 +159,37 @@ public class DispatcherTests
 
         Assert.Equal(AppFunctionErrorCode.Denied, outcome.ErrorCode);
         Assert.Equal("open the app", outcome.Message);
+    }
+
+    [Theory]
+    [InlineData(AppFunctionPlatform.Android)]
+    [InlineData(AppFunctionPlatform.Other)]
+    public async Task OpensApp_InTheBackground_IsDeniedBeforeDelegates(AppFunctionPlatform platform)
+    {
+        var d = new RecordingDelegate("d", this.log);
+        var outcome = await this.Create<OpensAppTestRegistry>(d).Execute(Call("greet", platform), """{"name":"Bob","times":1}""", CancellationToken.None);
+
+        Assert.Equal(AppFunctionErrorCode.Denied, outcome.ErrorCode);
+        Assert.Equal("Open the app to continue", outcome.Message);
+        Assert.DoesNotContain(this.log, x => x.StartsWith("d:invoking"));
+        Assert.Contains(this.log, x => x.StartsWith("d:invoked"));
+    }
+
+    [Fact]
+    public async Task OpensApp_OnAppleInTheBackground_NeedsForeground()
+    {
+        var outcome = await this.Create<OpensAppTestRegistry>().Execute(Call("greet", AppFunctionPlatform.Apple), """{"name":"Bob","times":1}""", CancellationToken.None);
+        Assert.Equal(AppFunctionStatus.NeedsForeground, outcome.Status);
+    }
+
+    [Theory]
+    [InlineData(AppFunctionPlatform.Apple)]
+    [InlineData(AppFunctionPlatform.Android)]
+    [InlineData(AppFunctionPlatform.Other)]
+    public async Task OpensApp_InTheForeground_Runs(AppFunctionPlatform platform)
+    {
+        var outcome = await this.Create<OpensAppTestRegistry>().Execute(Call("greet", platform, foreground: true), """{"name":"Bob","times":1}""", CancellationToken.None);
+        Assert.Equal(AppFunctionStatus.Success, outcome.Status);
     }
 
     [Fact]

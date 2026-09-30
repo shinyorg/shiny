@@ -31,8 +31,9 @@ sealed class AppFunctionAIFunction : AIFunction
 
     protected override async ValueTask<object?> InvokeCoreAsync(AIFunctionArguments arguments, CancellationToken cancellationToken)
     {
+        // the chat runs inside the app, so the app is on screen: OpensApp functions and OpenApp gates pass
         var outcome = await this.dispatcher
-            .Execute(new AppFunctionInvocation(this.function.Id), ToJson(arguments), cancellationToken)
+            .Execute(new AppFunctionInvocation(this.function.Id, IsForeground: true), ToJson(arguments), cancellationToken)
             .ConfigureAwait(false);
 
         if (outcome.Status != AppFunctionStatus.Success)

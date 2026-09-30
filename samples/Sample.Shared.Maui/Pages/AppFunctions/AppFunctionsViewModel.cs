@@ -43,7 +43,7 @@ public partial class AppFunctionsViewModel(
     }
 
     // The same pipeline Siri and Gemini go through: binding, delegates, handler, result. Not flagged as
-    // foreground, so SignInDelegate's OpenApp gate refuses cancel_order here the way Android does.
+    // foreground, so SignInDelegate refuses cancel_order here until you sign in, the way Android does.
     [RelayCommand]
     Task CreateTestOrder() => this.Run("create_order", """{"customer":"acme","quantity":2,"priority":"Normal","note":"from the app"}""");
 

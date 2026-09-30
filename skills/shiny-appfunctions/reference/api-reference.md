@@ -44,7 +44,7 @@ public sealed class AppFunctionAttribute(string id) : Attribute
     public string Id { get; }
     public string? Title { get; set; }          // default: type name split into words
     public string? Description { get; set; }
-    public bool OpensApp { get; set; }         // iOS: foreground before the handler runs
+    public bool OpensApp { get; set; }         // needs the app on screen: iOS foregrounds it first; Android/other runs only if visible, else Denied
 }
 
 [AttributeUsage(Property | Parameter)]
@@ -130,7 +130,7 @@ public sealed class AppFunctionContext
     public AppFunctionInvocation Invocation { get; }
     public string FunctionId { get; }
     public AppFunctionPlatform Platform { get; }
-    public bool IsForeground { get; }                   // app on screen: user asked from inside it, or iOS OpensApp/OpenApp
+    public bool IsForeground { get; }                   // app on screen: user asked from inside it, in-app AI tools, or iOS OpensApp/OpenApp
     public string? CallerPackage { get; }               // Android: calling agent's package
     public object? Request { get; }                     // null for entity lookups
     public IServiceProvider Services { get; }           // the call's DI scope
@@ -262,4 +262,4 @@ Tool results (`JsonObject`):
 - success: `{ "success": true, "result": <value>?, "message": "<dialog>"? }`
 - failure: `{ "error": "<message>", "code": "<AppFunctionErrorCode>" }`
 
-Calls run as `AppFunctionInvocation(id)` - `AppFunctionPlatform.Other`, `IsForeground = false`.
+Calls run as `AppFunctionInvocation(id, IsForeground: true)` - `AppFunctionPlatform.Other`, in the foreground, so `OpensApp` functions run and `OpenApp` gates pass.

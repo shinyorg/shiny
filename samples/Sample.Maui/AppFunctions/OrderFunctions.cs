@@ -115,13 +115,18 @@ public class CancelOrderHandler(OrderStore store) : IAppFunctionHandler<CancelOr
 }
 
 
-/// <summary>Cancelling needs a signed-in user: Siri asks to continue in the app (where you can sign in); Android refuses.</summary>
+/// <summary>
+/// Cancelling needs a signed-in user. From the background, Siri asks to continue in the app (where you can sign in)
+/// and Android refuses; once the app is on screen, OpenApp would pass, so the call is refused until you sign in.
+/// </summary>
 public class SignInDelegate(SignInState signIn) : IAppFunctionDelegate
 {
     public Task<AppFunctionGate> OnInvoking(AppFunctionContext context, CancellationToken cancellationToken)
     {
         if (context.FunctionId == "cancel_order" && !signIn.IsSignedIn)
-            return Task.FromResult(AppFunctionGate.OpenApp("Sign in to cancel orders."));
+            return Task.FromResult(context.IsForeground
+                ? AppFunctionGate.Deny("Sign in to cancel orders.")
+                : AppFunctionGate.OpenApp("Sign in to cancel orders."));
 
         return Task.FromResult(AppFunctionGate.Allow);
     }

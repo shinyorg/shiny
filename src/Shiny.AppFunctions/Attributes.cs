@@ -21,8 +21,9 @@ public sealed class AppFunctionAttribute(string id) : Attribute
     public string? Description { get; set; }
 
     /// <summary>
-    /// iOS: the app is brought to the foreground before the handler runs. Android has no equivalent and runs it
-    /// in the background.
+    /// The function needs the app on screen, as if every call passed an <see cref="AppFunctionGate.OpenApp"/> gate.
+    /// iOS: the app is brought to the foreground before the handler runs. Android cannot bring an app forward from
+    /// the background, so the call runs only while the app is visible and is otherwise refused (<c>Denied</c>).
     /// </summary>
     public bool OpensApp { get; set; }
 }

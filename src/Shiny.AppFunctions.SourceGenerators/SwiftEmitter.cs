@@ -119,7 +119,8 @@ static class SwiftEmitter
 
         if (fn.Parameters.Count > 0)
         {
-            var summary = fn.Title + " " + string.Join(" ", fn.Parameters.Where(p => p.IsRequired).Select(p => $"\\(\\.${Ident(p.WireName)})"));
+            // A projected value is never backticked: \.$default and \.$title are valid Swift, \.$`title` is not.
+            var summary = fn.Title + " " + string.Join(" ", fn.Parameters.Where(p => p.IsRequired).Select(p => $"\\(\\.${p.WireName})"));
             sb.AppendLine("    static var parameterSummary: some ParameterSummary {");
             sb.AppendLine($"        Summary(\"{Escape(summary.Trim())}\")");
             sb.AppendLine("    }");

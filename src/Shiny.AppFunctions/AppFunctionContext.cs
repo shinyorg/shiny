@@ -2,7 +2,7 @@ namespace Shiny.AppFunctions;
 
 public enum AppFunctionPlatform
 {
-    /// <summary>Tests, or an in-process caller such as an AI tool adapter.</summary>
+    /// <summary>Tests, or an in-process caller such as the AI tool adapter (which calls with the app in the foreground).</summary>
     Other,
     /// <summary>Siri, Shortcuts, Spotlight or Apple Intelligence through App Intents.</summary>
     Apple,
@@ -34,8 +34,9 @@ public sealed class AppFunctionContext
     public AppFunctionPlatform Platform => this.Invocation.Platform;
 
     /// <summary>
-    /// The app is on screen for this run: the user was already in it when they asked Siri or Gemini, or (iOS) it was
-    /// brought forward by <see cref="AppFunctionAttribute.OpensApp"/> or <see cref="AppFunctionGate.OpenApp"/>.
+    /// The app is on screen for this run: the user was already in it when they asked Siri or Gemini, the call came
+    /// from an in-app AI chat, or (iOS) it was brought forward by <see cref="AppFunctionAttribute.OpensApp"/> or
+    /// <see cref="AppFunctionGate.OpenApp"/>.
     /// The handler still runs off the main thread, so dispatch UI work to it.
     /// </summary>
     public bool IsForeground => this.Invocation.IsForeground;
