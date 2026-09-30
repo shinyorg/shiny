@@ -282,7 +282,6 @@ adb shell "cmd app_function execute-app-function --package <applicationId> --fun
 - Functions in class libraries are not scanned (no diagnostic yet).
 - Titles and descriptions are not localized.
 - Multi-RID iOS builds (arm64 + x64 simulator together) are not supported by the metadata step.
-- Siri by voice, Gemini itself and physical devices were not part of the verification; the emulator/simulator flows were.
 
 ## Reference Files
 
