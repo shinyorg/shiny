@@ -30,6 +30,7 @@
         <Project Path="tests/Shiny.BluetoothLE.Hosting.Linux.Tests/Shiny.BluetoothLE.Hosting.Linux.Tests.csproj" />
         <Project Path="tests/Shiny.AppFunctions.Tests/Shiny.AppFunctions.Tests.csproj" />
         <Project Path="tests/Shiny.AppFunctions.SourceGenerators.Tests/Shiny.AppFunctions.SourceGenerators.Tests.csproj" />
+        <Project Path="tests/Shiny.Printers.Tests/Shiny.Printers.Tests.csproj" />
     </Folder>
     <Folder Name="/.Solution/">
         <File Path=".editorconfig" />
@@ -88,6 +89,11 @@
     <Project Path="src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
     <Project Path="src\Shiny.Gamepad\Shiny.Gamepad.csproj" />
     <Project Path="src\Shiny.Wearables\Shiny.Wearables.csproj" />
+    <Project Path="src\Shiny.Printers\Shiny.Printers.csproj" />
+    <Project Path="src\Shiny.Printers.BluetoothLE\Shiny.Printers.BluetoothLE.csproj" />
+    <Project Path="src\Shiny.Printers.Network\Shiny.Printers.Network.csproj" />
+    <Project Path="src\Shiny.Printing\Shiny.Printing.csproj" />
+    <Project Path="src\Shiny.Printing.Rendering\Shiny.Printing.Rendering.csproj" />
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
         <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />
@@ -98,6 +104,8 @@
         <Project Path="src/Shiny.Data.Sync.Blazor/Shiny.Data.Sync.Blazor.csproj" />
         <Project Path="src\Shiny.ScreenRecorder.Blazor\Shiny.ScreenRecorder.Blazor.csproj" />
         <Project Path="src\Shiny.Gamepad.Blazor\Shiny.Gamepad.Blazor.csproj" />
+        <Project Path="src\Shiny.Printers.Blazor\Shiny.Printers.Blazor.csproj" />
+        <Project Path="src\Shiny.Printing.Blazor\Shiny.Printing.Blazor.csproj" />
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />

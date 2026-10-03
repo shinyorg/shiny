@@ -6,6 +6,14 @@
          Recording grant itself is a TCC prompt, not an Info.plist key. -->
     <key>NSMicrophoneUsageDescription</key>
     <string>Records narration alongside a screen recording</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>This sample discovers and prints to receipt printers on your local network.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <!-- Shiny.Printers.Network: raw (port 9100) and LPR receipt printers -->
+        <string>_pdl-datastream._tcp</string>
+        <string>_printer._tcp</string>
+    </array>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses Bluetooth to scan for and connect to nearby devices</string>
     <key>NSBluetoothPeripheralUsageDescription</key>

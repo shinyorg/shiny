@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- mirrors Shiny.Net.Discovery so each platform gets its native mDNS browser -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.Printers.Network</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny Printers over WiFi / Ethernet - raw TCP (JetDirect / port 9100) streaming to network thermal printers plus mDNS discovery through Shiny.Net.Discovery</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Reactive" />
+        <ProjectReference Include="..\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />
+        <ProjectReference Include="..\Shiny.Printers\Shiny.Printers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Printers.Tests" />
+    </ItemGroup>
+
+</Project>

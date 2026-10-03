@@ -52,7 +52,14 @@
             "src\\Shiny.AppFunctions\\Shiny.AppFunctions.csproj",
             "src\\Shiny.AppFunctions.SourceGenerators\\Shiny.AppFunctions.SourceGenerators.csproj",
             "src\\Shiny.AppFunctions.Build\\Shiny.AppFunctions.Build.csproj",
-            "src\\Shiny.AppFunctions.Extensions.AI\\Shiny.AppFunctions.Extensions.AI.csproj"
+            "src\\Shiny.AppFunctions.Extensions.AI\\Shiny.AppFunctions.Extensions.AI.csproj",
+            "src\\Shiny.Printers\\Shiny.Printers.csproj",
+            "src\\Shiny.Printers.BluetoothLE\\Shiny.Printers.BluetoothLE.csproj",
+            "src\\Shiny.Printers.Network\\Shiny.Printers.Network.csproj",
+            "src\\Shiny.Printing\\Shiny.Printing.csproj",
+            "src\\Shiny.Printing.Rendering\\Shiny.Printing.Rendering.csproj",
+            "src\\Shiny.Printers.Blazor\\Shiny.Printers.Blazor.csproj",
+            "src\\Shiny.Printing.Blazor\\Shiny.Printing.Blazor.csproj"
         ]
     }
 }

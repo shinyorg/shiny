@@ -20,6 +20,9 @@ public static class MauiProgram
         var s = builder.Services;
         s.AddBluetoothLE();
         s.AddBluetoothLeHosting();
+
+        // after AddBluetoothLE - BLE printing needs an IBleManager already registered on Linux
+        s.AddBluetoothLePrinting();
         s.AddNotifications<SampleNotificationDelegate>();
         s.AddBattery();
         s.AddConnectivity();

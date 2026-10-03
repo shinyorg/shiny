@@ -23,6 +23,9 @@
         <string>_http._tcp</string>
         <string>_ipp._tcp</string>
         <string>_airplay._tcp</string>
+        <!-- Shiny.Printers.Network: raw (port 9100) and LPR receipt printers -->
+        <string>_pdl-datastream._tcp</string>
+        <string>_printer._tcp</string>
     </array>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses Bluetooth to scan for and connect to nearby devices</string>

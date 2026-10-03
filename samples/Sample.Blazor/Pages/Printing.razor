@@ -1,0 +1,285 @@
+@page "/printing"
+@using Sample.Blazor.Printing
+@using Shiny.Printers
+@using Shiny.Printers.Blazor
+@using Shiny.Printers.Document
+@using Shiny.Printers.Imaging
+@using Shiny.Printing
+@implements IAsyncDisposable
+@inject BrowserPrinterManager Printers
+@inject BrowserImageDecoder Images
+@inject IPrintService NativePrint
+
+<PageTitle>Printing</PageTitle>
+
+<h1>Printing</h1>
+
+<p>
+    Thermal ESC/POS printing over the browser's own device APIs &mdash; the same <code>PrintDocument</code> and
+    <code>EscPosProtocol</code> the MAUI sample streams over BLE and TCP. All three transports are Chromium-only and
+    need HTTPS (or localhost). Each button opens the browser's device chooser, which <em>is</em> the scan, so it only
+    works from a click.
+</p>
+
+<table class="table">
+    <tbody>
+        <tr>
+            <th>Support</th>
+            <td>
+                Web Bluetooth <code>@support.Bluetooth</code> &middot;
+                Web Serial <code>@support.Serial</code> &middot;
+                WebUSB <code>@support.Usb</code> &middot;
+                secure context <code>@support.SecureContext</code>
+            </td>
+        </tr>
+        @if (printer != null)
+        {
+            <tr><th>Printer</th><td>@printer.Connection.Name over @printer.Connection.Transport @(printer.Connection.Detail is { } d ? $"({d})" : "")</td></tr>
+            <tr><th>Paper</th><td>@printer.Capabilities.PaperWidthMm mm / @printer.Capabilities.CharactersPerLine col / @printer.Capabilities.DotsPerLine dots</td></tr>
+            <tr><th>State</th><td>@state</td></tr>
+        }
+    </tbody>
+</table>
+
+@if (printer == null)
+{
+    <div class="mb-3">
+        <label class="form-label" for="paper">Paper</label>
+        <select class="form-select w-auto" id="paper" @bind="paper" disabled="@busy">
+            <option value="58">58 mm &mdash; 32 col</option>
+            <option value="80">80 mm &mdash; 48 col</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary me-2" disabled="@(busy || !support.Bluetooth)" @onclick="ConnectBluetooth">Web Bluetooth</button>
+        <button class="btn btn-primary me-2" disabled="@(busy || !support.Serial)" @onclick="ConnectSerial">Web Serial</button>
+        <button class="btn btn-primary me-2" disabled="@(busy || !support.Usb)" @onclick="ConnectUsb">WebUSB</button>
+    </div>
+}
+else
+{
+    <div class="mb-3 form-check">
+        <input class="form-check-input" type="checkbox" id="logo" @bind="includeLogo" disabled="@busy" />
+        <label class="form-check-label" for="logo">Include logo (decoded by the browser's canvas - no imaging library in the payload)</label>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary me-2" disabled="@(busy || !Ready)" @onclick="PrintReceipt">Print receipt</button>
+        <button class="btn btn-secondary me-2" disabled="@(busy || !Ready)" @onclick="FeedAndCut">Feed &amp; cut</button>
+        <button class="btn btn-danger me-2" disabled="@busy" @onclick="Disconnect">Disconnect</button>
+    </div>
+}
+
+<h2 class="h4 mt-4">OS print dialog</h2>
+<p>
+    No thermal printer involved: <code>Shiny.Printing.Blazor</code> hands HTML to <code>window.print()</code> for any
+    installed printer. Capabilities: <code>@NativePrint.Capabilities</code>
+</p>
+<div class="mb-3">
+    <button class="btn btn-outline-primary" disabled="@busy" @onclick="PrintHtmlToOs">Print receipt as HTML</button>
+</div>
+
+@if (log.Count > 0)
+{
+    <h2 class="h5 mt-4">Log</h2>
+    <ul class="list-unstyled small">
+        @foreach (var entry in log)
+        {
+            <li><code>@entry.At.ToString("HH:mm:ss")</code> @entry.Message</li>
+        }
+    </ul>
+}
+
+@code {
+    record LogEntry(DateTime At, string Message);
+
+    readonly List<LogEntry> log = [];
+    BrowserPrintingSupport support = new(false, false, false, false);
+    BrowserPrinter? printer;
+    IDisposable? statusSub;
+    PrinterConnectionState state = PrinterConnectionState.Disconnected;
+    string paper = "58";
+    bool includeLogo = true;
+    bool busy;
+
+    bool Ready => this.printer != null && this.state == PrinterConnectionState.Connected;
+
+    PrinterCapabilities Capabilities => this.paper == "80"
+        ? PrinterCapabilities.Paper80mm
+        : PrinterCapabilities.Paper58mm;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // JS interop is only legal once the component has rendered
+        if (firstRender)
+        {
+            this.support = await this.Printers.GetSupport();
+            this.StateHasChanged();
+        }
+    }
+
+
+    Task ConnectBluetooth() => this.Connect("Web Bluetooth", () => this.Printers.RequestBluetooth(new() { Capabilities = this.Capabilities }));
+    Task ConnectSerial() => this.Connect("Web Serial", () => this.Printers.RequestSerial(new() { Capabilities = this.Capabilities }));
+    Task ConnectUsb() => this.Connect("WebUSB", () => this.Printers.RequestUsb(new() { Capabilities = this.Capabilities }));
+
+
+    async Task Connect(string label, Func<Task<BrowserPrinter>> connect)
+    {
+        this.busy = true;
+        try
+        {
+            var connected = await connect();
+            this.printer = connected;
+            this.state = PrinterConnectionState.Connected;
+
+            // WhenStatusChanged replays the current state, so this also catches a disconnect that raced us
+            this.statusSub = connected.Connection
+                .WhenStatusChanged()
+                .Subscribe(next => this.InvokeAsync(() =>
+                {
+                    this.state = next;
+                    if (next == PrinterConnectionState.Disconnected)
+                        this.Log("Printer disconnected");
+
+                    this.StateHasChanged();
+                }));
+
+            this.Log($"Connected to '{connected.Connection.Name}' over {label}");
+        }
+        catch (OperationCanceledException)
+        {
+            this.Log($"{label}: chooser dismissed");
+        }
+        catch (Exception ex)
+        {
+            this.Log($"{label} failed: {ex.Message}");
+        }
+        finally
+        {
+            this.busy = false;
+        }
+    }
+
+
+    async Task Disconnect()
+    {
+        this.busy = true;
+        try
+        {
+            await this.Teardown();
+            this.Log("Disconnected");
+        }
+        finally
+        {
+            this.busy = false;
+        }
+    }
+
+
+    async Task Teardown()
+    {
+        this.statusSub?.Dispose();
+        this.statusSub = null;
+
+        // BrowserPrinter owns its connection - disposing hands the device back to the browser
+        if (this.printer != null)
+            await this.printer.DisposeAsync();
+
+        this.printer = null;
+        this.state = PrinterConnectionState.Disconnected;
+    }
+
+
+    Task PrintReceipt() => this.Print("receipt", async caps =>
+    {
+        PrinterImage? logo = null;
+        if (this.includeLogo && caps.SupportsImages)
+        {
+            logo = await this.Images.Decode("receipt-logo.png", caps.DotsPerLine);
+            if (logo == null)
+                this.Log("Logo could not be decoded - printing without it");
+        }
+        return SampleReceipt.Build(caps, logo);
+    });
+
+
+    Task FeedAndCut() => this.Print("feed & cut", caps =>
+    {
+        var doc = new PrintDocument().Feed(4);
+        if (caps.SupportsCut)
+            doc.Cut();
+
+        return Task.FromResult(doc);
+    });
+
+
+    async Task Print(string what, Func<PrinterCapabilities, Task<PrintDocument>> build)
+    {
+        if (this.printer == null)
+            return;
+
+        this.busy = true;
+        try
+        {
+            var document = await build(this.printer.Capabilities);
+            await this.printer.Print(document);
+            this.Log($"Printed {what}");
+        }
+        catch (Exception ex)
+        {
+            this.Log($"Print failed: {ex.Message}");
+        }
+        finally
+        {
+            this.busy = false;
+        }
+    }
+
+
+    async Task PrintHtmlToOs()
+    {
+        this.busy = true;
+        try
+        {
+            var result = await this.NativePrint.Print(PrintJob.Html(ReceiptHtml));
+            this.Log($"OS print: {result.Status}{(result.Error == null ? "" : $" - {result.Error}")}");
+        }
+        finally
+        {
+            this.busy = false;
+        }
+    }
+
+
+    const string ReceiptHtml =
+        """
+        <html><head><style>
+            body { font-family: ui-monospace, Menlo, Consolas, monospace; width: 58mm; margin: 0 auto; }
+            h1 { font-size: 15pt; text-align: center; margin: 0 0 2mm; }
+            .r { display: flex; justify-content: space-between; }
+            hr { border: 0; border-top: 1px dashed #000; }
+        </style></head><body>
+            <h1>SHINY MART</h1>
+            <p style="text-align:center;margin:0">123 Receipt Street<br>Tel: 555-0100</p>
+            <hr>
+            <div class="r"><span>Coffee</span><span>$3.50</span></div>
+            <div class="r"><span>Croissant</span><span>$2.25</span></div>
+            <div class="r"><span>Orange Juice</span><span>$4.00</span></div>
+            <hr>
+            <div class="r"><strong>TOTAL</strong><strong>$9.75</strong></div>
+            <p style="text-align:center">Thank you!</p>
+        </body></html>
+        """;
+
+
+    void Log(string message)
+    {
+        this.log.Insert(0, new(DateTime.Now, message));
+        if (this.log.Count > 50)
+            this.log.RemoveAt(this.log.Count - 1);
+    }
+
+
+    public async ValueTask DisposeAsync() => await this.Teardown();
+}

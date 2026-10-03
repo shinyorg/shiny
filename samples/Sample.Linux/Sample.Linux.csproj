@@ -13,6 +13,8 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Platforms.Linux.Gtk4"/>
         <PackageReference Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials"/>
+        <!-- SkiaSharp's net10.0 build only carries macOS + Windows natives; Shiny.Printing.Rendering needs this on Linux -->
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux"/>
     </ItemGroup>
 
     <ItemGroup>

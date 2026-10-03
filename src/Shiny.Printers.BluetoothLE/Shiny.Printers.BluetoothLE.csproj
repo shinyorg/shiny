@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- mirrors Shiny.BluetoothLE so registration can call AddBluetoothLE() wherever it exists -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.Printers.BluetoothLE</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny Printers over Bluetooth LE - scan, connect and stream ESC/POS to BLE thermal printers with MTU-chunked writes</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Reactive" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\Shiny.Printers\Shiny.Printers.csproj" />
+    </ItemGroup>
+
+</Project>

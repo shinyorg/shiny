@@ -43,6 +43,9 @@
         <MauiImage Include="Resources\Images\*"/>
         <MauiFont Include="Resources\Fonts\*"/>
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
+
+        <!-- the receipt logo is embedded rather than a MauiAsset: MAUI's FileSystem is not implemented on the macOS head -->
+        <EmbeddedResource Include="Pages\Printing\receipt-logo.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -76,6 +79,10 @@
         <ProjectReference Include="..\..\src\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Wifi\Shiny.Net.Wifi.csproj" />
         <ProjectReference Include="..\..\src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printers.BluetoothLE\Shiny.Printers.BluetoothLE.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printers.Network\Shiny.Printers.Network.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printing\Shiny.Printing.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printing.Rendering\Shiny.Printing.Rendering.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <!-- the App Functions page reads the registry and runs functions through the dispatcher; the functions are in Sample.Maui -->
         <ProjectReference Include="..\..\src\Shiny.AppFunctions\Shiny.AppFunctions.csproj" />

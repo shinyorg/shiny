@@ -44,6 +44,9 @@
         <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.2.0"/>
         <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1"/>
+        <PackageVersion Include="SkiaSharp" Version="4.151.1"/>
+        <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1"/>
+        <PackageVersion Include="System.Drawing.Common" Version="10.0.0"/>
         <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="13.1.2"/>
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1"/>

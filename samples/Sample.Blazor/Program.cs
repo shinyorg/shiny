@@ -14,6 +14,11 @@ builder.Services.AddBluetoothLE();
 builder.Services.AddGps();
 builder.Services.AddBlazorHttpTransfers<SampleHttpTransferDelegate>();
 builder.Services.AddScreenRecorder();
+
+// Thermal ESC/POS over Web Bluetooth / Web Serial / WebUSB, plus the OS print dialog via window.print()
+builder.Services.AddBrowserPrinting();
+builder.Services.AddBlazorPrinting();
+builder.Services.AddScoped<Sample.Blazor.Printing.BrowserImageDecoder>();
 builder.Services.AddPush<SamplePushDelegate>(new WebPushOptions
 {
     // Replace with your own VAPID public key generated for your push backend

@@ -23,6 +23,8 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
                 new("🟢 Eddystone", "Scan Eddystone UID / URL / TLM frames", "eddystone"),
                 new("📶 Beacon Broadcast", "Advertise as an iBeacon", "beaconbroadcast"),
                 new("📅 Calendar", "Browse & edit device calendar events", "calendar"),
+                new("🧾 Thermal Printer", "Print receipts to BLE & WiFi ESC/POS printers", "thermalprinter"),
+                new("🖨️ Native Print", "Print PDFs & HTML through CUPS", "nativeprint"),
                 new("🤖 AI Assistant", "Chat + Shiny AI tools via GitHub Copilot", "ai"),
                 new("🔋 Battery", "Observe battery level & state", "battery"),
                 new("🌐 Connectivity", "Observe network connectivity", "connectivity"),
@@ -93,6 +95,10 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         list.Add(new("🔎 mDNS / Bonjour", "Browse DNS-SD services on the local network", "mdns"));
         list.Add(new("🛰️ SSDP / UPnP", "Find routers, media servers & smart TVs", "ssdp"));
         list.Add(new("🎥 WS-Discovery", "Find ONVIF cameras, WSD printers & PCs", "wsdiscovery"));
+
+        // --- Printing ---
+        list.Add(new("🧾 Thermal Printer", "Print receipts to BLE & WiFi ESC/POS printers", "thermalprinter"));
+        list.Add(new("🖨️ Native Print", "Print PDFs & HTML through the OS print dialog", "nativeprint"));
 
         // --- Device state ---
         list.Add(new("🔋 Battery", "Observe battery level & state", "battery"));

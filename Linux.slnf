@@ -36,7 +36,14 @@
       "src\\Shiny.ScreenRecorder.Blazor\\Shiny.ScreenRecorder.Blazor.csproj",
       "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
       "src\\Shiny.Gamepad.Linux\\Shiny.Gamepad.Linux.csproj",
-      "src\\Shiny.Gamepad.Blazor\\Shiny.Gamepad.Blazor.csproj"
+      "src\\Shiny.Gamepad.Blazor\\Shiny.Gamepad.Blazor.csproj",
+      "src\\Shiny.Printers\\Shiny.Printers.csproj",
+      "src\\Shiny.Printers.BluetoothLE\\Shiny.Printers.BluetoothLE.csproj",
+      "src\\Shiny.Printers.Network\\Shiny.Printers.Network.csproj",
+      "src\\Shiny.Printing\\Shiny.Printing.csproj",
+      "src\\Shiny.Printing.Rendering\\Shiny.Printing.Rendering.csproj",
+      "src\\Shiny.Printers.Blazor\\Shiny.Printers.Blazor.csproj",
+      "src\\Shiny.Printing.Blazor\\Shiny.Printing.Blazor.csproj"
     ]
   }
 }

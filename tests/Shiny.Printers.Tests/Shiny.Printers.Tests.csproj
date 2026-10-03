@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Shiny.Printers.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.Printers\Shiny.Printers.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printers.BluetoothLE\Shiny.Printers.BluetoothLE.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printers.Blazor\Shiny.Printers.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printers.Network\Shiny.Printers.Network.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printing\Shiny.Printing.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printing.Rendering\Shiny.Printing.Rendering.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+</Project>

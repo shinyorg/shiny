@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.Printing.Rendering</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny Printing Rendering - renders a Shiny.Printers PrintDocument to PDF with SkiaSharp so the same receipt can be printed on any OS-native printer through Shiny.Printing</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="SkiaSharp" />
+        <ProjectReference Include="..\Shiny.Printers\Shiny.Printers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Printers.Tests" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.Printers</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny Printers - transport and protocol agnostic thermal / receipt printing: a fluent document model, ESC/POS and TSPL encoders, barcodes, QR codes and raster images</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Printers.Tests" />
+    </ItemGroup>
+
+</Project>

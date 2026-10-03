@@ -54,6 +54,8 @@ public static class ShinyRegistrations
         // Shiny.BluetoothLE.Hosting.Linux).
         s.AddBluetoothLE<SampleBleDelegate>();
         s.AddBluetoothLeHosting();
+        // BLE thermal printers - Linux registers this from its head, after Shiny.BluetoothLE.Linux
+        s.AddBluetoothLePrinting();
         s.AddNotifications<SampleNotificationDelegate>();
 
         // Source-generated GATT/L2CAP hosting - registers every [BleService] and [L2CapService]
@@ -136,6 +138,14 @@ public static class ShinyRegistrations
         s.AddMdns();
         s.AddSsdp();
         s.AddWsDiscovery();
+
+        // ── Printing ──
+        // Thermal / receipt printers over WiFi (raw TCP 9100, found over the mDNS registered above) and
+        // OS-native printing (AirPrint / PrintManager / GDI+ / CUPS) work on every platform here. CUPS backs
+        // both Linux and the macOS head, which resolve Shiny.Printing's plain net10.0 build.
+        s.AddNetworkPrinting();
+        s.AddNativePrinting();
+        s.AddPrintDocumentRendering();
 
 #if IOS || ANDROID
         // App Functions: the orders "backend" behind the functions Siri and Gemini call. The functions themselves,

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Printing"
+             xmlns:printing="clr-namespace:Shiny.Printing;assembly=Shiny.Printing"
+             x:Class="Sample.Shared.Maui.Pages.Printing.NativePrintPage"
+             x:DataType="vm:NativePrintViewModel"
+             Title="Native Print">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="Hands a document to the platform print pipeline - AirPrint, Android PrintManager, Windows GDI+ / shell, or CUPS."
+                   FontSize="13" />
+            <Label Text="{Binding CapabilitiesText}" FontSize="12" TextColor="Gray" />
+
+            <Button Text="Print PDF (rendered receipt)" Command="{Binding PrintPdfCommand}" />
+            <Button Text="Print HTML" Command="{Binding PrintHtmlCommand}" IsVisible="{Binding SupportsHtml}" />
+
+            <!-- desktop / CUPS only: enumerate, pick, and optionally skip the dialog -->
+            <Border Padding="12" StrokeThickness="1" Stroke="Gray" StrokeShape="RoundRectangle 8" IsVisible="{Binding SupportsEnumerate}">
+                <VerticalStackLayout Spacing="8">
+                    <Button Text="List Printers" Command="{Binding ListPrintersCommand}" />
+                    <Picker Title="Printer"
+                            ItemsSource="{Binding Printers}"
+                            ItemDisplayBinding="{Binding DisplayName, x:DataType=printing:PrinterInfo}"
+                            SelectedItem="{Binding SelectedPrinter}" />
+                    <HorizontalStackLayout Spacing="8" IsVisible="{Binding SupportsSilent}">
+                        <Switch IsToggled="{Binding Silent}" VerticalOptions="Center" />
+                        <Label Text="Print silently (no dialog)" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="{Binding Status}" FontAttributes="Bold" LineBreakMode="WordWrap" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

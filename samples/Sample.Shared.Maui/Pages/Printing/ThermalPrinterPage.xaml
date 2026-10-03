@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Printing"
+             xmlns:ble="clr-namespace:Shiny.Printers.BluetoothLE;assembly=Shiny.Printers.BluetoothLE"
+             xmlns:net="clr-namespace:Shiny.Printers.Network;assembly=Shiny.Printers.Network"
+             x:Class="Sample.Shared.Maui.Pages.Printing.ThermalPrinterPage"
+             x:DataType="vm:ThermalPrinterViewModel"
+             Title="Thermal Printer">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Border Padding="12" StrokeThickness="1" Stroke="Gray" StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{Binding Status}" FontAttributes="Bold" />
+                    <Label Text="{Binding CapabilitiesText}" FontSize="12" TextColor="Gray" IsVisible="{Binding IsConnected}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- connected: print / disconnect -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsVisible="{Binding IsConnected}">
+                <Button Grid.Column="0" Text="Print Receipt" Command="{Binding PrintCommand}" />
+                <Button Grid.Column="1" Text="Disconnect" Command="{Binding DisconnectPrinterCommand}" />
+            </Grid>
+
+            <!-- Bluetooth LE -->
+            <Border Padding="12" StrokeThickness="1" Stroke="Gray" StrokeShape="RoundRectangle 8" IsVisible="{Binding IsDisconnected}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Bluetooth LE" FontAttributes="Bold" />
+                    <Label Text="Matches the common ESC/POS GATT profiles (18F0/2AF1, FFE0/FFE1, ISSC). Tap a printer to connect."
+                           FontSize="12" TextColor="Gray" />
+                    <Button Text="{Binding BleScanText}" Command="{Binding ToggleBleScanCommand}" />
+                    <CollectionView ItemsSource="{Binding BlePrinters}"
+                                    HeightRequest="160"
+                                    SelectionMode="Single"
+                                    SelectionChangedCommand="{Binding ConnectBleCommand}"
+                                    SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+                        <CollectionView.EmptyView>
+                            <Label Text="No BLE printers yet" TextColor="Gray" HorizontalTextAlignment="Center" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="ble:DiscoveredPrinter">
+                                <Grid Padding="8" ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Name, TargetNullValue='(unnamed)'}" FontAttributes="Bold" />
+                                        <Label Text="{Binding Uuid}" FontSize="11" TextColor="Gray" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding Rssi, StringFormat='{0} dBm'}" VerticalOptions="Center" TextColor="Gray" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- WiFi / Ethernet -->
+            <Border Padding="12" StrokeThickness="1" Stroke="Gray" StrokeShape="RoundRectangle 8" IsVisible="{Binding IsDisconnected}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="WiFi / Network" FontAttributes="Bold" />
+                    <Label Text="Browses _pdl-datastream._tcp and _printer._tcp over mDNS. Tap a printer to connect over raw TCP."
+                           FontSize="12" TextColor="Gray" />
+                    <Button Text="{Binding NetworkScanText}" Command="{Binding ToggleNetworkScanCommand}" />
+                    <CollectionView ItemsSource="{Binding NetworkPrinters}"
+                                    HeightRequest="140"
+                                    SelectionMode="Single"
+                                    SelectionChangedCommand="{Binding ConnectNetworkCommand}"
+                                    SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+                        <CollectionView.EmptyView>
+                            <Label Text="No network printers yet" TextColor="Gray" HorizontalTextAlignment="Center" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="net:DiscoveredNetworkPrinter">
+                                <Grid Padding="8" ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                        <Label Text="{Binding ServiceType}" FontSize="11" TextColor="Gray" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" VerticalOptions="Center" TextColor="Gray">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0}:{1}">
+                                                <Binding Path="Host" />
+                                                <Binding Path="Port" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="Or connect by address" FontSize="12" TextColor="Gray" Margin="0,4,0,0" />
+                    <Grid ColumnDefinitions="*,80" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Placeholder="192.168.1.50" Keyboard="Url" Text="{Binding ManualHost}" />
+                        <Entry Grid.Column="1" Placeholder="9100" Keyboard="Numeric" Text="{Binding ManualPort}" />
+                    </Grid>
+                    <HorizontalStackLayout Spacing="8">
+                        <Switch IsToggled="{Binding Manual80mm}" VerticalOptions="Center" />
+                        <Label Text="80mm paper (off = 58mm)" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Button Text="Connect" Command="{Binding ConnectManualCommand}" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

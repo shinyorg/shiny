@@ -8,6 +8,9 @@
     <true/>
     <key>com.apple.security.network.client</key>
     <true/>
+    <!-- Shiny.Printing: the macOS head prints through CUPS (lp), which a sandboxed app can only reach with this -->
+    <key>com.apple.security.print</key>
+    <true/>
     <!-- Shiny.ScreenRecorder: a sandboxed app needs this to mix the microphone into a recording.
          Screen capture itself is gated by the Screen Recording TCC grant, not by an entitlement. -->
     <key>com.apple.security.device.audio-input</key>

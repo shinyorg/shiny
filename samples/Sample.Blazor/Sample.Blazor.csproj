@@ -17,5 +17,7 @@
         <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.ScreenRecorder.Blazor\Shiny.ScreenRecorder.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printers.Blazor\Shiny.Printers.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printing.Blazor\Shiny.Printing.Blazor.csproj" />
     </ItemGroup>
 </Project>

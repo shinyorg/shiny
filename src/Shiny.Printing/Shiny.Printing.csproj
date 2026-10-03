@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            No -macos target: an AppKit or console macOS app resolves the base target, which is the
+            CUPS (lp / lpstat) backend - the right answer there. Mac Catalyst gets AirPrint.
+        -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.Printing</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny Printing - OS-native printing: hand a PDF, image, HTML or file to the platform print pipeline (AirPrint, Android PrintManager, Windows GDI+/shell, CUPS) so any installed printer can be targeted</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <!-- AndroidPlatform: the current activity that hosts the system print dialog -->
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!-- Windows images print through GDI+ (System.Drawing.Printing) -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+        <PackageReference Include="System.Drawing.Common" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Printers.Tests" />
+        <InternalsVisibleTo Include="Shiny.Printing.Blazor" />
+    </ItemGroup>
+
+</Project>
