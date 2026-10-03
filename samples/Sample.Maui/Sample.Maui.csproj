@@ -31,6 +31,12 @@
     <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
         <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
         <PublishAot>true</PublishAot>
+        <!--
+            Builds the stock Live Activity widget extension (PlugIns/ShinyLiveActivity.appex) with no Xcode project, and
+            adds NSSupportsLiveActivities. Its bundle id is org.shiny.sample.LiveActivity; the provisioning profile is
+            inferred - set ShinyLiveActivityCodesignProvision to choose one.
+        -->
+        <ShinyLiveActivityWidget>true</ShinyLiveActivityWidget>
     </PropertyGroup>
     
     <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">

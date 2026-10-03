@@ -19,4 +19,13 @@
                  Properties="Configuration=$(Configuration)"
                  RemoveProperties="TargetFramework;RuntimeIdentifier" />
     </Target>
+
+    <!--
+        Same for Shiny.Mobile.LiveActivities: NuGet consumers get its targets from buildTransitive/ and the widget Swift
+        from buildTransitive/swift/; here both come straight from the repo (the Swift from templates/WidgetExtension).
+    -->
+    <PropertyGroup>
+        <ShinyLiveActivitySwiftDir>$(MSBuildThisFileDirectory)../../templates/WidgetExtension/</ShinyLiveActivitySwiftDir>
+    </PropertyGroup>
+    <Import Project="$(MSBuildThisFileDirectory)../../src/Shiny.Mobile.LiveActivities/buildTransitive/Shiny.Mobile.LiveActivities.targets" />
 </Project>

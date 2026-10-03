@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.LiveActivities"
+             xmlns:la="clr-namespace:Shiny.LiveActivities;assembly=Shiny.Mobile.LiveActivities"
+             x:Class="Sample.Shared.Maui.Pages.LiveActivities.LiveActivityPage"
+             x:DataType="vm:LiveActivityViewModel"
+             Title="Live Activities">
+    <Grid Padding="16" RowSpacing="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*">
+        <Label Grid.Row="0" Text="{Binding Access, StringFormat='Access: {0}'}" FontAttributes="Bold" />
+
+        <Entry Grid.Row="1" Placeholder="Title" Text="{Binding Title}" />
+        <Entry Grid.Row="2" Placeholder="Body" Text="{Binding Body}" />
+        <Entry Grid.Row="3" Placeholder="Short status (Dynamic Island / status chip)" Text="{Binding ShortStatus}" />
+
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Label Grid.Column="0" Text="Self-advancing 12 minute timer" VerticalOptions="Center" />
+            <Switch Grid.Column="1" IsToggled="{Binding UseTimer}" />
+        </Grid>
+        <Grid Grid.Row="5" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Label Grid.Column="0" Text="{Binding Progress, StringFormat='Fraction {0:P0} (timer off)'}" VerticalOptions="Center" />
+            <Slider Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding Progress}" />
+        </Grid>
+
+        <Grid Grid.Row="6" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+            <Button Grid.Column="0" Text="Start" Command="{Binding StartCommand}" />
+            <Button Grid.Column="1" Text="Update" Command="{Binding UpdateAllCommand}" />
+            <Button Grid.Column="2" Text="End All" Command="{Binding EndAllCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="7" ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0" Text="Running" FontAttributes="Bold" VerticalOptions="Center" />
+            <Button Grid.Column="1" Text="Refresh" Command="{Binding RefreshCommand}" />
+        </Grid>
+
+        <CollectionView Grid.Row="8" ItemsSource="{Binding Activities}">
+            <CollectionView.EmptyView>
+                <Label Text="No live activities running" HorizontalTextAlignment="Center" TextColor="Gray" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="la:LiveActivity">
+                    <Grid Padding="8,6" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding Id}" LineBreakMode="MiddleTruncation" />
+                        <Label Grid.Column="1" Text="{Binding State}" FontAttributes="Bold" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

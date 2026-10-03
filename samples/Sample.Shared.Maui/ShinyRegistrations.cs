@@ -30,11 +30,22 @@ public static class ShinyRegistrations
         s.AddConnectivity();
 #endif
 
+#if IOS || ANDROID
+        // Live Activities: ActivityKit on iOS (the widget extension is built by Sample.Maui - see
+        // ShinyLiveActivityWidget there) and promoted ongoing notifications on Android.
+        // Registered before AddTransferProgress, which otherwise registers its own manager.
+        s.AddLiveActivities();
+#endif
+
 #if IOS || ANDROID || MACCATALYST || WINDOWS
         // HttpTransfers has platform-specific implementations for iOS/MacCatalyst, Android, and Windows.
         // macOS is unsupported by Shiny.Net.Http; Linux uses AddStandardHttpTransfers from the Linux head.
         // AddHttpTransfers already wires the default repository.
         s.AddHttpTransfers<SampleHttpTransferDelegate>();
+
+        // Mirrors transfers onto a Live Activity (iOS - the widget comes from ShinyLiveActivityWidget in
+        // Sample.Maui) or the foreground-service notification (Android); a no-op elsewhere.
+        s.AddTransferProgress();
 #endif
 #if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
         // BLE central, BLE hosting and local notifications are wired the same way on

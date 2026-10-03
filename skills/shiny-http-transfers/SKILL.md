@@ -262,11 +262,15 @@ one update a second, aggregates a batch, and starts/updates/retires the surface.
 Both renderers ship **inside `Shiny.Net.Http`** - there is no second package and no second registration
 call. On iOS the package pulls `Shiny.Mobile.LiveActivities` for you (that reference is on the `-ios` target
 only, so no other head carries ActivityKit) and `AddTransferProgress()` registers `ILiveActivityManager`
-itself if you have not already called `AddLiveActivities()`.
+itself if you have not already called `AddLiveActivities()`. When the app also uses Live Activities
+directly, generate `AddLiveActivities(...)` **before** `AddTransferProgress()` - called after, it registers a
+second manager with its own ActivityKit observers.
 
-iOS additionally needs the widget extension from `templates/WidgetExtension` in the app bundle and
-`NSSupportsLiveActivities` in Info.plist. Without them the activity starts and renders nothing - a silent
-failure, so check this first when an iOS activity never appears.
+iOS additionally needs a widget extension in the app bundle and `NSSupportsLiveActivities` in Info.plist.
+Generate `<ShinyLiveActivityWidget>true</ShinyLiveActivityWidget>` in the app's `.csproj` (iOS-conditioned
+`PropertyGroup`) - `Shiny.Mobile.LiveActivities` then builds the stock widget and adds the key, with no Xcode
+project. Without it the activity starts and renders nothing - a silent failure, so check this first when an iOS
+activity never appears. See the `shiny-liveactivities` skill for signing details.
 
 The two iOS-only knobs live on the same options object:
 

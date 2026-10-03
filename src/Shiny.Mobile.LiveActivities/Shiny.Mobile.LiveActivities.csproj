@@ -20,6 +20,14 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
+    <!-- The opt-in widget extension build (ShinyLiveActivityWidget=true). The Swift ships from templates/WidgetExtension,
+         the same copy CI compile-checks, so there is one widget and one ShinyActivityAttributes.swift to keep in step
+         with native/ShinyLiveActivities. -->
+    <ItemGroup>
+        <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive\" />
+        <None Include="..\..\templates\WidgetExtension\*.swift" Pack="true" PackagePath="buildTransitive\swift\" Visible="false" />
+    </ItemGroup>
+
     <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
         <ProjectReference Include="..\Shiny.iOS.LiveActivities.Binding\Shiny.iOS.LiveActivities.Binding.csproj" />
     </ItemGroup>

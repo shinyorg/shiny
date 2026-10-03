@@ -54,6 +54,10 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         if (!OperatingSystem.IsLinux())
             list.Add(new("📲 Push", "Push notification registration", "push"));
 
+        // --- Live Activities (iOS/iPadOS ActivityKit + Android 16 Live Updates; ActivityKit is unavailable on Mac Catalyst) ---
+        if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
+            list.Add(new("🏝️ Live Activities", "Lock Screen & Dynamic Island / Android live updates", "liveactivities"));
+
         // --- Background transfers ---
         list.Add(new("⬇️ HTTP Transfers", "Background uploads & downloads", "httptransfers"));
 

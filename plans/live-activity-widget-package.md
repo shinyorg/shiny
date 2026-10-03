@@ -1,8 +1,22 @@
 # Plan: ship the Live Activity widget extension as a NuGet package
 
-Status: **proposed** — nothing built. Supersedes the manual Xcode steps in
-`templates/WidgetExtension/README.md`.
-Last updated: 2026-09-07
+Status: **implemented differently (2026-10-02)** — kept for the reasoning. Supersedes the manual Xcode steps
+that used to be in `templates/WidgetExtension/README.md`.
+Last updated: 2026-10-02
+
+> **What shipped instead.** No separate package and no `ProjectReference` shim: an opt-in
+> `ShinyLiveActivityWidget=true` property in `Shiny.Mobile.LiveActivities`'s own
+> `buildTransitive/Shiny.Mobile.LiveActivities.targets`. It compiles the Swift with `swiftc` directly (no
+> `.xcodeproj`, no xcodegen), writes the extension's Info.plist, and hands the bundle to the SDK as an
+> `AdditionalAppExtensions` item (`Xamarin.Shared.targets`, `_ExtendAppExtensionReferences`), which copies it
+> into `PlugIns/` and **does** sign it with the app's key (open decision 1). Device builds run the SDK's own
+> `DetectSigningIdentity` / `EmbedProvisionProfile` / `CompileEntitlements` tasks for the extension's bundle id,
+> so its profile is inferred like the app's. Opt-in covers the "separate package" concern — Android and
+> push-only apps never run a Swift build. Suffix chosen: `.LiveActivity` (`ShinyLiveActivityBundleId`). Non-Mac
+> builds skip with a warning (open decision 3). The incidental finding below was confirmed: `XcodeProject`'s
+> `Kind` is a `NativeReference` kind, so the old documented setup never embedded an extension.
+> Verified: simulator, an iPhone 15 Pro (Debug, wildcard profile), an App Store-signed `publish`, and a
+> `PackageReference` consumer.
 
 ## Summary
 

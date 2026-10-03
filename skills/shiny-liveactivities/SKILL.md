@@ -33,6 +33,14 @@ triggers:
   - LiveActivityUpdate
   - NSSupportsLiveActivities
   - widget extension
+  - ShinyLiveActivityWidget
+  - ShinyLiveActivityWidgetSource
+  - ShinyLiveActivityBundleId
+  - ShinyLiveActivityCodesignProvision
+  - ShinyLiveActivityCodesignEntitlements
+  - ShinyLiveActivityMinimumOSVersion
+  - ShinyLiveActivitySupportsFrequentUpdates
+  - ShinyLiveActivity.appex
   - ShinyActivityAttributes
   - promoted ongoing notification
   - requestPromotedOngoing
@@ -50,7 +58,7 @@ the always-on display).
 
 | Platform | What you get |
 |---|---|
-| iOS / iPadOS 16.2+ | A real Live Activity via ActivityKit, rendered by **your** SwiftUI widget extension |
+| iOS / iPadOS 16.2+ | A real Live Activity via ActivityKit, rendered by a SwiftUI widget extension the package builds into your app (`ShinyLiveActivityWidget`) |
 | Android 16 (API 36)+ | `Notification.ProgressStyle` + `requestPromotedOngoing` + `setShortCriticalText` |
 | Android 8-15 | An ordinary ongoing notification with a determinate progress bar (no chip) |
 | macOS, Mac Catalyst, tvOS, Windows, Linux, Blazor | `NoOpLiveActivityManager` — `IsSupported` is false, every call is a safe no-op |
@@ -193,7 +201,8 @@ relevance score plus a string bag — delivery tracking, rideshare ETA, sports s
 transfer progress.
 
 If a genuinely typed schema is required, the only route is forking `ShinyActivityAttributes.swift` in
-**both** `native/ShinyLiveActivities/` and `templates/WidgetExtension/` plus `LiveActivityContentSchema` —
+**both** `native/ShinyLiveActivities/` and `templates/WidgetExtension/` (the copy the widget build compiles) plus
+`LiveActivityContentSchema` —
 which leaves the contract shared with `Shiny.Extensions.Push`, where drift fails silently. Flag that
 tradeoff rather than doing it silently.
 
@@ -208,14 +217,56 @@ Every push update costs budget, and on iOS a suspended app sends none at all —
 freezes. `FromRange` keeps moving with no app involvement. Use `FromValue` only when the fraction is
 genuinely known and not time-shaped, and `Indeterminate = true` when it is unknown.
 
-## The iOS widget extension is not optional
+## The iOS widget extension — one property, no Xcode
 
 iOS renders the activity from a **SwiftUI widget extension in your app bundle** — nothing about the layout
-can be driven from C#. Without it, `Start` succeeds and the activity renders nothing, silently. Copy
-`templates/WidgetExtension` (`ShinyLiveActivityWidget.swift` + `ShinyActivityAttributes.swift`, which must
-stay byte-identical to the library's copy) and add `NSSupportsLiveActivities` to Info.plist. The template's
-README has the Xcode and `.csproj` wiring. **Check these two things first when an iOS activity never
-appears.**
+can be driven from C#. Without it (or without `NSSupportsLiveActivities`), `Start` succeeds and the activity
+renders nothing, silently. **Always generate this in the app head's `.csproj` when the app targets iOS:**
+
+```xml
+<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+  <ShinyLiveActivityWidget>true</ShinyLiveActivityWidget>
+</PropertyGroup>
+```
+
+The package's build targets then compile the stock widget with `swiftc` into `PlugIns/ShinyLiveActivity.appex`
+(bundle id `$(ApplicationId).LiveActivity`), infer and embed its provisioning profile on device builds, sign it
+with the app's identity, and merge `NSSupportsLiveActivities` into Info.plist. It is opt-in so Android-only and
+push-only apps never run a Swift build, and it needs a Mac (skipped with a warning elsewhere).
+
+Do **not** generate any of the old manual setup: no Xcode widget project, no copied Swift, no
+`<XcodeProject Kind="AppExtension">` (the SDK treats `Kind` as a `NativeReference` kind, so that never embedded
+an extension), no hand-added `NSSupportsLiveActivities`.
+
+| Property / item | Default | Use |
+|---|---|---|
+| `ShinyLiveActivityWidget` | `false` | Turn the build on |
+| `ShinyLiveActivityBundleId` | `$(ApplicationId).LiveActivity` | Extension bundle id — permanent once shipped (it owns a provisioning profile) |
+| `ShinyLiveActivityCodesignProvision` | best installed match (exact, then team wildcard) | Name/UUID of the extension's profile — set for Release/CI or when several match |
+| `ShinyLiveActivityCodesignEntitlements` | — | Extra entitlements plist (app groups) |
+| `ShinyLiveActivityMinimumOSVersion` | `SupportedOSPlatformVersion`, at least 16.2 | Extension deployment target |
+| `ShinyLiveActivityDisplayName` | `Live Activity` | Extension display name |
+| `ShinyLiveActivitySupportsFrequentUpdates` | `false` | Also adds `NSSupportsLiveActivitiesFrequentUpdates` |
+| `ShinyLiveActivityWidgetSource` (item) | stock widget | Your own SwiftUI sources replacing the stock widget |
+
+Signing: simulator builds need nothing. Debug on a device works with a team wildcard development profile.
+App Store/Ad Hoc builds need a distribution profile covering `<app>.LiveActivity` (a wildcard App Store profile
+counts). No matching profile is a build error naming the bundle id; a profile of a different kind from the
+app's (Ad Hoc vs App Store) is a warning.
+
+**Custom layout.** Generate Swift files with a `@main` `WidgetBundle` rendering
+`ActivityConfiguration(for: ShinyActivityAttributes.self)` and include them:
+
+```xml
+<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+  <ShinyLiveActivityWidgetSource Include="Platforms/iOS/LiveActivity/*.swift" />
+</ItemGroup>
+```
+
+**Never declare `ShinyActivityAttributes` in those files** — the package always compiles its own copy next to
+them, which is what keeps the widget and the app on the same type. Sources are Swift only (no asset catalog or
+`.strings`), so use SF Symbols and text from the content. Read custom values from `context.state.data` and
+`context.attributes.values`; branch on `context.attributes.kind`.
 
 Android needs no such thing — `POST_NOTIFICATIONS` on API 33+, which `RequestAccess()` asks for.
 
@@ -263,7 +314,8 @@ the Unix epoch — `LiveActivityContentSchema.ToAppleReferenceSeconds` converts.
 (`timestamp`, `stale-date`, `dismissal-date`) stays Unix.
 
 A field-name or type drift between the C# `LiveActivityContent`, the Swift `ShinyActivityAttributes.ContentState`
-(in **both** `native/` and `templates/WidgetExtension/`), and the server's `content-state` **does not throw** —
+(in **both** `native/` and `templates/WidgetExtension/`; the widget build always compiles the package's copy, so
+app vs widget can't drift), and the server's `content-state` **does not throw** —
 ActivityKit silently drops the update and the activity just stops refreshing. Change all of them together.
 
 Keep the payload small: ActivityKit caps content-state at 4KB. `Data` is deliberately `string`-keyed and

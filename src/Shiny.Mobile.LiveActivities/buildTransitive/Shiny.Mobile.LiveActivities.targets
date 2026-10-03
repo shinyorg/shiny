@@ -1,0 +1,213 @@
+<Project>
+  <!--
+    Shiny.Mobile.LiveActivities widget extension build (iOS apps only, opt-in with ShinyLiveActivityWidget=true).
+
+    iOS renders a Live Activity from a WidgetKit extension. Instead of an Xcode project, this builds one:
+    1. swiftc compiles ShinyActivityAttributes.swift (always the package's copy, so it can't drift from the bridge)
+       plus the widget sources (the stock widget, or the app's ShinyLiveActivityWidgetSource items) straight into
+       obj/.../shinyla/appex/ShinyLiveActivity.appex. Flags were taken from an Xcode 27 build of the same Swift.
+    2. On device builds the extension gets its own provisioning profile and entitlements from the SDK's own
+       DetectSigningIdentity / EmbedProvisionProfile / CompileEntitlements tasks, run for the extension's bundle id.
+    3. The bundle is handed to the SDK as an AdditionalAppExtensions item, which copies it into PlugIns/ and signs it
+       with the app's signing key.
+    4. NSSupportsLiveActivities is merged into the app's Info.plist (PartialAppManifest).
+
+    Properties:
+      ShinyLiveActivityWidget=true                  turn this on
+      ShinyLiveActivityBundleId                     extension bundle id (default: $(ApplicationId).LiveActivity)
+      ShinyLiveActivityCodesignProvision            provisioning profile name or UUID (default: best installed match for the bundle id)
+      ShinyLiveActivityCodesignEntitlements         extra entitlements for the extension, e.g. app groups
+      ShinyLiveActivityMinimumOSVersion             extension deployment target (default: SupportedOSPlatformVersion, at least 16.2)
+      ShinyLiveActivityDisplayName                  CFBundleDisplayName of the extension (default: Live Activity)
+      ShinyLiveActivitySupportsFrequentUpdates=true also sets NSSupportsLiveActivitiesFrequentUpdates
+
+    Items:
+      ShinyLiveActivityWidgetSource                 your own SwiftUI widget (with the @main WidgetBundle), replacing the stock one
+  -->
+  <PropertyGroup>
+    <_ShinyLAPlatform>$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))</_ShinyLAPlatform>
+    <_ShinyLAIsApp Condition="'$(_ShinyLAPlatform)' == 'ios' and '$(OutputType)' == 'Exe' and '$(ShinyLiveActivityWidget)' == 'true'">true</_ShinyLAIsApp>
+    <!-- swiftc, PlistBuddy and the signing tasks need a Mac; a Windows build (Hot Restart, or one paired to a Mac) skips the extension -->
+    <_ShinyLASkippedOffMac Condition="'$(_ShinyLAIsApp)' == 'true' and !$([MSBuild]::IsOSPlatform('OSX'))">true</_ShinyLASkippedOffMac>
+    <_ShinyLAIsApp Condition="'$(_ShinyLASkippedOffMac)' == 'true'"></_ShinyLAIsApp>
+    <ShinyLiveActivitySwiftDir Condition="'$(ShinyLiveActivitySwiftDir)' == ''">$(MSBuildThisFileDirectory)swift/</ShinyLiveActivitySwiftDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(_ShinyLAIsApp)' == 'true'">
+    <ShinyLiveActivityMinimumOSVersion Condition="'$(ShinyLiveActivityMinimumOSVersion)' == '' and '$(SupportedOSPlatformVersion)' != '' and $([MSBuild]::VersionGreaterThanOrEquals('$(SupportedOSPlatformVersion)', '16.2'))">$(SupportedOSPlatformVersion)</ShinyLiveActivityMinimumOSVersion>
+    <ShinyLiveActivityMinimumOSVersion Condition="'$(ShinyLiveActivityMinimumOSVersion)' == ''">16.2</ShinyLiveActivityMinimumOSVersion>
+    <ShinyLiveActivityDisplayName Condition="'$(ShinyLiveActivityDisplayName)' == ''">Live Activity</ShinyLiveActivityDisplayName>
+    <!-- also the executable name and the module name -->
+    <_ShinyLAName>ShinyLiveActivity</_ShinyLAName>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(_ShinyLAIsApp)' == 'true'">
+    <PartialAppManifest Include="$(MSBuildThisFileDirectory)ShinyLiveActivities.plist" />
+    <PartialAppManifest Include="$(MSBuildThisFileDirectory)ShinyLiveActivitiesFrequentUpdates.plist" Condition="'$(ShinyLiveActivitySupportsFrequentUpdates)' == 'true'" />
+  </ItemGroup>
+
+  <Target Name="_ShinyLiveActivityOffMac" BeforeTargets="Build" Condition="'$(_ShinyLASkippedOffMac)' == 'true'">
+    <Warning Text="Shiny.Mobile.LiveActivities: the Live Activity widget extension is only built on macOS; this build does not include it, so an activity started from this app renders nothing." />
+  </Target>
+
+  <!-- computed at build time: RuntimeIdentifier, IntermediateOutputPath and the app manifest are not final at evaluation -->
+  <Target Name="_ShinyLiveActivityPaths" DependsOnTargets="_ReadAppManifest" Condition="'$(_ShinyLAIsApp)' == 'true'">
+    <PropertyGroup>
+      <_ShinyLADir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(IntermediateOutputPath)shinyla/'))</_ShinyLADir>
+      <_ShinyLAAppex>$(_ShinyLADir)appex/$(_ShinyLAName).appex/</_ShinyLAAppex>
+      <_ShinyLAExecutable>$(_ShinyLAAppex)$(_ShinyLAName)</_ShinyLAExecutable>
+      <_ShinyLAInfoPlist>$(_ShinyLAAppex)Info.plist</_ShinyLAInfoPlist>
+      <ShinyLiveActivityBundleId Condition="'$(ShinyLiveActivityBundleId)' == ''">$(_BundleIdentifier).LiveActivity</ShinyLiveActivityBundleId>
+      <_ShinyLAIsSimulator Condition="$(RuntimeIdentifier.StartsWith('iossimulator'))">true</_ShinyLAIsSimulator>
+      <_ShinyLASdk Condition="'$(_ShinyLAIsSimulator)' == 'true'">iphonesimulator</_ShinyLASdk>
+      <_ShinyLASdk Condition="'$(_ShinyLAIsSimulator)' != 'true'">iphoneos</_ShinyLASdk>
+      <_ShinyLAPlatformName Condition="'$(_ShinyLAIsSimulator)' == 'true'">iPhoneSimulator</_ShinyLAPlatformName>
+      <_ShinyLAPlatformName Condition="'$(_ShinyLAIsSimulator)' != 'true'">iPhoneOS</_ShinyLAPlatformName>
+      <_ShinyLAArch Condition="$(RuntimeIdentifier.EndsWith('x64'))">x86_64</_ShinyLAArch>
+      <_ShinyLAArch Condition="'$(_ShinyLAArch)' == ''">arm64</_ShinyLAArch>
+      <_ShinyLATriple>$(_ShinyLAArch)-apple-ios$(ShinyLiveActivityMinimumOSVersion)</_ShinyLATriple>
+      <_ShinyLATriple Condition="'$(_ShinyLAIsSimulator)' == 'true'">$(_ShinyLATriple)-simulator</_ShinyLATriple>
+      <!-- the extension must carry the app's versions or App Store validation rejects the upload -->
+      <_ShinyLAShortVersion>$(_CFBundleShortVersionString)</_ShinyLAShortVersion>
+      <_ShinyLAShortVersion Condition="'$(_ShinyLAShortVersion)' == ''">1.0</_ShinyLAShortVersion>
+      <_ShinyLAVersion>$(_CFBundleVersion)</_ShinyLAVersion>
+      <_ShinyLAVersion Condition="'$(_ShinyLAVersion)' == ''">1</_ShinyLAVersion>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ShinyLASwift Include="$(ShinyLiveActivitySwiftDir)ShinyActivityAttributes.swift" />
+      <_ShinyLASwift Include="@(ShinyLiveActivityWidgetSource->'%(FullPath)')" />
+      <_ShinyLASwift Include="$(ShinyLiveActivitySwiftDir)ShinyLiveActivityWidget.swift" Condition="'@(ShinyLiveActivityWidgetSource)' == ''" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="ShinyLiveActivityCompileWidget"
+          DependsOnTargets="_ShinyLiveActivityPaths"
+          Condition="'$(_ShinyLAIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'"
+          Inputs="@(_ShinyLASwift);$(MSBuildThisFileFullPath)"
+          Outputs="$(_ShinyLAExecutable)">
+    <Exec Command="xcrun --sdk $(_ShinyLASdk) --show-sdk-path" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyLASdkPath" />
+    </Exec>
+    <MakeDir Directories="$(_ShinyLAAppex)" />
+    <!-- -e _NSExtensionMain: the extension point's main runs the WidgetBundle, not Swift's @main entry -->
+    <Exec Command="xcrun --sdk $(_ShinyLASdk) swiftc -parse-as-library -swift-version 5 -O -application-extension -module-name $(_ShinyLAName) -target $(_ShinyLATriple) -sdk &quot;$(_ShinyLASdkPath)&quot; @(_ShinyLASwift->'&quot;%(Identity)&quot;', ' ') -Xlinker -e -Xlinker _NSExtensionMain -Xlinker -dead_strip -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/../../Frameworks -o &quot;$(_ShinyLAExecutable)&quot;" />
+  </Target>
+
+  <Target Name="ShinyLiveActivityInfoPlist"
+          DependsOnTargets="_ShinyLiveActivityPaths;_WriteAppManifest"
+          Condition="'$(_ShinyLAIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <_ShinyLAPlistLine Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;" />
+      <_ShinyLAPlistLine Include="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;" />
+      <_ShinyLAPlistLine Include="&lt;plist version=&quot;1.0&quot;&gt;&lt;dict&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;&lt;string&gt;en&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleDisplayName&lt;/key&gt;&lt;string&gt;$(ShinyLiveActivityDisplayName)&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleExecutable&lt;/key&gt;&lt;string&gt;$(_ShinyLAName)&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleIdentifier&lt;/key&gt;&lt;string&gt;$(ShinyLiveActivityBundleId)&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;&lt;string&gt;6.0&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleName&lt;/key&gt;&lt;string&gt;$(_ShinyLAName)&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundlePackageType&lt;/key&gt;&lt;string&gt;XPC!&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;&lt;string&gt;$(_ShinyLAShortVersion)&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleVersion&lt;/key&gt;&lt;string&gt;$(_ShinyLAVersion)&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;CFBundleSupportedPlatforms&lt;/key&gt;&lt;array&gt;&lt;string&gt;$(_ShinyLAPlatformName)&lt;/string&gt;&lt;/array&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;MinimumOSVersion&lt;/key&gt;&lt;string&gt;$(ShinyLiveActivityMinimumOSVersion)&lt;/string&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;UIDeviceFamily&lt;/key&gt;&lt;array&gt;&lt;integer&gt;1&lt;/integer&gt;&lt;integer&gt;2&lt;/integer&gt;&lt;/array&gt;" />
+      <_ShinyLAPlistLine Include="&lt;key&gt;NSExtension&lt;/key&gt;&lt;dict&gt;&lt;key&gt;NSExtensionPointIdentifier&lt;/key&gt;&lt;string&gt;com.apple.widgetkit-extension&lt;/string&gt;&lt;/dict&gt;" />
+      <_ShinyLAPlistLine Include="&lt;/dict&gt;&lt;/plist&gt;" />
+      <!-- the SDK already stamped these build-environment keys into the app's manifest; the extension gets the same values.
+           The Exec below uses backticks: MSBuild would read a shell $( ) as a property. -->
+      <_ShinyLADTKey Include="DTCompiler;DTPlatformBuild;DTPlatformName;DTPlatformVersion;DTSDKBuild;DTSDKName;DTXcode;DTXcodeBuild;BuildMachineOSBuild" />
+    </ItemGroup>
+    <MakeDir Directories="$(_ShinyLAAppex)" />
+    <!-- assembled in a scratch file and copied only when it differs, so an unchanged build doesn't re-copy and re-sign the extension -->
+    <WriteLinesToFile File="$(_ShinyLADir)Info.plist" Lines="@(_ShinyLAPlistLine)" Overwrite="true" />
+    <Exec Command="v=`/usr/libexec/PlistBuddy -c 'Print :%(_ShinyLADTKey.Identity)' &quot;$(_AppBundleManifestPath)&quot; 2>/dev/null` &amp;&amp; /usr/libexec/PlistBuddy -c &quot;Add :%(_ShinyLADTKey.Identity) string $v&quot; &quot;$(_ShinyLADir)Info.plist&quot; || true" StandardOutputImportance="low" />
+    <Exec Command="cmp -s &quot;$(_ShinyLADir)Info.plist&quot; &quot;$(_ShinyLAInfoPlist)&quot; || cp &quot;$(_ShinyLADir)Info.plist&quot; &quot;$(_ShinyLAInfoPlist)&quot;" StandardOutputImportance="low" />
+  </Target>
+
+  <!--
+    Device builds: the extension's bundle id needs its own provisioning profile. The SDK's own tasks pick it the way
+    they pick the app's (exact match beats a team wildcard), signed by the identity the app already resolved.
+  -->
+  <Target Name="ShinyLiveActivitySigning"
+          DependsOnTargets="_ShinyLiveActivityPaths;_DetectSigningIdentity;_DetectSdkLocations;_EmbedProvisionProfile"
+          Condition="'$(_ShinyLAIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(_ShinyLAIsSimulator)' != 'true' and '$(EnableCodeSigning)' != 'false'">
+    <DetectSigningIdentity
+      SessionId="$(BuildSessionId)"
+      AppBundleName="$(_ShinyLAName)"
+      BundleIdentifier="$(ShinyLiveActivityBundleId)"
+      CodesignEntitlements="$(ShinyLiveActivityCodesignEntitlements)"
+      CodesignRequireProvisioningProfile="true"
+      Keychain="$(CodesignKeychain)"
+      SdkIsSimulator="false"
+      SdkPlatform="$(_SdkPlatform)"
+      ProvisioningProfile="$(ShinyLiveActivityCodesignProvision)"
+      SdkDevPath="$(_SdkDevPath)"
+      SigningKey="$(_CodeSigningKey)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      ContinueOnError="true">
+      <Output TaskParameter="DetectedProvisioningProfile" PropertyName="_ShinyLAProvisioningProfile" />
+    </DetectSigningIdentity>
+
+    <Error Condition="'$(_ShinyLAProvisioningProfile)' == '' and '$(ShinyLiveActivityCodesignProvision)' != ''"
+           Text="Shiny.Mobile.LiveActivities: the provisioning profile '$(ShinyLiveActivityCodesignProvision)' (ShinyLiveActivityCodesignProvision) can't sign the Live Activity widget extension '$(ShinyLiveActivityBundleId)'. It must cover that bundle id and include the certificate the app is signed with - see the warning above." />
+    <Error Condition="'$(_ShinyLAProvisioningProfile)' == '' and '$(ShinyLiveActivityCodesignProvision)' == ''"
+           Text="Shiny.Mobile.LiveActivities: no provisioning profile found for the Live Activity widget extension ('$(ShinyLiveActivityBundleId)'). Create one for that bundle id (a team wildcard profile also works for development), or name it with &lt;ShinyLiveActivityCodesignProvision&gt;. To use another bundle id, set &lt;ShinyLiveActivityBundleId&gt;." />
+
+    <EmbedProvisionProfile
+      SessionId="$(BuildSessionId)"
+      AppBundleDir="$(_ShinyLAAppex)"
+      ProvisioningProfile="$(_ShinyLAProvisioningProfile)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      EmbeddedProvisionProfilePath="$(_ShinyLAAppex)embedded.mobileprovision" />
+
+    <CompileEntitlements
+      SessionId="$(BuildSessionId)"
+      AppBundleDir="$(_ShinyLAAppex)"
+      BundleIdentifier="$(ShinyLiveActivityBundleId)"
+      Entitlements="$(ShinyLiveActivityCodesignEntitlements)"
+      CompiledEntitlements="$(_ShinyLADir)$(_ShinyLAName).xcent"
+      ProvisioningProfile="$(_ShinyLAProvisioningProfile)"
+      SdkDevPath="$(_SdkDevPath)"
+      SdkIsSimulator="false"
+      SdkPlatform="$(_SdkPlatform)"
+      SdkVersion="$(_SdkVersion)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      Debug="$(_BundlerDebug)"
+      ValidateEntitlements="$(ValidateEntitlements)">
+      <Output TaskParameter="EntitlementsInSignature" PropertyName="_ShinyLAEntitlements" />
+    </CompileEntitlements>
+
+    <!--
+      Both bundles are signed by one identity, so the SDK already refuses a development profile against a distribution
+      certificate. What still slips through is Ad Hoc next to App Store (or Enterprise), which only fails at upload or
+      install. DetectSigningIdentity's DetectedDistributionType reports what was asked for (Any when inferred), not what
+      the profile is, so profile-kind.sh reads both embedded profiles instead.
+    -->
+    <Exec Condition="'$(_EmbeddedProvisionProfilePath)' != '' and Exists('$(_EmbeddedProvisionProfilePath)')" Command="sh &quot;$(MSBuildThisFileDirectory)profile-kind.sh&quot; &quot;$(_EmbeddedProvisionProfilePath)&quot;" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyLAAppProfileKind" />
+    </Exec>
+    <Exec Command="sh &quot;$(MSBuildThisFileDirectory)profile-kind.sh&quot; &quot;$(_ShinyLAAppex)embedded.mobileprovision&quot;" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyLAProfileKind" />
+    </Exec>
+    <Warning Condition="'$(_ShinyLAAppProfileKind)' != '' and '$(_ShinyLAAppProfileKind)' != '$(_ShinyLAProfileKind)'"
+             Text="Shiny.Mobile.LiveActivities: the widget extension's provisioning profile is $(_ShinyLAProfileKind) but the app's is $(_ShinyLAAppProfileKind). App Store, TestFlight and Ad Hoc installs reject mixed profiles - name a profile of the same kind ($(_ShinyLAAppProfileKind)) that covers '$(ShinyLiveActivityBundleId)' with &lt;ShinyLiveActivityCodesignProvision&gt;." />
+
+    <Message Importance="normal" Text="Shiny.Mobile.LiveActivities: signing $(ShinyLiveActivityBundleId) with provisioning profile $(_ShinyLAProvisioningProfile) ($(_ShinyLAProfileKind))" />
+  </Target>
+
+  <!-- the SDK copies AdditionalAppExtensions into PlugIns/ and adds them to its codesign list in _ExtendAppExtensionReferences -->
+  <Target Name="ShinyLiveActivityWidget"
+          BeforeTargets="_ExtendAppExtensionReferences"
+          DependsOnTargets="ShinyLiveActivityCompileWidget;ShinyLiveActivityInfoPlist;ShinyLiveActivitySigning"
+          Condition="'$(_ShinyLAIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <AdditionalAppExtensions Include="$(_ShinyLADir)">
+        <Name>$(_ShinyLAName)</Name>
+        <BuildOutput>appex</BuildOutput>
+        <CodesignEntitlements>$(_ShinyLAEntitlements)</CodesignEntitlements>
+        <CodesignWarnIfNoEntitlements>false</CodesignWarnIfNoEntitlements>
+      </AdditionalAppExtensions>
+    </ItemGroup>
+  </Target>
+</Project>

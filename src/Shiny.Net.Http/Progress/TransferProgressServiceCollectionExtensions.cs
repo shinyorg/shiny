@@ -24,9 +24,9 @@ public static class TransferProgressServiceCollectionExtensions
     /// <remarks>
     /// Android registers <see cref="ForegroundNotificationRenderer"/>, which draws on the notification the
     /// transfer foreground service already posts - so there is one notification, not two. iOS registers
-    /// <c>LiveActivityTransferRenderer</c>, which needs the widget extension from
-    /// <c>templates/WidgetExtension</c> in your app bundle and <c>NSSupportsLiveActivities</c> in
-    /// Info.plist; without them the activity starts and renders nothing. Every other platform has no
+    /// <c>LiveActivityTransferRenderer</c>, which needs a widget extension in your app bundle and
+    /// <c>NSSupportsLiveActivities</c> in Info.plist - set <c>ShinyLiveActivityWidget=true</c> in the app's
+    /// project and both are built in; without them the activity starts and renders nothing. Every other platform has no
     /// surface to draw on, so the manager quietly does nothing - this is safe to call unconditionally, and
     /// you can always register your own <see cref="ITransferProgressRenderer"/>.
     /// </remarks>
