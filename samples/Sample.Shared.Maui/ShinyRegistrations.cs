@@ -100,6 +100,8 @@ public static class ShinyRegistrations
         s.AddGps<SampleGpsDelegate>();
         s.AddGeofencing<SampleGeofenceDelegate>();
         s.AddMotionActivity<SampleMotionActivityDelegate>();
+        // reverse geocoding: MapKit/CoreLocation on Apple, android.location.Geocoder on Android
+        s.AddGeocoding();
 #endif
 
 #if IOS || ANDROID || MACCATALYST

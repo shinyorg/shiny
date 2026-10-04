@@ -82,6 +82,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             Add(FeatureGroup.Location, "📍 GPS", "Track location with GPS", "gps");
             Add(FeatureGroup.Location, "🔲 Geofencing", "Monitor geofence regions", "geofencing");
             Add(FeatureGroup.Location, "🏃 Motion Activity", "Activity recognition (walk, drive, etc.)", "motionactivity");
+            Add(FeatureGroup.Location, "🗺️ Geocoding", "Turn coordinates into addresses", "geocoding");
         }
 
         // --- Contacts (iOS, Mac Catalyst & Android; IsIOS() is also true on Mac Catalyst) ---
