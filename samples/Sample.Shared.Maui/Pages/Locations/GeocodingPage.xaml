@@ -16,7 +16,6 @@
 
             <shiny:TableSection Title="Actions">
                 <shiny:ButtonCell Title="Reverse Geocode" Command="{Binding ReverseGeocodeCommand}" />
-                <shiny:LabelCell Title="Provider" ValueText="{Binding Provider}" />
                 <shiny:LabelCell Title="Supported" ValueText="{Binding IsSupported}" />
                 <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
             </shiny:TableSection>

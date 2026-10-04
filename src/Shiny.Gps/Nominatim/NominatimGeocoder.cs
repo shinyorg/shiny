@@ -9,22 +9,11 @@ using System.Threading.Tasks;
 namespace Shiny.Locations;
 
 
-/// <summary>
-/// A managed <see cref="IGeocoder"/> over the OpenStreetMap Nominatim API. <c>AddGeocoding()</c> registers it on
-/// every platform without a native geocoder (Windows, Linux, macOS, Blazor WebAssembly) and on Android devices
-/// without a geocoding backend. It keeps to the public server's usage policy: one request at a time, at most one
-/// per <see cref="NominatimOptions.MinimumRequestInterval"/>, with results cached.
-/// </summary>
-/// <remarks>
-/// Results are © OpenStreetMap contributors (ODbL) - show <see cref="Attribution"/> wherever you display them.
-/// </remarks>
-public class NominatimGeocoder : IGeocoder, IDisposable
+// The IGeocoder AddGeocoding() registers on every platform without a native geocoder (Windows, Linux, macOS,
+// Blazor WebAssembly) and on Android devices without a geocoding backend. Apps only ever see IGeocoder. It keeps to
+// the public server's usage policy: one request at a time, at most one per MinimumRequestInterval, results cached.
+sealed class NominatimGeocoder : IGeocoder, IDisposable
 {
-    /// <summary>
-    /// The attribution OpenStreetMap requires wherever Nominatim results are displayed.
-    /// </summary>
-    public const string Attribution = "© OpenStreetMap contributors";
-
     readonly NominatimOptions options;
     readonly HttpClient httpClient;
     readonly bool ownsClient;
@@ -36,16 +25,11 @@ public class NominatimGeocoder : IGeocoder, IDisposable
     bool hasRequested;
 
 
-    /// <summary>
-    /// Creates a geocoder with its own <see cref="HttpClient"/>.
-    /// </summary>
     public NominatimGeocoder(NominatimOptions? options = null)
         : this(options ?? new NominatimOptions(), new HttpClient(), TimeProvider.System, true) { }
 
 
-    /// <summary>
-    /// Creates a geocoder that sends its requests through <paramref name="httpClient"/>, which the caller owns.
-    /// </summary>
+    // the caller owns httpClient
     public NominatimGeocoder(NominatimOptions options, HttpClient httpClient, TimeProvider? timeProvider = null)
         : this(options, httpClient, timeProvider ?? TimeProvider.System, false) { }
 
@@ -59,9 +43,7 @@ public class NominatimGeocoder : IGeocoder, IDisposable
     }
 
 
-    /// <summary>
-    /// Always true - the lookup only needs network access.
-    /// </summary>
+    // the lookup only needs network access
     public bool IsSupported => true;
 
 
@@ -203,6 +185,5 @@ public class NominatimGeocoder : IGeocoder, IDisposable
             this.httpClient.Dispose();
 
         this.gate.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

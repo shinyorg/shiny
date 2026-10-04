@@ -42,7 +42,6 @@ triggers:
   - AddGeocoding
   - Placemark
   - ReverseGeocode
-  - NominatimGeocoder
   - NominatimOptions
   - OpenStreetMap
   - Nominatim
@@ -160,11 +159,12 @@ services.AddGeocoding(o =>
 });
 ```
 
-The public Nominatim server is free but has a usage policy: `NominatimGeocoder` serializes requests, spaces them at
+The public Nominatim server is free but has a usage policy: the registered geocoder serializes requests, spaces them at
 least `MinimumRequestInterval` (1s) apart, and caches `CacheSize` (100) results keyed on the position rounded to ~1m.
-Results are © OpenStreetMap contributors - show `NominatimGeocoder.Attribution` wherever they are displayed. Never
+Results are © OpenStreetMap contributors - show `NominatimOptions.Attribution` wherever they are displayed. Never
 generate code that fires reverse geocodes on every GPS reading against the public server; geocode on demand or on a
-significant move.
+significant move. The implementation is internal - always inject `IGeocoder`, never `new` up or reference a Nominatim
+geocoder type.
 
 ### Motion Activity Registration
 
@@ -200,7 +200,7 @@ When generating code for Shiny.Locations:
 10. **For `GeofenceRegion`**, always provide a unique `Identifier` string. The `SingleUse` parameter removes the region after the first trigger. To register a region idempotently, use the `TryStartMonitoring(region, replaceIfExists)` extension on `IGeofenceManager` — it only starts monitoring if a region with the same identifier isn't already being monitored, and (when `replaceIfExists` is `true`, the default) stops and restarts an existing region so changed position/notification settings take effect. It returns `true` when the region already existed, `false` when it was newly added.
 11. **Inject `IMotionActivityManager`** via constructor injection for motion activity features. Call `RequestAccess()` before `StartListener()`, then subscribe to `MotionActivityReadingReceived` for foreground updates or register `IMotionActivityDelegate` for background processing.
 12. **For geofence dwell, set `DwellTime` with an object initializer** - `new GeofenceRegion("id", center, radius) { DwellTime = TimeSpan.FromMinutes(5) }` - and handle `GeofenceState.Dwelling` in `IGeofenceDelegate.OnStatusChanged`. `DwellTime` is not a constructor parameter. Entry and exit are always tracked internally; `NotifyOnEntry`/`NotifyOnExit` only filter what reaches the delegate (set both false for dwell-only). A `SingleUse` region with a `DwellTime` is removed after the dwell, not the entry. No GPS, background mode or extra permission is needed. **Timing differs on iOS:** Android (native loitering delay) and Windows (timer) report `Dwelling` while the user is still inside, but iOS usually reports it at exit, just before `Exited`, because iOS suspends the app between region events. When generating dwell code, don't assume the user is still inside on iOS, and say so if the user's scenario needs an in-place action.
-13. **For reverse geocoding, inject `IGeocoder`** (registered by `AddGeocoding()`), check `IsSupported`, then `await geocoder.ReverseGeocode(position, ct)` - it returns `IReadOnlyList<Placemark>` (empty when nothing matched) with `FormattedAddress`, `Thoroughfare`, `Locality`, `AdministrativeArea`, `PostalCode`, `CountryCode`, etc. It needs network access. On Windows, Linux, macOS, Blazor and Android without Play Services the registered geocoder is `NominatimGeocoder` (OpenStreetMap) - display `NominatimGeocoder.Attribution` with its results, and expect calls to queue at one per second against the public server.
+13. **For reverse geocoding, inject `IGeocoder`** (registered by `AddGeocoding()`), check `IsSupported`, then `await geocoder.ReverseGeocode(position, ct)` - it returns `IReadOnlyList<Placemark>` (empty when nothing matched) with `FormattedAddress`, `Thoroughfare`, `Locality`, `AdministrativeArea`, `PostalCode`, `CountryCode`, etc. It needs network access. On Windows, Linux, macOS, Blazor and Android without Play Services the registered `IGeocoder` uses OpenStreetMap Nominatim - display `NominatimOptions.Attribution` with its results, and expect calls to queue at one per second against the public server.
 
 ## Conventions
 

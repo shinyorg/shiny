@@ -7,15 +7,15 @@ namespace Shiny.Locations;
 
 /// <summary>
 /// Converts coordinates into human-readable addresses using the platform geocoder (MapKit / CoreLocation on iOS and
-/// Mac Catalyst, <c>android.location.Geocoder</c> on Android) or, everywhere else, <see cref="NominatimGeocoder"/>
-/// against OpenStreetMap. All of them need network access.
+/// Mac Catalyst, <c>android.location.Geocoder</c> on Android) or, everywhere else, the OpenStreetMap Nominatim API
+/// (see <see cref="NominatimOptions"/>). All of them need network access.
 /// </summary>
 public interface IGeocoder
 {
     /// <summary>
     /// Whether a geocoder is available. The native Android geocoder reports false on devices without a geocoding
-    /// backend (typically no Google Play Services) - <c>AddGeocoding()</c> registers <see cref="NominatimGeocoder"/>
-    /// on those devices instead, so through it this is always true.
+    /// backend (typically no Google Play Services) - <c>AddGeocoding()</c> registers the OpenStreetMap geocoder on those
+    /// devices instead, so through it this is always true.
     /// </summary>
     bool IsSupported { get; }
 

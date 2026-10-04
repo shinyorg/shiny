@@ -240,13 +240,21 @@ public class NominatimGeocoderTests
     [Fact]
     public void AddGeocoding_KeepsExistingRegistration()
     {
-        var existing = new NominatimGeocoder(new NominatimOptions(), new HttpClient(new FakeHandler()));
+        var existing = new StubGeocoder();
         var services = new ServiceCollection();
         services.AddSingleton<IGeocoder>(existing);
         services.AddGeocoding();
 
         using var sp = services.BuildServiceProvider();
         Assert.Same(existing, sp.GetRequiredService<IGeocoder>());
+    }
+
+
+    class StubGeocoder : IGeocoder
+    {
+        public bool IsSupported => true;
+        public Task<IReadOnlyList<Placemark>> ReverseGeocode(Position position, CancellationToken cancelToken = default)
+            => Task.FromResult<IReadOnlyList<Placemark>>([]);
     }
 
 

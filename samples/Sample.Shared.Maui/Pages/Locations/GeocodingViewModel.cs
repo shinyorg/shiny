@@ -16,11 +16,11 @@ public partial class GeocodingViewModel(IGeocoder geocoder, IServiceProvider ser
 
     public bool IsSupported => geocoder.IsSupported;
     public bool HasGps => this.gpsManager != null;
-    public string Provider => geocoder is NominatimGeocoder ? "OpenStreetMap Nominatim" : "Native";
 
-    // OpenStreetMap requires attribution wherever Nominatim results are shown
-    public string? Attribution => geocoder is NominatimGeocoder ? NominatimGeocoder.Attribution : null;
-    public bool ShowAttribution => this.Attribution != null;
+    // iOS, Mac Catalyst & Android geocode natively; everywhere else AddGeocoding() uses OpenStreetMap, which requires
+    // attribution wherever its results are shown (IsIOS() is also true on Mac Catalyst)
+    public bool ShowAttribution => !OperatingSystem.IsIOS() && !OperatingSystem.IsAndroid();
+    public string Attribution => NominatimOptions.Attribution;
     public ObservableCollection<PlacemarkItem> Placemarks { get; } = new();
 
     [RelayCommand]

@@ -5,8 +5,9 @@ namespace Shiny.Locations;
 
 
 /// <summary>
-/// Options for <see cref="NominatimGeocoder"/> - the managed reverse geocoder <c>AddGeocoding()</c> registers on
-/// platforms without a native one (Windows, Linux, macOS, Blazor WebAssembly).
+/// Options for the OpenStreetMap Nominatim geocoder - the <see cref="IGeocoder"/> <c>AddGeocoding()</c> registers on
+/// platforms without a native one (Windows, Linux, macOS, Blazor WebAssembly) and on Android devices without a
+/// geocoding backend.
 /// </summary>
 /// <remarks>
 /// The public server at nominatim.openstreetmap.org is free, but it has a usage policy
@@ -16,6 +17,12 @@ namespace Shiny.Locations;
 /// </remarks>
 public class NominatimOptions
 {
+    /// <summary>
+    /// The attribution OpenStreetMap requires wherever Nominatim results are displayed - ideally linked to
+    /// https://www.openstreetmap.org/copyright.
+    /// </summary>
+    public const string Attribution = "© OpenStreetMap contributors";
+
     /// <summary>
     /// The public OpenStreetMap Nominatim server.
     /// </summary>

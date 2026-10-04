@@ -333,7 +333,7 @@ public interface IGeofenceManager
 
 Reverse geocoding through the platform geocoder. iOS/Mac Catalyst 26+ use MapKit `MKReverseGeocodingRequest`
 (`CLGeocoder` below 26); Android uses `android.location.Geocoder` (listener API on 33+). Windows, Linux, macOS,
-Blazor WebAssembly and Android devices without a geocoder backend get `NominatimGeocoder` (OpenStreetMap). Needs
+Blazor WebAssembly and Android devices without a geocoder backend get an internal OpenStreetMap Nominatim geocoder. Needs
 network access.
 
 ```csharp
@@ -346,27 +346,20 @@ public interface IGeocoder
 }
 ```
 
-Returns an empty list when nothing matched. On Android, calling the native `Geocoder` when `IsSupported` is false throws `InvalidOperationException` - `AddGeocoding()` registers `NominatimGeocoder` on those devices instead.
+Returns an empty list when nothing matched. On Android, calling the native `Geocoder` when `IsSupported` is false throws `InvalidOperationException` - `AddGeocoding()` registers the OpenStreetMap geocoder on those devices instead.
 
-### NominatimGeocoder / NominatimOptions
+### NominatimOptions
 
-A managed `IGeocoder` over the OpenStreetMap Nominatim `reverse` API (`format=jsonv2`) - System.Text.Json source
-generated, AOT/trim safe. Nominatim returns at most one placemark per lookup.
+`AddGeocoding()` falls back to an internal `IGeocoder` over the OpenStreetMap Nominatim `reverse` API
+(`format=jsonv2`) - System.Text.Json source generated, AOT/trim safe, at most one placemark per lookup. The
+implementation type is not public: inject `IGeocoder`, and configure it through `AddGeocoding(o => ...)`.
 
 ```csharp
 namespace Shiny.Locations;
 
-public class NominatimGeocoder : IGeocoder, IDisposable
-{
-    public const string Attribution = "© OpenStreetMap contributors"; // show wherever results are displayed
-    public NominatimGeocoder(NominatimOptions? options = null);       // owns its HttpClient
-    public NominatimGeocoder(NominatimOptions options, HttpClient httpClient, TimeProvider? timeProvider = null);
-    public bool IsSupported { get; }                                  // always true
-    public Task<IReadOnlyList<Placemark>> ReverseGeocode(Position position, CancellationToken cancelToken = default);
-}
-
 public class NominatimOptions
 {
+    public const string Attribution = "© OpenStreetMap contributors"; // show wherever results are displayed
     public static readonly Uri PublicServer;              // https://nominatim.openstreetmap.org/
     public Uri BaseUri { get; set; }                      // default PublicServer
     public string UserAgent { get; set; }                 // default "<EntryAssembly>/<version> (Shiny.Gps)"; not sent from the browser
@@ -595,7 +588,7 @@ services.AddGeofencing(typeof(MyGeofenceDelegate));
 ### Geocoding Registration
 
 ```csharp
-services.AddGeocoding(); // native IGeocoder on iOS, Mac Catalyst and Android; NominatimGeocoder (OpenStreetMap) elsewhere
+services.AddGeocoding(); // native IGeocoder on iOS, Mac Catalyst and Android; OpenStreetMap Nominatim elsewhere
 services.AddGeocoding(o => o.Email = "contact@myapp.com"); // configure the Nominatim fallback
 ```
 

@@ -10,7 +10,7 @@ public static class GeocodingServiceCollectionExtensions
     /// <summary>
     /// Registers <see cref="IGeocoder"/> for reverse geocoding. iOS and Mac Catalyst use MapKit / CoreLocation and
     /// Android uses <c>android.location.Geocoder</c>; every other platform (Windows, Linux, macOS, Blazor WebAssembly),
-    /// and Android devices without a geocoding backend, use <see cref="NominatimGeocoder"/> against OpenStreetMap.
+    /// and Android devices without a geocoding backend, use the OpenStreetMap Nominatim API (see <see cref="NominatimOptions"/>).
     /// An <see cref="IGeocoder"/> you register first is kept.
     /// </summary>
     public static IServiceCollection AddGeocoding(this IServiceCollection services)
