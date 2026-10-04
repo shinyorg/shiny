@@ -23,4 +23,15 @@ public interface IPrintService
     /// <see cref="PrintingCapabilities.EnumeratePrinters"/> is not supported (iOS, Android, web).
     /// </summary>
     Task<IReadOnlyList<PrinterInfo>> GetPrinters(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lays HTML out on pages with the same engine printing uses and returns the result as a PDF, with no
+    /// print UI - for sharing or emailing a document rather than printing it. Throws
+    /// <see cref="PlatformNotSupportedException"/> where <see cref="PrintingCapabilities.HtmlToPdf"/> is not set.
+    /// </summary>
+    /// <param name="html">A complete HTML document.</param>
+    /// <param name="options">Page size, orientation and margin; defaults to A4 portrait with half-inch margins.</param>
+    /// <param name="cancellationToken">Cancels waiting for the result.</param>
+    /// <returns>The PDF bytes.</returns>
+    Task<byte[]> HtmlToPdf(string html, PdfPageOptions? options = null, CancellationToken cancellationToken = default);
 }

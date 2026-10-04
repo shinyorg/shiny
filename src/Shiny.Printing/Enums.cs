@@ -85,5 +85,8 @@ public enum PrintingCapabilities
     Silent = 32,
 
     /// <summary>Can enumerate installed printers via <see cref="IPrintService.GetPrinters"/>.</summary>
-    EnumeratePrinters = 64
+    EnumeratePrinters = 64,
+
+    /// <summary>Can lay HTML out on pages and return it as a PDF via <see cref="IPrintService.HtmlToPdf"/>.</summary>
+    HtmlToPdf = 128
 }

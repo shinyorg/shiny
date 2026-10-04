@@ -45,6 +45,10 @@ public sealed class WindowsPrintService : IPrintService
     }
 
 
+    public Task<byte[]> HtmlToPdf(string html, PdfPageOptions? options = null, CancellationToken cancellationToken = default)
+        => throw new PlatformNotSupportedException("HTML to PDF is not supported on Windows.");
+
+
     public Task<IReadOnlyList<PrinterInfo>> GetPrinters(CancellationToken cancellationToken = default)
     {
         var defaultName = new PrinterSettings().PrinterName;

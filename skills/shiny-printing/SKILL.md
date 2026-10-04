@@ -318,6 +318,15 @@ public class DocumentPrinter(IPrintService print, IPrintDocumentRenderer rendere
         var target = (await print.GetPrinters()).FirstOrDefault(x => x.IsDefault);
         await print.Print(PrintJob.Pdf(pdf, new() { PreferSilent = true, PrinterId = target?.Id }));
     }
+
+    // HTML laid out exactly as printing would, saved as a PDF to share instead (iOS / Mac Catalyst / Android)
+    public async Task<string> SavePdf(string html)
+    {
+        var pdf = await print.HtmlToPdf(html, PdfPageOptions.Letter with { Orientation = PrintOrientation.Landscape });
+        var path = Path.Combine(FileSystem.CacheDirectory, "callsheet.pdf");
+        await File.WriteAllBytesAsync(path, pdf);
+        return path;
+    }
 }
 ```
 
@@ -327,18 +336,25 @@ public class DocumentPrinter(IPrintService print, IPrintDocumentRenderer rendere
   (`Completed`, `Submitted`, `Cancelled`, `Failed`) and `Error`. `IsSuccess` covers `Completed` and `Submitted`.
 - **Feature-detect with `IPrintService.Capabilities`** before offering a button:
 
-| Platform | Backend | PDF | Image | HTML | Silent | Enumerate |
-|---|---|:-:|:-:|:-:|:-:|:-:|
-| iOS / Mac Catalyst | AirPrint `UIPrintInteractionController` | yes | yes | yes | to a previously picked `UIPrinter` URL | no |
-| Android | `PrintManager` (+ `WebView` for HTML) | yes | yes | yes | no - always the system dialog | no |
-| Windows | GDI+ (images) + shell `print`/`printto` (PDF) | yes | yes | no | yes | yes |
-| Linux / macOS (non-Catalyst) | CUPS `lp` / `lpstat` | yes | yes | no | yes (always direct to queue) | yes |
-| Blazor | `window.print()` | yes | yes | yes | no | no |
+| Platform | Backend | PDF | Image | HTML | HtmlToPdf | Silent | Enumerate |
+|---|---|:-:|:-:|:-:|:-:|:-:|:-:|
+| iOS / Mac Catalyst | AirPrint `UIPrintInteractionController` (+ `WKWebView` for HTML) | yes | yes | yes | yes | to a previously picked `UIPrinter` URL | no |
+| Android | `PrintManager` (+ `WebView` for HTML) | yes | yes | yes | yes | no - always the system dialog | no |
+| Windows | GDI+ (images) + shell `print`/`printto` (PDF) | yes | yes | no | no | yes | yes |
+| Linux / macOS (non-Catalyst) | CUPS `lp` / `lpstat` | yes | yes | no | no | yes (always direct to queue) | yes |
+| Blazor | `window.print()` | yes | yes | yes | no | no | no |
 
+- HTML (`PrintJob.Html` and `PrintJob.HtmlUrl`) renders through a real browser engine on every platform that
+  supports it, so flexbox and CSS `page-break-*` rules survive printing.
 - HTML on Windows / CUPS is unsupported - render to PDF first.
+- `HtmlToPdf(html, PdfPageOptions)` returns PDF bytes with no UI; it throws `PlatformNotSupportedException` where
+  `PrintingCapabilities.HtmlToPdf` is not set. `PdfPageOptions` is A4 portrait with 36pt margins by default
+  (`PdfPageOptions.Letter` preset; `Orientation = Landscape` turns the page). Android also honours a CSS
+  `@page { margin }` in the document, which wins over `Margin` there; iOS uses `Margin` only.
 - Windows PDFs print through the registered PDF handler's shell verb; a machine with no PDF app fails.
-- `PrintOrientation`, `PrintDuplex`, `PrintColorMode`, `Copies` go in `PrintOptions`; Android lets the user choose
-  these in its dialog instead.
+- `PrintOrientation`, `PrintDuplex`, `PrintColorMode`, `Copies` go in `PrintOptions`. On Android only
+  `Orientation` is applied - it sets the dialog's starting paper (the locale's Letter / A4, turned); the user
+  chooses the rest in the dialog.
 
 ## Platform setup
 

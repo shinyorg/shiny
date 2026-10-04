@@ -59,6 +59,10 @@ public sealed class BlazorPrintService(IJSRuntime jsRuntime) : IPrintService, IA
     }
 
 
+    public Task<byte[]> HtmlToPdf(string html, PdfPageOptions? options = null, CancellationToken cancellationToken = default)
+        => throw new PlatformNotSupportedException("HTML to PDF is not supported in the browser.");
+
+
     public Task<IReadOnlyList<PrinterInfo>> GetPrinters(CancellationToken cancellationToken = default)
         => Task.FromResult<IReadOnlyList<PrinterInfo>>([]);
 

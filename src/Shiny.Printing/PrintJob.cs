@@ -81,6 +81,10 @@ public sealed class PrintJob
         return new(PrintContentKind.File, options ?? new()) { Text = path };
     }
 
+    /// <summary>The markup of an <see cref="PrintContentKind.Html"/> job, read from disk for an <c>.html</c> file job.</summary>
+    internal string ReadHtml() => this.Kind == PrintContentKind.File ? System.IO.File.ReadAllText(this.Text!) : this.Text!;
+
+
     /// <summary>
     /// Maps a <see cref="PrintContentKind.File"/> job to the concrete kind implied by its extension
     /// (<c>.pdf</c> → Pdf, image extensions → Image, <c>.htm/.html</c> → Html). Throws for anything else.

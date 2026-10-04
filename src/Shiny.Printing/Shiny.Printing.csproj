@@ -27,6 +27,14 @@
         <PackageReference Include="System.Drawing.Common" />
     </ItemGroup>
 
+    <!--
+        HtmlToPdf drives a WebView's print adapter into a file; its callbacks can only be subclassed from
+        inside android.print, so that piece is Java. Called through JNI, so no C# binding is generated.
+    -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <AndroidJavaSource Include="Platforms\Android\Java\ShinyPdfWriter.java" Bind="false" />
+    </ItemGroup>
+
     <ItemGroup>
         <InternalsVisibleTo Include="Shiny.Printers.Tests" />
         <InternalsVisibleTo Include="Shiny.Printing.Blazor" />

@@ -71,6 +71,10 @@ public sealed class CupsPrintService(ICupsProcessRunner runner) : IPrintService
     }
 
 
+    public Task<byte[]> HtmlToPdf(string html, PdfPageOptions? options = null, CancellationToken cancellationToken = default)
+        => throw new PlatformNotSupportedException("HTML to PDF is not supported by the CUPS backend.");
+
+
     public async Task<IReadOnlyList<PrinterInfo>> GetPrinters(CancellationToken cancellationToken = default)
     {
         try
