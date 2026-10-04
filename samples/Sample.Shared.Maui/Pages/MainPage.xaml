@@ -7,18 +7,61 @@
              x:Name="PageRoot"
              x:DataType="vm:MainViewModel"
              Title="Shiny Sample">
+    <ContentPage.Resources>
+        <DataTemplate x:Key="FeatureTemplate" x:DataType="vm:FeatureItem">
+            <shiny:CommandCell Title="{Binding Title}"
+                               Description="{Binding Description}"
+                               Command="{Binding BindingContext.NavigateCommand, Source={x:Reference PageRoot}}"
+                               CommandParameter="{Binding Route}" />
+        </DataTemplate>
+    </ContentPage.Resources>
+
     <shiny:TableView>
         <shiny:TableRoot>
-            <shiny:TableSection Title="Features" ItemsSource="{Binding Features}">
-                <shiny:TableSection.ItemTemplate>
-                    <DataTemplate x:DataType="vm:FeatureItem">
-                        <shiny:CommandCell Title="{Binding Title}"
-                                           Description="{Binding Description}"
-                                           Command="{Binding BindingContext.NavigateCommand, Source={x:Reference PageRoot}}"
-                                           CommandParameter="{Binding Route}" />
-                    </DataTemplate>
-                </shiny:TableSection.ItemTemplate>
-            </shiny:TableSection>
+            <shiny:TableSection Title="{Binding Bluetooth.Title}"
+                                IsVisible="{Binding Bluetooth.IsVisible}"
+                                ItemsSource="{Binding Bluetooth.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding Notifications.Title}"
+                                IsVisible="{Binding Notifications.IsVisible}"
+                                ItemsSource="{Binding Notifications.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding Background.Title}"
+                                IsVisible="{Binding Background.IsVisible}"
+                                ItemsSource="{Binding Background.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding Location.Title}"
+                                IsVisible="{Binding Location.IsVisible}"
+                                ItemsSource="{Binding Location.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding PersonalData.Title}"
+                                IsVisible="{Binding PersonalData.IsVisible}"
+                                ItemsSource="{Binding PersonalData.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding Networking.Title}"
+                                IsVisible="{Binding Networking.IsVisible}"
+                                ItemsSource="{Binding Networking.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding Peripherals.Title}"
+                                IsVisible="{Binding Peripherals.IsVisible}"
+                                ItemsSource="{Binding Peripherals.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding Ai.Title}"
+                                IsVisible="{Binding Ai.IsVisible}"
+                                ItemsSource="{Binding Ai.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
+
+            <shiny:TableSection Title="{Binding Device.Title}"
+                                IsVisible="{Binding Device.IsVisible}"
+                                ItemsSource="{Binding Device.Items}"
+                                ItemTemplate="{StaticResource FeatureTemplate}" />
         </shiny:TableRoot>
     </shiny:TableView>
 </ContentPage>

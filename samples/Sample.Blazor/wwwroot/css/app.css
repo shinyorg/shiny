@@ -36,6 +36,15 @@ main {
     padding: 0.5rem 0;
 }
 
+.nav-group {
+    margin-top: 0.75rem;
+    color: #8a8f98;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
 .nav-link {
     color: #d7d7d7;
     text-decoration: none;

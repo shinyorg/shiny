@@ -69,9 +69,9 @@ public class AppDelegate : ShinyAppDelegate
                 Wrap(new DiscoveryViewController(), "mDNS"),
                 Wrap(new JobsViewController(), "Jobs"),
                 Wrap(new TransfersViewController(), "HTTP"),
+                Wrap(new DataSyncViewController(), "Sync"),
                 Wrap(new PushViewController(), "Push"),
-                Wrap(new RecorderViewController(), "Record"),
-                Wrap(new DataSyncViewController(), "Sync")
+                Wrap(new RecorderViewController(), "Record")
             ]
         };
 
