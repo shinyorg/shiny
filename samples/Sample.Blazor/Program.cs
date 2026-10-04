@@ -12,6 +12,8 @@ builder.Services.AddConnectivity();
 builder.Services.AddBattery();
 builder.Services.AddBluetoothLE();
 builder.Services.AddGps();
+// no browser geocoding API - this registers the OpenStreetMap Nominatim geocoder
+builder.Services.AddGeocoding();
 builder.Services.AddBlazorHttpTransfers<SampleHttpTransferDelegate>();
 builder.Services.AddScreenRecorder();
 

@@ -11,16 +11,17 @@
             <shiny:TableSection Title="Position">
                 <shiny:EntryCell Title="Latitude" ValueText="{Binding Latitude, Mode=TwoWay}" Keyboard="Numeric" />
                 <shiny:EntryCell Title="Longitude" ValueText="{Binding Longitude, Mode=TwoWay}" Keyboard="Numeric" />
-                <shiny:ButtonCell Title="Use Current Position" Command="{Binding UseCurrentPositionCommand}" />
+                <shiny:ButtonCell Title="Use Current Position" Command="{Binding UseCurrentPositionCommand}" IsVisible="{Binding HasGps}" />
             </shiny:TableSection>
 
             <shiny:TableSection Title="Actions">
                 <shiny:ButtonCell Title="Reverse Geocode" Command="{Binding ReverseGeocodeCommand}" />
+                <shiny:LabelCell Title="Provider" ValueText="{Binding Provider}" />
                 <shiny:LabelCell Title="Supported" ValueText="{Binding IsSupported}" />
                 <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
             </shiny:TableSection>
 
-            <shiny:TableSection Title="Placemarks" ItemsSource="{Binding Placemarks}">
+            <shiny:TableSection Title="Placemarks" ItemsSource="{Binding Placemarks}" FooterText="{Binding Attribution}" FooterVisible="{Binding ShowAttribution}">
                 <shiny:TableSection.ItemTemplate>
                     <DataTemplate x:DataType="vm:PlacemarkItem">
                         <shiny:LabelCell Title="{Binding Title}" Description="{Binding Description}" />

@@ -100,9 +100,11 @@ public static class ShinyRegistrations
         s.AddGps<SampleGpsDelegate>();
         s.AddGeofencing<SampleGeofenceDelegate>();
         s.AddMotionActivity<SampleMotionActivityDelegate>();
-        // reverse geocoding: MapKit/CoreLocation on Apple, android.location.Geocoder on Android
-        s.AddGeocoding();
 #endif
+
+        // reverse geocoding: MapKit/CoreLocation on iOS & Mac Catalyst, android.location.Geocoder on Android,
+        // and OpenStreetMap Nominatim everywhere else (Windows, Linux, macOS)
+        s.AddGeocoding();
 
 #if IOS || ANDROID || MACCATALYST
         // Contacts: Shiny.Contacts has native implementations for iOS, Mac Catalyst, macOS and Android.

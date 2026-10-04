@@ -36,6 +36,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             Add(FeatureGroup.Bluetooth, "🔵 Beacon Ranging", "Range iBeacons and estimate distance", "beaconranging");
             Add(FeatureGroup.Bluetooth, "🟢 Eddystone", "Scan Eddystone UID / URL / TLM frames", "eddystone");
             Add(FeatureGroup.Bluetooth, "📶 Beacon Broadcast", "Advertise as an iBeacon", "beaconbroadcast");
+            Add(FeatureGroup.Location, "🗺️ Geocoding", "Turn coordinates into addresses (OpenStreetMap)", "geocoding");
             Add(FeatureGroup.PersonalData, "📅 Calendar", "Browse & edit device calendar events", "calendar");
             Add(FeatureGroup.Peripherals, "🧾 Thermal Printer", "Print receipts to BLE & WiFi ESC/POS printers", "thermalprinter");
             Add(FeatureGroup.Peripherals, "🖨️ Native Print", "Print PDFs & HTML through CUPS", "nativeprint");
@@ -82,8 +83,9 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             Add(FeatureGroup.Location, "📍 GPS", "Track location with GPS", "gps");
             Add(FeatureGroup.Location, "🔲 Geofencing", "Monitor geofence regions", "geofencing");
             Add(FeatureGroup.Location, "🏃 Motion Activity", "Activity recognition (walk, drive, etc.)", "motionactivity");
-            Add(FeatureGroup.Location, "🗺️ Geocoding", "Turn coordinates into addresses", "geocoding");
         }
+        // Geocoding: native on iOS, Mac Catalyst & Android, OpenStreetMap Nominatim everywhere else
+        Add(FeatureGroup.Location, "🗺️ Geocoding", "Turn coordinates into addresses", "geocoding");
 
         // --- Contacts (iOS, Mac Catalyst & Android; IsIOS() is also true on Mac Catalyst) ---
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())

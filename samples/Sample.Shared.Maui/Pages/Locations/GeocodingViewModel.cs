@@ -1,24 +1,37 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Sample.Shared.Maui.Pages.Locations;
 
 [ShellMap<GeocodingPage>("geocoding")]
-public partial class GeocodingViewModel(IGeocoder geocoder, IGpsManager gpsManager) : ObservableObject
+public partial class GeocodingViewModel(IGeocoder geocoder, IServiceProvider services) : ObservableObject
 {
+    // GPS is only registered on iOS, Mac Catalyst & Android - elsewhere the position is typed in
+    readonly IGpsManager? gpsManager = services.GetService<IGpsManager>();
+
     // defaults to a well-known address so the page works without a GPS fix
     [ObservableProperty] string latitude = "43.6426";
     [ObservableProperty] string longitude = "-79.3871";
     [ObservableProperty] string status = string.Empty;
 
     public bool IsSupported => geocoder.IsSupported;
+    public bool HasGps => this.gpsManager != null;
+    public string Provider => geocoder is NominatimGeocoder ? "OpenStreetMap Nominatim" : "Native";
+
+    // OpenStreetMap requires attribution wherever Nominatim results are shown
+    public string? Attribution => geocoder is NominatimGeocoder ? NominatimGeocoder.Attribution : null;
+    public bool ShowAttribution => this.Attribution != null;
     public ObservableCollection<PlacemarkItem> Placemarks { get; } = new();
 
     [RelayCommand]
     async Task UseCurrentPosition()
     {
+        if (this.gpsManager == null)
+            return;
+
         try
         {
-            var access = await gpsManager.RequestAccess(GpsRequest.Foreground);
+            var access = await this.gpsManager.RequestAccess(GpsRequest.Foreground);
             if (access != AccessState.Available)
             {
                 this.Status = $"GPS Access: {access}";
@@ -26,7 +39,7 @@ public partial class GeocodingViewModel(IGeocoder geocoder, IGpsManager gpsManag
             }
 
             this.Status = "Getting position...";
-            var reading = await gpsManager.GetCurrentPosition();
+            var reading = await this.gpsManager.GetCurrentPosition();
             if (reading == null)
             {
                 this.Status = "No position available";
@@ -47,7 +60,6 @@ public partial class GeocodingViewModel(IGeocoder geocoder, IGpsManager gpsManag
     {
         if (!geocoder.IsSupported)
         {
-            // Android devices without a geocoding backend (typically no Google Play Services)
             this.Status = "No geocoder on this device";
             return;
         }
@@ -80,7 +92,7 @@ public partial class GeocodingViewModel(IGeocoder geocoder, IGpsManager gpsManag
 
 public record PlacemarkItem(string Title, string Description)
 {
-    public static PlacemarkItem From(Placemark p)
+    public static PlacemarkItem From(Shiny.Locations.Placemark p)
     {
         var street = Join(" ", p.SubThoroughfare, p.Thoroughfare);
         var title = p.FormattedAddress ?? p.Name ?? street ?? "(unnamed)";

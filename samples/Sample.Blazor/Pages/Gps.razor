@@ -2,6 +2,7 @@
 @using Shiny.Locations
 @implements IAsyncDisposable
 @inject IGpsManager GpsService
+@inject IGeocoder Geocoder
 
 <PageTitle>GPS</PageTitle>
 
@@ -17,6 +18,7 @@
     <button class="btn btn-secondary me-2" @onclick="GetLast">Get Current</button>
     <button class="btn btn-primary me-2" @onclick="Start" disabled="@isListening">Start Listener</button>
     <button class="btn btn-danger me-2" @onclick="Stop" disabled="@(!isListening)">Stop Listener</button>
+    <button class="btn btn-outline-primary me-2" @onclick="ReverseGeocode" disabled="@(reading == null || isGeocoding)">Reverse Geocode</button>
 </div>
 
 @if (error != null)
@@ -38,11 +40,37 @@
     </tbody>
 </table>
 
+@if (placemark != null)
+{
+    <h2 class="h5 mt-4">Address</h2>
+    <table class="table">
+        <tbody>
+            <tr><th>Address</th><td>@placemark.FormattedAddress</td></tr>
+            <tr><th>Street</th><td>@placemark.SubThoroughfare @placemark.Thoroughfare</td></tr>
+            <tr><th>Locality</th><td>@placemark.Locality</td></tr>
+            <tr><th>Region</th><td>@placemark.AdministrativeArea</td></tr>
+            <tr><th>Postal Code</th><td>@placemark.PostalCode</td></tr>
+            <tr><th>Country</th><td>@placemark.CountryName (@placemark.CountryCode)</td></tr>
+        </tbody>
+    </table>
+    @* OpenStreetMap requires attribution wherever Nominatim results are shown *@
+    <p class="text-muted small">
+        Address data <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">@NominatimGeocoder.Attribution</a>
+    </p>
+}
+else if (geocodeStatus != null)
+{
+    <p class="text-muted">@geocodeStatus</p>
+}
+
 @code {
     GpsReading? reading;
     AccessState access = AccessState.Unknown;
     bool isListening;
     string? error;
+    Placemark? placemark;
+    string? geocodeStatus;
+    bool isGeocoding;
 
     protected override void OnInitialized()
     {
@@ -73,6 +101,33 @@
         catch (Exception ex)
         {
             error = ex.Message;
+        }
+    }
+
+    async Task ReverseGeocode()
+    {
+        if (reading == null)
+            return;
+
+        try
+        {
+            error = null;
+            isGeocoding = true;
+            placemark = null;
+            geocodeStatus = "Looking up...";
+
+            var results = await Geocoder.ReverseGeocode(reading.Position);
+            placemark = results.FirstOrDefault();
+            geocodeStatus = placemark == null ? "No address found" : null;
+        }
+        catch (Exception ex)
+        {
+            geocodeStatus = null;
+            error = ex.Message;
+        }
+        finally
+        {
+            isGeocoding = false;
         }
     }
 
