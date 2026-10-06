@@ -1,5 +1,5 @@
 # Shiny Client for .NET
-<img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
+<img src="https://github.com/shinyorg/shiny/raw/HEAD/art/old/logo.png" width="100" /> 
 
 Shiny is a cross-platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
@@ -153,7 +153,7 @@ var response = await chatClient.GetResponseAsync(messages, new ChatOptions { Too
 
 ## Links
 * [Documentation](https://shinylib.net)
-* [Change Log](https://shinylib.net/release-notes/client/)
+* [Change Log](https://shinylib.net/client/release-notes/)
 * [Community Support](https://github.com/shinyorg/shiny/discussions)
 * [NuGets](https://www.nuget.org/profiles/ShinyLib)
 * [AI Coding Skills](https://shinylib.net/foundation/ai-skills/)
