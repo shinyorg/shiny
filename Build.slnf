@@ -29,6 +29,8 @@
             "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
             "src\\Shiny.Mobile.LiveActivities\\Shiny.Mobile.LiveActivities.csproj",
             "src\\Shiny.iOS.LiveActivities.Binding\\Shiny.iOS.LiveActivities.Binding.csproj",
+            "src\\Shiny.Mobile.InAppPurchases\\Shiny.Mobile.InAppPurchases.csproj",
+            "src\\Shiny.Mobile.InAppPurchases.Server\\Shiny.Mobile.InAppPurchases.Server.csproj",
             "src\\Shiny.Net.Http.Blazor\\Shiny.Net.Http.Blazor.csproj",
             "src\\Shiny.Net.Discovery\\Shiny.Net.Discovery.csproj",
             "src\\Shiny.Net.Wifi\\Shiny.Net.Wifi.csproj",

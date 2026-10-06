@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Shiny.InAppPurchases</RootNamespace>
+        <!-- StoreKit 2 and Google Play Billing only. Everything else resolves the net10.0 asset, which carries the
+             contracts and registers nothing. -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <IsAotCompatible>true</IsAotCompatible>
+
+        <Description>Cross-platform in-app purchases - consumables, non-consumables and auto-renewable subscriptions over StoreKit 2 on iOS and Google Play Billing 9 on Android</Description>
+        <PackageTags>shiny in-app-purchase iap storekit storekit2 google-play-billing subscriptions maui ios android</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Xamarin.Android.Google.BillingClient" />
+    </ItemGroup>
+
+    <!--
+        StoreKit 2 is Swift-only, so native/ShinyStoreKit is a small @_cdecl C-ABI shim built into a dynamic
+        xcframework by build.sh (swiftc, no Xcode project) and consumed through NativeReference.
+    -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ShinyStoreKitNativeDir>$(MSBuildThisFileDirectory)..\..\native\ShinyStoreKit\</ShinyStoreKitNativeDir>
+        <ShinyStoreKitXcframework>$(ShinyStoreKitNativeDir)build\ShinyStoreKit.xcframework</ShinyStoreKitXcframework>
+    </PropertyGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <ShinyStoreKitSwiftSource Include="$(ShinyStoreKitNativeDir)Sources\**\*.swift;$(ShinyStoreKitNativeDir)build.sh" />
+
+        <!-- StoreKit 2 Swift bridge (dynamic framework). Embedded in consuming apps and packed into the nupkg. -->
+        <NativeReference Include="$(ShinyStoreKitXcframework)">
+            <Kind>Framework</Kind>
+            <SmartLink>false</SmartLink>
+        </NativeReference>
+    </ItemGroup>
+
+    <Target Name="BuildShinyStoreKit"
+            BeforeTargets="PrepareForBuild"
+            Condition="$(TargetFramework.Contains('-ios')) And $([MSBuild]::IsOSPlatform('OSX'))"
+            Inputs="@(ShinyStoreKitSwiftSource)"
+            Outputs="$(ShinyStoreKitXcframework)\Info.plist">
+        <Exec Command="/bin/bash &quot;$(ShinyStoreKitNativeDir)build.sh&quot;" />
+    </Target>
+
+    <!--
+        The iOS SDK only creates Shiny.Mobile.InAppPurchases.resources(.zip) - the sidecar that carries NativeReference
+        items to consuming apps and into the nupkg - for binding projects. This is a plain library (no bgen), so run the
+        same SDK target explicitly.
+    -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <NoBindingEmbedding>true</NoBindingEmbedding>
+    </PropertyGroup>
+
+    <!-- the SDK's _CreateBindingResourcePackage depends on app-only native reference expansion, so call its task directly -->
+    <Target Name="ShinyStoreKitCreateNativeResourcePackage"
+            AfterTargets="CoreCompile"
+            Condition="$(TargetFramework.Contains('-ios'))"
+            Inputs="@(NativeReference->'%(FullPath)\Info.plist')"
+            Outputs="$(OutputPath)$(AssemblyName).resources.stamp">
+        <CreateBindingResourcePackage
+            NativeReferences="@(NativeReference)"
+            BindingResourcePath="$(OutputPath)$(AssemblyName).resources"
+            Compress="auto"
+            IntermediateOutputPath="$(IntermediateOutputPath)" />
+        <Touch AlwaysCreate="true" Files="$(OutputPath)$(AssemblyName).resources.stamp">
+            <Output TaskParameter="TouchedFiles" ItemName="FileWrites" />
+        </Touch>
+    </Target>
+
+</Project>

@@ -16,7 +16,7 @@ subfolder per module (URLs are `/client/<module>/...`):
 - Feature pages: `src/content/docs/client/<module>/*.mdx` — `core/`, `ble/`, `blehosting/`,
   `beacons/`, `locations/`, `discovery/`, `wifi/`, `screenrecorder/`, `contactstore/`,
   `calendarstore/`, `jobs/`, `notifications/`, `push/`, `liveactivities/`, `httptransfers/`,
-  `datasync/`, `wearables/`, `configuration/`, `printing/`.
+  `datasync/`, `wearables/`, `configuration/`, `printing/`, `inapppurchases/`.
 - Release notes: **one shared file**, `src/content/docs/client/release-notes.mdx`. Every package
   ships under the same version, so notes are grouped `## v<major>` → `### <version> - <date>` →
   `#### <Component>` (e.g. `#### BluetoothLE`, `#### Push Notifications`). Add your note under the
@@ -53,6 +53,35 @@ heading when cutting the release.
 **Never write a release note for a sample-app fix.** Release notes describe the *shipped library*.
 Changes confined to `samples/` get no note — fix the sample, and only add a note if the same change
 also altered library behavior or documented guidance (write the note about *that*, not the sample).
+
+## In-App Purchases (`Shiny.Mobile.InAppPurchases` + `.Server`)
+
+App Store / Google Play **in-app purchases** (consumables, non-consumables, auto-renewable subscriptions) - NOT Apple
+Pay / Google Pay card payments, which go through a payment processor and get no store notifications. Namespaces are
+`Shiny.InAppPurchases` / `Shiny.InAppPurchases.Server` (package names keep `Mobile`, like Live Activities).
+
+- **Client** targets `net10.0` (contracts only), `-ios`, `-android`. `InAppPurchaseManager` in `Platforms/iOS` and
+  `Platforms/Android` is an `IShinyStartupTask`, so out-of-band updates (Ask to Buy, pending payments, renewals,
+  refunds) reach `IPurchaseDelegate` from launch. Android uses `AndroidPlatform` for the current activity and main
+  thread. No MAUI or Essentials APIs here - only `samples/Sample.InAppPurchases.Maui` references MAUI.
+- **StoreKit 2 bridge**: StoreKit 2 is Swift-only and StoreKit 1 is deprecated, so `native/ShinyStoreKit` is a small
+  `@_cdecl` C-ABI Swift shim that exchanges JSON with C# through `[UnmanagedCallersOnly]` callbacks (no bgen, trim/AOT
+  safe). `build.sh` compiles it with `swiftc` into `native/ShinyStoreKit/build/ShinyStoreKit.xcframework` (no Xcode
+  project); the csproj runs it on macOS when the Swift changes and ships it through `NativeReference` plus an explicit
+  `CreateBindingResourcePackage` step, because the SDK only makes the `.resources.zip` sidecar for binding projects.
+- **Nothing auto-finishes**: apps verify `Purchase.VerificationData` server-side, grant, then
+  `FinishPurchaseAsync(purchase, consume)`. Google refunds unacknowledged purchases after 3 days. Consumable vs
+  non-consumable is decided at finish time because Google Play does not model it.
+- **`AccountToken` is a `Guid`** - Apple `appAccountToken` (UUID) and Google `obfuscatedAccountId`
+  (`ToString("N")`) - and round-trips into server notifications.
+- **Server**: BCL-only crypto, AOT-compatible, `TreatWarningsAsErrors`. Webhooks return non-2xx when a handler throws
+  so the stores retry; de-duplication is keyed on Apple `notificationUUID` / Pub/Sub `messageId` and recorded only
+  after handlers succeed. Tests: `tests/Shiny.Mobile.InAppPurchases.Server.Tests`.
+- `Xamarin.Android.Google.BillingClient` is held at `9.1.0`: later binding revisions require AndroidX.Fragment 1.9 and
+  Play Services Location 121.4, above this repo's central pins.
+- `samples/Sample.InAppPurchases.Maui/readme.md` is the store setup / testing / production walkthrough - update it when
+  setup steps, config keys, endpoints or store behavior change. Docs: `client/inapppurchases/` (Getting Started, Store
+  Setup, Server).
 
 ## Linux / D-Bus (Tmds.DBus.Protocol)
 

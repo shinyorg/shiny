@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Shiny.InAppPurchases.Server</RootNamespace>
+        <IsAotCompatible>true</IsAotCompatible>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <!-- Release builds generate XML docs; missing comments on public members must not fail the build -->
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+        <Description>ASP.NET Core backend for Shiny.Mobile.InAppPurchases - App Store Server Notifications V2, Google Play Real-time Developer Notifications, and server-side purchase verification</Description>
+        <PackageTags>shiny in-app-purchase iap storekit google-play-billing subscriptions aspnetcore webhooks app-store-server-notifications rtdn</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <InternalsVisibleTo Include="Shiny.Mobile.InAppPurchases.Server.Tests" />
+        <EmbeddedResource Include="Resources\AppleRootCA-G3.cer" LogicalName="AppleRootCA-G3.cer" />
+    </ItemGroup>
+
+</Project>

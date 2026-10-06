@@ -4,18 +4,21 @@
         <Project Path="samples\Sample.Linux\Sample.Linux.csproj" />
         <Project Path="samples\Sample.MacOS\Sample.MacOS.csproj" />
         <Project Path="samples\Sample.Maui\Sample.Maui.csproj" />
+        <Project Path="samples\Sample.InAppPurchases.Maui\Sample.InAppPurchases.Maui.csproj" />
     </Folder>
     <Folder Name="/NativeSamples/">
         <Project Path="samples\Sample.tvOS\Sample.tvOS.csproj" />
     </Folder>
     <Folder Name="/ServerSamples/">
         <Project Path="samples/Sample.Api/Sample.Api.csproj" />
+        <Project Path="samples\Sample.InAppPurchases.Server\Sample.InAppPurchases.Server.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/Shiny.Tests/Shiny.Tests.csproj" />
         <Project Path="tests/Shiny.Data.Sync.Tests/Shiny.Data.Sync.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Http.Tests/Shiny.Net.Http.Tests.csproj" />
         <Project Path="tests/Shiny.Mobile.LiveActivities.Tests/Shiny.Mobile.LiveActivities.Tests.csproj" />
+        <Project Path="tests/Shiny.Mobile.InAppPurchases.Server.Tests/Shiny.Mobile.InAppPurchases.Server.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Discovery.Tests/Shiny.Net.Discovery.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Wifi.Tests/Shiny.Net.Wifi.Tests.csproj" />
         <Project Path="tests/Shiny.Wearables.Tests/Shiny.Wearables.Tests.csproj" />
@@ -79,6 +82,8 @@
     <Project Path="src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Mobile.LiveActivities\Shiny.Mobile.LiveActivities.csproj" />
     <Project Path="src\Shiny.iOS.LiveActivities.Binding\Shiny.iOS.LiveActivities.Binding.csproj" />
+    <Project Path="src\Shiny.Mobile.InAppPurchases\Shiny.Mobile.InAppPurchases.csproj" />
+    <Project Path="src\Shiny.Mobile.InAppPurchases.Server\Shiny.Mobile.InAppPurchases.Server.csproj" />
     <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
     <Project Path="src\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />
     <Project Path="src\Shiny.Net.Wifi\Shiny.Net.Wifi.csproj" />

@@ -52,6 +52,9 @@
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1"/>
         <PackageVersion Include="xunit" Version="2.9.3"/>
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
+        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MsftExtensionVersion)"/>
+        <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MsftExtensionVersion)"/>
+        <PackageVersion Include="Scalar.AspNetCore" Version="2.17.3"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.19.0.1"/>
@@ -79,5 +82,7 @@
         <PackageVersion Include="Xamarin.AndroidX.Preference" Version="1.2.1.18"/>
         <PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.0.1.2"/>
         <PackageVersion Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1"/>
+        <!-- 9.1.0 (not .2): later binding revisions need AndroidX.Fragment 1.9 / Play Services Location 121.4, above the pins here -->
+        <PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="9.1.0"/>
     </ItemGroup>
 </Project>
