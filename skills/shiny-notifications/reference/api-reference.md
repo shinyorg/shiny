@@ -92,7 +92,7 @@ public interface IChannelManager
 
 ### ICanManageBadge
 
-Extended interface for platforms that support badge management. Check with `is` cast on `INotificationManager`.
+Extended interface for platforms that support badge management - implemented on iOS, Mac Catalyst and macOS (the Dock tile badge); not on Android or Windows. Check with `is` cast on `INotificationManager`, or use `TrySetBadge` / `TryGetBadge`.
 
 ```csharp
 public interface ICanManageBadge : INotificationManager
@@ -283,7 +283,7 @@ public class AndroidNotification : Notification
 {
     public bool AutoCancel { get; set; }                           // Default: true
     public bool OnGoing { get; set; }                              // Persistent notification
-    public string? Ticket { get; set; }
+    [Obsolete] public string? Ticket { get; set; }                // misspelling - forwards to Ticker; use Ticker
     public string? Category { get; set; }
     public string? SmallIconResourceName { get; set; }             // Android drawable resource name
     public string? LargeIconResourceName { get; set; }
@@ -658,7 +658,7 @@ notificationManager.AddChannel(new Channel
 
 ### Badge not working
 
-1. Use `TrySetBadge` / `TryGetBadge` extension methods -- they return false if the platform does not support badges.
+1. Use `TrySetBadge` / `TryGetBadge` extension methods -- they return false if the platform does not support badges (Android and Windows). iOS, Mac Catalyst and macOS support them.
 2. `BadgeCount` on a notification is only valid for immediate (non-triggered) notifications.
 
 ### Default channel cannot be removed

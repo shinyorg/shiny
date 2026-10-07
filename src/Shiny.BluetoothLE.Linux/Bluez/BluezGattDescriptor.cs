@@ -29,18 +29,19 @@ internal class BluezGattDescriptor
             BluezConstants.GattDescriptorInterface,
             "UUID"
         );
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadStringVariant()!;
-            }
+            },
+            ct
         );
     }
 
 
-    public Task<byte[]> ReadValueAsync(Dictionary<string, object>? options = null, CancellationToken ct = default)
+    public Task<byte[]> ReadValueAsync(CancellationToken ct = default)
     {
         var writer = this.connection.GetMessageWriter();
         writer.WriteMethodCallHeader(
@@ -54,13 +55,14 @@ internal class BluezGattDescriptor
         writer.WriteDictionary(new Dictionary<string, VariantValue>());
 
         var msg = writer.CreateMessage();
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadArrayOfByte();
-            }
+            },
+            ct
         );
     }
 
@@ -80,6 +82,6 @@ internal class BluezGattDescriptor
         writer.WriteDictionary(new Dictionary<string, VariantValue>());
 
         var msg = writer.CreateMessage();
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 }

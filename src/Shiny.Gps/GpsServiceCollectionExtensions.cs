@@ -20,7 +20,7 @@ public static class GpsServiceCollectionExtensions
     public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, bool forceUseOldCLManager = false) where TDelegate : class, IGpsDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
-        services.AddGps();
+        services.AddGps(forceUseOldCLManager);
         
         return services;
     }
@@ -77,7 +77,7 @@ public static class GpsServiceCollectionExtensions
     public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, bool forceLocationApi = false) where TDelegate : class, IGpsDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
-        services.AddGps();
+        services.AddGps(forceLocationApi);
 
         return services;
     }

@@ -33,9 +33,6 @@ sealed class CalendarAccessPolicy
     /// </summary>
     public CalendarAICapabilities Effective { get; }
 
-    /// <summary>True when at least one calendar id was given an explicit capability set.</summary>
-    public bool HasCalendarFilters => this.perCalendar.Count > 0;
-
     /// <summary>The capabilities allowed for a calendar id (null id falls back to the global set).</summary>
     public CalendarAICapabilities For(string? calendarId)
         => calendarId != null && this.perCalendar.TryGetValue(calendarId, out var caps)

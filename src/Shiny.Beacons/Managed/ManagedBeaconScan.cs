@@ -22,7 +22,6 @@ public class ManagedBeaconScan(IBeaconRangingManager rangingManager) : IDisposab
 {
     readonly BindingList<ManagedBeacon> beacons = new();
     CompositeDisposable? disposer;
-    IScheduler? scheduler;
 
 
     /// <summary>The beacons currently in range, newest additions last.</summary>
@@ -64,7 +63,6 @@ public class ManagedBeaconScan(IBeaconRangingManager rangingManager) : IDisposab
 
         (await rangingManager.RequestAccess().ConfigureAwait(false)).Assert();
 
-        this.scheduler = scheduler;
         this.BufferTime = bufferTime ?? TimeSpan.FromSeconds(2);
         this.ClearTime = clearTime;
         this.ScanningRegion = region;
@@ -99,7 +97,6 @@ public class ManagedBeaconScan(IBeaconRangingManager rangingManager) : IDisposab
     {
         this.disposer?.Dispose();
         this.disposer = null;
-        this.scheduler = null;
         this.ScanningRegion = null;
     }
 

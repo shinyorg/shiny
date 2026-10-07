@@ -9,7 +9,13 @@ public class AndroidNotification : Notification
 {
     public bool AutoCancel { get; set; } = true;
     public bool OnGoing { get; set; }
-    public string? Ticket { get; set; }
+
+    [Obsolete("Misspelling of Ticker, which is the property applied to the notification - this now forwards to it")]
+    public string? Ticket
+    {
+        get => this.Ticker;
+        set => this.Ticker = value;
+    }
 
     public string? Category { get; set; }
     public string? SmallIconResourceName { get; set; }

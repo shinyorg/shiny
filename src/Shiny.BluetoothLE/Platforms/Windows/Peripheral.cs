@@ -430,12 +430,6 @@ public partial class Peripheral : IPeripheral
     }
 
 
-    void StartConnectAttempt()
-    {
-        this.StartConnectAttempt(out _);
-    }
-
-
     bool StartConnectAttempt(out CancellationToken connectToken)
     {
         lock (this.connectSync)

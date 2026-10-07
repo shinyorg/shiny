@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Tmds.DBus.Protocol;
 
 namespace Shiny.BluetoothLE.Bluez;
@@ -7,6 +9,25 @@ namespace Shiny.BluetoothLE.Bluez;
 
 internal static class DbusExtensions
 {
+    // Tmds.DBus.Protocol's CallMethodAsync takes no CancellationToken, so cancelling stops the
+    // caller waiting and the reply is dropped - BlueZ still runs the call once it is sent. A token
+    // that is already cancelled sends nothing. These are named CallAsync rather than overloading
+    // CallMethodAsync: its generic form has an optional object readerState, which would quietly
+    // bind a CancellationToken and never cancel.
+    public static Task CallAsync(this DBusConnection connection, MessageBuffer message, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return connection.CallMethodAsync(message).WaitAsync(ct);
+    }
+
+
+    public static Task<T> CallAsync<T>(this DBusConnection connection, MessageBuffer message, MessageValueReader<T> reader, CancellationToken ct, object? readerState = null)
+    {
+        ct.ThrowIfCancellationRequested();
+        return connection.CallMethodAsync(message, reader, readerState).WaitAsync(ct);
+    }
+
+
     public static MessageBuffer CreateMethodCall(
         this DBusConnection connection,
         string destination,
@@ -44,25 +65,6 @@ internal static class DbusExtensions
         );
         writer.WriteString(@interface);
         writer.WriteString(property);
-        return writer.CreateMessage();
-    }
-
-
-    public static MessageBuffer CreateGetAllPropertiesCall(
-        this DBusConnection connection,
-        string destination,
-        string path,
-        string @interface)
-    {
-        var writer = connection.GetMessageWriter();
-        writer.WriteMethodCallHeader(
-            destination: destination,
-            path: path,
-            @interface: BluezConstants.PropertiesInterface,
-            member: "GetAll",
-            signature: "s"
-        );
-        writer.WriteString(@interface);
         return writer.CreateMessage();
     }
 

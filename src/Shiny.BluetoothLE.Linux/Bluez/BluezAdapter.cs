@@ -30,7 +30,7 @@ internal class BluezAdapter
             BluezConstants.AdapterInterface,
             "StartDiscovery"
         );
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 
@@ -42,7 +42,7 @@ internal class BluezAdapter
             BluezConstants.AdapterInterface,
             "StopDiscovery"
         );
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 
@@ -63,7 +63,7 @@ internal class BluezAdapter
         });
 
         var msg = writer.CreateMessage();
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 
@@ -75,49 +75,14 @@ internal class BluezAdapter
             BluezConstants.AdapterInterface,
             "Powered"
         );
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadBoolVariant();
-            }
+            },
+            ct
         );
-    }
-
-
-    public Task<bool> GetDiscoveringAsync(CancellationToken ct = default)
-    {
-        var msg = this.connection.CreateGetPropertyCall(
-            BluezConstants.Service,
-            this.objectPath,
-            BluezConstants.AdapterInterface,
-            "Discovering"
-        );
-        return this.connection.CallMethodAsync(
-            msg,
-            static (Message reply, object? _) =>
-            {
-                var reader = reply.GetBodyReader();
-                return reader.ReadBoolVariant();
-            }
-        );
-    }
-
-
-    public async Task RemoveDeviceAsync(string devicePath, CancellationToken ct = default)
-    {
-        var writer = this.connection.GetMessageWriter();
-        writer.WriteMethodCallHeader(
-            destination: BluezConstants.Service,
-            path: this.objectPath,
-            @interface: BluezConstants.AdapterInterface,
-            member: "RemoveDevice",
-            signature: "o"
-        );
-        writer.WriteObjectPath(devicePath);
-
-        var msg = writer.CreateMessage();
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
     }
 }

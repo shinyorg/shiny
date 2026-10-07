@@ -94,7 +94,12 @@ public class GattServerContext : BluetoothGattServerCallback
 
     public Subject<ConnectionStateChangeEventArgs> ConnectionStateChanged { get; } = new();
     public override void OnConnectionStateChange(BluetoothDevice device, ProfileState status, ProfileState newState)
-        => this.ConnectionStateChanged.OnNext(new ConnectionStateChangeEventArgs(device, status, newState));
+    {
+        if (newState == ProfileState.Disconnected && device.Address != null)
+            this.mtus.TryRemove(device.Address, out _);
+
+        this.ConnectionStateChanged.OnNext(new ConnectionStateChangeEventArgs(device, status, newState));
+    }
 
 
     public Subject<NotificationSentEventArgs> NotificationSent { get; } = new();
@@ -102,10 +107,26 @@ public class GattServerContext : BluetoothGattServerCallback
         => this.NotificationSent.OnNext(new NotificationSentEventArgs(peripheral, status));
 
 
+    // centrals usually negotiate the MTU straight after connecting - before they read, write or
+    // subscribe - so it is remembered per device for the peripherals created after it
+    readonly ConcurrentDictionary<string, int> mtus = new();
+
+    /// <summary>
+    /// The usable payload size (negotiated MTU less the ATT header) for a connected central.
+    /// </summary>
+    public int GetPayloadSize(BluetoothDevice device)
+        => device.Address != null && this.mtus.TryGetValue(device.Address, out var mtu)
+            ? mtu - BleConstants.AttHeaderSize
+            : BleConstants.DefaultPayloadSize;
+
+
     public Subject<MtuChangedEventArgs> MtuChanged { get; } = new();
     public override void OnMtuChanged(BluetoothDevice peripheral, int mtu)
     {
         base.OnMtuChanged(peripheral, mtu);
+        if (peripheral.Address != null)
+            this.mtus[peripheral.Address] = mtu;
+
         this.MtuChanged.OnNext(new MtuChangedEventArgs(peripheral, mtu));
     }
 

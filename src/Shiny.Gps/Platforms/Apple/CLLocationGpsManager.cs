@@ -62,7 +62,10 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
         this.GpsReadingReceived?.Invoke(this, reading);
     }
 
-    internal void OnFailed(NSError error) {}
+    // CLLocationManager keeps trying after most failures (kCLErrorLocationUnknown is transient), so
+    // this only reports - nothing is stopped here
+    internal void OnFailed(NSError error)
+        => this.logger.LogWarning("CLLocationManager failed: {Error} (code {Code})", error.LocalizedDescription, error.Code);
 
 
     public async void Start()

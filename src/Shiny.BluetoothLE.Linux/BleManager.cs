@@ -20,6 +20,7 @@ public class BleManager : IBleManager, IAsyncDisposable
     readonly ILogger<BleManager> logger;
     readonly ILogger<Peripheral> peripheralLogger;
     DBusConnection? connection;
+    Task? connecting;
     BluezAdapter? adapter;
     readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
 
@@ -44,8 +45,11 @@ public class BleManager : IBleManager, IAsyncDisposable
         if (this.connection == null)
         {
             this.connection = new DBusConnection(DBusAddress.System!);
-            await this.connection.ConnectAsync().ConfigureAwait(false);
+            this.connecting = this.connection.ConnectAsync().AsTask();
         }
+        // every caller waits on the one connect, so a caller that cancels stops waiting without
+        // abandoning the connection for the others - and none of them gets it before it is up
+        await this.connecting!.WaitAsync(ct).ConfigureAwait(false);
         return this.connection;
     }
 
@@ -69,7 +73,7 @@ public class BleManager : IBleManager, IAsyncDisposable
             var powered = await adapter.GetPoweredAsync(ct).ConfigureAwait(false);
             return powered ? AccessState.Available : AccessState.Disabled;
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             return AccessState.NotSupported;
         }
@@ -111,7 +115,7 @@ public class BleManager : IBleManager, IAsyncDisposable
                 {
                     await adapter.SetDiscoveryFilterAsync("le", cts.Token).ConfigureAwait(false);
                 }
-                catch
+                catch (Exception ex) when (ex is not OperationCanceledException)
                 {
                     // filter may not be supported - proceed anyway
                 }
@@ -353,7 +357,7 @@ public class BleManager : IBleManager, IAsyncDisposable
         );
 
         // GetManagedObjects returns a{oa{sa{sv}}} which we parse via MessageValueReader
-        var devices = await conn.CallMethodAsync(
+        var devices = await conn.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
@@ -422,7 +426,8 @@ public class BleManager : IBleManager, IAsyncDisposable
                 }
 
                 return result;
-            }
+            },
+            ct
         ).ConfigureAwait(false);
 
         foreach (var dev in devices)
@@ -464,6 +469,7 @@ public class BleManager : IBleManager, IAsyncDisposable
         {
             this.connection.Dispose();
             this.connection = null;
+            this.connecting = null;
         }
     }
 }

@@ -154,9 +154,6 @@ static unsafe partial class EvdevNative
     /// <summary>The device's name, as <c>EVIOCGNAME(len)</c>.</summary>
     internal static nuint GetName(nuint length) => Ioc(IocRead, 0x06, length);
 
-    /// <summary>The device's physical location, as <c>EVIOCGPHYS(len)</c>.</summary>
-    internal static nuint GetPhys(nuint length) => Ioc(IocRead, 0x07, length);
-
     /// <summary>The device's unique identifier - usually a MAC address - as <c>EVIOCGUNIQ(len)</c>.</summary>
     internal static nuint GetUniq(nuint length) => Ioc(IocRead, 0x08, length);
 

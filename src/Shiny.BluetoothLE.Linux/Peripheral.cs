@@ -194,7 +194,7 @@ public partial class Peripheral : IPeripheral
     {
         var charPath = await this.FindCharacteristicPathAsync(serviceUuid, characteristicUuid, ct).ConfigureAwait(false);
         var ch = new BluezGattCharacteristic(this.connection, charPath);
-        var data = await ch.ReadValueAsync(ct: ct).ConfigureAwait(false);
+        var data = await ch.ReadValueAsync(ct).ConfigureAwait(false);
         var flags = await ch.GetFlagsAsync(ct).ConfigureAwait(false);
 
         return new BleCharacteristicResult(
@@ -376,7 +376,7 @@ public partial class Peripheral : IPeripheral
     {
         var descPath = await this.FindDescriptorPathAsync(serviceUuid, characteristicUuid, descriptorUuid, ct).ConfigureAwait(false);
         var desc = new BluezGattDescriptor(this.connection, descPath);
-        var data = await desc.ReadValueAsync(ct: ct).ConfigureAwait(false);
+        var data = await desc.ReadValueAsync(ct).ConfigureAwait(false);
 
         var charPath = await this.FindCharacteristicPathAsync(serviceUuid, characteristicUuid, ct).ConfigureAwait(false);
         var charFlags = await new BluezGattCharacteristic(this.connection, charPath).GetFlagsAsync(ct).ConfigureAwait(false);
@@ -423,7 +423,7 @@ public partial class Peripheral : IPeripheral
             "GetManagedObjects"
         );
 
-        return await this.connection.CallMethodAsync(
+        return await this.connection.CallAsync(
             msg,
             (Message reply, object? state) =>
             {
@@ -470,6 +470,7 @@ public partial class Peripheral : IPeripheral
 
                 return result;
             },
+            ct,
             readerState: this.device.ObjectPath
         ).ConfigureAwait(false);
     }
@@ -484,7 +485,7 @@ public partial class Peripheral : IPeripheral
             "GetManagedObjects"
         );
 
-        return await this.connection.CallMethodAsync(
+        return await this.connection.CallAsync(
             msg,
             (Message reply, object? state) =>
             {
@@ -543,6 +544,7 @@ public partial class Peripheral : IPeripheral
 
                 return result;
             },
+            ct,
             readerState: servicePath
         ).ConfigureAwait(false);
     }
@@ -557,7 +559,7 @@ public partial class Peripheral : IPeripheral
             "GetManagedObjects"
         );
 
-        return await this.connection.CallMethodAsync(
+        return await this.connection.CallAsync(
             msg,
             (Message reply, object? state) =>
             {
@@ -604,6 +606,7 @@ public partial class Peripheral : IPeripheral
 
                 return result;
             },
+            ct,
             readerState: characteristicPath
         ).ConfigureAwait(false);
     }

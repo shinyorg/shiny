@@ -30,13 +30,14 @@ internal class BluezGattCharacteristic
             BluezConstants.GattCharacteristicInterface,
             "UUID"
         );
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadStringVariant()!;
-            }
+            },
+            ct
         );
     }
 
@@ -49,44 +50,19 @@ internal class BluezGattCharacteristic
             BluezConstants.GattCharacteristicInterface,
             "Flags"
         );
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadStringArrayVariant();
-            }
+            },
+            ct
         );
     }
 
 
-    public async Task<bool> GetNotifyingAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            var msg = this.connection.CreateGetPropertyCall(
-                BluezConstants.Service,
-                this.objectPath,
-                BluezConstants.GattCharacteristicInterface,
-                "Notifying"
-            );
-            return await this.connection.CallMethodAsync(
-                msg,
-                static (Message reply, object? _) =>
-                {
-                    var reader = reply.GetBodyReader();
-                    return reader.ReadBoolVariant();
-                }
-            ).ConfigureAwait(false);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-
-    public Task<byte[]> ReadValueAsync(Dictionary<string, object>? options = null, CancellationToken ct = default)
+    public Task<byte[]> ReadValueAsync(CancellationToken ct = default)
     {
         var writer = this.connection.GetMessageWriter();
         writer.WriteMethodCallHeader(
@@ -101,13 +77,14 @@ internal class BluezGattCharacteristic
         writer.WriteDictionary(new Dictionary<string, VariantValue>());
 
         var msg = writer.CreateMessage();
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadArrayOfByte();
-            }
+            },
+            ct
         );
     }
 
@@ -130,7 +107,7 @@ internal class BluezGattCharacteristic
         });
 
         var msg = writer.CreateMessage();
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 
@@ -142,7 +119,7 @@ internal class BluezGattCharacteristic
             BluezConstants.GattCharacteristicInterface,
             "StartNotify"
         );
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 
@@ -154,7 +131,7 @@ internal class BluezGattCharacteristic
             BluezConstants.GattCharacteristicInterface,
             "StopNotify"
         );
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 

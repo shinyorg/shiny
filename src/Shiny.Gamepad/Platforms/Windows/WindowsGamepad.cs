@@ -26,7 +26,6 @@ class WindowsGamepad : AbstractGamepad
 {
     readonly ILogger logger;
     readonly NativeGamepad pad;
-    readonly RawGameController? raw;
     readonly GamepadCapabilities capabilities;
 
 
@@ -34,7 +33,6 @@ class WindowsGamepad : AbstractGamepad
     {
         this.logger = logger;
         this.pad = pad;
-        this.raw = raw;
         this.Name = raw?.DisplayName is { Length: > 0 } name ? name : "Gamepad";
         this.Kind = DetectKind(raw);
 

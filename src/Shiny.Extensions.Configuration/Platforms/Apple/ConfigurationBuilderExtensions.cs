@@ -42,7 +42,7 @@ public static partial class ConfigurationBuilderExtensions
 
     static IConfigurationBuilder AddJsonFileInternal(this IConfigurationBuilder builder, string fileName, string? environment, bool optional, bool reloadOnChange)
     {
-        builder.AddJsonFileInternal(fileName, true, reloadOnChange);
+        builder.AddJsonFileInternal(fileName, optional, reloadOnChange);
         if (!String.IsNullOrWhiteSpace(environment))
         {
             var newFileName = GetEnvFileName(fileName, environment);

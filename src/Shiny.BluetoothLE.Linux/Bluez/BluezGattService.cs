@@ -28,32 +28,14 @@ internal class BluezGattService
             BluezConstants.GattServiceInterface,
             "UUID"
         );
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadStringVariant()!;
-            }
-        );
-    }
-
-
-    public Task<bool> GetPrimaryAsync(CancellationToken ct = default)
-    {
-        var msg = this.connection.CreateGetPropertyCall(
-            BluezConstants.Service,
-            this.objectPath,
-            BluezConstants.GattServiceInterface,
-            "Primary"
-        );
-        return this.connection.CallMethodAsync(
-            msg,
-            static (Message reply, object? _) =>
-            {
-                var reader = reply.GetBodyReader();
-                return reader.ReadBoolVariant();
-            }
+            },
+            ct
         );
     }
 }

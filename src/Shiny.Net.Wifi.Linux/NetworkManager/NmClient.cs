@@ -489,24 +489,6 @@ internal sealed class NmClient : IAsyncDisposable
     }
 
 
-    public async Task<bool> GetWwanEnabled(CancellationToken ct = default)
-    {
-        var conn = await this.GetConnection(ct).ConfigureAwait(false);
-        return await conn
-            .GetBoolProperty(NmConstants.RootPath, NmConstants.ManagerInterface, "WwanEnabled")
-            .ConfigureAwait(false);
-    }
-
-
-    public async Task SetWwanEnabled(bool enabled, CancellationToken ct = default)
-    {
-        var conn = await this.GetConnection(ct).ConfigureAwait(false);
-        await conn
-            .SetBoolProperty(NmConstants.RootPath, NmConstants.ManagerInterface, "WwanEnabled", enabled)
-            .ConfigureAwait(false);
-    }
-
-
     /// <summary>
     /// Watches every PropertiesChanged signal NetworkManager emits.
     /// </summary>

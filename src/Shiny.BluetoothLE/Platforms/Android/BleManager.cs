@@ -384,29 +384,4 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             Manifest.Permission.AccessFineLocation
         };
     }
-
-
-    static void Assert(AccessState access)
-    {
-        if (access == AccessState.NotSetup)
-        {
-            var permissions = GetPlatformPermissions();
-            var msgList = String.Join(", ", permissions);
-            throw new InvalidOperationException("Your AndroidManifest.xml is missing 1 or more of the following permissions for this version of Android: " + msgList);
-        }
-        
-        if (access != AccessState.Available)
-            throw new PermissionException("BluetoothLE", access);
-    }
 }
-
-//    public IEnumerable<Peripheral> GetConnectedDevices()
-//    {
-//        var nativeDevices = this.Manager.GetDevicesMatchingConnectionStates(ProfileType.Gatt, new[]
-//        {
-//            (int) ProfileState.Connecting,
-//            (int) ProfileState.Connected
-//        });
-//        foreach (var native in nativeDevices)
-//            yield return this.GetDevice(native);
-//    }

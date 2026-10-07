@@ -67,24 +67,6 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
 
 
     /// <summary>
-    /// True when the address belongs to this host. Used to drop our own datagrams, which come
-    /// back through multicast loopback.
-    /// </summary>
-    public bool IsLocalAddress(IPAddress address)
-    {
-        lock (this.joinLock)
-        {
-            foreach (var addresses in this.interfaceAddresses.Values)
-            {
-                if (addresses.Contains(address))
-                    return true;
-            }
-        }
-        return IPAddress.IsLoopback(address);
-    }
-
-
-    /// <summary>
     /// Starts the sockets if this is the first lease. Dispose the returned lease to release it -
     /// the sockets close once the last lease goes away.
     /// </summary>

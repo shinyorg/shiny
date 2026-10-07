@@ -20,7 +20,7 @@ public class NotificationManager(
     IPlatform platform,
     IChannelManager channelManager,
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings
-) : INotificationManager, IMacLifecycle.INotificationHandler
+) : INotificationManager, ICanManageBadge, IMacLifecycle.INotificationHandler
 {
     readonly Lazy<IEnumerable<INotificationDelegate>> delegates = new(() => services.GetRequiredService<IEnumerable<INotificationDelegate>>());
     readonly ILogger logger = logger;
@@ -43,6 +43,9 @@ public class NotificationManager(
     public Task SetBadge(int? badge) => platform.InvokeOnMainThreadAsync(() =>
         NSApplication.SharedApplication.DockTile.BadgeLabel = (badge.GetValueOrDefault() == 0) ? null : badge!.Value.ToString()
     );
+
+
+    Task ICanManageBadge.SetBadge(int value) => this.SetBadge(value);
 
 
     public async Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)

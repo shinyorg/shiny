@@ -21,7 +21,6 @@ namespace Shiny.Beacons;
 /// </remarks>
 public class BeaconRangingManager : IBeaconRangingManager
 {
-    readonly BeaconRangingOptions options;
     readonly CLLocationManager manager;
     readonly BeaconRangingDelegate locationDelegate;
     readonly object syncLock = new();
@@ -34,7 +33,6 @@ public class BeaconRangingManager : IBeaconRangingManager
     /// <param name="options">Supplies the proximity thresholds and the clock.</param>
     public BeaconRangingManager(BeaconRangingOptions options)
     {
-        this.options = options;
         this.locationDelegate = new BeaconRangingDelegate(options);
         this.manager = new CLLocationManager { Delegate = this.locationDelegate };
     }

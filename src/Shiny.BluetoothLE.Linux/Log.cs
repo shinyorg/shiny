@@ -7,14 +7,6 @@ namespace Shiny.BluetoothLE;
 internal static partial class Log
 {
     [LoggerMessage(
-        EventId = 1,
-        Level = LogLevel.Debug,
-        Message = "BlueZ adapter state: Powered={powered}, Discovering={discovering}"
-    )]
-    public static partial void AdapterState(this ILogger logger, bool powered, bool discovering);
-
-
-    [LoggerMessage(
         EventId = 2,
         Level = LogLevel.Debug,
         Message = "BlueZ device discovered: {devicePath}"

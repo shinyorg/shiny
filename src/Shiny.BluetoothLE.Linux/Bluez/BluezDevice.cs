@@ -30,7 +30,7 @@ internal class BluezDevice
             BluezConstants.DeviceInterface,
             "Connect"
         );
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 
@@ -42,33 +42,7 @@ internal class BluezDevice
             BluezConstants.DeviceInterface,
             "Disconnect"
         );
-        await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
-    }
-
-
-    public async Task<string?> GetNameAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            var msg = this.connection.CreateGetPropertyCall(
-                BluezConstants.Service,
-                this.objectPath,
-                BluezConstants.DeviceInterface,
-                "Name"
-            );
-            return await this.connection.CallMethodAsync(
-                msg,
-                static (Message reply, object? _) =>
-                {
-                    var reader = reply.GetBodyReader();
-                    return reader.ReadStringVariant();
-                }
-            ).ConfigureAwait(false);
-        }
-        catch
-        {
-            return null;
-        }
+        await this.connection.CallAsync(msg, ct).ConfigureAwait(false);
     }
 
 
@@ -80,13 +54,14 @@ internal class BluezDevice
             BluezConstants.DeviceInterface,
             "Address"
         );
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadStringVariant()!;
-            }
+            },
+            ct
         );
     }
 
@@ -103,38 +78,20 @@ internal class BluezDevice
                 BluezConstants.DeviceInterface,
                 "AddressType"
             );
-            return await this.connection.CallMethodAsync(
+            return await this.connection.CallAsync(
                 msg,
                 static (Message reply, object? _) =>
                 {
                     var reader = reply.GetBodyReader();
                     return reader.ReadStringVariant()!;
-                }
+                },
+                ct
             ).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             return "public";
         }
-    }
-
-
-    public Task<bool> GetConnectedAsync(CancellationToken ct = default)
-    {
-        var msg = this.connection.CreateGetPropertyCall(
-            BluezConstants.Service,
-            this.objectPath,
-            BluezConstants.DeviceInterface,
-            "Connected"
-        );
-        return this.connection.CallMethodAsync(
-            msg,
-            static (Message reply, object? _) =>
-            {
-                var reader = reply.GetBodyReader();
-                return reader.ReadBoolVariant();
-            }
-        );
     }
 
 
@@ -146,13 +103,14 @@ internal class BluezDevice
             BluezConstants.DeviceInterface,
             "ServicesResolved"
         );
-        return this.connection.CallMethodAsync(
+        return this.connection.CallAsync(
             msg,
             static (Message reply, object? _) =>
             {
                 var reader = reply.GetBodyReader();
                 return reader.ReadBoolVariant();
-            }
+            },
+            ct
         );
     }
 
@@ -167,122 +125,19 @@ internal class BluezDevice
                 BluezConstants.DeviceInterface,
                 "RSSI"
             );
-            return await this.connection.CallMethodAsync(
+            return await this.connection.CallAsync(
                 msg,
                 static (Message reply, object? _) =>
                 {
                     var reader = reply.GetBodyReader();
                     return reader.ReadInt16Variant();
-                }
+                },
+                ct
             ).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             return 0;
-        }
-    }
-
-
-    public async Task<string[]> GetUuidsAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            var msg = this.connection.CreateGetPropertyCall(
-                BluezConstants.Service,
-                this.objectPath,
-                BluezConstants.DeviceInterface,
-                "UUIDs"
-            );
-            return await this.connection.CallMethodAsync(
-                msg,
-                static (Message reply, object? _) =>
-                {
-                    var reader = reply.GetBodyReader();
-                    return reader.ReadStringArrayVariant();
-                }
-            ).ConfigureAwait(false);
-        }
-        catch
-        {
-            return Array.Empty<string>();
-        }
-    }
-
-
-    public async Task<short> GetTxPowerAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            var msg = this.connection.CreateGetPropertyCall(
-                BluezConstants.Service,
-                this.objectPath,
-                BluezConstants.DeviceInterface,
-                "TxPower"
-            );
-            return await this.connection.CallMethodAsync(
-                msg,
-                static (Message reply, object? _) =>
-                {
-                    var reader = reply.GetBodyReader();
-                    return reader.ReadInt16Variant();
-                }
-            ).ConfigureAwait(false);
-        }
-        catch
-        {
-            return 0;
-        }
-    }
-
-
-    public async Task<Dictionary<ushort, byte[]>> GetManufacturerDataAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            var msg = this.connection.CreateGetPropertyCall(
-                BluezConstants.Service,
-                this.objectPath,
-                BluezConstants.DeviceInterface,
-                "ManufacturerData"
-            );
-            return await this.connection.CallMethodAsync(
-                msg,
-                static (Message reply, object? _) =>
-                {
-                    var reader = reply.GetBodyReader();
-                    return reader.ReadManufacturerDataVariant();
-                }
-            ).ConfigureAwait(false);
-        }
-        catch
-        {
-            return new Dictionary<ushort, byte[]>();
-        }
-    }
-
-
-    public async Task<Dictionary<string, byte[]>> GetServiceDataAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            var msg = this.connection.CreateGetPropertyCall(
-                BluezConstants.Service,
-                this.objectPath,
-                BluezConstants.DeviceInterface,
-                "ServiceData"
-            );
-            return await this.connection.CallMethodAsync(
-                msg,
-                static (Message reply, object? _) =>
-                {
-                    var reader = reply.GetBodyReader();
-                    return reader.ReadServiceDataVariant();
-                }
-            ).ConfigureAwait(false);
-        }
-        catch
-        {
-            return new Dictionary<string, byte[]>();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Windows.Devices.Bluetooth;
@@ -57,22 +56,6 @@ public static class Utils
     public static bool HasNotify(this GattCharacteristic ch) =>
         ch.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate) ||
         ch.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify);
-
-
-    public static ulong ToBluetoothAddress(this Guid deviceId)
-    {
-        var address = deviceId
-            .ToByteArray()
-            .Skip(10)
-            .Take(6)
-            .ToArray();
-
-        var hexAddress = BitConverter.ToString(address).Replace("-", "");
-        if (ulong.TryParse(hexAddress, NumberStyles.HexNumber, null, out var mac))
-            return mac;
-
-        return 0L;
-    }
 
 
 

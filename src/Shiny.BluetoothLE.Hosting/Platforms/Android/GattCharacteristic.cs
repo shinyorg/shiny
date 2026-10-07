@@ -198,6 +198,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         this.SetupNotifications();
         this.SetupRead();
         this.SetupWrite();
+        this.SetupMtuChanged();
     }
 
 
@@ -278,7 +279,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             .Where(x => x.Characteristic.Equals(this.Native))
             .Subscribe(async ch =>
             {
-                var peripheral = new Peripheral(ch.Device);
+                var peripheral = new Peripheral(ch.Device) { Mtu = this.context.GetPayloadSize(ch.Device) };
                 var request = new ReadRequest(this, peripheral, ch.Offset);
                 var result = await this.onRead(request).ConfigureAwait(false);
 
@@ -306,7 +307,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             .Subscribe(async ch =>
             {
                 var responded = false;
-                var peripheral = new Peripheral(ch.Device);
+                var peripheral = new Peripheral(ch.Device) { Mtu = this.context.GetPayloadSize(ch.Device) };
                 var request = new WriteRequest(
                     this,
                     peripheral,
@@ -345,12 +346,13 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
     {
         this.context
             .MtuChanged
-            .Where(x => this.subscribers.ContainsKey(x.Device.Address!))
             .Subscribe(ch =>
             {
-                var peripheral = this.subscribers[ch.Device.Address!] as Peripheral;
-                if (peripheral != null)
-                    peripheral.Mtu = ch.Mtu - BleConstants.AttHeaderSize;
+                lock (this.subscribers)
+                {
+                    if (this.subscribers.TryGetValue(ch.Device.Address!, out var device) && device is Peripheral peripheral)
+                        peripheral.Mtu = ch.Mtu - BleConstants.AttHeaderSize;
+                }
             })
             .DisposedBy(this.disposer);
     }
@@ -363,7 +365,7 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             if (this.subscribers.ContainsKey(native.Address!))
                 return this.subscribers[native.Address!];
 
-            var device = new Peripheral(native);
+            var device = new Peripheral(native) { Mtu = this.context.GetPayloadSize(native) };
             this.subscribers.Add(native.Address!, device);
             return device;
         }

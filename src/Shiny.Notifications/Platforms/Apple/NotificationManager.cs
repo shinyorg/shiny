@@ -21,7 +21,7 @@ public class NotificationManager(
     IPlatform platform,
     IChannelManager channelManager,
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings
-) : INotificationManager, IIosLifecycle.INotificationHandler
+) : INotificationManager, ICanManageBadge, IIosLifecycle.INotificationHandler
 {
     public void AddChannel(Channel channel) => channelManager.Add(channel);
     public void RemoveChannel(string channelId) => channelManager.Remove(channelId);
@@ -38,6 +38,9 @@ public class NotificationManager(
     public Task SetBadge(int? badge) => platform.InvokeOnMainThreadAsync(() =>
         UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0
     );
+
+
+    Task ICanManageBadge.SetBadge(int value) => this.SetBadge(value);
 
 
     public async Task<AccessState> GetCurrentAccess(AccessRequestFlags flags = AccessRequestFlags.Notification)
