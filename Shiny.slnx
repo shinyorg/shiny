@@ -24,6 +24,7 @@
         <Project Path="tests/Shiny.Wearables.Tests/Shiny.Wearables.Tests.csproj" />
         <Project Path="tests/Shiny.ScreenRecorder.Tests/Shiny.ScreenRecorder.Tests.csproj" />
         <Project Path="tests/Shiny.Gamepad.Tests/Shiny.Gamepad.Tests.csproj" />
+        <Project Path="tests/Shiny.GameCenter.Tests/Shiny.GameCenter.Tests.csproj" />
         <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
         <Project Path="tests/Shiny.Notifications.Tests/Shiny.Notifications.Tests.csproj" />
         <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
@@ -93,6 +94,7 @@
     <Project Path="src\Shiny.Push\Shiny.Push.csproj" />
     <Project Path="src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
     <Project Path="src\Shiny.Gamepad\Shiny.Gamepad.csproj" />
+    <Project Path="src\Shiny.GameCenter\Shiny.GameCenter.csproj" />
     <Project Path="src\Shiny.Wearables\Shiny.Wearables.csproj" />
     <Project Path="src\Shiny.Printers\Shiny.Printers.csproj" />
     <Project Path="src\Shiny.Printers.BluetoothLE\Shiny.Printers.BluetoothLE.csproj" />

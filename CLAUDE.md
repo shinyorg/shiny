@@ -83,6 +83,22 @@ Pay / Google Pay card payments, which go through a payment processor and get no 
   setup steps, config keys, endpoints or store behavior change. Docs: `client/inapppurchases/` (Getting Started, Store
   Setup, Server).
 
+## Game Center (`Shiny.GameCenter`)
+
+Achievements / leaderboards / friends over GameKit (iOS, Mac Catalyst, macOS) and Play Games Services v2 (Android).
+
+- **The queue, key mapping and de-duplication live in `Infrastructure/GameCenterManager.cs`**, compiled on every TFM and
+  unit-tested on `net10.0` through a fake `IGameServicesProvider` (`tests/Shiny.GameCenter.Tests`). Providers only
+  translate. Progress is absolute steps, never deltas - keep it that way so retries stay idempotent.
+- **`Xamarin.GooglePlayServices.Games.V2` is pinned at 121.0.0.4**: 122.x pulls Play Services Base 118.11 ->
+  AndroidX.Fragment 1.9, above this repo's pins. Neither version binds `PlayersClient`, the `Player`/`Achievement`/
+  `LeaderboardScore` interfaces, or `getScoreHolder()` - those go through `Platforms/Android/PlayGamesJni.cs`, and buffer
+  items are read as the bound `AchievementRef` / `LeaderboardScoreRef` via `JavaCast`. Use the `*Immediate` client calls
+  so the queue only clears once Google has the data.
+- **Apple UI goes through `GKAccessPoint.TriggerAccessPoint`** - `GKGameCenterViewController` is obsoleted in the 26 SDKs
+  and is only kept for single-leaderboard views on iOS/Catalyst < 18. `GKLocalPlayer.LoadFriendsListAsync()` is the
+  iOS 14.5 `loadFriends`; the binding's `LoadFriendsAsync` / `LoadFriendPlayersAsync` are the deprecated ones.
+
 ## Linux / D-Bus (Tmds.DBus.Protocol)
 
 The Linux packages that reference `Tmds.DBus.Protocol` (`Shiny.BluetoothLE.Linux`,

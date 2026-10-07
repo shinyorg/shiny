@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.GameCenter</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny Game Center - achievements and leaderboards over Apple Game Center (iOS, Mac Catalyst, macOS) and Google Play Games Services v2 (Android), with one set of logical keys and a durable offline queue</Description>
+        <PackageTags>shiny gamecenter gamekit play-games achievements leaderboards maui ios android macos</PackageTags>
+
+        <!-- imported explicitly below so Platforms\Apple can also be compiled into the macOS target -->
+        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!-- 121.0.0.4, not 122.x: 122 needs AndroidX.Fragment 1.9 via Play Services Base 118.11, above this repo's pins -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Xamarin.GooglePlayServices.Games.V2" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
+
+    <!--
+        GameKit is one framework on iOS, Mac Catalyst and macOS; only the view controller type used to
+        present its UI differs (UIKit vs AppKit), and that is #if MACOS'd at the call site. Directory.Build.targets
+        only routes Platforms\Apple to ios/maccatalyst, so the macOS target is pointed at it here.
+    -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">
+        <Compile Include="Platforms\Apple\**\*.cs" />
+    </ItemGroup>
+
+</Project>
