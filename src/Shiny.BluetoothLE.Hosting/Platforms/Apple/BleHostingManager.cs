@@ -106,21 +106,7 @@ public partial class BleHostingManager : IBleHostingManager
             if (args.Error != null || args.Channel == null)
                 return;
 
-            var c = args.Channel;
-            c.InputStream.Open();
-            c.OutputStream.Open();
-
-            onOpen(new L2CapChannel(
-                c.Psm,
-                c.Peer.Identifier.ToString(),
-                data => Observable.FromAsync(ct => c.OutputStream.WriteAsync(data, 0, data.Length, ct)),
-                c.InputStream.ListenForData(),
-                () =>
-                {
-                    c.InputStream.Close();
-                    c.OutputStream.Close();
-                }
-            ));
+            onOpen(args.Channel.ToL2CapChannel());
         });
         this.Manager.DidOpenL2CapChannel += handler;
 

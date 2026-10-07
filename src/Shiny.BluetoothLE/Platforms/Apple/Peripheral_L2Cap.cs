@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reactive.Linq;
 using CoreBluetooth;
 
@@ -17,21 +17,7 @@ public partial class Peripheral : ICanL2Cap
                 return;
             }
 
-            var channel = args.Channel!;
-            channel.InputStream.Open();
-            channel.OutputStream.Open();
-
-            ob.OnNext(new L2CapChannel(
-                channel.Psm,
-                channel.Peer.Identifier.ToString(),
-                data => Observable.FromAsync(ct => channel.OutputStream.WriteAsync(data, 0, data.Length, ct)),
-                channel.InputStream.ListenForData(),
-                () =>
-                {
-                    channel.InputStream.Close();
-                    channel.OutputStream.Close();
-                }
-            ));
+            ob.OnNext(args.Channel!.ToL2CapChannel());
             ob.OnCompleted();
         });
 
