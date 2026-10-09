@@ -344,7 +344,8 @@ public class GattReliableWriteTransactionException : Exception
 // Main entry point for BLE client operations. Inject via DI.
 public interface IBleManager
 {
-    // Gets current access/permission state
+    // Gets current access state without prompting: Denied/Unknown for permissions, otherwise the
+    // adapter state (Available, or Disabled when Bluetooth is off)
     AccessState CurrentAccess { get; }
 
     // Requests necessary permissions for BLE usage

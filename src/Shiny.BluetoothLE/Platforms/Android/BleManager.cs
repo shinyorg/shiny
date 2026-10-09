@@ -58,7 +58,8 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
             if (states.Any(x => x == AccessState.Unknown))
                 return AccessState.Unknown;
 
-            return AccessState.Available;
+            // permissions alone say nothing about whether the adapter is on (issue #1664)
+            return this.Native.GetAccessState();
         }
     }
 
