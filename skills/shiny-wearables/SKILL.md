@@ -34,6 +34,11 @@ triggers:
   - IWearableDelegate
   - WearableDelegate
   - WearableProtocol
+  - WearableData
+  - WearableManagerExtensions
+  - GetValues
+  - send json to watch
+  - send string to watch
   - WearableException
   - WearableErrorCode
   - WearableStatus
@@ -178,16 +183,20 @@ public class WatchService(IWearableManager wearables)
         {
             try
             {
-                byte[] reply = await wearables.SendMessage("workout/start", Encoding.UTF8.GetBytes("""{"kind":"run"}"""));
+                // key/values go as a JSON object; the reply comes back as key/values
+                var reply = await wearables.SendMessage("workout/start", new Dictionary<string, object?> { ["kind"] = "run", ["km"] = 5 });
+                var accepted = reply["accepted"].GetBoolean();
             }
             catch (WearableException ex) when (ex.Code == WearableErrorCode.NotReachable)
             {
                 // fall back to a queued transfer
-                await wearables.Transfer("workout/start", Encoding.UTF8.GetBytes("""{"kind":"run"}"""));
+                await wearables.Transfer("workout/start", new Dictionary<string, object?> { ["kind"] = "run", ["km"] = 5 });
             }
         }
 
-        await wearables.UpdateContext(Encoding.UTF8.GetBytes("""{"plan":"5k"}"""));
+        // plain text goes as UTF-8; the reply comes back as text
+        string pong = await wearables.SendMessage("ping", "hello");
+        await wearables.UpdateContext(new Dictionary<string, object?> { ["plan"] = "5k" });
         var fileId = await wearables.TransferFile("maps/offline", localPath, new Dictionary<string, string> { ["zoom"] = "14" });
 
         IReadOnlyList<WearableTransferInfo> pending = await wearables.GetPendingTransfers();
@@ -196,8 +205,10 @@ public class WatchService(IWearableManager wearables)
 }
 ```
 
+- **Never build a JSON string** (raw string literals, string interpolation, `JsonSerializer.Serialize`) to pass as a payload. Structured data is always key/values; the `string` overloads are for plain text only.
 - Paths are app-defined (`sync`, `workout/start`); slashes are trimmed; whitespace, `?`, `#` throw `ArgumentException`.
-- Payloads are raw `byte[]` - pick a format (JSON is the usual choice) and use it on both ends.
+- **Never hand-encode payloads.** `SendMessage`, `UpdateContext` and `Transfer` have extension overloads (`WearableManagerExtensions`, namespace `Shiny.Wearables`) taking a `string` (plain text, sent as UTF-8) or an `IReadOnlyDictionary<string, TValue>` (sent as a JSON object; `Dictionary<string, object?>` and `Dictionary<string, string>` both work). The string `SendMessage` returns the reply as a `string`; the dictionary one returns `IReadOnlyDictionary<string, JsonElement>` (empty for an empty reply, `JsonException` if the reply is not a JSON object). The `byte[]` members remain for binary payloads.
+- Dictionary values: null, string, bool, numbers, `DateTime`/`DateTimeOffset`/`TimeSpan`/`Guid`/`Uri`, enums (by name), `byte[]` (base64), `JsonElement`, nested string-keyed dictionaries and lists/arrays. Anything else throws `NotSupportedException` - break it into a nested dictionary or list. No reflection, so it is trim/AOT safe.
 
 ### Receiving
 
@@ -205,11 +216,24 @@ public class WatchService(IWearableManager wearables)
 public class MyWearableDelegate : WearableDelegate
 {
     // return value = the reply the watch gets; null lets another delegate answer
-    public override Task<byte[]?> OnMessageReceived(WearableMessage message)
-        => Task.FromResult<byte[]?>(message.Path == "ping" ? Encoding.UTF8.GetBytes("pong") : null);
+    // the body reads as message.GetString() or message.GetValues(); WearableData.FromString / FromValues build a reply
+    public override Task<byte[]?> OnMessageReceived(WearableMessage message) => message.Path switch
+    {
+        "ping" => Task.FromResult<byte[]?>(WearableData.FromString("pong")),
+        "workout/start" => Task.FromResult<byte[]?>(WearableData.FromValues(new Dictionary<string, object?>
+        {
+            ["accepted"] = message.GetValues()["kind"].GetString() == "run"
+        })),
+        _ => Task.FromResult<byte[]?>(null)
+    };
 
-    public override Task OnContextReceived(WearableContext context) => Task.CompletedTask;
-    public override Task OnTransferReceived(WearableTransfer transfer) => Task.CompletedTask;
+    public override Task OnContextReceived(WearableContext context)
+    {
+        var plan = context.GetValues()["plan"].GetString();   // or context.GetString()
+        return Task.CompletedTask;
+    }
+
+    public override Task OnTransferReceived(WearableTransfer transfer) => Task.CompletedTask;   // transfer.GetString() / GetValues()
 
     // file already moved to {AppData}/Shiny.Wearables/{id}/{name}; the delegate owns it
     public override Task OnFileReceived(WearableFile file) => Task.CompletedTask;

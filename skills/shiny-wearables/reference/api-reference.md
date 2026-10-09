@@ -52,6 +52,28 @@ public interface IWearableManager
 
 `TransferFile` throws `FileNotFoundException` when the file is missing. Invalid paths throw `ArgumentException`.
 
+## String / key-value overloads (WearableManagerExtensions)
+
+```csharp
+// plain text goes as UTF-8; structured data goes as key/values (a JSON object) - never build a JSON string
+Task<string> SendMessage(this IWearableManager m, string path, string data, string? nodeId = null, CancellationToken ct = default);
+Task<IReadOnlyDictionary<string, JsonElement>> SendMessage<TValue>(this IWearableManager m, string path, IReadOnlyDictionary<string, TValue> values, string? nodeId = null, CancellationToken ct = default);
+Task UpdateContext(this IWearableManager m, string data, CancellationToken ct = default);
+Task UpdateContext<TValue>(this IWearableManager m, IReadOnlyDictionary<string, TValue> values, CancellationToken ct = default);
+Task<string> Transfer(this IWearableManager m, string path, string data, CancellationToken ct = default);
+Task<string> Transfer<TValue>(this IWearableManager m, string path, IReadOnlyDictionary<string, TValue> values, CancellationToken ct = default);
+
+public static class WearableData
+{
+    byte[] FromString(string value);
+    byte[] FromValues<TValue>(IReadOnlyDictionary<string, TValue> values);   // NotSupportedException for an unknown value type
+    string GetString(byte[]? data);                                          // "" for no bytes
+    IReadOnlyDictionary<string, JsonElement> GetValues(byte[]? data);        // empty for no bytes; JsonException if not an object
+}
+
+// WearableMessage, WearableContext and WearableTransfer also have GetString() and GetValues()
+```
+
 ## IWearableDelegate / WearableDelegate
 
 ```csharp

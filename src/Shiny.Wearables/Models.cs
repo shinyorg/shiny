@@ -75,20 +75,44 @@ public sealed record WearableStatus(
 /// <param name="Data">The message body.</param>
 /// <param name="NodeId">The node that sent it.</param>
 /// <param name="ExpectsReply">Whether the sender is waiting on a reply. When it is not, what the delegate returns is discarded.</param>
-public sealed record WearableMessage(string Path, byte[] Data, string? NodeId, bool ExpectsReply);
+public sealed record WearableMessage(string Path, byte[] Data, string? NodeId, bool ExpectsReply)
+{
+    /// <summary>The message body as UTF-8 text.</summary>
+    public string GetString() => WearableData.GetString(this.Data);
+
+    /// <summary>The message body as the key/values of a JSON object; empty when it has no body.</summary>
+    /// <exception cref="System.Text.Json.JsonException">The body is not a JSON object.</exception>
+    public IReadOnlyDictionary<string, System.Text.Json.JsonElement> GetValues() => WearableData.GetValues(this.Data);
+}
 
 
 /// <summary>
 /// The latest context a wearable shared. Only the newest value is kept; a newer one replaces it.
 /// </summary>
-public sealed record WearableContext(byte[] Data, string? NodeId);
+public sealed record WearableContext(byte[] Data, string? NodeId)
+{
+    /// <summary>The context as UTF-8 text.</summary>
+    public string GetString() => WearableData.GetString(this.Data);
+
+    /// <summary>The context as the key/values of a JSON object; empty when it has no body.</summary>
+    /// <exception cref="System.Text.Json.JsonException">The body is not a JSON object.</exception>
+    public IReadOnlyDictionary<string, System.Text.Json.JsonElement> GetValues() => WearableData.GetValues(this.Data);
+}
 
 
 /// <summary>
 /// A queued data transfer from the wearable. Transfers are delivered in order, once, even if the app was not running
 /// when they were sent.
 /// </summary>
-public sealed record WearableTransfer(string Id, string Path, byte[] Data, string? NodeId);
+public sealed record WearableTransfer(string Id, string Path, byte[] Data, string? NodeId)
+{
+    /// <summary>The transfer's data as UTF-8 text.</summary>
+    public string GetString() => WearableData.GetString(this.Data);
+
+    /// <summary>The transfer's data as the key/values of a JSON object; empty when it has no body.</summary>
+    /// <exception cref="System.Text.Json.JsonException">The body is not a JSON object.</exception>
+    public IReadOnlyDictionary<string, System.Text.Json.JsonElement> GetValues() => WearableData.GetValues(this.Data);
+}
 
 
 /// <summary>
