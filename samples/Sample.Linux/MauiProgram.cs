@@ -13,6 +13,7 @@ public static class MauiProgram
         builder
             .UseMauiAppLinuxGtk4<App>()
             .AddLinuxGtk4Essentials()
+            .UseShiny()
             .UseSampleShiny();
 
         // Linux-specific registrations — the cross-platform Shiny packages do not
@@ -29,10 +30,6 @@ public static class MauiProgram
         
         s.AddDefaultRepository();
         s.AddHttpClientTransfers<SampleHttpTransferDelegate>();
-
-        // Screen recording through the xdg-desktop-portal ScreenCast API, encoded by gst-launch or
-        // ffmpeg. The compositor runs its own picker, so the sample page hides its target list here.
-        s.AddScreenRecorder();
 
         return builder.Build();
     }

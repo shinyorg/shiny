@@ -46,7 +46,7 @@ public class BlazorGamepadManager : AbstractGamepadManager, IAsyncDisposable
     internal async Task<IJSObjectReference> GetModule()
     {
         this.module ??= await this.jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Gamepad.Blazor/gamepad.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Gamepad/gamepad.js")
             .ConfigureAwait(false);
 
         return this.module;

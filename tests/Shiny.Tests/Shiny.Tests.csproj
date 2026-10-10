@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Gps\Shiny.Gps.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Core.Linux\Shiny.Core.Linux.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
 </Project>

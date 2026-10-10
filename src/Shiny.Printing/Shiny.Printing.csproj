@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <!--
@@ -22,6 +22,14 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
+    <!--
+        The base target framework is also the Blazor build: the browser print dialog imports
+        wwwroot/shiny-printing.js (served from _content/Shiny.Printing/), hence the Razor SDK.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
+    </ItemGroup>
+
     <!-- Windows images print through GDI+ (System.Drawing.Printing) -->
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
         <PackageReference Include="System.Drawing.Common" />
@@ -37,7 +45,6 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="Shiny.Printers.Tests" />
-        <InternalsVisibleTo Include="Shiny.Printing.Blazor" />
     </ItemGroup>
 
 </Project>

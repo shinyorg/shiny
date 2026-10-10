@@ -7,8 +7,8 @@ namespace Shiny.Gamepad;
 /// <remarks>
 /// <para>Backed by GameController on iOS, tvOS, Mac Catalyst and macOS, <c>InputDevice</c> plus the
 /// activity's window callback on Android, <c>Windows.Gaming.Input</c> on Windows, evdev on Linux
-/// (via the separate <c>Shiny.Gamepad.Linux</c> package) and the W3C Gamepad API in the browser
-/// (via <c>Shiny.Gamepad.Blazor</c>).</para>
+/// and the W3C Gamepad API in the browser - the last two from this package's plain .NET build,
+/// chosen at runtime.</para>
 /// <para><b>Nothing happens until <see cref="GetGamepads"/> is awaited once.</b> That call starts
 /// the watch, and from then on <see cref="Connected"/> and <see cref="Disconnected"/> report
 /// changes without being asked. It is the only asynchronous step - everything a frame needs after

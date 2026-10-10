@@ -147,7 +147,7 @@ On non-platform .NET hosts (Linux, macOS server, console apps, etc.) call `AddHt
 
 The managed loop resolves its `HttpClient` from `IHttpClientFactory` using the named client `HttpClientHttpTransferProcess.HttpClientName` (`"Shiny.Net.Http"`). To customize it (timeouts, default headers, a custom primary handler, Polly, etc.), configure that named client after registering transfers: `services.AddHttpClient("Shiny.Net.Http").ConfigureHttpClient(c => c.Timeout = TimeSpan.FromMinutes(10));`. (iOS/Mac Catalyst use `NSUrlSession` and ignore this.)
 
-You must register an `IConnectivity` implementation yourself (e.g. `AddConnectivity()` from `Shiny.Core.Linux` or `Shiny.Core.Blazor`). A default JSON filesystem repository is registered automatically and persists transfer state to `{LocalApplicationData}/Shiny` across process restarts.
+`IConnectivity` is registered for you (`AddConnectivity()` from `Shiny.Core` - register your own first to replace it). A default JSON filesystem repository is registered automatically and persists transfer state to `{LocalApplicationData}/Shiny` across process restarts.
 
 Cancelled downloads clean up any partial file on disk so a subsequent re-queue starts fresh.
 

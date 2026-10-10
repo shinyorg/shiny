@@ -3,8 +3,6 @@
         "path": "Shiny.slnx",
         "projects": [
             "src\\Shiny.Core\\Shiny.Core.csproj",
-            "src\\Shiny.Core.Blazor\\Shiny.Core.Blazor.csproj",
-            "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj",
             "src\\Shiny.Hosting.Maui\\Shiny.Hosting.Maui.csproj",
             "src\\Shiny.Hosting.Native\\Shiny.Hosting.Native.csproj",
             "src\\Shiny.Extensions.Configuration\\Shiny.Extensions.Configuration.csproj",
@@ -25,7 +23,6 @@
             "src\\Shiny.Geofencing\\Shiny.Geofencing.csproj",
             "src\\Shiny.Locations\\Shiny.Locations.csproj",
             "src\\Shiny.Locations.Extensions.AI\\Shiny.Locations.Extensions.AI.csproj",
-            "src\\Shiny.Locations.Blazor\\Shiny.Locations.Blazor.csproj",
             "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
             "src\\Shiny.Mobile.LiveActivities\\Shiny.Mobile.LiveActivities.csproj",
             "src\\Shiny.iOS.LiveActivities.Binding\\Shiny.iOS.LiveActivities.Binding.csproj",
@@ -45,12 +42,8 @@
             "src\\Shiny.Data.Sync\\Shiny.Data.Sync.csproj",
             "src\\Shiny.Data.Sync.Blazor\\Shiny.Data.Sync.Blazor.csproj",
             "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
-            "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
-            "src\\Shiny.ScreenRecorder.Blazor\\Shiny.ScreenRecorder.Blazor.csproj",
             "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
             "src\\Shiny.GameCenter\\Shiny.GameCenter.csproj",
-            "src\\Shiny.Gamepad.Linux\\Shiny.Gamepad.Linux.csproj",
-            "src\\Shiny.Gamepad.Blazor\\Shiny.Gamepad.Blazor.csproj",
             "src\\Shiny.Wearables\\Shiny.Wearables.csproj",
             "src\\Shiny.AppFunctions\\Shiny.AppFunctions.csproj",
             "src\\Shiny.AppFunctions.SourceGenerators\\Shiny.AppFunctions.SourceGenerators.csproj",
@@ -60,9 +53,7 @@
             "src\\Shiny.Printers.BluetoothLE\\Shiny.Printers.BluetoothLE.csproj",
             "src\\Shiny.Printers.Network\\Shiny.Printers.Network.csproj",
             "src\\Shiny.Printing\\Shiny.Printing.csproj",
-            "src\\Shiny.Printing.Rendering\\Shiny.Printing.Rendering.csproj",
-            "src\\Shiny.Printers.Blazor\\Shiny.Printers.Blazor.csproj",
-            "src\\Shiny.Printing.Blazor\\Shiny.Printing.Blazor.csproj"
+            "src\\Shiny.Printing.Rendering\\Shiny.Printing.Rendering.csproj"
         ]
     }
 }

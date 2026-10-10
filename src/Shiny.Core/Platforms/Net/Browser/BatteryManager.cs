@@ -17,7 +17,7 @@ namespace Shiny.Infrastructure;
 /// awaited first. Rather than block, the load is kicked off the first time anything touches this
 /// class - a property read or a <see cref="Changed"/> subscription - and the properties report
 /// <see cref="BatteryState.Unknown"/> until it completes. Call <see cref="StartAsync"/> (or
-/// <c>UseShinyCore()</c> on the built host) to await that explicitly.
+/// <c>UseShiny()</c> on the built host) to await that explicitly.
 /// </para>
 /// <para>
 /// Only Chromium-based browsers implement the API. Where it is missing, <see cref="Status"/> stays
@@ -101,7 +101,7 @@ public class BatteryManager(IJSRuntime jsRuntime, ILogger<BatteryManager> logger
     async Task Start()
     {
         var mod = await jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Core.Blazor/battery.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Core/battery.js")
             .ConfigureAwait(false);
 
         // the module resolves navigator.getBattery() here - without it, every read below

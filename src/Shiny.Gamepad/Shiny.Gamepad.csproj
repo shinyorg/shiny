@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -13,7 +13,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsAotCompatible>true</IsAotCompatible>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-        <Description>Shiny Gamepad - read sticks, triggers and buttons from game controllers, with rumble, battery, motion and light-bar support, on Android, iOS, tvOS, Mac Catalyst, macOS and Windows</Description>
+        <Description>Shiny Gamepad - read sticks, triggers and buttons from game controllers, with rumble, battery, motion and light-bar support, on Android, iOS, tvOS, Mac Catalyst, macOS, Windows, Linux (evdev) and Blazor WebAssembly (W3C Gamepad API)</Description>
 
         <!-- imported explicitly below so Platforms\Apple can also be compiled into the macOS target -->
         <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
@@ -21,6 +21,24 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!--
+        The base target framework is also the Linux and Blazor WebAssembly build - AddGamepads() picks
+        evdev or the W3C Gamepad API with OperatingSystem checks. The browser backend imports
+        wwwroot/gamepad.js (served from _content/Shiny.Gamepad/), hence the Razor SDK.
+
+        evdev is an ioctl interface and nothing else: capabilities, axis ranges and force-feedback
+        uploads are all fixed-layout structs passed by pointer, and ioctl(2) is variadic, so there is
+        no signature LibraryImport can marshal without unsafe code. Same reason Shiny.Net.Wifi turns
+        it on for wlanapi.dll.
+    -->
+    <PropertyGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 
     <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />

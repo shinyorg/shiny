@@ -12,16 +12,15 @@ namespace Shiny.ScreenRecorder;
 /// references Shiny.ScreenRecorder still compile and still resolve <see cref="IScreenRecorder"/>
 /// from DI. <see cref="Capabilities"/> is <see cref="ScreenRecorderCapabilities.None"/>, so
 /// well-behaved code branches around it before it ever throws.</para>
-/// <para>A Linux desktop wants <c>Shiny.ScreenRecorder.Linux</c> and a Blazor WebAssembly app
-/// wants <c>Shiny.ScreenRecorder.Blazor</c>; both register a real implementation of this same
-/// interface over the top of this one.</para>
+/// <para><c>AddScreenRecorder()</c> registers this on plain .NET for Windows and macOS; on Linux and
+/// Blazor WebAssembly it registers the real portal or browser recorder instead.</para>
 /// </remarks>
 public class NotSupportedScreenRecorder(ILogger<NotSupportedScreenRecorder> logger) : AbstractScreenRecorder(logger)
 {
     public override ScreenRecorderCapabilities Capabilities => ScreenRecorderCapabilities.None;
 
     protected override string PlatformReason =>
-        "this is the plain .NET target, which has no screen capture API. Reference Shiny.ScreenRecorder.Linux on a Linux desktop, or Shiny.ScreenRecorder.Blazor in a browser";
+        "this is the plain .NET target outside Linux and the browser, which has no screen capture API";
 
 
     public override Task<AccessState> RequestAccess(ScreenRecordingRequest request, CancellationToken ct = default)

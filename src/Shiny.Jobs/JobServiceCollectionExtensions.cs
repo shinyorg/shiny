@@ -21,10 +21,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddJob<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TJob>(this IServiceCollection services, Func<JobRegistration, JobRegistration>? configure = null)
         where TJob : class, IJob
     {
-#if PLATFORM
         services.AddConnectivity();
         services.AddBattery();
-#endif
         if (!services.HasService<IJobManager>())
         {
             services.AddSingleton(new JobRegistrar(services));

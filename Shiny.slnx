@@ -104,23 +104,14 @@
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
         <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />
-        <Project Path="src/Shiny.Core.Blazor/Shiny.Core.Blazor.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
-        <Project Path="src/Shiny.Locations.Blazor/Shiny.Locations.Blazor.csproj" />
         <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
         <Project Path="src/Shiny.Data.Sync.Blazor/Shiny.Data.Sync.Blazor.csproj" />
-        <Project Path="src\Shiny.ScreenRecorder.Blazor\Shiny.ScreenRecorder.Blazor.csproj" />
-        <Project Path="src\Shiny.Gamepad.Blazor\Shiny.Gamepad.Blazor.csproj" />
-        <Project Path="src\Shiny.Printers.Blazor\Shiny.Printers.Blazor.csproj" />
-        <Project Path="src\Shiny.Printing.Blazor\Shiny.Printing.Blazor.csproj" />
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj" />
-        <Project Path="src\Shiny.Core.Linux\Shiny.Core.Linux.csproj" />
         <Project Path="src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
         <Project Path="src\Shiny.Net.Wifi.Linux\Shiny.Net.Wifi.Linux.csproj" />
-        <Project Path="src\Shiny.ScreenRecorder.Linux\Shiny.ScreenRecorder.Linux.csproj" />
-        <Project Path="src\Shiny.Gamepad.Linux\Shiny.Gamepad.Linux.csproj" />
     </Folder>
 </Solution>

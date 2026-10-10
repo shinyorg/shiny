@@ -6,22 +6,22 @@ For MAUI / native targets:
 
 ```xml
 <!-- GPS, motion activity, geocoding -->
-<PackageReference Include="Shiny.Gps" Version="5.*" />
+<PackageReference Include="Shiny.Gps" Version="6.*" />
 <!-- geofencing (independent of Shiny.Gps) -->
-<PackageReference Include="Shiny.Geofencing" Version="5.*" />
+<PackageReference Include="Shiny.Geofencing" Version="6.*" />
 <!-- or both at once - meta-package with no code of its own -->
-<PackageReference Include="Shiny.Locations" Version="5.*" />
+<PackageReference Include="Shiny.Locations" Version="6.*" />
 ```
 
 For Blazor WebAssembly:
 
 ```xml
-<PackageReference Include="Shiny.Locations.Blazor" Version="5.*" />
+<PackageReference Include="Shiny.Gps" Version="6.*" />
 ```
 
 `Position` and `Distance` live in `Shiny.Core`, which both packages depend on. All types keep the `Shiny.Locations` namespace.
 
-> **Blazor / Web limitations.** `Shiny.Locations.Blazor` only implements `IGpsManager`, and only for foreground use via `navigator.geolocation`. There is no `IGeofenceManager` (the browser has no Geofence API), no significant-location-change API, and no way to keep the page alive in the background. Background modes on a `GpsRequest` are accepted but logged and treated as foreground; `IGpsDelegate` is invoked but only while the tab is alive.
+> **Blazor / Web limitations.** On Blazor WebAssembly, `Shiny.Gps` only implements `IGpsManager`, and only for foreground use via `navigator.geolocation`. There is no `IGeofenceManager` (the browser has no Geofence API), no significant-location-change API, and no way to keep the page alive in the background. Background modes on a `GpsRequest` are accepted but logged and treated as foreground; `IGpsDelegate` is invoked but only while the tab is alive.
 
 ## Namespaces
 

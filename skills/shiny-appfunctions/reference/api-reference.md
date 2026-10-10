@@ -3,7 +3,7 @@
 ## Installation
 
 ```xml
-<PackageReference Include="Shiny.AppFunctions" Version="5.*" />
+<PackageReference Include="Shiny.AppFunctions" Version="6.*" />
 ```
 
 Targets: `net10.0` (contracts + dispatcher, no platform bridge), `net10.0-ios`, `net10.0-android`.
@@ -230,7 +230,7 @@ Generated assets: `app_functions.xml`, `app_functions_v2.xml`, `app_functions_sc
 ## AI tools (Shiny.AppFunctions.Extensions.AI)
 
 ```xml
-<PackageReference Include="Shiny.AppFunctions.Extensions.AI" Version="5.*" />
+<PackageReference Include="Shiny.AppFunctions.Extensions.AI" Version="6.*" />
 ```
 
 Target: `net10.0` (usable from the iOS and Android heads). Depends on `Microsoft.Extensions.AI.Abstractions`.

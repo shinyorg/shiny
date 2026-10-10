@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AppKit;
+using CoreFoundation;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using UserNotifications;
@@ -42,11 +43,23 @@ public class MacLifecycleExecutor : IShinyStartupTask, IDisposable
     {
         var center = NSNotificationCenter.DefaultCenter;
 
-        this.disposer.Add(
-            center.AddObserver(NSApplication.DidFinishLaunchingNotification, n =>
-                this.Execute(this.finishLaunchingHandlers, h => h.Handle(n.UserInfo))
-            )
-        );
+        if (NSRunningApplication.CurrentApplication.FinishedLaunching)
+        {
+            // the host started from inside applicationDidFinishLaunching: (the MAUI macOS backend builds the
+            // app there) - an observer added while that notification is being delivered never receives it,
+            // so run the handlers once the delegate callback returns. Its user info is gone by then.
+            DispatchQueue.MainQueue.DispatchAsync(() =>
+                this.Execute(this.finishLaunchingHandlers, h => h.Handle(null))
+            );
+        }
+        else
+        {
+            this.disposer.Add(
+                center.AddObserver(NSApplication.DidFinishLaunchingNotification, n =>
+                    this.Execute(this.finishLaunchingHandlers, h => h.Handle(n.UserInfo))
+                )
+            );
+        }
 
         this.disposer.Add(
             center.AddObserver(NSApplication.DidBecomeActiveNotification, _ =>

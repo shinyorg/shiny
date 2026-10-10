@@ -14,10 +14,10 @@
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Http.Blazor\Shiny.Net.Http.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Locations.Blazor\Shiny.Locations.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.ScreenRecorder.Blazor\Shiny.ScreenRecorder.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Core.Blazor\Shiny.Core.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Printers.Blazor\Shiny.Printers.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Printing.Blazor\Shiny.Printing.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Gps\Shiny.Gps.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printers\Shiny.Printers.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Printing\Shiny.Printing.csproj" />
     </ItemGroup>
 </Project>

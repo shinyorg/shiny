@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -13,7 +13,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsAotCompatible>true</IsAotCompatible>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-        <Description>Shiny Screen Recorder - record the screen to an MP4 with optional microphone and system audio on Android (MediaProjection), iOS and Mac Catalyst (ReplayKit), macOS (ScreenCaptureKit) and Windows (Windows.Graphics.Capture)</Description>
+        <Description>Shiny Screen Recorder - record the screen to an MP4 with optional microphone and system audio on Android (MediaProjection), iOS and Mac Catalyst (ReplayKit), macOS (ScreenCaptureKit), Windows (Windows.Graphics.Capture), Linux (xdg-desktop-portal ScreenCast) and Blazor WebAssembly (getDisplayMedia)</Description>
 
         <!-- imported explicitly below so Platforms\AppleShared can be added to all three Apple targets -->
         <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
@@ -28,14 +28,28 @@
         macOS: CGPreflightScreenCaptureAccess / CGRequestScreenCaptureAccess are not bound in
         Microsoft.macOS.dll and are the only way to drive the Screen Recording TCC prompt.
 
+        Linux (the base target framework): stopping the encoder needs kill(2) - Process.Kill only
+        sends SIGKILL, which loses the MP4 index.
+
         Same reason Shiny.Net.Wifi turns this on for wlanapi.dll.
     -->
-    <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) OR $(TargetFramework.Contains('-macos'))">
+    <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) OR $(TargetFramework.Contains('-macos')) OR '$(TargetFramework)' == '$(BaseTargetFramework)'">
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!--
+        The base target framework is also the Linux and Blazor WebAssembly build - AddScreenRecorder()
+        picks the desktop portal (over D-Bus) or getDisplayMedia with OperatingSystem checks. The
+        browser backend imports wwwroot/screen-recorder.js (served from _content/Shiny.ScreenRecorder/),
+        hence the Razor SDK.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
+        <PackageReference Include="Tmds.DBus.Protocol" />
     </ItemGroup>
 
     <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />

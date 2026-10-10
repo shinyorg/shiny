@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -14,6 +14,14 @@
     <ItemGroup>
         <PackageReference Include="Shiny.Extensions.Serialization" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!--
+        The base target framework is also the Blazor WebAssembly build: the browser Geolocation API
+        backend imports wwwroot/gps.js (served from _content/Shiny.Gps/), hence the Razor SDK.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">

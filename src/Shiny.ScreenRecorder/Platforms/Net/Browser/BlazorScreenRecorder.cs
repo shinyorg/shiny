@@ -32,7 +32,7 @@ public class BlazorScreenRecorder(IJSRuntime jsRuntime, ILogger<BlazorScreenReco
     internal async Task<IJSObjectReference> GetModule()
     {
         this.module ??= await jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.ScreenRecorder.Blazor/screen-recorder.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.ScreenRecorder/screen-recorder.js")
             .ConfigureAwait(false);
 
         return this.module;

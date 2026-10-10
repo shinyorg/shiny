@@ -12,8 +12,8 @@ namespace Shiny.Gamepad.Infrastructure;
 /// constructor. Registering the service must not go near the hardware - a console app that
 /// resolves <see cref="IGamepadManager"/> and never asks for a controller should not have opened a
 /// device node, subscribed to a notification centre or hooked an activity's window.</para>
-/// <para>Public for the two out-of-package backends, <c>Shiny.Gamepad.Linux</c> and
-/// <c>Shiny.Gamepad.Blazor</c>. It is not an extension point for applications.</para>
+/// <para>Public because the public <c>BlazorGamepadManager</c> derives from it. It is not an
+/// extension point for applications.</para>
 /// </remarks>
 public abstract class AbstractGamepadManager(ILogger logger) : IGamepadManager
 {

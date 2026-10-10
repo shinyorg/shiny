@@ -7,8 +7,8 @@ namespace Shiny.ScreenRecorder;
 /// <remarks>
 /// <para>Backed by MediaProjection on Android, ReplayKit on iOS and Mac Catalyst, ScreenCaptureKit
 /// on macOS, Windows.Graphics.Capture on Windows, the xdg-desktop-portal ScreenCast API on Linux
-/// (via the separate <c>Shiny.ScreenRecorder.Linux</c> package) and getDisplayMedia + MediaRecorder
-/// in the browser (via <c>Shiny.ScreenRecorder.Blazor</c>).</para>
+/// and getDisplayMedia + MediaRecorder in the browser - the last two from this package's plain .NET
+/// build, chosen at runtime.</para>
 /// <para><b>What gets recorded is not the same everywhere.</b> Android, macOS, Windows and Linux
 /// record the system screen, so anything on it - including other apps - ends up in the file. iOS
 /// and Mac Catalyst record only your own app's UI, because that is all ReplayKit offers without a

@@ -98,8 +98,6 @@ Modules with a `net10.0-tvos` target: `Shiny.Core`, `Shiny.Hosting.Native`, `Shi
 |-------|-----------|---------|
 | `Shiny.Hosting.Maui` | `Shiny` | MAUI hosting integration (`UseShiny`) |
 | `Shiny.Hosting.Native` | `Shiny` | Native hosting base classes (`ShinyAppDelegate`, `ShinyAndroidApplication`, `ShinyAndroidActivity`) |
-| `Shiny.Core.Linux` | `Shiny` | Linux platform implementation + `AddConnectivity()` / `AddBattery()` |
-| `Shiny.Core.Blazor` | `Shiny` | Blazor WebAssembly platform implementation + `AddConnectivity()` / `AddBattery()` |
 | `Shiny.Extensions.DependencyInjection` | `Shiny` | Source-generated `[Service]` / `[Singleton]` / `[Scoped]` / `[Transient]` DI registration. Pulled in by `Shiny.Core`. |
 | `Shiny.Extensions.Stores` | `Shiny.Extensions.Stores` | `IKeyValueStore`, `IRepository`, source-generated `[Bind]` partial-property persistence, static `Shiny.Stores.Default/Secure` accessor. Pulled in by `Shiny.Core`. |
 | `Shiny.Extensions.Stores.Web` | `Shiny.Extensions.Stores` | Blazor WebAssembly `localStorage` / `sessionStorage` adapters (`AddShinyWebAssemblyStores()`) |
@@ -136,6 +134,8 @@ public static class MauiProgram
     }
 }
 ```
+
+`UseShiny()` also covers macOS (AppKit) MAUI apps built on `Microsoft.Maui.Platforms.MacOS` - `Shiny.Hosting.Maui` ships a `net10.0-macos` target, so call it after `UseMauiAppMacOS<App>()` like any other head. Never hand-roll an `IMauiInitializeService` that news up `Shiny.Hosting.Host` or call `AddShinyCoreServices()` yourself - that is what `UseShiny()` does. (Doing both is harmless - `Host.Run()` ignores a second run over the same service provider and `AddShinyCoreServices()` is idempotent - but it is dead code.) The macOS MAUI backend has no lifecycle events for remote notifications, so a macOS head that **uses push** forwards `application:didRegisterForRemoteNotificationsWithDeviceToken:` and friends from its `MacOSMauiApplication` subclass to `Host.Lifecycle` (see `samples/Sample.MacOS/Main.cs`). Only add those methods when the app actually uses push - implementing them is what tells Apple the app uses push, and App Review flags apps that implement them without it. Shiny deliberately ships no base delegate that overrides them.
 
 ### Native (Non-MAUI) Setup
 
@@ -176,15 +176,15 @@ public class MainActivity : ShinyAndroidActivity { }
 
 ### Linux / macOS / plain .NET Setup
 
-`Shiny.Core.Linux` provides the Linux `IConnectivity` and `IBattery` implementations and is targeted at console / GTK apps. Use the same `HostBuilder.Create()` flow and call `AddConnectivity()` / `AddBattery()` from `Shiny.Core.Linux` if you need device monitoring. On plain .NET, modules that need them (`AddJob`, `AddHttpClientTransfers`, `AddDataSync`) can't reference the Linux package and do **not** add them — you must call these yourself.
+There are **no** `Shiny.Core.Linux` or `Shiny.Core.Blazor` packages any more - `Shiny.Core`'s plain `net10.0` build carries the Linux and Blazor WebAssembly implementations and `AddConnectivity()` / `AddBattery()` pick one at runtime with `OperatingSystem.IsBrowser()` / `OperatingSystem.IsLinux()`. On plain .NET, `IConnectivity` is the browser monitor on Blazor and `System.Net.NetworkInformation` everywhere else; `IBattery` is the browser Battery Status API on Blazor, sysfs on Linux, and **not registered** on plain .NET for Windows or macOS (register your own if a module such as `AddJob` needs one). A Linux GTK **MAUI** app (`Microsoft.Maui.Platforms.Linux.Gtk4`) uses `UseShiny()` from `Shiny.Hosting.Maui` like any other MAUI head - call it after `AddLinuxGtk4Essentials()`; it runs the host and points `NetPlatform.MainThreadHandler` at the GTK MAUI dispatcher. A console, service or non-MAUI GTK app uses the same `HostBuilder.Create()` flow. Modules that need device monitoring (`AddJob`, `AddHttpClientTransfers`, `AddDataSync`) add it themselves on every target.
 
 ### Blazor WebAssembly Setup
 
-For Blazor WASM, reference `Shiny.Core.Blazor` and call `AddConnectivity()` / `AddBattery()` to wire navigator-based monitoring. Both monitors load a JS module before they can report anything, so they self-start on the first property read or `Changed` subscription and report `Unknown` until that completes; `await host.Services.UseShinyCore()` after `Build()` starts them up front when the first read must be accurate. Only Chromium-based browsers expose the Network Information and Battery Status APIs — elsewhere `ConnectionTypes` and `BatteryState` stay `Unknown` (`Access` still works, it is `navigator.onLine`). Storage requires `Shiny.Extensions.Stores.Web` and a call to `host.Services.UseShinyStores()` after `Build()` so the static `Shiny.Stores` accessor snapshots the `IJSRuntime`-backed `LocalStorageKeyValueStore`.
+For Blazor WASM, reference `Shiny.Core` (its JS modules are served from `_content/Shiny.Core/`) and call `AddConnectivity()` / `AddBattery()` to wire navigator-based monitoring. Both monitors load a JS module before they can report anything, so they self-start on the first property read or `Changed` subscription and report `Unknown` until that completes. **Always** call `await host.Services.UseShiny()` after `Build()` and before `RunAsync()` - it runs the Shiny host (every `IShinyStartupTask`, including the in-process job runner, which otherwise never starts) and then starts the monitors up front. Only Chromium-based browsers expose the Network Information and Battery Status APIs — elsewhere `ConnectionTypes` and `BatteryState` stay `Unknown` (`Access` still works, it is `navigator.onLine`). Storage requires `Shiny.Extensions.Stores.Web` and a call to `host.Services.UseShinyStores()` after `Build()` so the static `Shiny.Stores` accessor snapshots the `IJSRuntime`-backed `LocalStorageKeyValueStore`.
 
 ### Replacing IConnectivity / IBattery
 
-Modules that depend on device monitoring add it for you: on the platform TFMs (Android, iOS, tvOS, Mac Catalyst, macOS, Windows) `AddJob` adds both, and `AddHttpTransfers` / `AddHttpClientTransfers` / `AddDataSync` add `IConnectivity`; the Blazor `AddBlazorHttpTransfers` / `AddBlazorDataSync` add both from `Shiny.Core.Blazor`. Every one of these registrations is a `TryAdd`, so to substitute your own implementation register it **before** the module call:
+Modules that depend on device monitoring add it for you on every target: `AddJob` adds both, `AddHttpTransfers` / `AddHttpClientTransfers` / `AddDataSync` add `IConnectivity`, and the Blazor `AddBlazorHttpTransfers` / `AddBlazorDataSync` add both. None of them replace an existing registration, so to substitute your own implementation register it **before** the module call:
 
 ```csharp
 builder.Services.AddSingleton<Shiny.Net.IConnectivity, MyConnectivity>(); // first - wins

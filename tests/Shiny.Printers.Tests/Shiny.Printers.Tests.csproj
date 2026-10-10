@@ -18,7 +18,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Printers\Shiny.Printers.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Printers.BluetoothLE\Shiny.Printers.BluetoothLE.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Printers.Blazor\Shiny.Printers.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Printers.Network\Shiny.Printers.Network.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Printing\Shiny.Printing.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Printing.Rendering\Shiny.Printing.Rendering.csproj" />

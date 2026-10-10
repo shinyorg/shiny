@@ -12,9 +12,8 @@ namespace Shiny.Gamepad.Infrastructure;
 /// <see cref="UpdateState"/>. Where the platform pushes input (Apple, Android, Linux) that happens
 /// in its callback; where it has to be polled (Windows, the browser) the manager's loop does it.
 /// Neither the diffing nor the threshold logic is written twice.</para>
-/// <para>Public for the two out-of-package backends, <c>Shiny.Gamepad.Linux</c> and
-/// <c>Shiny.Gamepad.Blazor</c>, which derive from it. It is not an extension point for
-/// applications.</para>
+/// <para>Public because the public <c>BlazorGamepad</c> derives from it. It is not an extension
+/// point for applications.</para>
 /// </remarks>
 public abstract class AbstractGamepad(string id, ILogger logger) : IGamepad
 {

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using CoreFoundation;
 using Foundation;
 
 namespace Shiny;
@@ -26,15 +27,13 @@ public class MacPlatform : IPlatform
     public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
 
 
+    // the main dispatch queue, the same as Shiny.Maui.Shell's macOS MainThread - MAUI Essentials'
+    // MainThread has no AppKit implementation, so both marshal through GCD directly
     public void InvokeOnMainThread(Action action)
     {
-        if (NSThread.Current.IsMainThread)
-        {
+        if (NSThread.IsMain)
             action();
-        }
         else
-        {
-            NSRunLoop.Main.BeginInvokeOnMainThread(action);
-        }
+            DispatchQueue.MainQueue.DispatchAsync(action);
     }
 }

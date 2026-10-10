@@ -88,7 +88,7 @@ Use this skill when the user needs to:
 
 | Property   | Value                        |
 |------------|------------------------------|
-| NuGet      | `Shiny.Gps` (GPS, motion activity, geocoding), `Shiny.Geofencing` (geofences), `Shiny.Locations` (meta-package referencing both - no code of its own), `Shiny.Locations.Blazor` (Blazor WASM GPS, depends on `Shiny.Gps`) |
+| NuGet      | `Shiny.Gps` (GPS, motion activity, geocoding), `Shiny.Geofencing` (geofences), `Shiny.Locations` (meta-package referencing both - no code of its own). Blazor WASM GPS is in `Shiny.Gps`'s `net10.0` build (chosen with `OperatingSystem.IsBrowser()`); `Shiny.Locations.Blazor` no longer exists |
 | Namespace  | `Shiny.Locations`            |
 | Platforms  | iOS, Android, Windows, Blazor WebAssembly (foreground GPS only). **No tvOS target** — `CLMonitor`, `CLMonitorConfiguration` and `CLRegionState` are absent on tvOS, so geofencing cannot be implemented there |
 | DI Namespace | `Shiny` (extension methods on `IServiceCollection`) |
@@ -125,8 +125,8 @@ builder.Services.AddGps();
 builder.Services.AddGps<MyGpsDelegate>();
 ```
 
-Geofencing (`AddGeofencing`) is **not** available in
-`Shiny.Locations.Blazor`. For region-entry behavior on the web, evaluate regions
+Geofencing (`AddGeofencing`) is **not** available on
+Blazor WebAssembly. For region-entry behavior on the web, evaluate regions
 server-side from GPS reports and notify the client via `Shiny.Push.Blazor`.
 
 ### Geofence Registration

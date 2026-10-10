@@ -102,8 +102,8 @@ Achievements / leaderboards / friends over GameKit (iOS, Mac Catalyst, macOS) an
 ## Linux / D-Bus (Tmds.DBus.Protocol)
 
 The Linux packages that reference `Tmds.DBus.Protocol` (`Shiny.BluetoothLE.Linux`,
-`Shiny.BluetoothLE.Hosting.Linux`, `Shiny.Net.Wifi.Linux`, `Shiny.Notifications.Linux`,
-`Shiny.ScreenRecorder.Linux`) talk to BlueZ, NetworkManager, the notification service and the
+`Shiny.BluetoothLE.Hosting.Linux`, `Shiny.Net.Wifi.Linux`, `Shiny.Notifications.Linux`, and
+`Shiny.ScreenRecorder`'s `net10.0` build) talk to BlueZ, NetworkManager, the notification service and the
 portals through it. Its low-level API fails in ways that
 compile cleanly, pass on a dev machine, and only break against a real system bus. Three of these shipped
 in `Shiny.BluetoothLE.Linux` 5.7.0 and made every scan fail on any machine where BlueZ already knew a

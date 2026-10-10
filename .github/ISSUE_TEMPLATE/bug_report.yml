@@ -13,7 +13,7 @@ body:
     id: component
     attributes:
       label: Component/Nuget
-      description: The component you are filing against.  If it is not listed here it means there is no support for it.  The Blazor WASM and Linux add-on packages (ie. Shiny.Net.Http.Blazor, Shiny.Core.Linux) belong to their feature above - pick the feature and check the matching operating system below
+      description: The component you are filing against.  If it is not listed here it means there is no support for it.  The Blazor WASM and Linux add-on packages (ie. Shiny.Net.Http.Blazor, Shiny.BluetoothLE.Linux) belong to their feature above - pick the feature and check the matching operating system below
       options:
         - Core / Foundation (Shiny.Core)
         - Hosting - MAUI (Shiny.Hosting.Maui)

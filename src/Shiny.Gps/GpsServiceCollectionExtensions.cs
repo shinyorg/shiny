@@ -6,6 +6,8 @@ using Shiny.Locations;
 #if ANDROID
 using Android.App;
 using Android.Gms.Common;
+#elif !PLATFORM
+using Shiny.Locations.Blazor;
 #endif
 
 namespace Shiny;
@@ -84,9 +86,37 @@ public static class GpsServiceCollectionExtensions
     #else
 
     /// <summary>
-    /// This is a blank AddGps - you won't see this documentation if you've got a proper target that is supported
+    /// Adds GPS on Blazor WebAssembly through the browser Geolocation API. Does nothing on any other
+    /// plain .NET host, which has no location API.
+    /// </summary>
+    /// <remarks>
+    /// The browser does not support true background GPS or geofencing. Listeners only run while the
+    /// page/tab is alive and the user has granted permission.
+    /// </remarks>
+    public static IServiceCollection AddGps(this IServiceCollection services)
+    {
+        if (OperatingSystem.IsBrowser())
+        {
+            services.AddSingleton<GpsManager>();
+            services.AddSingleton<IGpsManager>(sp => sp.GetRequiredService<GpsManager>());
+        }
+        return services;
+    }
+
+
+    /// <summary>
+    /// Adds GPS with a custom <see cref="IGpsDelegate"/> on Blazor WebAssembly. The delegate is only
+    /// invoked while the Blazor app is running in the foreground. Does nothing on any other plain .NET
+    /// host.
     /// </summary>
     public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGpsDelegate
-        => services;
+    {
+        if (OperatingSystem.IsBrowser())
+        {
+            services.AddSingletonAsImplementedInterfaces<TDelegate>();
+            services.AddGps();
+        }
+        return services;
+    }
     #endif
 }

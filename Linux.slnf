@@ -15,7 +15,6 @@
       "src\\Shiny.Hosting.Maui\\Shiny.Hosting.Maui.csproj",
       "src\\Shiny.Hosting.Native\\Shiny.Hosting.Native.csproj",
       "src\\Shiny.Jobs\\Shiny.Jobs.csproj",
-      "src\\Shiny.Locations.Blazor\\Shiny.Locations.Blazor.csproj",
       "src\\Shiny.Gps\\Shiny.Gps.csproj",
       "src\\Shiny.Geofencing\\Shiny.Geofencing.csproj",
       "src\\Shiny.Locations\\Shiny.Locations.csproj",
@@ -29,21 +28,13 @@
       "src\\Shiny.Push.AzureNotificationHubs\\Shiny.Push.AzureNotificationHubs.csproj",
       "src\\Shiny.Push.Blazor\\Shiny.Push.Blazor.csproj",
       "src\\Shiny.Push\\Shiny.Push.csproj",
-      "src\\Shiny.Core.Blazor\\Shiny.Core.Blazor.csproj",
-      "src\\Shiny.Core.Linux\\Shiny.Core.Linux.csproj",
       "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
-      "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
-      "src\\Shiny.ScreenRecorder.Blazor\\Shiny.ScreenRecorder.Blazor.csproj",
       "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
-      "src\\Shiny.Gamepad.Linux\\Shiny.Gamepad.Linux.csproj",
-      "src\\Shiny.Gamepad.Blazor\\Shiny.Gamepad.Blazor.csproj",
       "src\\Shiny.Printers\\Shiny.Printers.csproj",
       "src\\Shiny.Printers.BluetoothLE\\Shiny.Printers.BluetoothLE.csproj",
       "src\\Shiny.Printers.Network\\Shiny.Printers.Network.csproj",
       "src\\Shiny.Printing\\Shiny.Printing.csproj",
-      "src\\Shiny.Printing.Rendering\\Shiny.Printing.Rendering.csproj",
-      "src\\Shiny.Printers.Blazor\\Shiny.Printers.Blazor.csproj",
-      "src\\Shiny.Printing.Blazor\\Shiny.Printing.Blazor.csproj"
+      "src\\Shiny.Printing.Rendering\\Shiny.Printing.Rendering.csproj"
     ]
   }
 }

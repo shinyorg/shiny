@@ -20,7 +20,7 @@ namespace Shiny.Printers.Blazor;
 /// </remarks>
 public sealed class BrowserPrinterManager(IJSRuntime jsRuntime) : IAsyncDisposable
 {
-    const string ModulePath = "./_content/Shiny.Printers.Blazor/shiny-printers.js";
+    const string ModulePath = "./_content/Shiny.Printers/shiny-printers.js";
     IJSObjectReference? module;
 
 

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
@@ -6,11 +6,18 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsAotCompatible>true</IsAotCompatible>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-        <Description>Shiny Printers - transport and protocol agnostic thermal / receipt printing: a fluent document model, ESC/POS and TSPL encoders, barcodes, QR codes and raster images</Description>
+        <Description>Shiny Printers - transport and protocol agnostic thermal / receipt printing: a fluent document model, ESC/POS and TSPL encoders, barcodes, QR codes and raster images, plus Web Bluetooth, Web Serial and WebUSB transports for Blazor (Browser/, script served from _content/Shiny.Printers/)</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <InternalsVisibleTo Include="Shiny.Printers.Tests" />
+    </ItemGroup>
+
+    <!-- the browser transports (Browser/) - JS interop, DI registration and the Rx connection-state stream -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="Microsoft.JSInterop" />
+        <PackageReference Include="System.Reactive" />
     </ItemGroup>
 
 </Project>

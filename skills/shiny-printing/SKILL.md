@@ -94,13 +94,11 @@ can go to either.
 
 | Package | Platforms | Purpose |
 |---|---|---|
-| `Shiny.Printers` | any .NET | Document model, `PrinterCapabilities`, `EscPosProtocol`, `TsplProtocol`, `PrinterImage`. No dependencies, AOT/trim clean. |
+| `Shiny.Printers` | any .NET | Document model, `PrinterCapabilities`, `EscPosProtocol`, `TsplProtocol`, `PrinterImage`, plus the Blazor (WASM / Server) Web Bluetooth, Web Serial and WebUSB transports (`AddBrowserPrinting()`, namespace `Shiny.Printers.Blazor`). AOT/trim clean. |
 | `Shiny.Printers.BluetoothLE` | iOS, Mac Catalyst, macOS, Android, Windows, Linux | Scan + connect BLE printers via `Shiny.BluetoothLE`, MTU-chunked writes. |
 | `Shiny.Printers.Network` | everywhere incl. Blazor **Server** | Raw TCP (port 9100) + mDNS discovery via `Shiny.Net.Discovery`. |
-| `Shiny.Printers.Blazor` | Blazor WASM / Server | Web Bluetooth, Web Serial, WebUSB transports. |
-| `Shiny.Printing` | iOS, Mac Catalyst, Android, Windows, Linux, macOS | `IPrintService` - AirPrint / `PrintManager` / GDI+ + shell / CUPS. |
+| `Shiny.Printing` | iOS, Mac Catalyst, Android, Windows, Linux, macOS, Blazor | `IPrintService` - AirPrint / `PrintManager` / GDI+ + shell / CUPS, and `window.print()` on Blazor (`AddNativePrinting()` picks it on WebAssembly; `AddBlazorPrinting()` for Blazor Server). |
 | `Shiny.Printing.Rendering` | any .NET | `IPrintDocumentRenderer` - `PrintDocument` -> PDF with SkiaSharp. |
-| `Shiny.Printing.Blazor` | Blazor WASM / Server | `IPrintService` over `window.print()`. |
 
 ## Registration
 

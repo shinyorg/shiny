@@ -20,6 +20,12 @@ public static class ShinyInfrastructureExtensions
     /// </remarks>
     public static IServiceCollection AddShinyCoreServices(this IServiceCollection services)
     {
+        // every platform branch below registers an IPlatform - a second call would register the
+        // lifecycle executor's startup task twice, attaching every platform hook twice even though
+        // the host only runs once
+        if (services.HasService<IPlatform>())
+            return services;
+
         services.AddShinyStores();
 
 #if ANDROID

@@ -23,5 +23,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Sample.Shared.Maui\Sample.Shared.Maui.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
     </ItemGroup>
 </Project>

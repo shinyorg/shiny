@@ -13,6 +13,7 @@ public static class MauiProgram
         builder
             .UseMauiAppMacOS<App>()
             .AddMacOSEssentials()
+            .UseShiny()
             .UseSampleShiny();
         return builder.Build();
     }

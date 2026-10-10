@@ -34,7 +34,7 @@ class LinuxGamepadManager(ILogger<LinuxGamepadManager> logger) : AbstractGamepad
     protected override Task OnStart(CancellationToken ct)
     {
         if (!OperatingSystem.IsLinux())
-            throw new GamepadException("Shiny.Gamepad.Linux only runs on Linux - reference Shiny.Gamepad for the other platforms");
+            throw new GamepadException("The evdev gamepad backend only runs on Linux - AddGamepads() picks the right backend for the current OS");
 
         if (!Directory.Exists(InputDirectory))
             throw new GamepadException($"'{InputDirectory}' does not exist - this kernel has no evdev interface");

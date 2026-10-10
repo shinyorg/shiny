@@ -98,7 +98,7 @@ public class GpsManager(
     async Task<IJSObjectReference> GetModule()
     {
         this.module ??= await jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Locations.Blazor/gps.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Gps/gps.js")
             .ConfigureAwait(false);
 
         return this.module;

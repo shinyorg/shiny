@@ -10,6 +10,8 @@ public class Host : IHost
     const string InitFailErrorMessage = "ServiceProvider is not initialized - This means you have not setup Shiny correctly!  Please follow instructions at https://shinylib.net";
 
 
+    static readonly object runLock = new();
+    static IServiceProvider? runningServices;
     static IHost? currentHost;
     public static IHost Current
     {
@@ -54,17 +56,36 @@ public class Host : IHost
 
     public virtual void Run()
     {
-        var tasks = this.Services.GetServices<IShinyStartupTask>();
-        //var logger = this.Logging.CreateLogger<Host>();
         var logger = this.Services.GetRequiredService<ILogger<Host>>();
 
-        foreach (var task in tasks)
+        lock (runLock)
         {
-            var tn = task.GetType().FullName;
-            logger.LogDebug($"Startup task '{tn}' ran successfully");
-            task.Start();
+            // a second host over the same container (UseShiny() called twice, or UseShiny() next to a
+            // hand-written initializer) would start every startup task again and double up their hooks
+            if (ReferenceEquals(runningServices, this.Services))
+            {
+                logger.LogWarning("Shiny host is already running for this service provider - ignoring the additional Run() call");
+                return;
+            }
+            runningServices = this.Services;
+
+            try
+            {
+                var tasks = this.Services.GetServices<IShinyStartupTask>();
+                foreach (var task in tasks)
+                {
+                    var tn = task.GetType().FullName;
+                    logger.LogDebug($"Startup task '{tn}' ran successfully");
+                    task.Start();
+                }
+                Host.Current = this;
+            }
+            catch
+            {
+                runningServices = null;
+                throw;
+            }
         }
-        Host.Current = this;
     }
 
 
@@ -73,5 +94,10 @@ public class Host : IHost
         (this.Services as IDisposable)?.Dispose();
         this.Logging.Dispose();
         currentHost = null;
+        lock (runLock)
+        {
+            if (ReferenceEquals(runningServices, this.Services))
+                runningServices = null;
+        }
     }
 }

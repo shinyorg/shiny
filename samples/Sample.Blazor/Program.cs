@@ -26,4 +26,6 @@ builder.Services.AddPush<SamplePushDelegate>(new WebPushOptions
     // Replace with your own VAPID public key generated for your push backend
     VapidPublicKey = "BNbxGYNMhEIi9zrneh7mqV4oUanjLUK3m-REPLACE-ME"
 });
-await builder.Build().RunAsync();
+var host = builder.Build();
+await host.Services.UseShiny();
+await host.RunAsync();

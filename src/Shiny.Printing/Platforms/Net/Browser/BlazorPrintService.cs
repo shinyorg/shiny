@@ -11,7 +11,7 @@ namespace Shiny.Printing.Blazor;
 /// </summary>
 public sealed class BlazorPrintService(IJSRuntime jsRuntime) : IPrintService, IAsyncDisposable
 {
-    const string ModulePath = "./_content/Shiny.Printing.Blazor/shiny-printing.js";
+    const string ModulePath = "./_content/Shiny.Printing/shiny-printing.js";
     IJSObjectReference? module;
 
     public PrintingCapabilities Capabilities =>

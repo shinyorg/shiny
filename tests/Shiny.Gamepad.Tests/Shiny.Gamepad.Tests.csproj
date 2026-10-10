@@ -17,7 +17,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Gamepad\Shiny.Gamepad.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Gamepad.Linux\Shiny.Gamepad.Linux.csproj" />
     </ItemGroup>
 
 </Project>

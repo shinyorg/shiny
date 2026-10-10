@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using CoreFoundation;
 using Foundation;
 
 namespace Shiny;
@@ -31,15 +32,12 @@ public class IosPlatform : IPlatform
     //public string Model { get; } = "";
 
 
+    // the main dispatch queue, the same as MacPlatform and Shiny.Maui.Shell's macOS MainThread
     public void InvokeOnMainThread(Action action)
     {
-        if (NSThread.Current.IsMainThread)
-        {
+        if (NSThread.IsMain)
             action();
-        }
         else
-        {
-            NSRunLoop.Main.BeginInvokeOnMainThread(action);
-        }
+            DispatchQueue.MainQueue.DispatchAsync(action);
     }
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
@@ -18,6 +18,19 @@
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="Shiny.Extensions.DependencyInjection" />
         <PackageReference Include="Shiny.Extensions.Stores" />
+    </ItemGroup>
+
+    <!--
+        The base target framework is also the Blazor WebAssembly and Linux build: the browser monitors
+        import wwwroot/*.js through IJSRuntime (served from _content/Shiny.Core/), which is why this
+        is a Razor SDK project. OperatingSystem.IsBrowser()/IsLinux() pick the implementation at runtime.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Tests" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">

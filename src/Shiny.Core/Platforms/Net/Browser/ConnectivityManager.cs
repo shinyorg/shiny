@@ -17,7 +17,7 @@ namespace Shiny.Infrastructure;
 /// module behind them has to be imported first. Rather than block, the load is kicked off the first
 /// time anything touches this class - a property read or a <see cref="Changed"/> subscription - and
 /// the properties report <see cref="NetworkAccess.Unknown"/> / <see cref="ConnectionTypes.Unknown"/>
-/// until it completes. Call <see cref="StartAsync"/> (or <c>UseShinyCore()</c> on the built host) to
+/// until it completes. Call <see cref="StartAsync"/> (or <c>UseShiny()</c> on the built host) to
 /// await that explicitly.
 /// </para>
 /// <para>
@@ -89,7 +89,7 @@ public class ConnectivityManager(IJSRuntime jsRuntime, ILogger<ConnectivityManag
     async Task Start()
     {
         var mod = await jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Core.Blazor/connectivity.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Core/connectivity.js")
             .ConfigureAwait(false);
 
         // resolves navigator.connection - without it, getConnType() never reports anything

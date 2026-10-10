@@ -95,21 +95,21 @@ Windows uses COM-activated in-process background tasks. Call `ShinyJobsBackgroun
 
 On the base .NET TFM there is no native OS scheduler — Shiny runs an in-process managed `JobManager` on a recurring timer (default 30s; configurable via the static `JobManager.Interval` property, minimum 15s, maximum 5 minutes). Jobs only execute while the host process is alive.
 
-There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` directly on all plain .NET targets (Blazor WASM included). You must register an `IBattery` and `IConnectivity` implementation yourself on these targets — `AddJob` cannot reference the Linux/Blazor support packages, so it only auto-adds them on the platform TFMs (Android, iOS, tvOS, Mac Catalyst, Windows). Registration order does not matter for the support-package calls. To replace the defaults with your own implementation on any target, register yours **before** `AddJob` — the auto-registration uses `TryAdd`.
+There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` directly on all plain .NET targets (Blazor WASM included). `AddJob` registers `IConnectivity` and `IBattery` for you on every target - `Shiny.Core` picks the Linux or browser implementation at runtime. The one gap is plain .NET on **Windows or macOS** (a console or service, not MAUI): there is no battery API there, so register your own `IBattery` or the `JobManager` cannot be built. To replace the defaults with your own implementation on any target, register yours **before** `AddJob` — the auto-registration never replaces an existing one.
 
 ```csharp
 using Shiny;
 using Shiny.Jobs;
 
-// Linux / console — battery + connectivity come from Shiny.Core.Linux
-services.AddConnectivity();
-services.AddBattery();
-// Blazor WASM — the same two calls from Shiny.Core.Blazor
+// Linux / Blazor WASM - battery + connectivity are registered by AddJob
+// Windows / macOS console - register an IBattery first: services.AddSingleton<IBattery, MyBattery>();
 services.AddJob<MySyncJob>(r => r
     .WithForeground()
     .WithInternet(InternetAccess.Any)
 );
 ```
+
+The in-process `JobManager` is an `IShinyStartupTask`, so the Shiny host must run: `UseShiny()` in a MAUI app (including Linux GTK and macOS), `await host.Services.UseShiny()` after `Build()` on Blazor WASM, or `host.Run()` from `HostBuilder` in a console/service app.
 
 **Blazor WASM caveat**: the in-process `JobManager` only runs while the tab is open. Background tabs are throttled (~1 min timer floor on Chromium), may be frozen after ~5 minutes, and iOS Safari kills background WASM aggressively. There is no way to run C# jobs via Service Worker Background Sync because the SW has no access to the WASM runtime. For background HTTP work specifically, use `Shiny.Net.Http.Blazor`.
 

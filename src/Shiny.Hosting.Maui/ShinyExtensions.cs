@@ -1,8 +1,9 @@
-﻿#if PLATFORM
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Hosting;
+#if PLATFORM
 using Microsoft.Maui.LifecycleEvents;
 using Shiny.Hosting;
+#endif
 using Shiny.Infrastructure;
 
 namespace Shiny;
@@ -10,6 +11,11 @@ namespace Shiny;
 
 public static class ShinyExtensions
 {
+    /// <summary>
+    /// Registers Shiny's core services and starts the Shiny host when the MAUI app is built. On the
+    /// plain net10.0 build - the one MAUI backends such as Linux GTK resolve - it also points
+    /// Shiny's main thread at the backend's MAUI dispatcher.
+    /// </summary>
     public static MauiAppBuilder UseShiny(this MauiAppBuilder builder)
     {
         builder.Services.AddSingleton<IMauiInitializeService, ShinyMauiInitializationService>();
@@ -34,6 +40,7 @@ public static class ShinyExtensions
         }
 #endif
 
+#if PLATFORM
         builder.ConfigureLifecycleEvents(events =>
         {
 #if ANDROID
@@ -44,7 +51,7 @@ public static class ShinyExtensions
                 .OnActivityResult((activity, requestCode, result, intent) => Host.Lifecycle.OnActivityResult(activity, requestCode, result, intent))
                 .OnNewIntent((activity, intent) => Host.Lifecycle.OnNewIntent(activity, intent))
             );
-#elif APPLE
+#elif APPLE && !MACOS
             // Shiny will supply push events & handle background url for http transfers
             events.AddiOS(ios => ios
                 .ContinueUserActivity((_, activity, handler) => Host.Lifecycle.OnContinueUserActivity(activity, handler))
@@ -57,8 +64,8 @@ public static class ShinyExtensions
             );
 #endif
         });
+#endif
 
         return builder;
     }
 }
-#endif

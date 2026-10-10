@@ -74,9 +74,7 @@ public static class DataSyncServiceCollectionExtensions
 
     static void AddCore(IServiceCollection services, Action<ISyncEndpointBuilder> configure)
     {
-#if PLATFORM
         services.AddConnectivity();
-#endif
         services.AddDefaultRepository();
 
         var registry = new SyncEndpointRegistry();

@@ -125,30 +125,20 @@ and fails on real hardware.
 ## Installation
 
 ```bash
-# Android, iOS, tvOS, Mac Catalyst, macOS, Windows
+# every platform - Android, iOS, tvOS, Mac Catalyst, macOS, Windows, Linux (evdev), Blazor WebAssembly
 dotnet add package Shiny.Gamepad
-
-# Linux desktop / Raspberry Pi - instead of the above
-dotnet add package Shiny.Gamepad.Linux
-
-# Blazor WebAssembly - instead of the above
-dotnet add package Shiny.Gamepad.Blazor
+# Shiny.Gamepad.Linux / Shiny.Gamepad.Blazor no longer exist - the net10.0 build picks evdev or the
+# W3C Gamepad API at runtime with OperatingSystem.IsLinux() / IsBrowser()
 ```
 
 ```csharp
-// MAUI, or any of the native platform targets
+// every platform - MAUI, native targets, Linux, Blazor WebAssembly
 builder.Services.AddGamepads();
 
-// Linux and Blazor register the SAME method name from their own package - do not call both
-services.AddGamepads();
-
-// a server, console or test host with no controller API: reports no controllers, never throws
+// a server, console or test host: reports no controllers, never throws
+// (on Linux, AddGamepads() would otherwise open evdev)
 services.AddNotSupportedGamepads();
 ```
-
-**Never call `AddGamepads()` twice.** The Linux and Blazor packages deliberately reuse the name on
-the same target framework, so referencing one of them and calling the base package's method is
-ambiguous at compile time.
 
 No permission, entitlement or manifest entry is needed on any platform.
 

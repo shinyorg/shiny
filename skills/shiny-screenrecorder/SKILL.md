@@ -150,7 +150,7 @@ recording that silently came out without the microphone is worse than one that r
 | Item      | Value |
 |-----------|-------|
 | GitHub    | https://github.com/shinyorg/shiny |
-| NuGet     | `Shiny.ScreenRecorder`, plus `Shiny.ScreenRecorder.Linux` on Linux and `Shiny.ScreenRecorder.Blazor` in the browser |
+| NuGet     | `Shiny.ScreenRecorder` - one package everywhere; its `net10.0` build holds the Linux and Blazor WebAssembly recorders (`Shiny.ScreenRecorder.Linux` / `.Blazor` no longer exist) |
 | Namespace | `Shiny.ScreenRecorder` (types); `Shiny` (registration extensions) |
 | Platforms | Android, iOS, Mac Catalyst, macOS, Windows, Linux, Blazor WebAssembly |
 
@@ -178,15 +178,13 @@ app audio at all forces the whole pipeline down.
 builder.Services.AddScreenRecorder();     // IScreenRecorder, singleton
 ```
 
-Same call on every platform. On Linux reference `Shiny.ScreenRecorder.Linux` and in a Blazor
-WebAssembly app reference `Shiny.ScreenRecorder.Blazor` **instead of** the base package - each
-registers its own implementation of the same interface.
+Same call and same package on every platform. On `net10.0`, `AddScreenRecorder()` picks the
+browser recorder with `OperatingSystem.IsBrowser()`, the desktop-portal recorder with
+`OperatingSystem.IsLinux()`, and the not-supported recorder anywhere else.
 
-On a plain .NET host - a server, console or test project with no screen - the base package offers
-`AddNotSupportedScreenRecorder()` instead, which registers a recorder reporting
-`ScreenRecorderCapabilities.None`. It is named differently on purpose: the Linux and Blazor packages
-register a *real* implementation under `AddScreenRecorder` on that same target framework, so sharing
-the name would make every call ambiguous in a project referencing one of them.
+On a plain .NET host - a server, console or test project with no screen - call
+`AddNotSupportedScreenRecorder()` to force the recorder that reports
+`ScreenRecorderCapabilities.None` (on Linux, `AddScreenRecorder()` would otherwise use the portal).
 
 ### Platform setup
 
