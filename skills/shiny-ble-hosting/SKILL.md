@@ -58,26 +58,8 @@ triggers:
   - L2CapFileRequest
   - L2CapTransferOptions
   - TransferProgress
-  - BleService
-  - BleServiceAttribute
-  - ReadCharacteristic
-  - WriteCharacteristic
-  - NotifyCharacteristic
-  - RequestResponseCharacteristic
-  - L2CapService
-  - OnChannelOpened
-  - BleServiceContext
-  - BleSubscription
-  - BleL2CapContext
-  - BleHostedServiceSession
-  - AddBleHostedServices
-  - AttachBleHostedServices
-  - StartBleHostedAdvertising
-  - ble source generator
-  - ble hosting source generator
-  - generated gatt service
-  - Framed
-  - MaxMessageBytes
+  - ReadAll
+  - ble request response
   - ble message framing
   - large gatt message
   - BleMessageFraming
@@ -85,7 +67,6 @@ triggers:
   - BleMessageFrameResult
   - GattMessageExtensions
   - NotifyMessage
-  - GetMessageReassembler
   - L2CapTicketBroker
   - L2CapTicket
   - L2CapTicketBrokerOptions
@@ -102,12 +83,9 @@ triggers:
 
 You are an expert in Shiny.BluetoothLE.Hosting, a .NET library for turning a device into a BLE peripheral. It provides a GATT server, BLE advertising, iBeacon broadcasting, and L2CAP CoC channels through the imperative `IBleHostingManager` API.
 
-There are two ways to expose a GATT service, and both compile down to the same thing:
+Every GATT service is registered by injecting `IBleHostingManager` and calling `AddService(uuid, primary, sb => ...)`; every L2CAP listener by calling `OpenL2Cap(...)` (or one of the file server / ticket broker helpers built on it).
 
-1. **Imperative** — inject `IBleHostingManager` and call `AddService(uuid, primary, sb => ...)`. Best for one-off or dynamically shaped services.
-2. **Source generated** — put `[BleService]` / `[L2CapService]` on a `partial class` and let the bundled generator emit the `AddService(...)` calls, the `IsReplyNeeded`/offset handling, the notify push API, and the DI registration. Prefer this for anything with more than a characteristic or two.
-
-> The old reflection-based managed pattern (`BleGattCharacteristic` base class, `[BleGattCharacteristic]` attribute, `AddBleHostedCharacteristic<T>`, `AttachRegisteredServices`) was **removed** for AOT compliance. The source generator replaces it and emits no reflection. Never generate code against those types.
+> **v6 removed the `[BleService]` source generator.** `Shiny.BluetoothLE.Hosting.SourceGenerators` and its attributes (`[BleService]`, `[ReadCharacteristic]`, `[WriteCharacteristic]`, `[NotifyCharacteristic]`, `[RequestResponseCharacteristic]`, `[L2CapService]`, `[OnChannelOpened]`), its runtime types (`BleServiceContext` / generated `{Service}Context`, `BleContextStore`, `BleHostingRuntime`, `BleSubscription`, `BleL2CapContext`, `BleHostedServiceSession`, the `GetMessageReassembler(this BleServiceContext, ...)` extension), its generated members (`AddBleHostedServices()`, `AttachBleHostedServices(...)`, `StartBleHostedAdvertising(...)`, `NotifyX` overloads, the `BleService` property, attribute-driven PSM publication) and its `SBH0xx` diagnostics no longer exist. The older reflection-based pattern (`BleGattCharacteristic` base class, `[BleGattCharacteristic]`, `AddBleHostedCharacteristic<T>`, `AttachRegisteredServices`) was removed before that. Never generate code against any of those - register services with `IBleHostingManager` directly.
 
 ## When to Use This Skill
 
@@ -124,8 +102,7 @@ Invoke this skill when the user wants to:
 - Build a MAUI app that acts as a BLE peripheral
 - Publish an L2CAP PSM for centrals to open streaming channels against (iOS/macOS, Android API 29+, Linux)
 - Serve file uploads/downloads to connected centrals over L2CAP, with progress and throughput metrics
-- Declare a GATT service or L2CAP listener with attributes on a partial class instead of builder lambdas
-- Keep per-connected-central state (a SignalR-style context) across requests on a hosted service
+- Keep per-connected-central state across requests on a hosted service
 - Exchange requests, replies or notifications longer than one GATT operation (message framing)
 - Share one L2CAP PSM between many authorised transfers with single-use tickets, or use a channel as a `Stream`
 
@@ -136,7 +113,7 @@ Invoke this skill when the user wants to:
 - **Platforms**: iOS, Mac Catalyst, macOS (CoreBluetooth), Android, Linux (BlueZ). Windows throws `NotSupportedException` for advertising/GATT-server hosting; only the `OpenL2Cap` API is exposed and it also throws on Windows. **There is no tvOS target and there cannot be one** — `CBMutableService` and `CBMutableCharacteristic` have no constructors on tvOS, which is Apple's way of saying an Apple TV cannot act as a GATT peripheral. If asked to build a GATT server or advertise from tvOS, say it is impossible rather than generating code; the central role (`Shiny.BluetoothLE`) does support tvOS.
 - **Dependencies**: `Shiny.Core`, `Shiny.BluetoothLE.Common`
 
-Inject `IBleHostingManager` and call `AddService(uuid, primary, builder)` to register a GATT service inline, or declare it with `[BleService]` on a partial class and let the bundled source generator emit that call. The generator ships inside the same package under `analyzers/dotnet/cs` - no extra `PackageReference` needed.
+Inject `IBleHostingManager` and call `AddService(uuid, primary, builder)` to register a GATT service. The package ships no source generator or attributes.
 
 ## Setup
 
@@ -201,102 +178,172 @@ var service = await hostingManager.AddService("12345678-1234-1234-1234-123456789
 });
 ```
 
-### 2b. Source-Generated GATT Service
+### 2b. A Service Class Around `IBleHostingManager`
 
-Put the attributes on a `partial class`. The generator emits the `AddService(...)` call, the
-`GattResult` wrapping, the `IsReplyNeeded`/`Respond` handling, the notify push API, and the DI
-registration. Every UUID is normalized to the full 128-bit form.
+For anything with more than a characteristic or two, wrap the `AddService(...)` call in your own class
+so the handlers, the `IGattCharacteristic` references you notify through, and any per-central state
+live in one place. Always pass the full 128-bit UUID - the API does not normalize short forms.
 
 ```csharp
-[BleService("180D", Advertise = true, Name = "HeartRate")]
-public partial class HeartRateService(IHeartRateSensor sensor)
+public class HeartRateService(IBleHostingManager hosting, IHeartRateSensor sensor) : IAsyncDisposable
 {
-    // byte[] is wrapped in GattResult.Success; return GattResult to pick the status yourself
-    [ReadCharacteristic("2A37")]
-    Task<byte[]> ReadMeasurement(HeartRateServiceContext context)
-        => Task.FromResult(new byte[] { 0x00, sensor.Read(context.User) });
+    public const string ServiceUuid = "0000180d-0000-1000-8000-00805f9b34fb";
+    const string MeasurementUuid = "00002a37-0000-1000-8000-00805f9b34fb";
+    const string ControlPointUuid = "00002a39-0000-1000-8000-00805f9b34fb";
 
-    // the hook is optional - NotifyMeasurement / MeasurementSubscribers / HasMeasurementSubscribers
-    // are generated either way. Put [NotifyCharacteristic] on the class (with Name) to skip the hook
-    [NotifyCharacteristic("2A37", Name = "Measurement", Indicate = true)]
-    Task OnMeasurementSubscription(BleSubscription subscription, HeartRateServiceContext context)
-        => Task.CompletedTask;
+    IGattCharacteristic? measurement;
 
-    // returning GattState responds that value, and only when the central asked for a reply.
-    // returning void/Task responds Success, or Failure if the handler throws
-    [WriteCharacteristic("2A39")]
-    Task<GattState> ControlPoint(byte[] data, int offset, HeartRateServiceContext context)
-        => Task.FromResult(offset == 0 ? GattState.Success : GattState.InvalidOffset);
+    public async Task Start()
+    {
+        await hosting.AddService(ServiceUuid, true, sb =>
+        {
+            // read + indicate on one characteristic
+            this.measurement = sb.AddCharacteristic(MeasurementUuid, cb => cb
+                .SetRead(request =>
+                {
+                    // IPeripheral.Context is yours - per-central state lives as long as Shiny caches that central
+                    var user = request.Peripheral.Context as AuthUser;
+                    return Task.FromResult(GattResult.Success(new byte[] { 0x00, sensor.Read(user) }));
+                })
+                .SetNotification(options: NotificationOptions.Indicate)
+            );
 
-    // write + notify - the result is pushed back to the writing central, which must be subscribed
-    [RequestResponseCharacteristic("2A3B", Name = "Command")]
-    Task<byte[]> Exchange(byte[] request, CancellationToken cancellationToken) => Handle(request);
+            sb.AddCharacteristic(ControlPointUuid, cb => cb.SetWrite(request =>
+            {
+                var state = request.Offset == 0 ? GattState.Success : GattState.InvalidOffset;
+                if (request.IsReplyNeeded)
+                    request.Respond(state);
 
-    // opt-in hooks; the compiler drops the generated call when you do not implement them
-    partial void OnBleHandlerError(string characteristicUuid, Exception ex) => Log(ex);
-}
+                return Task.CompletedTask;
+            }));
+        });
+    }
 
-// your half of the generated context - one instance per connected central, held across requests
-public partial class HeartRateServiceContext
-{
-    public AuthUser? User { get; set; }
+    public Task PushMeasurement(byte value, CancellationToken cancellationToken)
+        => this.measurement is { SubscribedCentrals.Count: > 0 } m
+            ? m.Notify(new byte[] { 0x00, value }, cancellationToken)   // all subscribers
+            : Task.CompletedTask;
+
+    public ValueTask DisposeAsync()
+    {
+        hosting.RemoveService(ServiceUuid);
+        return ValueTask.CompletedTask;
+    }
 }
 ```
 
-Handler parameters bind **by type, in any order, any subset** - none are required. See
-`reference/api-reference.md` for the full binding table and the `SBH001`-`SBH014` diagnostics.
+Register the class yourself (`builder.Services.AddSingleton<HeartRateService>()`) and call `Start()`
+after `RequestAccess()`. Keep the instance alive for as long as the service should be hosted.
+
+#### Request/response characteristics
+
+A GATT write response cannot carry a payload, so a request/response exchange is a characteristic with
+**both** write and notify: the central subscribes, writes the request, and the reply comes back to that
+central as a notification. Respond to the write first, then notify only the writing central:
+
+```csharp
+sb.AddCharacteristic(CommandUuid, cb => cb
+    .SetNotification()
+    .SetWrite(async request =>
+    {
+        if (request.IsReplyNeeded)
+            request.Respond(GattState.Success);
+
+        var reply = await this.Handle(request.Data);
+        if (request.Characteristic.SubscribedCentrals.Any(x => x.Uuid == request.Peripheral.Uuid))
+            await request.Characteristic.Notify(reply, request.Peripheral);
+    })
+);
+```
 
 #### Requests and replies longer than one GATT operation
 
 A write or notification carries at most `Mtu` bytes - 20 on a link that never negotiated more. When a
-request or reply can be longer (JSON, a certificate, a scan result), set `Framed = true` rather than
-inventing a chunking protocol:
+request or reply can be longer (JSON, a certificate, a scan result), use `BleMessageFraming` rather than
+inventing a chunking protocol: feed each write fragment into a `BleMessageReassembler` kept **per central**,
+run the handler once the message is whole, and send the reply with `NotifyMessage`:
 
 ```csharp
-[RequestResponseCharacteristic("2A3B", Name = "Command", Framed = true, MaxMessageBytes = 16 * 1024)]
-async Task<byte[]> Exchange(byte[] message, HeartRateServiceContext context, CancellationToken cancellationToken)
-{
-    var command = JsonSerializer.Deserialize(message, AppJsonContext.Default.Command)!;
-    return JsonSerializer.SerializeToUtf8Bytes(await Run(command, cancellationToken), AppJsonContext.Default.Result);
-}
+readonly ConcurrentDictionary<string, BleMessageReassembler> reassemblers = new();
+
+sb.AddCharacteristic(CommandUuid, cb => cb
+    .SetNotification(sub =>
+    {
+        // the central's partial message goes with its subscription
+        if (!sub.IsSubscribing)
+            this.reassemblers.TryRemove(sub.Peripheral.Uuid, out _);
+
+        return Task.CompletedTask;
+    })
+    .SetWrite(async request =>
+    {
+        var reassembler = this.reassemblers.GetOrAdd(
+            request.Peripheral.Uuid,
+            _ => new BleMessageReassembler(maxMessageBytes: 16 * 1024)
+        );
+
+        BleMessageFrameResult frame;
+        byte[]? message;
+        lock (reassembler)
+            frame = reassembler.Push(request.Data, out message);
+
+        if (frame == BleMessageFrameResult.Partial)
+        {
+            if (request.IsReplyNeeded)
+                request.Respond(GattState.Success);
+            return;
+        }
+
+        if (frame != BleMessageFrameResult.Complete)
+        {
+            // Malformed / OutOfSequence / TooLarge - the reassembler has already reset
+            if (request.IsReplyNeeded)
+                request.Respond(GattState.Failure);
+            return;
+        }
+
+        if (request.IsReplyNeeded)
+            request.Respond(GattState.Success);
+
+        var command = JsonSerializer.Deserialize(message!, AppJsonContext.Default.Command)!;
+        var reply = JsonSerializer.SerializeToUtf8Bytes(await this.Run(command), AppJsonContext.Default.Result);
+        await request.Characteristic.NotifyMessage(reply, request.Peripheral);
+    })
+);
 ```
 
-The generator treats each write as one fragment, reassembles per central (the reassembler lives on that
-central's context, so two centrals never interleave), and runs the handler **once** with the whole
-message - `byte[]` and `WriteRequest.Data` are both the full message. Intermediate fragments are answered
-`GattState.Success` without running the handler. The reply is split to the writing central's MTU with
-`NotifyMessage`. A message over `MaxMessageBytes` (default 64 KB), or one with a dropped or reordered
-fragment, is discarded, answered `GattState.Failure`, and reported to `OnBleHandlerError` as an
-`InvalidDataException`.
+Never share one `BleMessageReassembler` across centrals - two centrals writing at once would interleave
+fragments and both messages would be discarded. Key it by `IPeripheral.Uuid` (one per central, per
+characteristic, per direction) and remove it when the central unsubscribes or goes away.
 
 The central **must** speak the same format - `WriteCharacteristicMessageAsync` to send and
 `NotifyCharacteristicMessages` to receive, in `Shiny.BluetoothLE` (see the `shiny-bluetoothle` skill). A
 plain `WriteCharacteristicAsync` against a framed characteristic is not a valid fragment. As with any
 request/response characteristic, the central subscribes before it writes.
 
-Wire it up:
+#### Publishing an L2CAP PSM over GATT
+
+A central has no in-band way to learn a PSM, so open the listener first and serve `instance.Psm` from a
+read characteristic (two little-endian bytes):
 
 ```csharp
-builder.Services.AddBluetoothLeHosting();
-builder.Services.AddBleHostedServices();   // generated
+var instance = await hosting.OpenL2Cap(secure: false, onOpen: channel => _ = Echo(channel));
 
-await using var session = await hostingManager.AttachBleHostedServices(serviceProvider);
-await hostingManager.StartBleHostedAdvertising("MyDevice");
-```
-
-An `[L2CapService]` class works the same way - one `[OnChannelOpened]` handler per accepted central,
-and `PsmService`/`PsmCharacteristic` publish the assigned PSM as a read characteristic so centrals
-can discover it:
-
-```csharp
-[L2CapService(Secure = false, PsmService = "180D", PsmCharacteristic = "2ABC", Name = "EchoStream")]
-public partial class StreamService
-{
-    [OnChannelOpened]
-    async Task Echo(L2CapChannel channel, BleL2CapContext context, CancellationToken cancellationToken)
+await hosting.AddService(StreamServiceUuid, true, sb =>
+    sb.AddCharacteristic(PsmCharacteristicUuid, cb => cb.SetRead(_ =>
     {
-        await foreach (var buffer in channel.ReadAll(cancellationToken))
-            await channel.Write(buffer).ToTask(cancellationToken);
+        var psm = instance.Psm;
+        return Task.FromResult(GattResult.Success(new[] { (byte)(psm & 0xFF), (byte)(psm >> 8) }));
+    }))
+);
+
+static async Task Echo(L2CapChannel channel)
+{
+    using (channel)
+    {
+        // ReadAll: IAsyncEnumerable over DataReceived, ends when the central closes the channel
+        await foreach (var buffer in channel.ReadAll())
+            await channel.Write(buffer).ToTask();
     }
 }
 ```
@@ -341,7 +388,7 @@ await characteristic.Notify(data);
 await characteristic.Notify(data, specificPeripheral1, specificPeripheral2);
 ```
 
-`IPeripheral.Mtu` (and `BleServiceContext.Mtu`) is the usable payload -- the negotiated ATT MTU
+`IPeripheral.Mtu` is the usable payload -- the negotiated ATT MTU
 already minus the 3-byte ATT header. Cap a notification at `peripheral.Mtu` directly; do not
 subtract the header again. Anything larger is silently truncated by the platform.
 
@@ -355,12 +402,11 @@ Pass a `CancellationToken` to bound that wait - it goes **before** the `params` 
 ```csharp
 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 await characteristic.Notify(data, cts.Token);                  // all subscribers
-await characteristic.Notify(data, cts.Token, context.Peripheral); // one central
+await characteristic.Notify(data, cts.Token, request.Peripheral); // one central
 ```
 
 If Bluetooth powers off while an Apple `Notify` is waiting, the task faults with `InvalidOperationException`.
-Generated `[BleService]` classes get a matching `NotifyX(data, cancellationToken, params centrals)` overload,
-and generated request/response replies already pass `BleHostToken`. An empty centrals list means every
+An empty centrals list means every
 subscriber on all platforms; a named list goes only to those centrals. `SubscribedCentrals` is tracked whether
 or not `SetNotification` was given a subscribe hook, so never register a no-op hook just to populate it.
 
@@ -372,15 +418,14 @@ notifications. A central that enabled indications receives indications.
 central has notifications enabled, so while one is subscribed every connected central appears in
 `SubscribedCentrals`. And every `Notify` reaches all subscribed centrals - the `centrals` argument cannot narrow
 it (the send is skipped only when none of the named centrals is subscribed). Never put per-central data on a
-notify characteristic that several centrals subscribe to on Linux; generated request/response replies fan out
-to every subscriber there. Adding or removing a service re-registers the whole GATT application with BlueZ.
+notify characteristic that several centrals subscribe to on Linux; request/response replies sent with
+`Notify(reply, request.Peripheral)` fan out to every subscriber there. Adding or removing a service re-registers the whole GATT application with BlueZ.
 
 ```csharp
-[Notify]
-public async Task Push(BleServiceContext context, byte[] payload)
+public Task Push(IGattCharacteristic characteristic, IPeripheral central, byte[] payload)
 {
-    var max = context.Mtu;                       // NOT context.Mtu - 3
-    await this.Characteristic.Notify(payload.Take(max).ToArray(), context.Peripheral);
+    var max = central.Mtu;                       // NOT central.Mtu - 3
+    return characteristic.Notify(payload.Take(max).ToArray(), central);
 }
 ```
 
@@ -391,42 +436,16 @@ Do not truncate a payload that has to arrive whole, and do not hand-roll chunkin
 bit 6 END, bits 0-5 a sequence number - sized to that central's MTU, and awaits each notification in turn:
 
 ```csharp
-await characteristic.NotifyMessage(bigPayload, context.Peripheral, cancellationToken);
+await characteristic.NotifyMessage(bigPayload, request.Peripheral, cancellationToken);
 ```
 
 It addresses **one** central, because fragments are sized per central. Never send two messages to the same
 central on the same characteristic concurrently - the fragments interleave and the central discards both.
 The central receives with `NotifyCharacteristicMessages` (`Shiny.BluetoothLE`).
 
-For framed **writes** outside `[RequestResponseCharacteristic(Framed = true)]` - a `[WriteCharacteristic]`
-handler, say - feed each write into the reassembler kept on the central's context:
-
-```csharp
-[WriteCharacteristic("2A3C")]
-async Task<GattState> Upload(WriteRequest request, HeartRateServiceContext context)
-{
-    var reassembler = context.GetMessageReassembler("2A3C", maxMessageBytes: 32 * 1024);
-
-    BleMessageFrameResult frame;
-    byte[]? message;
-    lock (reassembler)
-        frame = reassembler.Push(request.Data, out message);
-
-    if (frame == BleMessageFrameResult.Partial)
-        return GattState.Success;
-
-    if (frame != BleMessageFrameResult.Complete)
-        return GattState.Failure;          // Malformed / OutOfSequence / TooLarge - already reset
-
-    await this.Store(message!);
-    return GattState.Success;
-}
-```
-
-`GetMessageReassembler` is one instance per context and characteristic UUID (case-insensitive), created on
-first use and gone with the central's context. With the imperative `SetWrite` API there is no context - keep
-a `BleMessageReassembler` per central yourself (keyed by `request.Peripheral.Uuid`), never one shared across
-centrals.
+For framed **writes**, keep a `BleMessageReassembler` per central - a dictionary keyed by
+`request.Peripheral.Uuid`, removed on unsubscribe/disconnect - and push each write fragment into it, as in
+the request/response example in section 2b. Never share one reassembler across centrals.
 
 ### 6. Responding to Write Requests
 
@@ -601,31 +620,50 @@ Reserve a ticket from an **authenticated** route - typically a GATT command - an
 `ticket.Token` to that central only:
 
 ```csharp
-[BleService("7a5e0000-5c2d-4f5e-9b1a-3c6d2e8f1a00")]
-public partial class CameraService(L2CapTicketBroker broker, ICamera camera)
+public class CameraService(IBleHostingManager hosting, L2CapTicketBroker broker, ICamera camera)
 {
-    [RequestResponseCharacteristic("7a5e0001-5c2d-4f5e-9b1a-3c6d2e8f1a00", Name = "Capture", Framed = true)]
-    async Task<byte[]> RequestCapture(CameraServiceContext context, CancellationToken ct)
-    {
-        if (!context.IsAuthenticated)                     // your own property on the partial context
-            return Error("not authorised");                 // Error/Encode: your reply format
+    const string ServiceUuid = "7a5e0000-5c2d-4f5e-9b1a-3c6d2e8f1a00";
+    const string CaptureUuid = "7a5e0001-5c2d-4f5e-9b1a-3c6d2e8f1a00";
 
-        var ticket = await broker.Reserve(
-            label: "capture",
-            lifetime: TimeSpan.FromSeconds(30),               // unclaimed token expires after this
-            handler: async (stream, token) =>
+    public Task Start() => hosting.AddService(ServiceUuid, true, sb =>
+        sb.AddCharacteristic(CaptureUuid, cb => cb
+            .SetNotification()
+            .SetWrite(async request =>
             {
-                // stream is an L2CapChannelStream; it is closed when this returns, which ends the transfer
-                await using var jpeg = await camera.Capture(token);
-                await jpeg.CopyToAsync(stream, token);
-            },
-            maxWriteSize: 8192                                // optional, overrides the broker default
-        );
+                if (request.IsReplyNeeded)
+                    request.Respond(GattState.Success);
 
-        return Encode(ticket.Psm, ticket.Token);
-    }
+                byte[] reply;
+                if (request.Peripheral.Context is not AuthUser)    // your own per-central state
+                {
+                    reply = Error("not authorised");                // Error/Encode: your reply format
+                }
+                else
+                {
+                    var ticket = await broker.Reserve(
+                        label: "capture",
+                        lifetime: TimeSpan.FromSeconds(30),           // unclaimed token expires after this
+                        handler: async (stream, token) =>
+                        {
+                            // stream is an L2CapChannelStream; it is closed when this returns, which ends the transfer
+                            await using var jpeg = await camera.Capture(token);
+                            await jpeg.CopyToAsync(stream, token);
+                        },
+                        maxWriteSize: 8192                            // optional, overrides the broker default
+                    );
+                    reply = Encode(ticket.Psm, ticket.Token);
+                }
+
+                // a PSM + 32-char token is longer than a 20-byte notification - frame the reply
+                await request.Characteristic.NotifyMessage(reply, request.Peripheral);
+            })
+        )
+    );
 }
 ```
+
+The central subscribes with `NotifyCharacteristicMessages`, then writes the capture command. If the command
+itself can exceed one write, reassemble it per central first (section 2b).
 
 - `Reserve` opens the listener on first use; `broker.Psm` is 0 until then. Every ticket shares the same PSM.
 - The first channel to present the token gets the handler. A wrong, expired or already-claimed token - or a
@@ -656,17 +694,17 @@ the host answers `"SL2T" [version:1] [status:1]`, and only after `Accepted` does
 ## Best Practices
 
 1. **Always request access first** -- call `RequestAccess()` and check the result before any hosting operations, so a denied permission or a switched-off adapter reaches the user rather than surfacing as a thrown `InvalidOperationException` deeper in. On Apple platforms it is no longer required for correctness: as of 5.6, `AddService(...)` and `StartAdvertising(...)` wait out the `CBPeripheralManager` power-on handshake themselves. Before that they issued the native call against a manager still reporting `Unknown`, which CoreBluetooth drops without ever invoking the completion delegate both methods await -- so a call made at app startup hung indefinitely instead of failing. Do not work around it with your own `await RequestAccess()` retry loop or a `Task.Delay` before advertising
-2. **Reach for `[BleService]` first** -- the generator emits the same builder calls plus the response/offset handling, subscriber tracking, and per-central context. Fall back to `AddService(uuid, primary, sb => ...)` lambdas when the service shape is only known at runtime
-3. **Always write the full 128-bit UUID when calling `AddService` by hand** -- short forms like `"180D"` work on Apple (`CBUUID.FromString`) but throw on Android (`java.util.UUID.fromString`). The generator normalizes for you; the imperative API does not
+2. **Register services with `IBleHostingManager.AddService` directly** -- the `[BleService]` source generator was removed in v6. For anything non-trivial, wrap the `AddService(uuid, primary, sb => ...)` call in your own service class that keeps the `IGattCharacteristic` references and per-central state
+3. **Always write the full 128-bit UUID** -- short forms like `"180D"` work on Apple (`CBUUID.FromString`) but throw on Android (`java.util.UUID.fromString`). `AddService` / `AddCharacteristic` do not normalize
 4. **Respond to writes when needed** -- always check `WriteRequest.IsReplyNeeded` and call `Respond` with the appropriate `GattState`
 5. **Return GattResult.Error on failures** -- use `GattResult.Error(GattState.Failure)` in read handlers when an error occurs
 6. **Stop advertising before cleanup** -- call `StopAdvertising()` and `ClearServices()` when done
 7. **Check IsAdvertising** -- avoid calling `StartAdvertising` if already advertising
-8. **Dispose `L2CapInstance` and per-central `L2CapChannel`s explicitly** -- disposing the instance closes the listener but does not auto-close already-open channels. With `[L2CapService]` the generator disposes each channel when the handler returns, and the `BleHostedServiceSession` closes the listener
-9. **Keep the `BleHostedServiceSession` alive** -- `AttachBleHostedServices` returns it, and disposing it cancels in-flight handlers, closes L2CAP listeners, and removes the GATT services
-10. **Size notifications with `Mtu` as-is** -- `IPeripheral.Mtu`/`BleServiceContext.Mtu` is the payload (ATT MTU minus `BleConstants.AttHeaderSize`), not the ATT MTU. Add the header back with `+ BleConstants.AttHeaderSize` only when feeding an API that genuinely wants an ATT MTU
-11. **Never register the same service UUID twice** -- `BleHostingManager` keys services by UUID. Several `[BleService]` classes may share one UUID; the generator merges them into a single `AddService` call
-12. **Frame anything that may not fit in `Mtu`** -- `[RequestResponseCharacteristic(Framed = true)]`, `NotifyMessage`, or `GetMessageReassembler`, paired with `WriteCharacteristicMessageAsync` / `NotifyCharacteristicMessages` on the central. Never truncate, and never hand-roll a chunk counter
+8. **Dispose `L2CapInstance` and per-central `L2CapChannel`s explicitly** -- disposing the instance closes the listener but does not auto-close already-open channels. Dispose each channel when your handler for it finishes
+9. **Tear down what you added** -- `RemoveService(uuid)` / `ClearServices()` for GATT services and `L2CapInstance.Dispose()` for listeners; nothing does it for you
+10. **Size notifications with `Mtu` as-is** -- `IPeripheral.Mtu` is the payload (ATT MTU minus `BleConstants.AttHeaderSize`), not the ATT MTU. Add the header back with `+ BleConstants.AttHeaderSize` only when feeding an API that genuinely wants an ATT MTU
+11. **Never register the same service UUID twice** -- `BleHostingManager` keys services by UUID. Put every characteristic of a service in one `AddService` call
+12. **Frame anything that may not fit in `Mtu`** -- `NotifyMessage` for replies and a per-central `BleMessageReassembler` (keyed by `IPeripheral.Uuid`) for writes, paired with `WriteCharacteristicMessageAsync` / `NotifyCharacteristicMessages` on the central. Never truncate, and never hand-roll a chunk counter
 13. **Share one PSM through `L2CapTicketBroker`** -- one `Reserve` per transfer, the token handed out over an authenticated GATT route, instead of an `OpenL2Cap` per transfer
 
 ## Reference Files

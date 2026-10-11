@@ -22,7 +22,7 @@ namespace Shiny.BluetoothLE;
 /// <para>A message that fits in one fragment has both START and END set, so short messages cost one byte.
 /// The sequence number lets <see cref="BleMessageReassembler"/> notice a dropped or reordered fragment and
 /// abandon the message rather than hand back garbage. The same format is used in both directions, and by
-/// the hosting side (<c>NotifyMessage</c>, and <c>[RequestResponseCharacteristic(Framed = true)]</c>) and
+/// the hosting side (<c>NotifyMessage</c> and a <see cref="BleMessageReassembler"/>) and
 /// the central side (<c>WriteCharacteristicMessageAsync</c>, <c>NotifyCharacteristicMessages</c>).</para>
 /// </remarks>
 public static class BleMessageFraming

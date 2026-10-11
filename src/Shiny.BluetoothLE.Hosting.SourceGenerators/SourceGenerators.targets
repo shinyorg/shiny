@@ -1,5 +1,0 @@
-<Project>
-    <ItemGroup>
-        <CompilerVisibleProperty Include="RootNamespace" />
-    </ItemGroup>
-</Project>

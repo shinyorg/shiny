@@ -10,8 +10,8 @@ namespace Shiny.BluetoothLE.Hosting;
 /// </summary>
 /// <remarks>
 /// The central side of the same format is <c>WriteCharacteristicMessageAsync</c> and
-/// <c>NotifyCharacteristicMessages</c> in Shiny.BluetoothLE. For a generated service, set
-/// <c>Framed = true</c> on <see cref="RequestResponseCharacteristicAttribute"/> instead of calling these.
+/// <c>NotifyCharacteristicMessages</c> in Shiny.BluetoothLE. To receive framed writes, feed each fragment to a
+/// <see cref="BleMessageReassembler"/> you keep per central.
 /// </remarks>
 public static class GattMessageExtensions
 {
@@ -42,41 +42,6 @@ public static class GattMessageExtensions
         {
             cancellationToken.ThrowIfCancellationRequested();
             await characteristic.Notify(fragment, cancellationToken, central).ConfigureAwait(false);
-        }
-    }
-
-
-    /// <summary>
-    /// Gets the reassembler that collects one characteristic's framed writes from the central this context
-    /// belongs to, creating it on first use.
-    /// </summary>
-    /// <param name="context">The central's context.</param>
-    /// <param name="characteristicUuid">The characteristic being written.</param>
-    /// <param name="maxMessageBytes">The size cap applied when the reassembler is created.</param>
-    /// <remarks>
-    /// Held on the context, so it lives exactly as long as the central's connection and is never shared with
-    /// another central. Feed it from the characteristic's write handler, one fragment at a time.
-    /// </remarks>
-    public static BleMessageReassembler GetMessageReassembler(
-        this BleServiceContext context,
-        string characteristicUuid,
-        int maxMessageBytes = BleMessageFraming.DefaultMaxMessageBytes
-    )
-    {
-        if (context == null) throw new ArgumentNullException(nameof(context));
-        if (characteristicUuid == null) throw new ArgumentNullException(nameof(characteristicUuid));
-
-        var key = "shiny:ble:frames:" + characteristicUuid.ToUpperInvariant();
-        var items = context.Items;
-
-        lock (items)
-        {
-            if (items.TryGetValue(key, out var existing) && existing is BleMessageReassembler reassembler)
-                return reassembler;
-
-            var created = new BleMessageReassembler(maxMessageBytes);
-            items[key] = created;
-            return created;
         }
     }
 }

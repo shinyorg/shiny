@@ -50,7 +50,6 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         // --- Bluetooth & Beacons ---
         Add(FeatureGroup.Bluetooth, "📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan");
         Add(FeatureGroup.Bluetooth, "📢 BLE Hosting", "Advertise as a GATT server", "blehosting");
-        Add(FeatureGroup.Bluetooth, "🧬 BLE Hosting (Generated)", "Same GATT server via [BleService] attributes", "blehostinggen");
         // L2CAP: Android (29+), Apple, Linux/BlueZ. No WinRT surface for it.
         if (!OperatingSystem.IsWindows())
             Add(FeatureGroup.Bluetooth, "🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap");

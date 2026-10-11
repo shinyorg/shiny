@@ -12,9 +12,8 @@ namespace Shiny.BluetoothLE;
 /// Writes and receives messages longer than one GATT operation, using <see cref="BleMessageFraming"/>.
 /// </summary>
 /// <remarks>
-/// The peripheral must speak the same format - a Shiny.BluetoothLE.Hosting service with
-/// <c>[RequestResponseCharacteristic(Framed = true)]</c>, or one that uses <c>NotifyMessage</c> and a
-/// <see cref="BleMessageReassembler"/> itself.
+/// The peripheral must speak the same format - a Shiny.BluetoothLE.Hosting service that uses
+/// <c>NotifyMessage</c> and a <see cref="BleMessageReassembler"/>.
 /// </remarks>
 public static class MessageExtensions
 {

@@ -228,7 +228,7 @@ When generating BLE client code, follow these conventions:
 
 A single write or notification carries at most `peripheral.Mtu` bytes - 20 until a larger MTU is negotiated. When a
 command, reply or event can be longer (JSON, a certificate, a scan result) and the peripheral is a
-`Shiny.BluetoothLE.Hosting` service using `[RequestResponseCharacteristic(Framed = true)]` or `NotifyMessage`, use the
+`Shiny.BluetoothLE.Hosting` service using `NotifyMessage` and a `BleMessageReassembler`, use the
 message helpers (`MessageExtensions`). Do not hand-roll a chunking protocol, and do not use `WriteCharacteristicBlob`
 for this - the blob write has no message boundaries.
 

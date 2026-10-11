@@ -50,21 +50,6 @@ public class GattMessageExtensionsTests
     }
 
 
-    [Fact]
-    public void GetMessageReassembler_IsOnePerCentralAndCharacteristic()
-    {
-        var alpha = new TestContext(new FakeCentral("alpha", 185));
-        var beta = new TestContext(new FakeCentral("beta", 185));
-
-        var first = alpha.GetMessageReassembler("2a3b");
-        Assert.Same(first, alpha.GetMessageReassembler("2A3B"));
-        Assert.NotSame(first, alpha.GetMessageReassembler("2A3C"));
-        Assert.NotSame(first, beta.GetMessageReassembler("2A3B"));
-    }
-
-
-    sealed class TestContext(IPeripheral peripheral) : BleServiceContext(peripheral, "180D", () => null);
-
 
     sealed class FakeCentral(string uuid, int mtu) : IPeripheral
     {

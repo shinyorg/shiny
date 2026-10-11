@@ -800,8 +800,7 @@ public static class CharacteristicExtensions
 ### Message Extensions (MessageExtensions)
 
 Messages longer than one GATT operation, framed with `BleMessageFraming`. The peripheral must speak the same format -
-a `Shiny.BluetoothLE.Hosting` `[RequestResponseCharacteristic(Framed = true)]`, or one using `NotifyMessage` and a
-`BleMessageReassembler`.
+a `Shiny.BluetoothLE.Hosting` service using `NotifyMessage` and a `BleMessageReassembler`.
 
 ```csharp
 public static class MessageExtensions
@@ -1506,7 +1505,7 @@ bleManager
    - Use `CanRequestMtu()` to check support, or `TryRequestMtu()` which gracefully falls back.
 
 9. **Framed messages never arrive**
-   - The peripheral must frame too (`[RequestResponseCharacteristic(Framed = true)]` or `NotifyMessage`). Against a plain characteristic `NotifyCharacteristicMessages` treats the first byte as a header and discards most messages.
+   - The peripheral must frame too (`NotifyMessage` and a `BleMessageReassembler`). Against a plain characteristic `NotifyCharacteristicMessages` treats the first byte as a header and discards most messages.
    - Subscribe with `NotifyCharacteristicMessages` *before* `WriteCharacteristicMessageAsync` when the reply is a notification.
    - A message larger than `maxMessageBytes` (default 64 KB) is dropped without an error - raise it.
 

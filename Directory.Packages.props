@@ -1,91 +1,91 @@
 ﻿<Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-        <MsftExtensionVersion>10.0.7</MsftExtensionVersion>
-        <MauiLabsVersion>0.1.0-preview.12.26368.2</MauiLabsVersion>
-        <MauiVersion>10.0.100</MauiVersion>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Shiny.Maui.Shell" Version="7.0.0"/>
-        <PackageVersion Include="Shiny.Maui.Controls" Version="1.3.0"/>
-        <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="5.2.1"/>
-        <PackageVersion Include="Shiny.Extensions.Stores" Version="6.0.0-beta.2"/>
-        <PackageVersion Include="Shiny.Extensions.Serialization" Version="6.0.0-beta.2"/>
-        <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
-        <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS" Version="$(MauiLabsVersion)"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.MacOS.Essentials" Version="$(MauiLabsVersion)"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4" Version="$(MauiLabsVersion)"/>
-        <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials" Version="$(MauiLabsVersion)"/>
-        <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="$(MauiLabsVersion)"/>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.10.91"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0"/>
-        <PackageVersion Include="PolySharp" Version="1.15.0"/>
-        <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.11.4"/>
-        <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
-        <PackageVersion Include="System.Reactive" Version="7.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.8.1"/>
-        <PackageVersion Include="Microsoft.Extensions.AI" Version="10.8.1"/>
-        <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.1"/>
-        <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.8.0"/>
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.2.0"/>
-        <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.7"/>
-        <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1"/>
-        <PackageVersion Include="SkiaSharp" Version="4.151.1"/>
-        <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1"/>
-        <PackageVersion Include="System.Drawing.Common" Version="10.0.0"/>
-        <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="13.1.2"/>
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1"/>
-        <PackageVersion Include="xunit" Version="2.9.3"/>
-        <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
-        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Scalar.AspNetCore" Version="2.17.3"/>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.19.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime.Android" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx.Android" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModel" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModel.Ktx" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.11.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Fragment" Version="1.8.9.3"/>
-        <PackageVersion Include="Xamarin.AndroidX.Fragment.Ktx" Version="1.8.9.4"/>
-        <PackageVersion Include="Xamarin.AndroidX.Activity" Version="1.13.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.Activity.Ktx" Version="1.13.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.SavedState" Version="1.5.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.SavedState.SavedState.Ktx" Version="1.5.0.1"/>
-        <PackageVersion Include="Xamarin.AndroidX.AppCompat" Version="1.7.1.4"/>
-        <PackageVersion Include="Xamarin.GooglePlayServices.Location" Version="121.3.0.9"/>
-        <PackageVersion Include="Xamarin.GooglePlayServices.Wearable" Version="120.0.1.1"/>
-        <!-- 121.0.0.4 (not 122.x): 122 pulls Play Services Base 118.11 -> AndroidX.Fragment 1.9, above the pins here -->
-        <PackageVersion Include="Xamarin.GooglePlayServices.Games.V2" Version="121.0.0.4"/>
-        <PackageVersion Include="Xamarin.AndroidX.Preference" Version="1.2.1.18"/>
-        <PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.0.1.2"/>
-        <PackageVersion Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1"/>
-        <!-- 9.1.0 (not .2): later binding revisions need AndroidX.Fragment 1.9 / Play Services Location 121.4, above the pins here -->
-        <PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="9.1.0"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <MsftExtensionVersion>10.0.7</MsftExtensionVersion>
+    <MauiLabsVersion>0.1.0-preview.12.26368.2</MauiLabsVersion>
+    <MauiVersion>10.0.100</MauiVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageVersion Include="Shiny.Maui.Shell" Version="7.0.3" />
+    <PackageVersion Include="Shiny.Maui.Controls" Version="1.6.0" />
+    <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="5.2.1" />
+    <PackageVersion Include="Shiny.Extensions.Stores" Version="6.0.0-beta.2" />
+    <PackageVersion Include="Shiny.Extensions.Serialization" Version="6.0.0-beta.2" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Maui.Platforms.MacOS" Version="$(MauiLabsVersion)" />
+    <PackageVersion Include="Microsoft.Maui.Platforms.MacOS.Essentials" Version="$(MauiLabsVersion)" />
+    <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4" Version="$(MauiLabsVersion)" />
+    <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials" Version="$(MauiLabsVersion)" />
+    <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="$(MauiLabsVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.10.91" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="PolySharp" Version="1.15.0" />
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.10.1" />
+    <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1" />
+    <PackageVersion Include="System.Reactive" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.8.1" />
+    <PackageVersion Include="Microsoft.Extensions.AI" Version="10.8.1" />
+    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.1" />
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.8.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.2.0" />
+    <PackageVersion Include="Microsoft.JSInterop" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.7" />
+    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1" />
+    <PackageVersion Include="SkiaSharp" Version="4.151.1" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1" />
+    <PackageVersion Include="System.Drawing.Common" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="14.1.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MsftExtensionVersion)" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.17.14" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.19.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime.Android" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx.Android" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModel" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModel.Ktx" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.11.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Fragment" Version="1.8.9.3" />
+    <PackageVersion Include="Xamarin.AndroidX.Fragment.Ktx" Version="1.8.9.4" />
+    <PackageVersion Include="Xamarin.AndroidX.Activity" Version="1.13.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Activity.Ktx" Version="1.13.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.SavedState" Version="1.5.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.SavedState.SavedState.Ktx" Version="1.5.0.1" />
+    <PackageVersion Include="Xamarin.AndroidX.AppCompat" Version="1.7.1.4" />
+    <PackageVersion Include="Xamarin.GooglePlayServices.Location" Version="121.3.0.9" />
+    <PackageVersion Include="Xamarin.GooglePlayServices.Wearable" Version="120.0.1.1" />
+    <!-- 121.0.0.4 (not 122.x): 122 pulls Play Services Base 118.11 -> AndroidX.Fragment 1.9, above the pins here -->
+    <PackageVersion Include="Xamarin.GooglePlayServices.Games.V2" Version="121.0.0.4" />
+    <PackageVersion Include="Xamarin.AndroidX.Preference" Version="1.2.1.18" />
+    <PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.0.1.2" />
+    <PackageVersion Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1" />
+    <!-- 9.1.0 (not .2): later binding revisions need AndroidX.Fragment 1.9 / Play Services Location 121.4, above the pins here -->
+    <PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="9.1.0" />
+  </ItemGroup>
 </Project>
