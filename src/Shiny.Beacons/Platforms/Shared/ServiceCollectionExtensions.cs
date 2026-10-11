@@ -143,11 +143,14 @@ public static class BeaconServiceCollectionExtensions
 #if APPLE || ANDROID || WINDOWS
         services.AddBluetoothLE();
 #else
-        // The base target has no BLE implementation of its own - a Linux or plain .NET host brings
+        // Blazor WebAssembly gets Web Bluetooth from Shiny.BluetoothLE itself
+        services.AddBluetoothLE();
+
+        // Anywhere else the base target has no BLE implementation of its own - a Linux or plain .NET host brings
         // one (Shiny.BluetoothLE.Linux) and registers it. Say so now rather than failing later with
         // an unresolved IBleManager from somewhere deep in a scan.
         if (!services.HasService<Shiny.BluetoothLE.IBleManager>())
-            throw new InvalidOperationException("No IBleManager is registered. Beacons need a BluetoothLE implementation - call AddBluetoothLE() from Shiny.BluetoothLE.Linux (or your host's equivalent) before registering beacon services.");
+            throw new InvalidOperationException("No IBleManager is registered. Beacons need a BluetoothLE implementation - call AddLinuxBluetoothLE() from Shiny.BluetoothLE.Linux on Linux (or your host's equivalent) before registering beacon services.");
 #endif
     }
 }

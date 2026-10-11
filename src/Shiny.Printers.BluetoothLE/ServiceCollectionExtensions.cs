@@ -13,7 +13,7 @@ public static class BlePrintersServiceCollectionExtensions
     /// <c>AddBluetoothLE&lt;TDelegate&gt;()</c> yourself as well is fine.
     /// </summary>
     /// <remarks>
-    /// On Linux (or any plain .NET host) register <c>AddBluetoothLE()</c> from <c>Shiny.BluetoothLE.Linux</c>
+    /// On Linux (or any plain .NET host) register <c>AddLinuxBluetoothLE()</c> from <c>Shiny.BluetoothLE.Linux</c>
     /// <b>before</b> calling this.
     /// </remarks>
     public static IServiceCollection AddBluetoothLePrinting(this IServiceCollection services)
@@ -21,10 +21,13 @@ public static class BlePrintersServiceCollectionExtensions
 #if APPLE || ANDROID || WINDOWS
         services.AddBluetoothLE();
 #else
-        // The base target has no BLE implementation of its own. Say so now rather than failing later
+        // Blazor WebAssembly gets Web Bluetooth from Shiny.BluetoothLE itself
+        services.AddBluetoothLE();
+
+        // Anywhere else the base target has no BLE implementation of its own. Say so now rather than failing later
         // with an unresolved IBleManager from somewhere deep in a scan.
         if (!services.HasService<Shiny.BluetoothLE.IBleManager>())
-            throw new InvalidOperationException("No IBleManager is registered. BLE printing needs a BluetoothLE implementation - call AddBluetoothLE() from Shiny.BluetoothLE.Linux (or your host's equivalent) before AddBluetoothLePrinting().");
+            throw new InvalidOperationException("No IBleManager is registered. BLE printing needs a BluetoothLE implementation - call AddLinuxBluetoothLE() from Shiny.BluetoothLE.Linux on Linux (or your host's equivalent) before AddBluetoothLePrinting().");
 #endif
         services.TryAddSingleton<IPrinterScanner, BlePrinterScanner>();
         services.TryAddSingleton<BlePrinterManager>();

@@ -20,7 +20,7 @@ namespace Shiny.BluetoothLE;
 /// <item>
 /// A GATT service is only reachable if its UUID was declared when the device was chosen (as a scan
 /// filter or in <c>optionalServices</c>). Web Bluetooth has no post-hoc "discover everything", so
-/// <see cref="GetServices"/> returns only what was declared - see <see cref="BleManager.Scan"/>.
+/// <see cref="GetServices"/> returns only what was declared - see <see cref="BrowserBleManager.Scan"/>.
 /// </item>
 /// <item>
 /// <see cref="ReadRssi"/> and <see cref="WhenServicesChanged"/> have no Web Bluetooth equivalent and
@@ -28,7 +28,7 @@ namespace Shiny.BluetoothLE;
 /// </item>
 /// </list>
 /// </remarks>
-public class Peripheral : IPeripheral, IAsyncDisposable
+public class BrowserPeripheral : IPeripheral, IAsyncDisposable
 {
     readonly Func<Task<IJSObjectReference>> getModule;
     readonly BehaviorSubject<ConnectionState> status = new(ConnectionState.Disconnected);
@@ -38,7 +38,7 @@ public class Peripheral : IPeripheral, IAsyncDisposable
     readonly IDisposable disconnectSub;
 
 
-    public Peripheral(Func<Task<IJSObjectReference>> moduleAccessor, string uuid, string? name)
+    public BrowserPeripheral(Func<Task<IJSObjectReference>> moduleAccessor, string uuid, string? name)
     {
         this.getModule = moduleAccessor ?? throw new ArgumentNullException(nameof(moduleAccessor));
         this.Uuid = uuid;

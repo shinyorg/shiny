@@ -19,10 +19,10 @@ public static class MauiProgram
         // Linux-specific registrations — the cross-platform Shiny packages do not
         // expose these on plain net10.0, so the .Linux packages wire them here.
         var s = builder.Services;
-        s.AddBluetoothLE();
+        s.AddLinuxBluetoothLE();
         s.AddBluetoothLeHosting();
 
-        // after AddBluetoothLE - BLE printing needs an IBleManager already registered on Linux
+        // after AddLinuxBluetoothLE - BLE printing needs an IBleManager already registered on Linux
         s.AddBluetoothLePrinting();
         s.AddNotifications<SampleNotificationDelegate>();
         s.AddBattery();
@@ -30,6 +30,10 @@ public static class MauiProgram
         
         s.AddDefaultRepository();
         s.AddHttpClientTransfers<SampleHttpTransferDelegate>();
+
+        // Screen recording through the xdg-desktop-portal ScreenCast API, encoded by gst-launch or
+        // ffmpeg. The compositor runs its own picker, so the sample page hides its target list here.
+        s.AddLinuxScreenRecorder();
 
         return builder.Build();
     }

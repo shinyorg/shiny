@@ -24,6 +24,7 @@
         <Project Path="tests/Shiny.Wearables.Tests/Shiny.Wearables.Tests.csproj" />
         <Project Path="tests/Shiny.ScreenRecorder.Tests/Shiny.ScreenRecorder.Tests.csproj" />
         <Project Path="tests/Shiny.Gamepad.Tests/Shiny.Gamepad.Tests.csproj" />
+        <Project Path="tests/Shiny.AppStore.Tests/Shiny.AppStore.Tests.csproj" />
         <Project Path="tests/Shiny.GameCenter.Tests/Shiny.GameCenter.Tests.csproj" />
         <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
         <Project Path="tests/Shiny.Notifications.Tests/Shiny.Notifications.Tests.csproj" />
@@ -93,7 +94,9 @@
     <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
     <Project Path="src\Shiny.Push\Shiny.Push.csproj" />
     <Project Path="src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
+    <Project Path="src\Shiny.ScreenRecorder.Linux\Shiny.ScreenRecorder.Linux.csproj" />
     <Project Path="src\Shiny.Gamepad\Shiny.Gamepad.csproj" />
+    <Project Path="src\Shiny.AppStore\Shiny.AppStore.csproj" />
     <Project Path="src\Shiny.GameCenter\Shiny.GameCenter.csproj" />
     <Project Path="src\Shiny.Wearables\Shiny.Wearables.csproj" />
     <Project Path="src\Shiny.Printers\Shiny.Printers.csproj" />
@@ -104,7 +107,6 @@
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
         <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />
-        <Project Path="src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
         <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
         <Project Path="src/Shiny.Data.Sync.Blazor/Shiny.Data.Sync.Blazor.csproj" />
     </Folder>

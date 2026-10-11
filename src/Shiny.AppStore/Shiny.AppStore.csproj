@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.AppStore</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>true</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <Description>Shiny App Store - check the store for a newer version of the running app, deep-link to its store page and review page, and request the native in-app review prompt on the Apple App Store and Mac App Store, Google Play, the Microsoft Store and Linux Flatpak/Snap</Description>
+
+        <!-- imported explicitly below so Platforms\Apple can also be compiled into the macOS target -->
+        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!-- the Google Play in-app review flow -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Xamarin.Google.Android.Play.Review" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AppStore.Tests" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
+
+    <!--
+        The iTunes lookup and StoreKit review prompt are shared by iOS, Mac Catalyst and macOS - only the
+        lookup entity, the deep-link scheme and how the prompt is anchored differ, and those are #if MACOS.
+        Directory.Build.targets only routes Platforms\Apple to ios/maccatalyst/tvos.
+    -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">
+        <Compile Include="Platforms\Apple\**\*.cs" />
+    </ItemGroup>
+
+</Project>

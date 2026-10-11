@@ -11,7 +11,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Blazor\Shiny.BluetoothLE.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Http.Blazor\Shiny.Net.Http.Blazor.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Gps\Shiny.Gps.csproj" />

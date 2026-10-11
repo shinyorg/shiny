@@ -97,7 +97,8 @@ Do NOT use this skill for BLE hosting/peripheral mode (advertising, GATT server)
 
 ## Library Overview
 
-- **NuGet Package**: `Shiny.BluetoothLE` (Android, iOS/tvOS/macOS, Windows), `Shiny.BluetoothLE.Linux` (Linux via BlueZ), `Shiny.BluetoothLE.Blazor` (Blazor WebAssembly via Web Bluetooth API)
+- **NuGet Package**: `Shiny.BluetoothLE` (Android, iOS/tvOS/macOS, Windows, and Blazor WebAssembly via the Web Bluetooth API - `Shiny.BluetoothLE.Blazor` no longer exists), `Shiny.BluetoothLE.Linux` (Linux via BlueZ - a separate package so its D-Bus dependency never reaches WebAssembly)
+- **Registration**: `services.AddBluetoothLE()` everywhere except Linux, where it is `services.AddLinuxBluetoothLE()` from `Shiny.BluetoothLE.Linux`. The Web Bluetooth classes are `BrowserBleManager` / `BrowserPeripheral` / `BrowserAdvertisementData`
 - **Primary Namespace**: `Shiny.BluetoothLE`
 - **Managed Scan Namespace**: `Shiny.BluetoothLE.Managed`
 - **Platforms**: Android, iOS/tvOS/macOS (Apple), Windows, Linux (BlueZ), WebAssembly (Web Bluetooth)

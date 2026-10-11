@@ -34,6 +34,8 @@ triggers:
   - GetScreenRecordingStopIntent
   - screen recording notification
   - AddScreenRecorder
+  - AddLinuxScreenRecorder
+  - Shiny.ScreenRecorder.Linux
   - Shiny.ScreenRecorder
   - ReplayKit
   - RPScreenRecorder
@@ -150,7 +152,7 @@ recording that silently came out without the microphone is worse than one that r
 | Item      | Value |
 |-----------|-------|
 | GitHub    | https://github.com/shinyorg/shiny |
-| NuGet     | `Shiny.ScreenRecorder` - one package everywhere; its `net10.0` build holds the Linux and Blazor WebAssembly recorders (`Shiny.ScreenRecorder.Linux` / `.Blazor` no longer exist) |
+| NuGet     | `Shiny.ScreenRecorder` (its `net10.0` build holds the Blazor WebAssembly recorder - `Shiny.ScreenRecorder.Blazor` no longer exists), plus `Shiny.ScreenRecorder.Linux` on Linux |
 | Namespace | `Shiny.ScreenRecorder` (types); `Shiny` (registration extensions) |
 | Platforms | Android, iOS, Mac Catalyst, macOS, Windows, Linux, Blazor WebAssembly |
 
@@ -178,13 +180,13 @@ app audio at all forces the whole pipeline down.
 builder.Services.AddScreenRecorder();     // IScreenRecorder, singleton
 ```
 
-Same call and same package on every platform. On `net10.0`, `AddScreenRecorder()` picks the
-browser recorder with `OperatingSystem.IsBrowser()`, the desktop-portal recorder with
-`OperatingSystem.IsLinux()`, and the not-supported recorder anywhere else.
+Same call everywhere except Linux. On `net10.0`, `AddScreenRecorder()` registers the browser recorder
+behind `OperatingSystem.IsBrowser()` and the not-supported recorder anywhere else. **On Linux, reference
+`Shiny.ScreenRecorder.Linux` and call `builder.Services.AddLinuxScreenRecorder()` instead** - it is a separate
+package so its `Tmds.DBus.Protocol` dependency never reaches a WebAssembly app.
 
-On a plain .NET host - a server, console or test project with no screen - call
-`AddNotSupportedScreenRecorder()` to force the recorder that reports
-`ScreenRecorderCapabilities.None` (on Linux, `AddScreenRecorder()` would otherwise use the portal).
+On a plain .NET host - a server, console or test project with no screen - `AddScreenRecorder()` (or
+`AddNotSupportedScreenRecorder()`) registers the recorder that reports `ScreenRecorderCapabilities.None`.
 
 ### Platform setup
 

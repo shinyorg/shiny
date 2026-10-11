@@ -31,8 +31,9 @@ public static class ScreenRecorderServiceCollectionExtensions
     /// <para>Windows: needs Windows 10 1903 or later. Packaged apps declare the
     /// <c>graphicsCapture</c> capability. There is no audio - see
     /// <see cref="ScreenRecorderCapabilities"/>.</para>
-    /// <para>Linux and Blazor WebAssembly are covered by this package's plain .NET build - see the
-    /// <c>AddScreenRecorder</c> documented there.</para>
+    /// <para>Blazor WebAssembly is covered by this package's plain .NET build - see the
+    /// <c>AddScreenRecorder</c> documented there. Linux: reference <c>Shiny.ScreenRecorder.Linux</c> and
+    /// call <c>AddLinuxScreenRecorder()</c>.</para>
     /// </remarks>
     public static IServiceCollection AddScreenRecorder(this IServiceCollection services)
     {
@@ -60,10 +61,11 @@ public static class ScreenRecorderServiceCollectionExtensions
 #else
 
     /// <summary>
-    /// Registers <see cref="IScreenRecorder"/>, choosing the backend at runtime: <c>getDisplayMedia</c>
-    /// and <c>MediaRecorder</c> on Blazor WebAssembly, the xdg-desktop-portal ScreenCast API with an
-    /// external encoder on Linux, and <see cref="AddNotSupportedScreenRecorder"/> anywhere else
-    /// (plain .NET on Windows or macOS has no screen capture API).
+    /// Registers <see cref="IScreenRecorder"/>: <c>getDisplayMedia</c> and <c>MediaRecorder</c> on Blazor
+    /// WebAssembly (an <c>OperatingSystem.IsBrowser()</c> check), and
+    /// <see cref="AddNotSupportedScreenRecorder"/> anywhere else. On Linux, reference
+    /// <c>Shiny.ScreenRecorder.Linux</c> and call <c>AddLinuxScreenRecorder()</c> instead - it is a separate
+    /// package so its D-Bus dependency never reaches a WebAssembly app.
     /// </summary>
     /// <remarks>
     /// <para><b>Blazor WebAssembly:</b> the page must be served over HTTPS (or from localhost), and
@@ -74,15 +76,6 @@ public static class ScreenRecorderServiceCollectionExtensions
     /// until it has run, <see cref="IScreenRecorder.Capabilities"/> reports
     /// <see cref="ScreenRecorderCapabilities.None"/> because feature detection needs a JS round trip
     /// that a synchronous property cannot make.</para>
-    /// <para><b>Linux:</b> needs a desktop session with a running <c>xdg-desktop-portal</c>
-    /// implementing ScreenCast - GNOME, KDE Plasma and the wlroots portal all do - plus either
-    /// <c>gst-launch-1.0</c> with the good and bad plugin sets (<c>gstreamer1.0-tools
-    /// gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-pipewire</c>, Wayland and X11)
-    /// or <c>ffmpeg</c> (X11 only, whole display, no picker). Audio needs a reachable PulseAudio or
-    /// PipeWire-Pulse server and the <c>pactl</c> tool. Flatpak-sandboxed hosts are not supported.
-    /// Everything is probed at runtime: on a machine missing the pieces the registration still
-    /// succeeds and <see cref="IScreenRecorder.Capabilities"/> reports
-    /// <see cref="ScreenRecorderCapabilities.None"/>.</para>
     /// </remarks>
     public static IServiceCollection AddScreenRecorder(this IServiceCollection services)
     {
@@ -92,12 +85,6 @@ public static class ScreenRecorderServiceCollectionExtensions
             services.AddSingleton<IScreenRecorder>(sp => new BlazorScreenRecorder(
                 sp.GetRequiredService<IJSRuntime>(),
                 sp.GetRequiredService<ILogger<BlazorScreenRecorder>>()
-            ));
-        }
-        else if (OperatingSystem.IsLinux())
-        {
-            services.AddSingleton<IScreenRecorder>(sp => new LinuxScreenRecorder(
-                sp.GetRequiredService<ILogger<LinuxScreenRecorder>>()
             ));
         }
         else
@@ -114,8 +101,7 @@ public static class ScreenRecorderServiceCollectionExtensions
     /// </summary>
     /// <remarks>
     /// For server, console and test hosts that resolve <see cref="IScreenRecorder"/> from a shared
-    /// library but have no screen to record - including on Linux, where <c>AddScreenRecorder</c>
-    /// would use the desktop portal. Well-behaved code branches on
+    /// library but have no screen to record. Well-behaved code branches on
     /// <see cref="IScreenRecorder.Capabilities"/> and never reaches the throw.
     /// </remarks>
     public static IServiceCollection AddNotSupportedScreenRecorder(this IServiceCollection services)

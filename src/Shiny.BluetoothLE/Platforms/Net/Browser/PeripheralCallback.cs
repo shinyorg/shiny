@@ -6,7 +6,7 @@ namespace Shiny.BluetoothLE;
 
 
 /// <summary>
-/// The JS-invokable bridge for a single <see cref="Peripheral"/>: carries GATT notifications and
+/// The JS-invokable bridge for a single <see cref="BrowserPeripheral"/>: carries GATT notifications and
 /// disconnect events back from ble.js.
 /// </summary>
 public class PeripheralCallback : IDisposable

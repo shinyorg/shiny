@@ -4,7 +4,6 @@
     "projects": [
       "samples\\Sample.Blazor\\Sample.Blazor.csproj",
       "samples\\Sample.Shared.Maui\\Sample.Shared.Maui.csproj",
-      "src\\Shiny.BluetoothLE.Blazor\\Shiny.BluetoothLE.Blazor.csproj",
       "src\\Shiny.BluetoothLE.Common\\Shiny.BluetoothLE.Common.csproj",
       "src\\Shiny.BluetoothLE.Hosting.Linux\\Shiny.BluetoothLE.Hosting.Linux.csproj",
       "src\\Shiny.BluetoothLE.Hosting\\Shiny.BluetoothLE.Hosting.csproj",
@@ -29,7 +28,9 @@
       "src\\Shiny.Push.Blazor\\Shiny.Push.Blazor.csproj",
       "src\\Shiny.Push\\Shiny.Push.csproj",
       "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
+      "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
       "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
+      "src\\Shiny.AppStore\\Shiny.AppStore.csproj",
       "src\\Shiny.Printers\\Shiny.Printers.csproj",
       "src\\Shiny.Printers.BluetoothLE\\Shiny.Printers.BluetoothLE.csproj",
       "src\\Shiny.Printers.Network\\Shiny.Printers.Network.csproj",

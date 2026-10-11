@@ -9,6 +9,26 @@ triggers:
   - HostBuilder
   - IHost
   - IPlatform
+  - IAppStartupInstaller
+  - AddAppStartupInstaller
+  - AppStartupOptions
+  - AppStartupState
+  - LinuxStartupMode
+  - IStartupService
+  - run at startup
+  - launch at login
+  - login item
+  - autostart
+  - systemd unit
+  - DeviceIdiom
+  - CultureChanged
+  - TimeZoneChanged
+  - OpenAppSettings
+  - DeviceManufacturer
+  - DeviceModel
+  - AppVersion
+  - UserAgent
+  - UserAgentVersion
   - IKeyValueStore
   - IKeyValueStoreFactory
   - StoreKeys
@@ -180,7 +200,7 @@ There are **no** `Shiny.Core.Linux` or `Shiny.Core.Blazor` packages any more - `
 
 ### Blazor WebAssembly Setup
 
-For Blazor WASM, reference `Shiny.Core` (its JS modules are served from `_content/Shiny.Core/`) and call `AddConnectivity()` / `AddBattery()` to wire navigator-based monitoring. Both monitors load a JS module before they can report anything, so they self-start on the first property read or `Changed` subscription and report `Unknown` until that completes. **Always** call `await host.Services.UseShiny()` after `Build()` and before `RunAsync()` - it runs the Shiny host (every `IShinyStartupTask`, including the in-process job runner, which otherwise never starts) and then starts the monitors up front. Only Chromium-based browsers expose the Network Information and Battery Status APIs — elsewhere `ConnectionTypes` and `BatteryState` stay `Unknown` (`Access` still works, it is `navigator.onLine`). Storage requires `Shiny.Extensions.Stores.Web` and a call to `host.Services.UseShinyStores()` after `Build()` so the static `Shiny.Stores` accessor snapshots the `IJSRuntime`-backed `LocalStorageKeyValueStore`.
+For Blazor WASM, reference `Shiny.Core` (its JS modules are served from `_content/Shiny.Core/`), call `builder.Services.AddShinyCoreServices()` (namespace `Shiny.Infrastructure`) to register `IPlatform` (`NetPlatform`) - nothing else does on plain `net10.0` - and call `AddConnectivity()` / `AddBattery()` to wire navigator-based monitoring. `NetPlatform.UserAgent` / `UserAgentVersion` give the browser user agent and a best-effort parsed browser version (null outside a browser); inject `NetPlatform` for them. These, plus `IPlatform.AppVersion` / `CultureChanged` / `TimeZoneChanged`, replace the members removed from `Shiny.Extensions.BlazorHosting`'s `IAppSupport`, which now only has screen/viewport sizes. Both monitors load a JS module before they can report anything, so they self-start on the first property read or `Changed` subscription and report `Unknown` until that completes. **Always** call `await host.Services.UseShiny()` after `Build()` and before `RunAsync()` - it runs the Shiny host (every `IShinyStartupTask`, including the in-process job runner, which otherwise never starts) and then starts the monitors up front. Only Chromium-based browsers expose the Network Information and Battery Status APIs — elsewhere `ConnectionTypes` and `BatteryState` stay `Unknown` (`Access` still works, it is `navigator.onLine`). Storage requires `Shiny.Extensions.Stores.Web` and a call to `host.Services.UseShinyStores()` after `Build()` so the static `Shiny.Stores` accessor snapshots the `IJSRuntime`-backed `LocalStorageKeyValueStore`.
 
 ### Replacing IConnectivity / IBattery
 
@@ -206,11 +226,12 @@ When generating code that uses Shiny.Core, follow these conventions:
 6. **Implement `IAndroidLifecycle.*`, `IIosLifecycle.*`, or `IMacLifecycle.*` sub-interfaces** for platform-specific lifecycle hooks. Register them in DI and the lifecycle executor dispatches to them automatically.
 7. **Inject a keyed `IKeyValueStore` from `Shiny.Extensions.Stores`** via `[FromKeyedServices(StoreKeys.Default)] IKeyValueStore store` (or `StoreKeys.Secure`). The store factory is also available via `IKeyValueStoreFactory.Get(alias)`.
 8. **Use the static `Shiny.Stores.Default` / `Shiny.Stores.Secure` accessors** for one-off reads/writes outside DI contexts — the accessor self-bootstraps on first use after `AddShinyStores()` has run (call `host.Services.UseShinyStores()` after `Build()` on Blazor WASM).
-9. **Use `IPlatform`** to access `AppData`, `Cache`, `Public` directories and `InvokeOnMainThread()`.
-10. **Use `AccessState` enum** and `state.Assert()` extension method to validate permissions before proceeding with platform operations.
-11. **Use the `Changed` C# events on `IConnectivity` and `IBattery`** to react to network or battery state — these are no longer observable. Rx has been removed from `Shiny.Core` and `Shiny.Jobs`; only `Shiny.BluetoothLE` retains reactive streams. Subscribe with `+= handler` and unsubscribe in your `Dispose` / page-leave hook.
-12. **Use `IRepository`** for entity persistence, with entities implementing `IRepositoryEntity` (must have an `Identifier` property). The default implementation is a filesystem JSON store registered by `services.AddDefaultRepository()` and used internally by Locations, Notifications, and HTTP Transfers.
-13. **For Blazor WASM**, call `host.Services.UseShinyStores()` immediately after `builder.Build()` so the static `Shiny.Stores` accessor captures the DI-resolved `LocalStorageKeyValueStore` (it needs `IJSRuntime`).
+9. **Use `IPlatform`** to access `AppData`, `Cache`, `Public` directories and `InvokeOnMainThread()`, and for device/app info: `AppVersion`, `DeviceManufacturer`, `DeviceModel`, `PlatformVersion`, `Platform` (`Android`, `iOS`, `MacCatalyst`, `tvOS`, `macOS`, `Windows`, `Linux`, `Browser`), `DeviceIdiom` (`Shiny.DeviceIdiom` - never MAUI's `Microsoft.Maui.Devices.DeviceIdiom`; qualify it when both namespaces are imported), `CurrentCulture` / `CultureChanged`, `CurrentTimeZone` / `TimeZoneChanged` (native listeners start with the first subscriber; raised off the UI thread - marshal before touching UI) and `OpenAppSettings()`. These are implemented natively with no MAUI, and replace the members removed from `Shiny.Extensions.MauiHosting`'s `IAppSupport` - never generate them against `IAppSupport`.
+10. **Use `IAppStartupInstaller`** (register with `services.AddAppStartupInstaller(o => ...)`) to put the app in the OS launch-at-login list: `HKCU\...\Run` on unpackaged Windows, `SMAppService` login items on macOS 13+ / Mac Catalyst 16+, and on Linux an XDG autostart entry or a systemd unit chosen by `AppStartupOptions.LinuxMode` (`XdgAutostart`, `SystemdGraphicalSession`, `SystemdUser`, `SystemdSystem` - the last needs root). Check `IsSupported` before showing a toggle; `Register()` returns the state the OS settled on (`Enabled`, `DisabledByUser`, `DisabledByPolicy`, `RequiresApproval` on macOS) - bind UI to that or a fresh `GetState()`, never cache it, and call `OpenSettings()` when the user has to finish in the OS. Android/iOS/tvOS report `NotSupported`. It replaces `Shiny.Extensions.MauiHosting`'s `IStartupService` / `AddStartupService` - never generate those.
+11. **Use `AccessState` enum** and `state.Assert()` extension method to validate permissions before proceeding with platform operations.
+12. **Use the `Changed` C# events on `IConnectivity` and `IBattery`** to react to network or battery state — these are no longer observable. Rx has been removed from `Shiny.Core` and `Shiny.Jobs`; only `Shiny.BluetoothLE` retains reactive streams. Subscribe with `+= handler` and unsubscribe in your `Dispose` / page-leave hook.
+13. **Use `IRepository`** for entity persistence, with entities implementing `IRepositoryEntity` (must have an `Identifier` property). The default implementation is a filesystem JSON store registered by `services.AddDefaultRepository()` and used internally by Locations, Notifications, and HTTP Transfers.
+14. **For Blazor WASM**, call `host.Services.UseShinyStores()` immediately after `builder.Build()` so the static `Shiny.Stores` accessor captures the DI-resolved `LocalStorageKeyValueStore` (it needs `IJSRuntime`).
 
 ### Conventions
 

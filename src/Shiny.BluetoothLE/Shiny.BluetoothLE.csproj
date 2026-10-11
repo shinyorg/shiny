@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -9,12 +9,22 @@
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
         
-        <Description>Shiny Reactive BluetoothLE Plugin for client/central operations</Description>
+        <Description>Shiny Reactive BluetoothLE Plugin for client/central operations - iOS, tvOS, Mac Catalyst, macOS, Android, Windows and Blazor WebAssembly (Web Bluetooth). Linux is Shiny.BluetoothLE.Linux</Description>
     </PropertyGroup>
     
     <ItemGroup>
         <PackageReference Include="System.Reactive" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
+    </ItemGroup>
+
+    <!--
+        The base target framework is also the Blazor WebAssembly build - AddBluetoothLE() registers the
+        Web Bluetooth backend (Platforms\Net\Browser) behind an OperatingSystem.IsBrowser() check, which
+        imports wwwroot/ble.js (served from _content/Shiny.BluetoothLE/), hence the Razor SDK. Linux is the
+        separate Shiny.BluetoothLE.Linux package so its D-Bus dependency never reaches a WebAssembly app.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 </Project>

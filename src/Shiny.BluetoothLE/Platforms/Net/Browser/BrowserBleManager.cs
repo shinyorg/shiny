@@ -16,16 +16,16 @@ namespace Shiny.BluetoothLE;
 /// See <see cref="Scan"/> for the one behavioural difference from the native implementations: no
 /// shipping browser enables free-running BLE scanning by default, so a chooser is used instead.
 /// </remarks>
-public class BleManager(IJSRuntime jsRuntime) : IBleManager, IAsyncDisposable
+public class BrowserBleManager(IJSRuntime jsRuntime) : IBleManager, IAsyncDisposable
 {
     IJSObjectReference? jsModule;
-    readonly Dictionary<string, Peripheral> peripherals = new();
+    readonly Dictionary<string, BrowserPeripheral> peripherals = new();
 
 
     async Task<IJSObjectReference> GetModule()
     {
         this.jsModule ??= await jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.BluetoothLE.Blazor/ble.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.BluetoothLE/ble.js")
             .ConfigureAwait(false);
 
         return this.jsModule;
@@ -191,11 +191,11 @@ public class BleManager(IJSRuntime jsRuntime) : IBleManager, IAsyncDisposable
     {
         if (!this.peripherals.TryGetValue(result.DeviceId, out var peripheral))
         {
-            peripheral = new Peripheral(this.GetModule, result.DeviceId, result.DeviceName);
+            peripheral = new BrowserPeripheral(this.GetModule, result.DeviceId, result.DeviceName);
             this.peripherals[result.DeviceId] = peripheral;
         }
 
-        return new ScanResult(peripheral, result.Rssi, new AdvertisementData(result));
+        return new ScanResult(peripheral, result.Rssi, new BrowserAdvertisementData(result));
     }
 
 

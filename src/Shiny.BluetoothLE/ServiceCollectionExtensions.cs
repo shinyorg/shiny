@@ -64,5 +64,19 @@ public static class BleServiceCollectionExtensions
         return services.AddSingletonAsImplementedInterfaces<TCentralDelegate>();
     }
 #endif
+#else
+    /// <summary>
+    /// Registers the Blazor WebAssembly <see cref="IBleManager"/>, backed by the Web Bluetooth API. Does
+    /// nothing outside a browser - on Linux reference <c>Shiny.BluetoothLE.Linux</c> and call
+    /// <c>AddLinuxBluetoothLE()</c>, which is a separate package so its D-Bus dependency never reaches a
+    /// WebAssembly app.
+    /// </summary>
+    public static IServiceCollection AddBluetoothLE(this IServiceCollection services)
+    {
+        if (OperatingSystem.IsBrowser())
+            services.TryAddSingleton<IBleManager, BrowserBleManager>();
+
+        return services;
+    }
 #endif
 }

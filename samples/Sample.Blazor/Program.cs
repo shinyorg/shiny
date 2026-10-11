@@ -2,12 +2,16 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Sample.Blazor;
 using Shiny;
+using Shiny.Infrastructure;
 using Shiny.Push.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+// plain net10.0 has no hosting layer to do this - registers IPlatform (NetPlatform: device info,
+// user agent, culture/time zone) and the key/value stores
+builder.Services.AddShinyCoreServices();
 builder.Services.AddConnectivity();
 builder.Services.AddBattery();
 builder.Services.AddBluetoothLE();

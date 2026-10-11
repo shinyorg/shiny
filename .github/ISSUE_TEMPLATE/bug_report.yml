@@ -34,6 +34,7 @@ body:
         - Calendar (Shiny.Calendar)
         - Contacts (Shiny.Contacts)
         - AI Tooling (Shiny.*.Extensions.AI)
+        - App Store - version checks, store links, review prompt (Shiny.AppStore)
         - Other
     validations:
       required: true

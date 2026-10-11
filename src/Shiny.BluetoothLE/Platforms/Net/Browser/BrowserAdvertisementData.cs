@@ -4,7 +4,7 @@ using System.Linq;
 namespace Shiny.BluetoothLE;
 
 
-public class AdvertisementData(JsScanResult sr) : IAdvertisementData
+public class BrowserAdvertisementData(JsScanResult sr) : IAdvertisementData
 {
     public string? LocalName => sr.DeviceName;
     public bool? IsConnectable => null;

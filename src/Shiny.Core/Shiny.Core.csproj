@@ -33,6 +33,11 @@
         <InternalsVisibleTo Include="Shiny.Tests" />
     </ItemGroup>
 
+    <!-- WindowsPlatform's CultureChanged / TimeZoneChanged - UserPreferenceChanged(Locale) and TimeChanged -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+        <PackageReference Include="Microsoft.Win32.SystemEvents" />
+    </ItemGroup>
+
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
