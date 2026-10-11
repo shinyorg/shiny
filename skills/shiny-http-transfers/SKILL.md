@@ -15,6 +15,9 @@ triggers:
   - HttpTransferRequest
   - HttpTransferMonitor
   - Shiny.Net.Http
+  - AddBlazorHttpTransfers
+  - BrowserHttpTransferManager
+  - BlazorHttpTransferOptions
   - azure blob upload
   - aws s3 upload
   - s3 upload
@@ -74,7 +77,7 @@ Use this skill when the user needs to:
 
 | Item        | Value                                                                                   |
 |-------------|-----------------------------------------------------------------------------------------|
-| NuGet       | `Shiny.Net.Http`, `Shiny.Net.Http.Blazor`                                               |
+| NuGet       | `Shiny.Net.Http` (one package everywhere - its `net10.0` build includes Blazor WASM)    |
 | Namespace   | `Shiny.Net.Http`                                                                        |
 | Platforms   | iOS, tvOS (native NSURLSession); Android, Windows, Linux, macOS, .NET base (managed HttpClient loop); Blazor WASM (Service Worker) |
 | DI Setup    | `services.AddHttpTransfers<TDelegate>()` (iOS/tvOS/Android/Windows), `services.AddHttpClientTransfers<TDelegate>()` (Linux/macOS/plain .NET), or `services.AddBlazorHttpTransfers<TDelegate>()` (Blazor) |
@@ -151,24 +154,24 @@ The managed loop resolves its `HttpClient` from `IHttpClientFactory` using the n
 
 Cancelled downloads clean up any partial file on disk so a subsequent re-queue starts fresh.
 
-### Blazor WASM Setup (`Shiny.Net.Http.Blazor`)
+### Blazor WASM Setup (`Shiny.Net.Http`)
 
 ```csharp
 using Shiny;
 
 builder.Services.AddBlazorHttpTransfers<MyDelegate>(opts =>
 {
-    opts.ServiceWorkerPath = "./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js";
+    opts.ServiceWorkerPath = "./_content/Shiny.Net.Http/http-transfer-sw.js";
 });
 ```
 
-The Blazor package uses the Service Worker Background Sync API. Queued transfers are written to IndexedDB; the Service Worker's `sync` event handler drains the queue via `fetch()` and stores download bodies as `Blob`s back into IndexedDB. When the tab reopens, the C# `HttpTransferManager` reconciles results from IndexedDB and fires the `IHttpTransferDelegate` callbacks.
+`AddBlazorHttpTransfers` ships in `Shiny.Net.Http`'s `net10.0` build - never reference `Shiny.Net.Http.Blazor`, which was merged into `Shiny.Net.Http` in v6. It uses the Service Worker Background Sync API. Queued transfers are written to IndexedDB; the Service Worker's `sync` event handler drains the queue via `fetch()` and stores download bodies as `Blob`s back into IndexedDB. When the tab reopens, the C# `BrowserHttpTransferManager` reconciles results from IndexedDB and fires the `IHttpTransferDelegate` callbacks.
 
 Ship the bundled SW file or import its handlers from your own service worker:
 
 ```js
 // my-sw.js
-importScripts('./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js');
+importScripts('./_content/Shiny.Net.Http/http-transfer-sw.js');
 ```
 
 **Blazor limitations (v1)**:
@@ -177,7 +180,7 @@ importScripts('./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js');
 - **Pause/Resume is best-effort** — `Pause(identifier)` marks the IndexedDB entry `paused` so the SW drain skips it (it only processes `pending`/`error`), and `Resume(identifier)` re-queues it. An already in-flight SW `fetch()` cannot be aborted (no `AbortController` wiring), so it runs to completion; and because downloads aren't resumable, a resumed download restarts from zero. Pausing a not-yet-started (or retry-pending) transfer works cleanly.
 - **Upload bodies are base64-bridged through JS interop** and persisted as IndexedDB `Blob`s. Fine for small/medium files; very large uploads should wait for a future OPFS streaming path.
 - **Browser support for Background Sync is Chromium-only** (no Firefox, no Safari). On unsupported browsers queued transfers drain while the tab is foreground and then sit in IndexedDB until next visit.
-- **Retrieving completed downloads**: use `(manager as Shiny.Net.Http.Blazor.HttpTransferManager).GetDownloadBytes(identifier)` which reads the blob back out of IndexedDB as a `byte[]`.
+- **Retrieving completed downloads**: use `(manager as Shiny.Net.Http.BrowserHttpTransferManager).GetDownloadBytes(identifier)` which reads the blob back out of IndexedDB as a `byte[]`.
 
 **Do not confuse with `Shiny.Jobs` on Blazor** — Jobs only run while the tab is open because the WASM runtime cannot execute inside a Service Worker. HTTP transfers are the one exception because `fetch()` is pure JS that the SW can run on its own.
 

@@ -7,20 +7,24 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Shiny.Extensions.Stores;
 
-namespace Shiny.Push.Blazor;
+namespace Shiny.Push;
 
 
-public class PushManager(
+/// <summary>
+/// Blazor WebAssembly <see cref="IPushManager"/> backed by the Web Push API and a service worker.
+/// </summary>
+public class BrowserPushManager(
     IJSRuntime jsRuntime,
     WebPushOptions options,
     IServiceProvider services,
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
-    ILogger<PushManager> logger
+    ILogger<BrowserPushManager> logger
 ) : IPushManager, IAsyncDisposable
 {
     IJSObjectReference? module;
-    DotNetObjectReference<PushManager>? selfRef;
+    DotNetObjectReference<BrowserPushManager>? selfRef;
 
+    // keeps the key from when this lived in Shiny.Push.Blazor so existing subscriptions survive the move
     static string Key(string prop) => $"Shiny.Push.Blazor.PushManager.{prop}";
 
     public IPushTagSupport? Tags => null;
@@ -59,7 +63,7 @@ public class PushManager(
     async Task<IJSObjectReference> GetModule()
     {
         this.module ??= await jsRuntime
-            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Push.Blazor/push.js")
+            .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Push/push.js")
             .ConfigureAwait(false);
 
         return this.module;

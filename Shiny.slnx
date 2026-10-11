@@ -106,9 +106,6 @@
     <Project Path="src\Shiny.Printing.Rendering\Shiny.Printing.Rendering.csproj" />
     <Folder Name="/Blazor/">
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
-        <Project Path="src/Shiny.Push.Blazor/Shiny.Push.Blazor.csproj" />
-        <Project Path="src/Shiny.Net.Http.Blazor/Shiny.Net.Http.Blazor.csproj" />
-        <Project Path="src/Shiny.Data.Sync.Blazor/Shiny.Data.Sync.Blazor.csproj" />
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />

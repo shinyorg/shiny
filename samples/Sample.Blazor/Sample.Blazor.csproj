@@ -12,8 +12,8 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push.Blazor\Shiny.Push.Blazor.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Net.Http.Blazor\Shiny.Net.Http.Blazor.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Gps\Shiny.Gps.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />

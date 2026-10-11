@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
-namespace Shiny.Net.Http.Blazor;
+namespace Shiny.Net.Http;
 
 
 /// <summary>
@@ -16,18 +16,18 @@ namespace Shiny.Net.Http.Blazor;
 /// Background Sync API. Transfers continue running while the tab is closed
 /// (where the browser supports background sync).
 /// </summary>
-public class HttpTransferManager(
+public class BrowserHttpTransferManager(
     IJSRuntime jsRuntime,
     IServiceProvider services,
     BlazorHttpTransferOptions options,
-    ILogger<HttpTransferManager> logger
+    ILogger<BrowserHttpTransferManager> logger
 ) : IHttpTransferManager, IAsyncDisposable
 {
     public event EventHandler<int>? CountChanged;
     public event EventHandler<HttpTransferResult>? UpdateReceived;
 
     IJSObjectReference? module;
-    DotNetObjectReference<HttpTransferManager>? selfRef;
+    DotNetObjectReference<BrowserHttpTransferManager>? selfRef;
     bool initialized;
 
 
@@ -36,7 +36,7 @@ public class HttpTransferManager(
         if (this.module == null)
         {
             this.module = await jsRuntime
-                .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Net.Http.Blazor/http-transfer.js")
+                .InvokeAsync<IJSObjectReference>("import", "./_content/Shiny.Net.Http/http-transfer.js")
                 .ConfigureAwait(false);
         }
 

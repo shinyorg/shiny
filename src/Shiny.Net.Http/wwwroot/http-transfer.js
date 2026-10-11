@@ -1,4 +1,4 @@
-// Foreground JS interop module for Shiny.Net.Http.Blazor
+// Foreground JS interop module for Shiny.Net.Http
 // Backed by IndexedDB; relies on http-transfer-sw.js (registered by the host)
 // to drain the queue via the Background Sync API.
 

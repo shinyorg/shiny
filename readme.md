@@ -14,7 +14,7 @@ things like dependency injection & logging in a structured way to your code!
 
 ## Modules
 
-Every package ships under the same version. Platform-specific add-ons (`*.Linux`, `*.Blazor`) ship next to the packages below for the platforms that need them.
+Every package ships under the same version. Blazor WebAssembly support ships inside each package's `net10.0` build - there are no `*.Blazor` packages. Linux add-ons that talk to D-Bus (`*.Linux`) ship next to the packages below so that dependency never reaches a WebAssembly app.
 
 | Area | Modules | Packages |
 |------|---------|----------|

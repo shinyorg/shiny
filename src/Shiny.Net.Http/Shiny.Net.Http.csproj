@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -8,13 +8,22 @@
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
 
-        <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
+        <Description>Shiny addon for adding upload and download management to your app (with metrics!) - iOS, tvOS, Mac Catalyst, Android, Windows, Linux, macOS and Blazor WebAssembly (Service Worker Background Sync)</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Http"/>
         <PackageReference Include="Shiny.Extensions.Serialization"/>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj"/>
+    </ItemGroup>
+
+    <!--
+        The base target framework is also the Blazor WebAssembly build - AddBlazorHttpTransfers() registers the
+        Service Worker backend (Platforms\Net\Browser), which imports wwwroot/http-transfer.js and registers
+        wwwroot/http-transfer-sw.js (served from _content/Shiny.Net.Http/), hence the Razor SDK.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop"/>
     </ItemGroup>
 
     <!-- iOS only. ActivityKit is unavailable on Mac Catalyst and tvOS (the framework ships in those SDKs

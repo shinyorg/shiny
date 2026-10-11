@@ -1,4 +1,4 @@
-namespace Shiny.Push.Blazor;
+namespace Shiny.Push;
 
 
 public class WebPushOptions
@@ -12,5 +12,5 @@ public class WebPushOptions
     /// Path to the service worker file that handles push events. Defaults to the bundled Shiny push service worker.
     /// Override this if you embed Shiny push handling in your own service worker via importScripts().
     /// </summary>
-    public string ServiceWorkerPath { get; set; } = "./_content/Shiny.Push.Blazor/push-sw.js";
+    public string ServiceWorkerPath { get; set; } = "./_content/Shiny.Push/push-sw.js";
 }

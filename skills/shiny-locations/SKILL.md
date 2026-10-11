@@ -127,7 +127,7 @@ builder.Services.AddGps<MyGpsDelegate>();
 
 Geofencing (`AddGeofencing`) is **not** available on
 Blazor WebAssembly. For region-entry behavior on the web, evaluate regions
-server-side from GPS reports and notify the client via `Shiny.Push.Blazor`.
+server-side from GPS reports and notify the client via `Shiny.Push` (Web Push).
 
 ### Geofence Registration
 

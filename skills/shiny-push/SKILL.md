@@ -25,6 +25,10 @@ triggers:
   - PushAccessState
   - PushNotification
   - Shiny.Push
+  - web push
+  - WebPushOptions
+  - BrowserPushManager
+  - VAPID
   - shiny push
 ---
 
@@ -53,7 +57,7 @@ Use this skill when the user needs to:
 | **NuGet (Azure NH)** | `Shiny.Push.AzureNotificationHubs` |
 | **Primary Namespace** | `Shiny.Push` |
 | **Config Namespace** | `Shiny` (extension methods on `IServiceCollection`) |
-| **Platforms** | iOS (APNs), tvOS (APNs, silent/badge only), Android (FCM), Windows (WNS), WebAssembly (experimental) |
+| **Platforms** | iOS (APNs), tvOS (APNs, silent/badge only), Android (FCM), Windows (WNS), Blazor WebAssembly (Web Push / VAPID, in the same `Shiny.Push` package's `net10.0` build) |
 
 ### tvOS
 
@@ -92,6 +96,30 @@ builder.Services.AddPush<MyPushDelegate>(FirebaseConfig.FromValues(
 builder.Services.AddPush<MyPushDelegate>();
 #endif
 ```
+
+### Blazor WebAssembly (Web Push)
+
+There is no separate Blazor package - `Shiny.Push`'s `net10.0` build carries the Web Push backend (`BrowserPushManager`). Never reference `Shiny.Push.Blazor`; it was merged into `Shiny.Push` in v6.
+
+```csharp
+using Shiny;
+using Shiny.Push;
+
+builder.Services.AddShinyCoreServices();
+builder.Services.AddPush<MyPushDelegate>(new WebPushOptions
+{
+    VapidPublicKey = "<your VAPID public key>"
+    // ServiceWorkerPath defaults to "./_content/Shiny.Push/push-sw.js"
+});
+
+var host = builder.Build();
+await host.Services.UseShiny();
+await host.RunAsync();
+```
+
+- Requires HTTPS (or `localhost`), a VAPID key pair (send pushes from the backend with the private key), and the service worker. To use your own service worker, `importScripts('./_content/Shiny.Push/push-sw.js')` from it and point `ServiceWorkerPath` at yours.
+- Safari only allows subscribing from an installed PWA.
+- `Tags` is always `null` on the browser.
 
 ### Azure Notification Hubs
 

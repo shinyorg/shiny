@@ -1,7 +1,7 @@
 // Shiny HTTP Transfer Service Worker
 // This file can be used as a standalone service worker, or its handlers can be
 // imported into your own service worker via:
-//   importScripts('./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js');
+//   importScripts('./_content/Shiny.Net.Http/http-transfer-sw.js');
 //
 // It performs queued HTTP transfers via the Background Sync API while the
 // Blazor WASM tab is closed or suspended.

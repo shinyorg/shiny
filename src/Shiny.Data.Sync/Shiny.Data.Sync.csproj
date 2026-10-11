@@ -8,7 +8,7 @@
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
 
-        <Description>Shiny addon for reliable, background-capable bidirectional JSON data sync over HTTP</Description>
+        <Description>Shiny addon for reliable, background-capable bidirectional JSON data sync over HTTP - iOS, tvOS, Mac Catalyst, Android, Windows, Linux, macOS and Blazor WebAssembly</Description>
     </PropertyGroup>
 
     <ItemGroup>

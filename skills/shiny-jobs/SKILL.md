@@ -22,7 +22,7 @@ triggers:
 
 Shiny.Jobs provides cross-platform background job scheduling and execution. On iOS and Android it uses the native OS schedulers (`BGTaskScheduler` / AndroidX `WorkManager`); on Windows it uses COM-activated background tasks. On plain .NET targets (Linux, macOS server, Blazor WASM, console, etc.) it runs an in-process managed `JobManager` driven by a recurring timer — jobs run only while the host process is alive; there is no OS-level scheduler on those targets. All platforms support the same constraints (network availability, charging, battery).
 
-> **Blazor WASM caveat**: background jobs only run while the tab is open and foregrounded. Service Worker / Periodic Background Sync cannot invoke C# because the SW has no access to the Blazor WASM runtime. For true background HTTP work on Blazor, use `Shiny.Net.Http.Blazor`.
+> **Blazor WASM caveat**: background jobs only run while the tab is open and foregrounded. Service Worker / Periodic Background Sync cannot invoke C# because the SW has no access to the Blazor WASM runtime. For true background HTTP work on Blazor, use `Shiny.Net.Http` (`AddBlazorHttpTransfers`).
 
 ## When to Use This Skill
 
@@ -111,7 +111,7 @@ services.AddJob<MySyncJob>(r => r
 
 The in-process `JobManager` is an `IShinyStartupTask`, so the Shiny host must run: `UseShiny()` in a MAUI app (including Linux GTK and macOS), `await host.Services.UseShiny()` after `Build()` on Blazor WASM, or `host.Run()` from `HostBuilder` in a console/service app.
 
-**Blazor WASM caveat**: the in-process `JobManager` only runs while the tab is open. Background tabs are throttled (~1 min timer floor on Chromium), may be frozen after ~5 minutes, and iOS Safari kills background WASM aggressively. There is no way to run C# jobs via Service Worker Background Sync because the SW has no access to the WASM runtime. For background HTTP work specifically, use `Shiny.Net.Http.Blazor`.
+**Blazor WASM caveat**: the in-process `JobManager` only runs while the tab is open. Background tabs are throttled (~1 min timer floor on Chromium), may be frozen after ~5 minutes, and iOS Safari kills background WASM aggressively. There is no way to run C# jobs via Service Worker Background Sync because the SW has no access to the WASM runtime. For background HTTP work specifically, use `Shiny.Net.Http` (`AddBlazorHttpTransfers`).
 
 ## Code Generation Instructions
 

@@ -1,13 +1,13 @@
-namespace Shiny.Net.Http.Blazor;
+namespace Shiny.Net.Http;
 
 
 public class BlazorHttpTransferOptions
 {
     /// <summary>
     /// The URL of the Service Worker script that handles background HTTP transfers.
-    /// Defaults to the bundled <c>./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js</c>.
+    /// Defaults to the bundled <c>./_content/Shiny.Net.Http/http-transfer-sw.js</c>.
     /// If you serve your own service worker, point this at it (and importScripts the
     /// Shiny SW handlers from your own SW file).
     /// </summary>
-    public string ServiceWorkerPath { get; set; } = "./_content/Shiny.Net.Http.Blazor/http-transfer-sw.js";
+    public string ServiceWorkerPath { get; set; } = "./_content/Shiny.Net.Http/http-transfer-sw.js";
 }

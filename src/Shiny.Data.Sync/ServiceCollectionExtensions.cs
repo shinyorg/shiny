@@ -72,6 +72,39 @@ public static class DataSyncServiceCollectionExtensions
     }
 
 
+#if !PLATFORM
+    /// <summary>
+    /// Registers Shiny.Data.Sync for Blazor WebAssembly, persisting the outbox and inbox cursors
+    /// to localStorage and draining via in-process HttpClient driven by the connectivity loop.
+    ///
+    /// Note: this does NOT use Service Worker Background Sync - sync runs while the tab is open.
+    /// </summary>
+    public static IServiceCollection AddBlazorDataSync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(
+        this IServiceCollection services,
+        Action<ISyncEndpointBuilder> configure
+    )
+        where TDelegate : class, IDataSyncDelegate
+    {
+        services.AddBattery();
+        services.AddConnectivity();
+        services.AddLocalStorageRepository();
+
+        services.AddSingletonAsImplementedInterfaces<HttpClientDataSyncManager>();
+        services.AddSingleton<HttpClientDataSyncProcess>();
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+
+        var registry = new SyncEndpointRegistry();
+        configure(registry);
+        services.AddSingleton(registry);
+
+        services.AddHttpClient(RestSyncTransport.HttpClientName);
+        services.AddSingleton<ISyncTransport, RestSyncTransport>();
+        services.AddSingleton<SyncInboxProcessor>();
+        return services;
+    }
+#endif
+
+
     static void AddCore(IServiceCollection services, Action<ISyncEndpointBuilder> configure)
     {
         services.AddConnectivity();

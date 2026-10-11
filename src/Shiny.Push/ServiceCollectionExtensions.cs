@@ -40,6 +40,30 @@ public static class PushServiceCollectionExtensions
         return services.AddPush();
     }
 
+#if !PLATFORM
+    /// <summary>
+    /// Adds Web Push notification support to a Blazor WebAssembly PWA. Requires a VAPID public key.
+    /// </summary>
+    public static IServiceCollection AddPush(this IServiceCollection services, WebPushOptions options)
+    {
+        services.AddSingleton(options);
+        services.AddSingletonAsImplementedInterfaces<BrowserPushManager>();
+        services.AddLocalStorageKeyValueStore();
+        return services;
+    }
+
+
+    /// <summary>
+    /// Adds Web Push notification support to a Blazor WebAssembly PWA with a custom <see cref="IPushDelegate"/>.
+    /// </summary>
+    public static IServiceCollection AddPush<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, WebPushOptions options)
+        where TDelegate : class, IPushDelegate
+    {
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+        return services.AddPush(options);
+    }
+#endif
+
 #if ANDROID
 
     /// <summary>

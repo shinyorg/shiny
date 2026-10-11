@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -9,11 +9,20 @@
         <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
         
-        <Description>Shiny addon for all your push notification needs</Description>
+        <Description>Shiny addon for all your push notification needs - iOS, tvOS, Mac Catalyst, macOS, Android, Windows and Blazor WebAssembly (Web Push)</Description>
     </PropertyGroup>
 
     <ItemGroup>
-<ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!--
+        The base target framework is also the Blazor WebAssembly build - AddPush(WebPushOptions) registers the
+        Web Push backend (Platforms\Net\Browser), which imports wwwroot/push.js and registers
+        wwwroot/push-sw.js (served from _content/Shiny.Push/), hence the Razor SDK.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">

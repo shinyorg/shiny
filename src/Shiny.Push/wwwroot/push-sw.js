@@ -1,7 +1,7 @@
 // Shiny Push Service Worker
 // This file can be used as a standalone service worker, or its handlers can be
 // imported into your own service worker via:
-//   importScripts('./_content/Shiny.Push.Blazor/push-sw.js');
+//   importScripts('./_content/Shiny.Push/push-sw.js');
 
 self.addEventListener('push', event => {
     let payload = {};

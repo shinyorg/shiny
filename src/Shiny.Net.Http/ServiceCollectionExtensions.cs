@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Hosting;
@@ -59,6 +60,37 @@ public static class HttpTransferServiceCollectionExtensions
         AddCore(services);
         return services;
     }
+
+
+#if !PLATFORM
+    /// <summary>
+    /// Registers the Blazor WebAssembly HTTP transfer manager backed by the Service Worker
+    /// Background Sync API and IndexedDB. Transfers continue to drain in the
+    /// background while the tab is closed (where supported by the browser).
+    ///
+    /// Your app must serve the Shiny SW script (or import its handlers from your own
+    /// service worker). The default path is
+    /// <c>./_content/Shiny.Net.Http/http-transfer-sw.js</c>.
+    /// </summary>
+    public static IServiceCollection AddBlazorHttpTransfers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(
+        this IServiceCollection services,
+        Action<BlazorHttpTransferOptions>? configure = null
+    )
+        where TDelegate : class, IHttpTransferDelegate
+    {
+        var options = new BlazorHttpTransferOptions();
+        configure?.Invoke(options);
+
+        services.AddBattery();
+        services.AddConnectivity();
+        services.AddLocalStorageRepository();
+
+        services.AddSingleton(options);
+        services.AddSingletonAsImplementedInterfaces<BrowserHttpTransferManager>();
+        services.AddSingletonAsImplementedInterfaces<TDelegate>();
+        return services;
+    }
+#endif
 
 
     static void AddCore(IServiceCollection services)

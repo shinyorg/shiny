@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Sample.Blazor;
 using Shiny;
 using Shiny.Infrastructure;
-using Shiny.Push.Blazor;
+using Shiny.Push;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
