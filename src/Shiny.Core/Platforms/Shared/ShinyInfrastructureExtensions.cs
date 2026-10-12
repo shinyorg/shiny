@@ -69,7 +69,7 @@ public static class ShinyInfrastructureExtensions
         if (OperatingSystem.IsBrowser())
             services.AddSingletonAsImplementedInterfaces<BrowserScreenInfo>();
         else
-            services.AddSingletonAsImplementedInterfaces<IScreenInfo, NetScreenInfo>();
+            services.AddSingletonAsImplementedInterfaces<NetScreenInfo>();
 #endif
         return services;
     }
