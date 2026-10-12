@@ -13,7 +13,7 @@ public static class NetHostingExtensions
     /// <summary>
     /// Starts the Shiny host over an already-built container - running every registered
     /// <see cref="IShinyStartupTask"/>, such as the in-process job runner - then, on Blazor
-    /// WebAssembly, starts whichever browser connectivity/battery monitors have been registered so
+    /// WebAssembly, starts the screen info and whichever browser connectivity/battery monitors have been registered so
     /// they report real values from the first read rather than after their JS module has loaded.
     /// </summary>
     /// <remarks>
@@ -33,6 +33,10 @@ public static class NetHostingExtensions
         var battery = services.GetService<BatteryManager>();
         if (battery != null)
             await battery.StartAsync().ConfigureAwait(false);
+
+        var screen = services.GetService<BrowserScreenInfo>();
+        if (screen != null)
+            await screen.StartAsync().ConfigureAwait(false);
     }
 
 

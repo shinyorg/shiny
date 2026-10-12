@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 #if PLATFORM
 using Microsoft.Extensions.Logging;
@@ -29,10 +30,8 @@ public static class ShinyInfrastructureExtensions
         services.AddShinyStores();
 
 #if ANDROID
-        services.AddSingleton<AndroidPlatform>();
-        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<AndroidPlatform>());
-        services.AddSingleton<IAndroidLifecycle.IOnActivityRequestPermissionsResult>(sp => sp.GetRequiredService<AndroidPlatform>());
-        services.AddSingleton<IAndroidLifecycle.IOnActivityResult>(sp => sp.GetRequiredService<AndroidPlatform>());
+        services.AddSingletonAsImplementedInterfaces<AndroidPlatform>();
+        services.AddSingleton<IScreenInfo, AndroidScreenInfo>();
 
         // built explicitly - AndroidLifecycleExecutor is a Java.Lang.Object, so it must expose the
         // (IntPtr, JniHandleOwnership) JNI constructor.  Containers that pick a constructor by
@@ -49,26 +48,28 @@ public static class ShinyInfrastructureExtensions
         ));
         services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<AndroidLifecycleExecutor>());
 #elif IOS || MACCATALYST || TVOS
-        services.AddSingleton<IosPlatform>();
-        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<IosPlatform>());
+        services.AddSingletonAsImplementedInterfaces<IosPlatform>();
+        services.AddSingleton<IScreenInfo, IosScreenInfo>();
 
-        services.AddSingleton<IosLifecycleExecutor>();
-        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<IosLifecycleExecutor>());
+        services.AddSingletonAsImplementedInterfaces<IosLifecycleExecutor>();
 #elif MACOS
-        services.AddSingleton<MacPlatform>();
-        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<MacPlatform>());
+        services.AddSingletonAsImplementedInterfaces<MacPlatform>();
+        services.AddSingleton<IScreenInfo, MacScreenInfo>();
 
-        services.AddSingleton<MacLifecycleExecutor>();
-        services.AddSingleton<IShinyStartupTask>(sp => sp.GetRequiredService<MacLifecycleExecutor>());
+        services.AddSingletonAsImplementedInterfaces<MacLifecycleExecutor>();
 #elif WINDOWS
-        services.AddSingleton<WindowsPlatform>();
-        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<WindowsPlatform>());
+        services.AddSingletonAsImplementedInterfaces<WindowsPlatform>();
+        services.AddSingleton<IScreenInfo, WindowsScreenInfo>();
 #else
         // A host that is just .NET - a GTK desktop app on Linux, a console app, a service. No
         // lifecycle executor, because there is no platform lifecycle to execute: nothing here gets
         // told the app went to the background, so nothing pretends to.
-        services.AddSingleton<NetPlatform>();
-        services.AddSingleton<IPlatform>(sp => sp.GetRequiredService<NetPlatform>());
+        services.AddSingletonAsImplementedInterfaces<NetPlatform>();
+
+        if (OperatingSystem.IsBrowser())
+            services.AddSingletonAsImplementedInterfaces<BrowserScreenInfo>();
+        else
+            services.AddSingletonAsImplementedInterfaces<IScreenInfo, NetScreenInfo>();
 #endif
         return services;
     }
