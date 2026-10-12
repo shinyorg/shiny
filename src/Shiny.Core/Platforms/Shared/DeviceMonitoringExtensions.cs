@@ -10,12 +10,21 @@ namespace Shiny;
 
 public static class DeviceMonitoringExtensions
 {
+// Every target returns IServiceCollection: a package compiled only for net10.0 (Shiny.Jobs on macOS, for one)
+// calls the net10.0 signature but binds to the platform build at runtime, so a different return type there is a
+// MissingMethodException.
 #if PLATFORM
-    public static void AddConnectivity(this IServiceCollection services)
-        => services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
+    public static IServiceCollection AddConnectivity(this IServiceCollection services)
+    {
+        services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
+        return services;
+    }
 
-    public static void AddBattery(this IServiceCollection services)
-        => services.TryAddSingleton<IBattery, BatteryImpl>();
+    public static IServiceCollection AddBattery(this IServiceCollection services)
+    {
+        services.TryAddSingleton<IBattery, BatteryImpl>();
+        return services;
+    }
 #else
     /// <summary>
     /// Registers <see cref="IConnectivity"/> - the browser's <c>navigator.onLine</c> and Network

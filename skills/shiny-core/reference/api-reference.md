@@ -827,10 +827,10 @@ public static class BatteryExtensions
 ```csharp
 namespace Shiny;
 
-public static class ServiceCollectionExtensions
+public static class DeviceMonitoringExtensions
 {
-    public static void AddConnectivity(this IServiceCollection services);
-    public static void AddBattery(this IServiceCollection services);
+    public static IServiceCollection AddConnectivity(this IServiceCollection services);
+    public static IServiceCollection AddBattery(this IServiceCollection services);
 }
 ```
 
