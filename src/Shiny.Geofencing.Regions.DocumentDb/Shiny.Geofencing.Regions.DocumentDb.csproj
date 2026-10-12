@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+
+        <Description>Shiny Region Geofencing provider for Shiny.DocumentDb on SQLite - monitor polygon or point documents as geofence regions, with a built-in seeder for US state, Canadian province and US &amp; Canadian city regions</Description>
+        <PackageTags>geofence;geofencing;gps;location;geospatial;spatial;sqlite;documentdb;maui;shiny</PackageTags>
+        <RootNamespace>Shiny.Locations</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Shiny.DocumentDb.Sqlite" />
+        <ProjectReference Include="..\Shiny.Geofencing.Regions\Shiny.Geofencing.Regions.csproj" />
+    </ItemGroup>
+</Project>

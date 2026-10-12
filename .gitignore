@@ -22,6 +22,8 @@
 x64/
 x86/
 [Tt]ools/
+# the repo-root tools/ holds dev-only generators (e.g. the region geofencing dataset) and is tracked
+!/tools/
 bld/
 [Bb]in/
 [Oo]bj/

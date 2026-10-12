@@ -82,6 +82,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         {
             Add(FeatureGroup.Location, "📍 GPS", "Track location with GPS", "gps");
             Add(FeatureGroup.Location, "🔲 Geofencing", "Monitor geofence regions", "geofencing");
+            Add(FeatureGroup.Location, "🗺️ Region Geofencing", "Unlimited GPS regions - states, cities, geocoder", "regiongeofencing");
             Add(FeatureGroup.Location, "🏃 Motion Activity", "Activity recognition (walk, drive, etc.)", "motionactivity");
         }
         // Geocoding: native on iOS, Mac Catalyst & Android, OpenStreetMap Nominatim everywhere else

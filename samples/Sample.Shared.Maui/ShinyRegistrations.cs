@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Media;
+using Shiny.DocumentDb;
 using Sample.Shared.Maui.Services;
 using Sample.Shared.Maui.Ai;
 using Shiny.Calendar.Extensions.AI;
@@ -10,6 +11,8 @@ namespace Sample.Shared.Maui;
 
 public static class ShinyRegistrations
 {
+    const string RegionStoreName = "regions";
+
     public static MauiAppBuilder UseSampleShiny(this MauiAppBuilder builder)
     {
         builder
@@ -100,6 +103,25 @@ public static class ShinyRegistrations
         // reverse geocoding: MapKit/CoreLocation on iOS & Mac Catalyst, android.location.Geocoder on Android,
         // and OpenStreetMap Nominatim everywhere else (Windows, Linux, macOS)
         s.AddGeocoding();
+
+#if IOS || ANDROID || MACCATALYST
+        // Region geofencing: no OS region limit - background GPS readings are checked against region sets.
+        // States/provinces and cities come from a SQLite document store seeded with the built-in US/Canada data
+        // (seeded once, on first launch); the third set reverse geocodes each reading, so it needs a connection.
+        // It shares the GPS manager registered above - but owns the listener while it runs.
+        s.AddDocumentStore(RegionStoreName, opts =>
+        {
+            var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "sample-regions.db");
+            opts.DatabaseProvider = new Shiny.DocumentDb.Sqlite.SqliteDatabaseProvider($"Data Source={dbPath}");
+            opts.MapNorthAmericaData();
+        });
+        s.AddNorthAmericaSeeder(RegionStoreName);
+        s.AddRegionGeofencing<SampleRegionGeofenceDelegate>(cfg => cfg
+            .AddNorthAmericanRegions(Pages.Locations.RegionGeofencingViewModel.StatesSet, storeName: RegionStoreName)
+            .AddNorthAmericanCities(25_000, Pages.Locations.RegionGeofencingViewModel.CitiesSet, storeName: RegionStoreName)
+            .AddGeocoderRegionSet(Pages.Locations.RegionGeofencingViewModel.GeocodedSet, GeocoderRegionLevel.Locality)
+        );
+#endif
 
 #if IOS || ANDROID || MACCATALYST
         // Contacts: Shiny.Contacts has native implementations for iOS, Mac Catalyst, macOS and Android.

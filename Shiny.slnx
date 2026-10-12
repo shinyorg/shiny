@@ -23,6 +23,7 @@
         <Project Path="tests/Shiny.Gamepad.Tests/Shiny.Gamepad.Tests.csproj" />
         <Project Path="tests/Shiny.AppStore.Tests/Shiny.AppStore.Tests.csproj" />
         <Project Path="tests/Shiny.GameCenter.Tests/Shiny.GameCenter.Tests.csproj" />
+        <Project Path="tests/Shiny.Geofencing.Regions.Tests/Shiny.Geofencing.Regions.Tests.csproj" />
         <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
         <Project Path="tests/Shiny.Notifications.Tests/Shiny.Notifications.Tests.csproj" />
         <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
@@ -32,6 +33,9 @@
         <Project Path="tests/Shiny.AppFunctions.Tests/Shiny.AppFunctions.Tests.csproj" />
         <Project Path="tests/Shiny.AppFunctions.SourceGenerators.Tests/Shiny.AppFunctions.SourceGenerators.Tests.csproj" />
         <Project Path="tests/Shiny.Printers.Tests/Shiny.Printers.Tests.csproj" />
+    </Folder>
+    <Folder Name="/tools/">
+        <Project Path="tools/Shiny.Geofencing.Regions.DocumentDb.DataSeeder/Shiny.Geofencing.Regions.DocumentDb.DataSeeder.csproj" />
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
@@ -81,6 +85,8 @@
     <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" />
     <Project Path="src\Shiny.Gps\Shiny.Gps.csproj" />
     <Project Path="src\Shiny.Geofencing\Shiny.Geofencing.csproj" />
+    <Project Path="src\Shiny.Geofencing.Regions\Shiny.Geofencing.Regions.csproj" />
+    <Project Path="src\Shiny.Geofencing.Regions.DocumentDb\Shiny.Geofencing.Regions.DocumentDb.csproj" />
     <Project Path="src\Shiny.Locations\Shiny.Locations.csproj" />
     <Project Path="src\Shiny.Locations.Extensions.AI\Shiny.Locations.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Mobile.LiveActivities\Shiny.Mobile.LiveActivities.csproj" />

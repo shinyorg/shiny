@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shiny="http://shiny.net/maui/controls"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Locations"
+             x:Class="Sample.Shared.Maui.Pages.Locations.RegionGeofencingPage"
+             x:DataType="vm:RegionGeofencingViewModel"
+             Title="Region Geofencing">
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Monitoring"
+                                FooterText="Background GPS checked against US states &amp; Canadian provinces and US &amp; Canadian cities (SQLite), plus the reverse geocoder (online). Transitions go to Events and notifications. Stop the GPS page's listener first - only one listener can run.">
+                <shiny:LabelCell Title="Monitoring" ValueText="{Binding MonitoringText}" />
+                <shiny:ButtonCell Title="{Binding ToggleText}" Command="{Binding ToggleCommand}" />
+                <shiny:LabelCell Title="Status" ValueText="{Binding Status}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Where am I?">
+                <shiny:LabelCell Title="State / Province" ValueText="{Binding StateRegion}" />
+                <shiny:LabelCell Title="City (25km)" ValueText="{Binding CityRegion}" />
+                <shiny:LabelCell Title="Geocoded City" ValueText="{Binding GeocodedRegion}" />
+                <shiny:ButtonCell Title="Refresh" Command="{Binding RefreshCommand}" />
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
+</ContentPage>

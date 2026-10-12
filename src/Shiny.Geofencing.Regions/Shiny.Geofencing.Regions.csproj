@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+
+        <Description>Shiny Region Geofencing - GPS-driven geofencing over unlimited polygon, radius or reverse-geocoded regions resolved by a pluggable region source</Description>
+        <PackageTags>geofence;geofencing;gps;location;geospatial;spatial;polygon;maui;shiny</PackageTags>
+        <RootNamespace>Shiny.Locations</RootNamespace>
+    </PropertyGroup>
+
+    <!--
+        The registration API needs the platform GPS manager, so only the iOS, Android and Mac Catalyst
+        targets carry AddRegionGeofencing. The base target still ships every type (source contract,
+        config, evaluator) so providers and the logic are testable from plain .NET.
+    -->
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Gps\Shiny.Gps.csproj" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <IsPackable>false</IsPackable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <!-- Dev-only regeneration tool: downloads live boundaries and re-emits the embedded Data/*.cs.
+             Kept out of Build.slnf so CI never runs its network I/O. -->
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.Geofencing.Regions.DocumentDb\Shiny.Geofencing.Regions.DocumentDb.csproj" />
+    </ItemGroup>
+</Project>
