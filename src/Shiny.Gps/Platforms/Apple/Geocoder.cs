@@ -7,11 +7,12 @@ using Contacts;
 using CoreLocation;
 using Foundation;
 using MapKit;
+using ObjCRuntime;
 
 namespace Shiny.Locations;
 
 
-public class Geocoder : IGeocoder
+public class Geocoder(IPlatform platform) : IGeocoder
 {
     // kCLErrorGeocodeFoundNoResult - a lookup that simply matched nothing
     const string CLErrorDomain = "kCLErrorDomain";
@@ -26,8 +27,11 @@ public class Geocoder : IGeocoder
         try
         {
             // CLGeocoder is deprecated from iOS 26 in favour of MapKit's MKReverseGeocodingRequest
+            // MapKit is main-thread only - the request has to be created, started and cancelled there
             if (OperatingSystem.IsIOSVersionAtLeast(26) || OperatingSystem.IsMacCatalystVersionAtLeast(26))
-                return await ReverseWithMapKit(location, position, cancelToken).ConfigureAwait(false);
+                return await platform
+                    .InvokeTaskOnMainThread(() => this.ReverseWithMapKit(location, position, cancelToken))
+                    .ConfigureAwait(false);
 
             return await ReverseWithCoreLocation(location, position, cancelToken).ConfigureAwait(false);
         }
@@ -40,12 +44,18 @@ public class Geocoder : IGeocoder
 
     [System.Runtime.Versioning.SupportedOSPlatform("ios26.0")]
     [System.Runtime.Versioning.SupportedOSPlatform("maccatalyst26.0")]
-    static async Task<IReadOnlyList<Placemark>> ReverseWithMapKit(CLLocation location, Position position, CancellationToken cancelToken)
+    async Task<IReadOnlyList<Placemark>> ReverseWithMapKit(CLLocation location, Position position, CancellationToken cancelToken)
     {
         using var request = new MKReverseGeocodingRequest(location);
-        using var reg = cancelToken.Register(request.Cancel);
+        // the cancel can land on the main queue after the request is disposed - both run there, so the handle check is safe
+        using var reg = cancelToken.Register(() => platform.InvokeOnMainThread(() =>
+        {
+            if (request.Handle != NativeHandle.Zero)
+                request.Cancel();
+        }));
 
-        var items = await request.GetMapItemsAsync().ConfigureAwait(false);
+        // no ConfigureAwait(false) - the MKMapItems are read below, which also has to stay on the main thread
+        var items = await request.GetMapItemsAsync();
         cancelToken.ThrowIfCancellationRequested();
 
         return (items ?? [])
