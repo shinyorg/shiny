@@ -154,6 +154,16 @@ public static class ShinyRegistrations
         s.AddSingleton<Sample.Shared.Maui.Services.Orders.InvocationLog>();
 #endif
 
+        // Gamepads: GameController on Apple, InputDevice on Android, Windows.Gaming.Input on Windows; the plain .NET
+        // build picks evdev on Linux at runtime. No permission is involved anywhere.
+        s.AddGamepads();
+
+#if IOS || ANDROID
+        // Wearables: WatchConnectivity on iPhone, the Wear OS Data Layer on Android - nothing else has a paired watch.
+        // The delegate echoes messages back and records everything the watch sends in the event store.
+        s.AddWearables<SampleWearableDelegate>();
+#endif
+
 #if !(PLATFORM && MACOS)
         // Jobs: iOS, Android, MacCatalyst, Windows (in-proc COM-activated), and bare .NET (in-proc).
         // MacOS does not expose a background-task scheduler we wrap today.

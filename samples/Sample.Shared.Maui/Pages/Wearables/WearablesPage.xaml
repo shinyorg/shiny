@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shiny="http://shiny.net/maui/controls"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Wearables"
+             x:Class="Sample.Shared.Maui.Pages.Wearables.WearablesPage"
+             x:DataType="vm:WearablesViewModel"
+             Title="Wearables">
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Status" FooterText="A companion Apple Watch / Wear OS app has to be installed before messages go anywhere - the delegate echoes back whatever it sends">
+                <shiny:LabelCell Title="Supported" ValueText="{Binding IsSupported}" />
+                <shiny:LabelCell Title="Paired" ValueText="{Binding IsPaired}" />
+                <shiny:LabelCell Title="App Installed" ValueText="{Binding IsAppInstalled}" />
+                <shiny:LabelCell Title="Reachable" ValueText="{Binding IsReachable}" />
+                <shiny:LabelCell Title="Pending Transfers" ValueText="{Binding PendingTransfers}" />
+                <shiny:ButtonCell Title="Refresh" Command="{Binding RefreshCommand}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Watches" ItemsSource="{Binding Nodes}">
+                <shiny:TableSection.ItemTemplate>
+                    <DataTemplate x:DataType="vm:WearableNodeItem">
+                        <shiny:LabelCell Title="{Binding Title}" Description="{Binding Description}" />
+                    </DataTemplate>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Send">
+                <shiny:EntryCell Title="Path" ValueText="{Binding Path, Mode=TwoWay}" />
+                <shiny:EntryCell Title="Text" ValueText="{Binding Text, Mode=TwoWay}" />
+                <shiny:ButtonCell Title="Send Message (needs reachable)" Command="{Binding SendMessageCommand}" />
+                <shiny:ButtonCell Title="Update Context" Command="{Binding UpdateContextCommand}" />
+                <shiny:ButtonCell Title="Queue Transfer" Command="{Binding TransferCommand}" />
+                <shiny:LabelCell Title="Result" Description="{Binding Result}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="From the Watch">
+                <shiny:LabelCell Title="Last Received" Description="{Binding LastReceived}" />
+                <shiny:LabelCell Title="Received Context" Description="{Binding ReceivedContext}" />
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
+</ContentPage>

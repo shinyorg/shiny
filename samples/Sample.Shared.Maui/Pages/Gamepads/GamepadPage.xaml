@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shiny="http://shiny.net/maui/controls"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Gamepads"
+             x:Class="Sample.Shared.Maui.Pages.Gamepads.GamepadPage"
+             x:DataType="vm:GamepadViewModel"
+             Title="Gamepad">
+    <shiny:TableView>
+        <shiny:TableRoot>
+            <shiny:TableSection Title="Controllers" ItemsSource="{Binding Gamepads}" FooterText="{Binding Status}">
+                <shiny:TableSection.ItemTemplate>
+                    <DataTemplate x:DataType="vm:GamepadItem">
+                        <shiny:ButtonCell Title="{Binding Title}" Command="{Binding Select}" />
+                    </DataTemplate>
+                </shiny:TableSection.ItemTemplate>
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Selected" IsVisible="{Binding HasGamepad}">
+                <shiny:LabelCell Title="Name" ValueText="{Binding Name}" />
+                <shiny:LabelCell Title="Kind" ValueText="{Binding Kind}" />
+                <shiny:LabelCell Title="Player" ValueText="{Binding Player}" />
+                <shiny:LabelCell Title="Capabilities" Description="{Binding Capabilities}" />
+                <shiny:LabelCell Title="Battery" ValueText="{Binding Battery}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Live Input" IsVisible="{Binding HasGamepad}">
+                <shiny:LabelCell Title="Last Button" ValueText="{Binding LastButton}" />
+                <shiny:LabelCell Title="Held" Description="{Binding Buttons}" />
+                <shiny:LabelCell Title="Left Stick" ValueText="{Binding LeftStick}" />
+                <shiny:LabelCell Title="Right Stick" ValueText="{Binding RightStick}" />
+                <shiny:LabelCell Title="Triggers" ValueText="{Binding Triggers}" />
+            </shiny:TableSection>
+
+            <shiny:TableSection Title="Output" IsVisible="{Binding HasGamepad}">
+                <shiny:ButtonCell Title="Rumble" Command="{Binding RumbleCommand}" IsVisible="{Binding CanVibrate}" />
+                <shiny:ButtonCell Title="Cycle Light Colour" Command="{Binding CycleLightCommand}" IsVisible="{Binding CanLight}" />
+                <shiny:SwitchCell Title="Motion Sensors" On="{Binding MotionEnabled, Mode=TwoWay}" IsVisible="{Binding CanMotion}" />
+                <shiny:LabelCell Title="Motion" Description="{Binding Motion}" IsVisible="{Binding CanMotion}" />
+                <shiny:ButtonCell Title="Refresh Battery" Command="{Binding RefreshBatteryCommand}" IsVisible="{Binding CanBattery}" />
+            </shiny:TableSection>
+        </shiny:TableRoot>
+    </shiny:TableView>
+</ContentPage>

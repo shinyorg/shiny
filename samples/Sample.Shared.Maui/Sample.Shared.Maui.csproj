@@ -76,6 +76,9 @@
         <ProjectReference Include="..\..\src\Shiny.Printing\Shiny.Printing.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Printing.Rendering\Shiny.Printing.Rendering.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Gamepad\Shiny.Gamepad.csproj" />
+        <!-- WatchConnectivity (iPhone) / Wear OS Data Layer (Android); the other heads resolve the contracts-only build -->
+        <ProjectReference Include="..\..\src\Shiny.Wearables\Shiny.Wearables.csproj" />
         <!-- the App Functions page reads the registry and runs functions through the dispatcher; the functions are in Sample.Maui -->
         <ProjectReference Include="..\..\src\Shiny.AppFunctions\Shiny.AppFunctions.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />

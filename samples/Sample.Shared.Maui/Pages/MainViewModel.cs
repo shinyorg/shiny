@@ -40,6 +40,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             Add(FeatureGroup.PersonalData, "📅 Calendar", "Browse & edit device calendar events", "calendar");
             Add(FeatureGroup.Peripherals, "🧾 Thermal Printer", "Print receipts to BLE & WiFi ESC/POS printers", "thermalprinter");
             Add(FeatureGroup.Peripherals, "🖨️ Native Print", "Print PDFs & HTML through CUPS", "nativeprint");
+            Add(FeatureGroup.Peripherals, "🎮 Gamepad", "Live controller input, rumble & lights", "gamepad");
             Add(FeatureGroup.Ai, "🤖 AI Assistant", "Chat + Shiny AI tools via GitHub Copilot", "ai");
             Add(FeatureGroup.Device, "🔋 Battery", "Observe battery level & state", "battery");
             Add(FeatureGroup.Device, "🌐 Connectivity", "Observe network connectivity", "connectivity");
@@ -103,6 +104,10 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         Add(FeatureGroup.Peripherals, "🧾 Thermal Printer", "Print receipts to BLE & WiFi ESC/POS printers", "thermalprinter");
         Add(FeatureGroup.Peripherals, "🖨️ Native Print", "Print PDFs & HTML through the OS print dialog", "nativeprint");
         Add(FeatureGroup.Peripherals, "🎬 Screen Recorder", "Record the screen to a video file", "screenrecorder");
+        Add(FeatureGroup.Peripherals, "🎮 Gamepad", "Live controller input, rumble & lights", "gamepad");
+        // Wearables: iPhone (WatchConnectivity - not iPad/Mac Catalyst) & Android (Wear OS)
+        if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
+            Add(FeatureGroup.Peripherals, "⌚ Wearables", "Talk to a companion Apple Watch / Wear OS app", "wearables");
 
         // --- AI Assistant (GitHub Copilot + Shiny *.Extensions.AI tools) ---
         Add(FeatureGroup.Ai, "🤖 AI Assistant", "Chat with your device via GitHub Copilot", "ai");
