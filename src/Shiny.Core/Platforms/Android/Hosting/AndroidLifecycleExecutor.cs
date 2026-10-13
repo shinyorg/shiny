@@ -6,13 +6,12 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using AndroidX.Lifecycle;
-using Java.Interop;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Hosting;
 
 
-public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILifecycleObserver, IDisposable
+public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILifecycleEventObserver, IDisposable
 {
     readonly ILogger logger;
     readonly AndroidPlatform platform;
@@ -62,21 +61,19 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, IShinyStartupTask, ILi
     }
 
 
-    [Lifecycle.Event.OnResume]
-    [Export]
+    // an interface callback rather than [Export]ed [Lifecycle.Event.*] methods, which need runtime code generation
+    // and are not trim safe
+    public void OnStateChanged(ILifecycleOwner source, Lifecycle.Event e)
+    {
+        if (Lifecycle.Event.OnResume.Equals(e))
+            this.OnResume();
+        else if (Lifecycle.Event.OnPause.Equals(e))
+            this.OnPause();
+    }
+
+
     public void OnResume() => this.Execute(this.appHandlers, x => x.OnForeground());
-
-
-    [Lifecycle.Event.OnPause]
-    [Export]
     public void OnPause() => this.Execute(this.appHandlers, x => x.OnBackground());
-
-    //[Lifecycle.Event.OnDestroy]
-    //[Export]
-    //public void OnDestroy()
-    //{
-    //    Console.WriteLine("LIFECYCLE: OnDestory");
-    //}
 
     public void OnActivityOnCreate(Activity activity, Bundle? savedInstanceState)
         => this.Execute(this.onCreateHandlers, x => x.ActivityOnCreate(activity, savedInstanceState));

@@ -145,6 +145,14 @@ public class AndroidNotificationManager
 
 
     public virtual PendingIntent GetLaunchPendingIntent(AndroidNotification notification)
+        => this.CreateLaunchPendingIntent(notification, null);
+
+
+    /// <summary>
+    /// Creates the PendingIntent that opens the launch activity - the notification body when <paramref name="action"/> is null,
+    /// otherwise an OpenApp action button, whose identifier reaches INotificationDelegate.OnEntry.
+    /// </summary>
+    protected virtual PendingIntent CreateLaunchPendingIntent(AndroidNotification notification, ChannelAction? action)
     {
         Intent launchIntent;
 
@@ -165,6 +173,15 @@ public class AndroidNotificationManager
         }
 
         this.PopulateIntent(launchIntent, notification);
+        if (action != null)
+        {
+            launchIntent.PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
+
+            // PendingIntent equality ignores extras but not categories - without this, the action shares the body's
+            // PendingIntent (same request code, same launch intent) and one overwrites the other's action extra.
+            // The intent names its activity explicitly, so the category plays no part in resolving it.
+            launchIntent.AddCategory(OpenAppActionCategory + action.Identifier);
+        }
 
         PendingIntent pendingIntent;
         if ((notification.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
@@ -188,6 +205,7 @@ public class AndroidNotificationManager
         }
         return pendingIntent;
     }
+    const string OpenAppActionCategory = "com.shiny.notifications.OPEN_APP_ACTION.";
 
 
     public virtual void ApplyChannel(NotificationCompat.Builder builder, Notification notification, Channel channel)
@@ -203,6 +221,10 @@ public class AndroidNotificationManager
                 switch (action.ActionType)
                 {
                     case ChannelActionType.OpenApp:
+                        // a broadcast can't start an activity (Android 12+ blocks notification trampolines),
+                        // so this action opens the launch activity directly, like tapping the notification
+                        if (notification is AndroidNotification android)
+                            builder.AddAction(this.CreateOpenAppAction(android, action));
                         break;
 
                     case ChannelActionType.TextReply:
@@ -251,6 +273,18 @@ public class AndroidNotificationManager
     protected virtual NotificationCompat.Action CreateAction(Notification notification, ChannelAction action)
     {
         var pendingIntent = this.CreateActionIntent(notification, action);
+        var iconId = this.platform.GetResourceIdByName(action.Identifier);
+        var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
+            .SetAuthenticationRequired(action.RequiresUnlock)
+            .Build();
+
+        return nativeAction;
+    }
+
+
+    protected virtual NotificationCompat.Action CreateOpenAppAction(AndroidNotification notification, ChannelAction action)
+    {
+        var pendingIntent = this.CreateLaunchPendingIntent(notification, action);
         var iconId = this.platform.GetResourceIdByName(action.Identifier);
         var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
             .SetAuthenticationRequired(action.RequiresUnlock)
