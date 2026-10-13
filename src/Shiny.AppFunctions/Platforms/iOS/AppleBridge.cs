@@ -29,7 +29,18 @@ static class AppleBridge
     public static unsafe void Register()
     {
         if (Interlocked.Exchange(ref registered, 1) == 0)
-            shiny_af_set_handler(&OnInvoke);
+        {
+            try
+            {
+                shiny_af_set_handler(&OnInvoke);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // the Swift lib is only built on a macOS build host (e.g. absent from Windows Hot Restart builds);
+                // the app still runs, it just exposes no App Intents
+                System.Diagnostics.Trace.TraceWarning("Shiny.AppFunctions: native App Intents runtime not linked - this build was not made on macOS");
+            }
+        }
     }
 
     [UnmanagedCallersOnly]

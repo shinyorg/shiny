@@ -152,9 +152,12 @@ public class ChannelAction
     public string Identifier { get; set; }                         // Required
     public string Title { get; set; }                              // Required
     public ChannelActionType ActionType { get; set; }              // Default: None
+    public bool RequiresUnlock { get; set; }                       // Device must be unlocked before the action runs (iOS/macOS, Android 12+; ignored on Windows/Linux)
 
     public static ChannelAction Create(string id, ChannelActionType actionType = ChannelActionType.None);
+    public static ChannelAction Create(string id, ChannelActionType actionType, bool requiresUnlock);
     public static ChannelAction Create(string id, string title, ChannelActionType actionType = ChannelActionType.None);
+    public static ChannelAction Create(string id, string title, ChannelActionType actionType, bool requiresUnlock);
 }
 ```
 

@@ -13,6 +13,8 @@ triggers:
   - repeating notification
   - badge count
   - notification actions
+  - RequiresUnlock
+  - action requires unlock
   - Shiny.Notifications
   - INotificationManager
   - INotificationDelegate
@@ -152,6 +154,7 @@ When generating code that uses Shiny Notifications, follow these conventions:
 - Use channels to group notifications by category (e.g., "alerts", "reminders", "messages").
 - The default channel (`Channel.Default`) always exists with `Identifier = "Notifications"` and `ChannelImportance.Low`.
 - Do not remove the default channel -- the library will throw an `InvalidOperationException`.
+- Set `ChannelAction.RequiresUnlock = true` (or `ChannelAction.Create(id, title, type, requiresUnlock: true)`) for any action with a real-world effect ("Open Garage", "Disarm") - otherwise it runs straight from the lock screen. It combines with any `ChannelActionType`; do not use `OpenApp` just to force an unlock. Honoured on iOS/Mac Catalyst/macOS and Android 12+ (API 31); older Android runs the action without prompting, and Windows/Linux ignore it.
 - Set `BadgeCount` only on immediate notifications (not triggered ones) -- validation will fail otherwise.
 - Use `IntervalTrigger` with either `Interval` (raw TimeSpan) or `TimeOfDay` (daily/weekly recurring), never both.
 - For geofence notifications, ensure `Center` and `Radius` are both set on `GeofenceTrigger`.

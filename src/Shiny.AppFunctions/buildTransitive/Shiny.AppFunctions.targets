@@ -16,6 +16,10 @@
       ShinyAppFunctionsMinimumOSVersion          iOS deployment target for the Swift (default: SupportedOSPlatformVersion, at least 16.0)
       ShinyAppFunctionsConstProtocolsFile        swiftc's const-extraction protocol list (default: the Xcode 27 list shipped here)
       ShinyAppFunctionsDevelopmentRegion         added to Info.plist when it has no CFBundleDevelopmentRegion (default: en)
+
+    The iOS steps need the Xcode toolchain, so they only run on a macOS build host. A Windows build with no paired Mac
+    compiles the C# and skips them (nothing is linked there); a Windows build paired to a Mac stops with an error,
+    because the Mac would link the app without the Swift half.
   -->
   <PropertyGroup>
     <_ShinyAFPlatform>$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))</_ShinyAFPlatform>
@@ -23,6 +27,8 @@
     <_ShinyAFIsApp Condition="'$(_ShinyAFPlatform)' == 'ios' and '$(OutputType)' == 'Exe'">true</_ShinyAFIsApp>
     <_ShinyAFIsApp Condition="'$(_ShinyAFPlatform)' == 'android' and '$(AndroidApplication)' == 'true'">true</_ShinyAFIsApp>
     <_ShinyAFIsApp Condition="'$(ShinyAppFunctionsEnabled)' == 'false'"></_ShinyAFIsApp>
+    <!-- xcrun, swiftc and the App Intents processors only exist on macOS -->
+    <_ShinyAFIsApple Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and $([MSBuild]::IsOSPlatform('osx'))">true</_ShinyAFIsApple>
     <ShinyAppFunctionsTasksDir Condition="'$(ShinyAppFunctionsTasksDir)' == ''">$(MSBuildThisFileDirectory)../tasks/</ShinyAppFunctionsTasksDir>
     <_ShinyAFTaskAssembly Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ShinyAppFunctionsTasksDir)net8.0/Shiny.AppFunctions.Build.dll</_ShinyAFTaskAssembly>
     <_ShinyAFTaskAssembly Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ShinyAppFunctionsTasksDir)net472/Shiny.AppFunctions.Build.dll</_ShinyAFTaskAssembly>
@@ -76,7 +82,7 @@
 
   <!-- ================================ iOS ================================ -->
 
-  <PropertyGroup Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios'">
+  <PropertyGroup Condition="'$(_ShinyAFIsApple)' == 'true'">
     <ShinyAppFunctionsMinimumOSVersion Condition="'$(ShinyAppFunctionsMinimumOSVersion)' == '' and '$(SupportedOSPlatformVersion)' != '' and $([MSBuild]::VersionGreaterThanOrEquals('$(SupportedOSPlatformVersion)', '16.0'))">$(SupportedOSPlatformVersion)</ShinyAppFunctionsMinimumOSVersion>
     <ShinyAppFunctionsMinimumOSVersion Condition="'$(ShinyAppFunctionsMinimumOSVersion)' == ''">16.0</ShinyAppFunctionsMinimumOSVersion>
     <ShinyAppFunctionsConstProtocolsFile Condition="'$(ShinyAppFunctionsConstProtocolsFile)' == ''">$(MSBuildThisFileDirectory)swift/const_extract_protocols.json</ShinyAppFunctionsConstProtocolsFile>
@@ -85,21 +91,28 @@
     <_ShinyAFModule>ShinyAppFunctions</_ShinyAFModule>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios'">
+  <ItemGroup Condition="'$(_ShinyAFIsApple)' == 'true'">
     <_ShinyAFRuntimeSwift Include="$(MSBuildThisFileDirectory)swift/*.swift" />
   </ItemGroup>
+
+  <!-- IsMacEnabled is only set once Visual Studio has connected to the Mac, so this is checked at build time -->
+  <Target Name="_ShinyAppFunctionsHostCheck"
+          BeforeTargets="_ExpandNativeReferences"
+          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and '$(_ShinyAFIsApple)' != 'true' and '$(IsMacEnabled)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <Error Text="Shiny.AppFunctions: the iOS App Intents are compiled with the Xcode toolchain, which only runs when the build itself runs on macOS. Build this app on the Mac, or set ShinyAppFunctionsEnabled=false for builds from Windows (App Intents are then not available)." />
+  </Target>
 
   <!-- the lib is built after CoreCompile; the SDK only lists NativeReferences here and reads the file at native link time -->
   <Target Name="_ShinyAppFunctionsNativeReference"
           BeforeTargets="_ExpandNativeReferences"
           DependsOnTargets="_ShinyAppFunctionsPaths"
-          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and '$(DesignTimeBuild)' != 'true'">
+          Condition="'$(_ShinyAFIsApple)' == 'true' and '$(DesignTimeBuild)' != 'true'">
     <ItemGroup>
       <NativeReference Include="$(_ShinyAFLib)" Kind="Static" ForceLoad="true" SmartLink="false" IsCxx="false" LinkWithSwiftSystemLibraries="true" Frameworks="AppIntents Foundation" />
     </ItemGroup>
   </Target>
 
-  <Target Name="_ShinyAppFunctionsXcode" DependsOnTargets="_ShinyAppFunctionsPaths" Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios'">
+  <Target Name="_ShinyAppFunctionsXcode" DependsOnTargets="_ShinyAppFunctionsPaths" Condition="'$(_ShinyAFIsApple)' == 'true'">
     <Exec Command="xcrun --sdk $(_ShinyAFSdk) --show-sdk-path" ConsoleToMSBuild="true" StandardOutputImportance="low">
       <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyAFSdkPath" />
     </Exec>
@@ -117,7 +130,7 @@
   <Target Name="ShinyAppFunctionsCompileSwift"
           AfterTargets="ShinyAppFunctionsExtract"
           DependsOnTargets="_ShinyAppFunctionsXcode"
-          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and '$(DesignTimeBuild)' != 'true'"
+          Condition="'$(_ShinyAFIsApple)' == 'true' and '$(DesignTimeBuild)' != 'true'"
           Inputs="$(_ShinyAFSwiftFile);@(_ShinyAFRuntimeSwift);$(ShinyAppFunctionsConstProtocolsFile);$(MSBuildThisFileFullPath)"
           Outputs="$(_ShinyAFLib);$(_ShinyAFConstValues)">
     <Exec Command="xcrun --sdk $(_ShinyAFSdk) swiftc -c -wmo -parse-as-library -swift-version 5 -O -g -module-name $(_ShinyAFModule) -target $(_ShinyAFTriple) -sdk &quot;$(_ShinyAFSdkPath)&quot; @(_ShinyAFRuntimeSwift->'&quot;%(FullPath)&quot;', ' ') &quot;$(_ShinyAFSwiftFile)&quot; -emit-const-values-path &quot;$(_ShinyAFConstValues)&quot; -Xfrontend -const-gather-protocols-file -Xfrontend &quot;$(ShinyAppFunctionsConstProtocolsFile)&quot; -o &quot;$(_ShinyAFDir)$(_ShinyAFModule).o&quot;" />
@@ -127,7 +140,7 @@
   <Target Name="ShinyAppFunctionsIntentsMetadata"
           BeforeTargets="BeforeCodesign"
           DependsOnTargets="_ShinyAppFunctionsXcode"
-          Condition="'$(_ShinyAFIsApp)' == 'true' and '$(_ShinyAFPlatform)' == 'ios' and '$(DesignTimeBuild)' != 'true' and '$(AppBundleDir)' != ''">
+          Condition="'$(_ShinyAFIsApple)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(AppBundleDir)' != ''">
     <PropertyGroup>
       <_ShinyAFApp>$([System.IO.Path]::GetFullPath('$(AppBundleDir)'))</_ShinyAFApp>
     </PropertyGroup>

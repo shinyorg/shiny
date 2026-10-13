@@ -284,6 +284,8 @@ Related AI tool packages (same `*AITools` bundle pattern, see their skills): `Sh
 | `ShinyAppFunctionsDevelopmentRegion` | `en` | added to Info.plist only if it has no `CFBundleDevelopmentRegion` |
 | `ShinyAppFunctionsConstProtocolsFile` | the Xcode 27 list shipped in the package | swiftc const-extraction protocol list; override for a later Xcode |
 
+The iOS Swift/metadata steps run only on a macOS build host. A Windows build with no paired Mac skips them; a Windows build paired to a Mac fails with a Shiny.AppFunctions error - build on the Mac, or set `ShinyAppFunctionsEnabled=false` for those builds. Never suggest a `ShinyAppFunctionsEnabled` workaround for plain Windows builds; none is needed.
+
 ## Generator diagnostics
 
 | Id | Meaning |
