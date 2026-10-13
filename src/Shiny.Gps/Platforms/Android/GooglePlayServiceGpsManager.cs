@@ -2,15 +2,18 @@ using System;
 using System.Threading.Tasks;
 using Android.Gms.Location;
 using Android.OS;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores;
 
 namespace Shiny.Locations;
 
 
 public class GooglePlayServiceGpsManager(
     AndroidPlatform platform,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<GooglePlayServiceGpsManager> logger
-) : AbstractGpsManager(platform, logger)
+) : AbstractGpsManager(platform, store, logger)
 {
     IFusedLocationProviderClient? listenerClient;
 

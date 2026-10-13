@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores;
 using P = Android.Manifest.Permission;
 
 namespace Shiny.Locations;
@@ -10,13 +11,17 @@ namespace Shiny.Locations;
 
 public abstract class AbstractGpsManager : IGpsManager, IShinyStartupTask
 {
+    const string CurrentSettingsKey = "Shiny.Locations.GpsManager.CurrentSettings";
+    readonly IKeyValueStore store;
     readonly ILogger logger;
 
 
-    protected AbstractGpsManager(AndroidPlatform platform, ILogger logger)
+    protected AbstractGpsManager(AndroidPlatform platform, IKeyValueStore store, ILogger logger)
     {
         this.Platform = platform;
+        this.store = store;
         this.logger = logger;
+        this.currentSettings = store.Get<AndroidGpsRequest>(CurrentSettingsKey);
         this.Callback = new ShinyLocationCallback
         {
             OnReading = x => this.GpsReadingReceived?.Invoke(this, x)
@@ -53,7 +58,12 @@ public abstract class AbstractGpsManager : IGpsManager, IShinyStartupTask
     public AndroidGpsRequest? CurrentSettings
     {
         get => this.currentSettings;
-        set => this.currentSettings = value;
+        set
+        {
+            this.currentSettings = value;
+            var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
+            this.store.SetOrRemove(CurrentSettingsKey, bg != GpsBackgroundMode.None ? value : null);
+        }
     }
 
 

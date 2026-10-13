@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 namespace Shiny.Locations;
 
 [Shiny.ShinyJsonContext]
+[JsonSerializable(typeof(MotionActivityReading))]
+[JsonSerializable(typeof(List<MotionActivityReading>))]
+[JsonSerializable(typeof(MotionActivityReading[]))]
 #if APPLE
 [JsonSerializable(typeof(AppleGpsRequest))]
 [JsonSerializable(typeof(List<AppleGpsRequest>))]

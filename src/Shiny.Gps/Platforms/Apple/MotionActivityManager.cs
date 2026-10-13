@@ -3,23 +3,35 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreMotion;
 using Foundation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores;
 
 namespace Shiny.Locations;
 
 
 public class MotionActivityManager(
     IServiceProvider services,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<MotionActivityManager> logger
 ) : IMotionActivityManager, IShinyStartupTask
 {
+    const string IsListeningKey = "Shiny.Locations.MotionActivityManager.IsListening";
     readonly CMMotionActivityManager activityManager = new();
 
-    bool isListening;
+    // CoreMotion drops updates when the process ends - the persisted flag is what lets Start() resume them
+    bool isListening = store.Get<bool>(IsListeningKey);
     public bool IsListening
     {
         get => this.isListening;
-        private set => this.isListening = value;
+        private set
+        {
+            this.isListening = value;
+            if (value)
+                store.Set(IsListeningKey, true);
+            else
+                store.Remove(IsListeningKey);
+        }
     }
 
 

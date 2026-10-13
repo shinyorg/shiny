@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Gms.Location;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores;
 
 namespace Shiny.Locations;
 
@@ -11,20 +13,31 @@ namespace Shiny.Locations;
 public class MotionActivityManager(
     AndroidPlatform platform,
     IServiceProvider services,
+    [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<MotionActivityManager> logger
 ) : IMotionActivityManager, IShinyStartupTask
 {
     public const string ReceiverName = "com.shiny.locations." + nameof(MotionActivityBroadcastReceiver);
     public const string IntentAction = ReceiverName + ".INTENT_ACTION";
+    const string IsListeningKey = "Shiny.Locations.MotionActivityManager.IsListening";
+    const string LastReadingKey = "Shiny.Locations.MotionActivityManager.LastReading";
 
     PendingIntent? pendingIntent;
 
 
-    bool isListening;
+    // Google Play services keeps the activity registration when the process dies, so the flag has to outlive it too
+    bool isListening = store.Get<bool>(IsListeningKey);
     public bool IsListening
     {
         get => this.isListening;
-        private set => this.isListening = value;
+        private set
+        {
+            this.isListening = value;
+            if (value)
+                store.Set(IsListeningKey, true);
+            else
+                store.Remove(IsListeningKey);
+        }
     }
 
 
@@ -51,7 +64,7 @@ public class MotionActivityManager(
     }
 
 
-    MotionActivityReading? lastReading;
+    MotionActivityReading? lastReading = store.Get<MotionActivityReading>(LastReadingKey);
 
     public Task<MotionActivityReading?> GetLastReading()
         => Task.FromResult(this.lastReading);
@@ -97,6 +110,7 @@ public class MotionActivityManager(
             );
 
             this.lastReading = reading;
+            store.Set(LastReadingKey, reading);
             this.MotionActivityReadingReceived?.Invoke(this, reading);
 
             await services

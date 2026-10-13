@@ -2,7 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Android.Locations;
 using Android.OS;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores;
 using AContext = Android.Content.Context;
 
 namespace Shiny.Locations;
@@ -11,7 +13,11 @@ namespace Shiny.Locations;
 public class LocationServicesGpsManager : AbstractGpsManager
 {
     readonly LocationManager client;
-    public LocationServicesGpsManager(AndroidPlatform platform, ILogger<LocationServicesGpsManager> logger) : base(platform, logger)
+    public LocationServicesGpsManager(
+        AndroidPlatform platform,
+        [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
+        ILogger<LocationServicesGpsManager> logger
+    ) : base(platform, store, logger)
         => this.client = platform.GetSystemService<LocationManager>(AContext.LocationService);
 
 
