@@ -1,4 +1,5 @@
-﻿using CoreFoundation;
+﻿using System;
+using CoreFoundation;
 
 namespace Shiny.BluetoothLE;
 
@@ -50,4 +51,15 @@ public record AppleBleConfiguration(
     /// is an alert per packet for as long as the app stays in the background.
     /// </remarks>
     public bool NotifyOnNotification { get; init; } = true;
+
+    /// <summary>
+    /// How long a write without response waits for CoreBluetooth to accept it (<c>canSendWriteWithoutResponse</c>)
+    /// before failing with a <see cref="BleException"/>. Default 10 seconds.
+    /// </summary>
+    /// <remarks>
+    /// The wait holds the peripheral operation queue, so while it lasts no other GATT operation runs. A peripheral
+    /// that stops draining its buffer would otherwise hold it until the link drops. Use
+    /// <see cref="System.Threading.Timeout.InfiniteTimeSpan"/> to wait for as long as the connection is up.
+    /// </remarks>
+    public TimeSpan WriteWithoutResponseTimeout { get; init; } = TimeSpan.FromSeconds(10);
 }

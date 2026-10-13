@@ -13,6 +13,7 @@ triggers:
   - would like to open
   - NotifyOnConnection
   - NotifyOnNotification
+  - WriteWithoutResponseTimeout
   - characteristic
   - scan ble
   - ble scan
@@ -152,6 +153,13 @@ services.AddBluetoothLE(new AppleBleConfiguration
     NotifyOnConnection = false,
     NotifyOnDisconnection = false,
     NotifyOnNotification = false
+});
+
+// iOS/Mac Catalyst/macOS/tvOS - how long a write without response waits on CoreBluetooth's flow control before
+// failing with a BleException. Default 10 seconds; Timeout.InfiniteTimeSpan waits for as long as the link is up.
+services.AddBluetoothLE(new AppleBleConfiguration
+{
+    WriteWithoutResponseTimeout = TimeSpan.FromSeconds(5)
 });
 ```
 
@@ -455,7 +463,7 @@ unless you are talking to a non-Shiny peer.
 - Always check `CharacteristicProperties` before attempting read/write/notify operations using the convenience extensions (`CanRead()`, `CanWrite()`, `CanNotify()`, etc.).
 - Use `WriteCharacteristicBlob()` for writing large data streams that exceed MTU size -- it already chunks to `peripheral.Mtu` (the payload size), so do not pre-chunk.
 - Use `WriteCharacteristicMessageAsync()` / `NotifyCharacteristicMessages()` when the peripheral needs to know where a message ends (a framed Shiny hosting characteristic) -- never mix them with plain writes/notifications on the same characteristic.
-- Writes without response (`withResponse: false`) on Apple already wait on CoreBluetooth's flow control (`CanSendWriteWithoutResponse` / `peripheralIsReadyToSendWriteWithoutResponse`) inside the operation queue -- never add `Task.Delay` pacing between writes or poll `CanSendWriteWithoutResponse` yourself; just await each write in turn.
+- Writes without response (`withResponse: false`) on Apple already wait on CoreBluetooth's flow control (`CanSendWriteWithoutResponse` / `peripheralIsReadyToSendWriteWithoutResponse`) inside the operation queue -- never add `Task.Delay` pacing between writes or poll `CanSendWriteWithoutResponse` yourself; just await each write in turn. The wait is bounded by `AppleBleConfiguration.WriteWithoutResponseTimeout` (default 10 seconds): a peripheral that stops accepting data fails the write with a `BleException` instead of holding the operation queue, so handle that error on a streaming write rather than assuming it can only hang.
 - Use `NotifyCharacteristic()` for real-time data streaming from a peripheral -- it handles subscription lifecycle and auto-reconnection.
 - Buffer or throttle scan results in UI scenarios to avoid performance issues.
 - Use `WhenConnected()` and `WhenDisconnected()` convenience extensions for cleaner connection state handling.

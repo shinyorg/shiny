@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -194,6 +195,7 @@ public partial class Peripheral
     }
 
     
+    static readonly TimeSpan WwrReadyRecheckInterval = TimeSpan.FromMilliseconds(250);
     readonly Subject<Unit> readyWwrSubj = new();
     public override void IsReadyToSendWriteWithoutResponse(CBPeripheral peripheral)
     {
@@ -296,13 +298,17 @@ public partial class Peripheral
         {
             this.logger.CanSendWriteWithoutResponse(nativeCh, false);
 
-            // readyWwrSubj is hot and IsReadyToSendWriteWithoutResponse fires once, on CoreBluetooth's queue. Merge
-            // subscribes to it BEFORE the deferred re-check runs, so a callback that lands between the check above and
-            // the wait is still seen - otherwise the wait never completes and the operation lock is held until disconnect (#1657)
-            var ready = this.readyWwrSubj.Merge(Observable.Defer(() => this.Native.CanSendWriteWithoutResponse
-                ? Observable.Return(Unit.Default)
-                : Observable.Empty<Unit>()
-            ));
+            // This wait holds the operation lock, so it has to end. IsReadyToSendWriteWithoutResponse fires once, on
+            // CoreBluetooth's queue, and is not guaranteed to follow every "false" - WhenReady keeps re-reading the flag
+            // and gives up after the configured timeout, so a peripheral that stops taking data fails this write
+            // instead of freezing every other GATT operation until disconnect (#1657, #1672)
+            var ready = WriteFlowControl.WhenReady(
+                this.readyWwrSubj,
+                () => this.Native.CanSendWriteWithoutResponse,
+                WwrReadyRecheckInterval,
+                this.manager.Configuration.WriteWithoutResponseTimeout,
+                Scheduler.Default
+            );
             await this.WaitForOperation(ready, ct).ConfigureAwait(false);
             this.logger.CanSendWriteWithoutResponse(nativeCh, true);
         }

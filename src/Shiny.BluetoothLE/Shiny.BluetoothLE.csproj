@@ -13,6 +13,10 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.BluetoothLE.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="System.Reactive" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
