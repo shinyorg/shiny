@@ -27,7 +27,7 @@ public static class MotionActivityServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection to configure</param>
     /// <param name="delegateType">The IMotionActivityDelegate to call</param>
-    public static IServiceCollection AddMotionActivity(this IServiceCollection services, Type? delegateType = null)
+    public static IServiceCollection AddMotionActivity(this IServiceCollection services, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? delegateType = null)
     {
         if (delegateType != null)
         {
@@ -56,7 +56,7 @@ public static class MotionActivityServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection to configure</param>
     /// <param name="delegateType">The IMotionActivityDelegate to call</param>
-    public static IServiceCollection AddMotionActivity(this IServiceCollection services, Type? delegateType = null)
+    public static IServiceCollection AddMotionActivity(this IServiceCollection services, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? delegateType = null)
     {
         if (delegateType != null)
         {
@@ -89,7 +89,7 @@ public static class MotionActivityServiceCollectionExtensions
     /// <summary>
     /// Motion activity recognition is not supported on this platform
     /// </summary>
-    public static IServiceCollection AddMotionActivity(this IServiceCollection services, Type? delegateType = null)
+    public static IServiceCollection AddMotionActivity(this IServiceCollection services, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? delegateType = null)
         => services;
 
     #endif

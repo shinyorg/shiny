@@ -19,7 +19,7 @@ public static class NotificationLinuxServiceCollectionExtensions
     /// <summary>
     /// Registers Shiny notifications backed by the freedesktop notifications D-Bus daemon.
     /// </summary>
-    public static IServiceCollection AddNotifications(this IServiceCollection services, Type? delegateType = null)
+    public static IServiceCollection AddNotifications(this IServiceCollection services, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? delegateType = null)
     {
         services.AddSingleton<NotificationManager>();
         services.AddSingleton<INotificationManager>(sp => sp.GetRequiredService<NotificationManager>());
