@@ -13,6 +13,7 @@ triggers:
   - would like to open
   - NotifyOnConnection
   - NotifyOnNotification
+  - CanSendWriteWithoutResponse
   - characteristic
   - scan ble
   - ble scan
@@ -455,7 +456,7 @@ unless you are talking to a non-Shiny peer.
 - Always check `CharacteristicProperties` before attempting read/write/notify operations using the convenience extensions (`CanRead()`, `CanWrite()`, `CanNotify()`, etc.).
 - Use `WriteCharacteristicBlob()` for writing large data streams that exceed MTU size -- it already chunks to `peripheral.Mtu` (the payload size), so do not pre-chunk.
 - Use `WriteCharacteristicMessageAsync()` / `NotifyCharacteristicMessages()` when the peripheral needs to know where a message ends (a framed Shiny hosting characteristic) -- never mix them with plain writes/notifications on the same characteristic.
-- Writes without response (`withResponse: false`) on Apple already wait on CoreBluetooth's flow control (`CanSendWriteWithoutResponse` / `peripheralIsReadyToSendWriteWithoutResponse`) inside the operation queue -- never add `Task.Delay` pacing between writes or poll `CanSendWriteWithoutResponse` yourself; just await each write in turn.
+- Writes without response (`withResponse: false`) on Apple already wait on CoreBluetooth's flow control (`CanSendWriteWithoutResponse` / `peripheralIsReadyToSendWriteWithoutResponse`) -- never add `Task.Delay` pacing between writes or poll `CanSendWriteWithoutResponse` yourself; just await each write in turn. The wait runs in a per-peripheral lane outside the shared GATT operation queue, so a stalled peripheral never blocks reads or notifications. If CoreBluetooth is not ready within 5 seconds the write fails with a `BleException` (not configurable - dispose/cancel sooner for a shorter limit); disposing the subscription before the value is handed to CoreBluetooth cancels the write.
 - Use `NotifyCharacteristic()` for real-time data streaming from a peripheral -- it handles subscription lifecycle and auto-reconnection.
 - Buffer or throttle scan results in UI scenarios to avoid performance issues.
 - Use `WhenConnected()` and `WhenDisconnected()` convenience extensions for cleaner connection state handling.

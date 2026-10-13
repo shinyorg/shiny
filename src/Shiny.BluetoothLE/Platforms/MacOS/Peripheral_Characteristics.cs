@@ -5,6 +5,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -285,28 +287,73 @@ public partial class Peripheral
     });
 
 
-    protected IObservable<BleCharacteristicResult> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => this.operations.QueueToObservable(async ct =>
+    // Write without response runs in its own lane: the CanSendWriteWithoutResponse wait happens here, outside the
+    // global operation queue, so a peripheral that stops draining its buffer only stalls these writes - not every
+    // GATT operation in the process (#1672). The operation lock is only taken for the WriteValue call itself.
+    readonly SemaphoreSlim wwrLane = new(1);
+    readonly Subject<Unit> wwrRecheckSubj = new();
+
+    // a peripheral that never drains its buffer fails the write rather than parking the lane until disconnect - callers
+    // wanting less dispose/cancel sooner
+    static readonly TimeSpan WriteWithoutResponseReadyTimeout = TimeSpan.FromSeconds(5);
+
+    protected IObservable<BleCharacteristicResult> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => Observable.FromAsync(async ct =>
     {
-        if (!this.Native.CanSendWriteWithoutResponse)
+        // CoreBluetooth can flip CanSendWriteWithoutResponse back to true without calling IsReadyToSendWriteWithoutResponse
+        // (seen around app suspension), so every new write makes a parked write look at the flag again
+        this.wwrRecheckSubj.OnNext(Unit.Default);
+
+        await this.wwrLane.WaitAsync(ct).ConfigureAwait(false);
+        try
         {
-            this.logger.CanSendWriteWithoutResponse(nativeCh, false);
+            await this.WaitForCanSendWriteWithoutResponse(nativeCh, ct).ConfigureAwait(false);
 
-            // readyWwrSubj is hot and IsReadyToSendWriteWithoutResponse fires once, on CoreBluetooth's queue. Merge
-            // subscribes to it BEFORE the deferred re-check runs, so a callback that lands between the check above and
-            // the wait is still seen - otherwise the wait never completes and the operation lock is held until disconnect (#1657)
-            var ready = this.readyWwrSubj.Merge(Observable.Defer(() => this.Native.CanSendWriteWithoutResponse
-                ? Observable.Return(Unit.Default)
-                : Observable.Empty<Unit>()
-            ));
-            await this.WaitForOperation(ready, ct).ConfigureAwait(false);
-            this.logger.CanSendWriteWithoutResponse(nativeCh, true);
+            // disposing before this point cancels the write - once WriteValue is called, it is with CoreBluetooth
+            BleCharacteristicResult result = null!;
+            await this.operations.Queue(() =>
+            {
+                this.logger.LogDebug("Writing characteristic without response");
+                this.Native.WriteValue(NSData.FromArray(value), nativeCh, CBCharacteristicWriteType.WithoutResponse);
+                result = this.ToResult(nativeCh, BleCharacteristicEvent.WriteWithoutResponse);
+                return Task.CompletedTask;
+            }, ct, nameof(WriteWithoutResponse)).ConfigureAwait(false);
+
+            return result;
         }
-        this.logger.LogDebug("Writing characteristic without response");
-        var data = NSData.FromArray(value);
-        this.Native.WriteValue(data, nativeCh, CBCharacteristicWriteType.WithoutResponse);
-
-        return this.ToResult(nativeCh, BleCharacteristicEvent.WriteWithoutResponse);
+        finally
+        {
+            this.wwrLane.Release();
+        }
     });
+
+
+    async Task WaitForCanSendWriteWithoutResponse(CBCharacteristic nativeCh, CancellationToken ct)
+    {
+        if (this.Native.CanSendWriteWithoutResponse)
+            return;
+
+        this.logger.CanSendWriteWithoutResponse(nativeCh, false);
+
+        // readyWwrSubj is hot and IsReadyToSendWriteWithoutResponse fires once, on CoreBluetooth's queue. Merge
+        // subscribes to it BEFORE the deferred re-check runs, so a callback that lands between the check above and
+        // the wait is still seen (#1657)
+        var ready = this.readyWwrSubj.Merge(this.wwrRecheckSubj
+            .Merge(Observable.Defer(() => Observable.Return(Unit.Default)))
+            .Where(_ => this.Native.CanSendWriteWithoutResponse)
+        );
+
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeoutCts.CancelAfter(WriteWithoutResponseReadyTimeout);
+        try
+        {
+            await this.WaitForOperation(ready, timeoutCts.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !ct.IsCancellationRequested)
+        {
+            throw new BleException($"Peripheral was not ready to send write without response within {WriteWithoutResponseReadyTimeout.TotalSeconds} seconds (CanSendWriteWithoutResponse stayed false)");
+        }
+        this.logger.CanSendWriteWithoutResponse(nativeCh, true);
+    }
 
 
     protected void AssertWrite(CBCharacteristic ch, bool withResponse)
