@@ -957,7 +957,7 @@ public static partial class ConfigurationBuilderExtensions
     // Add platform-specific preferences (NSUserDefaults / SharedPreferences)
     public static IConfigurationBuilder AddPlatformPreferences(this IConfigurationBuilder builder);
 
-    // Add remote configuration (platform shorthand)
+    // Add remote configuration (iOS/Android shorthand - cached in LocalApplicationData, loads in the background)
     public static IConfigurationBuilder AddRemote(
         this IConfigurationBuilder builder,
         string configurationUri,
@@ -965,11 +965,13 @@ public static partial class ConfigurationBuilderExtensions
         Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null
     );
 
-    // Add remote configuration (full control)
-    public static IConfigurationBuilder AddRemote(
+    // Add remote configuration with an explicit cache file (all platforms). Note: URI first.
+    // Replaces AddRemote(configurationFilePath, configurationUri, ...), which was ambiguous on iOS/Android;
+    // that overload is gone there and [Obsolete] elsewhere - never generate it.
+    public static IConfigurationBuilder AddRemoteWithCacheFile(
         this IConfigurationBuilder builder,
-        string configurationFilePath,
         string configurationUri,
+        string configurationFilePath,
         Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null,
         bool waitForRemoteLoad = true
     );

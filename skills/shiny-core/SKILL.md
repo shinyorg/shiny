@@ -82,6 +82,11 @@ triggers:
   - Shiny.Extensions.DependencyInjection
   - Shiny.Extensions.Stores
   - Shiny.Extensions.Configuration
+  - remote configuration
+  - IRemoteConfigurationProvider
+  - AddRemote
+  - AddRemoteWithCacheFile
+  - GetRemoteConfigurationProvider
 ---
 
 # Shiny Core

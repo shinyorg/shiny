@@ -61,12 +61,12 @@ public static partial class ConfigurationBuilderExtensions
         string configurationUri,
         string configurationFileName = "remotesettings.json",
         Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null
-    ) => builder.AddRemote(
+    ) => builder.AddRemoteWithCacheFile(
+        configurationUri,
         Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
             configurationFileName
         ),
-        configurationUri,
         getData,
         false
     );
@@ -98,15 +98,15 @@ public static partial class ConfigurationBuilderExtensions
     /// Adds a remote configuration source whose payload is cached at the given file path.
     /// </summary>
     /// <param name="builder">The configuration builder.</param>
-    /// <param name="configurationFilePath">Local file path where the remote settings are persisted.</param>
     /// <param name="configurationUri">The remote endpoint URI to load from.</param>
+    /// <param name="configurationFilePath">Local file path where the remote settings are persisted.</param>
     /// <param name="getData">Optional override that produces the configuration payload (e.g. for custom auth) as a JSON object - use <c>JsonNode.Parse</c> on a response body, or <c>JsonSerializer.SerializeToNode</c> with a source-generated context for a typed object.</param>
     /// <param name="waitForRemoteLoad">When true, the configuration build waits for the remote call to complete.</param>
     /// <returns>The same builder, for fluent chaining.</returns>
-    public static IConfigurationBuilder AddRemote(
-        this IConfigurationBuilder builder, 
-        string configurationFilePath, 
+    public static IConfigurationBuilder AddRemoteWithCacheFile(
+        this IConfigurationBuilder builder,
         string configurationUri,
+        string configurationFilePath,
         Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null,
         bool waitForRemoteLoad = true
     )
@@ -122,6 +122,29 @@ public static partial class ConfigurationBuilderExtensions
         
         return builder;
     }
+
+    #if !APPLE && !ANDROID
+
+    // not on iOS/Android: there AddRemote(string, string) also matched AddRemote(configurationUri, configurationFileName),
+    // which takes the same two strings with a different meaning, so the call did not compile
+    /// <summary>
+    /// Adds a remote configuration source whose payload is cached at the given file path.
+    /// </summary>
+    /// <param name="builder">The configuration builder.</param>
+    /// <param name="configurationFilePath">Local file path where the remote settings are persisted.</param>
+    /// <param name="configurationUri">The remote endpoint URI to load from.</param>
+    /// <param name="getData">Optional override that produces the configuration payload as a JSON object.</param>
+    /// <param name="waitForRemoteLoad">When true, the configuration build waits for the remote call to complete.</param>
+    [Obsolete("Use AddRemoteWithCacheFile(configurationUri, configurationFilePath, ...) - note that it takes the URI first")]
+    public static IConfigurationBuilder AddRemote(
+        this IConfigurationBuilder builder, 
+        string configurationFilePath, 
+        string configurationUri,
+        Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null,
+        bool waitForRemoteLoad = true
+    ) => builder.AddRemoteWithCacheFile(configurationUri, configurationFilePath, getData, waitForRemoteLoad);
+
+    #endif
 
     // public static MauiAppBuilder AddRemoteConfigurationMaui(
     //     this MauiAppBuilder builder, 
