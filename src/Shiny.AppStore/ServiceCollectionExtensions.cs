@@ -19,16 +19,16 @@ public static class AppStoreServiceCollectionExtensions
         var options = new AppStoreOptions();
         configure.Invoke(options);
 
-        // registered by factory rather than by type so nothing here needs reflection under AOT
+        services.TryAddSingleton(options);
 #if ANDROID
-        services.TryAddSingleton<IAppStore>(sp => new AndroidAppStore(sp.GetRequiredService<AndroidPlatform>(), options));
+        services.TryAddSingleton<IAppStore, AndroidAppStore>();
 #elif IOS || MACCATALYST || MACOS
-        services.TryAddSingleton<IAppStore>(sp => new AppleAppStore(sp.GetRequiredService<IPlatform>(), options));
+        services.TryAddSingleton<IAppStore, AppleAppStore>();
 #elif WINDOWS
-        services.TryAddSingleton<IAppStore>(sp => new WindowsAppStore(sp.GetRequiredService<IPlatform>(), options));
+        services.TryAddSingleton<IAppStore, WindowsAppStore>();
 #else
         if (OperatingSystem.IsLinux())
-            services.TryAddSingleton<IAppStore>(sp => new LinuxAppStore(sp.GetRequiredService<IPlatform>(), options));
+            services.TryAddSingleton<IAppStore, LinuxAppStore>();
         else
             services.TryAddSingleton<IAppStore, NotSupportedAppStore>();
 #endif

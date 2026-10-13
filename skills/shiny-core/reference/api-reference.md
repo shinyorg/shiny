@@ -343,7 +343,7 @@ public class IosPlatform : IPlatform
     public DirectoryInfo AppData { get; }
     public DirectoryInfo Cache { get; }
     public DirectoryInfo Public { get; }
-    public string AppIdentifier { get; }
+    public string? ApplicationIdentifier { get; }
     public void InvokeOnMainThread(Action action);
 }
 ```

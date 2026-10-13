@@ -19,8 +19,8 @@ public static class AppStartupInstallerExtensions
         var options = new AppStartupOptions();
         configure?.Invoke(options);
 
-        // registered by factory rather than by type so nothing here needs reflection under AOT
-        services.TryAddSingleton<IAppStartupInstaller>(_ => new AppStartupInstaller(options));
+        services.TryAddSingleton(options);
+        services.TryAddSingleton<IAppStartupInstaller, AppStartupInstaller>();
         return services;
     }
 }

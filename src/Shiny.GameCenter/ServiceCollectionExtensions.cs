@@ -1,9 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Shiny.GameCenter;
 using Shiny.GameCenter.Infrastructure;
-using Shiny.Net;
 
 namespace Shiny;
 
@@ -30,28 +28,17 @@ public static class GameCenterServiceCollectionExtensions
         configure?.Invoke(options);
         services.AddSingleton(options);
 
-        // registered by factory rather than by type so nothing here needs reflection under AOT
 #if ANDROID
-        services.TryAddSingleton<IGameServicesProvider>(sp => new PlayGamesProvider(
-            sp.GetRequiredService<AndroidPlatform>(),
-            sp.GetRequiredService<ILogger<PlayGamesProvider>>()
-        ));
+        services.TryAddSingleton<IGameServicesProvider, PlayGamesProvider>();
 #elif APPLE
-        services.TryAddSingleton<IGameServicesProvider>(sp => new GameKitProvider(
-            sp.GetRequiredService<GameCenterOptions>(),
-            sp.GetRequiredService<ILogger<GameKitProvider>>()
-        ));
+        services.TryAddSingleton<IGameServicesProvider, GameKitProvider>();
 #else
-        services.TryAddSingleton<IGameServicesProvider>(_ => new NotSupportedGameServicesProvider());
+        services.TryAddSingleton<IGameServicesProvider, NotSupportedGameServicesProvider>();
 #endif
 
-        services.TryAddSingleton(sp => new GameCenterManager(
-            sp.GetRequiredService<IGameServicesProvider>(),
-            sp.GetRequiredService<GameCenterOptions>(),
-            new GameCenterStateStore(GetStatePath(sp)),
-            sp.GetRequiredService<ILogger<GameCenterManager>>(),
-            sp.GetService<IConnectivity>()
-        ));
+        // the state file path depends on IPlatform, which may not be registered
+        services.TryAddSingleton(sp => new GameCenterStateStore(GetStatePath(sp)));
+        services.TryAddSingleton<GameCenterManager>();
         services.TryAddSingleton<IGameCenterManager>(sp => sp.GetRequiredService<GameCenterManager>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShinyStartupTask, GameCenterManager>(
             sp => sp.GetRequiredService<GameCenterManager>()

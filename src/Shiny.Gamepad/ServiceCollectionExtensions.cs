@@ -1,8 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-#if !PLATFORM
-using Microsoft.JSInterop;
-#endif
 using Shiny.Gamepad;
 
 namespace Shiny;
@@ -36,20 +32,12 @@ public static class GamepadServiceCollectionExtensions
     /// </remarks>
     public static IServiceCollection AddGamepads(this IServiceCollection services)
     {
-        // registered by factory rather than by type so nothing here needs reflection under AOT
 #if ANDROID
-        services.AddSingleton<IGamepadManager>(sp => new AndroidGamepadManager(
-            sp.GetRequiredService<AndroidPlatform>(),
-            sp.GetRequiredService<ILogger<AndroidGamepadManager>>()
-        ));
+        services.AddSingleton<IGamepadManager, AndroidGamepadManager>();
 #elif APPLE
-        services.AddSingleton<IGamepadManager>(sp => new AppleGamepadManager(
-            sp.GetRequiredService<ILogger<AppleGamepadManager>>()
-        ));
+        services.AddSingleton<IGamepadManager, AppleGamepadManager>();
 #elif WINDOWS
-        services.AddSingleton<IGamepadManager>(sp => new WindowsGamepadManager(
-            sp.GetRequiredService<ILogger<WindowsGamepadManager>>()
-        ));
+        services.AddSingleton<IGamepadManager, WindowsGamepadManager>();
 #endif
         return services;
     }
@@ -85,19 +73,13 @@ public static class GamepadServiceCollectionExtensions
     /// </remarks>
     public static IServiceCollection AddGamepads(this IServiceCollection services)
     {
-        // registered by factory rather than by type so nothing here needs reflection under AOT
         if (OperatingSystem.IsBrowser())
         {
-            services.AddSingleton<IGamepadManager>(sp => new BlazorGamepadManager(
-                sp.GetRequiredService<IJSRuntime>(),
-                sp.GetRequiredService<ILogger<BlazorGamepadManager>>()
-            ));
+            services.AddSingleton<IGamepadManager, BlazorGamepadManager>();
         }
         else if (OperatingSystem.IsLinux())
         {
-            services.AddSingleton<IGamepadManager>(sp => new LinuxGamepadManager(
-                sp.GetRequiredService<ILogger<LinuxGamepadManager>>()
-            ));
+            services.AddSingleton<IGamepadManager, LinuxGamepadManager>();
         }
         else
         {
@@ -118,9 +100,7 @@ public static class GamepadServiceCollectionExtensions
     /// </remarks>
     public static IServiceCollection AddNotSupportedGamepads(this IServiceCollection services)
     {
-        services.AddSingleton<IGamepadManager>(sp => new NotSupportedGamepadManager(
-            sp.GetRequiredService<ILogger<NotSupportedGamepadManager>>()
-        ));
+        services.AddSingleton<IGamepadManager, NotSupportedGamepadManager>();
 
         return services;
     }

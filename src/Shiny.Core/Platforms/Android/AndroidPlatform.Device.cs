@@ -34,12 +34,13 @@ public partial class AndroidPlatform
         }
     }
 
+    public string? ApplicationIdentifier => this.AppContext.PackageName;
     public string DeviceManufacturer => Build.Manufacturer ?? "Unknown";
     public string DeviceModel => Build.Model ?? "Unknown";
     public Version? PlatformVersion => PlatformVersionParser.Parse(Build.VERSION.Release);
     public string Platform => "Android";
 
-    public DeviceIdiom DeviceIdiom
+    public DeviceFormFactor DeviceFormFactor
     {
         get
         {
@@ -47,21 +48,21 @@ public partial class AndroidPlatform
             switch (uiMode?.CurrentModeType)
             {
                 case UiMode.TypeTelevision:
-                    return DeviceIdiom.TV;
+                    return DeviceFormFactor.TV;
 
                 case UiMode.TypeCar:
-                    return DeviceIdiom.Car;
+                    return DeviceFormFactor.Car;
 
                 case UiMode.TypeWatch:
-                    return DeviceIdiom.Watch;
+                    return DeviceFormFactor.Watch;
 
                 case UiMode.TypeDesk:
-                    return DeviceIdiom.Desktop;
+                    return DeviceFormFactor.Desktop;
             }
 
             // the same 600dp line Android's own resource qualifiers (sw600dp) draw for a tablet
             var smallestWidth = this.AppContext.Resources?.Configuration?.SmallestScreenWidthDp ?? 0;
-            return smallestWidth >= 600 ? DeviceIdiom.Tablet : DeviceIdiom.Phone;
+            return smallestWidth >= 600 ? DeviceFormFactor.Tablet : DeviceFormFactor.Phone;
         }
     }
 

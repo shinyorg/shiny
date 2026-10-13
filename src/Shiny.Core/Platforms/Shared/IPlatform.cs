@@ -10,8 +10,6 @@ namespace Shiny;
 /// </summary>
 public interface IPlatform
 {
-    //string AppIdentifier { get; }
-
     /// <summary>
     /// Invokes an action on the platform main/UI thread
     /// </summary>
@@ -41,6 +39,13 @@ public interface IPlatform
     Version AppVersion { get; }
 
     /// <summary>
+    /// The app's store/package identifier - the bundle identifier on Apple, the package name on Android,
+    /// the package identity name on packaged Windows apps, and the Flatpak app ID or Snap name on Linux.
+    /// Null where the app has no such identity (unpackaged Windows, plain .NET, Blazor WebAssembly).
+    /// </summary>
+    string? ApplicationIdentifier { get; }
+
+    /// <summary>
     /// The device manufacturer, or "Unknown" where the platform does not say
     /// </summary>
     string DeviceManufacturer { get; }
@@ -65,7 +70,7 @@ public interface IPlatform
     /// <summary>
     /// The kind of device the app is running on
     /// </summary>
-    DeviceIdiom DeviceIdiom { get; }
+    DeviceFormFactor DeviceFormFactor { get; }
 
     /// <summary>
     /// The current culture

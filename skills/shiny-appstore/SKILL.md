@@ -56,7 +56,7 @@ longer have it. Never generate `builder.AddAppStore(...)` or `builder.AddLinuxAp
 ```csharp
 using Shiny;
 
-// everything except the Windows product ID is detected from the running app
+// everything except the Windows product ID is backfilled from IPlatform.ApplicationIdentifier
 builder.Services.AddAppStore();
 
 // or with identifiers (named arguments)
@@ -72,7 +72,7 @@ builder.Services.AddAppStore(opts =>
 });
 ```
 
-`IAppStore` depends on Shiny's `IPlatform` (for the running app's version). MAUI apps get it from
+`IAppStore` depends on Shiny's `IPlatform` (for the running app's version and `ApplicationIdentifier`). MAUI apps get it from
 `UseShiny()`, native apps from the Shiny hosting base classes; a plain .NET host calls
 `services.AddShinyCoreServices()`.
 

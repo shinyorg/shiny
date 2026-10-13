@@ -34,7 +34,7 @@ public class AppleAppStore(IPlatform platform, AppStoreOptions options) : IAppSt
 
     public async Task<AppStoreResult?> GetCurrent(CancellationToken cancellationToken = default)
     {
-        var bundleId = options.AppleBundleId ?? NSBundle.MainBundle.BundleIdentifier;
+        var bundleId = options.AppleBundleId ?? platform.ApplicationIdentifier;
         if (String.IsNullOrWhiteSpace(bundleId))
             return null;
 

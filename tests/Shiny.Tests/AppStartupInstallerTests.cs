@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Shiny.Tests;
@@ -46,5 +47,17 @@ public class AppStartupInstallerTests
         Assert.False(installer.IsSupported);
         Assert.Equal(AppStartupState.NotSupported, await installer.GetState());
         Assert.Equal(AppStartupState.NotSupported, await installer.Register());
+    }
+
+
+    [Fact]
+    public void AddAppStartupInstaller_ResolvesByType()
+    {
+        var services = new ServiceCollection();
+        services.AddAppStartupInstaller(x => x.Identifier = "shiny-test");
+
+        using var sp = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true });
+        Assert.IsType<AppStartupInstaller>(sp.GetRequiredService<IAppStartupInstaller>());
+        Assert.Equal("shiny-test", sp.GetRequiredService<AppStartupOptions>().Identifier);
     }
 }

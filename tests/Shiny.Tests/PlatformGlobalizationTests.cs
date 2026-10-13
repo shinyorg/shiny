@@ -92,7 +92,9 @@ public class PlatformGlobalizationTests
         var platform = new NetPlatform();
         Assert.NotNull(platform.AppVersion);
         Assert.NotEqual("Unknown", platform.Platform);
-        Assert.Equal(DeviceIdiom.Desktop, platform.DeviceIdiom);
+        Assert.Equal(DeviceFormFactor.Desktop, platform.DeviceFormFactor);
+        if (!OperatingSystem.IsLinux())
+            Assert.Null(platform.ApplicationIdentifier);
         Assert.Equal(TimeZoneInfo.Local, platform.CurrentTimeZone);
     }
 }

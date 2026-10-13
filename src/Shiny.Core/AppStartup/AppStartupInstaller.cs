@@ -34,7 +34,7 @@ public sealed partial class AppStartupInstaller : IAppStartupInstaller
     public Task<bool> OpenSettings() => this.OpenSettingsCore();
 
 
-    // the entry assembly rather than IPlatform.AppIdentifier-style lookups - the desktop implementations
+    // the entry assembly rather than IPlatform.ApplicationIdentifier - the desktop implementations
     // run on the bare net10.0 target, where there is no bundle or package to ask
     string GetIdentifier()
     {

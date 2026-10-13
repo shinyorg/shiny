@@ -20,13 +20,14 @@ triggers:
   - login item
   - autostart
   - systemd unit
-  - DeviceIdiom
+  - DeviceFormFactor
   - CultureChanged
   - TimeZoneChanged
   - OpenAppSettings
   - DeviceManufacturer
   - DeviceModel
   - AppVersion
+  - ApplicationIdentifier
   - UserAgent
   - UserAgentVersion
   - IKeyValueStore
@@ -43,11 +44,6 @@ triggers:
   - screen size
   - screen orientation
   - lock orientation
-  - ShinyPermissions
-  - ShinyPermission
-  - maui permission
-  - Permissions.RequestAsync
-  - Permissions.CheckStatusAsync
   - BasePermission
   - IShinyStartupTask
   - ShinyLifecycleTask
@@ -172,47 +168,6 @@ public static class MauiProgram
 
 `UseShiny()` also covers macOS (AppKit) MAUI apps built on `Microsoft.Maui.Platforms.MacOS` - `Shiny.Hosting.Maui` ships a `net10.0-macos` target, so call it after `UseMauiAppMacOS<App>()` like any other head. Never hand-roll an `IMauiInitializeService` that news up `Shiny.Hosting.Host` or call `AddShinyCoreServices()` yourself - that is what `UseShiny()` does. (Doing both is harmless - `Host.Run()` ignores a second run over the same service provider and `AddShinyCoreServices()` is idempotent - but it is dead code.) The macOS MAUI backend has no lifecycle events for remote notifications, so a macOS head that **uses push** forwards `application:didRegisterForRemoteNotificationsWithDeviceToken:` and friends from its `MacOSMauiApplication` subclass to `Host.Lifecycle` (see `samples/Sample.MacOS/Main.cs`). Only add those methods when the app actually uses push - implementing them is what tells Apple the app uses push, and App Review flags apps that implement them without it. Shiny deliberately ships no base delegate that overrides them.
 
-### MAUI Permission Checks (`ShinyPermissions`)
-
-`Shiny.Hosting.Maui` ships `ShinyPermissions` - MAUI `Permissions.BasePermission` subclasses that ask the OS for exactly what each Shiny module needs, **without referencing the module**. Use them when you want MAUI's permission flow (a permissions screen, onboarding) instead of, or ahead of, the module's own `RequestAccess`.
-
-```csharp
-using Shiny;
-
-// prefer the instance form - with `using Shiny;`, an unqualified `Permissions` is ambiguous on Windows
-var status = await new ShinyPermissions.BluetoothLE().RequestAsync();
-var current = await new ShinyPermissions.GpsBackground().CheckStatusAsync();
-
-// the MAUI static form works too when written out
-var push = await Microsoft.Maui.ApplicationModel.Permissions.RequestAsync<ShinyPermissions.Push>();
-```
-
-| Check | Mirrors | Android | Apple | Windows |
-|-------|---------|---------|-------|---------|
-| `BluetoothLE` | `IBleManager.RequestAccess` | SCAN + CONNECT (12+) / BLUETOOTH + ADMIN + FINE (below), then adapter on | CoreBluetooth central authorization + power state | LE radio on |
-| `BluetoothLEHosting` | `IBleHostingManager.RequestAccess` | ADVERTISE + CONNECT (12+), adapter | CoreBluetooth peripheral authorization + power | peripheral role supported, radio on |
-| `Beacons` | ranging | = `BluetoothLE` | when-in-use location (ranging available) | = `BluetoothLE` |
-| `BeaconMonitoring` | monitoring | BLE + connected-device FGS (14+) + POST_NOTIFICATIONS (13+) | "always" location (not macOS) | = `BluetoothLE` |
-| `Gps` | `GpsRequest.Foreground` | coarse + fine | when-in-use | `location` capability |
-| `GpsBackground` | `GpsBackgroundMode.Standard` | coarse + fine, then background location on its own (10+) | when-in-use, then "always" | not supported |
-| `GpsRealtime` | `GpsBackgroundMode.Realtime` | coarse + fine + FGS + POST_NOTIFICATIONS + FGS location (bg location on 10/11) | "always" | not supported |
-| `Geofencing` | `IGeofenceManager.RequestAccess` | coarse + fine, then background location | "always" | `location` capability |
-| `MotionActivity` | `IMotionActivityManager` | ACTIVITY_RECOGNITION (10+) | CoreMotion (not macOS) | not supported |
-| `Notifications` | `RequestAccess()` | POST_NOTIFICATIONS (13+) + app notifications on | alert/badge/sound | toast setting |
-| `TimeSensitiveNotifications` | `AccessRequestFlags.TimeSensitivity` | + exact alarms (12+, opens Settings) | = `Notifications` | = `Notifications` |
-| `Push` | user-facing half of push | POST_NOTIFICATIONS (13+) | alert/badge/sound | toast setting |
-| `HttpTransfers`, `DataSync` | foreground service | FGS + POST_NOTIFICATIONS | granted | granted |
-| `Jobs` | `IJobManager.RequestAccess` | granted | `processing` mode + BGTask identifiers declared, Background App Refresh | not supported |
-| `Wifi` | `IWifiManager.RequestAccess` | fine (+ NEARBY_WIFI_DEVICES 13+) | when-in-use | `wiFiControl` |
-| `Contacts` | `IContactStore.RequestAccess` | READ + WRITE_CONTACTS | CNContactStore (iOS 18 limited = `Limited`) | not supported |
-| `Calendar` | `ICalendarStore.RequestAccess(ReadWrite)` | READ + WRITE_CALENDAR | full access (iOS 17 / macOS 14+) | appointments store |
-| `ScreenRecorder` | without audio | FGS + POST_NOTIFICATIONS | ReplayKit available / macOS screen capture (relaunch to apply) | capture supported |
-
-- **Results**: partial grants (approximate location, when-in-use for a background check, iOS 18 limited contacts, calendar write-only, notifications denied for a foreground service, no exact alarms) are `PermissionStatus.Limited`. iOS parental-control restrictions are `Restricted`. A switched-off service or radio is `Disabled`.
-- **Throws**: `FeatureNotSupportedException` when the platform or device can't do the feature (and on the plain `net10.0` / Linux GTK build, which has no checks); `Microsoft.Maui.ApplicationModel.PermissionException` when the manifest, Info.plist or (packaged) Windows capability entry is missing.
-- **Android needs the Shiny host running** - `UseShiny()` - because requests go through `AndroidPlatform`.
-- Pair `ScreenRecorder` with MAUI's `Permissions.Microphone` for audio. LiveActivities (iOS needs the Swift bridge), GameCenter, Wearables and Network Discovery have no check here.
-
 ### Native (Non-MAUI) Setup
 
 For native iOS apps, inherit from `ShinyAppDelegate`:
@@ -282,7 +237,7 @@ When generating code that uses Shiny.Core, follow these conventions:
 6. **Implement `IAndroidLifecycle.*`, `IIosLifecycle.*`, or `IMacLifecycle.*` sub-interfaces** for platform-specific lifecycle hooks. Register them in DI and the lifecycle executor dispatches to them automatically.
 7. **Inject a keyed `IKeyValueStore` from `Shiny.Extensions.Stores`** via `[FromKeyedServices(StoreKeys.Default)] IKeyValueStore store` (or `StoreKeys.Secure`). The store factory is also available via `IKeyValueStoreFactory.Get(alias)`.
 8. **Use the static `Shiny.Stores.Default` / `Shiny.Stores.Secure` accessors** for one-off reads/writes outside DI contexts — the accessor self-bootstraps on first use after `AddShinyStores()` has run (call `host.Services.UseShinyStores()` after `Build()` on Blazor WASM).
-9. **Use `IPlatform`** to access `AppData`, `Cache`, `Public` directories and `InvokeOnMainThread()`, and for device/app info: `AppVersion`, `DeviceManufacturer`, `DeviceModel`, `PlatformVersion`, `Platform` (`Android`, `iOS`, `MacCatalyst`, `tvOS`, `macOS`, `Windows`, `Linux`, `Browser`), `DeviceIdiom` (`Shiny.DeviceIdiom` - never MAUI's `Microsoft.Maui.Devices.DeviceIdiom`; qualify it when both namespaces are imported), `CurrentCulture` / `CultureChanged`, `CurrentTimeZone` / `TimeZoneChanged` (native listeners start with the first subscriber; raised off the UI thread - marshal before touching UI) and `OpenAppSettings()`. These are implemented natively with no MAUI, and replace the members removed from `Shiny.Extensions.MauiHosting`'s `IAppSupport` - never generate them against `IAppSupport`.
+9. **Use `IPlatform`** to access `AppData`, `Cache`, `Public` directories and `InvokeOnMainThread()`, and for device/app info: `AppVersion`, `ApplicationIdentifier` (`string?` - bundle identifier on Apple, package name on Android, package identity name on packaged Windows, Flatpak app ID / Snap name on Linux; null when there is no such identity, so always null-check it), `DeviceManufacturer`, `DeviceModel`, `PlatformVersion`, `Platform` (`Android`, `iOS`, `MacCatalyst`, `tvOS`, `macOS`, `Windows`, `Linux`, `Browser`), `DeviceFormFactor` (`Shiny.DeviceFormFactor` - `Unknown`, `Phone`, `Tablet`, `Desktop`, `TV`, `Watch`, `Car`; named so it never collides with MAUI's `Microsoft.Maui.Devices.DeviceIdiom` - do not generate `DeviceIdiom` against `IPlatform`), `CurrentCulture` / `CultureChanged`, `CurrentTimeZone` / `TimeZoneChanged` (native listeners start with the first subscriber; raised off the UI thread - marshal before touching UI) and `OpenAppSettings()`. These are implemented natively with no MAUI, and replace the members removed from `Shiny.Extensions.MauiHosting`'s `IAppSupport` - never generate them against `IAppSupport`.
 10. **Use `IScreenInfo`** (registered by every host, like `IPlatform`) for the main display and orientation - it replaces `IAppSupport.CurrentOrientation` / `OrientationChanged` / `SetOrientation` / `ResetOrientation` from `Shiny.Extensions.MauiHosting` and the Blazor screen sizes. `Metrics` is a `ScreenMetrics(Width, Height, Density, Orientation, RefreshRate)` snapshot in physical pixels (`WidthIndependent` / `HeightIndependent` divide by density); `MetricsChanged` / `OrientationChanged` start watching with the first subscriber and may be raised off the UI thread. The orientation enum is `Shiny.DeviceOrientation` (`Unknown`, `Portrait`, `Landscape`) - **not** MAUI's `DisplayOrientation` and not Android's `ScreenOrientation`. `SetOrientation(...)` returns whether it applied: Android uses the current Activity; iOS 16+ needs the app delegate to return `Shiny.IosOrientationLock.Supported` from `application:supportedInterfaceOrientationsForWindow:` to hold it; Windows sets the auto-rotation preference (tablets only); Blazor only locks a full-screen page or installed app; Mac Catalyst, macOS, tvOS and Linux return false. Linux and console hosts report `ScreenMetrics.Empty`.
 10. **Use `IAppStartupInstaller`** (register with `services.AddAppStartupInstaller(o => ...)`) to put the app in the OS launch-at-login list: `HKCU\...\Run` on unpackaged Windows, `SMAppService` login items on macOS 13+ / Mac Catalyst 16+, and on Linux an XDG autostart entry or a systemd unit chosen by `AppStartupOptions.LinuxMode` (`XdgAutostart`, `SystemdGraphicalSession`, `SystemdUser`, `SystemdSystem` - the last needs root). Check `IsSupported` before showing a toggle; `Register()` returns the state the OS settled on (`Enabled`, `DisabledByUser`, `DisabledByPolicy`, `RequiresApproval` on macOS) - bind UI to that or a fresh `GetState()`, never cache it, and call `OpenSettings()` when the user has to finish in the OS. Android/iOS/tvOS report `NotSupported`. It replaces `Shiny.Extensions.MauiHosting`'s `IStartupService` / `AddStartupService` - never generate those.
 11. **Use `AccessState` enum** and `state.Assert()` extension method to validate permissions before proceeding with platform operations.
@@ -311,8 +266,7 @@ When using Shiny in a MAUI app, several Shiny types collide with MAUI implicit u
 | `IBattery` | `Shiny.Power` | `Microsoft.Maui.Devices` | Use `Shiny.Power.IBattery` FQN |
 | `BatteryState`, `BatteryPowerSource`, `EnergySaverStatus` | `Shiny.Power` | `Microsoft.Maui.Devices` | Use `Shiny.Power.*` FQN (in the global namespace in 5.7.1 only — see below) |
 | `DeviceInfo` | `Shiny.BluetoothLE` | `Microsoft.Maui.Devices` | Use FQN for whichever you need |
-| `PermissionException` | `Shiny` | `Microsoft.Maui.ApplicationModel` | `ShinyPermissions` checks throw the MAUI one - catch `Microsoft.Maui.ApplicationModel.PermissionException` |
-| `Permissions` (Windows only) | `Shiny` | `Microsoft.Maui.ApplicationModel` | Use `new ShinyPermissions.X().RequestAsync()` or the `Microsoft.Maui.ApplicationModel.Permissions` FQN |
+| `Permissions` (Windows only) | `Shiny` | `Microsoft.Maui.ApplicationModel` | Use the `Microsoft.Maui.ApplicationModel.Permissions` FQN |
 
 **Safe global usings** (won't conflict with MAUI):
 ```csharp

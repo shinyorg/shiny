@@ -82,17 +82,22 @@ public class WindowsPlatform : IPlatform
         }
     }
 
+    // unpackaged - no package identity, and the entry assembly name is not a store identifier
+    public string? ApplicationIdentifier => this.isPackaged
+        ? Windows.ApplicationModel.Package.Current.Id.Name
+        : null;
+
     public string DeviceManufacturer => this.Read(x => x.SystemManufacturer);
     public string DeviceModel => this.Read(x => x.SystemProductName);
     public Version? PlatformVersion => Environment.OSVersion.Version;
     public string Platform => "Windows";
 
-    public DeviceIdiom DeviceIdiom => AnalyticsInfo.VersionInfo.DeviceFamily switch
+    public DeviceFormFactor DeviceFormFactor => AnalyticsInfo.VersionInfo.DeviceFamily switch
     {
-        "Windows.Desktop" => DeviceIdiom.Desktop,
-        "Windows.Mobile" => DeviceIdiom.Phone,
-        "Windows.Xbox" => DeviceIdiom.TV,
-        _ => DeviceIdiom.Unknown
+        "Windows.Desktop" => DeviceFormFactor.Desktop,
+        "Windows.Mobile" => DeviceFormFactor.Phone,
+        "Windows.Xbox" => DeviceFormFactor.TV,
+        _ => DeviceFormFactor.Unknown
     };
 
     public CultureInfo CurrentCulture => this.globalization.CurrentCulture;

@@ -94,6 +94,21 @@ public partial class NetPlatform : IPlatform
 
     public Version AppVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(1, 0);
 
+    public string? ApplicationIdentifier
+    {
+        get
+        {
+            if (!OperatingSystem.IsLinux())
+                return null;
+
+            var id = Environment.GetEnvironmentVariable("FLATPAK_ID");
+            if (String.IsNullOrWhiteSpace(id))
+                id = Environment.GetEnvironmentVariable("SNAP_NAME");
+
+            return String.IsNullOrWhiteSpace(id) ? null : id;
+        }
+    }
+
     public string DeviceManufacturer => OperatingSystem.IsLinux()
         ? ReadFirstLine(DmiVendor) ?? "Unknown"
         : "Unknown";
@@ -124,7 +139,7 @@ public partial class NetPlatform : IPlatform
         }
     }
 
-    public DeviceIdiom DeviceIdiom => OperatingSystem.IsBrowser() ? DeviceIdiom.Unknown : DeviceIdiom.Desktop;
+    public DeviceFormFactor DeviceFormFactor => OperatingSystem.IsBrowser() ? DeviceFormFactor.Unknown : DeviceFormFactor.Desktop;
 
 
     readonly Lazy<string?> userAgent = new(ReadUserAgent);

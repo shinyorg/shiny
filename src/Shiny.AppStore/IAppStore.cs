@@ -57,24 +57,26 @@ public class AppStoreOptions
     public string? AppleAppId { get; set; }
 
     /// <summary>
-    /// Apple bundle identifier. Auto-detected from the running bundle when null.
+    /// Apple bundle identifier. Falls back to <see cref="IPlatform.ApplicationIdentifier"/> (the running bundle) when null.
     /// </summary>
     public string? AppleBundleId { get; set; }
 
     /// <summary>
-    /// Android package name. Auto-detected from the running app context when null.
+    /// Android package name. Falls back to <see cref="IPlatform.ApplicationIdentifier"/> (the running package) when null.
     /// </summary>
     public string? AndroidPackageName { get; set; }
 
     /// <summary>
-    /// Microsoft Store Product ID (e.g. "9NBLGGH4NNS1"). Required on Windows.
+    /// Microsoft Store Product ID (e.g. "9NBLGGH4NNS1"). Required on Windows - the package identity name
+    /// in <see cref="IPlatform.ApplicationIdentifier"/> is not the Store product ID, so it cannot be backfilled.
     /// </summary>
     public string? WindowsProductId { get; set; }
 
     /// <summary>
     /// Linux AppStream component / Flatpak application ID (e.g. "net.shinylib.Sample"), used to query
     /// Flatpak or Snap for the published version and to deep-link the desktop software centre.
-    /// Auto-detected from the Flatpak/Snap environment when null.
+    /// Falls back to <see cref="IPlatform.ApplicationIdentifier"/> (the Flatpak app ID or Snap name), then the
+    /// entry assembly name, when null.
     /// </summary>
     public string? LinuxAppId { get; set; }
 

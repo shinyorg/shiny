@@ -72,12 +72,8 @@ public sealed class LinuxAppStore : IAppStore
         if (!String.IsNullOrWhiteSpace(this.options.LinuxAppId))
             return this.options.LinuxAppId;
 
-        // Both are set by the respective runtime inside the running app.
-        var id = Environment.GetEnvironmentVariable("FLATPAK_ID");
-        if (!String.IsNullOrWhiteSpace(id))
-            return id;
-
-        id = Environment.GetEnvironmentVariable("SNAP_NAME");
+        // the Flatpak app ID or Snap name, set by the respective runtime inside the running app
+        var id = this.platform.ApplicationIdentifier;
         if (!String.IsNullOrWhiteSpace(id))
             return id;
 

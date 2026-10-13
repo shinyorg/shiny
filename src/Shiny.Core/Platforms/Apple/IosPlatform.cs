@@ -25,7 +25,7 @@ public class IosPlatform : IPlatform
     public DirectoryInfo AppData { get; }
     public DirectoryInfo Cache { get; }
     public DirectoryInfo Public { get; }
-    public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
+    public string? ApplicationIdentifier => NSBundle.MainBundle.BundleIdentifier;
 
     public Version AppVersion => AppleSystem.AppVersion;
     public string DeviceManufacturer => "Apple";
@@ -33,7 +33,7 @@ public class IosPlatform : IPlatform
 
 #if MACCATALYST
     public string Platform => "MacCatalyst";
-    public DeviceIdiom DeviceIdiom => DeviceIdiom.Desktop;
+    public DeviceFormFactor DeviceFormFactor => DeviceFormFactor.Desktop;
 
     // hw.machine is the CPU architecture on a Mac - hw.model is the machine ("Mac15,3")
     public string DeviceModel => AppleSystem.GetSysctl("hw.model") ?? UIDevice.CurrentDevice.Model;
@@ -50,14 +50,14 @@ public class IosPlatform : IPlatform
            ?? AppleSystem.GetSysctl("hw.machine")
            ?? UIDevice.CurrentDevice.Model;
 
-    public DeviceIdiom DeviceIdiom => UIDevice.CurrentDevice.UserInterfaceIdiom switch
+    public DeviceFormFactor DeviceFormFactor => UIDevice.CurrentDevice.UserInterfaceIdiom switch
     {
-        UIUserInterfaceIdiom.Phone => DeviceIdiom.Phone,
-        UIUserInterfaceIdiom.Pad => DeviceIdiom.Tablet,
-        UIUserInterfaceIdiom.TV => DeviceIdiom.TV,
-        UIUserInterfaceIdiom.CarPlay => DeviceIdiom.Car,
-        UIUserInterfaceIdiom.Mac => DeviceIdiom.Desktop,
-        _ => DeviceIdiom.Unknown
+        UIUserInterfaceIdiom.Phone => DeviceFormFactor.Phone,
+        UIUserInterfaceIdiom.Pad => DeviceFormFactor.Tablet,
+        UIUserInterfaceIdiom.TV => DeviceFormFactor.TV,
+        UIUserInterfaceIdiom.CarPlay => DeviceFormFactor.Car,
+        UIUserInterfaceIdiom.Mac => DeviceFormFactor.Desktop,
+        _ => DeviceFormFactor.Unknown
     };
 #endif
 

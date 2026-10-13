@@ -22,7 +22,7 @@ public partial class AndroidAppStore(AndroidPlatform platform, AppStoreOptions o
     private static partial Regex GooglePlayJsonLdVersionRegex();
 
 
-    string PackageName => options.AndroidPackageName ?? platform.AppContext.PackageName!;
+    string PackageName => options.AndroidPackageName ?? platform.ApplicationIdentifier!;
 
 
     public async Task<AppStoreResult?> GetCurrent(CancellationToken cancellationToken = default)

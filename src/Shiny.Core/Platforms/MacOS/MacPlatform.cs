@@ -29,13 +29,13 @@ public class MacPlatform : IPlatform
     public DirectoryInfo AppData { get; }
     public DirectoryInfo Cache { get; }
     public DirectoryInfo Public { get; }
-    public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
+    public string? ApplicationIdentifier => NSBundle.MainBundle.BundleIdentifier;
 
     public Version AppVersion => AppleSystem.AppVersion;
     public string DeviceManufacturer => "Apple";
     public string DeviceModel => AppleSystem.GetSysctl("hw.model") ?? "Mac";
     public string Platform => "macOS";
-    public DeviceIdiom DeviceIdiom => DeviceIdiom.Desktop;
+    public DeviceFormFactor DeviceFormFactor => DeviceFormFactor.Desktop;
 
     public Version? PlatformVersion
     {
