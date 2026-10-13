@@ -9,7 +9,7 @@ namespace Shiny.Extensions.Configuration.Infrastructure;
 
 public class RemoteConfigurationProvider(
     RemoteConfig config, 
-    Func<RemoteConfig, CancellationToken, Task<object>>? getData
+    Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData
 ) : ConfigurationProvider, IRemoteConfigurationProvider
 {
     const string LAST_LOAD_KEY = "__LastLoaded";
@@ -82,8 +82,8 @@ public class RemoteConfigurationProvider(
             }
             else
             {
-                var obj = await getData.Invoke(config, cancellationToken).ConfigureAwait(false);
-                var json = JsonSerializer.Serialize(obj);
+                var node = await getData.Invoke(config, cancellationToken).ConfigureAwait(false);
+                var json = node.ToJsonString();
                 await this.WriteJson(json, cancellationToken).ConfigureAwait(false);
             }
         }

@@ -221,7 +221,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 
 ### Building Requests
 
-- Use `TransferHttpContent.FromJson(obj)` to attach a JSON body to an upload.
+- Use `TransferHttpContent.FromJson(obj, MyJsonContext.Default.MyType)` to attach a JSON body to an upload - it is trim/AOT safe. The `FromJson(object, JsonSerializerOptions?)` overload serializes by reflection and is marked `[RequiresUnreferencedCode]`; only use it where the app is not trimmed.
 - Use `TransferHttpContent.FromFormData(...)` to attach form-encoded data.
 - Use `AzureBlobStorageUploadRequest` for Azure Blob Storage uploads -- call `.WithBlobContainer(tenant, container)` or `.WithCustomUri(uri)`, configure auth via `.WithSasToken()` or `.WithSharedKeyAuthorization()`, then call `.Build()` to get an `HttpTransferRequest`.
 - Use `AwsS3UploadRequest` for AWS S3 uploads -- call `.WithBucket(bucket, region)`, configure auth via `.WithPresignedUrl()` or `.WithCredentials(accessKeyId, secretAccessKey)`, optionally set `.WithObjectKey()`, `.WithContentType()`, `.WithStorageClass()`, then call `.Build()` to get an `HttpTransferRequest`. Uses AWS Signature V4 signing with `UNSIGNED-PAYLOAD` -- no AWS SDK required.

@@ -9,8 +9,6 @@
 
         <RootNamespace>Shiny.GameCenter</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Game Center - achievements and leaderboards over Apple Game Center (iOS, Mac Catalyst, macOS) and Google Play Games Services v2 (Android), with one set of logical keys and a durable offline queue</Description>
         <PackageTags>shiny gamecenter gamekit play-games achievements leaderboards maui ios android macos</PackageTags>
 

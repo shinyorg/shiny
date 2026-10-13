@@ -43,6 +43,16 @@
         <WindowsTarget Condition="$([MSBuild]::IsOSPlatform('windows')) OR '$(EnableWindowsTargeting)' == 'true'">$(BaseTargetFramework)-windows10.0.19041.0</WindowsTarget>
     </PropertyGroup>
 
+    <!--
+        Every shipped library is trim/AOT checked, so the analyzers report a trim-unsafe call at library build
+        time instead of in an app's full-trim Release (#1669). The MSBuild task and source generator projects
+        run inside the compiler/MSBuild, not an app, and target net472/netstandard2.0, where these flags do not apply.
+    -->
+    <PropertyGroup Condition="$(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)src')) AND !$(MSBuildProjectName.EndsWith('.Build')) AND !$(MSBuildProjectName.EndsWith('.SourceGenerators'))">
+        <IsTrimmable>true</IsTrimmable>
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <IncludeSource>True</IncludeSource>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

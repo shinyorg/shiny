@@ -10,8 +10,6 @@
 
         <RootNamespace>Shiny.AppStore</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny App Store - check the store for a newer version of the running app, deep-link to its store page and review page, and request the native in-app review prompt on the Apple App Store and Mac App Store, Google Play, the Microsoft Store and Linux Flatpak/Snap</Description>
 
         <!-- imported explicitly below so Platforms\Apple can also be compiled into the macOS target -->

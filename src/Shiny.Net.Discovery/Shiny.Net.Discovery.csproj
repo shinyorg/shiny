@@ -11,8 +11,6 @@
 
         <RootNamespace>Shiny.Net.Discovery</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Network Discovery - cross-platform local network discovery: mDNS/DNS-SD (Bonjour/Zeroconf), SSDP/UPnP and WS-Discovery browsing, resolution and publishing</Description>
 
         <!-- imported explicitly below so Platforms\Apple can be re-added for -macos -->

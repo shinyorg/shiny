@@ -4,8 +4,6 @@
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
         <RootNamespace>Shiny.Printers</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Printers - transport and protocol agnostic thermal / receipt printing: a fluent document model, ESC/POS and TSPL encoders, barcodes, QR codes and raster images, plus Web Bluetooth, Web Serial and WebUSB transports for Blazor (Browser/, script served from _content/Shiny.Printers/)</Description>
     </PropertyGroup>
 

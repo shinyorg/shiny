@@ -11,8 +11,6 @@
 
         <RootNamespace>Shiny.Gamepad</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Gamepad - read sticks, triggers and buttons from game controllers, with rumble, battery, motion and light-bar support, on Android, iOS, tvOS, Mac Catalyst, macOS, Windows, Linux (evdev) and Blazor WebAssembly (W3C Gamepad API)</Description>
 
         <!-- imported explicitly below so Platforms\Apple can also be compiled into the macOS target -->

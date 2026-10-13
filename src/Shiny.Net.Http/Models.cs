@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Shiny.Extensions.Stores.Repositories;
 
 namespace Shiny.Net.Http;
@@ -230,15 +232,25 @@ public record TransferHttpContent(
     /// </summary>
     /// <param name="obj">The object to serialize.</param>
     /// <param name="jsonOptions">Optional serializer options.</param>
+    [RequiresUnreferencedCode("Serializes by reflection. Use the JsonTypeInfo overload for trimmed or AOT apps.")]
+    [RequiresDynamicCode("Serializes by reflection. Use the JsonTypeInfo overload for trimmed or AOT apps.")]
     public static TransferHttpContent FromJson(object obj, JsonSerializerOptions? jsonOptions = null)
-    {
-        var json = JsonSerializer.Serialize(obj, jsonOptions);
-        return new TransferHttpContent(
-            json,
-            "application/json",
-            "utf-8"
-        );
-    }
+        => Json(JsonSerializer.Serialize(obj, jsonOptions));
+
+    /// <summary>
+    /// Creates a JSON-encoded <see cref="TransferHttpContent"/> from an object, using source-generated
+    /// metadata (e.g. <c>MyJsonContext.Default.MyType</c>) - trim and AOT safe.
+    /// </summary>
+    /// <param name="obj">The object to serialize.</param>
+    /// <param name="jsonTypeInfo">The type's source-generated serialization metadata.</param>
+    public static TransferHttpContent FromJson<T>(T obj, JsonTypeInfo<T> jsonTypeInfo)
+        => Json(JsonSerializer.Serialize(obj, jsonTypeInfo));
+
+    static TransferHttpContent Json(string json) => new(
+        json,
+        "application/json",
+        "utf-8"
+    );
 
     /// <summary>
     /// Creates a URL-encoded form data <see cref="TransferHttpContent"/> from key/value pairs.

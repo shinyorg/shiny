@@ -45,10 +45,10 @@ public class BatteryManager(IJSRuntime jsRuntime, ILogger<BatteryManager> logger
         get
         {
             this.EnsureStarted();
-            if (this.inProcess == null || !this.inProcess.Invoke<bool>("isSupported"))
+            if (this.inProcess == null || !this.inProcess.InvokeNoArgs<bool>("isSupported"))
                 return BatteryState.Unknown;
 
-            return this.inProcess.Invoke<bool>("isCharging")
+            return this.inProcess.InvokeNoArgs<bool>("isCharging")
                 ? BatteryState.Charging
                 : BatteryState.Discharging;
         }
@@ -63,7 +63,7 @@ public class BatteryManager(IJSRuntime jsRuntime, ILogger<BatteryManager> logger
             if (this.inProcess == null)
                 return 1.0;
 
-            return this.inProcess.Invoke<double>("getLevel");
+            return this.inProcess.InvokeNoArgs<double>("getLevel");
         }
     }
 
@@ -77,10 +77,10 @@ public class BatteryManager(IJSRuntime jsRuntime, ILogger<BatteryManager> logger
         get
         {
             this.EnsureStarted();
-            if (this.inProcess == null || !this.inProcess.Invoke<bool>("isSupported"))
+            if (this.inProcess == null || !this.inProcess.InvokeNoArgs<bool>("isSupported"))
                 return BatteryPowerSource.Unknown;
 
-            return this.inProcess.Invoke<bool>("isCharging")
+            return this.inProcess.InvokeNoArgs<bool>("isCharging")
                 ? BatteryPowerSource.AC
                 : BatteryPowerSource.Battery;
         }

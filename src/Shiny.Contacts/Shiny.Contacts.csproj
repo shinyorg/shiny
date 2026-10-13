@@ -9,8 +9,6 @@
 
         <RootNamespace>Shiny.Contacts</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Contacts - cross-platform device contact access with CRUD and LINQ queries</Description>
     </PropertyGroup>
 

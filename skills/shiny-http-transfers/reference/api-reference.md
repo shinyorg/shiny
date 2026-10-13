@@ -253,7 +253,13 @@ public record TransferHttpContent(
     // Form data field name for the content in multipart uploads
     public string? ContentFormDataName { get; set; }
 
-    // Create from a serializable object as JSON
+    // Create from an object as JSON using source-generated metadata - trim/AOT safe
+    public static TransferHttpContent FromJson<T>(
+        T obj,
+        JsonTypeInfo<T> jsonTypeInfo
+    );
+
+    // Create from an object as JSON by reflection - [RequiresUnreferencedCode]/[RequiresDynamicCode]
     public static TransferHttpContent FromJson(
         object obj,
         JsonSerializerOptions? jsonOptions = null
@@ -652,7 +658,7 @@ public class MyViewModel
 ### Queue a Multipart Upload with JSON Body
 
 ```csharp
-var content = TransferHttpContent.FromJson(new { userId = 42, category = "documents" });
+var content = TransferHttpContent.FromJson(new UploadMetadata(42, "documents"), AppJsonContext.Default.UploadMetadata);
 
 var request = new HttpTransferRequest(
     Identifier: "upload-doc-456",

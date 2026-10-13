@@ -962,7 +962,7 @@ public static partial class ConfigurationBuilderExtensions
         this IConfigurationBuilder builder,
         string configurationUri,
         string configurationFileName = "remotesettings.json",
-        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null
+        Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null
     );
 
     // Add remote configuration (full control)
@@ -970,7 +970,7 @@ public static partial class ConfigurationBuilderExtensions
         this IConfigurationBuilder builder,
         string configurationFilePath,
         string configurationUri,
-        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null,
+        Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null,
         bool waitForRemoteLoad = true
     );
 

@@ -49,7 +49,7 @@ public class ConnectivityManager(IJSRuntime jsRuntime, ILogger<ConnectivityManag
             if (this.inProcess == null)
                 return ConnectionTypes.Unknown;
 
-            var type = this.inProcess.Invoke<string>("getConnType");
+            var type = this.inProcess.InvokeNoArgs<string>("getConnType");
             return type switch
             {
                 "bluetooth" => ConnectionTypes.Bluetooth,
@@ -72,7 +72,7 @@ public class ConnectivityManager(IJSRuntime jsRuntime, ILogger<ConnectivityManag
             if (this.inProcess == null)
                 return NetworkAccess.Unknown;
 
-            return this.inProcess.Invoke<bool>("isConnected")
+            return this.inProcess.InvokeNoArgs<bool>("isConnected")
                 ? NetworkAccess.Internet
                 : NetworkAccess.None;
         }

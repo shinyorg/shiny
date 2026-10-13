@@ -12,8 +12,6 @@
 
         <RootNamespace>Shiny.Wearables</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Wearables - talk to a companion Apple Watch (WatchConnectivity) or Wear OS (Data Layer) app: live messages with replies, the latest shared context, queued data transfers and file transfers, with background delivery through a delegate</Description>
     </PropertyGroup>
 

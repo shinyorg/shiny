@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Text.Json.Nodes;
+using System.IO;
 using System.Linq;
 using Shiny.Extensions.Configuration;
 using Shiny.Extensions.Configuration.Infrastructure;
@@ -54,12 +55,12 @@ public static partial class ConfigurationBuilderExtensions
     /// <param name="builder">The configuration builder.</param>
     /// <param name="configurationUri">The remote endpoint URI.</param>
     /// <param name="configurationFileName">Local file name used for the cached payload.</param>
-    /// <param name="getData">Optional override that produces the configuration payload (e.g. for custom auth).</param>
+    /// <param name="getData">Optional override that produces the configuration payload (e.g. for custom auth) as a JSON object - use <c>JsonNode.Parse</c> on a response body, or <c>JsonSerializer.SerializeToNode</c> with a source-generated context for a typed object.</param>
     public static IConfigurationBuilder AddRemote(
         this IConfigurationBuilder builder,
         string configurationUri,
         string configurationFileName = "remotesettings.json",
-        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null
+        Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null
     ) => builder.AddRemote(
         Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
@@ -99,14 +100,14 @@ public static partial class ConfigurationBuilderExtensions
     /// <param name="builder">The configuration builder.</param>
     /// <param name="configurationFilePath">Local file path where the remote settings are persisted.</param>
     /// <param name="configurationUri">The remote endpoint URI to load from.</param>
-    /// <param name="getData">Optional override that produces the configuration payload (e.g. for custom auth).</param>
+    /// <param name="getData">Optional override that produces the configuration payload (e.g. for custom auth) as a JSON object - use <c>JsonNode.Parse</c> on a response body, or <c>JsonSerializer.SerializeToNode</c> with a source-generated context for a typed object.</param>
     /// <param name="waitForRemoteLoad">When true, the configuration build waits for the remote call to complete.</param>
     /// <returns>The same builder, for fluent chaining.</returns>
     public static IConfigurationBuilder AddRemote(
         this IConfigurationBuilder builder, 
         string configurationFilePath, 
         string configurationUri,
-        Func<RemoteConfig, CancellationToken, Task<object>>? getData = null,
+        Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null,
         bool waitForRemoteLoad = true
     )
     {
@@ -125,7 +126,7 @@ public static partial class ConfigurationBuilderExtensions
     // public static MauiAppBuilder AddRemoteConfigurationMaui(
     //     this MauiAppBuilder builder, 
     //     string configurationUri,
-    //     Func<RemoteConfig, CancellationToken, Task<object>>? getData = null, 
+    //     Func<RemoteConfig, CancellationToken, Task<JsonNode>>? getData = null, 
     //     string configurationFileName = "remotesettings.json"
     // )
     // {

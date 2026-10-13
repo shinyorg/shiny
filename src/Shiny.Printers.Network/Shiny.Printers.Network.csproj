@@ -11,8 +11,6 @@
 
         <RootNamespace>Shiny.Printers.Network</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Printers over WiFi / Ethernet - raw TCP (JetDirect / port 9100) streaming to network thermal printers plus mDNS discovery through Shiny.Net.Discovery</Description>
     </PropertyGroup>
 

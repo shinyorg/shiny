@@ -13,8 +13,6 @@
         <RootNamespace>Shiny.AppFunctions</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny App Functions - declare app functions once in C# and expose them to Siri, Spotlight, Shortcuts and Apple Intelligence (App Intents) and to Gemini and other agents (Android AppFunctions)</Description>
         <!-- NU5100: tasks/ holds the MSBuild task assemblies on purpose -->
         <NoWarn>$(NoWarn);CS1591;NU5100</NoWarn>

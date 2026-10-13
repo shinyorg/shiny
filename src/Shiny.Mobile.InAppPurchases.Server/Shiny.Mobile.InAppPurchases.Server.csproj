@@ -4,7 +4,6 @@
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Shiny.InAppPurchases.Server</RootNamespace>
-        <IsAotCompatible>true</IsAotCompatible>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <!-- Release builds generate XML docs; missing comments on public members must not fail the build -->
         <NoWarn>$(NoWarn);CS1591</NoWarn>

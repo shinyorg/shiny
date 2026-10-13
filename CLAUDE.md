@@ -42,6 +42,15 @@ A change is not "done" until these are in sync:
 3. **Docs site** — update the relevant module's feature page and add a **release note** under that
    module's component heading in `client/release-notes.mdx`.
 
+### Trim / AOT
+
+`Directory.Build.props` sets `IsTrimmable` + `IsAotCompatible` on every `src/` library (not `*.Build` /
+`*.SourceGenerators`), so don't repeat them in a csproj. A full build of `Build.slnf` has **zero** `IL2xxx`/`IL3xxx`
+warnings - keep it that way. Fix with annotations (`[DynamicallyAccessedMembers]` matching what the callee needs) or a
+`JsonTypeInfo<T>` / `JsonNode` API; a reflection-only public API gets `[RequiresUnreferencedCode]` +
+`[RequiresDynamicCode]` next to a safe overload. `[UnconditionalSuppressMessage]` only with a justification that is
+actually true (see `Platforms/Net/Browser/JsInProcessExtensions.cs`).
+
 ### Release notes
 
 Notes use the `<RN>` component (`import RN from '/src/components/ReleaseNote.astro'`), with

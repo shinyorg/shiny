@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using CoreBluetooth;
 using Foundation;
@@ -77,7 +78,7 @@ public class AdvertisementData : IAdvertisementData
     public int? TxPower => this.txpower.Value;
 
 
-    protected Lazy<T> GetLazy<T>(NSString key, Func<NSObject, T> transform) => new Lazy<T>(() =>
+    protected Lazy<T> GetLazy<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(NSString key, Func<NSObject, T> transform) => new Lazy<T>(() =>
     {
         var obj = this.GetObject(key);
         if (obj == null)

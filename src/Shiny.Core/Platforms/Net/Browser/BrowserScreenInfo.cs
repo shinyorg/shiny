@@ -69,7 +69,7 @@ public class BrowserScreenInfo(IJSRuntime jsRuntime, ILogger<BrowserScreenInfo> 
         if (this.inProcess == null)
             return ScreenMetrics.Empty;
 
-        var screen = this.inProcess.Invoke<JsScreen>("getScreen");
+        var screen = this.inProcess.InvokeNoArgs<JsScreen>("getScreen");
         var width = screen.Width * screen.Density;
         var height = screen.Height * screen.Density;
         var orientation = screen.Orientation switch
@@ -108,7 +108,7 @@ public class BrowserScreenInfo(IJSRuntime jsRuntime, ILogger<BrowserScreenInfo> 
     int Invoke(string function)
     {
         this.EnsureStarted();
-        return this.inProcess?.Invoke<int>(function) ?? 0;
+        return this.inProcess?.InvokeNoArgs<int>(function) ?? 0;
     }
 
 

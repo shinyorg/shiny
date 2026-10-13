@@ -10,8 +10,6 @@
 
         <RootNamespace>Shiny.Calendar</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Calendar - cross-platform device calendar access with event/calendar CRUD and LINQ queries</Description>
     </PropertyGroup>
 

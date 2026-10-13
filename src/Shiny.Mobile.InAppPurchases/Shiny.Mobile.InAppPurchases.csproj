@@ -8,7 +8,6 @@
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
-        <IsAotCompatible>true</IsAotCompatible>
 
         <Description>Cross-platform in-app purchases - consumables, non-consumables and auto-renewable subscriptions over StoreKit 2 on iOS and Google Play Billing 9 on Android</Description>
         <PackageTags>shiny in-app-purchase iap storekit storekit2 google-play-billing subscriptions maui ios android</PackageTags>

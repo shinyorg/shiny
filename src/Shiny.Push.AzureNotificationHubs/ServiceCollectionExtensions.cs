@@ -23,7 +23,7 @@ public static class AnhServiceCollectionExtensions
     }
 
 
-    public static IServiceCollection AddPushAzureNotificationHubs<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TPushDelegate>(this IServiceCollection services, string listenerConnectionString, string hubName)
+    public static IServiceCollection AddPushAzureNotificationHubs<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TPushDelegate>(this IServiceCollection services, string listenerConnectionString, string hubName)
         where TPushDelegate : class, IPushDelegate
     {
         services.AddPush<TPushDelegate>();

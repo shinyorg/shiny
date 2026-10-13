@@ -11,8 +11,6 @@
 
         <RootNamespace>Shiny.ScreenRecorder</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Shiny Screen Recorder - record the screen to an MP4 with optional microphone and system audio on Android (MediaProjection), iOS and Mac Catalyst (ReplayKit), macOS (ScreenCaptureKit), Windows (Windows.Graphics.Capture), and Blazor WebAssembly (getDisplayMedia) - Linux is Shiny.ScreenRecorder.Linux</Description>
 
         <!-- imported explicitly below so Platforms\AppleShared can be added to all three Apple targets -->

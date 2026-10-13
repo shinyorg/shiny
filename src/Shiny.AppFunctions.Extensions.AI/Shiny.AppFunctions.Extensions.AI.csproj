@@ -4,8 +4,6 @@
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
         <RootNamespace>Shiny.AppFunctions.Extensions.AI</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <IsAotCompatible>true</IsAotCompatible>
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <Description>Microsoft.Extensions.AI tool surface for Shiny.AppFunctions - exposes the app functions Siri and Gemini call as AIFunction tools for an in-app LLM, through the same binding, delegates and handlers.</Description>
         <PackageTags>shiny appfunctions app intents siri gemini ai aifunction mcp llm tools aot</PackageTags>
     </PropertyGroup>
