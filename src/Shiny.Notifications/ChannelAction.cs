@@ -20,6 +20,14 @@ public class ChannelAction
     /// </summary>
     public ChannelActionType ActionType { get; set; } = ChannelActionType.None;
 
+    /// <summary>
+    /// Requires the user to unlock the device before the action runs - use it for actions with a real-world effect
+    /// (e.g. "Open Garage", "Disarm"). Combines with any <see cref="ActionType"/>.
+    /// iOS/Mac Catalyst/macOS: <c>UNNotificationActionOptions.AuthenticationRequired</c>. Android: API 31+ only - older
+    /// versions run the action without prompting. Ignored on Windows and Linux.
+    /// </summary>
+    public bool RequiresUnlock { get; set; }
+
 
     /// <summary>
     /// Creates an action whose title matches its identifier.
@@ -36,6 +44,22 @@ public class ChannelAction
 
 
     /// <summary>
+    /// Creates an action whose title matches its identifier.
+    /// </summary>
+    /// <param name="id">The action identifier (also used as the title).</param>
+    /// <param name="actionType">The action behavior.</param>
+    /// <param name="requiresUnlock">Requires the device to be unlocked before the action runs (see <see cref="RequiresUnlock"/>).</param>
+    /// <returns>A new <see cref="ChannelAction"/>.</returns>
+    public static ChannelAction Create(string id, ChannelActionType actionType, bool requiresUnlock) => new ChannelAction
+    {
+        Identifier = id,
+        Title = id,
+        ActionType = actionType,
+        RequiresUnlock = requiresUnlock
+    };
+
+
+    /// <summary>
     /// Creates an action with a separate identifier and title.
     /// </summary>
     /// <param name="id">The action identifier.</param>
@@ -47,6 +71,23 @@ public class ChannelAction
         Identifier = id,
         Title = title,
         ActionType = actionType
+    };
+
+
+    /// <summary>
+    /// Creates an action with a separate identifier and title.
+    /// </summary>
+    /// <param name="id">The action identifier.</param>
+    /// <param name="title">The action button text.</param>
+    /// <param name="actionType">The action behavior.</param>
+    /// <param name="requiresUnlock">Requires the device to be unlocked before the action runs (see <see cref="RequiresUnlock"/>).</param>
+    /// <returns>A new <see cref="ChannelAction"/>.</returns>
+    public static ChannelAction Create(string id, string title, ChannelActionType actionType, bool requiresUnlock) => new ChannelAction
+    {
+        Identifier = id,
+        Title = title,
+        ActionType = actionType,
+        RequiresUnlock = requiresUnlock
     };
 }
 
@@ -75,5 +116,4 @@ public enum ChannelActionType
     /// A plain action that fires the delegate without special styling or behavior.
     /// </summary>
     None
-    //AuthRequired
 }

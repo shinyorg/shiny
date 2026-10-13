@@ -252,7 +252,9 @@ public class AndroidNotificationManager
     {
         var pendingIntent = this.CreateActionIntent(notification, action);
         var iconId = this.platform.GetResourceIdByName(action.Identifier);
-        var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
+        var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
+            .SetAuthenticationRequired(action.RequiresUnlock)
+            .Build();
 
         return nativeAction;
     }
@@ -269,6 +271,7 @@ public class AndroidNotificationManager
         var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
             .SetAllowGeneratedReplies(true)
             .AddRemoteInput(input)
+            .SetAuthenticationRequired(action.RequiresUnlock)
             .Build();
 
         return nativeAction;

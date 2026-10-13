@@ -109,35 +109,42 @@ public class ChannelManager(IRepository repository, ILogger<ChannelManager> logg
     }
 
 
-    protected virtual UNNotificationAction CreateAction(ChannelAction action) => action.ActionType switch
+    protected virtual UNNotificationAction CreateAction(ChannelAction action)
     {
-        ChannelActionType.TextReply => UNTextInputNotificationAction.FromIdentifier(
-            action.Identifier,
-            action.Title,
-            UNNotificationActionOptions.None,
-            action.Title, // button title
-            String.Empty  // placeholder
-            // icon fromsystem or fromimage by name
-        ),
+        var unlock = action.RequiresUnlock
+            ? UNNotificationActionOptions.AuthenticationRequired
+            : UNNotificationActionOptions.None;
 
-        ChannelActionType.Destructive => UNNotificationAction.FromIdentifier(
-            action.Identifier,
-            action.Title,
-            UNNotificationActionOptions.Destructive
-        ),
+        return action.ActionType switch
+        {
+            ChannelActionType.TextReply => UNTextInputNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                unlock,
+                action.Title, // button title
+                String.Empty  // placeholder
+                // icon fromsystem or fromimage by name
+            ),
 
-        ChannelActionType.OpenApp => UNNotificationAction.FromIdentifier(
-            action.Identifier,
-            action.Title,
-            UNNotificationActionOptions.Foreground
-        ),
+            ChannelActionType.Destructive => UNNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                UNNotificationActionOptions.Destructive | unlock
+            ),
 
-        ChannelActionType.None => UNNotificationAction.FromIdentifier(
-            action.Identifier,
-            action.Title,
-            UNNotificationActionOptions.None
-        ),
+            ChannelActionType.OpenApp => UNNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                UNNotificationActionOptions.Foreground | unlock
+            ),
 
-        _ => throw new InvalidOperationException("Invalid action type")
-    };
+            ChannelActionType.None => UNNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                unlock
+            ),
+
+            _ => throw new InvalidOperationException("Invalid action type")
+        };
+    }
 }
