@@ -42,6 +42,18 @@ A change is not "done" until these are in sync:
 3. **Docs site** — update the relevant module's feature page and add a **release note** under that
    module's component heading in `client/release-notes.mdx`.
 
+### AppDeviceBridge (`~/Desktop/dev/appdevicebridge`)
+
+AppDeviceBridge exposes Shiny modules to a hosted web app as HTTP **bridges** (`Shiny.AppDeviceBridge.<Bridge>` +
+`.<Bridge>.Client`, consuming Shiny packages at `$(ShinyVersion)` in its `Directory.Packages.props`). When a public API
+is **added or changed** - a new module (e.g. Call Directory, Game Center) or a new member on a bridged one (e.g. a
+notification `ChannelAction` option) - check whether it belongs there and, if it does, add or update the bridge in the
+same piece of work, following that repo's `CLAUDE.md` (contracts start in the `.Client` project; regenerate the
+TypeScript clients; register in the simulator's `BridgeCatalog`; tests, skill, readme, docs and its own release
+note). Skip it when a page already has the capability through a standard web API (e.g. Gamepad - the W3C Gamepad API
+works in the WebView) or the API only makes sense from native code (DI/hosting, build tooling, server packages). If the
+bridge needs an unpublished Shiny package, say so rather than pinning a beta silently.
+
 ### Trim / AOT
 
 `Directory.Build.props` sets `IsTrimmable` + `IsAotCompatible` on every `src/` library (not `*.Build` /
