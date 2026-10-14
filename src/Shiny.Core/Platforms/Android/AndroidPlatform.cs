@@ -28,6 +28,7 @@ public partial class AndroidPlatform : IPlatform,
     int requestCode;
     readonly List<string> requestedPermissions;
     readonly ConcurrentDictionary<int, TaskCompletionSource<PermissionRequestResult>> pendingPermissions = new();
+    readonly ConcurrentDictionary<int, TaskCompletionSource<ActivityResult>> pendingResults = new();
 
     static AndroidActivityLifecycle activityLifecycle; // this should never change once installed on the platform
     readonly IKeyValueStore store;
@@ -70,7 +71,96 @@ public partial class AndroidPlatform : IPlatform,
             tcs.TrySetResult(new PermissionRequestResult(requestCode, permissions, grantResults));
     }
 
-    public void Handle(Activity activity, int requestCode, Result resultCode, Intent data) { }
+    public void Handle(Activity activity, int requestCode, Result resultCode, Intent data)
+    {
+        var result = new ActivityResult(activity, requestCode, resultCode, data);
+        if (this.pendingResults.TryRemove(requestCode, out var tcs))
+            tcs.TrySetResult(result);
+
+        this.ActivityResultReceived?.Invoke(this, result);
+    }
+
+
+    /// <summary>
+    /// Raised for every activity result the host forwards to Shiny - those started through
+    /// <see cref="StartActivityForResult"/> and any other <c>StartActivityForResult</c> on a Shiny-hosted activity.
+    /// Shiny.Hosting.Maui forwards results automatically; with Shiny.Hosting.Native the activity must derive from
+    /// <c>ShinyAndroidActivity</c> (or call <c>Host.Lifecycle.OnActivityResult</c> itself).
+    /// </summary>
+    public event EventHandler<ActivityResult>? ActivityResultReceived;
+
+
+    /// <summary>
+    /// Starts an activity for a result from the current activity and waits for that result - a system settings
+    /// screen, a role request, a consent dialog. Waits up to 5 seconds for an activity to appear if none is in the
+    /// foreground; there is no time limit on the user, only <paramref name="cancellationToken"/>.
+    /// </summary>
+    /// <remarks>
+    /// The result arrives through the host's <c>OnActivityResult</c> forwarding (see <see cref="ActivityResultReceived"/>).
+    /// If the host does not forward it, the returned task only completes through <paramref name="cancellationToken"/>.
+    /// </remarks>
+    public async Task<ActivityResult> StartActivityForResult(Intent intent, CancellationToken cancellationToken = default)
+    {
+        var activity = await this.GetActivityForRequest("start an activity for a result", cancellationToken).ConfigureAwait(false);
+
+        // ComponentActivity only accepts request codes in the lower 16 bits
+        var current = this.NextRequestCode();
+        var tcs = new TaskCompletionSource<ActivityResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        this.pendingResults[current] = tcs;
+
+        using var reg = cancellationToken.Register(() =>
+        {
+            if (this.pendingResults.TryRemove(current, out var t))
+                t.TrySetCanceled(cancellationToken);
+        });
+
+        this.InvokeOnMainThread(() =>
+        {
+            try
+            {
+                activity.StartActivityForResult(intent, current);
+            }
+            catch (Exception ex)
+            {
+                if (this.pendingResults.TryRemove(current, out var t))
+                    t.TrySetException(ex);
+            }
+        });
+
+        return await tcs.Task.ConfigureAwait(false);
+    }
+
+
+    int NextRequestCode()
+    {
+        // shared with permission requests; kept in the lower 16 bits and never 0
+        var code = Interlocked.Increment(ref this.requestCode) & 0xFFFF;
+        return code == 0 ? this.NextRequestCode() : code;
+    }
+
+
+    async Task<Activity> GetActivityForRequest(string purpose, CancellationToken cancellationToken)
+    {
+        var activity = this.CurrentActivity;
+        if (activity != null)
+            return activity;
+
+        // this timeout ONLY covers acquiring the activity - never the time the user spends on what it shows (#1625)
+        using var actCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        actCts.CancelAfter(TimeSpan.FromSeconds(5));
+        try
+        {
+            var change = await this
+                .WaitForActivity(ActivityState.Resumed, actCts.Token)
+                .ConfigureAwait(false);
+
+            return change.Activity;
+        }
+        catch (System.OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException($"A current activity was not detected to be able to {purpose}");
+        }
+    }
 
 
     public Application AppContext { get; }
@@ -211,26 +301,9 @@ public partial class AndroidPlatform : IPlatform,
         // timeout ONLY covers acquiring the activity - it must NEVER cover the time the user
         // spends interacting with the dialog, otherwise a slow tap throws after 5s and crashes
         // the app while the dialog is still on screen (see issue #1625).
-        var activity = this.CurrentActivity;
-        if (activity == null)
-        {
-            using var actCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            actCts.CancelAfter(TimeSpan.FromSeconds(5));
-            try
-            {
-                var change = await this
-                    .WaitForActivity(ActivityState.Resumed, actCts.Token)
-                    .ConfigureAwait(false);
+        var activity = await this.GetActivityForRequest("request permissions", cancellationToken).ConfigureAwait(false);
 
-                activity = change.Activity;
-            }
-            catch (System.OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-            {
-                throw new TimeoutException("A current activity was not detected to be able to request permissions");
-            }
-        }
-
-        var current = Interlocked.Increment(ref this.requestCode);
+        var current = this.NextRequestCode();
         var tcs = new TaskCompletionSource<PermissionRequestResult>();
         this.pendingPermissions[current] = tcs;
 

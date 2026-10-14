@@ -12,7 +12,10 @@ public sealed class NetworkPrinterManager
         var connection = new TcpPrinterConnection(config);
         await connection.Connect(cancellationToken, timeout).ConfigureAwait(false);
 
-        return new Printer(connection, config.ProtocolFactory(), config.Capabilities);
+        return new Printer(connection, config.ProtocolFactory(), config.Capabilities)
+        {
+            StatusTimeout = config.StatusTimeout
+        };
     }
 
 

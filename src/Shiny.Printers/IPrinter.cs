@@ -21,4 +21,16 @@ public interface IPrinter
 
     /// <summary>Sends already-encoded bytes to the printer verbatim.</summary>
     Task PrintRaw(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// True when both the transport and the command language can read the printer's status - e.g. ESC/POS over
+    /// TCP. Write-only transports (most BLE printers, the browser transports) return false.
+    /// </summary>
+    bool SupportsStatus => false;
+
+    /// <summary>Reads the printer's paper, cover, cutter and drawer sensors.</summary>
+    /// <exception cref="NotSupportedException"><see cref="SupportsStatus"/> is false.</exception>
+    /// <exception cref="TimeoutException">The printer did not answer - it may not implement status queries.</exception>
+    Task<PrinterStatus> GetStatus(CancellationToken cancellationToken = default)
+        => Task.FromException<PrinterStatus>(new NotSupportedException("This printer cannot report its status."));
 }

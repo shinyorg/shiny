@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <!-- Host side of the device tests: drives the app through DevFlow and serves the fixtures - see ../Shiny.DeviceTests/readme.md -->
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>Shiny.DeviceTests.Runner</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Shiny.DeviceTests.Shared\*.cs" Link="Shared\%(Filename)%(Extension)" />
+    </ItemGroup>
+
+</Project>

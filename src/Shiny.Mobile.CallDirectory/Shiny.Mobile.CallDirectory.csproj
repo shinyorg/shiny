@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Shiny.CallDirectory</RootNamespace>
+        <!-- iOS: Call Directory extension. Android: CallScreeningService over Android.Database.Sqlite. -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget);$(AndroidTarget)</TargetFrameworks>
+        <!-- LibraryImport into the system libsqlite3 (Apple) -->
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Description>Call blocking and caller identification for .NET - an iOS Call Directory extension built without an Xcode project, and an Android CallScreeningService, both fed from a SQLite list the app owns.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Mobile.CallDirectory.Tests" />
+    </ItemGroup>
+
+</Project>

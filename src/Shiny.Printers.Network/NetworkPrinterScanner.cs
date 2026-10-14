@@ -6,7 +6,7 @@ using Shiny.Net.Discovery;
 namespace Shiny.Printers.Network;
 
 
-/// <summary>Browses the local network for mDNS-advertised printers.</summary>
+/// <summary>Finds printers on the local network - by mDNS browse, or by sweeping the subnet for an open port.</summary>
 public interface INetworkPrinterScanner
 {
     /// <summary>
@@ -17,6 +17,14 @@ public interface INetworkPrinterScanner
 
     /// <summary>Browses a specific DNS-SD service type (e.g. a vendor-specific one).</summary>
     IObservable<DiscoveredNetworkPrinter> Scan(string serviceType);
+
+    /// <summary>
+    /// Tries a TCP connect to port 9100 (or <see cref="NetworkPrinterSweepConfig.Ports"/>) on every host of the
+    /// local subnet, emitting each host that accepts, and completes when the sweep is done. Finds the many
+    /// receipt printers that never advertise over mDNS. Any open port 9100 is reported, so a laser printer
+    /// answers too.
+    /// </summary>
+    IObservable<DiscoveredNetworkPrinter> Sweep(NetworkPrinterSweepConfig? config = null);
 }
 
 
@@ -46,6 +54,65 @@ public sealed class NetworkPrinterScanner(IMdnsManager mdns) : INetworkPrinterSc
                     ob.OnNext(printer);
             }
         });
+    }
+
+
+    public IObservable<DiscoveredNetworkPrinter> Sweep(NetworkPrinterSweepConfig? config = null)
+    {
+        config ??= new();
+        ArgumentOutOfRangeException.ThrowIfLessThan(config.MaxConcurrency, 1);
+
+        return Observable.Create<DiscoveredNetworkPrinter>(async (ob, ct) =>
+        {
+            var targets = SweepTargets(config);
+            var gate = new object();
+
+            await Parallel
+                .ForEachAsync(
+                    targets,
+                    new ParallelOptions { MaxDegreeOfParallelism = config.MaxConcurrency, CancellationToken = ct },
+                    async (target, token) =>
+                    {
+                        if (await SubnetSweep.Probe(target.Address, target.Port, config.ProbeTimeout, token).ConfigureAwait(false))
+                        {
+                            var host = target.Address.ToString();
+                            var printer = new DiscoveredNetworkPrinter
+                            {
+                                Name = host,
+                                Host = host,
+                                Port = target.Port,
+                                ServiceType = string.Empty,
+                                Method = NetworkPrinterDiscoveryMethod.PortSweep,
+                                Capabilities = config.Capabilities
+                            };
+                            // probes finish on many threads at once - observers expect one call at a time
+                            lock (gate)
+                                ob.OnNext(printer);
+                        }
+                    }
+                )
+                .ConfigureAwait(false);
+        });
+    }
+
+
+    internal static IEnumerable<(IPAddress Address, int Port)> SweepTargets(NetworkPrinterSweepConfig config)
+    {
+        IEnumerable<IPAddress> addresses;
+        if (config.Networks is { } networks)
+        {
+            addresses = networks.SelectMany(SubnetSweep.Hosts);
+        }
+        else
+        {
+            var local = SubnetSweep.LocalNetworks();
+            var self = local.Select(x => x.Self).ToHashSet();
+            addresses = local.SelectMany(x => SubnetSweep.Hosts(x.Network)).Where(x => !self.Contains(x));
+        }
+
+        return addresses
+            .Distinct()
+            .SelectMany(address => config.Ports.Select(port => (address, port)));
     }
 
 

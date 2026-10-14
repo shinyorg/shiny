@@ -1,0 +1,220 @@
+<Project>
+  <!--
+    Shiny.Mobile.CallDirectory extension build (iOS apps only, opt-in with ShinyCallDirectoryExtension=true).
+
+    iOS blocks and identifies calls from a Call Directory app extension. Instead of an Xcode project, this builds one,
+    the same way Shiny.Mobile.LiveActivities builds its widget:
+    1. swiftc compiles ShinyCallDirectoryHandler.swift into obj/.../shinycd/appex/ShinyCallDirectory.appex.
+    2. The app and the extension both get the app group (com.apple.security.application-groups): the app through the
+       SDK's CustomEntitlements, the extension through its own entitlements - compiled and signed on device, embedded
+       in the executable on the simulator, as Xcode does.
+    3. On device builds the extension gets its own provisioning profile from the SDK's own signing tasks.
+    4. The bundle is handed to the SDK as an AdditionalAppExtensions item (copied into PlugIns/ and signed).
+    5. The app group is stamped into the extension's Info.plist. The C# manager finds PlugIns/ShinyCallDirectory.appex
+       at runtime and reads the bundle id and app group from there, so the app and the extension cannot point at
+       different stores - and an app built without the extension (off a Mac) simply reports it missing.
+
+    Properties:
+      ShinyCallDirectoryExtension=true              turn this on
+      ShinyCallDirectoryAppGroup                    required - the app group shared by the app and the extension
+      ShinyCallDirectoryBundleId                    extension bundle id (default: $(ApplicationId).CallDirectory)
+      ShinyCallDirectoryCodesignProvision           provisioning profile name or UUID (default: best installed match)
+      ShinyCallDirectoryCodesignEntitlements        the extension's entitlements file, replacing the generated one (must list the app group)
+      ShinyCallDirectoryAddAppEntitlement=false     don't add the app group to the app's entitlements (it's in your Entitlements.plist)
+      ShinyCallDirectoryMinimumOSVersion            extension deployment target (default: SupportedOSPlatformVersion, at least 15.0)
+      ShinyCallDirectoryDisplayName                 the name shown in Settings > Apps > Phone > Call Blocking & Identification
+  -->
+  <PropertyGroup>
+    <_ShinyCDPlatform>$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))</_ShinyCDPlatform>
+    <_ShinyCDIsApp Condition="'$(_ShinyCDPlatform)' == 'ios' and '$(OutputType)' == 'Exe' and '$(ShinyCallDirectoryExtension)' == 'true'">true</_ShinyCDIsApp>
+    <_ShinyCDSkippedOffMac Condition="'$(_ShinyCDIsApp)' == 'true' and !$([MSBuild]::IsOSPlatform('OSX'))">true</_ShinyCDSkippedOffMac>
+    <_ShinyCDIsApp Condition="'$(_ShinyCDSkippedOffMac)' == 'true'"></_ShinyCDIsApp>
+    <ShinyCallDirectorySwiftDir Condition="'$(ShinyCallDirectorySwiftDir)' == ''">$(MSBuildThisFileDirectory)swift/</ShinyCallDirectorySwiftDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(_ShinyCDIsApp)' == 'true'">
+    <ShinyCallDirectoryMinimumOSVersion Condition="'$(ShinyCallDirectoryMinimumOSVersion)' == '' and '$(SupportedOSPlatformVersion)' != '' and $([MSBuild]::VersionGreaterThanOrEquals('$(SupportedOSPlatformVersion)', '15.0'))">$(SupportedOSPlatformVersion)</ShinyCallDirectoryMinimumOSVersion>
+    <ShinyCallDirectoryMinimumOSVersion Condition="'$(ShinyCallDirectoryMinimumOSVersion)' == ''">15.0</ShinyCallDirectoryMinimumOSVersion>
+    <ShinyCallDirectoryDisplayName Condition="'$(ShinyCallDirectoryDisplayName)' == ''">$(ApplicationTitle)</ShinyCallDirectoryDisplayName>
+    <ShinyCallDirectoryDisplayName Condition="'$(ShinyCallDirectoryDisplayName)' == ''">Call Directory</ShinyCallDirectoryDisplayName>
+    <_ShinyCDName>ShinyCallDirectory</_ShinyCDName>
+  </PropertyGroup>
+
+  <!-- the app's half of the app group; the SDK compiles it into the app's entitlements (simulator and device) -->
+  <ItemGroup Condition="'$(_ShinyCDIsApp)' == 'true' and '$(ShinyCallDirectoryAddAppEntitlement)' != 'false' and '$(ShinyCallDirectoryAppGroup)' != ''">
+    <CustomEntitlements Include="com.apple.security.application-groups" Type="StringArray" Value="$(ShinyCallDirectoryAppGroup)" />
+  </ItemGroup>
+
+  <Target Name="_ShinyCallDirectoryOffMac" BeforeTargets="Build" Condition="'$(_ShinyCDSkippedOffMac)' == 'true'">
+    <Warning Text="Shiny.Mobile.CallDirectory: the Call Directory extension is only built on macOS; this build does not include it, so ICallDirectoryManager.Reload reports ExtensionNotFound." />
+  </Target>
+
+  <Target Name="_ShinyCallDirectoryValidate" BeforeTargets="Build" Condition="'$(_ShinyCDIsApp)' == 'true'">
+    <Error Condition="'$(ShinyCallDirectoryAppGroup)' == ''" Text="Shiny.Mobile.CallDirectory: set &lt;ShinyCallDirectoryAppGroup&gt; (e.g. group.$(ApplicationId)). The app and the Call Directory extension share their store through it." />
+  </Target>
+
+  <Target Name="_ShinyCallDirectoryPaths" DependsOnTargets="_ReadAppManifest" Condition="'$(_ShinyCDIsApp)' == 'true'">
+    <PropertyGroup>
+      <_ShinyCDDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(IntermediateOutputPath)shinycd/'))</_ShinyCDDir>
+      <_ShinyCDAppex>$(_ShinyCDDir)appex/$(_ShinyCDName).appex/</_ShinyCDAppex>
+      <_ShinyCDExecutable>$(_ShinyCDAppex)$(_ShinyCDName)</_ShinyCDExecutable>
+      <_ShinyCDInfoPlist>$(_ShinyCDAppex)Info.plist</_ShinyCDInfoPlist>
+      <ShinyCallDirectoryBundleId Condition="'$(ShinyCallDirectoryBundleId)' == ''">$(_BundleIdentifier).CallDirectory</ShinyCallDirectoryBundleId>
+      <_ShinyCDIsSimulator Condition="$(RuntimeIdentifier.StartsWith('iossimulator'))">true</_ShinyCDIsSimulator>
+      <_ShinyCDSdk Condition="'$(_ShinyCDIsSimulator)' == 'true'">iphonesimulator</_ShinyCDSdk>
+      <_ShinyCDSdk Condition="'$(_ShinyCDIsSimulator)' != 'true'">iphoneos</_ShinyCDSdk>
+      <_ShinyCDPlatformName Condition="'$(_ShinyCDIsSimulator)' == 'true'">iPhoneSimulator</_ShinyCDPlatformName>
+      <_ShinyCDPlatformName Condition="'$(_ShinyCDIsSimulator)' != 'true'">iPhoneOS</_ShinyCDPlatformName>
+      <_ShinyCDArch Condition="$(RuntimeIdentifier.EndsWith('x64'))">x86_64</_ShinyCDArch>
+      <_ShinyCDArch Condition="'$(_ShinyCDArch)' == ''">arm64</_ShinyCDArch>
+      <_ShinyCDTriple>$(_ShinyCDArch)-apple-ios$(ShinyCallDirectoryMinimumOSVersion)</_ShinyCDTriple>
+      <_ShinyCDTriple Condition="'$(_ShinyCDIsSimulator)' == 'true'">$(_ShinyCDTriple)-simulator</_ShinyCDTriple>
+      <_ShinyCDShortVersion>$(_CFBundleShortVersionString)</_ShinyCDShortVersion>
+      <_ShinyCDShortVersion Condition="'$(_ShinyCDShortVersion)' == ''">1.0</_ShinyCDShortVersion>
+      <_ShinyCDVersion>$(_CFBundleVersion)</_ShinyCDVersion>
+      <_ShinyCDVersion Condition="'$(_ShinyCDVersion)' == ''">1</_ShinyCDVersion>
+      <_ShinyCDEntitlements>$(ShinyCallDirectoryCodesignEntitlements)</_ShinyCDEntitlements>
+      <_ShinyCDEntitlements Condition="'$(_ShinyCDEntitlements)' == ''">$(_ShinyCDDir)Entitlements.plist</_ShinyCDEntitlements>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ShinyCDSwift Include="$(ShinyCallDirectorySwiftDir)ShinyCallDirectoryLoader.swift" />
+      <_ShinyCDSwift Include="$(ShinyCallDirectorySwiftDir)ShinyCallDirectoryHandler.swift" />
+    </ItemGroup>
+  </Target>
+
+  <!-- the extension's half of the app group -->
+  <Target Name="ShinyCallDirectoryEntitlementsFile"
+          DependsOnTargets="_ShinyCallDirectoryPaths"
+          Condition="'$(_ShinyCDIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(ShinyCallDirectoryCodesignEntitlements)' == ''">
+    <ItemGroup>
+      <_ShinyCDEntLine Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;" />
+      <_ShinyCDEntLine Include="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;" />
+      <_ShinyCDEntLine Include="&lt;plist version=&quot;1.0&quot;&gt;&lt;dict&gt;" />
+      <_ShinyCDEntLine Include="&lt;key&gt;com.apple.security.application-groups&lt;/key&gt;&lt;array&gt;&lt;string&gt;$(ShinyCallDirectoryAppGroup)&lt;/string&gt;&lt;/array&gt;" />
+      <_ShinyCDEntLine Include="&lt;/dict&gt;&lt;/plist&gt;" />
+    </ItemGroup>
+    <MakeDir Directories="$(_ShinyCDDir)" />
+    <WriteLinesToFile File="$(_ShinyCDEntitlements)" Lines="@(_ShinyCDEntLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <!--
+    The simulator has no provisioning: Xcode embeds the entitlements in the executable (__TEXT,__entitlements as XML
+    and __TEXT,__ents_der as DER) and that is what the simulator enforces app groups from.
+  -->
+  <Target Name="_ShinyCallDirectorySimulatorEntitlements"
+          DependsOnTargets="ShinyCallDirectoryEntitlementsFile"
+          Condition="'$(_ShinyCDIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(_ShinyCDIsSimulator)' == 'true'">
+    <Exec Command="derq query -f xml -i &quot;$(_ShinyCDEntitlements)&quot; -o &quot;$(_ShinyCDDir)Entitlements.der&quot; --raw" StandardOutputImportance="low" />
+    <PropertyGroup>
+      <_ShinyCDEmbedEntitlements>-Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker &quot;$(_ShinyCDEntitlements)&quot; -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker &quot;$(_ShinyCDDir)Entitlements.der&quot;</_ShinyCDEmbedEntitlements>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="ShinyCallDirectoryCompile"
+          DependsOnTargets="_ShinyCallDirectoryPaths;ShinyCallDirectoryEntitlementsFile;_ShinyCallDirectorySimulatorEntitlements"
+          Condition="'$(_ShinyCDIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'"
+          Inputs="@(_ShinyCDSwift);$(MSBuildThisFileFullPath);$(_ShinyCDEntitlements)"
+          Outputs="$(_ShinyCDExecutable)">
+    <Exec Command="xcrun --sdk $(_ShinyCDSdk) --show-sdk-path" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyCDSdkPath" />
+    </Exec>
+    <MakeDir Directories="$(_ShinyCDAppex)" />
+    <!-- -e _NSExtensionMain: the extension point's main loads NSExtensionPrincipalClass, not a Swift @main -->
+    <Exec Command="xcrun --sdk $(_ShinyCDSdk) swiftc -parse-as-library -swift-version 5 -O -application-extension -module-name $(_ShinyCDName) -target $(_ShinyCDTriple) -sdk &quot;$(_ShinyCDSdkPath)&quot; @(_ShinyCDSwift->'&quot;%(Identity)&quot;', ' ') -Xlinker -e -Xlinker _NSExtensionMain -Xlinker -dead_strip -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/../../Frameworks $(_ShinyCDEmbedEntitlements) -o &quot;$(_ShinyCDExecutable)&quot;" />
+  </Target>
+
+  <Target Name="ShinyCallDirectoryInfoPlist"
+          DependsOnTargets="_ShinyCallDirectoryPaths;_WriteAppManifest"
+          Condition="'$(_ShinyCDIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <_ShinyCDPlistLine Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;" />
+      <_ShinyCDPlistLine Include="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;" />
+      <_ShinyCDPlistLine Include="&lt;plist version=&quot;1.0&quot;&gt;&lt;dict&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;&lt;string&gt;en&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleDisplayName&lt;/key&gt;&lt;string&gt;$(ShinyCallDirectoryDisplayName)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleExecutable&lt;/key&gt;&lt;string&gt;$(_ShinyCDName)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleIdentifier&lt;/key&gt;&lt;string&gt;$(ShinyCallDirectoryBundleId)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;&lt;string&gt;6.0&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleName&lt;/key&gt;&lt;string&gt;$(_ShinyCDName)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundlePackageType&lt;/key&gt;&lt;string&gt;XPC!&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;&lt;string&gt;$(_ShinyCDShortVersion)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleVersion&lt;/key&gt;&lt;string&gt;$(_ShinyCDVersion)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;CFBundleSupportedPlatforms&lt;/key&gt;&lt;array&gt;&lt;string&gt;$(_ShinyCDPlatformName)&lt;/string&gt;&lt;/array&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;MinimumOSVersion&lt;/key&gt;&lt;string&gt;$(ShinyCallDirectoryMinimumOSVersion)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;UIDeviceFamily&lt;/key&gt;&lt;array&gt;&lt;integer&gt;1&lt;/integer&gt;&lt;integer&gt;2&lt;/integer&gt;&lt;/array&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;ShinyCallDirectoryAppGroup&lt;/key&gt;&lt;string&gt;$(ShinyCallDirectoryAppGroup)&lt;/string&gt;" />
+      <_ShinyCDPlistLine Include="&lt;key&gt;NSExtension&lt;/key&gt;&lt;dict&gt;&lt;key&gt;NSExtensionPointIdentifier&lt;/key&gt;&lt;string&gt;com.apple.callkit.call-directory&lt;/string&gt;&lt;key&gt;NSExtensionPrincipalClass&lt;/key&gt;&lt;string&gt;ShinyCallDirectoryHandler&lt;/string&gt;&lt;/dict&gt;" />
+      <_ShinyCDPlistLine Include="&lt;/dict&gt;&lt;/plist&gt;" />
+      <_ShinyCDDTKey Include="DTCompiler;DTPlatformBuild;DTPlatformName;DTPlatformVersion;DTSDKBuild;DTSDKName;DTXcode;DTXcodeBuild;BuildMachineOSBuild" />
+    </ItemGroup>
+    <MakeDir Directories="$(_ShinyCDAppex)" />
+    <WriteLinesToFile File="$(_ShinyCDDir)Info.plist" Lines="@(_ShinyCDPlistLine)" Overwrite="true" />
+    <Exec Command="v=`/usr/libexec/PlistBuddy -c 'Print :%(_ShinyCDDTKey.Identity)' &quot;$(_AppBundleManifestPath)&quot; 2>/dev/null` &amp;&amp; /usr/libexec/PlistBuddy -c &quot;Add :%(_ShinyCDDTKey.Identity) string $v&quot; &quot;$(_ShinyCDDir)Info.plist&quot; || true" StandardOutputImportance="low" />
+    <Exec Command="cmp -s &quot;$(_ShinyCDDir)Info.plist&quot; &quot;$(_ShinyCDInfoPlist)&quot; || cp &quot;$(_ShinyCDDir)Info.plist&quot; &quot;$(_ShinyCDInfoPlist)&quot;" StandardOutputImportance="low" />
+  </Target>
+
+  <!-- device builds: its own provisioning profile (with the App Groups capability) and compiled entitlements -->
+  <Target Name="ShinyCallDirectorySigning"
+          DependsOnTargets="_ShinyCallDirectoryPaths;ShinyCallDirectoryEntitlementsFile;_DetectSigningIdentity;_DetectSdkLocations;_EmbedProvisionProfile"
+          Condition="'$(_ShinyCDIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(_ShinyCDIsSimulator)' != 'true' and '$(EnableCodeSigning)' != 'false'">
+    <DetectSigningIdentity
+      SessionId="$(BuildSessionId)"
+      AppBundleName="$(_ShinyCDName)"
+      BundleIdentifier="$(ShinyCallDirectoryBundleId)"
+      CodesignEntitlements="$(_ShinyCDEntitlements)"
+      CodesignRequireProvisioningProfile="true"
+      Keychain="$(CodesignKeychain)"
+      SdkIsSimulator="false"
+      SdkPlatform="$(_SdkPlatform)"
+      ProvisioningProfile="$(ShinyCallDirectoryCodesignProvision)"
+      SdkDevPath="$(_SdkDevPath)"
+      SigningKey="$(_CodeSigningKey)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      ContinueOnError="true">
+      <Output TaskParameter="DetectedProvisioningProfile" PropertyName="_ShinyCDProvisioningProfile" />
+    </DetectSigningIdentity>
+
+    <Error Condition="'$(_ShinyCDProvisioningProfile)' == ''"
+           Text="Shiny.Mobile.CallDirectory: no provisioning profile found for the Call Directory extension ('$(ShinyCallDirectoryBundleId)'). Create one for that bundle id with the App Groups capability and '$(ShinyCallDirectoryAppGroup)', or name it with &lt;ShinyCallDirectoryCodesignProvision&gt;." />
+
+    <EmbedProvisionProfile
+      SessionId="$(BuildSessionId)"
+      AppBundleDir="$(_ShinyCDAppex)"
+      ProvisioningProfile="$(_ShinyCDProvisioningProfile)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      EmbeddedProvisionProfilePath="$(_ShinyCDAppex)embedded.mobileprovision" />
+
+    <CompileEntitlements
+      SessionId="$(BuildSessionId)"
+      AppBundleDir="$(_ShinyCDAppex)"
+      BundleIdentifier="$(ShinyCallDirectoryBundleId)"
+      Entitlements="$(_ShinyCDEntitlements)"
+      CompiledEntitlements="$(_ShinyCDDir)$(_ShinyCDName).xcent"
+      ProvisioningProfile="$(_ShinyCDProvisioningProfile)"
+      SdkDevPath="$(_SdkDevPath)"
+      SdkIsSimulator="false"
+      SdkPlatform="$(_SdkPlatform)"
+      SdkVersion="$(_SdkVersion)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      Debug="$(_BundlerDebug)"
+      ValidateEntitlements="$(ValidateEntitlements)">
+      <Output TaskParameter="EntitlementsInSignature" PropertyName="_ShinyCDSignedEntitlements" />
+    </CompileEntitlements>
+
+    <Message Importance="normal" Text="Shiny.Mobile.CallDirectory: signing $(ShinyCallDirectoryBundleId) with provisioning profile $(_ShinyCDProvisioningProfile)" />
+  </Target>
+
+  <Target Name="ShinyCallDirectoryExtension"
+          BeforeTargets="_ExtendAppExtensionReferences"
+          DependsOnTargets="ShinyCallDirectoryCompile;ShinyCallDirectoryInfoPlist;ShinyCallDirectorySigning"
+          Condition="'$(_ShinyCDIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <AdditionalAppExtensions Include="$(_ShinyCDDir)">
+        <Name>$(_ShinyCDName)</Name>
+        <BuildOutput>appex</BuildOutput>
+        <CodesignEntitlements>$(_ShinyCDSignedEntitlements)</CodesignEntitlements>
+        <CodesignWarnIfNoEntitlements>false</CodesignWarnIfNoEntitlements>
+      </AdditionalAppExtensions>
+    </ItemGroup>
+  </Target>
+</Project>

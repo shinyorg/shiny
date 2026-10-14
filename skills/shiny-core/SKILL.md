@@ -48,6 +48,10 @@ triggers:
   - IShinyStartupTask
   - ShinyLifecycleTask
   - IAndroidLifecycle
+  - StartActivityForResult
+  - ActivityResultReceived
+  - ActivityResult
+  - IOnActivityResult
   - IIosLifecycle
   - IMacLifecycle
   - UseShiny
@@ -240,6 +244,7 @@ When generating code that uses Shiny.Core, follow these conventions:
 4. **Implement `IShinyStartupTask`** for code that should run immediately after the DI container is built. Register it with `services.AddSingleton<IShinyStartupTask, MyTask>()` or tag it `[Singleton]` and explicitly add the `IShinyStartupTask` interface.
 5. **Inherit `ShinyLifecycleTask`** for startup tasks that also need foreground/background application-lifecycle events. It composes `IAndroidLifecycle.IApplicationLifecycle`, `IIosLifecycle.IApplicationLifecycle`, `IMacLifecycle.IApplicationLifecycle`, and `IShinyStartupTask` into one base class.
 6. **Implement `IAndroidLifecycle.*`, `IIosLifecycle.*`, or `IMacLifecycle.*` sub-interfaces** for platform-specific lifecycle hooks. Register them in DI and the lifecycle executor dispatches to them automatically.
+   - **Android activity results:** to start an activity and get its answer (role request, settings screen, consent dialog), use `await androidPlatform.StartActivityForResult(intent, ct)`, which returns `ActivityResult(Activity, RequestCode, ResultCode, Data)` with `IsOk`. Every forwarded result is also raised as `AndroidPlatform.ActivityResultReceived` and dispatched to `IAndroidLifecycle.IOnActivityResult`. Shiny.Hosting.Maui forwards results automatically; Shiny.Hosting.Native needs the activity to derive from `ShinyAndroidActivity`. Never generate a transparent "result" activity of your own.
 7. **Inject a keyed `IKeyValueStore` from `Shiny.Extensions.Stores`** via `[FromKeyedServices(StoreKeys.Default)] IKeyValueStore store` (or `StoreKeys.Secure`). The store factory is also available via `IKeyValueStoreFactory.Get(alias)`.
 8. **Use the static `Shiny.Stores.Default` / `Shiny.Stores.Secure` accessors** for one-off reads/writes outside DI contexts — the accessor self-bootstraps on first use after `AddShinyStores()` has run (call `host.Services.UseShinyStores()` after `Build()` on Blazor WASM).
 9. **Use `IPlatform`** to access `AppData`, `Cache`, `Public` directories and `InvokeOnMainThread()`, and for device/app info: `AppVersion`, `ApplicationIdentifier` (`string?` - bundle identifier on Apple, package name on Android, package identity name on packaged Windows, Flatpak app ID / Snap name on Linux; null when there is no such identity, so always null-check it), `DeviceManufacturer`, `DeviceModel`, `PlatformVersion`, `Platform` (`Android`, `iOS`, `MacCatalyst`, `tvOS`, `macOS`, `Windows`, `Linux`, `Browser`), `DeviceFormFactor` (`Shiny.DeviceFormFactor` - `Unknown`, `Phone`, `Tablet`, `Desktop`, `TV`, `Watch`, `Car`; named so it never collides with MAUI's `Microsoft.Maui.Devices.DeviceIdiom` - do not generate `DeviceIdiom` against `IPlatform`), `CurrentCulture` / `CultureChanged`, `CurrentTimeZone` / `TimeZoneChanged` (native listeners start with the first subscriber; raised off the UI thread - marshal before touching UI) and `OpenAppSettings()`. These are implemented natively with no MAUI, and replace the members removed from `Shiny.Extensions.MauiHosting`'s `IAppSupport` - never generate them against `IAppSupport`.

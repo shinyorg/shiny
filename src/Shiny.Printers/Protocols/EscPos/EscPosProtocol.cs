@@ -7,9 +7,10 @@ namespace Shiny.Printers.Protocols.EscPos;
 
 /// <summary>
 /// Encodes a <see cref="PrintDocument"/> as ESC/POS - the de-facto standard for thermal receipt printers.
-/// Covers text styling, alignment, 1D barcodes, QR codes, raster images and paper cut.
+/// Covers text styling, alignment, 1D barcodes, QR codes, raster images and paper cut, plus real-time status
+/// (<c>DLE EOT</c>) over transports that can read replies.
 /// </summary>
-public sealed class EscPosProtocol : IPrinterProtocol
+public sealed class EscPosProtocol : IPrinterStatusProtocol
 {
     const byte ESC = 0x1B;
     const byte GS = 0x1D;
@@ -25,6 +26,17 @@ public sealed class EscPosProtocol : IPrinterProtocol
     public byte CodePage { get; set; } = 0;
 
     public string Name => "ESC/POS";
+
+
+    public async Task<PrinterStatus> QueryStatus(IPrinterQueryConnection connection, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+        var response = await connection
+            .Query(EscPosStatus.Request, EscPosStatus.ResponseLength, cancellationToken)
+            .ConfigureAwait(false);
+
+        return EscPosStatus.Parse(response);
+    }
 
 
     public byte[] Encode(PrintDocument document, PrinterCapabilities capabilities)

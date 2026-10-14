@@ -26,6 +26,28 @@ public sealed class Printer(IPrinterConnection connection, IPrinterProtocol prot
 
     public bool IsConnected => this.connection.IsConnected;
 
+    /// <summary>How long <see cref="GetStatus"/> waits for the printer to answer. Default 3s.</summary>
+    public TimeSpan StatusTimeout { get; init; } = TimeSpan.FromSeconds(3);
+
+    public bool SupportsStatus => this.connection is IPrinterQueryConnection && this.protocol is IPrinterStatusProtocol;
+
+    public async Task<PrinterStatus> GetStatus(CancellationToken cancellationToken = default)
+    {
+        if (this.connection is not IPrinterQueryConnection query || this.protocol is not IPrinterStatusProtocol status)
+            throw new NotSupportedException($"{this.protocol.Name} over {this.connection.GetType().Name} cannot report printer status.");
+
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        linked.CancelAfter(this.StatusTimeout);
+        try
+        {
+            return await status.QueryStatus(query, linked.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException($"The printer did not answer a status query within {this.StatusTimeout}.");
+        }
+    }
+
     public Task Print(PrintDocument document, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(document);

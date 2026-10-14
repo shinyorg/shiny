@@ -18,6 +18,9 @@ public sealed record NetworkPrinterConfig
     /// <summary>How long to wait for the TCP connect before giving up. Default 10s.</summary>
     public TimeSpan ConnectTimeout { get; init; } = TimeSpan.FromSeconds(10);
 
+    /// <summary>How long <see cref="IPrinter.GetStatus"/> waits for the printer to answer. Default 3s.</summary>
+    public TimeSpan StatusTimeout { get; init; } = TimeSpan.FromSeconds(3);
+
     /// <summary>Static capabilities for this printer (chars-per-line, paper width, etc).</summary>
     public required PrinterCapabilities Capabilities { get; init; }
 

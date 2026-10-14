@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>UIDeviceFamily</key>
+    <array>
+        <integer>2</integer>
+    </array>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>XSAppIconAssets</key>
+    <string>Assets.xcassets/appicon.appiconset</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>The device tests talk to the test runner and discover services on your local network.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <!-- Every mDNS service type the app browses for or publishes must be listed here,
+             or browsing silently returns nothing. This does NOT apply to SSDP or WS-Discovery. -->
+        <string>_http._tcp</string>
+        <string>_shinytest._tcp</string>
+        <string>_ipp._tcp</string>
+        <string>_airplay._tcp</string>
+        <!-- Shiny.Printers.Network: raw (port 9100) and LPR receipt printers -->
+        <string>_pdl-datastream._tcp</string>
+        <string>_printer._tcp</string>
+    </array>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>This app uses Bluetooth to scan for and connect to nearby devices</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>This app uses Bluetooth to communicate with peripherals</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs location access to demonstrate GPS features</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app needs background location for geofencing</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
+    <key>NSContactsUsageDescription</key>
+    <string>This app needs access to your contacts to demonstrate reading and editing device contacts</string>
+    <!-- the runner's HTTP fixtures are plain http on the host / LAN -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>bluetooth-central</string>
+        <string>bluetooth-peripheral</string>
+        <string>location</string>
+        <string>remote-notification</string>
+        <string>fetch</string>
+        <string>processing</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.shiny.job</string>
+        <string>com.shiny.jobpower</string>
+        <string>com.shiny.jobnet</string>
+        <string>com.shiny.jobpowernet</string>
+    </array>
+</dict>
+</plist>

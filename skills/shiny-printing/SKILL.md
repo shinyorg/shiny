@@ -1,6 +1,6 @@
 ---
 name: shiny-printing
-description: Generate code using Shiny.Printers and Shiny.Printing for .NET - thermal / receipt printing (ESC/POS, TSPL) with a fluent PrintDocument over Bluetooth LE, WiFi (raw TCP 9100 + mDNS discovery) and browser Web Bluetooth / Web Serial / WebUSB, plus OS-native printing of PDF, image, HTML and files through AirPrint, Android PrintManager, Windows GDI+/shell, CUPS and window.print, and rendering a receipt to PDF with SkiaSharp
+description: Generate code using Shiny.Printers and Shiny.Printing for .NET - thermal / receipt printing (ESC/POS, TSPL) with a fluent PrintDocument over Bluetooth LE, WiFi (raw TCP 9100 + mDNS discovery or subnet sweep, ESC/POS status read-back) and browser Web Bluetooth / Web Serial / WebUSB, plus OS-native printing of PDF, image, HTML and files through AirPrint, Android PrintManager, Windows GDI+/shell, CUPS and window.print, and rendering a receipt to PDF with SkiaSharp
 auto_invoke: true
 triggers:
   - print
@@ -20,6 +20,16 @@ triggers:
   - network printer
   - port 9100
   - JetDirect
+  - Sweep
+  - subnet sweep
+  - NetworkPrinterSweepConfig
+  - GetStatus
+  - PrinterStatus
+  - SupportsStatus
+  - printer status
+  - paper out
+  - cover open
+  - DLE EOT
   - print barcode
   - print QR code
   - cash drawer
@@ -238,6 +248,46 @@ var printer = await networkManager.Connect(found);
 - `Scan(serviceType)` browses a vendor-specific DNS-SD type.
 - Same `PrintDocument`, same disposal: `(printer as IDisposable)?.Dispose()` closes the socket.
 
+Printer not found by `Scan()`? Most cheap receipt printers never advertise mDNS - sweep the subnet for port 9100:
+
+```csharp
+// completes when done (~1-2s for a /24) - unlike Scan(), which never completes on its own
+var printers = await networkScanner.Sweep().ToList();
+
+// custom: explicit subnet / extra ports / 58mm
+var printers = await networkScanner.Sweep(new NetworkPrinterSweepConfig
+{
+    Networks = [IPNetwork.Parse("192.168.10.0/24")],
+    Ports = [9100, 9101],
+    Capabilities = PrinterCapabilities.Paper58mm
+}).ToList();
+```
+
+- Default `Networks = null` sweeps each active IPv4 interface's subnet, narrowed to its /24, skipping the device itself.
+- Swept results: `Name` = IP, `ServiceType` = `""`, `Method = NetworkPrinterDiscoveryMethod.PortSweep`. Merging with
+  `Scan()`? de-duplicate on `$"{Host}:{Port}"`.
+- Anything on 9100 answers (laser printers too). A printer busy with another client's connection may be missed.
+
+### Printer status (paper out, cover open, cutter, drawer)
+
+```csharp
+if (printer.SupportsStatus)                // ESC/POS over TCP only - BLE and browser transports are write-only
+{
+    var status = await printer.GetStatus();   // TimeoutException if the printer ignores DLE EOT
+    if (!status.CanPrint)
+        Show(status.IsPaperOut ? "Load paper" : status.IsCoverOpen ? "Close the cover" : "Printer error");
+    else if (status.IsPaperNearEnd)
+        Show("Paper low");
+}
+```
+
+- `PrinterStatus`: `IsOnline`, `IsCoverOpen`, `IsPaperOut`, `IsPaperNearEnd`, `IsCutterError`,
+  `HasUnrecoverableError`, `HasAutoRecoverableError`, `IsDrawerSensorHigh` (polarity depends on the drawer - never
+  call it "open" without checking), plus `CanPrint` / `HasError`.
+- Never call `GetStatus()` without checking `SupportsStatus` - it throws `NotSupportedException`.
+- Timeout: `NetworkPrinterConfig.StatusTimeout` (default 3s). Non-status reply -> `InvalidDataException`.
+- Safe to call while printing - the query waits for the in-flight send.
+
 ### Blazor (browser transports)
 
 ```razor
@@ -290,6 +340,8 @@ var printer = await networkManager.Connect(found);
 Implement `IPrinterConnection` (`IsConnected`, `WhenStatusChanged()` replaying the current state,
 `SendAsync(ReadOnlyMemory<byte>)` honouring the transport's payload limit) or `IPrinterProtocol`
 (`Encode(PrintDocument, PrinterCapabilities) => byte[]`), then compose: `new Printer(connection, protocol, caps)`.
+For status, the transport also implements `IPrinterQueryConnection` (`Query(request, responseLength)`) and the
+protocol `IPrinterStatusProtocol` (`QueryStatus(connection)`); `Printer.SupportsStatus` lights up when both do.
 
 ## OS-native printing
 

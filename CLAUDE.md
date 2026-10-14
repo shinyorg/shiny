@@ -16,7 +16,7 @@ subfolder per module (URLs are `/client/<module>/...`):
 - Feature pages: `src/content/docs/client/<module>/*.mdx` — `core/`, `ble/`, `blehosting/`,
   `beacons/`, `locations/`, `discovery/`, `wifi/`, `screenrecorder/`, `contactstore/`,
   `calendarstore/`, `jobs/`, `notifications/`, `push/`, `liveactivities/`, `httptransfers/`,
-  `datasync/`, `wearables/`, `configuration/`, `printing/`, `inapppurchases/`.
+  `datasync/`, `wearables/`, `configuration/`, `printing/`, `inapppurchases/`, `calldirectory/`.
 - Release notes: **one shared file**, `src/content/docs/client/release-notes.mdx`. Every package
   ships under the same version, so notes are grouped `## v<major>` → `### <version> - <date>` →
   `#### <Component>` (e.g. `#### BluetoothLE`, `#### Push Notifications`). Add your note under the
@@ -153,6 +153,27 @@ real bus (a Pi is the usual target):
   `btmon` shows BlueZ's own management commands (such as a `Stop Discovery` nobody asked for).
 - **Compare against the system tool** (`bluetoothctl scan on`, `nmcli`, `busctl`) to separate "the
   hardware can't" from "the library doesn't".
+
+## Device tests (`tests/Shiny.DeviceTests` + `.Runner`)
+
+End-to-end suites that run inside a real app on a simulator/emulator/device, driven through the MAUI DevFlow agent
+(an `org.shiny.devicetests` agent extension) by a host runner that also moves the simulated location, sends simctl
+pushes, relays BLE peer commands and serves the HTTP/data-sync/printer fixtures. `tests/Shiny.DeviceTests/readme.md`
+has the details; `tests/Shiny.DeviceTests/run.sh <ios|android|maccatalyst>` builds, installs and runs. Not in
+`Build.slnf`.
+
+- A missing capability is a **skip with a reason**, never a failure (`ctx.RequireCapability`, `RequireRealDevice`).
+  A failing test is either a library bug or a test bug - triage before touching `src/`.
+- Run on a **dedicated simulator** (`--device <udid>`): if another app takes the foreground iOS suspends the test
+  app and its agent stops answering.
+- This Mac has no Simulator.app, so simulators are headless: DevFlow's `ui alert` can't see system prompts and
+  nobody can tap one. Anything that prompts must be pre-granted (`simctl privacy`, `adb pm grant`) or avoided -
+  notifications use iOS **provisional** authorization for this reason. `simctl privacy grant` kills the app (the
+  runner relaunches it).
+- `simctl push` rejects silent (`content-available` only) pushes - that test skips on the simulator.
+- An incremental iOS build does not always regenerate the app's `Info.plist`; after editing it, delete
+  `obj/Debug/net10.0-ios` and `bin/Debug/net10.0-ios` before trusting a run.
+- The DevFlow agent's HTTP server needs a `Content-Length` - send buffered `StringContent`, not `JsonContent`.
 
 ## Blog posts (only when explicitly requested)
 

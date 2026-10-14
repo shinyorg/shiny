@@ -1,0 +1,6 @@
+<Project>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+
+    <!-- NuGet consumers get these from buildTransitive/; this app uses a project reference, so they are imported here -->
+    <Import Project="$(MSBuildThisFileDirectory)../../src/Shiny.Mobile.CallDirectory/buildTransitive/Shiny.Mobile.CallDirectory.targets" />
+</Project>

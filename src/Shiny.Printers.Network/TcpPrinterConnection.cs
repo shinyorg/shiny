@@ -6,14 +6,17 @@ namespace Shiny.Printers.Network;
 
 /// <summary>
 /// An <see cref="IPrinterConnection"/> backed by a raw TCP socket (port 9100 "RAW" / JetDirect). Unlike
-/// BLE there is no MTU to honour - TCP handles fragmentation, so writes go out in a single streamed pass.
+/// BLE there is no MTU to honour - TCP handles fragmentation, so writes go out in a single streamed pass. The
+/// socket is two-way, so it is also an <see cref="IPrinterQueryConnection"/> for status queries.
 /// </summary>
-public sealed class TcpPrinterConnection : IPrinterConnection, IDisposable
+public sealed class TcpPrinterConnection : IPrinterQueryConnection, IDisposable
 {
     readonly string host;
     readonly int port;
     readonly TimeSpan connectTimeout;
     readonly BehaviorSubject<PrinterConnectionState> status = new(PrinterConnectionState.Disconnected);
+    // one writer at a time - a status query must not land in the middle of a print job's bytes
+    readonly SemaphoreSlim gate = new(1, 1);
     Socket? socket;
 
 
@@ -82,10 +85,73 @@ public sealed class TcpPrinterConnection : IPrinterConnection, IDisposable
 
     public async ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
     {
+        var s = this.GetSocket();
+        await this.gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await Write(s, data, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            this.gate.Release();
+        }
+    }
+
+
+    public async ValueTask<byte[]> Query(ReadOnlyMemory<byte> request, int responseLength, CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(responseLength);
+        var s = this.GetSocket();
+
+        await this.gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            // a reply to an earlier query that timed out may still be sitting in the buffer
+            var scratch = new byte[256];
+            while (s.Available > 0)
+                await this.Read(s, scratch.AsMemory(0, Math.Min(s.Available, scratch.Length)), cancellationToken).ConfigureAwait(false);
+
+            await Write(s, request, cancellationToken).ConfigureAwait(false);
+
+            var response = new byte[responseLength];
+            var read = 0;
+            while (read < responseLength)
+                read += await this.Read(s, response.AsMemory(read), cancellationToken).ConfigureAwait(false);
+
+            return response;
+        }
+        finally
+        {
+            this.gate.Release();
+        }
+    }
+
+
+    Socket GetSocket()
+    {
         var s = this.socket;
         if (s is null || !s.Connected)
             throw new InvalidOperationException("The printer is not connected.");
 
+        return s;
+    }
+
+
+    async ValueTask<int> Read(Socket s, Memory<byte> buffer, CancellationToken cancellationToken)
+    {
+        var read = await s.ReceiveAsync(buffer, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+        if (read == 0)
+        {
+            // an orderly close from the printer - the socket is no use for printing either
+            this.Disconnect();
+            throw new IOException("The printer closed the connection.");
+        }
+        return read;
+    }
+
+
+    static async ValueTask Write(Socket s, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
+    {
         var remaining = data;
         while (!remaining.IsEmpty)
         {
@@ -125,5 +191,6 @@ public sealed class TcpPrinterConnection : IPrinterConnection, IDisposable
     {
         this.Disconnect();
         this.status.Dispose();
+        this.gate.Dispose();
     }
 }

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Shiny.CallDirectory.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+        <!-- compiled by the contract test with swiftc, not by MSBuild -->
+        <None Include="FakeCallKit\**" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\..\src\Shiny.Mobile.CallDirectory\buildTransitive\swift\ShinyCallDirectoryLoader.swift" Link="FakeCallKit\ShinyCallDirectoryLoader.swift" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.Mobile.CallDirectory\Shiny.Mobile.CallDirectory.csproj" />
+    </ItemGroup>
+
+</Project>

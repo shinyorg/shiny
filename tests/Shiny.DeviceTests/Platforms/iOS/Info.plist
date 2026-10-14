@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UIDeviceFamily</key>
+    <array>
+        <integer>1</integer>
+        <integer>2</integer>
+    </array>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <!-- iOS 27 terminates apps that have not adopted the UIScene lifecycle - see SceneDelegate.cs -->
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <false/>
+        <key>UISceneConfigurations</key>
+        <dict>
+            <key>UIWindowSceneSessionRoleApplication</key>
+            <array>
+                <dict>
+                    <key>UISceneConfigurationName</key>
+                    <string>__MAUI_DEFAULT_SCENE_CONFIGURATION__</string>
+                    <key>UISceneDelegateClassName</key>
+                    <string>SceneDelegate</string>
+                </dict>
+            </array>
+        </dict>
+    </dict>
+    <key>XSAppIconAssets</key>
+    <string>Assets.xcassets/appicon.appiconset</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>The device tests talk to the test runner and discover services on your local network.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <!-- Every mDNS service type the app browses for or publishes must be listed here,
+             or browsing silently returns nothing. This does NOT apply to SSDP or WS-Discovery. -->
+        <string>_http._tcp</string>
+        <!-- Shiny.DeviceTests: the Discovery suite publishes and browses its own service type -->
+        <string>_shinytest._tcp</string>
+        <string>_ipp._tcp</string>
+        <string>_airplay._tcp</string>
+        <!-- Shiny.Printers.Network: raw (port 9100) and LPR receipt printers -->
+        <string>_pdl-datastream._tcp</string>
+        <string>_printer._tcp</string>
+    </array>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>This app uses Bluetooth to scan for and connect to nearby devices</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>This app uses Bluetooth to communicate with peripherals</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs location access to demonstrate GPS features</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app needs background location for geofencing</string>
+    <!-- Shiny.ScreenRecorder: ReplayKit needs no entitlement to record this app's own UI, but
+         mixing the microphone into the recording does need this. -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Records narration alongside a screen recording of this app</string>
+    <key>NSMotionUsageDescription</key>
+    <string>This app uses motion activity recognition to detect walking, running, driving, and other activities</string>
+    <key>NSContactsUsageDescription</key>
+    <string>This app needs access to your contacts to demonstrate reading and editing device contacts</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
+    <!-- the runner's HTTP fixtures are plain http on the host / LAN -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+    <!-- LiveActivities suite: ActivityKit refuses every request without this (no widget extension is built) -->
+    <key>NSSupportsLiveActivities</key>
+    <true/>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>bluetooth-central</string>
+        <string>bluetooth-peripheral</string>
+        <string>location</string>
+        <string>remote-notification</string>
+        <string>fetch</string>
+        <string>processing</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.shiny.job</string>
+        <string>com.shiny.jobpower</string>
+        <string>com.shiny.jobnet</string>
+        <string>com.shiny.jobpowernet</string>
+    </array>
+</dict>
+</plist>
