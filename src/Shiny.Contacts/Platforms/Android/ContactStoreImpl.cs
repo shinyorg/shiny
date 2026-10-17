@@ -13,6 +13,55 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
 {
     static ContentResolver Resolver => Application.Context.ContentResolver!;
 
+    readonly object changedLock = new();
+    EventHandler? changed;
+    ChangeObserver? changeObserver;
+
+    public event EventHandler? Changed
+    {
+        add
+        {
+            lock (this.changedLock)
+            {
+                this.changed += value;
+                if (this.changeObserver != null)
+                    return;
+
+                // The provider root with descendants covers contacts, raw contacts and their data rows.
+                var observer = new ChangeObserver(() => this.changed?.Invoke(this, EventArgs.Empty));
+                try
+                {
+                    Resolver.RegisterContentObserver(ContactsContract.AuthorityUri!, true, observer);
+                    this.changeObserver = observer;
+                }
+                catch (Java.Lang.SecurityException)
+                {
+                    // No contacts permission yet - the next subscription tries again.
+                    observer.Dispose();
+                }
+            }
+        }
+        remove
+        {
+            lock (this.changedLock)
+            {
+                this.changed -= value;
+                if (this.changed == null && this.changeObserver != null)
+                {
+                    Resolver.UnregisterContentObserver(this.changeObserver);
+                    this.changeObserver.Dispose();
+                    this.changeObserver = null;
+                }
+            }
+        }
+    }
+
+    // A null handler delivers OnChange on a binder thread.
+    sealed class ChangeObserver(Action onChange) : ContentObserver(null)
+    {
+        public override void OnChange(bool selfChange) => onChange();
+    }
+
     public AccessState GetCurrentAccess()
     {
         var read = Application.Context.CheckSelfPermission(Android.Manifest.Permission.ReadContacts) == Android.Content.PM.Permission.Granted;

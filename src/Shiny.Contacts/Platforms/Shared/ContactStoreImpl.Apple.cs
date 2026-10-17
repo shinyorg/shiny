@@ -15,6 +15,39 @@ namespace Shiny.Contacts;
 /// </remarks>
 public class ContactStoreImpl : IContactStore
 {
+    readonly object changedLock = new();
+    EventHandler? changed;
+    NSObject? changedObserver;
+
+    public event EventHandler? Changed
+    {
+        add
+        {
+            lock (this.changedLock)
+            {
+                this.changed += value;
+
+                // Each call here opens its own CNContactStore, so listen for the notification from any of them.
+                this.changedObserver ??= NSNotificationCenter.DefaultCenter.AddObserver(
+                    CNContactStore.NotificationDidChange,
+                    _ => this.changed?.Invoke(this, EventArgs.Empty)
+                );
+            }
+        }
+        remove
+        {
+            lock (this.changedLock)
+            {
+                this.changed -= value;
+                if (this.changed == null && this.changedObserver != null)
+                {
+                    NSNotificationCenter.DefaultCenter.RemoveObserver(this.changedObserver);
+                    this.changedObserver = null;
+                }
+            }
+        }
+    }
+
     public AccessState GetCurrentAccess()
     {
         var status = CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts);

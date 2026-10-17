@@ -13,6 +13,14 @@ public interface ICalendarStore
     /// <param name="accessType">The level of access required. iOS 17+ distinguishes read-only, write-only, and full access.</param>
     Task<AccessState> RequestAccess(CalendarAccessType accessType = CalendarAccessType.ReadWrite, CancellationToken ct = default);
 
+    /// <summary>
+    /// Raised when calendars or events change on the device - edits made by other apps, sync, or this store.
+    /// The native listener is only attached while there is at least one subscriber. The event carries no
+    /// detail about what changed, so re-query what you show. It may be raised on a background thread and
+    /// several times for a single edit.
+    /// </summary>
+    event EventHandler? Changed;
+
     // ── Calendars ────────────────────────────────────────────────────
 
     /// <summary>

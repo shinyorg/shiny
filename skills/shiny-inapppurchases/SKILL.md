@@ -281,4 +281,9 @@ Always grant to the **authenticated user** in your verify endpoint, never to an 
   Slow test cards exercise `Pending`. Subscriptions renew every ~5 minutes.
 - **Server notifications:** App Store Connect → App Information → App Store Server Notifications (Version 2) → `/iap/apple`.
   Google: RTDN Pub/Sub topic (grant `google-play-developer-notifications@system.gserviceaccount.com` Publisher) → authenticated push subscription → `/iap/google`.
+- **Server testing without a device:** with `InAppPurchases__Google__RequirePubSubAuthentication=false`, POST a Pub/Sub envelope
+  (`{"message":{"data":"<base64 DeveloperNotification>","messageId":"..."}}`) to `/iap/google`; a `testNotification` needs no Play API call.
+  Apple JWS can't be forged - use `RequestTestNotificationAsync(sandbox: true)` or real sandbox purchases. Apple `Xcode`/`LocalTesting`
+  transactions are rejected. Unit test `IPurchaseEventHandler` by constructing a `PurchaseEvent` (required: `NotificationId`, `Platform`, `Type`, `RawType`).
+- Step-by-step testing (mobile + server, both stores): https://shinylib.net/client/inapppurchases/testing
 - Full walkthrough, production and testing: `samples/Sample.InAppPurchases.Maui/readme.md` in https://github.com/shinyorg/shiny

@@ -38,6 +38,11 @@ public class FakeCalendarStore : ICalendarStore
         return this;
     }
 
+    public event EventHandler? Changed;
+
+    /// <summary>Raises <see cref="Changed"/>, standing in for an edit made outside the store.</summary>
+    public void RaiseChanged() => this.Changed?.Invoke(this, EventArgs.Empty);
+
     public AccessState GetCurrentAccess() => AccessState.Available;
     public Task<AccessState> RequestAccess(CalendarAccessType accessType = CalendarAccessType.ReadWrite, CancellationToken ct = default)
         => Task.FromResult(AccessState.Available);

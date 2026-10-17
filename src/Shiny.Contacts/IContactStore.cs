@@ -13,6 +13,14 @@ public interface IContactStore
     Task<AccessState> RequestAccess(CancellationToken ct = default);
 
     /// <summary>
+    /// Raised when contacts change on the device - edits made by other apps, sync, or this store.
+    /// The native listener is only attached while there is at least one subscriber. The event carries no
+    /// detail about what changed, so re-query what you show. It may be raised on a background thread and
+    /// several times for a single edit.
+    /// </summary>
+    event EventHandler? Changed;
+
+    /// <summary>
     /// Retrieves all contacts from the device.
     /// </summary>
     Task<IReadOnlyList<Contact>> GetAll(CancellationToken ct = default);

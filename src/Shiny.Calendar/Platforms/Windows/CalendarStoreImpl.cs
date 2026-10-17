@@ -25,6 +25,64 @@ public class CalendarStoreImpl : ICalendarStore
     async Task<AppointmentStore> GetWriteStore()
         => this.writeStore ??= await AppointmentManager.RequestStoreAsync(AppointmentStoreAccessType.AppCalendarsReadWrite);
 
+    readonly object changedLock = new();
+    EventHandler? changed;
+    AppointmentStore? observedStore;
+
+    public event EventHandler? Changed
+    {
+        add
+        {
+            bool attach;
+            lock (this.changedLock)
+            {
+                attach = this.changed == null;
+                this.changed += value;
+            }
+            // The read store is only reachable asynchronously, so the first subscriber hooks it in the background.
+            if (attach)
+                _ = this.AttachStoreChanged();
+        }
+        remove
+        {
+            lock (this.changedLock)
+            {
+                this.changed -= value;
+                if (this.changed == null && this.observedStore != null)
+                {
+                    this.observedStore.StoreChanged -= this.OnStoreChanged;
+                    this.observedStore = null;
+                }
+            }
+        }
+    }
+
+    async Task AttachStoreChanged()
+    {
+        AppointmentStore store;
+        try
+        {
+            store = await this.GetReadStore();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return;
+        }
+
+        lock (this.changedLock)
+        {
+            // Everyone may have unsubscribed meanwhile, or a racing attach got here first.
+            if (this.changed == null || this.observedStore != null)
+                return;
+
+            this.observedStore = store;
+            store.StoreChanged += this.OnStoreChanged;
+        }
+    }
+
+    void OnStoreChanged(AppointmentStore sender, AppointmentStoreChangedEventArgs args)
+        => this.changed?.Invoke(this, EventArgs.Empty);
+
     public AccessState GetCurrentAccess()
         // The WinRT store cannot be probed without potentially prompting; RequestAccess resolves it.
         => AccessState.Unknown;

@@ -134,6 +134,19 @@ var current = calendarStore.GetCurrentAccess();
 - `AccessState.Denied` — denied
 - `AccessState.Unknown` — not yet determined (also the Windows `GetCurrentAccess()` result — call `RequestAccess`)
 
+## Change Notifications
+
+`ICalendarStore.Changed` is raised when calendars or events change on the device — edits from other apps, sync, or this store.
+The native listener is attached only while something is subscribed, so unsubscribe when you stop showing the data.
+The event carries no detail about what changed: re-query what you show. It can arrive on a background thread
+and several times for one edit, so dispatch to the UI thread and debounce if the refresh is expensive.
+
+```csharp
+store.Changed += (_, _) => dispatcher.Dispatch(async () => await this.Reload());
+```
+
+Backed by `EKEventStoreChangedNotification` (iOS/Mac Catalyst/macOS), a `ContentObserver` on the `CalendarContract` provider (Android), and `AppointmentStore.StoreChanged` (Windows).
+
 ## API Reference
 
 ### ICalendarStore Interface

@@ -18,6 +18,39 @@ namespace Shiny.Calendar;
 public class CalendarStoreImpl : ICalendarStore
 {
     readonly EKEventStore store = new();
+    readonly object changedLock = new();
+    EventHandler? changed;
+    NSObject? changedObserver;
+
+    public event EventHandler? Changed
+    {
+        add
+        {
+            lock (this.changedLock)
+            {
+                this.changed += value;
+
+                // EventKit posts this for every store whenever the calendar database changes, whoever changed it.
+                this.changedObserver ??= NSNotificationCenter.DefaultCenter.AddObserver(
+                    EKEventStore.ChangedNotification,
+                    _ => this.changed?.Invoke(this, EventArgs.Empty),
+                    this.store
+                );
+            }
+        }
+        remove
+        {
+            lock (this.changedLock)
+            {
+                this.changed -= value;
+                if (this.changed == null && this.changedObserver != null)
+                {
+                    NSNotificationCenter.DefaultCenter.RemoveObserver(this.changedObserver);
+                    this.changedObserver = null;
+                }
+            }
+        }
+    }
 
     public AccessState GetCurrentAccess()
     {
