@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE.Intrastructure;
 
@@ -53,7 +54,7 @@ public class SemaphoreOperationQueue : IOperationQueue
 
 public static class OperationQueueExtensions
 {
-    public static IObservable<T> QueueToObservable<T>(this IOperationQueue queue, Func<CancellationToken, Task<T>> func, [CallerMemberName] string? caller = null) => Observable.FromAsync(async ct =>
+    public static IObservable<T> QueueToObservable<T>(this IOperationQueue queue, Func<CancellationToken, Task<T>> func, [CallerMemberName] string? caller = null) => ObservableTask.FromAsync(async ct =>
     {
         T result = default!;
         await queue.Queue(async () => 

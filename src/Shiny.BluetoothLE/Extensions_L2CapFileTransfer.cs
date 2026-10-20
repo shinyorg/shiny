@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -105,7 +106,7 @@ public static class PeripheralL2CapFileTransferExtensions
         string? remoteFileName = null,
         bool secure = false,
         L2CapTransferOptions? options = null
-    ) => Observable.Create<TransferProgress>(async (ob, ct) =>
+    ) => ObservableTask.Create<TransferProgress>(async (ob, ct) =>
     {
         await peripheral
             .UploadFile(psm, localFilePath, remoteFileName, secure, ob.OnNext, options, ct)
@@ -130,7 +131,7 @@ public static class PeripheralL2CapFileTransferExtensions
         string localFilePath,
         bool secure = false,
         L2CapTransferOptions? options = null
-    ) => Observable.Create<TransferProgress>(async (ob, ct) =>
+    ) => ObservableTask.Create<TransferProgress>(async (ob, ct) =>
     {
         await peripheral
             .DownloadFile(psm, remoteFileName, localFilePath, secure, ob.OnNext, options, ct)

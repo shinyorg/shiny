@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Hosting.Bluez;
 using Tmds.DBus.Protocol;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -386,17 +387,27 @@ public class BleHostingManager : IBleHostingManager, IBluezGattHost, IAsyncDispo
                     }
                 });
 
-                onOpen(new L2CapChannel(
-                    psm,
-                    peer!,
-                    data => System.Reactive.Linq.Observable.FromAsync(ct => connected.SendAsync(data, ct)),
-                    rxSubj,
-                    () =>
-                    {
-                        connectionCts.Cancel();
-                        connected.Dispose();
-                    }
-                ));
+                try
+                {
+                    onOpen(new L2CapChannel(
+                        psm,
+                        peer!,
+                        data => ObservableTask.FromAsync(ct => connected.SendAsync(data, ct)),
+                        rxSubj,
+                        () =>
+                        {
+                            connectionCts.Cancel();
+                            connected.Dispose();
+                        }
+                    ));
+                }
+                catch (Exception ex)
+                {
+                    // a throwing callback used to end the accept loop, so the PSM stopped taking channels
+                    this.logger.LogWarning(ex, "L2CAP channel handler threw on PSM {Psm}", psm);
+                    connectionCts.Cancel();
+                    connected.Dispose();
+                }
             }
         });
 

@@ -210,8 +210,17 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             return;
 
         var peripheral = this.cache.SetSubscription(args.Central, subscribed);
-        if (this.onSubscribe != null)
+        if (this.onSubscribe == null)
+            return;
+
+        try
+        {
             await this.onSubscribe.Invoke(new CharacteristicSubscription(this, peripheral, subscribed));
+        }
+        catch
+        {
+            // async void - an exception here would crash the app
+        }
     }
 
 
@@ -226,22 +235,31 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             if (this.IsThis(req.Characteristic))
             {
                 var responded = false;
-                var peripheral = this.cache.GetOrAdd(req.Central);
-                await this.onWrite!.Invoke(new WriteRequest(
-                    this,
-                    peripheral,
-                    req.Value?.ToArray(),
-                    (int)req.Offset,
-                    true,
-                    (status) =>
-                    {
-                        responded = true;
-                        var nativeStatus = Enum.Parse<CBATTError>(status.ToString(), true);
-                        this.manager.RespondToRequest(req, nativeStatus);
-                    }
-                ));
-                if (!responded)
-                    this.manager.RespondToRequest(req, CBATTError.Success);
+                try
+                {
+                    var peripheral = this.cache.GetOrAdd(req.Central);
+                    await this.onWrite!.Invoke(new WriteRequest(
+                        this,
+                        peripheral,
+                        req.Value?.ToArray(),
+                        (int)req.Offset,
+                        true,
+                        (status) =>
+                        {
+                            responded = true;
+                            var nativeStatus = Enum.Parse<CBATTError>(status.ToString(), true);
+                            this.manager.RespondToRequest(req, nativeStatus);
+                        }
+                    ));
+                    if (!responded)
+                        this.manager.RespondToRequest(req, CBATTError.Success);
+                }
+                catch
+                {
+                    // async void - an exception here would crash the app; answer so the central isn't left waiting
+                    if (!responded)
+                        this.TryRespond(req, CBATTError.UnlikelyError);
+                }
             }
         }
     }
@@ -252,20 +270,41 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
         if (!args.Request.Characteristic.Equals(this.native))
             return;
 
-        var peripheral = this.cache.GetOrAdd(args.Request.Central);
-        var result = await this.onRead!.Invoke(new ReadRequest(
-            this,
-            peripheral,
-            (int)args.Request.Offset)
-        );
-        if (result.Status == GattState.Success)
+        try
         {
-            args.Request.Value = NSData.FromArray(result.Data!);
-            this.manager.RespondToRequest(args.Request, CBATTError.Success);
+            var peripheral = this.cache.GetOrAdd(args.Request.Central);
+            var result = await this.onRead!.Invoke(new ReadRequest(
+                this,
+                peripheral,
+                (int)args.Request.Offset)
+            );
+            if (result.Status == GattState.Success)
+            {
+                args.Request.Value = NSData.FromArray(result.Data!);
+                this.manager.RespondToRequest(args.Request, CBATTError.Success);
+            }
+            else
+            {
+                this.manager.RespondToRequest(args.Request, CBATTError.InsufficientEncryption);
+            }
         }
-        else
+        catch
         {
-            this.manager.RespondToRequest(args.Request, CBATTError.InsufficientEncryption);
+            // async void - an exception here would crash the app; answer so the central isn't left waiting
+            this.TryRespond(args.Request, CBATTError.UnlikelyError);
+        }
+    }
+
+
+    void TryRespond(CBATTRequest request, CBATTError error)
+    {
+        try
+        {
+            this.manager.RespondToRequest(request, error);
+        }
+        catch
+        {
+            // the request may already be answered or the central gone
         }
     }
 }

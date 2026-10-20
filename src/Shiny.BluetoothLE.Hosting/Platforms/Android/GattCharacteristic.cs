@@ -230,29 +230,20 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
                     lock (this.subscribers)
                         this.indicating[x.Device.Address!] = x.Value.SequenceEqual(Constants.IndicateEnableBytes);
 
-                    if (this.onSubscribe != null)
-                        await this.onSubscribe(new CharacteristicSubscription(this, peripheral, true)).ConfigureAwait(false);
+                    await this.InvokeSubscribe(peripheral, true).ConfigureAwait(false);
                 }
                 else if (x.Value.SequenceEqual(Constants.NotifyDisableBytes))
                 {
                     var peripheral = this.Remove(x.Device);
-                    if (peripheral != null && this.onSubscribe != null)
-                        await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
+                    if (peripheral != null)
+                        await this.InvokeSubscribe(peripheral, false).ConfigureAwait(false);
                 }
                 else
                 { 
                     respond = false;
                 }
                 if (respond && x.ResponseNeeded)
-                {
-                    this.context.Server.SendResponse(
-                        x.Device,
-                        x.RequestId,
-                        GattStatus.Success,
-                        0,
-                        new byte[] { 0x1 }
-                    );
-                }
+                    this.TrySendResponse(x.Device, x.RequestId, GattStatus.Success, 0, new byte[] { 0x1 });
             })
             .DisposedBy(this.disposer);
 
@@ -262,8 +253,8 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             .Subscribe(async x =>
             {
                 var peripheral = this.Remove(x.Device);
-                if (peripheral != null && this.onSubscribe != null)
-                    await this.onSubscribe(new CharacteristicSubscription(this, peripheral, false)).ConfigureAwait(false);
+                if (peripheral != null)
+                    await this.InvokeSubscribe(peripheral, false).ConfigureAwait(false);
             })
             .DisposedBy(this.disposer);
     }
@@ -279,18 +270,26 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             .Where(x => x.Characteristic.Equals(this.Native))
             .Subscribe(async ch =>
             {
-                var peripheral = new Peripheral(ch.Device) { Mtu = this.context.GetPayloadSize(ch.Device) };
-                var request = new ReadRequest(this, peripheral, ch.Offset);
-                var result = await this.onRead(request).ConfigureAwait(false);
+                // async void - an exception here would crash the app; answer so the central isn't left waiting
+                try
+                {
+                    var peripheral = new Peripheral(ch.Device) { Mtu = this.context.GetPayloadSize(ch.Device) };
+                    var request = new ReadRequest(this, peripheral, ch.Offset);
+                    var result = await this.onRead(request).ConfigureAwait(false);
 
-                this.context.Server.SendResponse
-                (
-                    ch.Device,
-                    ch.RequestId,
-                    result.Status.ToNative(),
-                    ch.Offset,
-                    result.Data!
-                );
+                    this.context.Server.SendResponse
+                    (
+                        ch.Device,
+                        ch.RequestId,
+                        result.Status.ToNative(),
+                        ch.Offset,
+                        result.Data!
+                    );
+                }
+                catch
+                {
+                    this.TrySendResponse(ch.Device, ch.RequestId, GattStatus.Failure, ch.Offset, null);
+                }
             })
             .DisposedBy(this.disposer);
     }
@@ -307,38 +306,76 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
             .Subscribe(async ch =>
             {
                 var responded = false;
-                var peripheral = new Peripheral(ch.Device) { Mtu = this.context.GetPayloadSize(ch.Device) };
-                var request = new WriteRequest(
-                    this,
-                    peripheral,
-                    ch.Value,
-                    ch.Offset,
-                    ch.ResponseNeeded,
-                    (status) =>
+                // async void - an exception here would crash the app; answer so the central isn't left waiting
+                try
+                {
+                    var peripheral = new Peripheral(ch.Device) { Mtu = this.context.GetPayloadSize(ch.Device) };
+                    var request = new WriteRequest(
+                        this,
+                        peripheral,
+                        ch.Value,
+                        ch.Offset,
+                        ch.ResponseNeeded,
+                        (status) =>
+                        {
+                            responded = true;
+                            this.context.Server.SendResponse(
+                                ch.Device,
+                                ch.RequestId,
+                                status.ToNative(),
+                                ch.Offset,
+                                ch.Value
+                            );
+                        }
+                    );
+                    await this.onWrite(request).ConfigureAwait(false);
+                    if (request.IsReplyNeeded && !responded)
                     {
-                        responded = true;
                         this.context.Server.SendResponse(
                             ch.Device,
                             ch.RequestId,
-                            status.ToNative(),
+                            GattStatus.Success,
                             ch.Offset,
                             ch.Value
                         );
                     }
-                );
-                await this.onWrite(request).ConfigureAwait(false);
-                if (request.IsReplyNeeded && !responded)
+                }
+                catch
                 {
-                    this.context.Server.SendResponse(
-                        ch.Device,
-                        ch.RequestId,
-                        GattStatus.Success,
-                        ch.Offset,
-                        ch.Value
-                    );
+                    if (ch.ResponseNeeded && !responded)
+                        this.TrySendResponse(ch.Device, ch.RequestId, GattStatus.Failure, ch.Offset, null);
                 }
             })
             .DisposedBy(this.disposer);
+    }
+
+
+    async Task InvokeSubscribe(IPeripheral peripheral, bool subscribed)
+    {
+        if (this.onSubscribe == null)
+            return;
+
+        try
+        {
+            await this.onSubscribe(new CharacteristicSubscription(this, peripheral, subscribed)).ConfigureAwait(false);
+        }
+        catch
+        {
+            // called from async void subscriptions - an exception here would crash the app
+        }
+    }
+
+
+    void TrySendResponse(BluetoothDevice device, int requestId, GattStatus status, int offset, byte[]? value)
+    {
+        try
+        {
+            this.context.Server.SendResponse(device, requestId, status, offset, value);
+        }
+        catch
+        {
+            // the central may already be gone
+        }
     }
 
 

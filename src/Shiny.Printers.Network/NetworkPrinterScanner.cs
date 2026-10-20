@@ -45,7 +45,7 @@ public sealed class NetworkPrinterScanner(IMdnsManager mdns) : INetworkPrinterSc
         ArgumentException.ThrowIfNullOrWhiteSpace(serviceType);
 
         // Disposing the subscription cancels the token, which ends the (otherwise endless) browse.
-        return Observable.Create<DiscoveredNetworkPrinter>(async (ob, ct) =>
+        return Guarded<DiscoveredNetworkPrinter>(async (ob, ct) =>
         {
             await foreach (var result in this.mdns.Browse(serviceType, ct).ConfigureAwait(false))
             {
@@ -62,7 +62,7 @@ public sealed class NetworkPrinterScanner(IMdnsManager mdns) : INetworkPrinterSc
         config ??= new();
         ArgumentOutOfRangeException.ThrowIfLessThan(config.MaxConcurrency, 1);
 
-        return Observable.Create<DiscoveredNetworkPrinter>(async (ob, ct) =>
+        return Guarded<DiscoveredNetworkPrinter>(async (ob, ct) =>
         {
             var targets = SweepTargets(config);
             var gate = new object();
@@ -94,6 +94,21 @@ public sealed class NetworkPrinterScanner(IMdnsManager mdns) : INetworkPrinterSc
                 .ConfigureAwait(false);
         });
     }
+
+
+    // an async Create that faults after the subscriber has gone leaves the exception on its task, where it
+    // surfaces as TaskScheduler.UnobservedTaskException (#1674) - hand it to the observer, which drops it once disposed
+    static IObservable<T> Guarded<T>(Func<IObserver<T>, CancellationToken, Task> subscribeAsync) => Observable.Create<T>(async (ob, ct) =>
+    {
+        try
+        {
+            await subscribeAsync(ob, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            ob.OnError(ex);
+        }
+    });
 
 
     internal static IEnumerable<(IPAddress Address, int Port)> SweepTargets(NetworkPrinterSweepConfig config)

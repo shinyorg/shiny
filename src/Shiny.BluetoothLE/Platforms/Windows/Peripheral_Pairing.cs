@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -10,7 +11,7 @@ public partial class Peripheral : ICanPairPeripherals
 {
     public PairingState PairingStatus => this.DeviceInfo.Pairing.IsPaired ? PairingState.Paired : PairingState.NotPaired;
 
-    public IObservable<bool> PairingRequest(string? pin = null) => Observable.FromAsync(async ct =>
+    public IObservable<bool> PairingRequest(string? pin = null) => ObservableTask.FromAsync(async ct =>
     {
         if (pin.IsEmpty())
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Reactive.Linq;
 using Android.Bluetooth;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -27,7 +28,7 @@ public partial class Peripheral : ICanL2Cap
             ob.OnNext(new L2CapChannel(
                 psm,
                 this.Native.Address!,
-                data => Observable.FromAsync(ct => socket.OutputStream!.WriteAsync(data, 0, data.Length, ct)),
+                data => ObservableTask.FromAsync(ct => socket.OutputStream!.WriteAsync(data, 0, data.Length, ct)),
                 socket.ListenForData(),
                 () => socket.Dispose()
             ));

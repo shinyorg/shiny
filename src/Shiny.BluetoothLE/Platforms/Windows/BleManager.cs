@@ -12,6 +12,7 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Radios;
 using Windows.Foundation;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -104,7 +105,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
         })
         .Select(_ => this.CreateScanner(scanConfig))
         .Switch()
-        .SelectMany(args => Observable.FromAsync(async ct =>
+        .SelectMany(args => ObservableTask.FromAsync(async ct =>
         {
             this.logger.LogDebug(
                 "WIN-SCAN-RECEIVED: address={BluetoothAddress}, rssi={Rssi}, localName={LocalName}",
@@ -304,7 +305,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     });
 
 
-    public IObservable<IReadOnlyList<Radio>> GetRadios() => Observable.FromAsync<IReadOnlyList<Radio>>(async ct =>
+    public IObservable<IReadOnlyList<Radio>> GetRadios() => ObservableTask.FromAsync<IReadOnlyList<Radio>>(async ct =>
     {
         var list = new List<Radio>();
         var peripherals = await DeviceInformation

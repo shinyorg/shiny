@@ -9,6 +9,7 @@ using Android.OS;
 using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 using static Android.Manifest;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -221,7 +222,7 @@ public partial class BleHostingManager(AndroidPlatform platform) : IBleHostingMa
                     onOpen(new L2CapChannel(
                         psm,
                         socket.RemoteDevice?.Address ?? string.Empty,
-                        data => System.Reactive.Linq.Observable.FromAsync(ct => socket.OutputStream!.WriteAsync(data, 0, data.Length, ct)),
+                        data => ObservableTask.FromAsync(ct => socket.OutputStream!.WriteAsync(data, 0, data.Length, ct)),
                         socket.ListenForData(),
                         () => socket.Dispose()
                     ));

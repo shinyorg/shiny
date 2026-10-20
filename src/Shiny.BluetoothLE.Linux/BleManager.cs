@@ -10,6 +10,7 @@ using Shiny.BluetoothLE.Bluez;
 using Shiny.BluetoothLE.Intrastructure;
 using Tmds.DBus.Protocol;
 using MessageNotification = Tmds.DBus.Protocol.Notification<Tmds.DBus.Protocol.Message>;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -65,7 +66,7 @@ public class BleManager : IBleManager, IAsyncDisposable
     }
 
 
-    public IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
+    public IObservable<AccessState> RequestAccess() => ObservableTask.FromAsync(async ct =>
     {
         try
         {

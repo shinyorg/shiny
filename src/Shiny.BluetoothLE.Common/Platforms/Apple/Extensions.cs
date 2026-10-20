@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -60,7 +61,7 @@ public static class Extensions
         return new L2CapChannel(
             channel.Psm,
             channel.Peer.Identifier.ToString(),
-            data => Observable.FromAsync(ct => channel.OutputStream.WriteAsync(data, 0, data.Length, ct)),
+            data => ObservableTask.FromAsync(ct => channel.OutputStream.WriteAsync(data, 0, data.Length, ct)),
             channel.InputStream.ListenForData(),
             () =>
             {

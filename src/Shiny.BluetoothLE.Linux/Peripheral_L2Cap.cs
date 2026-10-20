@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.BluetoothLE.Bluez;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -50,7 +51,7 @@ public partial class Peripheral : ICanL2Cap
                 ob.OnNext(new L2CapChannel(
                     psm,
                     bdAddr,
-                    data => Observable.FromAsync(ct => local.SendAsync(data, ct)),
+                    data => ObservableTask.FromAsync(ct => local.SendAsync(data, ct)),
                     rxSubj,
                     () =>
                     {

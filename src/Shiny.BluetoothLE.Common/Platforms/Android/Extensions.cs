@@ -32,9 +32,12 @@ public static class Extensions
                 }
                 ob.OnCompleted();
             }
-            catch (Exception ex) when (!cts.IsCancellationRequested)
+            catch (Exception ex)
             {
-                ob.OnError(ex);
+                // disposing cancels and then closes the socket, so the blocked Read always throws on a normal
+                // close - a filter would leave that on the discarded task as an unobserved exception
+                if (!cts.IsCancellationRequested)
+                    ob.OnError(ex);
             }
         });
 

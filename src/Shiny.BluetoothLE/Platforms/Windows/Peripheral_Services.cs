@@ -5,13 +5,14 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral
 {
-    public IObservable<BleServiceInfo> GetService(string serviceUuid) => Observable.FromAsync(async ct =>
+    public IObservable<BleServiceInfo> GetService(string serviceUuid) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 
@@ -32,7 +33,7 @@ public partial class Peripheral
     });
 
 
-    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => Observable.FromAsync(async ct =>
+    public IObservable<IReadOnlyList<BleServiceInfo>> GetServices() => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 

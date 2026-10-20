@@ -223,18 +223,26 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
         if (state == AccessState.Unknown)
             return;
 
-        this.stateUpdatedSubj.OnNext(state);
+        // async void - an exception here would crash the app
+        try
+        {
+            this.stateUpdatedSubj.OnNext(state);
 
-        // Keyed off the native state rather than the mapped AccessState: Resetting maps to
-        // Available, but CoreBluetooth invalidates every connection for it just as it does for
-        // PoweredOff. Ahead of the delegates on purpose - a consumer handling OnAdapterStateChanged
-        // should see peripheral state that already agrees with the adapter (issue #1652).
-        this.OnAdapterStateChanged(central.State == CBManagerState.PoweredOn);
+            // Keyed off the native state rather than the mapped AccessState: Resetting maps to
+            // Available, but CoreBluetooth invalidates every connection for it just as it does for
+            // PoweredOff. Ahead of the delegates on purpose - a consumer handling OnAdapterStateChanged
+            // should see peripheral state that already agrees with the adapter (issue #1652).
+            this.OnAdapterStateChanged(central.State == CBManagerState.PoweredOn);
 
-        await this.services.RunDelegates<IBleDelegate>(
-            x => x.OnAdapterStateChanged(state),
-            this.logger
-        );
+            await this.services.RunDelegates<IBleDelegate>(
+                x => x.OnAdapterStateChanged(state),
+                this.logger
+            );
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Error processing adapter state change to {State}", state);
+        }
     }
 
 

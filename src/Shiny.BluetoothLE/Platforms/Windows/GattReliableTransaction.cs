@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattReliableWriteTransaction;
+using Shiny.BluetoothLE.Infrastructure;
 
 
 namespace Shiny.BluetoothLE
@@ -30,7 +31,7 @@ namespace Shiny.BluetoothLE
         {
             this.AssertAction();
 
-            return Observable.FromAsync(async ct =>
+            return ObservableTask.FromAsync(async ct =>
             {
                 this.Status = TransactionState.Committing;
 

@@ -11,6 +11,7 @@ using CoreBluetooth;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -302,7 +303,7 @@ public partial class Peripheral
     // wanting less dispose/cancel sooner
     static readonly TimeSpan WriteWithoutResponseReadyTimeout = TimeSpan.FromSeconds(5);
 
-    protected IObservable<BleCharacteristicResult> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => Observable.FromAsync(async ct =>
+    protected IObservable<BleCharacteristicResult> WriteWithoutResponse(CBCharacteristic nativeCh, byte[] value) => ObservableTask.FromAsync(async ct =>
     {
         // CoreBluetooth can flip CanSendWriteWithoutResponse back to true without calling IsReadyToSendWriteWithoutResponse
         // (seen around app suspension), so every new write makes a parked write look at the flag again

@@ -266,7 +266,7 @@ public static class L2CapFileTransferExtensions
         string localFilePath,
         string? remoteFileName = null,
         L2CapTransferOptions? options = null
-    ) => Observable.Create<TransferProgress>(async (ob, ct) =>
+    ) => ObservableTask.Create<TransferProgress>(async (ob, ct) =>
     {
         await channel
             .UploadFile(localFilePath, remoteFileName, ob.OnNext, options, ct)
@@ -288,7 +288,7 @@ public static class L2CapFileTransferExtensions
         string remoteFileName,
         string localFilePath,
         L2CapTransferOptions? options = null
-    ) => Observable.Create<TransferProgress>(async (ob, ct) =>
+    ) => ObservableTask.Create<TransferProgress>(async (ob, ct) =>
     {
         await channel
             .DownloadFile(remoteFileName, localFilePath, ob.OnNext, options, ct)

@@ -5,13 +5,14 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral
 {
-    public IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => Observable.FromAsync(async ct =>
+    public IObservable<BleDescriptorInfo> GetDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 
@@ -28,7 +29,7 @@ public partial class Peripheral
     });
 
 
-    public IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid) => Observable.FromAsync(async ct =>
+    public IObservable<IReadOnlyList<BleDescriptorInfo>> GetDescriptors(string serviceUuid, string characteristicUuid) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 
@@ -47,7 +48,7 @@ public partial class Peripheral
     });
 
 
-    public IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => Observable.FromAsync(async ct =>
+    public IObservable<BleDescriptorResult> ReadDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 
@@ -67,7 +68,7 @@ public partial class Peripheral
     });
 
 
-    public IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => Observable.FromAsync(async ct =>
+    public IObservable<BleDescriptorResult> WriteDescriptor(string serviceUuid, string characteristicUuid, string descriptorUuid, byte[] data) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 

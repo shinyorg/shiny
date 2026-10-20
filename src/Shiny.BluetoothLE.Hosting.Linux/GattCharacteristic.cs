@@ -152,14 +152,32 @@ public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilde
 
     internal void AddSubscriber(Peripheral peripheral)
     {
-        if (this.subscribers.TryAdd(peripheral.DevicePath, peripheral) && this.OnSubscribeHandler != null)
-            _ = this.OnSubscribeHandler(new CharacteristicSubscription(this, peripheral, true));
+        if (this.subscribers.TryAdd(peripheral.DevicePath, peripheral))
+            _ = this.InvokeSubscribe(peripheral, true);
     }
 
 
     internal void RemoveSubscriber(string devicePath)
     {
-        if (this.subscribers.TryRemove(devicePath, out var peripheral) && this.OnSubscribeHandler != null)
-            _ = this.OnSubscribeHandler(new CharacteristicSubscription(this, peripheral, false));
+        if (this.subscribers.TryRemove(devicePath, out var peripheral))
+            _ = this.InvokeSubscribe(peripheral, false);
+    }
+
+
+    // called from BlueZ D-Bus handlers - a throw there disconnects the whole connection, and the discarded
+    // task would otherwise surface a fault as an unobserved task exception
+    async Task InvokeSubscribe(Peripheral peripheral, bool subscribed)
+    {
+        if (this.OnSubscribeHandler == null)
+            return;
+
+        try
+        {
+            await this.OnSubscribeHandler(new CharacteristicSubscription(this, peripheral, subscribed)).ConfigureAwait(false);
+        }
+        catch
+        {
+            // the subscription is already recorded - the hook failing does not undo it
+        }
     }
 }

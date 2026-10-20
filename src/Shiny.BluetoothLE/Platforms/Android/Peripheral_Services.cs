@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Android.Bluetooth;
 using Microsoft.Extensions.Logging;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -32,7 +33,7 @@ public partial class Peripheral
 
 
     protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices() =>
-        Observable.FromAsync<IReadOnlyList<BluetoothGattService>>(async ct =>
+        ObservableTask.FromAsync<IReadOnlyList<BluetoothGattService>>(async ct =>
         {
             this.AssertConnection();
 

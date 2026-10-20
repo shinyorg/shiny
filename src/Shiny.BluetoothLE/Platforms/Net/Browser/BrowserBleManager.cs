@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -59,7 +60,7 @@ public class BrowserBleManager(IJSRuntime jsRuntime) : IBleManager, IAsyncDispos
     }
 
 
-    public IObservable<AccessState> RequestAccess() => Observable.FromAsync(async () =>
+    public IObservable<AccessState> RequestAccess() => ObservableTask.FromAsync(async () =>
     {
         var module = await this.GetModule().ConfigureAwait(false);
         var result = await module.InvokeAsync<string>("requestAccess").ConfigureAwait(false);

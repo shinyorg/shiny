@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -146,7 +147,7 @@ public partial class Peripheral : IPeripheral
             // a GattSession with MaintainConnection=true so the OS doesn't tear down the
             // link the moment we're idle.
             this.connectSub?.Dispose();
-            this.connectSub = Observable.FromAsync(async ct =>
+            this.connectSub = ObservableTask.FromAsync(async ct =>
             {
                 if (this.Native == null)
                     throw new BleException("Device is disposed");

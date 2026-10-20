@@ -11,6 +11,7 @@ using Shiny.BluetoothLE.Bluez;
 using Shiny.BluetoothLE.Intrastructure;
 using Tmds.DBus.Protocol;
 using MessageNotification = Tmds.DBus.Protocol.Notification<Tmds.DBus.Protocol.Message>;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -128,7 +129,7 @@ public partial class Peripheral : IPeripheral
     public IObservable<Unit> WhenServicesChanged() => Observable.Never<Unit>();
 
 
-    public IObservable<int> ReadRssi() => Observable.FromAsync(async ct =>
+    public IObservable<int> ReadRssi() => ObservableTask.FromAsync(async ct =>
     {
         var rssi = await this.device.GetRssiAsync(ct).ConfigureAwait(false);
         return (int)rssi;

@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -311,7 +312,7 @@ public class BrowserPeripheral : IPeripheral, IAsyncDisposable
 
     // ---- plumbing --------------------------------------------------------------------------------
 
-    IObservable<T> Invoke<T>(Func<IJSObjectReference, Task<T>> operation) => Observable.FromAsync(async () =>
+    IObservable<T> Invoke<T>(Func<IJSObjectReference, Task<T>> operation) => ObservableTask.FromAsync(async () =>
     {
         if (this.status.Value != ConnectionState.Connected)
             throw new BleException("The peripheral is not connected.");

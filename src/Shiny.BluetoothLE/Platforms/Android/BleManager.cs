@@ -14,6 +14,7 @@ using Android.Runtime;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Intrastructure;
 using SR = Android.Bluetooth.LE.ScanResult;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
@@ -173,7 +174,7 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
         );
     }
 
-    public IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
+    public IObservable<AccessState> RequestAccess() => ObservableTask.FromAsync(async ct =>
     {
         var versionPermissions = GetPlatformPermissions();
 

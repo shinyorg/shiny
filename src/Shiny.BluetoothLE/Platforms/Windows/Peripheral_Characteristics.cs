@@ -7,13 +7,14 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
+using Shiny.BluetoothLE.Infrastructure;
 
 namespace Shiny.BluetoothLE;
 
 
 public partial class Peripheral
 {
-    public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => Observable.FromAsync<BleCharacteristicInfo>(async ct =>
+    public IObservable<BleCharacteristicInfo> GetCharacteristic(string serviceUuid, string characteristicUuid) => ObservableTask.FromAsync<BleCharacteristicInfo>(async ct =>
     {
         this.AssertConnection();
 
@@ -22,7 +23,7 @@ public partial class Peripheral
     });
 
 
-    public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => Observable.FromAsync(async ct =>
+    public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 
@@ -67,7 +68,7 @@ public partial class Peripheral
         if (!this.notifiers.ContainsKey(key))
         {
             var connectable = this.WhenConnected()
-                .Select(_ => Observable.FromAsync(ct => this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct)))
+                .Select(_ => ObservableTask.FromAsync(ct => this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct)))
                 .Switch()
                 .Select(ch => Observable.Create<BleCharacteristicResult>(ob =>
                 {
@@ -135,7 +136,7 @@ public partial class Peripheral
     }
 
 
-    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => Observable.FromAsync(async ct =>
+    public IObservable<BleCharacteristicResult> ReadCharacteristic(string serviceUuid, string characteristicUuid) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 
@@ -156,7 +157,7 @@ public partial class Peripheral
     });
 
 
-    public IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => Observable.FromAsync(async ct =>
+    public IObservable<BleCharacteristicResult> WriteCharacteristic(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => ObservableTask.FromAsync(async ct =>
     {
         this.AssertConnection();
 

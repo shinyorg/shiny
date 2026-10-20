@@ -293,8 +293,16 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
 
     void EmitConnectionState(ConnectionState state)
     {
-        if (this.connSubj.Value != state)
-            this.connSubj.OnNext(state);
+        // runs on a discarded Task.Run - a throwing subscriber would otherwise surface as an unobserved task exception
+        try
+        {
+            if (this.connSubj.Value != state)
+                this.connSubj.OnNext(state);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Error emitting connection state {State}", state);
+        }
     }
 
 
