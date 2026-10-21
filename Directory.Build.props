@@ -10,6 +10,7 @@
         <Description>Shiny</Description>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) $([System.DateTime]::Now.Year) Allan Ritchie</Copyright>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://shinylib.net/client/release-notes</PackageReleaseNotes>
