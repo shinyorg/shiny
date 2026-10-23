@@ -123,7 +123,7 @@ await host.RunAsync();
 
 ### Azure Notification Hubs
 
-Supports iOS (APNs), Android (FCM v1), and Windows (WNS) via a single registration call.
+Supports iOS, Mac Catalyst, macOS and tvOS (APNs), Android (FCM v1), and Windows (WNS) via a single registration call. A hub's APNs settings carry one bundle ID (the APNs topic), so a macOS or tvOS app with its own bundle ID needs its own hub; on tvOS send silent or badge-only payloads.
 
 ```csharp
 using Shiny;

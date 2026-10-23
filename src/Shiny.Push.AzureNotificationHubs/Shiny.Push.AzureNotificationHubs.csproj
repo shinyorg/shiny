@@ -6,6 +6,8 @@
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(TvOsTarget)</TargetFrameworks>
         
         <Description>Shiny Push Integration - Microsoft Azure Notification Hubs</Description>
     </PropertyGroup>

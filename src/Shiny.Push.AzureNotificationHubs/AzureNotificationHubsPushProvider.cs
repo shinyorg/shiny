@@ -112,7 +112,7 @@ public class AzureNotificationHubsPushProvider(
     }
 
 
-#if IOS || MACCATALYST
+#if APPLE
     public async Task<string> Register(NSData rawToken)
     {
         var nativeToken = rawToken.ToPushTokenString();

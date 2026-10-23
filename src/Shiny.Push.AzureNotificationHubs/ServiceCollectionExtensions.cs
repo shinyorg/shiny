@@ -11,7 +11,10 @@ public static class AnhServiceCollectionExtensions
     {
 #if PLATFORM
         services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
-        services.AddSingleton<AzureNotificationHubsPushProvider>();
+
+        // PushManager takes IPushProvider - registering only the concrete type left it injected with
+        // nothing, so the device never created an installation in the hub
+        services.AddSingletonAsImplementedInterfaces<AzureNotificationHubsPushProvider>();
 #endif
     }
     
