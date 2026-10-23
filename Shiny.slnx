@@ -19,6 +19,7 @@
         <Project Path="tests/Shiny.Mobile.InAppPurchases.Server.Tests/Shiny.Mobile.InAppPurchases.Server.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Discovery.Tests/Shiny.Net.Discovery.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Wifi.Tests/Shiny.Net.Wifi.Tests.csproj" />
+        <Project Path="tests/Shiny.Net.Vpn.Tests/Shiny.Net.Vpn.Tests.csproj" />
         <Project Path="tests/Shiny.Wearables.Tests/Shiny.Wearables.Tests.csproj" />
         <Project Path="tests/Shiny.ScreenRecorder.Tests/Shiny.ScreenRecorder.Tests.csproj" />
         <Project Path="tests/Shiny.Gamepad.Tests/Shiny.Gamepad.Tests.csproj" />
@@ -46,6 +47,7 @@
         <Project Path="src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj" />
         <Project Path="src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
         <Project Path="src\Shiny.Net.Wifi.Linux\Shiny.Net.Wifi.Linux.csproj" />
+        <Project Path="src\Shiny.Net.Vpn.Linux\Shiny.Net.Vpn.Linux.csproj" />
     </Folder>    
     <Folder Name="/.Solution/">
         <File Path=".editorconfig" />
@@ -100,6 +102,7 @@
     <Project Path="src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
     <Project Path="src\Shiny.Net.Discovery\Shiny.Net.Discovery.csproj" />
     <Project Path="src\Shiny.Net.Wifi\Shiny.Net.Wifi.csproj" />
+    <Project Path="src\Shiny.Net.Vpn\Shiny.Net.Vpn.csproj" />
     <Project Path="src\Shiny.Notifications\Shiny.Notifications.csproj" />
     <Project Path="src\Shiny.Notifications.Extensions.AI\Shiny.Notifications.Extensions.AI.csproj" />
     <Project Path="src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />

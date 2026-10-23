@@ -14,7 +14,7 @@ Every module in this monorepo lives under **one docs folder**, `src/content/docs
 subfolder per module (URLs are `/client/<module>/...`):
 
 - Feature pages: `src/content/docs/client/<module>/*.mdx` — `core/`, `ble/`, `blehosting/`,
-  `beacons/`, `locations/`, `discovery/`, `wifi/`, `screenrecorder/`, `contactstore/`,
+  `beacons/`, `locations/`, `discovery/`, `wifi/`, `vpn/`, `screenrecorder/`, `contactstore/`,
   `calendarstore/`, `jobs/`, `notifications/`, `push/`, `liveactivities/`, `httptransfers/`,
   `datasync/`, `wearables/`, `configuration/`, `printing/`, `inapppurchases/`, `calldirectory/`.
 - Release notes: **one shared file**, `src/content/docs/client/release-notes.mdx`. Every package
@@ -123,9 +123,9 @@ Achievements / leaderboards / friends over GameKit (iOS, Mac Catalyst, macOS) an
 ## Linux / D-Bus (Tmds.DBus.Protocol)
 
 The Linux packages that reference `Tmds.DBus.Protocol` (`Shiny.BluetoothLE.Linux`,
-`Shiny.BluetoothLE.Hosting.Linux`, `Shiny.Net.Wifi.Linux`, `Shiny.Notifications.Linux`,
-`Shiny.ScreenRecorder.Linux`) talk to BlueZ, NetworkManager, the notification service and the
-portals through it. Its low-level API fails in ways that
+`Shiny.BluetoothLE.Hosting.Linux`, `Shiny.Net.Wifi.Linux`, `Shiny.Net.Vpn.Linux`,
+`Shiny.Notifications.Linux`, `Shiny.ScreenRecorder.Linux`) talk to BlueZ, NetworkManager, the
+notification service and the portals through it. Its low-level API fails in ways that
 compile cleanly, pass on a dev machine, and only break against a real system bus. Three of these shipped
 in `Shiny.BluetoothLE.Linux` 5.7.0 and made every scan fail on any machine where BlueZ already knew a
 device. Hold these rules:

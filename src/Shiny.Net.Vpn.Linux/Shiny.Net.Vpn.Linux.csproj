@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny VPN for Linux via NetworkManager/D-Bus - save, connect, disconnect and monitor an IKEv2 VPN profile through NetworkManager's strongSwan plugin</Description>
+        <RootNamespace>Shiny.Net.Vpn</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Vpn\Shiny.Net.Vpn.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Tmds.DBus.Protocol" />
+    </ItemGroup>
+</Project>

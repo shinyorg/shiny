@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.Net.Vpn</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny VPN - save, connect, disconnect and monitor the operating system's built-in IKEv2 VPN client (shared secret, username/password or certificate) on iOS, Mac Catalyst, macOS and Android</Description>
+
+        <!-- imported explicitly below so Platforms\Apple can be added to macOS as well -->
+        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
+
+    <!--
+        NEVPNManager is the same personal VPN API on iOS, Mac Catalyst and macOS, but
+        Directory.Build.targets only hands Platforms\Apple to iOS and Mac Catalyst - macOS gets
+        Platforms\MacOS. One implementation serves all three, so it is added to macOS here.
+    -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">
+        <Compile Include="Platforms\Apple\**\*.cs" />
+    </ItemGroup>
+
+</Project>
