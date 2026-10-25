@@ -7,6 +7,8 @@ body:
     attributes:
       value: |
         Please note that we are not taking feature requests for Windows or Shiny v2.
+
+        > ⭐ **Finding this library useful? Please give the repository a [Star](https://github.com/shinyorg/shiny) - it's free and it's how the project gets seen.**
   - type: textarea
     attributes:
       label: Summary
