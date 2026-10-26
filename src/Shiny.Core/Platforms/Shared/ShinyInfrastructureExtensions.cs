@@ -32,6 +32,7 @@ public static class ShinyInfrastructureExtensions
 #if ANDROID
         services.AddSingletonAsImplementedInterfaces<AndroidPlatform>();
         services.AddSingleton<IScreenInfo, AndroidScreenInfo>();
+        services.AddSingleton<IScreenPosture, AndroidScreenPosture>();
 
         // built explicitly - AndroidLifecycleExecutor is a Java.Lang.Object, so it must expose the
         // (IntPtr, JniHandleOwnership) JNI constructor.  Containers that pick a constructor by
@@ -50,16 +51,24 @@ public static class ShinyInfrastructureExtensions
 #elif IOS || MACCATALYST || TVOS
         services.AddSingletonAsImplementedInterfaces<IosPlatform>();
         services.AddSingleton<IScreenInfo, IosScreenInfo>();
+#if IOS
+        services.AddSingleton<IScreenPosture, IosScreenPosture>();
+#else
+        // no foldable Mac or Apple TV
+        services.AddSingleton<IScreenPosture, NetScreenPosture>();
+#endif
 
         services.AddSingletonAsImplementedInterfaces<IosLifecycleExecutor>();
 #elif MACOS
         services.AddSingletonAsImplementedInterfaces<MacPlatform>();
         services.AddSingleton<IScreenInfo, MacScreenInfo>();
+        services.AddSingleton<IScreenPosture, NetScreenPosture>();
 
         services.AddSingletonAsImplementedInterfaces<MacLifecycleExecutor>();
 #elif WINDOWS
         services.AddSingletonAsImplementedInterfaces<WindowsPlatform>();
         services.AddSingleton<IScreenInfo, WindowsScreenInfo>();
+        services.AddSingleton<IScreenPosture, NetScreenPosture>();
 #else
         // A host that is just .NET - a GTK desktop app on Linux, a console app, a service. No
         // lifecycle executor, because there is no platform lifecycle to execute: nothing here gets
@@ -67,9 +76,15 @@ public static class ShinyInfrastructureExtensions
         services.AddSingletonAsImplementedInterfaces<NetPlatform>();
 
         if (OperatingSystem.IsBrowser())
+        {
             services.AddSingletonAsImplementedInterfaces<BrowserScreenInfo>();
+            services.AddSingletonAsImplementedInterfaces<BrowserScreenPosture>();
+        }
         else
+        {
             services.AddSingletonAsImplementedInterfaces<NetScreenInfo>();
+            services.AddSingletonAsImplementedInterfaces<NetScreenPosture>();
+        }
 #endif
         return services;
     }

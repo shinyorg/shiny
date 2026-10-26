@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Device"
+             x:Class="Sample.Shared.Maui.Pages.Device.PosturePage"
+             x:DataType="vm:PostureViewModel"
+             Title="Screen Posture">
+    <Grid Padding="16" RowSpacing="8" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*">
+        <Label Grid.Row="0" Text="{Binding Supported}" FontAttributes="Bold" />
+        <Label Grid.Row="1" Text="{Binding State, StringFormat='State: {0}'}" />
+        <Label Grid.Row="2" Text="{Binding Orientation, StringFormat='Orientation: {0}'}" />
+        <Label Grid.Row="3" Text="{Binding Fold, StringFormat='Fold: {0}'}" />
+        <Label Grid.Row="4" Text="{Binding Hinge, StringFormat='Hinge: {0}'}" />
+        <Label Grid.Row="5" Text="{Binding Segments, StringFormat='Segments: {0}'}" />
+        <Label Grid.Row="6" Text="{Binding Occlusions, StringFormat='Occlusions: {0}'}" />
+        <Label Grid.Row="7" Text="{Binding SupportedPostures, StringFormat='Supported postures: {0}'}" TextColor="Gray" />
+
+        <!-- the window drawn to scale: the fold in red, camera housings in amber -->
+        <GraphicsView Grid.Row="8" x:Name="Map" Margin="0,8,0,0" />
+    </Grid>
+</ContentPage>

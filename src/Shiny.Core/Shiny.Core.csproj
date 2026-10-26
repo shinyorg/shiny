@@ -38,8 +38,14 @@
         <PackageReference Include="Microsoft.Win32.SystemEvents" />
     </ItemGroup>
 
+    <!-- Platforms/Apple/UIKit27.cs - the iOS 27.1 hinge APIs through objc_msgSend and a block trampoline -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
         <PackageReference Include="Xamarin.AndroidX.Core" />
+        <PackageReference Include="Xamarin.AndroidX.Window.WindowJava" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />
     </ItemGroup>

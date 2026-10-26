@@ -1,6 +1,6 @@
 ---
 name: shiny-core
-description: Core infrastructure, hosting, DI, key-value stores, lifecycle hooks, and platform abstractions for Shiny on .NET MAUI, iOS, Android, Mac Catalyst, macOS, Windows, Linux, and Blazor WebAssembly
+description: Core infrastructure, hosting, DI, key-value stores, lifecycle hooks, screen info and foldable posture, and platform abstractions for Shiny on .NET MAUI, iOS, Android, Mac Catalyst, macOS, Windows, Linux, and Blazor WebAssembly
 auto_invoke: true
 triggers:
   - shiny core
@@ -44,6 +44,25 @@ triggers:
   - screen size
   - screen orientation
   - lock orientation
+  - IScreenPosture
+  - ScreenPosture
+  - FoldState
+  - FoldOrientation
+  - HingeStatus
+  - ScreenRect
+  - ScreenSize
+  - foldable
+  - fold
+  - hinge
+  - posture
+  - tabletop
+  - book posture
+  - dual screen
+  - iPhone Duo
+  - Pixel Fold
+  - Jetpack WindowManager
+  - viewport segments
+  - device posture
   - BasePermission
   - IShinyStartupTask
   - ShinyLifecycleTask
@@ -249,6 +268,22 @@ When generating code that uses Shiny.Core, follow these conventions:
 8. **Use the static `Shiny.Stores.Default` / `Shiny.Stores.Secure` accessors** for one-off reads/writes outside DI contexts — the accessor self-bootstraps on first use after `AddShinyStores()` has run (call `host.Services.UseShinyStores()` after `Build()` on Blazor WASM).
 9. **Use `IPlatform`** to access `AppData`, `Cache`, `Public` directories and `InvokeOnMainThread()`, and for device/app info: `AppVersion`, `ApplicationIdentifier` (`string?` - bundle identifier on Apple, package name on Android, package identity name on packaged Windows, Flatpak app ID / Snap name on Linux; null when there is no such identity, so always null-check it), `DeviceManufacturer`, `DeviceModel`, `PlatformVersion`, `Platform` (`Android`, `iOS`, `MacCatalyst`, `tvOS`, `macOS`, `Windows`, `Linux`, `Browser`), `DeviceFormFactor` (`Shiny.DeviceFormFactor` - `Unknown`, `Phone`, `Tablet`, `Desktop`, `TV`, `Watch`, `Car`; named so it never collides with MAUI's `Microsoft.Maui.Devices.DeviceIdiom` - do not generate `DeviceIdiom` against `IPlatform`), `CurrentCulture` / `CultureChanged`, `CurrentTimeZone` / `TimeZoneChanged` (native listeners start with the first subscriber; raised off the UI thread - marshal before touching UI) and `OpenAppSettings()`. These are implemented natively with no MAUI, and replace the members removed from `Shiny.Extensions.MauiHosting`'s `IAppSupport` - never generate them against `IAppSupport`.
 10. **Use `IScreenInfo`** (registered by every host, like `IPlatform`) for the main display and orientation - it replaces `IAppSupport.CurrentOrientation` / `OrientationChanged` / `SetOrientation` / `ResetOrientation` from `Shiny.Extensions.MauiHosting` and the Blazor screen sizes. `Metrics` is a `ScreenMetrics(Width, Height, Density, Orientation, RefreshRate)` snapshot in physical pixels (`WidthIndependent` / `HeightIndependent` divide by density); `MetricsChanged` / `OrientationChanged` start watching with the first subscriber and may be raised off the UI thread. The orientation enum is `Shiny.DeviceOrientation` (`Unknown`, `Portrait`, `Landscape`) - **not** MAUI's `DisplayOrientation` and not Android's `ScreenOrientation`. `SetOrientation(...)` returns whether it applied: Android uses the current Activity; iOS 16+ needs the app delegate to return `Shiny.IosOrientationLock.Supported` from `application:supportedInterfaceOrientationsForWindow:` to hold it; Windows sets the auto-rotation preference (tablets only); Blazor only locks a full-screen page or installed app; Mac Catalyst, macOS, tvOS and Linux return false. Linux and console hosts report `ScreenMetrics.Empty`.
+11. **Use `IScreenPosture`** (registered by every host, separate from `IScreenInfo`) for foldables - Android foldables (Jetpack WindowManager, current Activity), iPhone Duo (iOS 27.1+, key window; not Mac Catalyst) and Chromium on Blazor WASM (Device Posture + Viewport Segments). `Current` is a `ScreenPosture(State, Orientation, Fold, IsSeparating, Hinge, HingeAngleDegrees, Occlusions)`: `FoldState` is `None` (no fold in the window - a non-folding device, a foldable shown closed on its outer screen, or a window that does not reach the fold), `Flat` or `HalfOpen`; `FoldOrientation.Vertical` is book (left/right panes) and `Horizontal` is tabletop (top/bottom); `Fold` is a `ScreenRect?` in **window coordinates, dp / points / CSS px** and is null unless the fold divides the window. Lay out two panes when `IsSeparating` is true and use `posture.Segments(new ScreenSize(w, h))` for the two rectangles (null when nothing separates them); `IsTabletop` / `IsBook` are shortcuts. Decide layout from `State` / `Fold` only - `HingeAngleDegrees` (iOS only) is for live effects, and `Hinge` is `Unknown` on Android whenever the fold is not in the window. `Occlusions` are the iPhone Duo camera housings (empty elsewhere). `Changed` starts watching with the first subscriber and is raised on the main thread on Android/iOS. `IsSupported` says whether the platform can report posture, **not** whether the device folds - `SupportedPostures` is empty until a fold/hinge is known. The geometry types are `Shiny.ScreenRect` / `Shiny.ScreenSize` - never generate `Rect` / `Size` against this API (those are MAUI's `Microsoft.Maui.Graphics` types). On Android posture only streams live when the Activity handles `ScreenSize | SmallestScreenSize | ScreenLayout | Orientation` config changes (MAUI's template `MainActivity` does). On Blazor call `UseShiny()` so the JS module is loaded before the first read; CSS-only layouts can use `@media (device-posture: folded)` / `env(viewport-segment-*)` instead.
+
+```csharp
+public class TwoPaneViewModel(IScreenPosture posture) : IDisposable
+{
+    public void Start() => posture.Changed += OnPosture;          // raised on the main thread (Android/iOS)
+    void OnPosture(object? sender, ScreenPosture p)
+    {
+        if (p.Segments(new ScreenSize(windowWidth, windowHeight)) is { } panes)
+            ShowTwoPanes(panes.First, panes.Second, tabletop: p.IsTabletop);
+        else
+            ShowOnePane();
+    }
+    public void Dispose() => posture.Changed -= OnPosture;
+}
+```
 10. **Use `IAppStartupInstaller`** (register with `services.AddAppStartupInstaller(o => ...)`) to put the app in the OS launch-at-login list: `HKCU\...\Run` on unpackaged Windows, `SMAppService` login items on macOS 13+ / Mac Catalyst 16+, and on Linux an XDG autostart entry or a systemd unit chosen by `AppStartupOptions.LinuxMode` (`XdgAutostart`, `SystemdGraphicalSession`, `SystemdUser`, `SystemdSystem` - the last needs root). Check `IsSupported` before showing a toggle; `Register()` returns the state the OS settled on (`Enabled`, `DisabledByUser`, `DisabledByPolicy`, `RequiresApproval` on macOS) - bind UI to that or a fresh `GetState()`, never cache it, and call `OpenSettings()` when the user has to finish in the OS. Android/iOS/tvOS report `NotSupported`. It replaces `Shiny.Extensions.MauiHosting`'s `IStartupService` / `AddStartupService` - never generate those.
 11. **Use `AccessState` enum** and `state.Assert()` extension method to validate permissions before proceeding with platform operations.
 12. **Use the `Changed` C# events on `IConnectivity` and `IBattery`** to react to network or battery state — these are no longer observable. Rx has been removed from `Shiny.Core` and `Shiny.Jobs`; only `Shiny.BluetoothLE` retains reactive streams. Subscribe with `+= handler` and unsubscribe in your `Dispose` / page-leave hook.

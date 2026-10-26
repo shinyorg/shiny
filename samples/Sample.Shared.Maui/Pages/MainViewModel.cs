@@ -120,6 +120,9 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         // --- Device state & diagnostics ---
         Add(FeatureGroup.Device, "🔋 Battery", "Observe battery level & state", "battery");
         Add(FeatureGroup.Device, "🌐 Connectivity", "Observe network connectivity", "connectivity");
+        // Android foldables, iPhone Duo (iOS 27.1+); reports "not supported" elsewhere
+        if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
+            Add(FeatureGroup.Device, "📖 Screen Posture", "Fold, hinge & tabletop/book posture", "posture");
         Add(FeatureGroup.Device, "⚙️ Settings", "Connectivity, battery, key-value store", "settings");
         Add(FeatureGroup.Device, "📝 Events", "Captured delegate events (SQLite)", "events");
         return list;

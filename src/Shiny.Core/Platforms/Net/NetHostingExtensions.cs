@@ -13,7 +13,7 @@ public static class NetHostingExtensions
     /// <summary>
     /// Starts the Shiny host over an already-built container - running every registered
     /// <see cref="IShinyStartupTask"/>, such as the in-process job runner - then, on Blazor
-    /// WebAssembly, starts the screen info and whichever browser connectivity/battery monitors have been registered so
+    /// WebAssembly, starts the screen info, screen posture and whichever browser connectivity/battery monitors have been registered so
     /// they report real values from the first read rather than after their JS module has loaded.
     /// </summary>
     /// <remarks>
@@ -37,6 +37,10 @@ public static class NetHostingExtensions
         var screen = services.GetService<BrowserScreenInfo>();
         if (screen != null)
             await screen.StartAsync().ConfigureAwait(false);
+
+        var posture = services.GetService<BrowserScreenPosture>();
+        if (posture != null)
+            await posture.StartAsync().ConfigureAwait(false);
     }
 
 

@@ -33,6 +33,7 @@ Every package ships under the same version. Blazor WebAssembly support ships ins
 ### Foundation
 * **Core** - hosting, DI, key/value stores, object-store binding, lifecycle hooks, connectivity & battery monitoring - level, state, power source and energy saver - (added automatically by the modules that need them, with any implementation you register first kept), and the platform abstractions every Shiny module builds on - `IPlatform` directories and main thread, plus natively read device and app info (version, application identifier, manufacturer, model, OS version, platform, form factor), culture and time-zone change events and `OpenAppSettings()`, with no MAUI dependency, and `IAppStartupInstaller` to put the app in the OS launch-at-login list (Windows Run key, macOS/Mac Catalyst login items, Linux XDG autostart or a systemd user/system unit) ([docs](https://shinylib.net/client/core/))
 * **Screen info** - `IScreenInfo` in `Shiny.Core` reports the main display (physical size, density, refresh rate, portrait/landscape) with change events, and locks orientation (`SetOrientation` / `ResetOrientation`) on Android, iOS 16+, Windows tablets and Blazor full-screen pages - natively on every platform with no MAUI, registered by every host. Replaces the orientation and screen-size members of the old `IAppSupport`
+* **Screen posture (foldables)** - `IScreenPosture` in `Shiny.Core` reports whether a fold or hinge divides the window, where it is (`Fold` in window dp/points), whether it separates content, tabletop / book posture and the hinge status - Jetpack WindowManager on Android foldables, the hinge and reserved-region APIs on iPhone Duo (iOS 27.1+, including the camera housings as `Occlusions` and the hinge angle), and the Device Posture / Viewport Segments APIs in Chromium on Blazor WebAssembly. `Segments(windowSize)` returns the two panes either side of the fold. Registered by every host; elsewhere it reports `ScreenPosture.None`
 * **Android activity results** - `AndroidPlatform.StartActivityForResult(intent)` starts an activity from the current one and awaits its `ActivityResult` (role requests, settings screens, consent dialogs), and `ActivityResultReceived` raises every result the host forwards. Shiny.Hosting.Maui forwards results automatically and Shiny.Hosting.Native through `ShinyAndroidActivity`, so a module never needs a result activity of its own
 
 ### Background Work & Data
@@ -169,6 +170,10 @@ builder.Services.AddAppFunctionAITools(b => b.AddAllFunctions().ExcludeFunction(
 var tools = sp.GetRequiredService<ContactAITools>().Tools;
 var response = await chatClient.GetResponseAsync(messages, new ChatOptions { Tools = [.. tools] });
 ```
+
+## Commercial Support
+
+Shipping this to production? [ShinySoft Technologies](https://shinysoft.biz), the company that builds and maintains the Shiny libraries, offers priority issue response, support agreements, architecture reviews and private office hours. See [Commercial Support](https://shinylib.net/foundation/support/?utm_source=github&utm_medium=readme#commercial-support) or [get in touch](https://shinysoft.biz/contact?utm_source=github&utm_medium=readme). Community support through GitHub issues and discussions stays free.
 
 ## Links
 * [Documentation](https://shinylib.net)
