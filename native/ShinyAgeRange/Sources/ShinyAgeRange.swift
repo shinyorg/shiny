@@ -204,14 +204,12 @@ func mapError(_ error: Error) -> (code: String, message: String) {
             return ("notAvailable", service.localizedDescription)
         case .invalidRequest:
             return ("invalidRequest", service.localizedDescription)
-        case .invalidAccount:
-            return ("invalidAccount", service.localizedDescription)
-        case .declinedOnboarding:
-            return ("declinedOnboarding", service.localizedDescription)
-        case .network:
-            return ("network", service.localizedDescription)
-        @unknown default:
-            return ("unknown", service.localizedDescription)
+        default:
+            // invalidAccount, declinedOnboarding and network only exist in the Xcode 27 SDK - naming them breaks the
+            // build on Xcode 26, so read the case name instead (the enum has no payloads or custom description)
+            let name = String(describing: service)
+            let known = ["invalidAccount", "declinedOnboarding", "network"]
+            return (known.contains(name) ? name : "unknown", service.localizedDescription)
         }
     }
 
