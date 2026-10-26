@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,13 @@ public class NotificationManager(
     IChannelManager channelManager,
     IRepository repository,
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings,
-    ILogger<NotificationManager> logger
+    ILogger<NotificationManager> logger,
+    IPlatform platform
 ) : INotificationManager
 {
+    // toasts can't load remote images without package identity, so the image is stored locally and referenced by file:///
+    string ImageDirectory => System.IO.Path.Combine(platform.AppData.FullName, "shiny-notification-images");
+
     string? aumid;
     ToastNotifier? notifier;
     ToastNotifier Notifier
@@ -98,7 +103,7 @@ public class NotificationManager(
     }
 
 
-    public Task Send(Notification notification)
+    public async Task Send(Notification notification)
     {
         notification.AssertValid();
 
@@ -114,6 +119,11 @@ public class NotificationManager(
             channel = channelManager.Get(notification.Channel!)
                 ?? throw new InvalidOperationException($"Channel '{notification.Channel}' does not exist");
         }
+
+        if (notification.ImageUri.IsEmpty())
+            NotificationImages.Delete(this.ImageDirectory, notification.Id.ToString());
+        else
+            await NotificationImages.TryStore(notification.ImageUri!, this.ImageDirectory, notification.Id.ToString(), logger).ConfigureAwait(false);
 
         var xml = this.BuildToastXml(notification, channel);
         var doc = new XmlDocument();
@@ -178,8 +188,6 @@ public class NotificationManager(
             repository.Set(notification);
             this.Notifier.Show(toast);
         }
-
-        return Task.CompletedTask;
     }
 
 
@@ -207,6 +215,7 @@ public class NotificationManager(
         }
 
         repository.Remove<Notification>(tag);
+        NotificationImages.Delete(this.ImageDirectory, tag);
         return Task.CompletedTask;
     }
 
@@ -236,6 +245,19 @@ public class NotificationManager(
 
         if (scope == CancelScope.All || scope == CancelScope.Pending)
             repository.Clear<Notification>();
+
+        if (scope == CancelScope.All)
+        {
+            try
+            {
+                if (Directory.Exists(this.ImageDirectory))
+                    Directory.Delete(this.ImageDirectory, true);
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Failed to remove notification images");
+            }
+        }
 
         return Task.CompletedTask;
     }
@@ -267,6 +289,9 @@ public class NotificationManager(
             sb.Append($"<text>{Escape(notification.Title!)}</text>");
         if (!notification.Message.IsEmpty())
             sb.Append($"<text>{Escape(notification.Message!)}</text>");
+        var image = notification.ImageUri.IsEmpty() ? null : NotificationImages.Find(this.ImageDirectory, notification.Id.ToString());
+        if (image != null)
+            sb.Append($"<image placement=\"hero\" src=\"{Escape(new Uri(image).AbsoluteUri)}\" />");
         sb.Append("</binding></visual>");
 
         if (channel.Actions.Any())

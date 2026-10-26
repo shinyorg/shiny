@@ -85,6 +85,10 @@
         <PackageVersion Include="Xamarin.GooglePlayServices.Wearable" Version="120.0.1.1"/>
         <!-- 121.0.0.4 (not 122.x): 122 pulls Play Services Base 118.11 -> AndroidX.Fragment 1.9, above the pins here -->
         <PackageVersion Include="Xamarin.GooglePlayServices.Games.V2" Version="121.0.0.4"/>
+        <!-- satisfy the Play Age Signals AAR's Maven dependencies (Shiny.AgeSignals) at the versions Games.V2 / Play.Review already resolve -->
+        <PackageVersion Include="Xamarin.GooglePlayServices.Basement" Version="118.10.0.2"/>
+        <PackageVersion Include="Xamarin.GooglePlayServices.Tasks" Version="118.4.1.2"/>
+        <PackageVersion Include="Xamarin.Google.Android.Play.Core.Common" Version="2.0.4.9"/>
         <PackageVersion Include="Xamarin.AndroidX.Preference" Version="1.2.1.18"/>
         <PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.0.1.2"/>
         <PackageVersion Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1"/>

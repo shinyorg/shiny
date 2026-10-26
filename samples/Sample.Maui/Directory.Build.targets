@@ -28,4 +28,7 @@
         <ShinyLiveActivitySwiftDir>$(MSBuildThisFileDirectory)../../templates/WidgetExtension/</ShinyLiveActivitySwiftDir>
     </PropertyGroup>
     <Import Project="$(MSBuildThisFileDirectory)../../src/Shiny.Mobile.LiveActivities/buildTransitive/Shiny.Mobile.LiveActivities.targets" />
+
+    <!-- and Shiny.Push: its notification service extension targets and Swift ship together in buildTransitive/ -->
+    <Import Project="$(MSBuildThisFileDirectory)../../src/Shiny.Push/buildTransitive/Shiny.Push.targets" />
 </Project>

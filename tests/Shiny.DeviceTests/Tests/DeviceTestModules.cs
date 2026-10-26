@@ -21,6 +21,7 @@ public static class DeviceTestModules
         services.AddJobsDeviceTests();
         services.AddLiveActivityDeviceTests();
         services.AddCallDirectoryDeviceTests();
+        services.AddAgeSignalsDeviceTests();
         return services;
     }
 }

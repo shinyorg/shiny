@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Android.App;
 
 namespace Shiny.Push;
@@ -12,7 +13,9 @@ public record FirebaseConfig(
     string? ApiKey = null,
 
     NotificationChannel? DefaultChannel = null,
-    string? IntentAction = null
+    string? IntentAction = null,
+    // the data keys a push image URL is read from when FCM's own notification image isn't set (default: PushImages.DefaultKeys)
+    IReadOnlyList<string>? ImageKeys = null
 )
 {
     public static FirebaseConfig Embedded { get; } = new(true);

@@ -30,6 +30,18 @@ triggers:
   - BrowserPushManager
   - VAPID
   - shiny push
+  - push image
+  - push images
+  - rich push
+  - notification service extension
+  - UNNotificationServiceExtension
+  - mutable-content
+  - ShinyPushServiceExtension
+  - ShinyPushImageKeys
+  - PushImages
+  - ImageUri
+  - SendDefaultAsync
+  - BigPictureStyle
 ---
 
 # Shiny Push Notifications
@@ -48,6 +60,7 @@ Use this skill when the user needs to:
 - Unregister from push notifications
 - Customize Apple foreground notification presentation
 - Build and display Android notifications from push data
+- Show an image with a push (iOS notification service extension, Android big picture)
 
 ## Library Overview
 
@@ -146,6 +159,59 @@ builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
 #endif
 ```
 
+### Push Images
+
+The push carries an image URL; Shiny reports it as `PushNotification.Notification.ImageUri` on every platform.
+
+**iOS** shows an image only through a Notification Service Extension. Shiny builds one during `dotnet build` - never
+generate an Xcode project, a separate extension csproj, or C# `UNNotificationServiceExtension` code:
+
+```xml
+<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <ShinyPushServiceExtension>true</ShinyPushServiceExtension>
+    <!-- optional: payload keys, checked in order; dotted keys walk nested dictionaries -->
+    <ShinyPushImageKeys>image;fcm_options.image</ShinyPushImageKeys>
+</PropertyGroup>
+```
+
+- The push **must** have `"mutable-content": 1` in `aps` and an alert, or iOS never runs the extension (silent pushes never do).
+- Default keys: `image`, `image-url`, `imageUrl`, `attachment-url`, `fcm_options.image` (Firebase's `apns.fcm_options.image`).
+- The URL must be https (or the extension's ATS must allow the host - `ShinyPushServiceExtensionInfoPlist` merges a plist
+  with `NSAppTransportSecurity` into the extension). Max 10 MB (`ShinyPushImageMaxBytes`). For a private image send a
+  short-lived signed URL; the extension sends no auth headers.
+- The extension is Swift only (iOS gives it ~24 MB / 30 s) - your `IPushDelegate` code does not run in it.
+- Device builds need a provisioning profile for `$(ApplicationId).NotificationService` (override with
+  `ShinyPushServiceExtensionBundleId` / `ShinyPushServiceExtensionCodesignProvision`). Built on macOS only.
+- Own logic: `<ShinyPushServiceExtensionSource Include="MyService.swift" />` replaces the stock Swift; set
+  `ShinyPushServiceExtensionPrincipalClass` to its `@objc(...)` class name.
+- Mac Catalyst / macOS: no extension is built.
+
+```json
+{ "aps": { "alert": { "title": "New photo", "body": "Tap to view" }, "mutable-content": 1 },
+  "image": "https://cdn.example.com/photo.jpg" }
+```
+
+**Android**: FCM shows a *notification message's* `notification.image` itself while the app is in the background. In the
+foreground (or for a data message with an `image` data key), show it from the delegate:
+
+```csharp
+public override async Task OnReceived(PushNotification push)
+{
+#if ANDROID
+    if (push is AndroidPushNotification android)
+        await android.SendDefaultAsync(1001); // CreateBuilderAsync() + BigPictureStyle + large icon
+#endif
+}
+```
+
+**Web Push (Blazor)**: the bundled service worker shows the payload's `image` (Chromium) and reports it as `ImageUri`.
+
+**Server**: with Shiny.Extensions.Push set `PushNotification.ImageUrl` - it adds `mutable-content` + `image` for APNs and
+`notification.image` for FCM in one send.
+
+`LoadImageAsync()` returns the scaled `Bitmap` for a builder of your own; `FirebaseConfig.ImageKeys` changes the data
+keys. A failed image download never throws - the notification goes out without it.
+
 ## Code Generation Instructions and Conventions
 
 1. **Always implement `IPushDelegate`** (or subclass `PushDelegate`) to handle push events. Register it as a generic type parameter on `AddPush<T>()` or `AddPushAzureNotificationHubs<T>()`.
@@ -164,7 +230,7 @@ builder.Services.AddPushAzureNotificationHubs<MyPushDelegate>(
 6. **Android-specific customization:**
    - `PushNotification` received in `OnReceived` may be an `AndroidPushNotification` with access to the native `RemoteMessage`.
    - Use `AndroidPushNotification.CreateBuilder()` to build a `NotificationCompat.Builder` from the push data.
-   - Use `AndroidPushNotification.SendDefault(notificationId)` for quick notification display.
+   - Use `AndroidPushNotification.SendDefault(notificationId)` for quick notification display, or `SendDefaultAsync(notificationId)` / `CreateBuilderAsync()` to include the push image.
    - Configure `FirebaseConfig.DefaultChannel` to set a default `NotificationChannel`.
    - Configure `FirebaseConfig.IntentAction` to set a custom intent action for notification taps.
 

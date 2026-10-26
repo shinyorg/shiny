@@ -43,6 +43,12 @@ public partial class NotificationManager(
             await this.CancelInternal(notification).ConfigureAwait(false);
             repository.Remove<AndroidNotification>(id.ToString());
         }
+        else
+        {
+            // an immediate notification is never stored, but may still be showing
+            manager.NativeManager.Cancel(id);
+            manager.DeleteImage(id);
+        }
     }
 
 
@@ -185,6 +191,7 @@ public partial class NotificationManager(
         if (channel == null)
             throw new InvalidProgramException("No channel found for " + channelId);
 
+        await manager.StoreImage(android).ConfigureAwait(false);
         var builder = manager.CreateNativeBuilder(android, channel!);
 
         if (android.Geofence != null)
@@ -205,6 +212,9 @@ public partial class NotificationManager(
         {
             var native = builder.Build();
             manager.NativeManager.Notify(android.Id, native);
+
+            // the bitmap now lives in the posted notification
+            manager.DeleteImage(android.Id);
         }
         else
         {
@@ -229,6 +239,7 @@ public partial class NotificationManager(
             manager.CancelAlarm(notification);
 
         manager.NativeManager.Cancel(notification.Id);
+        manager.DeleteImage(notification.Id);
     }
 
 

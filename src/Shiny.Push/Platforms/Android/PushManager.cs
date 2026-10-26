@@ -291,7 +291,8 @@ public class PushManager(
                 {
                     notification = new Notification(
                         native.Title,
-                        native.Body
+                        native.Body,
+                        native.ImageUrl?.ToString() ?? PushImages.Find(msg.Data, this.config.ImageKeys)
                     );
                 }
                 var push = new AndroidPushNotification(

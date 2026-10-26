@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -112,6 +113,9 @@ public class NotificationManager(
         }
 
         var content = this.GetContent(notification, channel);
+        var image = await this.TryCreateImageAttachment(notification).ConfigureAwait(false);
+        if (image != null)
+            content.Attachments = [.. content.Attachments ?? [], image];
 
         var request = UNNotificationRequest.FromIdentifier(
             notification.Id.ToString(),
@@ -143,6 +147,34 @@ public class NotificationManager(
         UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
         UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
     });
+
+
+    /// <summary>
+    /// Copies or downloads <see cref="Notification.ImageUri"/> into the cache and wraps it as an attachment, which iOS
+    /// moves into its own store when the request is added. Null (logged) when there is no image or it can't be read.
+    /// </summary>
+    protected virtual async Task<UNNotificationAttachment?> TryCreateImageAttachment(Notification notification)
+    {
+        if (notification.ImageUri.IsEmpty())
+            return null;
+
+        var directory = Path.Combine(platform.Cache.FullName, "shiny-notification-images");
+        var path = await NotificationImages
+            .TryStore(notification.ImageUri!, directory, $"{notification.Id}-{Guid.NewGuid():N}", logger)
+            .ConfigureAwait(false);
+
+        if (path == null)
+            return null;
+
+        var attachment = UNNotificationAttachment.FromIdentifier("shiny-image", NSUrl.FromFilename(path), new UNNotificationAttachmentOptions(), out var error);
+        if (error != null)
+        {
+            logger.LogWarning("Notification image '{ImageUri}' is not a supported attachment ({Error}) - sending without it", notification.ImageUri, error.LocalizedDescription);
+            File.Delete(path);
+            return null;
+        }
+        return attachment;
+    }
 
 
     protected virtual UNMutableNotificationContent GetContent(Notification notification, Channel channel)

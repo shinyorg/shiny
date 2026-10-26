@@ -25,6 +25,7 @@ public static class NotificationExtensions
             Message = notification.Message,
             Geofence = notification.Geofence,
             Payload = notification.Payload,
+            ImageUri = notification.ImageUri,
         };
     }
     

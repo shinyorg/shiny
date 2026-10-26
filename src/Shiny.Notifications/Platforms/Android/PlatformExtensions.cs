@@ -54,9 +54,27 @@ public static class PlatformExtensions
 
     public static void TrySetImage(this NotificationCompat.Builder builder, string localAttachmentFilePath)
     {
-        using var stream = File.OpenRead(localAttachmentFilePath);
-        
-        var bitmap = BitmapFactory.DecodeStream(stream);
-        builder.SetStyle(new NotificationCompat.BigPictureStyle().BigPicture(bitmap));
+        var bitmap = DecodeNotificationImage(localAttachmentFilePath);
+        if (bitmap != null)
+            builder.SetStyle(new NotificationCompat.BigPictureStyle().BigPicture(bitmap));
+    }
+
+
+    /// <summary>
+    /// Decodes an image file scaled down to at most <paramref name="maxDimension"/> pixels on its longest side - a full
+    /// size photo decoded as-is can run to tens of MB, and a notification never shows more than a screen width.
+    /// </summary>
+    public static Bitmap? DecodeNotificationImage(string path, int maxDimension = 1440)
+    {
+        var bounds = new BitmapFactory.Options { InJustDecodeBounds = true };
+        BitmapFactory.DecodeFile(path, bounds);
+        if (bounds.OutWidth <= 0 || bounds.OutHeight <= 0)
+            return null;
+
+        var sample = 1;
+        while (Math.Max(bounds.OutWidth, bounds.OutHeight) / (sample * 2) >= maxDimension)
+            sample *= 2;
+
+        return BitmapFactory.DecodeFile(path, new BitmapFactory.Options { InSampleSize = sample });
     }
 }

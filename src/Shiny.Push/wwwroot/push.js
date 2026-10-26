@@ -70,10 +70,10 @@ function handleServiceWorkerMessage(event) {
     const msg = event.data;
     switch (msg.type) {
         case 'push-received':
-            dotNetRef.invokeMethodAsync('OnPushReceived', msg.data || {}, msg.title || null, msg.body || null);
+            dotNetRef.invokeMethodAsync('OnPushReceived', msg.data || {}, msg.title || null, msg.body || null, msg.image || null);
             break;
         case 'notification-click':
-            dotNetRef.invokeMethodAsync('OnNotificationClicked', msg.data || {}, msg.title || null, msg.body || null);
+            dotNetRef.invokeMethodAsync('OnNotificationClicked', msg.data || {}, msg.title || null, msg.body || null, msg.image || null);
             break;
         case 'subscription-change':
             dotNetRef.invokeMethodAsync('OnSubscriptionChanged', msg.subscription, msg.endpoint);

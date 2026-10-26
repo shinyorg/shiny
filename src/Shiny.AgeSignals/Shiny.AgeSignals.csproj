@@ -1,0 +1,92 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.AgeSignals</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny Age Signals - the user's age range as the app store shares it, for app store accountability laws (Texas SB 2420 and others) - Apple Declared Age Range on iOS and macOS 26+ and Google Play Age Signals on Android</Description>
+        <PackageTags>shiny age-verification age-signals declared-age-range texas sb2420 app-store-accountability maui ios android macos</PackageTags>
+
+        <!-- imported explicitly below so Platforms\Apple can also be compiled into the macOS target -->
+        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AgeSignals.Tests" />
+    </ItemGroup>
+
+    <!--
+        Play Age Signals has no NuGet binding, so the AAR is bound straight from Google's Maven repository. Its Maven
+        dependencies (play-services-basement, play-services-tasks, play core-common) are the three PackageReferences
+        below. VerifyDependencies is off because the verifier reads PackageReference Version metadata, which central
+        package management leaves empty (XAJDV7004).
+    -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <AndroidMavenLibrary Include="com.google.android.play:age-signals" Version="0.0.4" Repository="Google" VerifyDependencies="false" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Basement" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
+        <PackageReference Include="Xamarin.Google.Android.Play.Core.Common" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
+
+    <!-- Directory.Build.targets only routes Platforms\Apple to ios/maccatalyst/tvos -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">
+        <Compile Include="Platforms\Apple\**\*.cs" />
+    </ItemGroup>
+
+    <!--
+        Declared Age Range is Swift-only, so native/ShinyAgeRange is a small @_cdecl C-ABI shim built into a dynamic
+        xcframework (iOS + macOS slices) by build.sh (swiftc, no Xcode project) and consumed through NativeReference.
+    -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) Or $(TargetFramework.Contains('-macos'))">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ShinyAgeRangeNativeDir>$(MSBuildThisFileDirectory)..\..\native\ShinyAgeRange\</ShinyAgeRangeNativeDir>
+        <ShinyAgeRangeXcframework>$(ShinyAgeRangeNativeDir)build\ShinyAgeRange.xcframework</ShinyAgeRangeXcframework>
+        <!-- the SDK only creates the .resources sidecar for binding projects - see ShinyAgeRangeCreateNativeResourcePackage -->
+        <NoBindingEmbedding>true</NoBindingEmbedding>
+    </PropertyGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) Or $(TargetFramework.Contains('-macos'))">
+        <ShinyAgeRangeSwiftSource Include="$(ShinyAgeRangeNativeDir)Sources\**\*.swift;$(ShinyAgeRangeNativeDir)build.sh" />
+
+        <!-- Declared Age Range Swift bridge (dynamic framework). Embedded in consuming apps and packed into the nupkg. -->
+        <NativeReference Include="$(ShinyAgeRangeXcframework)">
+            <Kind>Framework</Kind>
+            <SmartLink>false</SmartLink>
+        </NativeReference>
+    </ItemGroup>
+
+    <Target Name="BuildShinyAgeRange"
+            BeforeTargets="PrepareForBuild"
+            Condition="($(TargetFramework.Contains('-ios')) Or $(TargetFramework.Contains('-macos'))) And $([MSBuild]::IsOSPlatform('OSX'))"
+            Inputs="@(ShinyAgeRangeSwiftSource)"
+            Outputs="$(ShinyAgeRangeXcframework)\Info.plist">
+        <Exec Command="/bin/bash &quot;$(ShinyAgeRangeNativeDir)build.sh&quot;" />
+    </Target>
+
+    <!-- the SDK's _CreateBindingResourcePackage depends on app-only native reference expansion, so call its task directly -->
+    <Target Name="ShinyAgeRangeCreateNativeResourcePackage"
+            AfterTargets="CoreCompile"
+            Condition="$(TargetFramework.Contains('-ios')) Or $(TargetFramework.Contains('-macos'))"
+            Inputs="@(NativeReference->'%(FullPath)\Info.plist')"
+            Outputs="$(OutputPath)$(AssemblyName).resources.stamp">
+        <CreateBindingResourcePackage
+            NativeReferences="@(NativeReference)"
+            BindingResourcePath="$(OutputPath)$(AssemblyName).resources"
+            Compress="auto"
+            IntermediateOutputPath="$(IntermediateOutputPath)" />
+        <Touch AlwaysCreate="true" Files="$(OutputPath)$(AssemblyName).resources.stamp">
+            <Output TaskParameter="TouchedFiles" ItemName="FileWrites" />
+        </Touch>
+    </Target>
+
+</Project>

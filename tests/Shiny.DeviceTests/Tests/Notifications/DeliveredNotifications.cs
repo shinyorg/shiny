@@ -70,4 +70,63 @@ public static class DeliveredNotifications
             throw new TimeoutException($"Notification {id} was still showing after {timeout.TotalSeconds:0}s");
         }
     }
+
+
+    /// <summary>
+    /// Whether the delivered notification carries an image - an attachment on Apple, a BigPictureStyle picture on
+    /// Android. Null when it isn't showing.
+    /// </summary>
+    public static async Task<bool?> HasImageAsync(int id)
+    {
+#if IOS || MACCATALYST
+        var delivered = await UserNotifications.UNUserNotificationCenter.Current
+            .GetDeliveredNotificationsAsync()
+            .ConfigureAwait(false);
+
+        var match = delivered.FirstOrDefault(x => x.Request.Identifier == id.ToString());
+        return match == null ? null : match.Request.Content.Attachments.Length > 0;
+#elif ANDROID
+        await Task.CompletedTask.ConfigureAwait(false);
+        var manager = (Android.App.NotificationManager)Android.App.Application.Context
+            .GetSystemService(Android.Content.Context.NotificationService)!;
+
+        var match = (manager.GetActiveNotifications() ?? []).FirstOrDefault(x => x.Id == id);
+        return match == null ? null : match.Notification?.Extras?.ContainsKey(AndroidX.Core.App.NotificationCompat.ExtraPicture) == true;
+#else
+        await Task.CompletedTask.ConfigureAwait(false);
+        return null;
+#endif
+    }
+
+
+#if IOS || MACCATALYST
+    /// <summary>
+    /// Waits for a delivered notification whose payload carries <paramref name="key"/> = <paramref name="value"/> - a
+    /// push, whose request identifier is a UUID iOS picks
+    /// </summary>
+    public static async Task<UserNotifications.UNNotification> WaitForPayloadAsync(TestContext ctx, string key, string value, TimeSpan timeout)
+    {
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ctx.CancellationToken);
+        cts.CancelAfter(timeout);
+        try
+        {
+            while (true)
+            {
+                var delivered = await UserNotifications.UNUserNotificationCenter.Current
+                    .GetDeliveredNotificationsAsync()
+                    .ConfigureAwait(false);
+
+                var match = delivered.FirstOrDefault(x => x.Request.Content.UserInfo?[key]?.ToString() == value);
+                if (match != null)
+                    return match;
+
+                await Task.Delay(250, cts.Token).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (!ctx.CancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException($"No notification with {key}={value} was delivered within {timeout.TotalSeconds:0}s");
+        }
+    }
+#endif
 }

@@ -1,0 +1,16 @@
+<metadata>
+    <!--
+        Bind only what AndroidAgeSignals calls. The AIDL plumbing, the obfuscated internals, the @IntDef annotation
+        interfaces (AgeSignalsMapper has the constants), the consent activity (Play starts it itself) and the fake
+        manager all stay Java-only.
+    -->
+    <remove-node path="/api/package[@name='com.google.android.gms.internal.playcore_age_signals']" />
+    <remove-node path="/api/package[@name='com.google.android.play.agesignals.model']" />
+    <remove-node path="/api/package[@name='com.google.android.play.agesignals.protocol']" />
+    <remove-node path="/api/package[@name='com.google.android.play.agesignals.testing']" />
+    <remove-node path="/api/package[@name='com.google.android.play.agesignals']/class[@name='AgeSharingConsentWrapperActivity']" />
+
+    <!-- the 0.x Play API is an implementation detail - IAgeSignals is the public contract -->
+    <attr path="/api/package[@name='com.google.android.play.agesignals']/class" name="visibility">internal</attr>
+    <attr path="/api/package[@name='com.google.android.play.agesignals']/interface" name="visibility">internal</attr>
+</metadata>

@@ -14,19 +14,23 @@ self.addEventListener('push', event => {
     const title = payload.title || (payload.notification && payload.notification.title) || 'Notification';
     const body = payload.body || (payload.notification && payload.notification.body) || '';
     const icon = payload.icon || (payload.notification && payload.notification.icon);
+    // a large image shown in the notification body (Chromium; other browsers ignore it)
+    const image = payload.image || (payload.notification && payload.notification.image) || null;
     const data = payload.data || {};
 
     event.waitUntil((async () => {
         await self.registration.showNotification(title, {
             body: body,
             icon: icon,
-            data: { title: title, body: body, data: data }
+            image: image || undefined,
+            data: { title: title, body: body, image: image, data: data }
         });
         await broadcastToClients({
             shinyPush: true,
             type: 'push-received',
             title: title,
             body: body,
+            image: image,
             data: data
         });
     })());
@@ -42,6 +46,7 @@ self.addEventListener('notificationclick', event => {
             type: 'notification-click',
             title: stored.title || null,
             body: stored.body || null,
+            image: stored.image || null,
             data: stored.data || {}
         });
 

@@ -71,9 +71,43 @@ public record PushNotification(
 ```csharp
 public record Notification(
     string? Title,
-    string? Message
+    string? Message,
+    string? ImageUri = null   // FCM's notification image, else the first image key in the payload
 );
 ```
+
+### PushImages (namespace: Shiny.Push)
+
+```csharp
+public static class PushImages
+{
+    // image, image-url, imageUrl, attachment-url, fcm_options.image
+    public static IReadOnlyList<string> DefaultKeys { get; }
+
+    // first value under keys that is an absolute http(s) URL
+    public static string? Find(IDictionary<string, string>? data, IEnumerable<string>? keys = null);
+
+    // Apple only: the keys the app's notification service extension was built with (ShinyPushImageKeys)
+    public static IReadOnlyList<string> AppleKeys { get; }
+    public static string? Find(NSDictionary? userInfo, IEnumerable<string>? keys = null);
+}
+```
+
+### iOS notification service extension (MSBuild, iOS app projects)
+
+| Property / item | Default | Purpose |
+|---|---|---|
+| `ShinyPushServiceExtension` | - | `true` builds `PlugIns/ShinyNotificationService.appex` |
+| `ShinyPushImageKeys` | `image;image-url;imageUrl;attachment-url;fcm_options.image` | payload keys holding the image URL |
+| `ShinyPushImageMaxBytes` | `10485760` | largest download attached |
+| `ShinyPushServiceExtensionBundleId` | `$(ApplicationId).NotificationService` | extension bundle id |
+| `ShinyPushServiceExtensionCodesignProvision` | inferred | provisioning profile name or UUID |
+| `ShinyPushServiceExtensionCodesignEntitlements` | - | entitlements file for the extension |
+| `ShinyPushServiceExtensionMinimumOSVersion` | `SupportedOSPlatformVersion` (min 15.0) | deployment target |
+| `ShinyPushServiceExtensionDisplayName` | `Notification Service` | `CFBundleDisplayName` |
+| `ShinyPushServiceExtensionInfoPlist` | - | plist merged into the extension's Info.plist (e.g. ATS) |
+| `ShinyPushServiceExtensionPrincipalClass` | `ShinyNotificationService` | `NSExtensionPrincipalClass` for your own Swift |
+| `ShinyPushServiceExtensionSource` (item) | stock Swift | your own `UNNotificationServiceExtension` Swift |
 
 ### ApplePushNotification (namespace: Shiny.Push) -- iOS only
 
@@ -103,6 +137,18 @@ public record AndroidPushNotification(
 
     // Creates the default builder and posts the notification
     public void SendDefault(int notificationId);
+
+    // FCM's notification image, else the first FirebaseConfig.ImageKeys data value that is an http(s) URL
+    public string? ImageUri { get; }
+
+    // Downloads ImageUri scaled for a notification; null when missing or it fails (never throws for a bad image)
+    public Task<Bitmap?> LoadImageAsync(CancellationToken cancelToken = default);
+
+    // CreateBuilder() + the image as BigPictureStyle and large icon
+    public Task<NotificationCompat.Builder> CreateBuilderAsync(CancellationToken cancelToken = default);
+
+    // CreateBuilderAsync() and posts it
+    public Task SendDefaultAsync(int notificationId, CancellationToken cancelToken = default);
 }
 ```
 
@@ -116,7 +162,8 @@ public record FirebaseConfig(
     string? ProjectId = null,
     string? ApiKey = null,
     NotificationChannel? DefaultChannel = null,
-    string? IntentAction = null
+    string? IntentAction = null,
+    IReadOnlyList<string>? ImageKeys = null   // data keys for the push image (default PushImages.DefaultKeys)
 )
 {
     public static FirebaseConfig Embedded { get; }

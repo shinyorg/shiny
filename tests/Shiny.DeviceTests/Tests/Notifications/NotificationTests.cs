@@ -110,6 +110,63 @@ public class NotificationTests(INotificationManager notifications) : DeviceTestS
             await DeliveredNotifications.WaitForRemovalAsync(ctx, id, TimeSpan.FromSeconds(10)).ConfigureAwait(false);
         });
 
+        this.Test("Send_WithLocalImage_IsDeliveredWithImage", async ctx =>
+        {
+            var file = Path.Combine(Path.GetTempPath(), $"devicetests-{Guid.NewGuid():N}.png");
+            await File.WriteAllBytesAsync(file, TestImage.Png, ctx.CancellationToken).ConfigureAwait(false);
+
+            var id = NewId();
+            await notifications.Send(new Notification
+            {
+                Id = id,
+                Title = "Device test",
+                Message = "Local image",
+                ImageUri = file
+            }).ConfigureAwait(false);
+
+            await DeliveredNotifications.WaitForDeliveryAsync(ctx, id, TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+            Assert.True(await DeliveredNotifications.HasImageAsync(id).ConfigureAwait(false));
+
+            // Shiny attaches a copy - iOS moves the file it is given, which must not be the app's own
+            Assert.True(File.Exists(file));
+            await notifications.Cancel(id).ConfigureAwait(false);
+        });
+
+        this.Test("Send_WithRemoteImage_IsDeliveredWithImage", async ctx =>
+        {
+            var nonce = Guid.NewGuid().ToString("N");
+            var url = ctx.Host.Url($"files/image.png?id={nonce}");
+
+            var id = NewId();
+            await notifications.Send(new Notification
+            {
+                Id = id,
+                Title = "Device test",
+                Message = "Remote image",
+                ImageUri = url
+            }).ConfigureAwait(false);
+
+            await DeliveredNotifications.WaitForDeliveryAsync(ctx, id, TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+            Assert.True(await DeliveredNotifications.HasImageAsync(id).ConfigureAwait(false));
+            await notifications.Cancel(id).ConfigureAwait(false);
+        });
+
+        this.Test("Send_WithMissingImage_IsStillDelivered", async ctx =>
+        {
+            var id = NewId();
+            await notifications.Send(new Notification
+            {
+                Id = id,
+                Title = "Device test",
+                Message = "Missing image",
+                ImageUri = Path.Combine(Path.GetTempPath(), "does-not-exist.png")
+            }).ConfigureAwait(false);
+
+            await DeliveredNotifications.WaitForDeliveryAsync(ctx, id, TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+            Assert.False(await DeliveredNotifications.HasImageAsync(id).ConfigureAwait(false));
+            await notifications.Cancel(id).ConfigureAwait(false);
+        });
+
         this.Test("Schedule_IsPending_ThenCancel", async ctx =>
         {
             var id = NewId();

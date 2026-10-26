@@ -55,6 +55,36 @@ public class PushTests(IPushManager push, INotificationManager notifications) : 
             Assert.Equal("Alert push", received.Notification.Message);
         });
 
+        this.Test("ImagePush_ReportsImageUri", async ctx =>
+        {
+            ctx.RequireCapability(HostCapability.Push);
+            await EnsureNotificationAccess(ctx).ConfigureAwait(false);
+
+            var (nonce, url) = await SendImagePush(ctx).ConfigureAwait(false);
+            var received = await WaitForPush(ctx, nonce).ConfigureAwait(false);
+
+            Assert.NotNull(received.Notification);
+            Assert.Equal(url, received.Notification.ImageUri);
+        });
+
+        this.Test("ImagePush_ServiceExtension_AttachesImage", async ctx =>
+        {
+            ctx.SkipUnless(ctx.Platform == "ios", "The notification service extension is iOS only");
+            // simctl push hands the payload to usernotificationsd as addNotificationRequest - the APNs path that
+            // launches a service extension is never taken (verified: the extension process never starts)
+            ctx.SkipUnless(!ctx.IsSimulator, "simctl push bypasses the APNs pipeline, so iOS never runs the notification service extension - needs a real APNs push");
+            ctx.RequireCapability(HostCapability.Push);
+            await EnsureNotificationAccess(ctx).ConfigureAwait(false);
+
+            var (nonce, _) = await SendImagePush(ctx).ConfigureAwait(false);
+            await WaitForPush(ctx, nonce).ConfigureAwait(false);
+
+#if IOS
+            var delivered = await DeliveredNotifications.WaitForPayloadAsync(ctx, "devicetests", nonce, TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+            Assert.NotEmpty(delivered.Request.Content.Attachments);
+#endif
+        }, TimeSpan.FromSeconds(60));
+
         this.Test("SilentPush_ReachesDelegate", async ctx =>
         {
             ctx.RequireCapability(HostCapability.Push);
@@ -85,6 +115,26 @@ public class PushTests(IPushManager push, INotificationManager notifications) : 
             Assert.Null(received.Notification);
         });
     }
+
+
+    static async Task<(string Nonce, string Url)> SendImagePush(TestContext ctx)
+    {
+        var nonce = Guid.NewGuid().ToString("N");
+        var url = ctx.Host.Url($"files/image.png?id={nonce}");
+        var payload = "{ \"aps\": { \"alert\": { \"title\": \"Device test\", \"body\": \"Image push\" }, \"mutable-content\": 1 }, "
+            + $"\"image\": \"{url}\", \"devicetests\": \"{nonce}\" }}";
+
+        await ctx.Host.SendPushAsync(payload, ctx.CancellationToken).ConfigureAwait(false);
+        return (nonce, url);
+    }
+
+
+    static Task<PushNotification> WaitForPush(TestContext ctx, string nonce) => ctx.Events.WaitAsync<PushNotification>(
+        TestPushDelegate.ReceivedTopic,
+        TimeSpan.FromSeconds(30),
+        ctx.CancellationToken,
+        x => x.Data.TryGetValue("devicetests", out var v) && v == nonce
+    );
 
 
     // a foreground alert push is only presented (and so only reaches OnReceived) once notifications are authorized

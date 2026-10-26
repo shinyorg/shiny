@@ -314,7 +314,8 @@ public class PushManager(
         var c = notification.Request.Content;
         var shinyNotification = new Notification(
             c.Title,
-            c.Body
+            c.Body,
+            PushImages.Find(c.UserInfo)
         );
 
         var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
@@ -337,7 +338,8 @@ public class PushManager(
                 {
                     return new Notification(
                         alertDict["title"]?.ToString(),
-                        alertDict["body"]?.ToString()
+                        alertDict["body"]?.ToString(),
+                        PushImages.Find(data)
                     );
                 }
             }

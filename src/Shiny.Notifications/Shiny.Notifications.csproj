@@ -12,6 +12,10 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Notifications.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Shiny.Extensions.Serialization" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>

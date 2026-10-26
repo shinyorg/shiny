@@ -37,6 +37,11 @@
             inferred - set ShinyLiveActivityCodesignProvision to choose one.
         -->
         <ShinyLiveActivityWidget>true</ShinyLiveActivityWidget>
+        <!--
+            Builds the stock notification service extension (PlugIns/ShinyNotificationService.appex) that attaches the
+            image of a push sent with "mutable-content": 1. Its bundle id is org.shiny.sample.NotificationService.
+        -->
+        <ShinyPushServiceExtension>true</ShinyPushServiceExtension>
     </PropertyGroup>
     
     <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
@@ -71,6 +76,18 @@
                             Visible="false" />
 
         <CustomEntitlements Include="com.apple.security.personal-information.calendars"
+                            Type="Boolean"
+                            Value="true"
+                            Visible="false" />
+    </ItemGroup>
+
+    <!--
+        Declared Age Range (Age Signals page): without this entitlement Apple's call never returns. Simulator builds
+        need no provisioning profile, so it is on there. For a device build, enable the Declared Age Range capability
+        on the App ID first, then drop the RuntimeIdentifier condition - a profile without it fails the signing step.
+    -->
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' And $(RuntimeIdentifier.StartsWith('iossimulator'))">
+        <CustomEntitlements Include="com.apple.developer.declared-age-range"
                             Type="Boolean"
                             Value="true"
                             Visible="false" />

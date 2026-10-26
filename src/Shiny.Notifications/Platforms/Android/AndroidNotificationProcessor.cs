@@ -106,6 +106,7 @@ public class AndroidNotificationProcessor
             if (!notification.Geofence.Repeat)
             {
                 this.repository.Remove<AndroidNotification>(notificationId);
+                this.notificationManager.DeleteImage(notification.Id);
                 await this.geofenceManager
                     .StopMonitoring(region.Identifier)
                     .ConfigureAwait(false);
@@ -138,6 +139,7 @@ public class AndroidNotificationProcessor
         if (notification.RepeatInterval == null)
         {
             this.repository.Remove<AndroidNotification>(notification.Id.ToString());
+            this.notificationManager.DeleteImage(notification.Id);
         }
         else
         {

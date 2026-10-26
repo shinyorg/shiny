@@ -26,6 +26,11 @@ triggers:
   - NotificationAITools
   - ReminderAICapabilities
   - channel importance
+  - notification image
+  - notification picture
+  - notification attachment
+  - ImageUri
+  - big picture notification
 ---
 
 # Shiny Notifications
@@ -139,7 +144,24 @@ When generating code that uses Shiny Notifications, follow these conventions:
 
 9. **Always inject `INotificationManager`** via constructor injection -- never create instances directly.
 
-10. **Use `CancelScope` wisely when cancelling:**
+10. **Show an image with `ImageUri`** - an https URL, a `file://` URI or a local path. Never build
+    `UNNotificationAttachment`s or `BigPictureStyle` by hand for this:
+    ```csharp
+    await notificationManager.Send(new Notification
+    {
+        Title = "Your order shipped",
+        Message = "Arriving Thursday",
+        ImageUri = "https://cdn.example.com/orders/1234.jpg",
+        ScheduleDate = DateTimeOffset.Now.AddHours(1)
+    });
+    ```
+    It is downloaded/copied when `Send` runs (so a scheduled notification needs no network when it fires, and shows the
+    image as it was at send time). A failed download is logged and the notification still goes out without it. iOS/macOS
+    attach it (JPEG/PNG/GIF/HEIC, max 10 MB), Android shows a big picture plus large icon (it replaces `UseBigTextStyle`),
+    Windows uses it as the toast's hero image; Linux ignores it. The source file is never moved. For an image that needs
+    auth, download it yourself and pass the local path. For push images see the `shiny-push` skill.
+
+11. **Use `CancelScope` wisely when cancelling:**
     - `CancelScope.DisplayedOnly` -- clears only shown notifications.
     - `CancelScope.Pending` -- clears only scheduled/triggered notifications.
     - `CancelScope.All` -- clears everything (default).

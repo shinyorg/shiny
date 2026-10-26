@@ -1,0 +1,225 @@
+<Project>
+  <!--
+    Shiny.Push notification service extension build (iOS apps only, opt-in with ShinyPushServiceExtension=true).
+
+    iOS only shows an image on a push when a Notification Service Extension downloads and attaches it. Instead of an
+    Xcode project, this builds one - the same pipeline as Shiny.Mobile.LiveActivities' widget extension:
+    1. swiftc compiles the stock ShinyNotificationService.swift (or the app's ShinyPushServiceExtensionSource items)
+       straight into obj/.../shinypush/appex/ShinyNotificationService.appex. The extension is Swift only - no .NET
+       runtime - because iOS gives a service extension about 24 MB of memory and 30 seconds.
+    2. The payload keys and size limit are written into the extension's Info.plist, where the Swift reads them.
+    3. On device builds the extension gets its own provisioning profile and entitlements from the SDK's own
+       DetectSigningIdentity / EmbedProvisionProfile / CompileEntitlements tasks, run for the extension's bundle id.
+    4. The bundle is handed to the SDK as an AdditionalAppExtensions item, which copies it into PlugIns/ and signs it
+       with the app's signing key.
+
+    The push itself must carry "mutable-content": 1 in its aps dictionary, or iOS never starts the extension.
+
+    Properties:
+      ShinyPushServiceExtension=true                     turn this on
+      ShinyPushImageKeys                                 payload keys holding the image URL, checked in order; a dotted key
+                                                         walks nested dictionaries (default: image;image-url;imageUrl;attachment-url;fcm_options.image)
+      ShinyPushImageMaxBytes                             largest download that is attached (default: 10485760, iOS's image limit)
+      ShinyPushServiceExtensionBundleId                  extension bundle id (default: $(ApplicationId).NotificationService)
+      ShinyPushServiceExtensionCodesignProvision         provisioning profile name or UUID (default: best installed match for the bundle id)
+      ShinyPushServiceExtensionCodesignEntitlements      entitlements for the extension, e.g. app groups for a custom extension
+      ShinyPushServiceExtensionMinimumOSVersion          extension deployment target (default: SupportedOSPlatformVersion, at least 15.0)
+      ShinyPushServiceExtensionDisplayName               CFBundleDisplayName of the extension (default: Notification Service)
+      ShinyPushServiceExtensionPrincipalClass            NSExtensionPrincipalClass (default: ShinyNotificationService) - set it for your own Swift
+      ShinyPushServiceExtensionInfoPlist                 a plist whose keys are merged into the extension's Info.plist, e.g.
+                                                         NSAppTransportSecurity exceptions for an http image host
+
+    Items:
+      ShinyPushServiceExtensionSource                    your own UNNotificationServiceExtension Swift, replacing the stock one
+  -->
+  <PropertyGroup>
+    <_ShinyPushPlatform>$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))</_ShinyPushPlatform>
+    <_ShinyPushIsApp Condition="'$(_ShinyPushPlatform)' == 'ios' and '$(OutputType)' == 'Exe' and '$(ShinyPushServiceExtension)' == 'true'">true</_ShinyPushIsApp>
+    <!-- swiftc, PlistBuddy and the signing tasks need a Mac; a Windows build (Hot Restart, or one paired to a Mac) skips the extension -->
+    <_ShinyPushSkippedOffMac Condition="'$(_ShinyPushIsApp)' == 'true' and !$([MSBuild]::IsOSPlatform('OSX'))">true</_ShinyPushSkippedOffMac>
+    <_ShinyPushIsApp Condition="'$(_ShinyPushSkippedOffMac)' == 'true'"></_ShinyPushIsApp>
+    <ShinyPushSwiftDir Condition="'$(ShinyPushSwiftDir)' == ''">$(MSBuildThisFileDirectory)swift/</ShinyPushSwiftDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(_ShinyPushIsApp)' == 'true'">
+    <ShinyPushServiceExtensionMinimumOSVersion Condition="'$(ShinyPushServiceExtensionMinimumOSVersion)' == '' and '$(SupportedOSPlatformVersion)' != '' and $([MSBuild]::VersionGreaterThanOrEquals('$(SupportedOSPlatformVersion)', '15.0'))">$(SupportedOSPlatformVersion)</ShinyPushServiceExtensionMinimumOSVersion>
+    <ShinyPushServiceExtensionMinimumOSVersion Condition="'$(ShinyPushServiceExtensionMinimumOSVersion)' == ''">15.0</ShinyPushServiceExtensionMinimumOSVersion>
+    <ShinyPushServiceExtensionDisplayName Condition="'$(ShinyPushServiceExtensionDisplayName)' == ''">Notification Service</ShinyPushServiceExtensionDisplayName>
+    <ShinyPushServiceExtensionPrincipalClass Condition="'$(ShinyPushServiceExtensionPrincipalClass)' == ''">ShinyNotificationService</ShinyPushServiceExtensionPrincipalClass>
+    <ShinyPushImageKeys Condition="'$(ShinyPushImageKeys)' == ''">image;image-url;imageUrl;attachment-url;fcm_options.image</ShinyPushImageKeys>
+    <ShinyPushImageMaxBytes Condition="'$(ShinyPushImageMaxBytes)' == ''">10485760</ShinyPushImageMaxBytes>
+    <!-- also the executable name and the module name -->
+    <_ShinyPushName>ShinyNotificationService</_ShinyPushName>
+  </PropertyGroup>
+
+  <Target Name="_ShinyPushServiceExtensionOffMac" BeforeTargets="Build" Condition="'$(_ShinyPushSkippedOffMac)' == 'true'">
+    <Warning Text="Shiny.Push: the notification service extension is only built on macOS; this build does not include it, so push images are not shown." />
+  </Target>
+
+  <!-- computed at build time: RuntimeIdentifier, IntermediateOutputPath and the app manifest are not final at evaluation -->
+  <Target Name="_ShinyPushServiceExtensionPaths" DependsOnTargets="_ReadAppManifest" Condition="'$(_ShinyPushIsApp)' == 'true'">
+    <PropertyGroup>
+      <_ShinyPushDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(IntermediateOutputPath)shinypush/'))</_ShinyPushDir>
+      <_ShinyPushAppex>$(_ShinyPushDir)appex/$(_ShinyPushName).appex/</_ShinyPushAppex>
+      <_ShinyPushExecutable>$(_ShinyPushAppex)$(_ShinyPushName)</_ShinyPushExecutable>
+      <_ShinyPushInfoPlist>$(_ShinyPushAppex)Info.plist</_ShinyPushInfoPlist>
+      <ShinyPushServiceExtensionBundleId Condition="'$(ShinyPushServiceExtensionBundleId)' == ''">$(_BundleIdentifier).NotificationService</ShinyPushServiceExtensionBundleId>
+      <_ShinyPushIsSimulator Condition="$(RuntimeIdentifier.StartsWith('iossimulator'))">true</_ShinyPushIsSimulator>
+      <_ShinyPushSdk Condition="'$(_ShinyPushIsSimulator)' == 'true'">iphonesimulator</_ShinyPushSdk>
+      <_ShinyPushSdk Condition="'$(_ShinyPushIsSimulator)' != 'true'">iphoneos</_ShinyPushSdk>
+      <_ShinyPushPlatformName Condition="'$(_ShinyPushIsSimulator)' == 'true'">iPhoneSimulator</_ShinyPushPlatformName>
+      <_ShinyPushPlatformName Condition="'$(_ShinyPushIsSimulator)' != 'true'">iPhoneOS</_ShinyPushPlatformName>
+      <_ShinyPushArch Condition="$(RuntimeIdentifier.EndsWith('x64'))">x86_64</_ShinyPushArch>
+      <_ShinyPushArch Condition="'$(_ShinyPushArch)' == ''">arm64</_ShinyPushArch>
+      <_ShinyPushTriple>$(_ShinyPushArch)-apple-ios$(ShinyPushServiceExtensionMinimumOSVersion)</_ShinyPushTriple>
+      <_ShinyPushTriple Condition="'$(_ShinyPushIsSimulator)' == 'true'">$(_ShinyPushTriple)-simulator</_ShinyPushTriple>
+      <!-- the extension must carry the app's versions or App Store validation rejects the upload -->
+      <_ShinyPushShortVersion>$(_CFBundleShortVersionString)</_ShinyPushShortVersion>
+      <_ShinyPushShortVersion Condition="'$(_ShinyPushShortVersion)' == ''">1.0</_ShinyPushShortVersion>
+      <_ShinyPushVersion>$(_CFBundleVersion)</_ShinyPushVersion>
+      <_ShinyPushVersion Condition="'$(_ShinyPushVersion)' == ''">1</_ShinyPushVersion>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ShinyPushSwift Include="@(ShinyPushServiceExtensionSource->'%(FullPath)')" />
+      <_ShinyPushSwift Include="$(ShinyPushSwiftDir)ShinyNotificationService.swift" Condition="'@(ShinyPushServiceExtensionSource)' == ''" />
+      <_ShinyPushImageKey Include="$(ShinyPushImageKeys)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="ShinyPushCompileServiceExtension"
+          DependsOnTargets="_ShinyPushServiceExtensionPaths"
+          Condition="'$(_ShinyPushIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'"
+          Inputs="@(_ShinyPushSwift);$(MSBuildThisFileFullPath)"
+          Outputs="$(_ShinyPushExecutable)">
+    <Exec Command="xcrun --sdk $(_ShinyPushSdk) --show-sdk-path" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyPushSdkPath" />
+    </Exec>
+    <MakeDir Directories="$(_ShinyPushAppex)" />
+    <!-- -e _NSExtensionMain: the extension point's main instantiates NSExtensionPrincipalClass, not Swift's @main entry -->
+    <Exec Command="xcrun --sdk $(_ShinyPushSdk) swiftc -parse-as-library -swift-version 5 -O -application-extension -module-name $(_ShinyPushName) -target $(_ShinyPushTriple) -sdk &quot;$(_ShinyPushSdkPath)&quot; @(_ShinyPushSwift->'&quot;%(Identity)&quot;', ' ') -Xlinker -e -Xlinker _NSExtensionMain -Xlinker -dead_strip -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/../../Frameworks -o &quot;$(_ShinyPushExecutable)&quot;" />
+  </Target>
+
+  <Target Name="ShinyPushServiceExtensionInfoPlist"
+          DependsOnTargets="_ShinyPushServiceExtensionPaths;_WriteAppManifest"
+          Condition="'$(_ShinyPushIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <PropertyGroup>
+      <_ShinyPushImageKeysXml>@(_ShinyPushImageKey->'&lt;string&gt;%(Identity)&lt;/string&gt;', '')</_ShinyPushImageKeysXml>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ShinyPushPlistLine Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;" />
+      <_ShinyPushPlistLine Include="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;" />
+      <_ShinyPushPlistLine Include="&lt;plist version=&quot;1.0&quot;&gt;&lt;dict&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;&lt;string&gt;en&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleDisplayName&lt;/key&gt;&lt;string&gt;$(ShinyPushServiceExtensionDisplayName)&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleExecutable&lt;/key&gt;&lt;string&gt;$(_ShinyPushName)&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleIdentifier&lt;/key&gt;&lt;string&gt;$(ShinyPushServiceExtensionBundleId)&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;&lt;string&gt;6.0&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleName&lt;/key&gt;&lt;string&gt;$(_ShinyPushName)&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundlePackageType&lt;/key&gt;&lt;string&gt;XPC!&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;&lt;string&gt;$(_ShinyPushShortVersion)&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleVersion&lt;/key&gt;&lt;string&gt;$(_ShinyPushVersion)&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;CFBundleSupportedPlatforms&lt;/key&gt;&lt;array&gt;&lt;string&gt;$(_ShinyPushPlatformName)&lt;/string&gt;&lt;/array&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;MinimumOSVersion&lt;/key&gt;&lt;string&gt;$(ShinyPushServiceExtensionMinimumOSVersion)&lt;/string&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;UIDeviceFamily&lt;/key&gt;&lt;array&gt;&lt;integer&gt;1&lt;/integer&gt;&lt;integer&gt;2&lt;/integer&gt;&lt;/array&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;ShinyPushImageKeys&lt;/key&gt;&lt;array&gt;$(_ShinyPushImageKeysXml)&lt;/array&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;ShinyPushImageMaxBytes&lt;/key&gt;&lt;integer&gt;$(ShinyPushImageMaxBytes)&lt;/integer&gt;" />
+      <_ShinyPushPlistLine Include="&lt;key&gt;NSExtension&lt;/key&gt;&lt;dict&gt;&lt;key&gt;NSExtensionPointIdentifier&lt;/key&gt;&lt;string&gt;com.apple.usernotifications.service&lt;/string&gt;&lt;key&gt;NSExtensionPrincipalClass&lt;/key&gt;&lt;string&gt;$(ShinyPushServiceExtensionPrincipalClass)&lt;/string&gt;&lt;/dict&gt;" />
+      <_ShinyPushPlistLine Include="&lt;/dict&gt;&lt;/plist&gt;" />
+      <!-- the SDK already stamped these build-environment keys into the app's manifest; the extension gets the same values.
+           The Exec below uses backticks: MSBuild would read a shell $( ) as a property. -->
+      <_ShinyPushDTKey Include="DTCompiler;DTPlatformBuild;DTPlatformName;DTPlatformVersion;DTSDKBuild;DTSDKName;DTXcode;DTXcodeBuild;BuildMachineOSBuild" />
+    </ItemGroup>
+    <MakeDir Directories="$(_ShinyPushAppex)" />
+    <!-- assembled in a scratch file and copied only when it differs, so an unchanged build doesn't re-copy and re-sign the extension -->
+    <WriteLinesToFile File="$(_ShinyPushDir)Info.plist" Lines="@(_ShinyPushPlistLine)" Overwrite="true" />
+    <Exec Command="v=`/usr/libexec/PlistBuddy -c 'Print :%(_ShinyPushDTKey.Identity)' &quot;$(_AppBundleManifestPath)&quot; 2>/dev/null` &amp;&amp; /usr/libexec/PlistBuddy -c &quot;Add :%(_ShinyPushDTKey.Identity) string $v&quot; &quot;$(_ShinyPushDir)Info.plist&quot; || true" StandardOutputImportance="low" />
+    <!-- Merge only adds keys the generated plist doesn't already have -->
+    <Exec Condition="'$(ShinyPushServiceExtensionInfoPlist)' != ''" Command="/usr/libexec/PlistBuddy -c &quot;Merge '$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(ShinyPushServiceExtensionInfoPlist)'))'&quot; &quot;$(_ShinyPushDir)Info.plist&quot;" StandardOutputImportance="low" />
+    <Exec Command="cmp -s &quot;$(_ShinyPushDir)Info.plist&quot; &quot;$(_ShinyPushInfoPlist)&quot; || cp &quot;$(_ShinyPushDir)Info.plist&quot; &quot;$(_ShinyPushInfoPlist)&quot;" StandardOutputImportance="low" />
+  </Target>
+
+  <!--
+    Device builds: the extension's bundle id needs its own provisioning profile. The SDK's own tasks pick it the way
+    they pick the app's (exact match beats a team wildcard), signed by the identity the app already resolved.
+  -->
+  <Target Name="ShinyPushServiceExtensionSigning"
+          DependsOnTargets="_ShinyPushServiceExtensionPaths;_DetectSigningIdentity;_DetectSdkLocations;_EmbedProvisionProfile"
+          Condition="'$(_ShinyPushIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(_ShinyPushIsSimulator)' != 'true' and '$(EnableCodeSigning)' != 'false'">
+    <DetectSigningIdentity
+      SessionId="$(BuildSessionId)"
+      AppBundleName="$(_ShinyPushName)"
+      BundleIdentifier="$(ShinyPushServiceExtensionBundleId)"
+      CodesignEntitlements="$(ShinyPushServiceExtensionCodesignEntitlements)"
+      CodesignRequireProvisioningProfile="true"
+      Keychain="$(CodesignKeychain)"
+      SdkIsSimulator="false"
+      SdkPlatform="$(_SdkPlatform)"
+      ProvisioningProfile="$(ShinyPushServiceExtensionCodesignProvision)"
+      SdkDevPath="$(_SdkDevPath)"
+      SigningKey="$(_CodeSigningKey)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      ContinueOnError="true">
+      <Output TaskParameter="DetectedProvisioningProfile" PropertyName="_ShinyPushProvisioningProfile" />
+    </DetectSigningIdentity>
+
+    <Error Condition="'$(_ShinyPushProvisioningProfile)' == '' and '$(ShinyPushServiceExtensionCodesignProvision)' != ''"
+           Text="Shiny.Push: the provisioning profile '$(ShinyPushServiceExtensionCodesignProvision)' (ShinyPushServiceExtensionCodesignProvision) can't sign the notification service extension '$(ShinyPushServiceExtensionBundleId)'. It must cover that bundle id and include the certificate the app is signed with - see the warning above." />
+    <Error Condition="'$(_ShinyPushProvisioningProfile)' == '' and '$(ShinyPushServiceExtensionCodesignProvision)' == ''"
+           Text="Shiny.Push: no provisioning profile found for the notification service extension ('$(ShinyPushServiceExtensionBundleId)'). Create one for that bundle id (a team wildcard profile also works for development), or name it with &lt;ShinyPushServiceExtensionCodesignProvision&gt;. To use another bundle id, set &lt;ShinyPushServiceExtensionBundleId&gt;." />
+
+    <EmbedProvisionProfile
+      SessionId="$(BuildSessionId)"
+      AppBundleDir="$(_ShinyPushAppex)"
+      ProvisioningProfile="$(_ShinyPushProvisioningProfile)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      EmbeddedProvisionProfilePath="$(_ShinyPushAppex)embedded.mobileprovision" />
+
+    <CompileEntitlements
+      SessionId="$(BuildSessionId)"
+      AppBundleDir="$(_ShinyPushAppex)"
+      BundleIdentifier="$(ShinyPushServiceExtensionBundleId)"
+      Entitlements="$(ShinyPushServiceExtensionCodesignEntitlements)"
+      CompiledEntitlements="$(_ShinyPushDir)$(_ShinyPushName).xcent"
+      ProvisioningProfile="$(_ShinyPushProvisioningProfile)"
+      SdkDevPath="$(_SdkDevPath)"
+      SdkIsSimulator="false"
+      SdkPlatform="$(_SdkPlatform)"
+      SdkVersion="$(_SdkVersion)"
+      TargetFrameworkMoniker="$(_ComputedTargetFrameworkMoniker)"
+      Debug="$(_BundlerDebug)"
+      ValidateEntitlements="$(ValidateEntitlements)">
+      <Output TaskParameter="EntitlementsInSignature" PropertyName="_ShinyPushEntitlements" />
+    </CompileEntitlements>
+
+    <!--
+      Both bundles are signed by one identity, so the SDK already refuses a development profile against a distribution
+      certificate. What still slips through is Ad Hoc next to App Store (or Enterprise), which only fails at upload or
+      install, so profile-kind.sh reads both embedded profiles.
+    -->
+    <Exec Condition="'$(_EmbeddedProvisionProfilePath)' != '' and Exists('$(_EmbeddedProvisionProfilePath)')" Command="sh &quot;$(MSBuildThisFileDirectory)profile-kind.sh&quot; &quot;$(_EmbeddedProvisionProfilePath)&quot;" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyPushAppProfileKind" />
+    </Exec>
+    <Exec Command="sh &quot;$(MSBuildThisFileDirectory)profile-kind.sh&quot; &quot;$(_ShinyPushAppex)embedded.mobileprovision&quot;" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ShinyPushProfileKind" />
+    </Exec>
+    <Warning Condition="'$(_ShinyPushAppProfileKind)' != '' and '$(_ShinyPushAppProfileKind)' != '$(_ShinyPushProfileKind)'"
+             Text="Shiny.Push: the notification service extension's provisioning profile is $(_ShinyPushProfileKind) but the app's is $(_ShinyPushAppProfileKind). App Store, TestFlight and Ad Hoc installs reject mixed profiles - name a profile of the same kind ($(_ShinyPushAppProfileKind)) that covers '$(ShinyPushServiceExtensionBundleId)' with &lt;ShinyPushServiceExtensionCodesignProvision&gt;." />
+
+    <Message Importance="normal" Text="Shiny.Push: signing $(ShinyPushServiceExtensionBundleId) with provisioning profile $(_ShinyPushProvisioningProfile) ($(_ShinyPushProfileKind))" />
+  </Target>
+
+  <!-- the SDK copies AdditionalAppExtensions into PlugIns/ and adds them to its codesign list in _ExtendAppExtensionReferences -->
+  <Target Name="ShinyPushServiceExtension"
+          BeforeTargets="_ExtendAppExtensionReferences"
+          DependsOnTargets="ShinyPushCompileServiceExtension;ShinyPushServiceExtensionInfoPlist;ShinyPushServiceExtensionSigning"
+          Condition="'$(_ShinyPushIsApp)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <AdditionalAppExtensions Include="$(_ShinyPushDir)">
+        <Name>$(_ShinyPushName)</Name>
+        <BuildOutput>appex</BuildOutput>
+        <CodesignEntitlements>$(_ShinyPushEntitlements)</CodesignEntitlements>
+        <CodesignWarnIfNoEntitlements>false</CodesignWarnIfNoEntitlements>
+      </AdditionalAppExtensions>
+    </ItemGroup>
+  </Target>
+</Project>

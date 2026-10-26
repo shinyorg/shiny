@@ -25,6 +25,11 @@
         <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 
+    <!-- The opt-in iOS notification service extension build (ShinyPushServiceExtension=true) that attaches push images -->
+    <ItemGroup>
+        <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive\" />
+    </ItemGroup>
+
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
         <PackageReference Include="Xamarin.Firebase.Messaging"/>
     </ItemGroup>

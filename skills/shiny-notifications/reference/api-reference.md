@@ -116,6 +116,7 @@ public class Notification : IRepositoryEntity
     public string? Message { get; set; }                           // Required
     public string? Channel { get; set; }                           // Channel identifier
     public IDictionary<string, string> Payload { get; set; }       // Custom key-value data
+    public string? ImageUri { get; set; }                          // https URL, file:// URI or local path - stored at Send
     public int? BadgeCount { get; set; }                           // App icon badge (0 to clear)
     public string? Thread { get; set; }                            // iOS: Thread, Android: Group
 

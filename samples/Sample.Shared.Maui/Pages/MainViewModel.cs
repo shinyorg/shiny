@@ -44,6 +44,7 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             Add(FeatureGroup.Ai, "🤖 AI Assistant", "Chat + Shiny AI tools via GitHub Copilot", "ai");
             Add(FeatureGroup.Device, "🔋 Battery", "Observe battery level & state", "battery");
             Add(FeatureGroup.Device, "🌐 Connectivity", "Observe network connectivity", "connectivity");
+            Add(FeatureGroup.Device, "🎂 Age Signals", "Store-shared age range (Declared Age Range)", "agesignals");
             Add(FeatureGroup.Device, "📝 Events", "Captured delegate events (SQLite)", "events");
             return list;
         }
@@ -123,6 +124,9 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         // Android foldables, iPhone Duo (iOS 27.1+); reports "not supported" elsewhere
         if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
             Add(FeatureGroup.Device, "📖 Screen Posture", "Fold, hinge & tabletop/book posture", "posture");
+        // Declared Age Range (iOS 26+) / Play Age Signals; Mac Catalyst has no implementation
+        if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
+            Add(FeatureGroup.Device, "🎂 Age Signals", "Store-shared age range (Texas SB 2420 & co.)", "agesignals");
         Add(FeatureGroup.Device, "⚙️ Settings", "Connectivity, battery, key-value store", "settings");
         Add(FeatureGroup.Device, "📝 Events", "Captured delegate events (SQLite)", "events");
         return list;

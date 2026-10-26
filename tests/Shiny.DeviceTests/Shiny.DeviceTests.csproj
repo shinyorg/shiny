@@ -36,6 +36,20 @@
         <CustomEntitlements Include="com.apple.security.personal-information.calendars" Type="Boolean" Value="true" Visible="false" />
     </ItemGroup>
 
+    <!--
+        The Push suite's image test needs the notification service extension. NuGet consumers get Shiny.Push.targets from
+        buildTransitive/; this app uses project references, so it is imported at the bottom of this file.
+    -->
+    <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+        <ShinyPushServiceExtension>true</ShinyPushServiceExtension>
+        <ShinyPushServiceExtensionInfoPlist>Platforms/iOS/NotificationService.plist</ShinyPushServiceExtensionInfoPlist>
+    </PropertyGroup>
+
+    <!-- without it Declared Age Range never answers (the Family extension rejects the client and the call hangs) -->
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+        <CustomEntitlements Include="com.apple.developer.declared-age-range" Type="Boolean" Value="true" Visible="false" />
+    </ItemGroup>
+
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.png" ForegroundFile="Resources\AppIcon\appiconfg.png" />
         <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#0B0E17" BaseSize="200,200" />
@@ -72,6 +86,9 @@
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Mobile.LiveActivities\Shiny.Mobile.LiveActivities.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Mobile.CallDirectory\Shiny.Mobile.CallDirectory.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AgeSignals\Shiny.AgeSignals.csproj" />
     </ItemGroup>
+
+    <Import Project="..\..\src\Shiny.Push\buildTransitive\Shiny.Push.targets" />
 
 </Project>

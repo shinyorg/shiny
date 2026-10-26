@@ -36,6 +36,14 @@ public class Notification : IRepositoryEntity
     public IDictionary<string, string> Payload { get; set; } = new Dictionary<string, string>(0);
 
     /// <summary>
+    /// An image shown with the notification - an http(s) URL, a file:// URI or a local file path. It is downloaded
+    /// (or copied) when the notification is sent, so a scheduled notification shows the image as it was then. If it
+    /// can't be read the notification is still sent, without it. iOS/macOS attach it (JPEG, PNG, GIF, HEIC; up to 10 MB),
+    /// Android shows it as a big picture, Windows as the toast's hero image.
+    /// </summary>
+    public string? ImageUri { get; set; }
+
+    /// <summary>
     /// The value to display on the app icon badge; set to 0 to clear. Android auto-increments by default and this value overrides that. iOS/UWP only show a badge when this is set.
     /// </summary>
     public int? BadgeCount { get; set; }

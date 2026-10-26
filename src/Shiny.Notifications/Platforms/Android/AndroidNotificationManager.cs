@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
@@ -61,9 +63,6 @@ public class AndroidNotificationManager
         if (!notification.Thread.IsEmpty())
             builder.SetGroup(notification.Thread);
 
-        //if (!notification.LocalAttachmentPath.IsEmpty())
-        //    this.platform.TrySetImage(notification.LocalAttachmentPath, builder);
-
         //if (notification.BadgeCount != null)
         //{
         //    // channel needs badge too
@@ -75,10 +74,25 @@ public class AndroidNotificationManager
         if (!notification.Ticker.IsEmpty())
             builder.SetTicker(notification.Ticker);
 
-        if (notification.UseBigTextStyle)
-            builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
-        else
+        // the image, stored by StoreImage when the notification was sent, takes the style over from big text
+        var image = notification.ImageUri.IsEmpty() ? null : this.LoadImage(notification);
+        if (image != null)
+        {
+            var style = new NotificationCompat.BigPictureStyle();
+            style.BigPicture(image);
+            style.BigLargeIcon((Bitmap?)null);
+            builder.SetStyle(style);
+            builder.SetLargeIcon(image);
             builder.SetContentText(notification.Message);
+        }
+        else if (notification.UseBigTextStyle)
+        {
+            builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
+        }
+        else
+        {
+            builder.SetContentText(notification.Message);
+        }
 
         if (!notification.LargeIconResourceName.IsEmpty())
         {
@@ -93,6 +107,47 @@ public class AndroidNotificationManager
             builder.SetColor(color);
         }
         return builder;
+    }
+
+
+    string ImageDirectory => System.IO.Path.Combine(this.platform.AppData.FullName, "shiny-notification-images");
+
+
+    /// <summary>
+    /// Copies or downloads <see cref="Notification.ImageUri"/> into app storage, where <see cref="CreateNativeBuilder"/>
+    /// reads it - also when an alarm or geofence shows the notification later with no time to download.
+    /// </summary>
+    public virtual async Task StoreImage(Notification notification)
+    {
+        if (notification.ImageUri.IsEmpty())
+            this.DeleteImage(notification.Id);
+        else
+            await NotificationImages.TryStore(notification.ImageUri!, this.ImageDirectory, notification.Id.ToString(), this.logger).ConfigureAwait(false);
+    }
+
+
+    /// <summary>
+    /// Removes the image <see cref="StoreImage"/> stored for the notification
+    /// </summary>
+    public virtual void DeleteImage(int notificationId)
+        => NotificationImages.Delete(this.ImageDirectory, notificationId.ToString());
+
+
+    protected virtual Bitmap? LoadImage(Notification notification)
+    {
+        var path = NotificationImages.Find(this.ImageDirectory, notification.Id.ToString());
+        if (path == null)
+            return null;
+
+        try
+        {
+            return PlatformExtensions.DecodeNotificationImage(path);
+        }
+        catch (System.Exception ex)
+        {
+            this.logger.LogWarning(ex, "Notification image for {NotificationId} could not be decoded - showing it without the image", notification.Id);
+            return null;
+        }
     }
 
 

@@ -43,6 +43,7 @@
             "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
             "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
             "src\\Shiny.AppStore\\Shiny.AppStore.csproj",
+            "src\\Shiny.AgeSignals\\Shiny.AgeSignals.csproj",
             "src\\Shiny.GameCenter\\Shiny.GameCenter.csproj",
             "src\\Shiny.Mobile.CallDirectory\\Shiny.Mobile.CallDirectory.csproj",
             "src\\Shiny.Wearables\\Shiny.Wearables.csproj",

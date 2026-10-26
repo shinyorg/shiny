@@ -17,6 +17,9 @@ public static class HttpTransferFixture
     static readonly ConcurrentDictionary<string, UploadRecord> uploads = new();
     static readonly ConcurrentDictionary<string, int> flakyHits = new();
 
+    // a 64x32 orange PNG - the notification image the Push and Notifications suites attach
+    static readonly byte[] png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAIAAAAt/+nTAAAANklEQVR42u3PQQkAAAgEsIto/zJeBp/CYAWWnbwWAQEBAQEBAQEBAQEBAQEBAQEBAQEBAYGrAvcqeJc4Xw/zAAAAAElFTkSuQmCC");
+
 
     public static void MapHttpTransfer(this WebApplication app, RunnerState state)
     {
@@ -30,6 +33,13 @@ public static class HttpTransferFixture
             var dropAfter = Int64.TryParse(ctx.Request.Query["dropAfter"], out var d) ? d : bytes / 2;
             var hit = flakyHits.AddOrUpdate(id, 1, (_, x) => x + 1);
             return ServeAsync(ctx, bytes, hit == 1 ? dropAfter : null);
+        });
+
+        // ?id= records who fetched it (the app, or the iOS notification service extension)
+        app.MapGet("/files/image.png", (HttpContext ctx) =>
+        {
+            Record(ctx, ctx.Request.Query["id"].ToString());
+            return Results.Bytes(png, "image/png");
         });
 
         app.MapGet("/files/requests/{id}", (string id) => Results.Json(

@@ -183,6 +183,9 @@ has the details; `tests/Shiny.DeviceTests/run.sh <ios|android|maccatalyst>` buil
   notifications use iOS **provisional** authorization for this reason. `simctl privacy grant` kills the app (the
   runner relaunches it).
 - `simctl push` rejects silent (`content-available` only) pushes - that test skips on the simulator.
+- `simctl push` never runs a Notification Service Extension: CoreSimulatorBridge hands the payload to
+  `usernotificationsd` as `addNotificationRequest`, skipping the APNs path that launches it. Verify
+  `ShinyNotificationService.swift` changes by calling the class directly from a macOS `swiftc` harness instead.
 - An incremental iOS build does not always regenerate the app's `Info.plist`; after editing it, delete
   `obj/Debug/net10.0-ios` and `bin/Debug/net10.0-ios` before trusting a run.
 - The DevFlow agent's HTTP server needs a `Content-Length` - send buffered `StringContent`, not `JsonContent`.

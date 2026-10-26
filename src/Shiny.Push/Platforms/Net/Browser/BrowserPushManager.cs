@@ -139,18 +139,18 @@ public class BrowserPushManager(
 
 
     [JSInvokable]
-    public Task OnPushReceived(Dictionary<string, string>? data, string? title, string? body)
+    public Task OnPushReceived(Dictionary<string, string>? data, string? title, string? body, string? image)
     {
-        var notification = (title != null || body != null) ? new Notification(title, body) : null;
+        var notification = (title != null || body != null) ? new Notification(title, body, image) : null;
         var push = new PushNotification(data ?? new Dictionary<string, string>(), notification);
         return services.RunDelegates<IPushDelegate>(x => x.OnReceived(push), logger);
     }
 
 
     [JSInvokable]
-    public Task OnNotificationClicked(Dictionary<string, string>? data, string? title, string? body)
+    public Task OnNotificationClicked(Dictionary<string, string>? data, string? title, string? body, string? image)
     {
-        var notification = (title != null || body != null) ? new Notification(title, body) : null;
+        var notification = (title != null || body != null) ? new Notification(title, body, image) : null;
         var push = new PushNotification(data ?? new Dictionary<string, string>(), notification);
         return services.RunDelegates<IPushDelegate>(x => x.OnEntry(push), logger);
     }

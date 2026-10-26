@@ -123,6 +123,10 @@ public static class ShinyRegistrations
         );
 #endif
 
+        // Age signals: Apple Declared Age Range on iOS / macOS 26+, Google Play Age Signals on Android,
+        // "not supported" everywhere else (including Mac Catalyst)
+        s.AddAgeSignals();
+
 #if IOS || ANDROID || MACCATALYST
         // Contacts: Shiny.Contacts has native implementations for iOS, Mac Catalyst, macOS and Android.
         s.AddContactStore();
