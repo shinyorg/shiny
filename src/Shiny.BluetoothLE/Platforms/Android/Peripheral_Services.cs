@@ -5,6 +5,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using System.Threading;
 using Android.Bluetooth;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Infrastructure;
@@ -32,40 +34,71 @@ public partial class Peripheral
         => this.serviceDiscoverySubj?.OnNext(status);
 
 
+    // Service discovery is shared by every operation that needs a service and is bounded by its own timeout:
+    // a caller with a short timeout (e.g. a 5 s read) that gives up no longer cancels it half-way, which left
+    // RequiresServiceDiscovery set and made the next caller refresh + rediscover from scratch - in a loop for
+    // peripherals whose discovery takes about as long as the read timeout. Concurrent callers also each ran
+    // their own refresh + DiscoverServices on the same GATT client.
+    static readonly TimeSpan ServiceDiscoveryTimeout = TimeSpan.FromSeconds(30);
+    readonly SharedOperation<IReadOnlyList<BluetoothGattService>> serviceDiscovery = new();
+
+
     protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices() =>
-        ObservableTask.FromAsync<IReadOnlyList<BluetoothGattService>>(async ct =>
+        ObservableTask.FromAsync<IReadOnlyList<BluetoothGattService>>(ct =>
         {
             this.AssertConnection();
 
-            this.serviceDiscoverySubj ??= new();
             if (!this.RequiresServiceDiscovery && this.Gatt?.Services != null)
-                return this.Gatt!.Services!.ToList();
+                return Task.FromResult<IReadOnlyList<BluetoothGattService>>(this.Gatt!.Services!.ToList());
 
-            // TODO: should lock here
-            this.RefreshServices(); // force refresh of services on GATT
-            var task = this.WaitForOperation(this.serviceDiscoverySubj, ct);
-            if (!this.Gatt!.DiscoverServices())
-                throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
-
-            var status = await task.ConfigureAwait(false);
-            if (status != GattStatus.Success)
-                throw new BleException("Service discovery failed with status: " + status);
-
-            this.RequiresServiceDiscovery = false;
-
-            return this.Gatt.Services!.ToList();
+            return this.serviceDiscovery.RunAsync(
+                this.DiscoverServicesCore,
+                ServiceDiscoveryTimeout,
+                this.disconnectCts.Token,
+                ct
+            );
         });
+
+
+    async Task<IReadOnlyList<BluetoothGattService>> DiscoverServicesCore(CancellationToken ct)
+    {
+        this.AssertConnection();
+        this.serviceDiscoverySubj ??= new();
+
+        this.RefreshServices(); // force refresh of services on GATT
+        var task = this.WaitForOperation(this.serviceDiscoverySubj, ct);
+        if (!this.Gatt!.DiscoverServices())
+            throw new InvalidOperationException("Android GATT reported that it could not run service discovery");
+
+        var status = await task.ConfigureAwait(false);
+        if (status != GattStatus.Success)
+            throw new BleException("Service discovery failed with status: " + status);
+
+        this.RequiresServiceDiscovery = false;
+
+        return this.Gatt.Services!.ToList();
+    }
 
 
     protected IObservable<BluetoothGattService> GetNativeService(string serviceUuid) => this
         .GetNativeServices()
-        .Select(x =>
+        .SelectMany(services =>
         {
             var native = this.Gatt!.GetService(Utils.ToUuidType(serviceUuid));
-            if (native == null)
-                throw new InvalidOperationException("No service found with uuid: " + serviceUuid);
+            if (native != null)
+                return Observable.Return(native);
 
-            return native;
+            // An EMPTY list flagged as discovered is stale (seen right after a reconnect): every lookup threw
+            // "No service found" for the rest of the connection. Rediscover once. A non-empty list that lacks
+            // the service is a real miss and fails straight away, so probing for optional services stays cheap.
+            if (services.Count > 0)
+                return Observable.Throw<BluetoothGattService>(new InvalidOperationException("No service found with uuid: " + serviceUuid));
+
+            this.RequiresServiceDiscovery = true;
+            return this
+                .GetNativeServices()
+                .Select(_ => this.Gatt!.GetService(Utils.ToUuidType(serviceUuid))
+                    ?? throw new InvalidOperationException("No service found with uuid: " + serviceUuid));
         });
 
 
