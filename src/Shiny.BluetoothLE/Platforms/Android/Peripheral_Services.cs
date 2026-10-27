@@ -31,7 +31,18 @@ public partial class Peripheral
 
     Subject<GattStatus>? serviceDiscoverySubj;
     public override void OnServicesDiscovered(BluetoothGatt? gatt, GattStatus status)
-        => this.serviceDiscoverySubj?.OnNext(status);
+    {
+        // This peripheral is the callback for every GATT client it opens. A late OnServicesDiscovered from a client
+        // already closed by a reconnect must not complete the discovery running on the current one: it "completed"
+        // a fresh discovery within milliseconds of the refresh(), with the list still empty, and every service
+        // lookup then threw "No service found" for the rest of the link.
+        if (gatt != null && this.Gatt != null && !gatt.Equals(this.Gatt))
+        {
+            this.logger.LogDebug("Ignoring OnServicesDiscovered from a previous GATT client");
+            return;
+        }
+        this.serviceDiscoverySubj?.OnNext(status);
+    }
 
 
     // Service discovery is shared by every operation that needs a service and is bounded by its own timeout:
@@ -74,9 +85,17 @@ public partial class Peripheral
         if (status != GattStatus.Success)
             throw new BleException("Service discovery failed with status: " + status);
 
-        this.RequiresServiceDiscovery = false;
+        var services = this.Gatt.Services?.ToList() ?? new List<BluetoothGattService>();
 
-        return this.Gatt.Services!.ToList();
+        // An empty list after a "successful" discovery is not a real result (a GATT server always exposes at least
+        // Generic Access/Attribute) - leave the peripheral flagged so the next operation discovers again instead of
+        // serving the empty list as cached for the rest of the connection.
+        if (services.Count > 0)
+            this.RequiresServiceDiscovery = false;
+        else
+            this.logger.LogWarning("Service discovery reported success with no services - will rediscover on next use");
+
+        return services;
     }
 
 
