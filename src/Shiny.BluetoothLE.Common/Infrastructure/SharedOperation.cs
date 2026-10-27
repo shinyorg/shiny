@@ -11,30 +11,27 @@ namespace Shiny.BluetoothLE.Infrastructure;
 /// its own cancellation token.
 /// </summary>
 /// <remarks>
-/// Built for GATT service discovery. Discovery used to run inside whichever operation first needed a service,
-/// bounded by that operation's timeout. When a read with a short timeout gave up, the discovery was cancelled
-/// half-way, the peripheral still needed discovery, and the next read refreshed the cache and started again
-/// from scratch - a peripheral whose discovery takes about as long as the read timeout never delivered data.
-/// Concurrent callers also each started their own discovery on the same GATT client.
-/// Here a caller giving up only stops <i>that caller</i> waiting; the operation keeps running (bounded by its
-/// own timeout and the lifetime token) and the next caller reuses it.
+/// Built for GATT service discovery. Concurrent callers used to each start their own discovery on the same GATT
+/// client; here they join the one in flight. The operation lives only as long as somebody is waiting on it: when the
+/// last caller gives up (its timeout or cancellation), the operation is cancelled too, so nothing keeps running that
+/// nobody asked for. A caller with no timeout of its own is still bounded by the operation's timeout.
 /// </remarks>
 [EditorBrowsable(EditorBrowsableState.Never)]
 public sealed class SharedOperation<T>
 {
     readonly object syncLock = new();
-    Task<T>? inflight;
+    Run? current;
 
 
     /// <summary>
-    /// Joins the operation in flight, or starts one when none is running (a completed or faulted one is not
-    /// reused).
+    /// Joins the operation in flight, or starts one when none is running (a completed, faulted or abandoned one is
+    /// not reused).
     /// </summary>
-    /// <param name="operation">The work. Receives a token cancelled by <paramref name="lifetime"/> or <paramref name="timeout"/>.</param>
-    /// <param name="timeout">How long the operation itself may run, independent of any caller.</param>
+    /// <param name="operation">The work. Receives a token cancelled by <paramref name="lifetime"/>, <paramref name="timeout"/> or the last caller leaving.</param>
+    /// <param name="timeout">The longest the operation may run, whoever is waiting.</param>
     /// <param name="lifetime">Ends the operation early (e.g. the peripheral disconnected).</param>
-    /// <param name="cancellationToken">Stops this caller waiting; the operation keeps running for the others.</param>
-    public Task<T> RunAsync(
+    /// <param name="cancellationToken">Stops this caller waiting; the operation is cancelled once no caller is left.</param>
+    public async Task<T> RunAsync(
         Func<CancellationToken, Task<T>> operation,
         TimeSpan timeout,
         CancellationToken lifetime,
@@ -42,42 +39,103 @@ public sealed class SharedOperation<T>
     {
         ArgumentNullException.ThrowIfNull(operation);
 
-        Task<T> task;
+        Run run;
         lock (this.syncLock)
         {
-            if (this.inflight == null || this.inflight.IsCompleted)
-            {
-                this.inflight = Start(operation, timeout, lifetime);
+            if (this.current == null || this.current.Task.IsCompleted)
+                this.current = Run.Start(operation, timeout, lifetime);
 
-                // Callers may all have stopped waiting before it fails - don't let that surface as an
-                // unobserved task exception (see #1674).
-                this.inflight.ContinueWith(
-                    static t => _ = t.Exception,
-                    CancellationToken.None,
-                    TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                    TaskScheduler.Default
-                );
-            }
-            task = this.inflight;
+            run = this.current;
+            run.Waiters++;
         }
-        return task.WaitAsync(cancellationToken);
+
+        try
+        {
+            return await run.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            var abandon = false;
+            lock (this.syncLock)
+            {
+                run.Waiters--;
+                if (run.Waiters == 0 && !run.Task.IsCompleted)
+                {
+                    abandon = true;
+                    // a caller arriving after this point must start fresh, not join a run being cancelled
+                    if (this.current == run)
+                        this.current = null;
+                }
+            }
+            // outside the lock - cancelling runs the operation's registrations inline
+            if (abandon)
+                run.Cancel();
+        }
     }
 
 
-    static async Task<T> Start(Func<CancellationToken, Task<T>> operation, TimeSpan timeout, CancellationToken lifetime)
+    sealed class Run
     {
-        // yield so the operation never runs inside the caller's lock or on its stack
-        await Task.Yield();
+        readonly CancellationTokenSource cts;
+        volatile bool abandoned;
 
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(lifetime);
-        cts.CancelAfter(timeout);
-        try
+        Run(CancellationTokenSource cts) => this.cts = cts;
+
+        public Task<T> Task { get; private set; } = null!;
+        public int Waiters { get; set; }
+
+
+        public static Run Start(Func<CancellationToken, Task<T>> operation, TimeSpan timeout, CancellationToken lifetime)
         {
-            return await operation(cts.Token).ConfigureAwait(false);
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(lifetime);
+            cts.CancelAfter(timeout);
+
+            var run = new Run(cts);
+            run.Task = run.Execute(operation, timeout, lifetime);
+
+            // A run abandoned by its callers, or one that fails after they all left, has nobody to observe it -
+            // don't let that surface as an unobserved task exception (see #1674).
+            run.Task.ContinueWith(
+                static t => _ = t.Exception,
+                CancellationToken.None,
+                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Default
+            );
+            return run;
         }
-        catch (OperationCanceledException ex) when (!lifetime.IsCancellationRequested && cts.IsCancellationRequested)
+
+
+        public void Cancel()
         {
-            throw new TimeoutException($"Operation did not complete within {timeout}", ex);
+            this.abandoned = true;
+            try
+            {
+                this.cts.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // the operation finished between the last waiter leaving and this call - nothing left to stop
+            }
+        }
+
+
+        async Task<T> Execute(Func<CancellationToken, Task<T>> operation, TimeSpan timeout, CancellationToken lifetime)
+        {
+            // yield so the operation never runs inside the caller's lock or on its stack
+            await System.Threading.Tasks.Task.Yield();
+
+            try
+            {
+                return await operation(this.cts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException ex) when (!lifetime.IsCancellationRequested && !this.abandoned)
+            {
+                throw new TimeoutException($"Operation did not complete within {timeout}", ex);
+            }
+            finally
+            {
+                this.cts.Dispose();
+            }
         }
     }
 }

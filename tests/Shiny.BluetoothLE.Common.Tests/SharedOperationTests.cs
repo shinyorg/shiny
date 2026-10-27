@@ -38,9 +38,36 @@ public class SharedOperationTests
 
 
     [Fact]
-    public async Task CallerGivingUp_DoesNotCancelTheOperation()
+    public async Task LastCallerGivingUp_CancelsTheOperation()
     {
-        // The bug: a short read timeout cancelled discovery half-way and the next caller started again from scratch
+        var op = new SharedOperation<int>();
+        var runs = 0;
+        var cancelled = new TaskCompletionSource();
+
+        Func<CancellationToken, Task<int>> work = async ct =>
+        {
+            Interlocked.Increment(ref runs);
+            using var reg = ct.Register(() => cancelled.TrySetResult());
+            await Task.Delay(Timeout.Infinite, ct);
+            return 7;
+        };
+
+        using var shortTimeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => op.RunAsync(work, Long, CancellationToken.None, shortTimeout.Token)
+        );
+        await cancelled.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        // the abandoned run is not reused - the next caller starts a new one
+        var second = op.RunAsync(_ => Task.FromResult(8), Long, CancellationToken.None, CancellationToken.None);
+        Assert.Equal(8, await second);
+        Assert.Equal(1, runs);
+    }
+
+
+    [Fact]
+    public async Task OneCallerGivingUp_OthersKeepWaiting()
+    {
         var op = new SharedOperation<int>();
         var runs = 0;
         var release = new TaskCompletionSource();
@@ -54,16 +81,15 @@ public class SharedOperationTests
             return 7;
         };
 
+        var stays = op.RunAsync(work, Long, CancellationToken.None, CancellationToken.None);
         using var shortTimeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
             () => op.RunAsync(work, Long, CancellationToken.None, shortTimeout.Token)
         );
         Assert.False(operationToken.IsCancellationRequested);
 
-        var second = op.RunAsync(work, Long, CancellationToken.None, CancellationToken.None);
         release.SetResult();
-
-        Assert.Equal(7, await second);
+        Assert.Equal(7, await stays);
         Assert.Equal(1, runs);
     }
 

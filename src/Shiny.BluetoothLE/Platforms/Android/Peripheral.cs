@@ -265,6 +265,10 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         {
             this.logger.LogWarning(ex, "Error closing prior GATT client before reconnect");
         }
+        // Close() silences the prior client's callbacks, so anything still waiting on one - a shared service
+        // discovery included - would otherwise hold until its own timeout, and the new client's operations would
+        // join that discovery instead of starting their own.
+        this.BreakOperations();
     }
 
 

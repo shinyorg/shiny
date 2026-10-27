@@ -5,8 +5,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using Android.Bluetooth;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Infrastructure;
@@ -45,29 +45,36 @@ public partial class Peripheral
     }
 
 
-    // Service discovery is shared by every operation that needs a service and is bounded by its own timeout:
-    // a caller with a short timeout (e.g. a 5 s read) that gives up no longer cancels it half-way, which left
-    // RequiresServiceDiscovery set and made the next caller refresh + rediscover from scratch - in a loop for
-    // peripherals whose discovery takes about as long as the read timeout. Concurrent callers also each ran
-    // their own refresh + DiscoverServices on the same GATT client.
+    // Service discovery is shared by every operation that needs a service - concurrent callers used to each run their
+    // own refresh + DiscoverServices on the same GATT client. Callers own the timeout (Rx Timeout, a cancellation
+    // token): once the last one waiting gives up, the discovery is torn down. A caller with no timeout of its own is
+    // bounded by ServiceDiscoveryTimeout instead of waiting forever.
     static readonly TimeSpan ServiceDiscoveryTimeout = TimeSpan.FromSeconds(30);
     readonly SharedOperation<IReadOnlyList<BluetoothGattService>> serviceDiscovery = new();
 
 
     protected IObservable<IReadOnlyList<BluetoothGattService>> GetNativeServices() =>
-        ObservableTask.FromAsync<IReadOnlyList<BluetoothGattService>>(ct =>
+        ObservableTask.FromAsync<IReadOnlyList<BluetoothGattService>>(async ct =>
         {
             this.AssertConnection();
 
             if (!this.RequiresServiceDiscovery && this.Gatt?.Services != null)
-                return Task.FromResult<IReadOnlyList<BluetoothGattService>>(this.Gatt!.Services!.ToList());
+                return this.Gatt!.Services!.ToList();
 
-            return this.serviceDiscovery.RunAsync(
-                this.DiscoverServicesCore,
-                ServiceDiscoveryTimeout,
-                this.disconnectCts.Token,
-                ct
-            );
+            var disconnect = this.disconnectCts.Token;
+            try
+            {
+                return await this.serviceDiscovery
+                    .RunAsync(this.DiscoverServicesCore, ServiceDiscoveryTimeout, disconnect, ct)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (disconnect.IsCancellationRequested && !ct.IsCancellationRequested)
+            {
+                // The discovery's token is linked to the disconnect token, so whether WaitForOperation turns the
+                // cancellation into a BleException depends on the order the linked tokens fire in. Map it here
+                // so a disconnect always reports as one, never as the caller cancelling.
+                throw new BleException("[GetNativeServices] Peripheral disconnected during service discovery");
+            }
         });
 
 
