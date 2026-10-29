@@ -82,27 +82,19 @@
     </ItemGroup>
 
     <!--
-        Declared Age Range (Age Signals page): without this entitlement Apple's call never returns. Simulator builds
-        need no provisioning profile, so it is on there. For a device build, enable the Declared Age Range capability
-        on the App ID first, then drop the RuntimeIdentifier condition - a profile without it fails the signing step.
+        iOS capabilities that need a provisioning profile carrying them. Each is on for this repo's org.shiny.sample App ID
+        (its Xcode-managed "iOS Team Provisioning Profile: org.shiny.sample" has them all). To run the sample under your
+        own team, change ApplicationId, enable the capability on your App ID in the Apple developer portal and download a
+        fresh development profile - or comment out the entitlement for a page you don't need: a profile without the
+        capability fails the signing step. Simulator builds need no profile.
     -->
-    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' And $(RuntimeIdentifier.StartsWith('iossimulator'))">
-        <CustomEntitlements Include="com.apple.developer.declared-age-range"
-                            Type="Boolean"
-                            Value="true"
-                            Visible="false" />
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+        <!-- Age Signals page: Declared Age Range capability. Without it Apple's calls never return - they hang, not fail. -->
+        <CustomEntitlements Include="com.apple.developer.declared-age-range" Type="Boolean" Value="true" Visible="false" />
+
+        <!-- NFC page: NFC Tag Reading capability (never works in the simulator). TAG, not NDEF - App Store Connect rejects NDEF since the iOS 18 SDK. -->
+        <CustomEntitlements Include="com.apple.developer.nfc.readersession.formats" Type="StringArray" Value="TAG" Visible="false" />
     </ItemGroup>
-
-    <!--
-        NFC (NFC page) on iOS needs the NFC Tag Reading capability on the App ID and this entitlement. It is commented
-        out because a provisioning profile without the capability fails the signing step, and NFC never works in the
-        simulator anyway. Enable the capability, then uncomment to try the NFC page on an iPhone. TAG, not NDEF: App Store
-        Connect rejects NDEF since the iOS 18 SDK, and TAG covers NDEF sessions.
-
-        <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-            <CustomEntitlements Include="com.apple.developer.nfc.readersession.formats" Type="StringArray" Value="TAG" Visible="false" />
-        </ItemGroup>
-    -->
 
     <!--
         SSDP and WS-Discovery use raw multicast, which on iOS requires
