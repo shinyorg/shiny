@@ -23,6 +23,7 @@
         <Project Path="tests/Shiny.Wearables.Tests/Shiny.Wearables.Tests.csproj" />
         <Project Path="tests/Shiny.ScreenRecorder.Tests/Shiny.ScreenRecorder.Tests.csproj" />
         <Project Path="tests/Shiny.Gamepad.Tests/Shiny.Gamepad.Tests.csproj" />
+        <Project Path="tests/Shiny.Nfc.Tests/Shiny.Nfc.Tests.csproj" />
         <Project Path="tests/Shiny.AppStore.Tests/Shiny.AppStore.Tests.csproj" />
         <Project Path="tests/Shiny.AgeSignals.Tests/Shiny.AgeSignals.Tests.csproj" />
         <Project Path="tests/Shiny.Biometrics.Tests/Shiny.Biometrics.Tests.csproj" />
@@ -113,6 +114,7 @@
     <Project Path="src\Shiny.ScreenRecorder\Shiny.ScreenRecorder.csproj" />
     <Project Path="src\Shiny.ScreenRecorder.Linux\Shiny.ScreenRecorder.Linux.csproj" />
     <Project Path="src\Shiny.Gamepad\Shiny.Gamepad.csproj" />
+    <Project Path="src\Shiny.Nfc\Shiny.Nfc.csproj" />
     <Project Path="src\Shiny.AppStore\Shiny.AppStore.csproj" />
     <Project Path="src\Shiny.AgeSignals\Shiny.AgeSignals.csproj" />
     <Project Path="src\Shiny.Biometrics\Shiny.Biometrics.csproj" />

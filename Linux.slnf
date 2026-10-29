@@ -32,6 +32,7 @@
       "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
       "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
       "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
+      "src\\Shiny.Nfc\\Shiny.Nfc.csproj",
       "src\\Shiny.AppStore\\Shiny.AppStore.csproj",
       "src\\Shiny.Printers\\Shiny.Printers.csproj",
       "src\\Shiny.Printers.BluetoothLE\\Shiny.Printers.BluetoothLE.csproj",

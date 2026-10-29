@@ -42,6 +42,7 @@
             "src\\Shiny.ScreenRecorder\\Shiny.ScreenRecorder.csproj",
             "src\\Shiny.ScreenRecorder.Linux\\Shiny.ScreenRecorder.Linux.csproj",
             "src\\Shiny.Gamepad\\Shiny.Gamepad.csproj",
+            "src\\Shiny.Nfc\\Shiny.Nfc.csproj",
             "src\\Shiny.AppStore\\Shiny.AppStore.csproj",
             "src\\Shiny.AgeSignals\\Shiny.AgeSignals.csproj",
             "src\\Shiny.Biometrics\\Shiny.Biometrics.csproj",
