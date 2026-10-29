@@ -89,6 +89,8 @@
         <PackageVersion Include="Xamarin.GooglePlayServices.Basement" Version="118.10.0.2"/>
         <PackageVersion Include="Xamarin.GooglePlayServices.Tasks" Version="118.4.1.2"/>
         <PackageVersion Include="Xamarin.Google.Android.Play.Core.Common" Version="2.0.4.9"/>
+        <!-- 1.1.0.33 depends on exactly the AndroidX pins above (Fragment 1.8.9.3, Activity 1.13, Core 1.19) -->
+        <PackageVersion Include="Xamarin.AndroidX.Biometric" Version="1.1.0.33"/>
         <PackageVersion Include="Xamarin.AndroidX.Preference" Version="1.2.1.18"/>
         <PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.0.1.2"/>
         <PackageVersion Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1"/>

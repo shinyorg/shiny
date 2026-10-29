@@ -25,6 +25,7 @@
         <Project Path="tests/Shiny.Gamepad.Tests/Shiny.Gamepad.Tests.csproj" />
         <Project Path="tests/Shiny.AppStore.Tests/Shiny.AppStore.Tests.csproj" />
         <Project Path="tests/Shiny.AgeSignals.Tests/Shiny.AgeSignals.Tests.csproj" />
+        <Project Path="tests/Shiny.Biometrics.Tests/Shiny.Biometrics.Tests.csproj" />
         <Project Path="tests/Shiny.GameCenter.Tests/Shiny.GameCenter.Tests.csproj" />
         <Project Path="tests/Shiny.Geofencing.Regions.Tests/Shiny.Geofencing.Regions.Tests.csproj" />
         <Project Path="tests/Shiny.Locations.Tests/Shiny.Locations.Tests.csproj" />
@@ -114,6 +115,7 @@
     <Project Path="src\Shiny.Gamepad\Shiny.Gamepad.csproj" />
     <Project Path="src\Shiny.AppStore\Shiny.AppStore.csproj" />
     <Project Path="src\Shiny.AgeSignals\Shiny.AgeSignals.csproj" />
+    <Project Path="src\Shiny.Biometrics\Shiny.Biometrics.csproj" />
     <Project Path="src\Shiny.GameCenter\Shiny.GameCenter.csproj" />
     <Project Path="src\Shiny.Wearables\Shiny.Wearables.csproj" />
     <Project Path="src\Shiny.Mobile.CallDirectory\Shiny.Mobile.CallDirectory.csproj" />
