@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
@@ -10,12 +10,37 @@
 
         <RootNamespace>Shiny.Nfc</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Description>Shiny NFC - read and write NDEF tags on Android, iOS, Windows, macOS, Linux and Blazor WebAssembly (Web NFC)</Description>
-        <PackageTags>$(PackageTags) nfc ndef rfid tags</PackageTags>
+        <Description>Shiny NFC - read and write NDEF tags on Android, iOS, Windows, macOS and Linux (PC/SC readers) and Blazor WebAssembly (Web NFC)</Description>
+        <PackageTags>$(PackageTags) nfc ndef rfid tags pcsc</PackageTags>
+
+        <!-- imported explicitly below so Platforms\Pcsc can be compiled into the base, Windows and macOS targets -->
+        <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <!--
+        PC/SC readers are the NFC path on every desktop: winscard.dll on Windows, PCSC.framework on macOS,
+        pcsc-lite on Linux. The base target framework is also the plain .NET build on Windows and macOS, so
+        it carries all three and picks one at runtime. SCARD_READERSTATE is a struct holding a pointer to
+        the reader name and an inline ATR array, which LibraryImport cannot marshal without unsafe code.
+    -->
+    <PropertyGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)' Or $(TargetFramework.Contains('-windows')) Or $(TargetFramework.Contains('-macos'))">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ShinyNfcPcsc>true</ShinyNfcPcsc>
+    </PropertyGroup>
+
+    <!-- the Blazor WebAssembly backend imports wwwroot/nfc.js, served from _content/Shiny.Nfc/ -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Microsoft.JSInterop" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets" />
+
+    <ItemGroup Condition="'$(ShinyNfcPcsc)' == 'true'">
+        <Compile Include="Platforms\Pcsc\**\*.cs" />
     </ItemGroup>
 
 </Project>
