@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.Security"
+             x:Class="Sample.Shared.Maui.Pages.Security.NfcPage"
+             x:DataType="vm:NfcViewModel"
+             Title="NFC">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="8">
+            <Label Text="Status" FontAttributes="Bold" />
+            <Label Text="{Binding Status}" AutomationId="Status" />
+            <Button Text="Check Access" Command="{Binding CheckCommand}" AutomationId="CheckAccess" />
+
+            <Label Text="Read one tag" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Button Text="Read" Command="{Binding ReadCommand}" AutomationId="Read" />
+
+            <Label Text="Write one tag" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Entry Text="{Binding Uri}" Placeholder="https://shinylib.net" Keyboard="Url" />
+            <Entry Text="{Binding Text}" Placeholder="Optional text record" />
+            <Button Text="Write" Command="{Binding WriteCommand}" AutomationId="Write" />
+
+            <Label Text="Continuous scan" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Button Text="{Binding ScanButtonText}" Command="{Binding ToggleScanCommand}" AutomationId="ToggleScan" />
+
+            <Label Text="Result" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Label Text="{Binding Result}" AutomationId="Result" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

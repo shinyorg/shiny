@@ -94,6 +94,17 @@
     </ItemGroup>
 
     <!--
+        NFC (NFC page) on iOS needs the NFC Tag Reading capability on the App ID and this entitlement. It is commented
+        out because a provisioning profile without the capability fails the signing step, and NFC never works in the
+        simulator anyway. Enable the capability, then uncomment to try the NFC page on an iPhone. TAG, not NDEF: App Store
+        Connect rejects NDEF since the iOS 18 SDK, and TAG covers NDEF sessions.
+
+        <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+            <CustomEntitlements Include="com.apple.developer.nfc.readersession.formats" Type="StringArray" Value="TAG" Visible="false" />
+        </ItemGroup>
+    -->
+
+    <!--
         SSDP and WS-Discovery use raw multicast, which on iOS requires
         com.apple.developer.networking.multicast. That entitlement is granted per developer team
         only after Apple approves a request at

@@ -45,6 +45,8 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
             Add(FeatureGroup.Device, "🔋 Battery", "Observe battery level & state", "battery");
             Add(FeatureGroup.Device, "🌐 Connectivity", "Observe network connectivity", "connectivity");
             Add(FeatureGroup.Device, "🎂 Age Signals", "Store-shared age range (Declared Age Range)", "agesignals");
+            Add(FeatureGroup.Device, "👆 Biometrics", "Touch ID / Apple Watch verification", "biometrics");
+            Add(FeatureGroup.Peripherals, "📇 NFC", "Read & write NDEF tags on a PC/SC reader", "nfc");
             Add(FeatureGroup.Device, "📝 Events", "Captured delegate events (SQLite)", "events");
             return list;
         }
@@ -127,6 +129,10 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         // Declared Age Range (iOS 26+) / Play Age Signals; Mac Catalyst has no implementation
         if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
             Add(FeatureGroup.Device, "🎂 Age Signals", "Store-shared age range (Texas SB 2420 & co.)", "agesignals");
+        Add(FeatureGroup.Device, "👆 Biometrics", "Touch ID, Face ID, fingerprint & Windows Hello", "biometrics");
+        // CoreNFC has no reader on a Mac, so Mac Catalyst has no NFC; Windows uses a PC/SC reader
+        if (!OperatingSystem.IsMacCatalyst())
+            Add(FeatureGroup.Peripherals, "📇 NFC", "Read & write NDEF tags", "nfc");
         Add(FeatureGroup.Device, "⚙️ Settings", "Connectivity, battery, key-value store", "settings");
         Add(FeatureGroup.Device, "📝 Events", "Captured delegate events (SQLite)", "events");
         return list;

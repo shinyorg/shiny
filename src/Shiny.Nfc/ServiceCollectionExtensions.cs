@@ -21,7 +21,7 @@ public static class NfcServiceCollectionExtensions
     /// (the App Store rejects <c>NDEF</c> since the iOS 18 SDK; <c>TAG</c> covers NDEF sessions).
     /// Needs an iPhone 7 or later; the iOS simulator and Mac Catalyst report no NFC.</para>
     /// <para><b>Windows and macOS:</b> NFC goes through a PC/SC contactless reader (an ACR122U,
-    /// for example), with no extra setup. A laptop's built-in NFC is usually a PC/SC
+    /// for example). A sandboxed macOS app also needs the <c>com.apple.security.smartcard</c> entitlement. A laptop's built-in NFC is usually a PC/SC
     /// reader too.</para>
     /// </remarks>
     public static IServiceCollection AddNfc(this IServiceCollection services)

@@ -96,7 +96,9 @@ builder.Services.AddNfc();
   <array><string>TAG</string></array>
   ```
 - **Linux**: `pcscd` running and `libpcsclite1` installed, plus the reader's CCID driver (`pcsc_scan` to check).
-- **Windows / macOS**: nothing - plug in a PC/SC reader.
+- **Windows**: nothing - plug in a PC/SC reader.
+- **macOS**: a sandboxed app needs `<key>com.apple.security.smartcard</key><true/>` in Entitlements.plist, or PC/SC
+  finds no readers.
 
 ## API
 

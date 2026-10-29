@@ -6,6 +6,9 @@
     <true/>
     <key>com.apple.security.device.bluetooth</key>
     <true/>
+    <!-- PC/SC (NFC page): a sandboxed app needs this to reach a smart card / NFC reader -->
+    <key>com.apple.security.smartcard</key>
+    <true/>
     <key>com.apple.security.network.client</key>
     <true/>
     <!-- Shiny.Printing: the macOS head prints through CUPS (lp), which a sandboxed app can only reach with this -->

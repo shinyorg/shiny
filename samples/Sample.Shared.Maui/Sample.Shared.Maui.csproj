@@ -54,6 +54,8 @@
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
 
         <ProjectReference Include="..\..\src\Shiny.AgeSignals\Shiny.AgeSignals.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Biometrics\Shiny.Biometrics.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Contacts\Shiny.Contacts.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Calendar\Shiny.Calendar.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Gps\Shiny.Gps.csproj" />

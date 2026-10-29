@@ -127,6 +127,12 @@ public static class ShinyRegistrations
         // "not supported" everywhere else (including Mac Catalyst)
         s.AddAgeSignals();
 
+        // Biometrics: LocalAuthentication on Apple, BiometricPrompt on Android, Windows Hello
+        s.AddBiometrics();
+
+        // NFC (NDEF): reader mode on Android, CoreNFC on iOS, a PC/SC reader on Windows and macOS
+        s.AddNfc();
+
 #if IOS || ANDROID || MACCATALYST
         // Contacts: Shiny.Contacts has native implementations for iOS, Mac Catalyst, macOS and Android.
         s.AddContactStore();

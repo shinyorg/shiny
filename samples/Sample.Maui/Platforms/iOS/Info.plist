@@ -75,6 +75,10 @@
     <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
     <key>NSCalendarsUsageDescription</key>
     <string>This app needs access to your calendar to demonstrate reading and editing device events</string>
+    <key>NSFaceIDUsageDescription</key>
+    <string>The Biometrics page verifies you with Face ID</string>
+    <key>NFCReaderUsageDescription</key>
+    <string>The NFC page reads and writes NFC tags</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>bluetooth-central</string>
