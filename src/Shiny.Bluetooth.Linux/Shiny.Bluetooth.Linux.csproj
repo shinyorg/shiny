@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny Bluetooth for Linux via BlueZ/D-Bus - classic Bluetooth (BR/EDR) RFCOMM client and server, discovery, pairing and discoverability</Description>
+        <PackageTags>bluetooth classic rfcomm spp serial br/edr linux bluez</PackageTags>
+        <RootNamespace>Shiny.Bluetooth</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Bluetooth\Shiny.Bluetooth.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Tmds.DBus.Protocol" />
+    </ItemGroup>
+</Project>

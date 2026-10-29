@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        Classic Bluetooth (BR/EDR) - RFCOMM client and server, inquiry, pairing. iOS and Mac Catalyst
+        are deliberately absent: classic Bluetooth there is ExternalAccessory, which only talks to MFi
+        accessories, so there is nothing a general-purpose library can offer. Linux ships separately in
+        Shiny.Bluetooth.Linux so Tmds.DBus never reaches a WebAssembly app through the net10.0 build.
+    -->
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacOsTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.Bluetooth</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny Bluetooth - classic Bluetooth (BR/EDR) RFCOMM client and server, device discovery, pairing and discoverability for Android, Windows and macOS (Linux via Shiny.Bluetooth.Linux)</Description>
+        <PackageTags>bluetooth classic rfcomm spp serial br/edr android windows macos linux</PackageTags>
+    </PropertyGroup>
+
+    <!-- IOBluetooth has no .NET binding, so macOS talks to it through objc_msgSend; LibraryImport's marshalling is unsafe -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-macos'))">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+</Project>
