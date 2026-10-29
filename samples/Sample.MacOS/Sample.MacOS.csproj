@@ -15,6 +15,17 @@
         <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     </PropertyGroup>
 
+    <!--
+        Capabilities that need a provisioning profile carrying them, on for this repo's org.shiny.sample App ID. To run
+        the sample under your own team, change ApplicationId, enable the capability on your App ID in the Apple developer
+        portal and download a fresh development profile - or comment the entitlement out: a profile without the
+        capability fails the signing step. The sandbox entitlements in Entitlements.plist need no profile.
+    -->
+    <ItemGroup>
+        <!-- Push page: Push Notifications capability -->
+        <CustomEntitlements Include="aps-environment" Type="String" Value="development" Visible="false" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Platforms.MacOS" />
         <PackageReference Include="Microsoft.Maui.Platforms.MacOS.Essentials" />
