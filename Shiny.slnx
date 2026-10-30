@@ -19,6 +19,7 @@
         <Project Path="tests/Shiny.Mobile.InAppPurchases.Server.Tests/Shiny.Mobile.InAppPurchases.Server.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Discovery.Tests/Shiny.Net.Discovery.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Wifi.Tests/Shiny.Net.Wifi.Tests.csproj" />
+        <Project Path="tests/Shiny.Bluetooth.Tests/Shiny.Bluetooth.Tests.csproj" />
         <Project Path="tests/Shiny.Net.Vpn.Tests/Shiny.Net.Vpn.Tests.csproj" />
         <Project Path="tests/Shiny.Wearables.Tests/Shiny.Wearables.Tests.csproj" />
         <Project Path="tests/Shiny.ScreenRecorder.Tests/Shiny.ScreenRecorder.Tests.csproj" />
@@ -48,6 +49,7 @@
     </Folder>
     <Folder Name="/Linux/">
         <Project Path="src\Shiny.BluetoothLE.Linux\Shiny.BluetoothLE.Linux.csproj" />
+        <Project Path="src\Shiny.Bluetooth.Linux\Shiny.Bluetooth.Linux.csproj" />
         <Project Path="src\Shiny.BluetoothLE.Hosting.Linux\Shiny.BluetoothLE.Hosting.Linux.csproj" />
         <Project Path="src\Shiny.Notifications.Linux\Shiny.Notifications.Linux.csproj" />
         <Project Path="src\Shiny.Net.Wifi.Linux\Shiny.Net.Wifi.Linux.csproj" />
@@ -78,6 +80,7 @@
     <Project Path="src\Shiny.AppFunctions.SourceGenerators\Shiny.AppFunctions.SourceGenerators.csproj" />
     <Project Path="src\Shiny.AppFunctions.Build\Shiny.AppFunctions.Build.csproj" />
     <Project Path="src\Shiny.AppFunctions.Extensions.AI\Shiny.AppFunctions.Extensions.AI.csproj" />
+    <Project Path="src\Shiny.Bluetooth\Shiny.Bluetooth.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
     <Project Path="src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
     <Project Path="src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
