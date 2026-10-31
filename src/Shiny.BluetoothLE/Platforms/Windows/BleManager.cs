@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ using Shiny.BluetoothLE.Infrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public partial class BleManager : IBleManager, IShinyStartupTask
+public partial class BleManager : INativeBleManager, IShinyStartupTask
 {
     static readonly TimeSpan ScanRestartCooldown = TimeSpan.FromMilliseconds(350);
     readonly IServiceProvider services;
@@ -83,7 +84,80 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     }
 
     public bool IsScanning { get; private set; }
-    public Radio? SelectedRadio { get; set; }
+    public Radio? SelectedRadio
+    {
+        get;
+        set
+        {
+            field = value;
+            if (this.SelectedAdapter is { } adapter)
+                this.RaiseNativeObjectLoaded(adapter);
+        }
+    }
+
+    public event EventHandler<object>? NativeObjectLoaded;
+
+
+    /// <summary>
+    /// Selects a <c>BluetoothAdapter</c> supplied by the caller (and its radio) instead of the first Low Energy adapter
+    /// Shiny finds. Not while scanning. The advertisement watcher always uses the system's default adapter, so this
+    /// changes which radio access and state come from, not which adapter scans.
+    /// <b>Advanced - only with deep knowledge of the platform Bluetooth stack.</b> Shiny assumes it owns the native
+    /// object, and one configured differently can silently break scanning, connections and delegates.
+    /// </summary>
+    /// <param name="adapter">The adapter to use; it must support Low Energy.</param>
+    /// <param name="cancelToken">Cancels the radio lookup.</param>
+    public async Task SetAdapterAsync(BluetoothAdapter adapter, CancellationToken cancelToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(adapter);
+        if (!adapter.IsLowEnergySupported)
+            throw new ArgumentException("The adapter does not support Bluetooth Low Energy", nameof(adapter));
+
+        if (this.IsScanning)
+            throw new InvalidOperationException("The adapter cannot be changed while scanning");
+
+        var radio = await adapter.GetRadioAsync().AsTask(cancelToken).ConfigureAwait(false)
+            ?? throw new InvalidOperationException("The adapter has no radio");
+
+        this.adapters.AddOrUpdate(radio, adapter);
+        this.logger.LogWarning("BluetoothAdapter was set externally");
+        this.SelectedRadio = radio;
+    }
+
+
+    Task INativeBleManager.SetNativeObjectAsync(object native, CancellationToken cancelToken)
+    {
+        if (native is not BluetoothAdapter adapter)
+            throw new ArgumentException($"Expected a BluetoothAdapter, got {native?.GetType().FullName ?? "null"}", nameof(native));
+
+        return this.SetAdapterAsync(adapter, cancelToken);
+    }
+
+    void RaiseNativeObjectLoaded(object native)
+    {
+        // a diagnostics subscriber must never break the call that loaded the native object
+        try
+        {
+            this.NativeObjectLoaded?.Invoke(this, native);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "A NativeObjectLoaded handler threw");
+        }
+    }
+
+    /// <summary>
+    /// The adapter that owns <see cref="SelectedRadio"/>, or null until a radio has been resolved through
+    /// <see cref="GetRadios"/> (or when <see cref="SelectedRadio"/> was set to a radio found some other way).
+    /// </summary>
+    public BluetoothAdapter? SelectedAdapter => this.SelectedRadio is { } radio && this.adapters.TryGetValue(radio, out var adapter) ? adapter : null;
+
+    /// <summary>
+    /// The advertisement watcher behind the current scan, or null when not scanning.
+    /// </summary>
+    public BluetoothLEAdvertisementWatcher? Watcher => this.watcher;
+
+    object? INativeBleManager.NativeObject => this.SelectedAdapter;
 
 
     public IEnumerable<IPeripheral> GetConnectedPeripherals()
@@ -305,6 +379,9 @@ public partial class BleManager : IBleManager, IShinyStartupTask
     });
 
 
+    // radio -> the adapter it came from, so SelectedAdapter can answer without another async lookup
+    readonly ConditionalWeakTable<Radio, BluetoothAdapter> adapters = new();
+
     public IObservable<IReadOnlyList<Radio>> GetRadios() => ObservableTask.FromAsync<IReadOnlyList<Radio>>(async ct =>
     {
         var list = new List<Radio>();
@@ -319,6 +396,7 @@ public partial class BleManager : IBleManager, IShinyStartupTask
             if (native.IsLowEnergySupported)
             {
                 var radio = await native.GetRadioAsync();
+                this.adapters.AddOrUpdate(radio, native);
                 list.Add(radio);
             }
         }

@@ -14,7 +14,7 @@ using Shiny.BluetoothLE.Intrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public partial class Peripheral : BluetoothGattCallback, IPeripheral
+public partial class Peripheral : BluetoothGattCallback, INativePeripheral
 {
     readonly AndroidPlatform platform;
     readonly BleManager manager;
@@ -42,6 +42,7 @@ public partial class Peripheral : BluetoothGattCallback, IPeripheral
         new (message, (int)status);
 
     public BluetoothDevice Native { get; }
+    object? INativePeripheral.NativeObject => this.Native;
     public BluetoothGatt? Gatt { get; private set; }
 
     public string? Name => this.Native.Name;

@@ -546,6 +546,41 @@ public class ManagedScanResult : NotifyPropertyChanged, IAdvertisementData
 
 ## Feature Interfaces (Optional Capabilities)
 
+### INativeBleManager / INativePeripheral
+
+```csharp
+// Prefer the GetNativeObject() / GetNativeObject<T>() extensions (FeatureNative) - null on Blazor WebAssembly
+public interface INativeBleManager : IBleManager
+{
+    // CBCentralManager (Apple, null until first used), BluetoothManager (Android),
+    // BluetoothAdapter (Windows, null until a radio is resolved), BlueZ adapter object path string (Linux)
+    object? NativeObject { get; }
+
+    // raised when the platform creates it (first use on Apple/Linux, each radio selection on Windows);
+    // never on Android. Prefer bleManager.WhenNativeObjectLoaded(), which also emits an existing object
+    event EventHandler<object>? NativeObjectLoaded;
+
+    // EXPERTS ONLY - replaces the object Shiny would create; before first use only (else InvalidOperationException),
+    // wrong type -> ArgumentException. CBCentralManager (Shiny becomes its delegate), BluetoothManager,
+    // BluetoothAdapter (must support LE), or on Linux an adapter path string ("/org/bluez/hci1") / connected DBusConnection.
+    // Extension IBleManager.SetNativeObjectAsync throws NotSupportedException on Blazor.
+    // Typed: Apple SetManager(CBCentralManager), Android SetNative(BluetoothManager),
+    //        Windows SetAdapterAsync(BluetoothAdapter, ct), Linux SetConnection(DBusConnection?, string? adapterObjectPath)
+    Task SetNativeObjectAsync(object native, CancellationToken cancelToken = default);
+}
+
+public interface INativePeripheral : IPeripheral
+{
+    // CBPeripheral (Apple), BluetoothDevice (Android), BluetoothLEDevice (Windows, null once cancelled),
+    // BlueZ device object path string (Linux)
+    object? NativeObject { get; }
+}
+
+var central = bleManager.GetNativeObject<CoreBluetooth.CBCentralManager>();
+bleManager.WhenNativeObjectLoaded().Subscribe(native => { /* CBCentralManager, BluetoothManager, ... */ });
+var device = peripheral.GetNativeObject<Android.Bluetooth.BluetoothDevice>();
+```
+
 ### ICanRequestMtu
 
 ```csharp

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using CoreBluetooth;
 using Foundation;
@@ -12,7 +14,7 @@ using Shiny.BluetoothLE.Intrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public class BleManager : CBCentralManagerDelegate, IBleManager
+public class BleManager : CBCentralManagerDelegate, INativeBleManager
 {
     readonly IServiceProvider services;
     readonly IOperationQueue operations;
@@ -39,12 +41,71 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
 
     CBCentralManager? manager;
+    readonly object managerLock = new();
+
+    // the field, not Manager - reading it from an inspector must not create the manager (and its permission prompt)
+    object? INativeBleManager.NativeObject => this.manager;
+    public event EventHandler<object>? NativeObjectLoaded;
+
+    void RaiseNativeObjectLoaded(object native)
+    {
+        // a diagnostics subscriber must never break the call that created the manager
+        try
+        {
+            this.NativeObjectLoaded?.Invoke(this, native);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "A NativeObjectLoaded handler threw");
+        }
+    }
+
+    /// <summary>
+    /// Uses a <c>CBCentralManager</c> created by the caller instead of the one Shiny would create, and makes this
+    /// manager its delegate. Only before Bluetooth is first used - it throws once the manager exists.
+    /// <b>Advanced - only with deep knowledge of the platform Bluetooth stack.</b> Shiny assumes it owns the native
+    /// object, and one configured differently can silently break scanning, connections and delegates.
+    /// </summary>
+    /// <param name="manager">The central to use.</param>
+    public void SetManager(CBCentralManager manager)
+    {
+        ArgumentNullException.ThrowIfNull(manager);
+        lock (this.managerLock)
+        {
+            if (this.manager != null)
+                throw new InvalidOperationException("The CBCentralManager has already been created - it can only be set before Bluetooth is first used");
+
+            manager.Delegate = this;
+            this.manager = manager;
+        }
+        this.logger.LogWarning("CBCentralManager was set externally - Shiny no longer controls how it was configured");
+        this.RaiseNativeObjectLoaded(manager);
+    }
+
+
+    Task INativeBleManager.SetNativeObjectAsync(object native, CancellationToken cancelToken)
+    {
+        if (native is not CBCentralManager central)
+            throw new ArgumentException($"Expected a CBCentralManager, got {native?.GetType().FullName ?? "null"}", nameof(native));
+
+        this.SetManager(central);
+        return Task.CompletedTask;
+    }
+
+
     public CBCentralManager Manager
     {
         get
         {
-            if (this.manager == null)
+            if (this.manager != null)
+                return this.manager;
+
+            CBCentralManager created;
+            lock (this.managerLock)
             {
+                if (this.manager != null)
+                    return this.manager;
+
                 var opts = new CBCentralInitOptions
                 {
                     ShowPowerAlert = this.config.ShowPowerAlert
@@ -52,8 +113,10 @@ public class BleManager : CBCentralManagerDelegate, IBleManager
 
                 this.manager = new CBCentralManager(this, this.config.DispatchQueue, opts);
                 this.manager.Delegate = this;
+                created = this.manager!;
             }
-            return this.manager;
+            this.RaiseNativeObjectLoaded(created);
+            return created;
         }
     }
 

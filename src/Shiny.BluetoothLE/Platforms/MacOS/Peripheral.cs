@@ -15,7 +15,7 @@ using Shiny.BluetoothLE.Intrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public partial class Peripheral : CBPeripheralDelegate, IPeripheral
+public partial class Peripheral : CBPeripheralDelegate, INativePeripheral
 {
     readonly BleManager manager;
     readonly ILogger logger;
@@ -41,6 +41,7 @@ public partial class Peripheral : CBPeripheralDelegate, IPeripheral
 
 
     public CBPeripheral Native { get; }
+    object? INativePeripheral.NativeObject => this.Native;
 
     public string Uuid { get; }
     public string? Name => this.Native.Name;

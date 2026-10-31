@@ -16,7 +16,7 @@ using Shiny.BluetoothLE.Infrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public partial class Peripheral : IPeripheral
+public partial class Peripheral : INativePeripheral
 {
     readonly DBusConnection connection;
     readonly BluezDevice device;
@@ -44,7 +44,17 @@ public partial class Peripheral : IPeripheral
     }
 
 
-    internal string ObjectPath => this.device.ObjectPath;
+    /// <summary>
+    /// The BlueZ device object path (e.g. <c>/org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF</c>).
+    /// </summary>
+    public string ObjectPath => this.device.ObjectPath;
+
+    /// <summary>
+    /// The system bus connection this peripheral talks to BlueZ over.
+    /// </summary>
+    public DBusConnection Connection => this.connection;
+
+    object? INativePeripheral.NativeObject => this.ObjectPath;
     public string Uuid { get; }
     public string? Name { get; internal set; }
     public int Mtu => 512 - BleConstants.AttHeaderSize; // BlueZ negotiates MTU internally; 512 is a safe assumed ATT MTU

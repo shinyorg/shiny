@@ -15,12 +15,14 @@ using Shiny.BluetoothLE.Infrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public class BleManager : IBleManager, IAsyncDisposable
+public class BleManager : INativeBleManager, IAsyncDisposable
 {
     readonly IOperationQueue operations;
     readonly ILogger<BleManager> logger;
     readonly ILogger<Peripheral> peripheralLogger;
     DBusConnection? connection;
+    bool ownsConnection = true;
+    string adapterPath = BluezConstants.DefaultAdapterPath;
     Task? connecting;
     BluezAdapter? adapter;
     readonly ConcurrentDictionary<string, Peripheral> peripherals = new();
@@ -39,6 +41,83 @@ public class BleManager : IBleManager, IAsyncDisposable
 
     public bool IsScanning { get; private set; }
     public AccessState CurrentAccess => AccessState.Unknown;
+
+    /// <summary>
+    /// The system bus connection, or null until Bluetooth is first used.
+    /// </summary>
+    public DBusConnection? Connection => this.connection;
+
+    /// <summary>
+    /// The BlueZ adapter object path (e.g. <c>/org/bluez/hci0</c>), or null until Bluetooth is first used.
+    /// </summary>
+    public string? AdapterObjectPath => this.adapter?.ObjectPath;
+
+    object? INativeBleManager.NativeObject => this.AdapterObjectPath;
+    public event EventHandler<object>? NativeObjectLoaded;
+
+    /// <summary>
+    /// Uses a system bus connection and/or BlueZ adapter supplied by the caller instead of the system bus and
+    /// <c>/org/bluez/hci0</c>. Only before Bluetooth is first used - it throws once the connection exists. A supplied
+    /// connection must already be connected, and is not disposed with this manager.
+    /// <b>Advanced - only with deep knowledge of BlueZ and D-Bus.</b> Shiny assumes it owns the connection, and one
+    /// shared with other code can silently break discovery and notifications (a handler that throws on it
+    /// disconnects everything).
+    /// </summary>
+    /// <param name="connection">A connected system bus connection, or null to let Shiny open its own.</param>
+    /// <param name="adapterObjectPath">The BlueZ adapter object path (e.g. <c>/org/bluez/hci1</c>), or null for <c>/org/bluez/hci0</c>.</param>
+    public void SetConnection(DBusConnection? connection, string? adapterObjectPath = null)
+    {
+        if (this.connection != null)
+            throw new InvalidOperationException("The D-Bus connection already exists - it can only be set before Bluetooth is first used");
+
+        if (adapterObjectPath != null)
+        {
+            if (!adapterObjectPath.StartsWith("/org/bluez/"))
+                throw new ArgumentException("Expected a BlueZ adapter object path such as /org/bluez/hci1", nameof(adapterObjectPath));
+
+            this.adapterPath = adapterObjectPath.TrimEnd('/');
+        }
+        if (connection != null)
+        {
+            this.connection = connection;
+            this.connecting = Task.CompletedTask;
+            this.ownsConnection = false;
+        }
+        this.logger.LogWarning("The BlueZ connection/adapter was set externally ({AdapterPath})", this.adapterPath);
+    }
+
+
+    Task INativeBleManager.SetNativeObjectAsync(object native, CancellationToken cancelToken)
+    {
+        switch (native)
+        {
+            case string path:
+                this.SetConnection(null, path);
+                break;
+
+            case DBusConnection conn:
+                this.SetConnection(conn);
+                break;
+
+            default:
+                throw new ArgumentException($"Expected a BlueZ adapter object path or a DBusConnection, got {native?.GetType().FullName ?? "null"}", nameof(native));
+        }
+        return Task.CompletedTask;
+    }
+
+
+    void RaiseNativeObjectLoaded(object native)
+    {
+        // a diagnostics subscriber must never break the call that loaded the native object
+        try
+        {
+            this.NativeObjectLoaded?.Invoke(this, native);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "A NativeObjectLoaded handler threw");
+        }
+    }
 
 
     async Task<DBusConnection> GetConnectionAsync(CancellationToken ct = default)
@@ -60,7 +139,10 @@ public class BleManager : IBleManager, IAsyncDisposable
         if (this.adapter == null)
         {
             var conn = await this.GetConnectionAsync(ct).ConfigureAwait(false);
-            this.adapter = new BluezAdapter(conn);
+            // two callers can both get here - only the one that wins reports the load
+            var created = new BluezAdapter(conn, this.adapterPath);
+            if (Interlocked.CompareExchange(ref this.adapter, created, null) == null)
+                this.RaiseNativeObjectLoaded(created.ObjectPath);
         }
         return this.adapter;
     }
@@ -234,7 +316,7 @@ public class BleManager : IBleManager, IAsyncDisposable
         var objectPath = (string)reader.ReadObjectPath();
 
         // Check if this is a device under our adapter
-        if (!objectPath.StartsWith(BluezConstants.DefaultAdapterPath))
+        if (!objectPath.StartsWith(this.adapterPath + "/"))
             return;
 
         var interfacesEnd = reader.ReadArrayStart(DBusType.DictEntry);
@@ -299,7 +381,7 @@ public class BleManager : IBleManager, IAsyncDisposable
     void ProcessPropertiesChanged(Message message, IObserver<ScanResult> ob)
     {
         var path = message.PathAsString;
-        if (path == null || !path.StartsWith(BluezConstants.DefaultAdapterPath + "/dev_"))
+        if (path == null || !path.StartsWith(this.adapterPath + "/dev_"))
             return;
 
         var reader = message.GetBodyReader();
@@ -360,9 +442,10 @@ public class BleManager : IBleManager, IAsyncDisposable
         // GetManagedObjects returns a{oa{sa{sv}}} which we parse via MessageValueReader
         var devices = await conn.CallAsync(
             msg,
-            static (Message reply, object? _) =>
+            static (Message reply, object? state) =>
             {
                 var result = new List<(string path, string? name, string? address, short rssi, string[]? uuids, short txPower)>();
+                var devicePrefix = (string)state!;
                 var reader = reply.GetBodyReader();
 
                 var objectsEnd = reader.ReadArrayStart(DBusType.DictEntry);
@@ -383,7 +466,7 @@ public class BleManager : IBleManager, IAsyncDisposable
                         var iface = reader.ReadString();
                         var propsEnd = reader.ReadArrayStart(DBusType.DictEntry);
 
-                        if (iface == BluezConstants.DeviceInterface && path.StartsWith(BluezConstants.DefaultAdapterPath))
+                        if (iface == BluezConstants.DeviceInterface && path.StartsWith(devicePrefix))
                         {
                             isDevice = true;
                             while (reader.HasNext(propsEnd))
@@ -428,7 +511,8 @@ public class BleManager : IBleManager, IAsyncDisposable
 
                 return result;
             },
-            ct
+            ct,
+            this.adapterPath + "/"
         ).ConfigureAwait(false);
 
         foreach (var dev in devices)
@@ -468,7 +552,8 @@ public class BleManager : IBleManager, IAsyncDisposable
     {
         if (this.connection != null)
         {
-            this.connection.Dispose();
+            if (this.ownsConnection)
+                this.connection.Dispose();
             this.connection = null;
             this.connecting = null;
         }

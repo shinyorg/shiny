@@ -16,7 +16,7 @@ using Shiny.BluetoothLE.Infrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public partial class Peripheral : IPeripheral
+public partial class Peripheral : INativePeripheral
 {
     static readonly TimeSpan ConnectAttemptTimeout = TimeSpan.FromSeconds(8);
     static readonly TimeSpan SlowConnectWarningThreshold = TimeSpan.FromSeconds(2);
@@ -50,7 +50,8 @@ public partial class Peripheral : IPeripheral
 
     public BluetoothLEDevice? Native { get; private set; }
     public ulong BluetoothAddress { get; }
-    public DeviceInformation DeviceInfo => this.Native!.DeviceInformation;
+    object? INativePeripheral.NativeObject => this.Native;
+    public DeviceInformation? DeviceInfo => this.Native?.DeviceInformation;
     public string Uuid { get; }
     public string? Name => this.Native?.Name;
     internal bool CanReuse => this.Native != null;

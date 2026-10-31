@@ -9,13 +9,14 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral : ICanPairPeripherals
 {
-    public PairingState PairingStatus => this.DeviceInfo.Pairing.IsPaired ? PairingState.Paired : PairingState.NotPaired;
+    public PairingState PairingStatus => this.DeviceInfo?.Pairing.IsPaired == true ? PairingState.Paired : PairingState.NotPaired;
 
     public IObservable<bool> PairingRequest(string? pin = null) => ObservableTask.FromAsync(async ct =>
     {
+        var info = this.DeviceInfo ?? throw new BleException("Device is disposed");
         if (pin.IsEmpty())
         {
-            var result = await this.DeviceInfo.Pairing.PairAsync(DevicePairingProtectionLevel.None);
+            var result = await info.Pairing.PairAsync(DevicePairingProtectionLevel.None);
             return result.Status == DevicePairingResultStatus.Paired;
         }
 
@@ -43,13 +44,13 @@ public partial class Peripheral : ICanPairPeripherals
 
         try
         {
-            this.DeviceInfo.Pairing.Custom.PairingRequested += handler;
-            var result = await this.DeviceInfo.Pairing.Custom.PairAsync(pairingKind);
+            info.Pairing.Custom.PairingRequested += handler;
+            var result = await info.Pairing.Custom.PairAsync(pairingKind);
             return result.Status == DevicePairingResultStatus.Paired;
         }
         finally
         {
-            this.DeviceInfo.Pairing.Custom.PairingRequested -= handler;
+            info.Pairing.Custom.PairingRequested -= handler;
         }
     });
 }

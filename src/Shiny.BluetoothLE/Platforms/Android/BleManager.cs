@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
 using Android;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
@@ -19,7 +21,7 @@ using Shiny.BluetoothLE.Infrastructure;
 namespace Shiny.BluetoothLE;
 
 
-public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
+public partial class BleManager : ScanCallback, INativeBleManager, IShinyStartupTask
 {
     public const string BroadcastReceiverName = "org.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
 
@@ -65,7 +67,47 @@ public partial class BleManager : ScanCallback, IBleManager, IShinyStartupTask
     }
 
     public bool IsScanning { get; private set; }
-    public BluetoothManager Native { get; }
+    public BluetoothManager Native { get; private set; }
+    object? INativeBleManager.NativeObject => this.Native;
+
+    // the BluetoothManager exists from construction, so there is never a load to report
+    public event EventHandler<object>? NativeObjectLoaded;
+
+
+    /// <summary>
+    /// Uses a <c>BluetoothManager</c> supplied by the caller instead of the system service Shiny resolves. Only
+    /// before the manager is used - it throws once a scan has started or a peripheral is known.
+    /// <b>Advanced - only with deep knowledge of the platform Bluetooth stack.</b> Shiny assumes it owns the native
+    /// object, and one configured differently can silently break scanning, connections and delegates.
+    /// </summary>
+    /// <param name="manager">The manager to use.</param>
+    public void SetNative(BluetoothManager manager)
+    {
+        ArgumentNullException.ThrowIfNull(manager);
+        if (this.IsScanning || !this.peripherals.IsEmpty)
+            throw new InvalidOperationException("The BluetoothManager is already in use - it can only be set before the first scan or peripheral");
+
+        this.Native = manager;
+        this.logger.LogWarning("BluetoothManager was set externally - Shiny no longer controls how it was obtained");
+        try
+        {
+            this.NativeObjectLoaded?.Invoke(this, manager);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "A NativeObjectLoaded handler threw");
+        }
+    }
+
+
+    Task INativeBleManager.SetNativeObjectAsync(object native, CancellationToken cancelToken)
+    {
+        if (native is not BluetoothManager manager)
+            throw new ArgumentException($"Expected a BluetoothManager, got {native?.GetType().FullName ?? "null"}", nameof(native));
+
+        this.SetNative(manager);
+        return Task.CompletedTask;
+    }
 
     /// <summary>
     /// Whether the adapter is actually on. ConnectGatt below this either returns null or produces a
