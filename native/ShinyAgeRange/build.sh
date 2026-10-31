@@ -12,7 +12,25 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 SRC="$DIR/Sources"
 OUT="$DIR/build"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/$NAME.XXXXXX")"
+LOCK="$DIR/.build.lock"
 trap 'rm -rf "$WORK"' EXIT
+
+# net10.0-ios and net10.0-macos both run this, in parallel on a multi-TFM build. One builds; the other waits, then finds
+# the framework up to date. (mkdir is the lock - macOS has no flock.) A lock older than 10 minutes is a killed build.
+while ! mkdir "$LOCK" 2>/dev/null; do
+    if [ -n "$(find "$LOCK" -maxdepth 0 -mmin +10 2>/dev/null)" ]; then
+        rm -rf "$LOCK"
+    else
+        sleep 1
+    fi
+done
+trap 'rm -rf "$WORK" "$LOCK"' EXIT
+
+PLIST="$OUT/$NAME.xcframework/Info.plist"
+if [ -f "$PLIST" ] && [ -z "$(find "$SRC" "$0" -newer "$PLIST" -type f 2>/dev/null)" ]; then
+    echo "$NAME.xcframework is up to date"
+    exit 0
+fi
 
 build_slice() {
     local sdk=$1 plist_platform=$2 slice=$3 min_key=$4 min_version=$5
