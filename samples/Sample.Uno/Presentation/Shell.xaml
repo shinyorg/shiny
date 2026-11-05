@@ -1,0 +1,19 @@
+<UserControl x:Class="Sample.Uno.Presentation.Shell"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:utu="using:Uno.Toolkit.UI">
+    <!-- Toolkit's extended splash - wired in by UseToolkitNavigation + NavigateAsync, unchanged by Shiny's builder -->
+    <utu:ExtendedSplashScreen x:Name="Splash"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              HorizontalContentAlignment="Stretch"
+                              VerticalContentAlignment="Stretch">
+        <utu:ExtendedSplashScreen.LoadingContentTemplate>
+            <DataTemplate>
+                <Grid>
+                    <ProgressRing IsActive="True" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Grid>
+            </DataTemplate>
+        </utu:ExtendedSplashScreen.LoadingContentTemplate>
+    </utu:ExtendedSplashScreen>
+</UserControl>

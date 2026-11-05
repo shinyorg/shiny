@@ -1,6 +1,6 @@
 ---
 name: shiny-core
-description: Core infrastructure, hosting, DI, key-value stores, lifecycle hooks, screen info and foldable posture, and platform abstractions for Shiny on .NET MAUI, iOS, Android, Mac Catalyst, macOS, Windows, Linux, and Blazor WebAssembly
+description: Core infrastructure, hosting, DI, key-value stores, lifecycle hooks, screen info and foldable posture, and platform abstractions for Shiny on .NET MAUI, Avalonia, Uno Platform, iOS, Android, Mac Catalyst, macOS, Windows, Linux, and Blazor WebAssembly
 auto_invoke: true
 triggers:
   - shiny core
@@ -102,6 +102,21 @@ triggers:
   - Shiny.Core.Blazor
   - Shiny.Hosting.Maui
   - Shiny.Hosting.Native
+  - Shiny.Hosting.Avalonia
+  - Avalonia
+  - AppBuilder
+  - ShinyAvaloniaMainActivity
+  - AvaloniaAppDelegate
+  - Shiny.Hosting.Uno
+  - Shiny.Hosting.Uno.WebAssembly
+  - Uno Platform
+  - Uno.Extensions.Hosting
+  - IShinyUnoApplication
+  - GetShinyBuilder
+  - StartShiny
+  - UseShinyWebAssembly
+  - NativeApplication
+  - ApplicationActivity
   - Shiny.Extensions.DependencyInjection
   - Shiny.Extensions.Stores
   - Shiny.Extensions.Configuration
@@ -118,7 +133,7 @@ Shiny.Core is the foundational library for the Shiny ecosystem. It provides the 
 
 ## When to Use This Skill
 
-- The user needs to set up Shiny hosting in a MAUI, native, Blazor, or Linux/macOS app
+- The user needs to set up Shiny hosting in a MAUI, Avalonia, Uno Platform, native, Blazor, or Linux/macOS app
 - The user asks about `IHost`, `HostBuilder`, or `UseShiny`
 - The user needs key-value storage (`IKeyValueStore`, settings, secure store) via `Shiny.Extensions.Stores`
 - The user wants source-generated persistence with `[Bind]` partial properties or a service-attributed DI registration with `[Service]` / `[Singleton]` / `[Scoped]` / `[Transient]`
@@ -158,6 +173,9 @@ Modules with a `net10.0-tvos` target: `Shiny.Core`, `Shiny.Hosting.Native`, `Shi
 |-------|-----------|---------|
 | `Shiny.Hosting.Maui` | `Shiny` | MAUI hosting integration (`UseShiny`) |
 | `Shiny.Hosting.Native` | `Shiny` | Native hosting base classes (`ShinyAppDelegate`, `ShinyAndroidApplication`, `ShinyAndroidActivity`) |
+| `Shiny.Hosting.Avalonia` | `Shiny` | Avalonia hosting (`AppBuilder.UseShiny`, `ShinyAvaloniaMainActivity`) |
+| `Shiny.Hosting.Uno` | `Shiny` | Uno Platform hosting over Uno.Extensions.Hosting (`IHostBuilder.UseShiny`, `IShinyUnoApplication`, `GetShinyBuilder`, Android `StartShiny<TApp>`) |
+| `Shiny.Hosting.Uno.WebAssembly` | `Shiny` | `IJSRuntime` for Shiny's browser modules on Uno's WebAssembly head (`UseShinyWebAssembly`) |
 | `Shiny.Extensions.DependencyInjection` | `Shiny` | Source-generated `[Service]` / `[Singleton]` / `[Scoped]` / `[Transient]` DI registration. Pulled in by `Shiny.Core`. |
 | `Shiny.Extensions.Stores` | `Shiny.Extensions.Stores` | `IKeyValueStore`, `IRepository`, source-generated `[Bind]` partial-property persistence, static `Shiny.Stores.Default/Secure` accessor. Pulled in by `Shiny.Core`. |
 | `Shiny.Extensions.Serialization` | `Shiny.Extensions.Serialization` | AOT-safe System.Text.Json serializer extensions used by Shiny modules |
@@ -195,6 +213,137 @@ public static class MauiProgram
 ```
 
 `UseShiny()` also covers macOS (AppKit) MAUI apps built on `Microsoft.Maui.Platforms.MacOS` - `Shiny.Hosting.Maui` ships a `net10.0-macos` target, so call it after `UseMauiAppMacOS<App>()` like any other head. Never hand-roll an `IMauiInitializeService` that news up `Shiny.Hosting.Host` or call `AddShinyCoreServices()` yourself - that is what `UseShiny()` does. (Doing both is harmless - `Host.Run()` ignores a second run over the same service provider and `AddShinyCoreServices()` is idempotent - but it is dead code.) The macOS MAUI backend has no lifecycle events for remote notifications, so a macOS head that **uses push** forwards `application:didRegisterForRemoteNotificationsWithDeviceToken:` and friends from its `MacOSMauiApplication` subclass to `Host.Lifecycle` (see `samples/Sample.MacOS/Main.cs`). Only add those methods when the app actually uses push - implementing them is what tells Apple the app uses push, and App Review flags apps that implement them without it. Shiny deliberately ships no base delegate that overrides them.
+
+### Avalonia Setup
+
+Reference `Shiny.Hosting.Avalonia` (Avalonia 12+). `AppBuilder.UseShiny(Action<HostBuilder>?)` builds and runs the Shiny host in Avalonia's `AfterPlatformServicesSetup` - before the `Application` is created - so `Host.Current` / `Host.ServiceProvider` are ready in `Initialize()` and `OnFrameworkInitializationCompleted()`. Avalonia has no DI container of its own, so the services Shiny builds are the app's container: register your own services in the same callback and resolve them through `Host.ServiceProvider`. Put the registrations in one static method every head shares:
+
+```csharp
+public static class ShinyStartup
+{
+    public static void Configure(HostBuilder builder)
+    {
+        builder.Services.AddConnectivity();
+#if PLATFORM
+        builder.Services.AddNotifications<MyNotificationDelegate>();
+#endif
+    }
+}
+
+// desktop - Program.cs
+public static AppBuilder BuildAvaloniaApp() => AppBuilder
+    .Configure<App>()
+    .UsePlatformDetect()
+    .UseShiny(ShinyStartup.Configure);
+
+// Android - Avalonia runs CustomizeAppBuilder from Application.OnCreate, so Shiny is up for background launches too
+[Application]
+public class MainApplication : AvaloniaAndroidApplication<App>
+{
+    public MainApplication(IntPtr handle, JniHandleOwnership ownership) : base(handle, ownership) { }
+
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
+        => base.CustomizeAppBuilder(builder).UseShiny(ShinyStartup.Configure);
+}
+
+[Activity(MainLauncher = true, LaunchMode = LaunchMode.SingleTop, Theme = "@style/Theme.AppCompat.DayNight.NoActionBar")]
+public class MainActivity : ShinyAvaloniaMainActivity { }
+
+// iOS - Avalonia runs CustomizeAppBuilder from didFinishLaunching
+[Register("AppDelegate")]
+public class AppDelegate : AvaloniaAppDelegate<App>
+{
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
+        => base.CustomizeAppBuilder(builder).UseShiny(ShinyStartup.Configure);
+
+    // only when the app uses Shiny.Net.Http background transfers
+    [Export("application:handleEventsForBackgroundURLSession:completionHandler:")]
+    public void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
+        => Host.Lifecycle.OnHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
+}
+```
+
+- **Android:** the main activity must derive from `ShinyAvaloniaMainActivity` (or override `OnCreate`, `OnNewIntent`, `OnActivityResult` and `OnRequestPermissionsResult` on an `AvaloniaMainActivity` and forward each to `Host.Lifecycle`). Without the permission forward every Shiny permission request hangs; without `OnCreate` / `OnNewIntent` notification taps never reach their delegate. On Android, set `IActivityApplicationLifetime.MainViewFactory` in `OnFrameworkInitializationCompleted` rather than creating the view eagerly - the process may have been started in the background.
+- **iOS:** foreground/background and notification taps need no code. Push methods (`application:didRegisterForRemoteNotificationsWithDeviceToken:`, `...didFailToRegister...`, `application:didReceiveRemoteNotification:fetchCompletionHandler:`) are `[Export]`ed on the app's own `AvaloniaAppDelegate<TApp>` subclass **only when the app uses push**, forwarding to `Host.Lifecycle` - Shiny ships no delegate base for them. Avalonia's `ContinueUserActivity` is non-virtual and Avalonia 12 is scene-based, so `IIosLifecycle.IContinueActivity` handlers are not reached.
+- **Desktop:** an Avalonia desktop head is plain `net10.0`, so it gets `NetPlatform` (not `MacPlatform` / `WindowsPlatform`) and the plain .NET module implementations; `UseShiny` points `NetPlatform.MainThreadHandler` at `Dispatcher.UIThread`. A head that targets `net10.0-windows10.0.19041.0` gets `WindowsPlatform` instead, with its `MainThreadHandler` set the same way.
+
+A complete three-head sample is `samples/Sample.Avalonia`.
+
+### Uno Platform Setup
+
+Reference `Shiny.Hosting.Uno` (Uno.Sdk 6.7+ with the `Hosting` feature). Shiny runs **inside the Uno.Extensions.Hosting container** - there is one container, so view models and app services inject Shiny services like any other. `IHostBuilder.UseShiny(Action<IServiceCollection>?)` adds Shiny's core services and starts the Shiny host through Uno's `IServiceInitialize` the moment the container is built (started or not). The app's `App` implements `IShinyUnoApplication`; its **static** `ConfigureApp(IApplicationBuilder)` holds everything the template does between `CreateBuilder(args)` and `NavigateAsync`, and `OnLaunched` calls `this.GetShinyBuilder(args)` in place of `this.CreateBuilder(args)`:
+
+```csharp
+public partial class App : Application, IShinyUnoApplication
+{
+    protected Window? MainWindow { get; private set; }
+    protected IHost? Host { get; private set; }
+
+    // once per process - on Android from Application.OnCreate (possibly a background start): no UI here
+    public static void ConfigureApp(IApplicationBuilder builder) => builder
+        .UseToolkitNavigation()
+        .Configure(host => host                         // never Configure((host, window) => ...) - throws on Android
+            .UseNavigation(RegisterRoutes)
+#if __WASM__
+            .UseShinyWebAssembly()                      // Shiny.Hosting.Uno.WebAssembly, WASM head only
+#endif
+            .UseShiny(services =>
+            {
+                services.AddConnectivity();
+                services.AddNotifications<MyNotificationDelegate>();
+            })
+        );
+
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
+    {
+        var builder = this.GetShinyBuilder(args);       // NOT this.CreateBuilder(args)
+        MainWindow = builder.Window;
+        Host = await builder.NavigateAsync<Shell>();    // returns the host already built on Android
+    }
+}
+
+// Android - Platforms/Android/Main.Android.cs
+[global::Android.App.Application(Theme = "@style/AppTheme")]
+public class Application : Microsoft.UI.Xaml.NativeApplication
+{
+    public Application(IntPtr javaReference, JniHandleOwnership transfer)
+        : base(() => new App(), javaReference, transfer) { }
+
+    public override void OnCreate()
+    {
+        base.OnCreate();
+        this.StartShiny<App>();     // builds the host before any activity - jobs/push/geofences in the background
+    }
+}
+
+[Activity(MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = global::Uno.UI.ActivityHelper.AllConfigChanges)]
+public class MainActivity : Microsoft.UI.Xaml.ApplicationActivity
+{
+    protected override void OnCreate(Bundle? bundle) { base.OnCreate(bundle); Host.Lifecycle.OnActivityOnCreate(this, bundle); }
+    protected override void OnNewIntent(Intent? intent) { base.OnNewIntent(intent); Host.Lifecycle.OnNewIntent(this, intent); }
+    protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data)
+    {
+        base.OnActivityResult(requestCode, resultCode, data);
+        Host.Lifecycle.OnActivityResult(this, requestCode, resultCode, data);
+    }
+    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+    {
+        base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        Host.Lifecycle.OnRequestPermissionsResult(this, requestCode, permissions, grantResults);
+    }
+}
+```
+
+- **Why the Android hook:** Uno calls `OnLaunched` only once an `ApplicationActivity` starts, and with the Skia renderer (the Uno 6 template default) it does not even create the App until then. A host built only in `OnLaunched` never exists when Android starts the process for a job, push or geofence. `StartShiny<App>()` builds it in `Application.OnCreate`; `GetShinyBuilder` later returns the same builder, window and host.
+- **No Shiny base classes on Android:** `NativeApplication` / `ApplicationActivity` are different types (different assemblies) under the Skia and native renderers, so the app keeps its own subclasses and adds the one `StartShiny` line plus the four activity forwards. Without the permission forward every Shiny permission request hangs; without `OnCreate` / `OnNewIntent` notification taps never reach their delegate.
+- **Notification taps under the Skia renderer:** Uno Skia does not re-host its window in a recreated activity, and Shiny's default `AndroidNotification.LaunchActivityFlags` (`NewTask | ClearTask`) recreates it - a blank screen after the tap. Send an `AndroidNotification` with `LaunchActivityFlags = ActivityFlags.NewTask | ActivityFlags.ClearTop | ActivityFlags.SingleTop`.
+- **The builder:** `GetShinyBuilder` returns Shiny's own `IApplicationBuilder` (same `CreateDefaultBuilder` + delegates as Uno's). `Build()` builds once; `App` / `Arguments` are filled in by `OnLaunched` (read launch args from `OnLaunched`'s `args`). `Configure((host, window) => ...)` throws when built from Android's `OnCreate` (no window yet) - resolve the scoped `Window` navigation registers instead. Uno's `ApplicationBuilder.OnCreate` dev-tooling hook does not fire.
+- **iOS:** no Shiny code - Uno calls `OnLaunched` from `didFinishLaunching` (background launches included). Uno's `Application` is the `UIApplicationDelegate`, so push methods are `[Export]`ed on `App` (under `#if __IOS__`) **only when the app uses push**.
+- **Desktop (Skia) / WebAssembly:** plain `net10.0` - `NetPlatform` and the plain .NET module implementations; Shiny's main thread is Uno's `DispatcherQueue` (also on the Windows head, via `WindowsPlatform`). `AddBattery()` registers nothing on macOS/Windows desktop - resolve `IBattery` optionally.
+- **WebAssembly:** Shiny's browser modules are written against Blazor's `IJSRuntime`. Reference `Shiny.Hosting.Uno.WebAssembly` from the `net10.0-browserwasm` head only and call `UseShinyWebAssembly()` (a no-op outside the browser). It registers an `IJSRuntime` over the runtime's `[JSImport]`/`[JSExport]` interop + Microsoft.JSInterop's JS dispatcher (module imports, in-process object references, `DotNetObjectReference` callbacks) and an `IStartupService` that holds the first navigation until the browser monitors load - the Uno equivalent of Blazor's `await services.UseShiny()`.
+- **View models:** Uno navigation can construct them off the UI thread (it does on Android) - marshal with the injected `Uno.Extensions.IDispatcher`, not `DispatcherQueue.GetForCurrentThread()`.
+
+A complete four-head sample (Android, iOS, Skia desktop, WebAssembly) is `samples/Sample.Uno`.
 
 ### Native (Non-MAUI) Setup
 

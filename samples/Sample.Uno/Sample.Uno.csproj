@@ -1,0 +1,51 @@
+<Project Sdk="Uno.Sdk/6.7.30">
+
+    <!--
+        One Uno single project, four heads: Android, iOS, the Skia desktop app (Windows, macOS, Linux) and WebAssembly.
+        Uno's Windows (WinAppSDK) head is left out because it only builds on Windows; Shiny.Hosting.Uno ships a
+        net10.0-windows target for it. SkiaRenderer is the Uno 6 template default and the case Shiny's Android hosting
+        has to handle (the App is only created once an activity starts).
+    -->
+    <PropertyGroup>
+        <TargetFrameworks>net10.0-android;net10.0-desktop;net10.0-browserwasm</TargetFrameworks>
+        <TargetFrameworks Condition="'$(AppleTargetsSupported)' == 'true'">$(TargetFrameworks);net10.0-ios</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <UnoSingleProject>true</UnoSingleProject>
+        <ImplicitUsings>enable</ImplicitUsings>
+
+        <ApplicationTitle>Shiny Uno</ApplicationTitle>
+        <ApplicationId>org.shiny.sample.uno</ApplicationId>
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+
+        <UnoFeatures>SkiaRenderer;Hosting;Navigation;Toolkit;Mvvm;Logging</UnoFeatures>
+
+        <!-- this is a sample, not a shipped package -->
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+        <!--
+            Uno.Sdk brings its own (newer) Microsoft.Extensions.* for the heads - transitive pinning to the repo's
+            central versions would report them as downgrades (NU1109). The libraries keep the pins.
+        -->
+        <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+
+        <!-- Uno.Sdk's implicit AndroidX versions are older than the ones Shiny builds against (Directory.Packages.props) -->
+        <AndroidXActivityVersion>1.13.0.1</AndroidXActivityVersion>
+        <AndroidXAppCompatVersion>1.7.1.4</AndroidXAppCompatVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.Hosting.Uno\Shiny.Hosting.Uno.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-android')) OR $(TargetFramework.Contains('-ios'))">
+        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+    </ItemGroup>
+
+    <!-- Shiny's browser modules (battery, connectivity, ...) need the IJSRuntime this provides -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-browserwasm'))">
+        <ProjectReference Include="..\..\src\Shiny.Hosting.Uno.WebAssembly\Shiny.Hosting.Uno.WebAssembly.csproj" />
+    </ItemGroup>
+</Project>

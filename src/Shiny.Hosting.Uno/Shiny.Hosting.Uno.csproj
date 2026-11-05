@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        net10.0 is what Uno's Skia desktop (net10.0-desktop) and WebAssembly (net10.0-browserwasm) heads resolve.
+        The platform targets are not optional: an Android/iOS/Windows head would otherwise pick up the net10.0 build,
+        which points NetPlatform at Uno's dispatcher - and NetPlatform only exists in Shiny.Core's net10.0 build.
+    -->
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+
+        <Description>Shiny hosting for Uno Platform - runs Shiny inside the Uno.Extensions.Hosting container and starts it with the process on Android</Description>
+        <PackageTags>$(PackageTags) uno unoplatform</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <PackageReference Include="Uno.WinUI" />
+        <PackageReference Include="Uno.Extensions.Hosting.WinUI" />
+    </ItemGroup>
+</Project>

@@ -10,6 +10,8 @@
         <Project Path="samples/Sample.Api/Sample.Api.csproj" />
         <Project Path="samples\Sample.InAppPurchases.Server\Sample.InAppPurchases.Server.csproj" />
         <Project Path="samples\Sample.Blazor\Sample.Blazor.csproj" />
+        <Project Path="samples\Sample.Avalonia\Sample.Avalonia.csproj" />
+        <Project Path="samples\Sample.Uno\Sample.Uno.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/Shiny.Tests/Shiny.Tests.csproj" />
@@ -93,8 +95,11 @@
     <Project Path="src\Shiny.Core\Shiny.Core.csproj" />
     <Project Path="src\Shiny.Data.Sync\Shiny.Data.Sync.csproj" />
     <Project Path="src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj" />
+    <Project Path="src\Shiny.Hosting.Avalonia\Shiny.Hosting.Avalonia.csproj" />
     <Project Path="src\Shiny.Hosting.Maui\Shiny.Hosting.Maui.csproj" />
     <Project Path="src\Shiny.Hosting.Native\Shiny.Hosting.Native.csproj" />
+    <Project Path="src\Shiny.Hosting.Uno\Shiny.Hosting.Uno.csproj" />
+    <Project Path="src\Shiny.Hosting.Uno.WebAssembly\Shiny.Hosting.Uno.WebAssembly.csproj" />
     <Project Path="src\Shiny.Jobs\Shiny.Jobs.csproj" />
     <Project Path="src\Shiny.Gps\Shiny.Gps.csproj" />
     <Project Path="src\Shiny.Geofencing\Shiny.Geofencing.csproj" />

@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Sample.Avalonia.MainView">
+    <ScrollViewer>
+        <StackPanel Margin="16" Spacing="12">
+            <TextBlock Text="Shiny on Avalonia" FontSize="24" FontWeight="SemiBold" />
+
+            <TextBlock Text="Platform" FontWeight="SemiBold" />
+            <TextBlock x:Name="PlatformText" TextWrapping="Wrap" />
+
+            <TextBlock Text="App data" FontWeight="SemiBold" />
+            <TextBlock x:Name="AppDataText" TextWrapping="Wrap" />
+
+            <TextBlock Text="Connectivity" FontWeight="SemiBold" />
+            <TextBlock x:Name="ConnectivityText" />
+
+            <TextBlock Text="Notifications" FontWeight="SemiBold" />
+            <Button x:Name="NotifyButton" Content="Request access + send notification" Click="OnSendNotification" />
+            <TextBlock x:Name="NotifyStatusText" TextWrapping="Wrap" />
+            <TextBlock x:Name="LastTapText" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

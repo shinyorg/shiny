@@ -120,6 +120,28 @@ Achievements / leaderboards / friends over GameKit (iOS, Mac Catalyst, macOS) an
   and is only kept for single-leaderboard views on iOS/Catalyst < 18. `GKLocalPlayer.LoadFriendsListAsync()` is the
   iOS 14.5 `loadFriends`; the binding's `LoadFriendsAsync` / `LoadFriendPlayersAsync` are the deprecated ones.
 
+## Uno Platform hosting (`Shiny.Hosting.Uno` + `.WebAssembly`)
+
+Shiny runs inside the Uno.Extensions.Hosting container; `samples/Sample.Uno` (Uno.Sdk, Skia renderer) is the reference app.
+
+- **Uno's Android types differ per renderer.** Under `SkiaRenderer` (the Uno 6 template default) `NativeApplication` /
+  `ApplicationActivity` live in `Uno.UI.Runtime.Skia.Android.dll`, under the native renderer in `Uno.UI.dll` - never
+  ship a Shiny subclass of either; the app keeps its own and calls `StartShiny<App>()` / forwards to `Host.Lifecycle`.
+- **Skia `NativeApplication` creates the App only when an activity starts** (native creates it in its constructor),
+  and both call `OnLaunched` only then. That is why the host is built from `Application.OnCreate` through Shiny's own
+  `IApplicationBuilder` (`Infrastructure/ShinyApplicationBuilder.cs`) - Uno's `ApplicationBuilder` is internal, needs
+  the App and creates a `Window` in its constructor. Keep `Build()` idempotent: `NavigateAsync` calls it again.
+- **Shiny.Notifications' default `NewTask | ClearTask` blanks an Uno Skia app on tap** (the window is not re-hosted
+  in the recreated activity) - Uno guidance is `NewTask | ClearTop | SingleTop`.
+- **The WASM shim must hand out in-process object references** (`UnoJSObjectReferenceJsonConverter`): Shiny's browser
+  modules read `mod as IJSInProcessObjectReference`, which Blazor's runtime satisfies the same way.
+- **Verify the WASM head from a published folder** served by a static server - the Uno dev server returned 404s here,
+  and browsers cache the boot manifest, so republish to a new folder/port rather than trusting a reload.
+- The sample turns off `CentralPackageTransitivePinningEnabled` and raises `AndroidXActivityVersion` /
+  `AndroidXAppCompatVersion` because Uno.Sdk's implicit packages clash with this repo's central pins.
+- Uno 6.7's iOS (Skia) runtime has no scene delegate, and the iOS 27 SDK traps apps without scene adoption - the iOS
+  head builds but cannot run on iOS 27 simulators until Uno adds one.
+
 ## Linux / D-Bus (Tmds.DBus.Protocol)
 
 The Linux packages that reference `Tmds.DBus.Protocol` (`Shiny.BluetoothLE.Linux`,

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        One project, three heads: net10.0 is the desktop app (Windows, macOS, Linux), the platform targets
+        are the Android and iOS apps. Head-specific code lives in Platforms\Net, Platforms\Android and
+        Platforms\iOS, which the repo's Directory.Build.targets compiles only for the matching target.
+    -->
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
+
+        <ApplicationTitle>Shiny Avalonia</ApplicationTitle>
+        <ApplicationId>org.shiny.sample.avalonia</ApplicationId>
+        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+
+        <!-- this is a sample, not a shipped package -->
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+        <AndroidManifest>Platforms\Android\AndroidManifest.xml</AndroidManifest>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Themes.Fluent" />
+        <ProjectReference Include="..\..\src\Shiny.Hosting.Avalonia\Shiny.Hosting.Avalonia.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
+        <PackageReference Include="Avalonia.Desktop" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Avalonia.Android" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <PackageReference Include="Avalonia.iOS" />
+    </ItemGroup>
+</Project>

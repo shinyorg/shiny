@@ -5,6 +5,10 @@
         <MsftExtensionVersion>10.0.7</MsftExtensionVersion>
         <MauiLabsVersion>0.1.0-preview.12.26368.2</MauiLabsVersion>
         <MauiVersion>10.0.100</MauiVersion>
+        <AvaloniaVersion>12.1.5</AvaloniaVersion>
+        <!-- the Uno.WinUI / Uno.Extensions versions Uno.Sdk 6.7.30 resolves (samples/Sample.Uno builds on that Sdk) -->
+        <UnoVersion>6.7.135</UnoVersion>
+        <UnoExtensionsVersion>7.3.6</UnoExtensionsVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
@@ -21,6 +25,13 @@
         <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4" Version="$(MauiLabsVersion)"/>
         <PackageVersion Include="Microsoft.Maui.Platforms.Linux.Gtk4.Essentials" Version="$(MauiLabsVersion)"/>
         <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="$(MauiLabsVersion)"/>
+        <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.iOS" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Uno.WinUI" Version="$(UnoVersion)"/>
+        <PackageVersion Include="Uno.Extensions.Hosting.WinUI" Version="$(UnoExtensionsVersion)"/>
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.10.91"/>

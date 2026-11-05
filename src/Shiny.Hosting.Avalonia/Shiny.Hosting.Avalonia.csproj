@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        The platform targets are not optional even though only Android carries code of its own: an iOS or
+        Windows app would otherwise pick up the net10.0 build, which points NetPlatform at Avalonia's
+        dispatcher - and NetPlatform only exists in Shiny.Core's net10.0 build, so it fails to load there.
+    -->
+    <PropertyGroup>
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(WindowsTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(MacCatalystTarget)</TargetFrameworks>
+
+        <Description>Shiny hosting for Avalonia - starts Shiny from the AppBuilder and forwards Android activity events</Description>
+        <PackageTags>$(PackageTags) avalonia</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="!$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Avalonia" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+        <PackageReference Include="Avalonia.Android" />
+    </ItemGroup>
+</Project>

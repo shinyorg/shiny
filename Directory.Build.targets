@@ -58,4 +58,13 @@
         <Compile Include="Platforms\Net\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
+
+    <!-- Uno.Sdk's own head target frameworks (samples/Sample.Uno) - net10.0-desktop and net10.0-browserwasm -->
+    <ItemGroup Condition="$(TargetFramework.Contains('-desktop'))">
+        <Compile Include="Platforms\Desktop\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('-browserwasm'))">
+        <Compile Include="Platforms\WebAssembly\**\*.cs" />
+    </ItemGroup>
 </Project>

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <!--
+        Only an Uno WebAssembly head references this (net10.0-browserwasm resolves the net10.0 build). It is a Razor SDK
+        project for the same reason Shiny.Core is: wwwroot ships as static web assets, served from
+        _content/Shiny.Hosting.Uno.WebAssembly/.
+    -->
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Description>Shiny hosting for Uno Platform WebAssembly - the IJSRuntime that Shiny's browser modules need, over Uno's .NET WebAssembly runtime</Description>
+        <PackageTags>$(PackageTags) uno unoplatform wasm webassembly</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Hosting.Uno\Shiny.Hosting.Uno.csproj" />
+        <PackageReference Include="Microsoft.JSInterop" />
+    </ItemGroup>
+</Project>

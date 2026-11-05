@@ -1,0 +1,30 @@
+<Page x:Class="Sample.Uno.Presentation.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:utu="using:Uno.Toolkit.UI"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <ScrollViewer utu:SafeArea.Insets="VisibleBounds">
+        <StackPanel Margin="16" Spacing="12">
+            <TextBlock Text="Shiny on Uno" FontSize="24" FontWeight="SemiBold" />
+
+            <TextBlock Text="Platform" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding Platform}" TextWrapping="Wrap" />
+
+            <TextBlock Text="Shiny host" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding HostInfo}" TextWrapping="Wrap" />
+
+            <TextBlock Text="Connectivity" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding Connectivity}" />
+
+            <TextBlock Text="Battery" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding Battery}" />
+
+            <TextBlock Text="Notifications" FontWeight="SemiBold" />
+            <Button Content="Request access + send notification"
+                    Command="{Binding SendNotificationCommand}"
+                    IsEnabled="{Binding NotificationsSupported}" />
+            <TextBlock Text="{Binding NotificationStatus}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding LastTap}" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>
