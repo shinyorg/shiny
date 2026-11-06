@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            No platform code: everything sits on the public IPeripheral API, so the net10.0 asset works on every
+            head that Shiny.BluetoothLE (or Shiny.BluetoothLE.Linux) supports.
+        -->
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.BluetoothLE.McuMgr</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny MCUmgr (SMP) client over Bluetooth LE - firmware updates (MCUboot image upload, test, confirm, reset), OS, file system, shell and stats management for Zephyr RTOS, nRF Connect SDK, Mynewt and NuttX devices</Description>
+        <PackageTags>ble bluetooth bluetoothle mcumgr smp mcuboot zephyr nrf nordic dfu firmware ota fota</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Formats.Cbor" />
+        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <InternalsVisibleTo Include="Shiny.BluetoothLE.McuMgr.Tests" />
+    </ItemGroup>
+
+</Project>

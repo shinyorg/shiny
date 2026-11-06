@@ -42,6 +42,7 @@
         <Project Path="tests/Shiny.AppFunctions.Tests/Shiny.AppFunctions.Tests.csproj" />
         <Project Path="tests/Shiny.AppFunctions.SourceGenerators.Tests/Shiny.AppFunctions.SourceGenerators.Tests.csproj" />
         <Project Path="tests/Shiny.Printers.Tests/Shiny.Printers.Tests.csproj" />
+        <Project Path="tests/Shiny.BluetoothLE.McuMgr.Tests/Shiny.BluetoothLE.McuMgr.Tests.csproj" />
         <Project Path="tests/Shiny.Mobile.CallDirectory.Tests/Shiny.Mobile.CallDirectory.Tests.csproj" />
         <Project Path="tests/Shiny.DeviceTests/Shiny.DeviceTests.csproj" />
         <Project Path="tests/Shiny.DeviceTests.Runner/Shiny.DeviceTests.Runner.csproj" />
@@ -131,6 +132,7 @@
     <Project Path="src\Shiny.Mobile.CallDirectory\Shiny.Mobile.CallDirectory.csproj" />
     <Project Path="src\Shiny.Printers\Shiny.Printers.csproj" />
     <Project Path="src\Shiny.Printers.BluetoothLE\Shiny.Printers.BluetoothLE.csproj" />
+    <Project Path="src\Shiny.BluetoothLE.McuMgr\Shiny.BluetoothLE.McuMgr.csproj" />
     <Project Path="src\Shiny.Printers.Network\Shiny.Printers.Network.csproj" />
     <Project Path="src\Shiny.Printing\Shiny.Printing.csproj" />
     <Project Path="src\Shiny.Printing.Rendering\Shiny.Printing.Rendering.csproj" />

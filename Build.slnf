@@ -13,6 +13,7 @@
             "src\\Shiny.BluetoothLE.Hosting\\Shiny.BluetoothLE.Hosting.csproj",
             "src\\Shiny.BluetoothLE.Hosting.Linux\\Shiny.BluetoothLE.Hosting.Linux.csproj",
             "src\\Shiny.BluetoothLE\\Shiny.BluetoothLE.csproj",
+            "src\\Shiny.BluetoothLE.McuMgr\\Shiny.BluetoothLE.McuMgr.csproj",
             "src\\Shiny.Beacons\\Shiny.Beacons.csproj",
             "src\\Shiny.BluetoothLE.Linux\\Shiny.BluetoothLE.Linux.csproj",
             "src\\Shiny.Bluetooth\\Shiny.Bluetooth.csproj",

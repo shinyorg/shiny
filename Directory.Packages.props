@@ -42,6 +42,7 @@
         <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
         <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
         <PackageVersion Include="System.Reactive" Version="7.0.0"/>
+        <PackageVersion Include="System.Formats.Cbor" Version="10.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.8.1"/>
         <PackageVersion Include="Microsoft.Extensions.AI" Version="10.8.1"/>
         <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.1"/>
