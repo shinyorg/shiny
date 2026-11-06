@@ -25,8 +25,8 @@ public sealed record BlePrinterConfig
     public bool WriteWithoutResponse { get; init; } = true;
 
     /// <summary>
-    /// Bytes per BLE write. When null the connection derives it from the negotiated MTU (MTU - 3),
-    /// capped to a safe value. Cheap printers often have tiny buffers, so an explicit small value (e.g. 20-180) helps.
+    /// Bytes per BLE write. When null the connection uses <c>IPeripheral.Mtu</c> - the usable payload of the negotiated
+    /// MTU, which already excludes the 3-byte ATT header - capped to 512. Cheap printers often have tiny buffers, so an explicit small value (e.g. 20-180) helps.
     /// </summary>
     public int? ChunkSize { get; init; }
 

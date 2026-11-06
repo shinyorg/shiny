@@ -225,7 +225,7 @@ var printer = await manager.Connect(peripheralUuid, new BlePrinterConfig
     ServiceUuid = "0000ff00-0000-1000-8000-00805f9b34fb",
     WriteCharacteristicUuid = "0000ff02-0000-1000-8000-00805f9b34fb",
     Capabilities = PrinterCapabilities.Paper58mm,
-    ChunkSize = 100,                                  // null = MTU - 3
+    ChunkSize = 100,                                  // null = IPeripheral.Mtu (usable payload, max 512)
     InterChunkDelay = TimeSpan.FromMilliseconds(30)   // let a small buffer drain
 });
 ```

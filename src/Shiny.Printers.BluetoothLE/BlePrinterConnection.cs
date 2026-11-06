@@ -44,7 +44,9 @@ public sealed class BlePrinterConnection(IPeripheral peripheral, BlePrinterConfi
         if (!this.IsConnected)
             throw new InvalidOperationException("The printer is not connected.");
 
-        var chunkSize = this.config.ChunkSize ?? Math.Clamp(this.peripheral.Mtu - 3, 20, 512);
+        // IPeripheral.Mtu is already the usable payload (ATT MTU minus the 3-byte header) - don't subtract it again.
+        // 512 is the largest attribute value GATT allows in a single write.
+        var chunkSize = this.config.ChunkSize ?? Math.Clamp(this.peripheral.Mtu, 20, 512);
         var withResponse = !this.config.WriteWithoutResponse;
 
         var offset = 0;
