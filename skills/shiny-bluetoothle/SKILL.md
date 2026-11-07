@@ -6,6 +6,7 @@ triggers:
   - bluetooth
   - ble
   - bluetoothle
+  - GetUuidFromAddress
   - bluetooth le
   - bluetooth low energy
   - peripheral
@@ -473,6 +474,14 @@ unless you are talking to a non-Shiny peer.
 - Use `NotifyCharacteristic()` for real-time data streaming from a peripheral -- it handles subscription lifecycle and auto-reconnection.
 - Buffer or throttle scan results in UI scenarios to avoid performance issues.
 - Use `WhenConnected()` and `WhenDisconnected()` convenience extensions for cleaner connection state handling.
+
+## Reconnecting without a scan
+
+`bleManager.GetKnownPeripheral(peripheral.Uuid)` returns a peripheral from a saved `Uuid` with no scan (Apple asks
+CoreBluetooth; Android builds it from the MAC address encoded in the id). On Android, an address that came from
+outside Shiny (e.g. CompanionDeviceManager) converts with `Peripheral.GetUuidFromAddress("AA:BB:CC:DD:EE:FF")`. For
+accessories picked through the system pairing sheet use `Shiny.BluetoothLE.AccessorySetup` and
+`bleManager.GetPeripheral(accessory)`.
 
 ## Reference Files
 

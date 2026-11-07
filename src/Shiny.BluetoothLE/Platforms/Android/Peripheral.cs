@@ -443,10 +443,19 @@ public partial class Peripheral : BluetoothGattCallback, INativePeripheral
     }
 
 
-    static string GetUuid(BluetoothDevice device)
+    static string GetUuid(BluetoothDevice device) => GetUuidFromAddress(device.Address!);
+
+
+    /// <summary>
+    /// The <see cref="Uuid"/> Shiny gives the peripheral with this MAC address (<c>AA:BB:CC:DD:EE:FF</c>) - for
+    /// addresses that come from outside Shiny, such as a CompanionDeviceManager association, so they can be passed to
+    /// <c>IBleManager.GetKnownPeripheral</c>.
+    /// </summary>
+    public static string GetUuidFromAddress(string macAddress)
     {
+        ArgumentNullException.ThrowIfNull(macAddress);
         var deviceGuid = new byte[16];
-        var mac = device.Address!.Replace(":", "");
+        var mac = macAddress.Replace(":", "");
         var macBytes = Enumerable
             .Range(0, mac.Length)
             .Where(x => x % 2 == 0)

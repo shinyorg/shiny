@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            AccessorySetupKit is iOS 18+ only (Apple ships no Mac Catalyst, macOS or tvOS version) and
+            CompanionDeviceManager is Android only. The base target carries the contracts, so shared code compiles
+            against IAccessorySetupManager everywhere; no manager is registered there.
+        -->
+        <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>
+
+        <RootNamespace>Shiny.BluetoothLE.AccessorySetup</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Shiny BluetoothLE Accessory Setup - the system pairing sheet for your BLE accessory: AccessorySetupKit on iOS 18+ and CompanionDeviceManager on Android, with no MFi and no location or general Bluetooth prompt. Picked accessories open as Shiny.BluetoothLE peripherals; Android adds background presence (appeared/disappeared) events</Description>
+        <PackageTags>ble bluetooth bluetoothle accessorysetupkit companiondevicemanager companion device pairing accessory setup ios android</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <InternalsVisibleTo Include="Shiny.BluetoothLE.AccessorySetup.Tests" />
+    </ItemGroup>
+
+</Project>
