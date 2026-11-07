@@ -131,6 +131,44 @@ public partial class AndroidPlatform : IPlatform,
     }
 
 
+    /// <summary>
+    /// Starts an <see cref="IntentSender"/> for a result from the current activity and waits for that result - the
+    /// form system services such as CompanionDeviceManager hand back their consent dialogs in. Same rules as
+    /// <see cref="StartActivityForResult"/>: it waits up to 5 seconds for an activity, never for the user, and the
+    /// result only arrives when the host forwards <c>OnActivityResult</c> to Shiny.
+    /// </summary>
+    public async Task<ActivityResult> StartIntentSenderForResult(IntentSender intentSender, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(intentSender);
+        var activity = await this.GetActivityForRequest("start an intent sender for a result", cancellationToken).ConfigureAwait(false);
+
+        var current = this.NextRequestCode();
+        var tcs = new TaskCompletionSource<ActivityResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        this.pendingResults[current] = tcs;
+
+        using var reg = cancellationToken.Register(() =>
+        {
+            if (this.pendingResults.TryRemove(current, out var t))
+                t.TrySetCanceled(cancellationToken);
+        });
+
+        this.InvokeOnMainThread(() =>
+        {
+            try
+            {
+                activity.StartIntentSenderForResult(intentSender, current, null, 0, 0, 0);
+            }
+            catch (Exception ex)
+            {
+                if (this.pendingResults.TryRemove(current, out var t))
+                    t.TrySetException(ex);
+            }
+        });
+
+        return await tcs.Task.ConfigureAwait(false);
+    }
+
+
     int NextRequestCode()
     {
         // shared with permission requests; kept in the lower 16 bits and never 0
