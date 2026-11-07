@@ -9,11 +9,14 @@ namespace Shiny;
 public static class AccessorySetupServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds <see cref="IAccessorySetupManager"/> on iOS and Android. Elsewhere nothing is registered - check for the
-    /// service. Call <c>AddBluetoothLE()</c> as well to talk to the accessories once they are picked.
+    /// Adds <see cref="IAccessorySetupManager"/> on iOS and Android, and Shiny.BluetoothLE's <c>IBleManager</c> (through
+    /// <c>AddBluetoothLE()</c>) to talk to the accessories once they are picked. Elsewhere only Bluetooth LE is
+    /// registered - check for the accessory setup service. Calling <c>AddBluetoothLE</c> yourself, before or after,
+    /// is fine: a delegate or Apple configuration you pass it is kept.
     /// </summary>
     public static IServiceCollection AddAccessorySetup(this IServiceCollection services)
     {
+        services.AddBluetoothLE();
 #if IOS || ANDROID
         if (!services.HasImplementation<AccessorySetupManager>())
             services.AddSingletonAsImplementedInterfaces<AccessorySetupManager>();

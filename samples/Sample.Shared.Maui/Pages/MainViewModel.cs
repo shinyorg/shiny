@@ -54,6 +54,10 @@ public partial class MainViewModel(INavigator navigator) : ObservableObject
         // --- Bluetooth & Beacons ---
         Add(FeatureGroup.Bluetooth, "📡 BLE Scanner", "Scan for nearby Bluetooth LE devices", "blescan");
         Add(FeatureGroup.Bluetooth, "📢 BLE Hosting", "Advertise as a GATT server", "blehosting");
+        // the system pairing sheet: AccessorySetupKit (iOS 18+, not Mac Catalyst) / CompanionDeviceManager (Android)
+        if (OperatingSystem.IsAndroid() || (OperatingSystem.IsIOS() && !OperatingSystem.IsMacCatalyst()))
+            Add(FeatureGroup.Bluetooth, "🤝 Accessory Setup", "Pick a BLE accessory from the system sheet", "accessorysetup");
+        Add(FeatureGroup.Bluetooth, "🎛️ Accessory Advertiser", "Be the accessory Accessory Setup finds", "accessoryadvertiser");
         // L2CAP: Android (29+), Apple, Linux/BlueZ. No WinRT surface for it.
         if (!OperatingSystem.IsWindows())
             Add(FeatureGroup.Bluetooth, "🔗 BLE L2CAP", "L2CAP CoC host & client demo", "blel2cap");

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Sample.Shared.Maui.Pages.BLE"
+             x:Class="Sample.Shared.Maui.Pages.BLE.AccessoryAdvertiserPage"
+             x:DataType="vm:AccessoryAdvertiserViewModel"
+             Title="Accessory Advertiser">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="{Binding Status}" FontSize="16" FontAttributes="Bold" />
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Pretend accessory" FontAttributes="Bold" />
+                    <Label FontSize="12" TextColor="Gray"
+                           Text="Advertise here, then open Accessory Setup on an iPhone (iOS 18+) or Android phone and pick this device from the system sheet." />
+                    <Entry Text="{Binding LocalName}" Placeholder="Device name" IsEnabled="{Binding CanEditName}" />
+                    <Label FontSize="11" TextColor="Gray"
+                           Text="Keep it short - only a few characters fit beside the service UUID, and longer names can be cut off. The picker's 'name must contain Shiny' filter only matches names containing 'Shiny'. Android advertises this by renaming the phone's Bluetooth adapter." />
+                    <Label Text="{Binding ServiceUuid, StringFormat='Service: {0}'}" FontSize="12" />
+                    <Button Text="{Binding AdvertiseText}" Command="{Binding ToggleAdvertisingCommand}" />
+                    <Label Text="{Binding ReadsServed, StringFormat='Info reads served: {0}'}" />
+                    <Label Text="{Binding LastPing, StringFormat='Last ping: {0}'}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="12" HasShadow="False" BorderColor="Gray">
+                <VerticalStackLayout Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Log" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="Clear" FontSize="12" Padding="8,2" Command="{Binding ClearLogCommand}" />
+                    </Grid>
+                    <CollectionView ItemsSource="{Binding Log}" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="No activity yet" HorizontalTextAlignment="Center" TextColor="Gray" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Label Text="{Binding .}" FontSize="12" Margin="0,2" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

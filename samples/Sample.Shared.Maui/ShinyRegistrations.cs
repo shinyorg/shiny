@@ -62,6 +62,13 @@ public static class ShinyRegistrations
         s.AddNotifications<SampleNotificationDelegate>();
 #endif
 
+#if IOS || ANDROID
+        // Accessory setup: the AccessorySetupKit sheet (iOS 18+) / CompanionDeviceManager dialog (Android). Picks the
+        // pretend accessory the "Accessory Advertiser" page hosts on a second device; the delegate logs grant changes
+        // and Android presence events to the event store.
+        s.AddAccessorySetup<SampleAccessorySetupDelegate>();
+#endif
+
 #if IOS || ANDROID || MACCATALYST || MACOS || WINDOWS
         // Beacons: ranging and Eddystone work on every MAUI-native platform. Monitoring is
         // registered too - on macOS it reports NotSupported rather than throwing at startup,

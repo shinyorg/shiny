@@ -8,7 +8,7 @@ public partial class EventsViewModel(IEventStore events) : ObservableObject, IPa
 {
     const int PageSize = 50;
 
-    public List<string> Categories { get; } = ["All", "GPS", "Geofence", "MotionActivity", "Notification", "Push", "Job", "HttpTransfer"];
+    public List<string> Categories { get; } = ["All", "GPS", "Geofence", "MotionActivity", "Notification", "Push", "Job", "HttpTransfer", "AccessorySetup"];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SelectedCategory))]

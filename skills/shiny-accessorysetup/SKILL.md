@@ -61,9 +61,12 @@ Namespaces: `using Shiny.BluetoothLE.AccessorySetup;` and `using Shiny.Bluetooth
 ## Registration
 
 ```csharp
-services.AddBluetoothLE();                         // to talk to the accessory once picked
 services.AddAccessorySetup();                      // or AddAccessorySetup<MyAccessoryDelegate>()
 ```
+
+`AddAccessorySetup()` also calls `AddBluetoothLE()`, so `IBleManager` is there to talk to picked accessories. Only
+call `AddBluetoothLE<TDelegate>()` / `AddBluetoothLE(appleConfig)` yourself when you need a BLE delegate or Apple
+configuration - before or after `AddAccessorySetup()`, both are kept.
 
 ## Pick an accessory, then use it as a peripheral
 

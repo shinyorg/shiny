@@ -57,6 +57,19 @@
     </array>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses Bluetooth to scan for and connect to nearby devices</string>
+    <!-- AccessorySetupKit: every service UUID / name the Accessory Setup page filters on (see SampleAccessory) -->
+    <key>NSAccessorySetupSupports</key>
+    <array>
+        <string>Bluetooth</string>
+    </array>
+    <key>NSAccessorySetupBluetoothServices</key>
+    <array>
+        <string>A495FF40-C5B1-4B44-B512-1370F02D74DE</string>
+    </array>
+    <key>NSAccessorySetupBluetoothNames</key>
+    <array>
+        <string>Shiny</string>
+    </array>
     <key>NSBluetoothPeripheralUsageDescription</key>
     <string>This app uses Bluetooth to communicate with peripherals</string>
     <key>NSLocationWhenInUseUsageDescription</key>

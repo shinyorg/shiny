@@ -49,6 +49,10 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
 
+    <!-- Accessory Setup: CompanionDeviceManager, and presence wake-ups on Android 12+ -->
+    <uses-feature android:name="android.software.companion_device_setup" android:required="false" />
+    <uses-permission android:name="android.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE" />
+
     <application
         android:allowBackup="true"
         android:supportsRtl="true">

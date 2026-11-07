@@ -20,7 +20,11 @@ public static class BleServiceCollectionExtensions
 #if APPLE
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services, AppleBleConfiguration? config = null)
     {
-        services.TryAddSingleton(config ?? new AppleBleConfiguration());
+        // an explicit config always wins - another package (e.g. AddAccessorySetup) may have called this first
+        if (config == null)
+            services.TryAddSingleton(new AppleBleConfiguration());
+        else
+            services.Replace(ServiceDescriptor.Singleton(config));
 
 #elif ANDROID || WINDOWS
     public static IServiceCollection AddBluetoothLE(this IServiceCollection services)
