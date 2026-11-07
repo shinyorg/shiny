@@ -50,8 +50,10 @@ is **added or changed** - a new module (e.g. Call Directory, Game Center) or a n
 notification `ChannelAction` option) - check whether it belongs there and, if it does, add or update the bridge in the
 same piece of work, following that repo's `CLAUDE.md` (contracts start in the `.Client` project; regenerate the
 TypeScript clients; register in the simulator's `BridgeCatalog`; tests, skill, readme, docs and its own release
-note). Skip it when a page already has the capability through a standard web API (e.g. Gamepad - the W3C Gamepad API
-works in the WebView) or the API only makes sense from native code (DI/hosting, build tooling, server packages). If the
+note). Only bridge what a page drives while it is open - **background-only modules are not bridged** (e.g. Jobs is no
+longer a bridge); for a module with both, bridge the foreground surface only. Skip it as well when a page already has
+the capability through a standard web API (e.g. Gamepad - the W3C Gamepad API works in the WebView) or the API only
+makes sense from native code (DI/hosting, build tooling, server packages). If the
 bridge needs an unpublished Shiny package, say so rather than pinning a beta silently.
 
 ### Trim / AOT
