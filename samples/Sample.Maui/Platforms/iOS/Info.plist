@@ -58,7 +58,7 @@
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses Bluetooth to scan for and connect to nearby devices</string>
     <!-- AccessorySetupKit: every service UUID / name the Accessory Setup page filters on (see SampleAccessory) -->
-    <key>NSAccessorySetupSupports</key>
+    <key>NSAccessorySetupKitSupports</key>
     <array>
         <string>Bluetooth</string>
     </array>
