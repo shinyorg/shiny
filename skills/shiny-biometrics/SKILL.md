@@ -141,8 +141,8 @@ public record BiometricResult(BiometricResultStatus Status, string? ErrorMessage
    a server as proof of identity; a server needs its own credential (token, passkey).
 8. Pass a `CancellationToken` to dismiss the prompt programmatically (e.g. when the app backgrounds); cancelling throws
    `OperationCanceledException`.
-9. Call `Authenticate` from a visible screen: Android throws `InvalidOperationException` when there is no current
-   `FragmentActivity`.
+9. Call `Authenticate` from a visible screen: Android waits up to 5 seconds for a `FragmentActivity` to resume (e.g.
+   right after a file picker returned) and throws `InvalidOperationException` if none does.
 
 ```csharp
 public class UnlockViewModel(IBiometrics biometrics)
