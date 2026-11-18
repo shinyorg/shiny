@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - v5
+      - v6
     paths:
       - 'samples/Sample.Blazor/**'
       - 'src/**/*.Blazor/**'

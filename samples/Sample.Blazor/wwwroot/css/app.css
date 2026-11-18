@@ -124,3 +124,20 @@ main {
     50% { stroke-dashoffset: calc(3.14 * 4rem); }
     100% { stroke-dashoffset: calc(3.14 * 8rem); }
 }
+
+/* Embedded in a docs page (Layout/EmbedLayout.razor): the docs page grows the iframe to the content, so
+   the frame itself never scrolls, and it is see-through so the docs page's background shows. */
+html.shiny-embed,
+html.shiny-embed body {
+    overflow: hidden;
+    background: transparent;
+}
+
+/* the docs page's dark theme (embed.js puts it on <html>) */
+html.shiny-embed[data-theme='dark'] body {
+    color: #E5E7EB;
+}
+
+html.shiny-embed[data-theme='dark'] a {
+    color: #A5B4FC;
+}

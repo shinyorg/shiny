@@ -1,0 +1,53 @@
+@namespace Sample.Blazor.Layout
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@implements IAsyncDisposable
+
+@* The layout a page gets when a shinylib.net docs page hosts it in an iframe (?embed=1, see
+   EmbedMode). The docs page is the chrome: no navigation here, and the page's own <h1> is hidden
+   because the docs page already has a title. wwwroot/js/embed.js reports the content height so the
+   frame can grow to fit, takes the docs page's light/dark switch and its tab navigation. *@
+<div class="embed-content">
+    @Body
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    IJSObjectReference? module;
+    DotNetObjectReference<EmbedLayout>? self;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        this.self = DotNetObjectReference.Create(this);
+        this.module = await this.JS.InvokeAsync<IJSObjectReference>("import", "./js/embed.js");
+        await this.module.InvokeVoidAsync("start", this.self, EmbedMode.InitialTheme);
+    }
+
+    // relative, so it resolves against the base href (/<repo>/ when deployed)
+    [JSInvokable]
+    public void Navigate(string route) => this.Nav.NavigateTo(route);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (this.module is not null)
+        {
+            try
+            {
+                await this.module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+        this.self?.Dispose();
+    }
+}

@@ -8,6 +8,12 @@
     <link rel="preload" id="webassembly" />
     <link href="css/app.css" rel="stylesheet" />
     <script type="importmap"></script>
+    <!-- Hosted in a shinylib.net docs page (?embed=1, see Layout/EmbedLayout.razor): mark it before the
+         first paint, so the page starts the way the embed shows it. -->
+    <script>
+        if (/[?&]embed(=(1|true))?(&|$)/i.test(location.search))
+            document.documentElement.classList.add('shiny-embed');
+    </script>
 </head>
 <body>
     <div id="app">

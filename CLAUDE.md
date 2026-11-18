@@ -253,3 +253,13 @@ Do **not** write blog posts automatically as part of a fix/feature. Write them *
 - **Hero image is required.** Create `src/assets/<slug>-hero.svg`:
   - SVG, `viewBox="0 0 1200 630"`, `width="1200" height="630"`.
   - Match the house style: dark navy/indigo gradient background (`#0f172a` → `#1e1b4b`), cyan/green/violet accent gradients, subtle glow filters, the feature name as the headline. Crib an existing one (e.g. `datasync-hero.svg`, `documentdb-orleans-hero.svg`) as a starting template.
+
+## Blazor sample embedded in the docs ("Try It In Blazor")
+
+The docs site (`~/Desktop/dev/documentation`, shinylib.net) hosts pages of `samples/Sample.Blazor` live inside documentation pages. The sample stays deployed **cross-origin** at `https://shinyorg.github.io/shiny/` (`.github/workflows/deploy-blazor-sample.yml`); the docs load a page in an iframe with `<BlazorSample app="shiny" route="<route>" />` (`src/components/BlazorSample.astro`, sample URLs in `BLAZOR_SAMPLES` in `src/consts.ts`). Pages embedded today: BLE scan, GPS, push, HTTP transfers, printing and screen recording.
+
+- **`?embed=1`** makes `App.razor` swap `MainLayout` for `Layout/EmbedLayout.razor` (detected once by `Layout/EmbedMode.cs`, so in-app links stay embedded). EmbedLayout drops the sample's navigation and hides a page's first `<h1>` (the docs page has the title). Anything a page needs from `MainLayout` (a service host, a startup call) must be in EmbedLayout too.
+- **`wwwroot/js/embed.js`** talks to the docs page over `postMessage`: it sends `shiny-embed:ready` and `{ type: 'shiny-embed:size', height, fill }`, and accepts `{ type: 'shiny-embed:theme', mode }` (put on `<html data-theme>`) and `{ type: 'shiny-embed:navigate', route }` (a sample route only) from shinylib.net / localhost. `?theme=` sets the starting scheme. The same protocol is used by every shinyorg sample — change it in all of them and in the docs component together.
+- **Sizing:** It sizes to its content: the docs grows the frame to fit, so the embedded document never scrolls. A page that scrolls itself marks its root `.demo-fill` and the docs keeps the frame at its fixed height instead.
+- **Routes are a public contract.** The docs link these routes; renaming or removing a page breaks a docs page, so update the docs repo in the same change.
+

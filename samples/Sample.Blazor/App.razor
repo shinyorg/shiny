@@ -1,12 +1,26 @@
+@inject NavigationManager Nav
 <Router AppAssembly="typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <RouteView RouteData="routeData" DefaultLayout="pageLayout" />
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
     <NotFound>
         <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="typeof(Layout.MainLayout)">
+        <LayoutView Layout="pageLayout">
             <p role="alert">Sorry, there's nothing at this address.</p>
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    // A shinylib.net docs page hosts the pages in an iframe with ?embed=1 - they get the bare
+    // EmbedLayout there and the full sample shell everywhere else. See Layout/EmbedMode.cs.
+    Type pageLayout = typeof(Sample.Blazor.Layout.MainLayout);
+
+    protected override void OnInitialized()
+    {
+        EmbedMode.Detect(this.Nav.Uri);
+        if (EmbedMode.IsActive)
+            this.pageLayout = typeof(Sample.Blazor.Layout.EmbedLayout);
+    }
+}

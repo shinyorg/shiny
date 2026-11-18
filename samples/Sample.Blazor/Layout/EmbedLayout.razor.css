@@ -1,0 +1,29 @@
+/* The embedded page sizes to its content and the docs page grows the iframe to match, so nothing in
+   here scrolls - the docs page does. */
+.embed-content {
+    padding: 16px 4px 4px;
+}
+
+/* the docs page already shows the title */
+.embed-content > ::deep h1:first-child {
+    display: none;
+}
+
+#blazor-error-ui {
+    display: none;
+    background: #FEE2E2;
+    color: #991B1B;
+    padding: 12px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 12px;
+    top: 8px;
+}
