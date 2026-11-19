@@ -6,6 +6,12 @@ namespace Shiny.BluetoothLE.Hosting;
 /// <summary>
 /// Options used when starting BLE advertising from a hosted peripheral.
 /// </summary>
+/// <remarks>
+/// Everything except <see cref="LocalName"/> has to fit the 31-byte advertising packet, together with the 3-byte flags
+/// the platform adds. A 128-bit service UUID takes 16 bytes plus a 2-byte list header, so two of them never fit;
+/// <see cref="IBleHostingManager.StartAdvertising"/> throws <see cref="System.ArgumentException"/> rather than letting
+/// the platform fail later or drop the overflow.
+/// </remarks>
 /// <param name="LocalName">Optional local name included in the advertisement.</param>
 /// <param name="ServiceUuids">GATT service UUIDs to advertise.</param>
 public record AdvertisementOptions(

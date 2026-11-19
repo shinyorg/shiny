@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE.Hosting.Bluez;
+using Shiny.BluetoothLE.Hosting.Infrastructure;
 using Tmds.DBus.Protocol;
 using Shiny.BluetoothLE.Infrastructure;
 
@@ -180,6 +181,9 @@ public class BleHostingManager : IBleHostingManager, IBluezGattHost, IAsyncDispo
     public Task StartAdvertising(AdvertisementOptions? options = null)
     {
         options ??= new AdvertisementOptions();
+
+        // BlueZ adds flags to a "peripheral" (discoverable) advertisement and truncates the local name to what is left
+        AdvertisementPacket.EnsureFits(options, new PacketLayout(Flags: options.IsConnectable, TxPower: true));
 
         var serviceData = options.ServiceData.ToDictionary(
             x => BluezGatt.NormalizeUuid(x.Uuid),
