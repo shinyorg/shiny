@@ -35,7 +35,7 @@ public sealed partial class AppStartupInstaller : IAppStartupInstaller
 
 
     // the entry assembly rather than IPlatform.ApplicationIdentifier - the desktop implementations
-    // run on the bare net10.0 target, where there is no bundle or package to ask
+    // run on the bare net11.0 target, where there is no bundle or package to ask
     string GetIdentifier()
     {
         var identifier = this.options.Identifier;

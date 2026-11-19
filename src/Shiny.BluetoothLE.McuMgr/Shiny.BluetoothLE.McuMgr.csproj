@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <!--
-            No platform code: everything sits on the public IPeripheral API, so the net10.0 asset works on every
+            No platform code: everything sits on the public IPeripheral API, so the net11.0 asset works on every
             head that Shiny.BluetoothLE (or Shiny.BluetoothLE.Linux) supports.
         -->
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>

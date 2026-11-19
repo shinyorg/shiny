@@ -2,8 +2,8 @@
 
     <!--
         The platform targets are not optional even though only Android carries code of its own: an iOS or
-        Windows app would otherwise pick up the net10.0 build, which points NetPlatform at Avalonia's
-        dispatcher - and NetPlatform only exists in Shiny.Core's net10.0 build, so it fails to load there.
+        Windows app would otherwise pick up the net11.0 build, which points NetPlatform at Avalonia's
+        dispatcher - and NetPlatform only exists in Shiny.Core's net11.0 build, so it fails to load there.
     -->
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>

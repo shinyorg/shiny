@@ -61,7 +61,7 @@ MCUmgr's **SMP** (Simple Management Protocol) is how Zephyr / nRF Connect SDK / 
 | SMP service | `8d53dc1d-1db7-4cd3-868b-8a527460aa84` (`BleSmpTransport.ServiceUuid`) |
 | SMP characteristic (write without response + notify) | `da2e7828-fbce-4e01-ae9e-261174997c48` (`BleSmpTransport.CharacteristicUuid`) |
 
-The package is a plain `net10.0` library on top of `Shiny.BluetoothLE`'s `IPeripheral` - **no DI registration and no
+The package is a plain `net11.0` library on top of `Shiny.BluetoothLE`'s `IPeripheral` - **no DI registration and no
 platform code**. It works wherever `Shiny.BluetoothLE` (iOS, Mac Catalyst, macOS, Android, Windows, Blazor Web
 Bluetooth) or `Shiny.BluetoothLE.Linux` provides peripherals. Register BLE as usual (`AddBluetoothLE()` /
 `AddLinuxBluetoothLE()`), scan, and hand the `IPeripheral` over.

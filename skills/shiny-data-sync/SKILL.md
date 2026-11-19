@@ -46,7 +46,7 @@ Do **not** use this skill for: large file uploads/downloads (use `shiny-http-tra
 
 | Item        | Value                                                                                   |
 |-------------|-----------------------------------------------------------------------------------------|
-| NuGet       | `Shiny.Data.Sync` (one package everywhere - its `net10.0` build includes Blazor WASM)   |
+| NuGet       | `Shiny.Data.Sync` (one package everywhere - its `net11.0` build includes Blazor WASM)   |
 | Namespace   | `Shiny.Data.Sync`                                                                       |
 | Platforms   | iOS / tvOS / Mac Catalyst (NSURLSession background, both outbox upload + inbox download); Android (Foreground Service + HttpClient); Windows / Linux / base .NET (HttpClient + connectivity loop); Blazor WASM (HttpClient + LocalStorage) |
 | DI Setup    | `services.AddDataSync<TDelegate>(builder => ...)` on all native platforms (auto-picks NSURLSession / Foreground Service / HttpClient based on TFM), `services.AddBlazorDataSync<TDelegate>(...)` on Blazor WASM (same package; `Shiny.Data.Sync.Blazor` no longer exists) |

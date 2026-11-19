@@ -18,8 +18,8 @@ namespace Shiny;
 /// <para>
 /// It exists because the base target framework had no <see cref="IPlatform"/> at all, which meant
 /// anything built on Shiny.Core could not be compiled for it: a Linux desktop head cannot ask for a
-/// net10.0-linux build, because there is no such target framework, so whatever it gets has to come
-/// from the plain net10.0 one.
+/// net11.0-linux build, because there is no such target framework, so whatever it gets has to come
+/// from the plain net11.0 one.
 /// </para>
 /// <para>
 /// Modelled on <c>WindowsPlatform</c>'s unpackaged branch rather than on anything new, and that is

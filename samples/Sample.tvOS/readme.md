@@ -1,6 +1,6 @@
 # Shiny tvOS Sample
 
-A plain UIKit tvOS app exercising every Shiny module that has a `net10.0-tvos` target. There is no
+A plain UIKit tvOS app exercising every Shiny module that has a `net11.0-tvos` target. There is no
 MAUI on tvOS, so this hosts through `Shiny.Hosting.Native` - one `ShinyAppDelegate` subclass and a
 `UITabBarController`, nothing more.
 
@@ -10,7 +10,7 @@ MAUI on tvOS, so this hosts through `Shiny.Hosting.Native` - one `ShinyAppDelega
 dotnet build samples/Sample.tvOS/Sample.tvOS.csproj -p:RuntimeIdentifier=tvossimulator-arm64
 
 xcrun simctl boot "Apple TV"
-xcrun simctl install booted samples/Sample.tvOS/bin/Debug/net10.0-tvos/tvossimulator-arm64/Sample.tvOS.app
+xcrun simctl install booted samples/Sample.tvOS/bin/Debug/net11.0-tvos/tvossimulator-arm64/Sample.tvOS.app
 xcrun simctl launch booted org.shiny.sample.tvos
 ```
 

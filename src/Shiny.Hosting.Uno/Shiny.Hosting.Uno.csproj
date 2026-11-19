@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <!--
-        net10.0 is what Uno's Skia desktop (net10.0-desktop) and WebAssembly (net10.0-browserwasm) heads resolve.
-        The platform targets are not optional: an Android/iOS/Windows head would otherwise pick up the net10.0 build,
-        which points NetPlatform at Uno's dispatcher - and NetPlatform only exists in Shiny.Core's net10.0 build.
+        net11.0 is what Uno's Skia desktop (net11.0-desktop) and WebAssembly (net11.0-browserwasm) heads resolve.
+        The platform targets are not optional: an Android/iOS/Windows head would otherwise pick up the net11.0 build,
+        which points NetPlatform at Uno's dispatcher - and NetPlatform only exists in Shiny.Core's net11.0 build.
     -->
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>

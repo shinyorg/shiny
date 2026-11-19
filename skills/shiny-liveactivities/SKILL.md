@@ -68,7 +68,7 @@ ships in the macOS SDK, which misleads people, but every public type in it is an
 `@available(macOS, unavailable)`, `@available(macCatalyst, unavailable)`, `@available(tvOS, unavailable)`
 and `@available(watchOS, unavailable)`. What a Mac shows is an *iPhone's* activity mirrored over iPhone
 Mirroring — nothing a Mac app declares or drives. That is why the native binding package is named
-`Shiny.iOS.LiveActivities.Binding`, and why the .NET package targets only `net10.0`, `-android` and `-ios`.
+`Shiny.iOS.LiveActivities.Binding`, and why the .NET package targets only `net11.0`, `-android` and `-ios`.
 
 Because unsupported platforms get a no-op rather than a throw, shared view models need no `#if` — branch on
 `IsSupported` only when the UI should hide the feature entirely.

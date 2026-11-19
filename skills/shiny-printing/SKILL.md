@@ -432,7 +432,7 @@ blocks the socket to the printer too.
 needs nothing - it runs from the current foreground activity, so call it while the app is visible.
 
 **Linux**: add `SkiaSharp.NativeAssets.Linux` to the **app** when using `Shiny.Printing.Rendering` - SkiaSharp's plain
-`net10.0` build ships only macOS and Windows natives, so rendering throws `DllNotFoundException: libSkiaSharp`
+`net11.0` build ships only macOS and Windows natives, so rendering throws `DllNotFoundException: libSkiaSharp`
 without it. CUPS printing needs `lp`/`lpstat` (the `cups-client` package).
 
 ## Don't

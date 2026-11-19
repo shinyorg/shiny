@@ -14,9 +14,9 @@ namespace Shiny;
 /// The iOS 27.1 hinge and reserved-region APIs, called through the Objective-C runtime.
 /// </summary>
 /// <remarks>
-/// A library's <c>net10.0-ios</c> compiles against the oldest supported iOS SDK pack (26.0), which has no binding for
-/// <c>UIHingeInteraction</c> or <c>UIViewReservedRegion</c>. Targeting <c>net10.0-ios27.1</c> instead would stop every
-/// <c>net10.0-ios</c> library that references Shiny.Core from restoring. So these few calls go through
+/// A library's <c>net11.0-ios</c> compiles against the oldest supported iOS SDK pack (27.0), which has no binding for
+/// <c>UIHingeInteraction</c> or <c>UIViewReservedRegion</c>. Targeting <c>net11.0-ios27.1</c> instead would stop every
+/// <c>net11.0-ios</c> library that references Shiny.Core from restoring. So these few calls go through
 /// <c>objc_msgSend</c> and key-value coding, with blittable signatures only (trim and AOT safe). Replace this file with
 /// the bound types once the library's default iOS pack is 27.1 or later.
 /// </remarks>

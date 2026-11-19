@@ -56,8 +56,8 @@ send no notifications for them.
 
 | Package | Targets | Use in |
 |---|---|---|
-| `Shiny.Mobile.InAppPurchases` | `net10.0-ios` (15+), `net10.0-android` (API 26+), `net10.0` (contracts only) | The app (any Shiny host, MAUI not required) |
-| `Shiny.Mobile.InAppPurchases.Server` | `net10.0` + ASP.NET Core | Your backend |
+| `Shiny.Mobile.InAppPurchases` | `net11.0-ios` (15+), `net11.0-android` (API 26+), `net11.0` (contracts only) | The app (any Shiny host, MAUI not required) |
+| `Shiny.Mobile.InAppPurchases.Server` | `net11.0` + ASP.NET Core | Your backend |
 
 Namespaces: `Shiny.InAppPurchases` (client) and `Shiny.InAppPurchases.Server` (server); the registration extensions (`AddInAppPurchases`, `AddInAppPurchaseServer`, `MapInAppPurchaseWebhooks`, `MapInAppPurchaseVerification`) live in `Shiny`.
 

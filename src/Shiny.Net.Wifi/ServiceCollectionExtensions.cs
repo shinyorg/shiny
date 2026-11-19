@@ -27,7 +27,7 @@ public static class WifiServiceCollectionExtensions
     /// <c>com.apple.security.network.client</c> when sandboxed.</para>
     /// <para>Windows: needs the <c>wiFiControl</c> capability, and <c>radios</c> to power the
     /// adapter.</para>
-    /// <para>Linux and plain .NET: this method does not exist on the plain <c>net10.0</c> target.
+    /// <para>Linux and plain .NET: this method does not exist on the plain <c>net11.0</c> target.
     /// Reference <c>Shiny.Net.Wifi.Linux</c>, which declares <c>AddWifi</c> with a
     /// NetworkManager-backed implementation of the same interfaces.</para>
     /// </remarks>

@@ -127,7 +127,7 @@ and fails on real hardware.
 ```bash
 # every platform - Android, iOS, tvOS, Mac Catalyst, macOS, Windows, Linux (evdev), Blazor WebAssembly
 dotnet add package Shiny.Gamepad
-# Shiny.Gamepad.Linux / Shiny.Gamepad.Blazor no longer exist - the net10.0 build picks evdev or the
+# Shiny.Gamepad.Linux / Shiny.Gamepad.Blazor no longer exist - the net11.0 build picks evdev or the
 # W3C Gamepad API at runtime with OperatingSystem.IsLinux() / IsBrowser()
 ```
 

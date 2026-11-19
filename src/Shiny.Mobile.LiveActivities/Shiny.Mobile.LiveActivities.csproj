@@ -8,7 +8,7 @@
              @available(macCatalyst, unavailable) / @available(tvOS, unavailable) / @available(watchOS,
              unavailable) - there is no AppKit or Mac Catalyst surface to bind. What macOS shows is an
              iPhone's activity mirrored over iPhone Mirroring, which no Mac app declares or drives.
-             Everything else resolves the net10.0 asset and gets NoOpLiveActivityManager. -->
+             Everything else resolves the net11.0 asset and gets NoOpLiveActivityManager. -->
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(IosTarget)</TargetFrameworks>

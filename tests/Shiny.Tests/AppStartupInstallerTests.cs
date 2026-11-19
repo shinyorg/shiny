@@ -39,7 +39,7 @@ public class AppStartupInstallerTests
     [Fact]
     public async Task UnsupportedHost_ReportsNotSupported()
     {
-        // the test host is macOS or Windows CI on plain net10.0 - Windows is a real install, so only assert off it
+        // the test host is macOS or Windows CI on plain net11.0 - Windows is a real install, so only assert off it
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             return;
 
