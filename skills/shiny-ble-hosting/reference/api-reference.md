@@ -205,8 +205,17 @@ public record AdvertisementOptions(
     string? LocalName = null,
     // GATT service UUIDs to advertise
     params string[] ServiceUuids
-);
+)
+{
+    IReadOnlyList<AdvertisementServiceData> ServiceData { get; init; }   // not on Apple
+    ManufacturerData? ManufacturerData { get; init; }                     // not on Apple
+    bool IsConnectable { get; init; } = true;
+    bool IncludeTxPower { get; init; } = false;
+}
 ```
+
+Everything except `LocalName` must fit the 31-byte advertising packet, or `StartAdvertising` throws
+`ArgumentException` (`ParamName` `"options"`). Two custom 128-bit service UUIDs alone are 37 bytes with flags.
 
 ### CharacteristicSubscription
 

@@ -24,6 +24,9 @@ triggers:
   - StopAdvertising
   - AdvertiseBeacon
   - AdvertisementOptions
+  - advertisement too large
+  - advertising packet size
+  - advertising 31 bytes
   - CharacteristicSubscription
   - GattResult
   - GattState
@@ -362,6 +365,25 @@ await hostingManager.StartAdvertising();
 
 // Stop advertising
 hostingManager.StopAdvertising();
+```
+
+The advertising packet holds **31 bytes**, and `StartAdvertising` throws an `ArgumentException` (`ParamName` =
+`"options"`, message lists every section and its size) before touching the radio when the options do not fit.
+Count it like this: flags 3 (always on Apple/Windows, on connectable advertisements on Android/Linux), each UUID list
+2 + 2 per 16-bit / 4 per 32-bit / 16 per 128-bit UUID, each service data entry 2 + UUID + payload, manufacturer data
+2 + 2 + payload, tx power 3 (Android/Linux, when `IncludeTxPower`). `LocalName` is not counted - the platforms put it
+in the scan response or truncate it. So **two custom 128-bit service UUIDs never fit** (3 + 2 + 32 = 37): advertise
+one UUID and let the central discover the other services from the GATT server after it connects.
+
+```csharp
+// WRONG - 37 bytes, throws ArgumentException
+await hostingManager.StartAdvertising(new AdvertisementOptions("MyDevice",
+    "12345678-1234-1234-1234-123456789abc",
+    "87654321-4321-4321-4321-cba987654321"));
+
+// RIGHT - one 128-bit UUID (21 bytes); the second service is still on the GATT server
+await hostingManager.StartAdvertising(new AdvertisementOptions("MyDevice",
+    "12345678-1234-1234-1234-123456789abc"));
 ```
 
 ### 4. iBeacon Broadcasting
@@ -706,6 +728,7 @@ the host answers `"SL2T" [version:1] [status:1]`, and only after `Accepted` does
 11. **Never register the same service UUID twice** -- `BleHostingManager` keys services by UUID. Put every characteristic of a service in one `AddService` call
 12. **Frame anything that may not fit in `Mtu`** -- `NotifyMessage` for replies and a per-central `BleMessageReassembler` (keyed by `IPeripheral.Uuid`) for writes, paired with `WriteCharacteristicMessageAsync` / `NotifyCharacteristicMessages` on the central. Never truncate, and never hand-roll a chunk counter
 13. **Share one PSM through `L2CapTicketBroker`** -- one `Reserve` per transfer, the token handed out over an authenticated GATT route, instead of an `OpenL2Cap` per transfer
+14. **Keep the advertisement within 31 bytes** -- one 128-bit service UUID at most (16-bit SIG UUIDs are 2 bytes each). `StartAdvertising` throws `ArgumentException` for an oversized `AdvertisementOptions` on every platform; do not catch it and retry with the same options, and do not add more UUIDs to "make the device findable" - centrals discover the full service list over GATT
 
 ## Reference Files
 

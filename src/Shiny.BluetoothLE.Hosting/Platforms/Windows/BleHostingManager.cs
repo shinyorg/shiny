@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Shiny.BluetoothLE.Hosting.Infrastructure;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -81,6 +82,10 @@ public partial class BleHostingManager : IBleHostingManager
     public Task StartAdvertising(AdvertisementOptions? options = null)
     {
         options ??= new AdvertisementOptions();
+
+        // the publisher always sends the flags set below. The local name is not counted: it is the one section the
+        // platforms truncate or move to the scan response, and a name that does not fit fails in Start as it always has
+        AdvertisementPacket.EnsureFits(options, new PacketLayout(Flags: true, TxPower: false));
         this.ResetAdvertisement();
 
         if (!options.LocalName.IsEmpty())

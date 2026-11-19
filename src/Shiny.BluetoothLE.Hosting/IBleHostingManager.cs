@@ -37,6 +37,10 @@ public interface IBleHostingManager
     /// Starts BLE advertising
     /// </summary>
     /// <param name="options">Optional advertisement configuration</param>
+    /// <exception cref="System.ArgumentException">
+    /// The options do not fit the 31-byte advertising packet - for example two custom 128-bit service UUIDs. The
+    /// message lists each section and its size. <see cref="AdvertisementOptions.LocalName"/> is not counted.
+    /// </exception>
     Task StartAdvertising(AdvertisementOptions? options = null);
 
     /// <summary>

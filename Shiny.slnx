@@ -38,6 +38,7 @@
         <Project Path="tests/Shiny.Jobs.Tests/Shiny.Jobs.Tests.csproj" />
         <Project Path="tests/Shiny.BluetoothLE.Common.Tests/Shiny.BluetoothLE.Common.Tests.csproj" />
         <Project Path="tests/Shiny.Beacons.Tests/Shiny.Beacons.Tests.csproj" />
+        <Project Path="tests/Shiny.BluetoothLE.Hosting.Tests/Shiny.BluetoothLE.Hosting.Tests.csproj" />
         <Project Path="tests/Shiny.BluetoothLE.Hosting.Linux.Tests/Shiny.BluetoothLE.Hosting.Linux.Tests.csproj" />
         <Project Path="tests/Shiny.AppFunctions.Tests/Shiny.AppFunctions.Tests.csproj" />
         <Project Path="tests/Shiny.AppFunctions.SourceGenerators.Tests/Shiny.AppFunctions.SourceGenerators.Tests.csproj" />

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Android.Bluetooth.LE;
 using Android.OS;
 using Java.Util;
+using Shiny.BluetoothLE.Hosting.Infrastructure;
 using Shiny.BluetoothLE.Hosting.Internals;
 using static Android.Manifest;
 using Shiny.BluetoothLE.Infrastructure;
@@ -141,6 +142,10 @@ public partial class BleHostingManager(AndroidPlatform platform) : IBleHostingMa
             throw new InvalidOperationException("Advertisement is already running");
         
         options ??= new();
+
+        // Android adds the flags structure to connectable advertisements; the local name is set on the adapter, not
+        // put in the packet
+        AdvertisementPacket.EnsureFits(options, new PacketLayout(Flags: options.IsConnectable, TxPower: true));
 
         var settings = new AdvertiseSettings.Builder()!
             .SetAdvertiseMode(AdvertiseMode.Balanced)!
