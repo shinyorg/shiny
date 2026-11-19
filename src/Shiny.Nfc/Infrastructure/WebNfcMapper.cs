@@ -31,7 +31,7 @@ partial class WebNfcJsonContext : JsonSerializerContext;
 /// Translates between <see cref="NdefRecord"/> and Web NFC's <c>NDEFRecord</c>, which unpacks the
 /// well-known types itself: a URL record arrives as the expanded URL, a text record as the text with
 /// its language and encoding alongside, and a well-known local type as <c>:type</c>. Compiled on every
-/// target so the mapping is unit tested on net10.0; the browser manager only moves the JSON.
+/// target so the mapping is unit tested on net11.0; the browser manager only moves the JSON.
 /// </summary>
 static class WebNfcMapper
 {

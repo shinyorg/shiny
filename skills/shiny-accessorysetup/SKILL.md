@@ -53,7 +53,7 @@ The OS's own "set up your accessory" UI for a BLE device, behind one API:
 Not AirPods' automatic popup (that is Apple-only proximity pairing; Android's equivalent is Google Fast Pair, which
 needs firmware support and Google registration). The app must be in the foreground and call `ShowPicker`.
 
-Elsewhere (`net10.0`, Windows, macOS, Mac Catalyst, Linux) nothing is registered - resolve
+Elsewhere (`net11.0`, Windows, macOS, Mac Catalyst, Linux) nothing is registered - resolve
 `IAccessorySetupManager?` and fall back to a normal `IBleManager.Scan`.
 
 Namespaces: `using Shiny.BluetoothLE.AccessorySetup;` and `using Shiny.BluetoothLE;` (for `GetPeripheral`).

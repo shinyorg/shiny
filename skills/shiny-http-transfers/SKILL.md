@@ -77,7 +77,7 @@ Use this skill when the user needs to:
 
 | Item        | Value                                                                                   |
 |-------------|-----------------------------------------------------------------------------------------|
-| NuGet       | `Shiny.Net.Http` (one package everywhere - its `net10.0` build includes Blazor WASM)    |
+| NuGet       | `Shiny.Net.Http` (one package everywhere - its `net11.0` build includes Blazor WASM)    |
 | Namespace   | `Shiny.Net.Http`                                                                        |
 | Platforms   | iOS, tvOS (native NSURLSession); Android, Windows, Linux, macOS, .NET base (managed HttpClient loop); Blazor WASM (Service Worker) |
 | DI Setup    | `services.AddHttpTransfers<TDelegate>()` (iOS/tvOS/Android/Windows), `services.AddHttpClientTransfers<TDelegate>()` (Linux/macOS/plain .NET), or `services.AddBlazorHttpTransfers<TDelegate>()` (Blazor) |
@@ -165,7 +165,7 @@ builder.Services.AddBlazorHttpTransfers<MyDelegate>(opts =>
 });
 ```
 
-`AddBlazorHttpTransfers` ships in `Shiny.Net.Http`'s `net10.0` build - never reference `Shiny.Net.Http.Blazor`, which was merged into `Shiny.Net.Http` in v6. It uses the Service Worker Background Sync API. Queued transfers are written to IndexedDB; the Service Worker's `sync` event handler drains the queue via `fetch()` and stores download bodies as `Blob`s back into IndexedDB. When the tab reopens, the C# `BrowserHttpTransferManager` reconciles results from IndexedDB and fires the `IHttpTransferDelegate` callbacks.
+`AddBlazorHttpTransfers` ships in `Shiny.Net.Http`'s `net11.0` build - never reference `Shiny.Net.Http.Blazor`, which was merged into `Shiny.Net.Http` in v6. It uses the Service Worker Background Sync API. Queued transfers are written to IndexedDB; the Service Worker's `sync` event handler drains the queue via `fetch()` and stores download bodies as `Blob`s back into IndexedDB. When the tab reopens, the C# `BrowserHttpTransferManager` reconciles results from IndexedDB and fires the `IHttpTransferDelegate` callbacks.
 
 Ship the bundled SW file or import its handlers from your own service worker:
 

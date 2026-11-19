@@ -27,19 +27,19 @@ done
 case "$platform" in
     ios)
         if [[ -n "$device" ]] && ! xcrun simctl list devices | grep -q "$device"; then
-            dotnet build "$project" -f net10.0-ios -p:RuntimeIdentifier=ios-arm64
-            xcrun devicectl device install app --device "$device" "$bin/net10.0-ios/ios-arm64/Shiny.DeviceTests.app"
+            dotnet build "$project" -f net11.0-ios -p:RuntimeIdentifier=ios-arm64
+            xcrun devicectl device install app --device "$device" "$bin/net11.0-ios/ios-arm64/Shiny.DeviceTests.app"
         else
-            dotnet build "$project" -f net10.0-ios -p:RuntimeIdentifier=iossimulator-arm64
-            xcrun simctl install "${device:-booted}" "$bin/net10.0-ios/iossimulator-arm64/Shiny.DeviceTests.app"
+            dotnet build "$project" -f net11.0-ios -p:RuntimeIdentifier=iossimulator-arm64
+            xcrun simctl install "${device:-booted}" "$bin/net11.0-ios/iossimulator-arm64/Shiny.DeviceTests.app"
         fi
         ;;
     android)
-        dotnet build "$project" -f net10.0-android -t:Install
+        dotnet build "$project" -f net11.0-android -t:Install
         ;;
     maccatalyst)
-        dotnet build "$project" -f net10.0-maccatalyst
-        open "$(find "$bin/net10.0-maccatalyst" -maxdepth 2 -name "Shiny.DeviceTests.app" | head -1)"
+        dotnet build "$project" -f net11.0-maccatalyst
+        open "$(find "$bin/net11.0-maccatalyst" -maxdepth 2 -name "Shiny.DeviceTests.app" | head -1)"
         ;;
     *)
         echo "unknown platform $platform" >&2

@@ -114,7 +114,7 @@ Use this skill when the user needs to:
 
 | Property   | Value                        |
 |------------|------------------------------|
-| NuGet      | `Shiny.Gps` (GPS, motion activity, geocoding), `Shiny.Geofencing` (geofences), `Shiny.Locations` (meta-package referencing both - no code of its own). Blazor WASM GPS is in `Shiny.Gps`'s `net10.0` build (chosen with `OperatingSystem.IsBrowser()`); `Shiny.Locations.Blazor` no longer exists |
+| NuGet      | `Shiny.Gps` (GPS, motion activity, geocoding), `Shiny.Geofencing` (geofences), `Shiny.Locations` (meta-package referencing both - no code of its own). Blazor WASM GPS is in `Shiny.Gps`'s `net11.0` build (chosen with `OperatingSystem.IsBrowser()`); `Shiny.Locations.Blazor` no longer exists |
 | Namespace  | `Shiny.Locations`            |
 | Platforms  | iOS, Android, Windows, Blazor WebAssembly (foreground GPS only). **No tvOS target** — `CLMonitor`, `CLMonitorConfiguration` and `CLRegionState` are absent on tvOS, so geofencing cannot be implemented there |
 | DI Namespace | `Shiny` (extension methods on `IServiceCollection`) |
@@ -260,7 +260,7 @@ more than 20 (iOS) / 60 (Android) regions, polygons, or address-level regions (c
 (`MinimumDistance` 300m / `MinimumTime` 1 min by default, optional `MaximumDistance`/`MaximumTime` safety nets), and asks
 each **region set**'s `IRegionSource` which region the reading is in. Each set tracks one current region, persisted, so
 restarts don't replay entries. iOS, Android, Mac Catalyst (`AddRegionGeofencing` is `#if APPLE || ANDROID`; the types
-compile on `net10.0`). Namespace `Shiny.Locations`; registration in `Shiny`.
+compile on `net11.0`). Namespace `Shiny.Locations`; registration in `Shiny`.
 
 ```csharp
 builder.Services.AddRegionGeofencing<MyRegionDelegate>(cfg => cfg

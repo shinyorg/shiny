@@ -19,7 +19,7 @@
 
     <ItemGroup>
         <!--
-            Every Shiny module that has a net10.0-tvos target. Absent by design, because Apple
+            Every Shiny module that has a net11.0-tvos target. Absent by design, because Apple
             gives tvOS no API to build them on: Shiny.BluetoothLE.Hosting (no peripheral role),
             Shiny.Net.Wifi (no NetworkExtension hotspot APIs), Shiny.Locations (no CLMonitor),
             Shiny.Notifications (a tvOS notification can only change the app icon badge).

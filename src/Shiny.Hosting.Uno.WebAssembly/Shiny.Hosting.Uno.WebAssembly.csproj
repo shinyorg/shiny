@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <!--
-        Only an Uno WebAssembly head references this (net10.0-browserwasm resolves the net10.0 build). It is a Razor SDK
+        Only an Uno WebAssembly head references this (net11.0-browserwasm resolves the net11.0 build). It is a Razor SDK
         project for the same reason Shiny.Core is: wwwroot ships as static web assets, served from
         _content/Shiny.Hosting.Uno.WebAssembly/.
     -->

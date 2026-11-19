@@ -34,7 +34,7 @@ triggers:
 # Shiny.GameCenter
 
 Achievements, leaderboards and friends over **Apple Game Center** (GameKit - iOS 15+, Mac Catalyst 15+, macOS) and
-**Google Play Games Services v2** (Android API 26+), behind one `IGameCenterManager`. The `net10.0` target registers a
+**Google Play Games Services v2** (Android API 26+), behind one `IGameCenterManager`. The `net11.0` target registers a
 manager that records locally and never sends (no service there).
 
 Namespace `Shiny.GameCenter`; `AddGameCenter` lives in `Shiny`.

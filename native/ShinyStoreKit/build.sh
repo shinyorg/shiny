@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds the StoreKit 2 Swift bridge into a dynamic xcframework consumed by Shiny.Mobile.InAppPurchases (net10.0-ios)
+# Builds the StoreKit 2 Swift bridge into a dynamic xcframework consumed by Shiny.Mobile.InAppPurchases (net11.0-ios)
 # via NativeReference. Runs automatically from the csproj on macOS; run manually after changing Swift sources
 # if you're not building through MSBuild.
 set -euo pipefail

@@ -6,7 +6,7 @@ namespace Shiny.AgeSignals.Infrastructure;
 
 /// <summary>
 /// Translates what the stores return into <see cref="AgeSignal"/>. Compiled on every target framework so the mapping is
-/// unit tested on net10.0; the platform classes only call the native APIs.
+/// unit tested on net11.0; the platform classes only call the native APIs.
 /// </summary>
 static class AgeSignalMapper
 {

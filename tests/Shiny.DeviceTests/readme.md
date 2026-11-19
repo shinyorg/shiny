@@ -1,7 +1,7 @@
 # Shiny Device Tests
 
 End-to-end tests that exercise the real platform implementations inside a running app on a simulator, emulator,
-Mac or phone. They complement the `net10.0` unit tests in `tests/`, which never touch CoreBluetooth, CoreLocation,
+Mac or phone. They complement the `net11.0` unit tests in `tests/`, which never touch CoreBluetooth, CoreLocation,
 EventKit, NsdManager and so on.
 
 | Project | What it is |
@@ -67,7 +67,7 @@ commands from the device under test to the peer's DevFlow agent.
 
 ```bash
 # 1. the peer: Mac Catalyst on this Mac (agent on :9302)
-dotnet build tests/Shiny.DeviceTests -f net10.0-maccatalyst -t:Run &
+dotnet build tests/Shiny.DeviceTests -f net11.0-maccatalyst -t:Run &
 
 # 2. the device under test: a physical iPhone (find its Wi-Fi IP in Settings)
 tests/Shiny.DeviceTests/run.sh ios --device <iphone-udid> --agent http://<iphone-ip>:9301 --peer maccatalyst --filter Ble

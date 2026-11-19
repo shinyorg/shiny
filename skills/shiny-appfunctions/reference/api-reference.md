@@ -6,7 +6,7 @@
 <PackageReference Include="Shiny.AppFunctions" Version="6.*" />
 ```
 
-Targets: `net10.0` (contracts + dispatcher, no platform bridge), `net10.0-ios`, `net10.0-android`.
+Targets: `net11.0` (contracts + dispatcher, no platform bridge), `net11.0-ios`, `net11.0-android`.
 The package also carries the source generator (`analyzers/`), the MSBuild task (`tasks/`) and the build targets,
 Swift runtime and Android schema (`buildTransitive/`).
 
@@ -233,7 +233,7 @@ Generated assets: `app_functions.xml`, `app_functions_v2.xml`, `app_functions_sc
 <PackageReference Include="Shiny.AppFunctions.Extensions.AI" Version="6.*" />
 ```
 
-Target: `net10.0` (usable from the iOS and Android heads). Depends on `Microsoft.Extensions.AI.Abstractions`.
+Target: `net11.0` (usable from the iOS and Android heads). Depends on `Microsoft.Extensions.AI.Abstractions`.
 
 ```csharp
 namespace Shiny;

@@ -11,7 +11,7 @@ namespace Shiny.Contacts;
 /// <remarks>
 /// This lives under Platforms/Shared (not Platforms/Apple) because Directory.Build.targets only
 /// compiles Platforms/Apple for the ios/maccatalyst TFMs - Platforms/Shared is the only folder
-/// that also flows into net10.0-macos. The #if APPLE guard compiles it away on Android.
+/// that also flows into net11.0-macos. The #if APPLE guard compiles it away on Android.
 /// </remarks>
 public class ContactStoreImpl : IContactStore
 {

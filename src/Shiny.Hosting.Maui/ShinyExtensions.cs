@@ -13,7 +13,7 @@ public static class ShinyExtensions
 {
     /// <summary>
     /// Registers Shiny's core services and starts the Shiny host when the MAUI app is built. On the
-    /// plain net10.0 build - the one MAUI backends such as Linux GTK resolve - it also points
+    /// plain net11.0 build - the one MAUI backends such as Linux GTK resolve - it also points
     /// Shiny's main thread at the backend's MAUI dispatcher.
     /// </summary>
     public static MauiAppBuilder UseShiny(this MauiAppBuilder builder)

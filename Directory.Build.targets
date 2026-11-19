@@ -51,7 +51,7 @@
         Everything in Shared other than IPlatform and its extension methods is wrapped in
         #if PLATFORM, and PLATFORM is not defined here - so this adds exactly those two and compiles
         the rest away. What it buys is that a plain .NET host has an IPlatform to implement and to
-        resolve at all. There is no net10.0-linux target framework for a Linux build to ask for, so
+        resolve at all. There is no net11.0-linux target framework for a Linux build to ask for, so
         the base one is the only place a GTK desktop head can get it from.
     -->
     <ItemGroup Condition="'$(TargetFramework)' == '$(BaseTargetFramework)'">
@@ -59,7 +59,7 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <!-- Uno.Sdk's own head target frameworks (samples/Sample.Uno) - net10.0-desktop and net10.0-browserwasm -->
+    <!-- Uno.Sdk's own head target frameworks (samples/Sample.Uno) - net11.0-desktop and net11.0-browserwasm -->
     <ItemGroup Condition="$(TargetFramework.Contains('-desktop'))">
         <Compile Include="Platforms\Desktop\**\*.cs" />
     </ItemGroup>

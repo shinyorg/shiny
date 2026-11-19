@@ -83,7 +83,7 @@ App Store / Google Play **in-app purchases** (consumables, non-consumables, auto
 Pay / Google Pay card payments, which go through a payment processor and get no store notifications. Namespaces are
 `Shiny.InAppPurchases` / `Shiny.InAppPurchases.Server` (package names keep `Mobile`, like Live Activities).
 
-- **Client** targets `net10.0` (contracts only), `-ios`, `-android`. `InAppPurchaseManager` in `Platforms/iOS` and
+- **Client** targets `net11.0` (contracts only), `-ios`, `-android`. `InAppPurchaseManager` in `Platforms/iOS` and
   `Platforms/Android` is an `IShinyStartupTask`, so out-of-band updates (Ask to Buy, pending payments, renewals,
   refunds) reach `IPurchaseDelegate` from launch. Android uses `AndroidPlatform` for the current activity and main
   thread. No MAUI or Essentials APIs here - only `samples/Sample.InAppPurchases.Maui` references MAUI.
@@ -111,7 +111,7 @@ Pay / Google Pay card payments, which go through a payment processor and get no 
 Achievements / leaderboards / friends over GameKit (iOS, Mac Catalyst, macOS) and Play Games Services v2 (Android).
 
 - **The queue, key mapping and de-duplication live in `Infrastructure/GameCenterManager.cs`**, compiled on every TFM and
-  unit-tested on `net10.0` through a fake `IGameServicesProvider` (`tests/Shiny.GameCenter.Tests`). Providers only
+  unit-tested on `net11.0` through a fake `IGameServicesProvider` (`tests/Shiny.GameCenter.Tests`). Providers only
   translate. Progress is absolute steps, never deltas - keep it that way so retries stay idempotent.
 - **`Xamarin.GooglePlayServices.Games.V2` is pinned at 121.0.0.4**: 122.x pulls Play Services Base 118.11 ->
   AndroidX.Fragment 1.9, above this repo's pins. Neither version binds `PlayersClient`, the `Player`/`Achievement`/
@@ -124,9 +124,10 @@ Achievements / leaderboards / friends over GameKit (iOS, Mac Catalyst, macOS) an
 
 ## Uno Platform hosting (`Shiny.Hosting.Uno` + `.WebAssembly`)
 
-Shiny runs inside the Uno.Extensions.Hosting container; `samples/Sample.Uno` (Uno.Sdk, Skia renderer) is the reference app.
+Shiny runs inside the Uno.Extensions.Hosting container; `samples/Sample.Uno` (Uno.Sdk 7, Skia renderer) is the reference app.
+Uno 7 / Uno.Extensions 8 is the first line that supports net11.0 (Uno.Sdk 6.7 stops at net10.0).
 
-- **Uno's Android types differ per renderer.** Under `SkiaRenderer` (the Uno 6 template default) `NativeApplication` /
+- **Uno's Android types differ per renderer.** Under `SkiaRenderer` (the Uno template default since 6) `NativeApplication` /
   `ApplicationActivity` live in `Uno.UI.Runtime.Skia.Android.dll`, under the native renderer in `Uno.UI.dll` - never
   ship a Shiny subclass of either; the app keeps its own and calls `StartShiny<App>()` / forwards to `Host.Lifecycle`.
 - **Skia `NativeApplication` creates the App only when an activity starts** (native creates it in its constructor),
@@ -139,10 +140,11 @@ Shiny runs inside the Uno.Extensions.Hosting container; `samples/Sample.Uno` (Un
   modules read `mod as IJSInProcessObjectReference`, which Blazor's runtime satisfies the same way.
 - **Verify the WASM head from a published folder** served by a static server - the Uno dev server returned 404s here,
   and browsers cache the boot manifest, so republish to a new folder/port rather than trusting a reload.
-- The sample turns off `CentralPackageTransitivePinningEnabled` and raises `AndroidXActivityVersion` /
-  `AndroidXAppCompatVersion` because Uno.Sdk's implicit packages clash with this repo's central pins.
-- Uno 6.7's iOS (Skia) runtime has no scene delegate, and the iOS 27 SDK traps apps without scene adoption - the iOS
-  head builds but cannot run on iOS 27 simulators until Uno adds one.
+- The sample turns off `CentralPackageTransitivePinningEnabled` because Uno.Sdk's implicit packages clash with this
+  repo's central pins. Uno.Sdk 7's implicit AndroidX (AppCompat 1.8.0, Fragment 1.9.0) is above the repo pins, so it
+  no longer overrides `AndroidXActivityVersion` / `AndroidXAppCompatVersion` (Uno.Sdk 6.7 needed both raised).
+- Uno 6.7's iOS (Skia) runtime had no scene delegate, and the iOS 27 SDK traps apps without scene adoption - the iOS
+  head built but could not run on iOS 27 simulators. Not yet re-checked on Uno 7.
 
 ## Linux / D-Bus (Tmds.DBus.Protocol)
 
@@ -211,7 +213,7 @@ has the details; `tests/Shiny.DeviceTests/run.sh <ios|android|maccatalyst>` buil
   `usernotificationsd` as `addNotificationRequest`, skipping the APNs path that launches it. Verify
   `ShinyNotificationService.swift` changes by calling the class directly from a macOS `swiftc` harness instead.
 - An incremental iOS build does not always regenerate the app's `Info.plist`; after editing it, delete
-  `obj/Debug/net10.0-ios` and `bin/Debug/net10.0-ios` before trusting a run.
+  `obj/Debug/net11.0-ios` and `bin/Debug/net11.0-ios` before trusting a run.
 - The DevFlow agent's HTTP server needs a `Content-Length` - send buffered `StringContent`, not `JsonContent`.
 
 ## Blog posts (only when explicitly requested)

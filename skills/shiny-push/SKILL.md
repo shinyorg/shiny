@@ -70,7 +70,7 @@ Use this skill when the user needs to:
 | **NuGet (Azure NH)** | `Shiny.Push.AzureNotificationHubs` |
 | **Primary Namespace** | `Shiny.Push` |
 | **Config Namespace** | `Shiny` (extension methods on `IServiceCollection`) |
-| **Platforms** | iOS (APNs), tvOS (APNs, silent/badge only), Android (FCM), Windows (WNS), Blazor WebAssembly (Web Push / VAPID, in the same `Shiny.Push` package's `net10.0` build) |
+| **Platforms** | iOS (APNs), tvOS (APNs, silent/badge only), Android (FCM), Windows (WNS), Blazor WebAssembly (Web Push / VAPID, in the same `Shiny.Push` package's `net11.0` build) |
 
 ### tvOS
 
@@ -112,7 +112,7 @@ builder.Services.AddPush<MyPushDelegate>();
 
 ### Blazor WebAssembly (Web Push)
 
-There is no separate Blazor package - `Shiny.Push`'s `net10.0` build carries the Web Push backend (`BrowserPushManager`). Never reference `Shiny.Push.Blazor`; it was merged into `Shiny.Push` in v6.
+There is no separate Blazor package - `Shiny.Push`'s `net11.0` build carries the Web Push backend (`BrowserPushManager`). Never reference `Shiny.Push.Blazor`; it was merged into `Shiny.Push` in v6.
 
 ```csharp
 using Shiny;

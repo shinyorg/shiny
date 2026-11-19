@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Shiny.InAppPurchases</RootNamespace>
-        <!-- StoreKit 2 and Google Play Billing only. Everything else resolves the net10.0 asset, which carries the
+        <!-- StoreKit 2 and Google Play Billing only. Everything else resolves the net11.0 asset, which carries the
              contracts and registers nothing. -->
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>
         <TargetFrameworks>$(TargetFrameworks);$(AndroidTarget)</TargetFrameworks>

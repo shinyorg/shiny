@@ -84,7 +84,7 @@ Use this skill when the user needs to:
 | **Namespace** | `Shiny.AppFunctions` |
 | **Registration** | `services.AddAppFunctions()` - **source-generated** into the app, in `Microsoft.Extensions.DependencyInjection` |
 | **Host** | Shiny.Core (`.UseShiny()` on MAUI) - no MAUI dependency |
-| **Platforms** | iOS 16+ (App Intents), Android 16 / API 36+ (AppFunctions; a no-op below). `net10.0` carries the contracts and the dispatcher - no platform bridge. No Mac Catalyst/macOS/Windows bridge |
+| **Platforms** | iOS 16+ (App Intents), Android 16 / API 36+ (AppFunctions; a no-op below). `net11.0` carries the contracts and the dispatcher - no platform bridge. No Mac Catalyst/macOS/Windows bridge |
 
 **The user writes no Swift, Kotlin, Info.plist, entitlements or AndroidManifest entries.** The generator writes the DI registration, binding, dispatch, the Swift App Intents and the Android schema; the package's build targets compile the Swift into the iOS app (and run Apple's metadata + Siri phrase processors) and add the schema assets on Android. The Android service arrives through the manifest merger.
 

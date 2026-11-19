@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <!--
-        One project, three heads: net10.0 is the desktop app (Windows, macOS, Linux), the platform targets
+        One project, three heads: net11.0 is the desktop app (Windows, macOS, Linux), the platform targets
         are the Android and iOS apps. Head-specific code lives in Platforms\Net, Platforms\Android and
         Platforms\iOS, which the repo's Directory.Build.targets compiles only for the matching target.
     -->

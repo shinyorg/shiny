@@ -3,7 +3,7 @@ namespace Shiny.Biometrics.Infrastructure;
 
 /// <summary>
 /// Translates the platforms' raw status / error codes into the library's enums, and picks Android's authenticator
-/// flags. Compiled on every target framework so it is unit tested on net10.0; the platform classes only call the native
+/// flags. Compiled on every target framework so it is unit tested on net11.0; the platform classes only call the native
 /// APIs and pass the codes through.
 /// </summary>
 static class BiometricMapper

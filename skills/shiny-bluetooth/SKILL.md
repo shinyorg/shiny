@@ -129,7 +129,7 @@ Invoke this skill when the user wants to:
 // Android, Windows, macOS
 builder.Services.AddBluetooth();
 
-// Linux - reference Shiny.Bluetooth.Linux; AddBluetooth does not exist on plain net10.0
+// Linux - reference Shiny.Bluetooth.Linux; AddBluetooth does not exist on plain net11.0
 services.AddLinuxBluetooth();
 ```
 
@@ -329,7 +329,7 @@ needs a BlueZ agent - a desktop session has one; on a headless device run `bluet
 ## Common mistakes
 
 - Using Shiny.Bluetooth for a BLE device (HM-10, ESP32 in BLE mode, anything with "GATT"). Use Shiny.BluetoothLE.
-- Generating iOS code. There is no target - the package will not restore for `net10.0-ios`.
+- Generating iOS code. There is no target - the package will not restore for `net11.0-ios`.
 - Treating one `ReadAsync` as one message. Frame the stream.
 - Connecting while `Discover` is still enumerating - finish or cancel the inquiry first.
 - Forgetting to dispose the `BluetoothConnection` / `BluetoothListener` - the radio link and SDP

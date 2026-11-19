@@ -2,13 +2,13 @@
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-        <MsftExtensionVersion>10.0.7</MsftExtensionVersion>
-        <MauiLabsVersion>0.1.0-preview.12.26368.2</MauiLabsVersion>
-        <MauiVersion>10.0.100</MauiVersion>
+        <MsftExtensionVersion>11.0.0</MsftExtensionVersion>
+        <MauiLabsVersion>0.1.0-preview.14.26567.2</MauiLabsVersion>
+        <MauiVersion>11.0.10</MauiVersion>
         <AvaloniaVersion>12.1.5</AvaloniaVersion>
-        <!-- the Uno.WinUI / Uno.Extensions versions Uno.Sdk 6.7.30 resolves (samples/Sample.Uno builds on that Sdk) -->
-        <UnoVersion>6.7.135</UnoVersion>
-        <UnoExtensionsVersion>7.3.6</UnoExtensionsVersion>
+        <!-- the Uno.WinUI / Uno.Extensions versions Uno.Sdk 7.0.22 resolves (samples/Sample.Uno builds on that Sdk; Uno 7 is the first with net11.0) -->
+        <UnoVersion>7.0.65</UnoVersion>
+        <UnoExtensionsVersion>8.0.1</UnoExtensionsVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
@@ -40,9 +40,10 @@
         <PackageVersion Include="PolySharp" Version="1.15.0"/>
         <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.10.1"/>
         <PackageVersion Include="Microsoft.Maui.Core" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1"/>
+        <!-- Microsoft.Maui.Essentials 11.0.10 and Uno.WinUI 7 both require 2.5.1 on Windows -->
+        <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.5.1"/>
         <PackageVersion Include="System.Reactive" Version="7.0.0"/>
-        <PackageVersion Include="System.Formats.Cbor" Version="10.0.0"/>
+        <PackageVersion Include="System.Formats.Cbor" Version="11.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.8.1"/>
         <PackageVersion Include="Microsoft.Extensions.AI" Version="10.8.1"/>
         <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.1"/>
@@ -59,7 +60,7 @@
         <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1"/>
         <PackageVersion Include="SkiaSharp" Version="4.151.1"/>
         <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1"/>
-        <PackageVersion Include="System.Drawing.Common" Version="10.0.0"/>
+        <PackageVersion Include="System.Drawing.Common" Version="11.0.0"/>
         <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="14.1.0"/>
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1"/>
@@ -70,6 +71,12 @@
         <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MsftExtensionVersion)"/>
         <PackageVersion Include="Scalar.AspNetCore" Version="2.17.14"/>
     </ItemGroup>
+    <!--
+        AndroidX floor: Microsoft.Maui.Controls 11.0.10 (via Google Material 1.14.0.5 and Essentials) depends on exactly
+        Core 1.19.0.1, Activity 1.13.0.1, Fragment 1.8.9.3, AppCompat 1.7.1.4 and Lifecycle 2.11.0.1 - the pins below - so
+        a MAUI 11 app resolves the same AndroidX graph Shiny builds against. Raising Fragment to 1.9 / AppCompat to 1.8
+        is fine for consumers (Uno.Sdk 7 already brings them), but nothing here needs it yet.
+    -->
     <ItemGroup>
         <PackageVersion Include="Xamarin.AndroidX.Core" Version="1.19.0.1"/>
         <!-- Shiny.Core's AndroidScreenPosture (Jetpack WindowManager); pulls Window + Window.WindowCore 1.5.1.3 -->
