@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Foundation;
 using CoreBluetooth;
 using CoreLocation;
+using Shiny.BluetoothLE.Hosting.Infrastructure;
 
 namespace Shiny.BluetoothLE.Hosting;
 
@@ -78,6 +79,10 @@ public partial class BleHostingManager : IBleHostingManager
 
         if (options.ManufacturerData != null)
             throw new NotSupportedException("Apple platforms cannot advertise manufacturer data - use AdvertiseBeacon for iBeacon, which CoreBluetooth exposes through a dedicated key.");
+
+        // CoreBluetooth would move the UUIDs that do not fit into its overflow area, which only an iOS device scanning
+        // for them by UUID can see - fail instead. The local name goes in the scan response (or is truncated).
+        AdvertisementPacket.EnsureFits(options, new PacketLayout(Flags: true, TxPower: false));
 
         var opts = new StartAdvertisingOptions();
         if (options.LocalName != null)

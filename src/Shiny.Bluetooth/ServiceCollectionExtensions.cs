@@ -21,7 +21,7 @@ public static class BluetoothServiceCollectionExtensions
     /// <para>Windows: needs the <c>bluetooth</c> device capability (and <c>radios</c>) when packaged.</para>
     /// <para>macOS: needs <c>NSBluetoothAlwaysUsageDescription</c> in Info.plist, and
     /// <c>com.apple.security.device.bluetooth</c> when sandboxed.</para>
-    /// <para>Linux: this method does not exist on the plain <c>net10.0</c> target. Reference
+    /// <para>Linux: this method does not exist on the plain <c>net11.0</c> target. Reference
     /// <c>Shiny.Bluetooth.Linux</c> and call <c>AddLinuxBluetooth</c>.</para>
     /// </remarks>
     public static IServiceCollection AddBluetooth(this IServiceCollection services)

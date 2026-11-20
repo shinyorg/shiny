@@ -4,7 +4,7 @@
         Classic Bluetooth (BR/EDR) - RFCOMM client and server, inquiry, pairing. iOS and Mac Catalyst
         are deliberately absent: classic Bluetooth there is ExternalAccessory, which only talks to MFi
         accessories, so there is nothing a general-purpose library can offer. Linux ships separately in
-        Shiny.Bluetooth.Linux so Tmds.DBus never reaches a WebAssembly app through the net10.0 build.
+        Shiny.Bluetooth.Linux so Tmds.DBus never reaches a WebAssembly app through the net11.0 build.
     -->
     <PropertyGroup>
         <TargetFrameworks>$(BaseTargetFramework)</TargetFrameworks>

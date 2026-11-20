@@ -179,13 +179,13 @@ throws `WifiNotSupportedException` with a message naming the exact limit.
 **On Linux, reference `Shiny.Net.Wifi.Linux` instead of the base package.** It declares
 `AddWifi()`/`AddWifiHotspot()` with NetworkManager-backed implementations of the same interfaces.
 The base package declares those two methods **only on its platform targets** (Android, Apple,
-Windows) - on plain `net10.0` they come from the Linux package, so the call is never ambiguous.
+Windows) - on plain `net11.0` they come from the Linux package, so the call is never ambiguous.
 The plain .NET stub (`NetWifiManager` / `NetWifiHotspot`) is not registered by anything: a Windows or
 macOS console app that wants addressing-only Wi-Fi info registers it itself, and every Wi-Fi-specific
 call on it throws - it is a deliberate stub, not a fallback.
 
 ```csharp
-// plain net10.0 on Windows/macOS only - there is no AddWifi() there
+// plain net11.0 on Windows/macOS only - there is no AddWifi() there
 services.AddSingleton<IWifiManager>(sp => new NetWifiManager(sp.GetRequiredService<ILogger<NetWifiManager>>()));
 ```
 

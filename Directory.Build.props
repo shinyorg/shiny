@@ -1,6 +1,6 @@
 ﻿<Project>
     <PropertyGroup>
-        <BaseTargetFramework>net10.0</BaseTargetFramework>
+        <BaseTargetFramework>net11.0</BaseTargetFramework>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
         <LangVersion>latest</LangVersion>
@@ -32,7 +32,7 @@
             The Windows target is only on by default on Windows hosts. CI builds and packs on
             macos-latest (the Live Activities binding needs Xcode), so it opts back in with
             -p:EnableWindowsTargeting=true - without that the shipped packages silently lose their
-            net10.0-windows lib. The same switch compiles the Windows target on a Mac locally.
+            net11.0-windows lib. The same switch compiles the Windows target on a Mac locally.
         -->
         <AppleTargetsSupported Condition="!$([MSBuild]::IsOSPlatform('linux'))">true</AppleTargetsSupported>
 

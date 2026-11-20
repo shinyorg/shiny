@@ -17,7 +17,7 @@ public static class VpnServiceCollectionExtensions
     /// the <c>com.apple.developer.networking.vpn.api</c> entitlement with the value <c>allow-vpn</c>.</para>
     /// <para>Android: needs API 30 (Android 11) for anything at all and API 33 for
     /// <see cref="VpnCapabilities.Status"/>; no manifest entries are needed.</para>
-    /// <para>Linux: this method does not exist on the plain <c>net10.0</c> target. Reference
+    /// <para>Linux: this method does not exist on the plain <c>net11.0</c> target. Reference
     /// <c>Shiny.Net.Vpn.Linux</c>, which declares <c>AddVpn</c> backed by NetworkManager.</para>
     /// </remarks>
     public static IServiceCollection AddVpn(this IServiceCollection services)

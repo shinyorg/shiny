@@ -152,7 +152,7 @@ recording that silently came out without the microphone is worse than one that r
 | Item      | Value |
 |-----------|-------|
 | GitHub    | https://github.com/shinyorg/shiny |
-| NuGet     | `Shiny.ScreenRecorder` (its `net10.0` build holds the Blazor WebAssembly recorder - `Shiny.ScreenRecorder.Blazor` no longer exists), plus `Shiny.ScreenRecorder.Linux` on Linux |
+| NuGet     | `Shiny.ScreenRecorder` (its `net11.0` build holds the Blazor WebAssembly recorder - `Shiny.ScreenRecorder.Blazor` no longer exists), plus `Shiny.ScreenRecorder.Linux` on Linux |
 | Namespace | `Shiny.ScreenRecorder` (types); `Shiny` (registration extensions) |
 | Platforms | Android, iOS, Mac Catalyst, macOS, Windows, Linux, Blazor WebAssembly |
 
@@ -180,7 +180,7 @@ app audio at all forces the whole pipeline down.
 builder.Services.AddScreenRecorder();     // IScreenRecorder, singleton
 ```
 
-Same call everywhere except Linux. On `net10.0`, `AddScreenRecorder()` registers the browser recorder
+Same call everywhere except Linux. On `net11.0`, `AddScreenRecorder()` registers the browser recorder
 behind `OperatingSystem.IsBrowser()` and the not-supported recorder anywhere else. **On Linux, reference
 `Shiny.ScreenRecorder.Linux` and call `builder.Services.AddLinuxScreenRecorder()` instead** - it is a separate
 package so its `Tmds.DBus.Protocol` dependency never reaches a WebAssembly app.

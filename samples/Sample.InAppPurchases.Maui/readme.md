@@ -101,7 +101,7 @@ purchase history is per tester.
 2. Make sure a development provisioning profile exists for your bundle id (automatic provisioning in your IDE is fine),
    then deploy:
    ```bash
-   dotnet build samples/Sample.InAppPurchases.Maui -f net10.0-ios -t:Run -p:RuntimeIdentifier=ios-arm64
+   dotnet build samples/Sample.InAppPurchases.Maui -f net11.0-ios -t:Run -p:RuntimeIdentifier=ios-arm64
    ```
 3. Tap a product. The first purchase attempt prompts you to sign in; use the **Sandbox Apple Account**.
    You don't need to sign out of your real Apple Account. The sheet shows **`[Environment: Sandbox]`**. If it doesn't,
@@ -137,13 +137,13 @@ Sandbox Server URL** → `https://<your-server>/iap/apple`, **Version 2**. Sandb
    your bundle id.
 2. **Build the archive / `.ipa`:**
    ```bash
-   dotnet publish samples/Sample.InAppPurchases.Maui -f net10.0-ios -c Release \
+   dotnet publish samples/Sample.InAppPurchases.Maui -f net11.0-ios -c Release \
      -p:ArchiveOnBuild=true \
      -p:RuntimeIdentifier=ios-arm64 \
      -p:CodesignKey="Apple Distribution: Your Company (TEAMID)" \
      -p:CodesignProvision="Your App Store Profile Name"
    ```
-   The `.ipa` lands in `bin/Release/net10.0-ios/ios-arm64/publish/`. Upload it with the **Transporter** app. Bump
+   The `.ipa` lands in `bin/Release/net11.0-ios/ios-arm64/publish/`. Upload it with the **Transporter** app. Bump
    `ApplicationDisplayVersion` / `ApplicationVersion` for every upload.
 3. **Submit your first in-app purchases with an app version.** On the version page, under
    **In-App Purchases and Subscriptions**, select the products (they must be *Ready to Submit*). Later products can be
@@ -176,7 +176,7 @@ Sandbox Server URL** → `https://<your-server>/iap/apple`, **Version 2**. Sandb
 4. **Build a signed App Bundle:**
    ```bash
    export UPLOAD_KEY_PASSWORD=...
-   dotnet publish samples/Sample.InAppPurchases.Maui -f net10.0-android -c Release \
+   dotnet publish samples/Sample.InAppPurchases.Maui -f net11.0-android -c Release \
      -p:AndroidPackageFormat=aab \
      -p:AndroidKeyStore=true \
      -p:AndroidSigningKeyStore=$PWD/upload.keystore \
@@ -184,7 +184,7 @@ Sandbox Server URL** → `https://<your-server>/iap/apple`, **Version 2**. Sandb
      -p:AndroidSigningKeyPass=env:UPLOAD_KEY_PASSWORD \
      -p:AndroidSigningStorePass=env:UPLOAD_KEY_PASSWORD
    ```
-   Upload `bin/Release/net10.0-android/publish/*-Signed.aab`. Increase `ApplicationVersion` (the version code) for every upload.
+   Upload `bin/Release/net11.0-android/publish/*-Signed.aab`. Increase `ApplicationVersion` (the version code) for every upload.
 5. **Upload it to the Internal testing track** (Testing → Internal testing → Create new release) and enroll in
    **Play App Signing** when asked. The Play Console won't let you create products until it has seen a build that uses
    Play Billing. The library adds the `com.android.vending.BILLING` permission for you.
@@ -222,7 +222,7 @@ accounts:
 
 1. Use a physical device, or an emulator created from a **Google Play** system image (not "Google APIs"). Sign in to the
    Play Store with a license tester account. On devices with several accounts, the purchase uses the account that installed the app.
-2. Deploy: `dotnet build samples/Sample.InAppPurchases.Maui -f net10.0-android -t:Run`
+2. Deploy: `dotnet build samples/Sample.InAppPurchases.Maui -f net11.0-android -t:Run`
 3. Tap a product. The Play sheet shows **"Test card, always approves"**, which confirms you're testing.
 
 **Internal / closed testing tracks** — use these for QA builds installed from Play. It can take a few hours for a new

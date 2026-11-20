@@ -12,7 +12,7 @@ enum CallScreeningAction
 
 /// <summary>
 /// The platform-free half of Android call screening - which entry an incoming handle maps to and what to do with
-/// the call - so it is unit tested on net10.0 rather than only on a phone.
+/// the call - so it is unit tested on net11.0 rather than only on a phone.
 /// </summary>
 static class CallScreening
 {

@@ -18,6 +18,12 @@
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Infrastructure/AdvertisementPacket: the Linux package shares the packet size check, the tests cover it on net11.0 -->
+        <InternalsVisibleTo Include="Shiny.BluetoothLE.Hosting.Linux" />
+        <InternalsVisibleTo Include="Shiny.BluetoothLE.Hosting.Tests" />
+    </ItemGroup>
+
     <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.targets"/>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-macos'))">

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Builds the Declared Age Range Swift bridge into a dynamic xcframework consumed by Shiny.AgeSignals (net10.0-ios and
-# net10.0-macos) via NativeReference. DeclaredAgeRange is weak-linked so the bridge loads on OS versions before 26.
+# Builds the Declared Age Range Swift bridge into a dynamic xcframework consumed by Shiny.AgeSignals (net11.0-ios and
+# net11.0-macos) via NativeReference. DeclaredAgeRange is weak-linked so the bridge loads on OS versions before 26.
 # Runs automatically from the csproj on macOS; run manually after changing Swift sources
 # if you're not building through MSBuild.
 set -euo pipefail
@@ -15,7 +15,7 @@ WORK="$(mktemp -d "${TMPDIR:-/tmp}/$NAME.XXXXXX")"
 LOCK="$DIR/.build.lock"
 trap 'rm -rf "$WORK"' EXIT
 
-# net10.0-ios and net10.0-macos both run this, in parallel on a multi-TFM build. One builds; the other waits, then finds
+# net11.0-ios and net11.0-macos both run this, in parallel on a multi-TFM build. One builds; the other waits, then finds
 # the framework up to date. (mkdir is the lock - macOS has no flock.) A lock older than 10 minutes is a killed build.
 while ! mkdir "$LOCK" 2>/dev/null; do
     if [ -n "$(find "$LOCK" -maxdepth 0 -mmin +10 2>/dev/null)" ]; then

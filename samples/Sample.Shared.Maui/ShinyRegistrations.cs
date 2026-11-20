@@ -180,7 +180,7 @@ public static class ShinyRegistrations
         // ── Printing ──
         // Thermal / receipt printers over WiFi (raw TCP 9100, found over the mDNS registered above) and
         // OS-native printing (AirPrint / PrintManager / GDI+ / CUPS) work on every platform here. CUPS backs
-        // both Linux and the macOS head, which resolve Shiny.Printing's plain net10.0 build.
+        // both Linux and the macOS head, which resolve Shiny.Printing's plain net11.0 build.
         s.AddNetworkPrinting();
         s.AddNativePrinting();
         s.AddPrintDocumentRendering();

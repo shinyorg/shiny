@@ -17,7 +17,7 @@ public static class MauiProgram
             .UseSampleShiny();
 
         // Linux-specific registrations — the cross-platform Shiny packages do not
-        // expose these on plain net10.0, so the .Linux packages wire them here.
+        // expose these on plain net11.0, so the .Linux packages wire them here.
         var s = builder.Services;
         s.AddLinuxBluetoothLE();
         s.AddBluetoothLeHosting();

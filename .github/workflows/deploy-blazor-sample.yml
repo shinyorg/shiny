@@ -29,9 +29,9 @@ env:
 
 jobs:
   build:
-    # macOS so the multi-target src libs (net10.0-ios, net10.0-android, …) can
+    # macOS so the multi-target src libs (net11.0-ios, net11.0-android, …) can
     # resolve their workload packs during project-graph restore. Linux runners
-    # fail with NETSDK1178 on Microsoft.iOS.Sdk.net10.0_26.x packs.
+    # fail with NETSDK1178 on Microsoft.iOS.Sdk.net11.0_27.x packs.
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -42,7 +42,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '11.0.x'
 
       - name: Restore workloads
         run: dotnet workload restore "${{ env.SAMPLE_CSPROJ }}"
