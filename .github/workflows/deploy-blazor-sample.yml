@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - v5
-      - v6
+      - main
     paths:
       - 'samples/Sample.Blazor/**'
       - 'src/**/*.Blazor/**'
@@ -36,8 +35,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0   # Nerdbank.GitVersioning needs full history
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6

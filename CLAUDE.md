@@ -77,6 +77,21 @@ heading when cutting the release.
 Changes confined to `samples/` get no note — fix the sample, and only add a note if the same change
 also altered library behavior or documented guidance (write the note about *that*, not the sample).
 
+## Releasing
+
+`main` is the only working branch (`v5`/`v6` and older are left as they are). Versions come from git tags, not the
+repo - there is no `version.json` / Nerdbank.GitVersioning:
+
+- Push a `v7.0.0` (or `v7.0.0-beta.1`) tag on a `main` commit, or run the **Release** workflow by hand with a version
+  (it creates the tag). `release.yml` builds `Build.slnf` with `-p:Version=<tag>`, pushes every package to NuGet
+  (trusted publishing) and creates a GitHub release with generated notes. A `-suffix` makes both prerelease.
+- **CI** (`ci.yml`) builds every push / PR to `main` the way a release does and publishes nothing. Its runner
+  and toolchain pins match `release.yml` - bump them together.
+- `skills/` syncs to shinyorg/skills only as the last job of a release (`release.yml` calls `sync-skills.yml`), so
+  the published skills always match a shipped version. Run **Sync Skills** by hand to re-sync without releasing.
+- Untagged builds are `0.0.0-dev` (`Directory.Build.props`).
+- When you tag, promote the `### <version> - TBD` heading in `client/release-notes.mdx` to the release date.
+
 ## In-App Purchases (`Shiny.Mobile.InAppPurchases` + `.Server`)
 
 App Store / Google Play **in-app purchases** (consumables, non-consumables, auto-renewable subscriptions) - NOT Apple
@@ -180,8 +195,9 @@ real bus (a Pi is the usual target):
 - **Test the package, not a swapped DLL.** Dropping one rebuilt assembly into a published app fails
   with `BadImageFormatException` whenever the working tree differs from the published package's
   commit. Instead, clone the release commit into a scratch directory, apply only the fix, and pack it
-  with `-p:PublicRelease=true` (Nerdbank ignores `-p:PackageVersion`) so it is exactly the released
-  version. Then restore the consumer against a scratch feed, using `RestoreConfigFile` and
+  with `-p:Version=<released version>` so it is exactly the released version (releases up to 6.6.0
+  used Nerdbank - pack those commits with `-p:PublicRelease=true` instead, as Nerdbank ignores
+  `-p:PackageVersion`). Then restore the consumer against a scratch feed, using `RestoreConfigFile` and
   `NUGET_PACKAGES` environment variables so no real `NuGet.config` or package cache changes.
 - **A small file-based console app** (`#:package`, `#:property PublishAot=false`, `SelfContained`,
   `PublishSingleFile`, `dotnet publish -r linux-arm64`) copied to the device exercises the library

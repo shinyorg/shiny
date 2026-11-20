@@ -18,6 +18,8 @@
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <!-- local / CI builds only - release.yml stamps the real version from the v* tag with -p:Version -->
+        <Version Condition="'$(Version)' == ''">0.0.0-dev</Version>
         
         <CI Condition="'$(GITHUB_ACTIONS)' == 'true'">true</CI>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>

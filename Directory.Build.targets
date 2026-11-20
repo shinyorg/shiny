@@ -1,9 +1,5 @@
 <Project>
     <ItemGroup>
-        <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Include="Platforms\**\*.cs" />
         <Compile Remove="Platforms\**\*.cs" />
 

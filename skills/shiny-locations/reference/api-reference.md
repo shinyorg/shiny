@@ -6,17 +6,17 @@ For MAUI / native targets:
 
 ```xml
 <!-- GPS, motion activity, geocoding -->
-<PackageReference Include="Shiny.Gps" Version="6.*" />
+<PackageReference Include="Shiny.Gps" Version="7.*" />
 <!-- geofencing (independent of Shiny.Gps) -->
-<PackageReference Include="Shiny.Geofencing" Version="6.*" />
+<PackageReference Include="Shiny.Geofencing" Version="7.*" />
 <!-- or both at once - meta-package with no code of its own -->
-<PackageReference Include="Shiny.Locations" Version="6.*" />
+<PackageReference Include="Shiny.Locations" Version="7.*" />
 ```
 
 For Blazor WebAssembly:
 
 ```xml
-<PackageReference Include="Shiny.Gps" Version="6.*" />
+<PackageReference Include="Shiny.Gps" Version="7.*" />
 ```
 
 `Position` and `Distance` live in `Shiny.Core`, which both packages depend on. All types keep the `Shiny.Locations` namespace.

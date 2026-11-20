@@ -3,7 +3,7 @@
 ## Installation
 
 ```xml
-<PackageReference Include="Shiny.Wearables" Version="6.*" />
+<PackageReference Include="Shiny.Wearables" Version="7.*" />
 ```
 
 Targets: `net11.0` (contracts only, nothing registered), `net11.0-android`, `net11.0-ios`.

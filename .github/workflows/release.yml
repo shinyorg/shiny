@@ -1,0 +1,101 @@
+name: Release
+
+# Push a tag like v7.0.0 (or v7.0.0-beta.1 for a prerelease) to build every package at that version, push them to
+# NuGet and publish a GitHub release. Or run it by hand with a version, which creates the v<version> tag on the
+# commit it built. The tag is the version - there is nothing to bump in the repo. A suffix after '-' marks both the
+# NuGet packages and the GitHub release as prerelease. Toolchain pins match ci.yml - bump them together.
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 7.0.0 or 7.0.0-beta.1) - creates the v<version> tag'
+        required: true
+
+permissions:
+  id-token: write   # required for NuGet trusted publishing (OIDC)
+  contents: write   # creates the GitHub release (and the tag, when run by hand)
+
+jobs:
+  release:
+    # same runner as ci.yml - see the note there (Xcode for the Live Activities shim, EnableWindowsTargeting
+    # for the net11.0-windows libs)
+    runs-on: xcode-27
+
+    steps:
+    - name: Version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION="${{ inputs.version }}"
+        else
+          VERSION="${GITHUB_REF_NAME#v}"
+        fi
+        if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+          echo "Version '$VERSION' must look like 7.0.0 or 7.0.0-beta.1"; exit 1
+        fi
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "TAG=v$VERSION" >> "$GITHUB_ENV"
+        if [[ "$VERSION" == *-* ]]; then echo "PRERELEASE=--prerelease" >> "$GITHUB_ENV"; fi
+
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+          dotnet-version: '11.0.100'
+          workloads: maui-ios, maui-android, maui-maccatalyst, maui-windows, macos, tvos, wasm-tools
+
+    - name: Select Xcode 27.1
+      run: sudo xcode-select -s /Applications/Xcode_27.1.app/Contents/Developer && xcodebuild -version
+
+    # Release packs on build (GeneratePackageOnBuild); Version overrides the 0.0.0-dev default in Directory.Build.props
+    - name: Build
+      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:EnableWindowsTargeting=true -property:Version="$VERSION"
+
+    - name: Collect packages
+      run: |
+        mkdir -p artifacts
+        find src -path '*/bin/Release/*' \( -name '*.nupkg' -o -name '*.snupkg' \) -exec cp {} artifacts/ \;
+        ls artifacts
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: nugets
+        path: artifacts/*
+        if-no-files-found: error
+
+    - name: NuGet Login (OIDC)
+      id: nuget-login
+      uses: NuGet/login@v1
+      with:
+        user: aritchie
+
+    # NuGet first: the GitHub release only appears once the packages it points at are live. The .snupkg files are
+    # pushed alongside their .nupkg. --skip-duplicate so a re-run after a partial failure pushes only what is missing.
+    - name: Publish NuGets
+      run: >
+        dotnet nuget push "artifacts/*.nupkg"
+        --source https://api.nuget.org/v3/index.json
+        --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
+        --skip-duplicate
+
+    - name: GitHub Release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: >
+        gh release create "$TAG"
+        --repo "${{ github.repository }}"
+        --title "Shiny $VERSION"
+        --notes "Release notes: https://shinylib.net/client/release-notes/"
+        --generate-notes
+        --target "$GITHUB_SHA"
+        $PRERELEASE
+
+  # only after the packages and the GitHub release are out, so the published skills match a shipped version
+  skills:
+    needs: release
+    uses: ./.github/workflows/sync-skills.yml
+    secrets: inherit

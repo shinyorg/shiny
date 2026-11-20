@@ -1,30 +1,23 @@
-﻿name: Build
+name: CI
 
+# Every push to main, and every pull request into it: build the packages the way a release builds them, without
+# publishing. Releases come from tags - see release.yml. Toolchain pins match release.yml - bump them together.
 on:
   workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
   push:
-    branches:
-      - preview
-      - v*
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  NugetApiKey: ${{secrets.NUGETAPIKEY}}
-
 jobs:
   build:
-    permissions:
-      id-token: write   # required for NuGet trusted publishing (OIDC)
-      contents: read
-
     # macOS, not Windows: Shiny.iOS.LiveActivities.Binding builds the ActivityKit Swift shim
     # (native/ShinyLiveActivities) through Xcode, which only exists here.
     # Directory.Build.props only adds $(WindowsTarget) on Windows hosts, so the Build step passes
@@ -36,8 +29,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v7
-      with:
-          fetch-depth: 0
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v6
@@ -64,22 +55,13 @@ jobs:
         build CODE_SIGNING_ALLOWED=NO
 
     - name: Build
-      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true -property:EnableWindowsTargeting=true
+      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:EnableWindowsTargeting=true
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v7
       with:
         name: nugets
-        path: ${{ github.workspace }}/artifacts
+        path: |
+          src/**/bin/Release/*.nupkg
+          src/**/bin/Release/*.snupkg
         retention-days: 5
-
-    - name: NuGet Login (OIDC)
-      id: nuget-login
-      if: ${{ github.ref == 'refs/heads/preview' || startsWith(github.ref, 'refs/heads/v') }}
-      uses: NuGet/login@v1
-      with:
-        user: aritchie
-
-    - name: Publish NuGets
-      if: ${{ github.ref == 'refs/heads/preview' || startsWith(github.ref, 'refs/heads/v') }}
-      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
