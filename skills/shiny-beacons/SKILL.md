@@ -310,6 +310,10 @@ distance directly, so the filter and estimator are bypassed there — only the t
 - **Blazor** needs `navigator.bluetooth.requestLEScan`, which is Chromium-only and behind
   `chrome://flags/#enable-experimental-web-platform-features`. The chooser fallback reports no
   advertisement payload, so beacons are invisible through it.
+- **Android filters the iBeacon scan** on Apple's company identifier and the `0x02 0x15` prefix,
+  because Android delivers nothing from an unfiltered scan while the screen is off. With
+  `AllowNonAppleCompanyId = true` the scan stays unfiltered (those payloads arrive under other
+  company identifiers), so monitoring then only sees beacons while the screen is on.
 
 ## Permissions
 

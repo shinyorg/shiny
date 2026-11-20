@@ -28,4 +28,28 @@ public record AndroidScanConfig(
     params string[] ServiceUuids
 ) : ScanConfig(
     ServiceUuids
+)
+{
+    /// <summary>
+    /// Manufacturer data filters, each passed to ScanFilter.Builder.setManufacturerData. Like service
+    /// UUID filters they are OR'd - an advertisement matching any filter is reported.
+    /// </summary>
+    /// <remarks>
+    /// Android pauses unfiltered scans while the screen is off, so a scan that has to keep running in
+    /// the background needs at least one filter. Use this when the peripheral advertises no service UUID.
+    /// </remarks>
+    public AndroidManufacturerDataFilter[] ManufacturerData { get; init; } = [];
+}
+
+
+/// <summary>
+/// A manufacturer data scan filter.
+/// </summary>
+/// <param name="ManufacturerId">The Bluetooth SIG company identifier, e.g. 0x004C for Apple.</param>
+/// <param name="Data">The bytes the manufacturer data (company identifier excluded) has to start with.</param>
+/// <param name="Mask">Optional, same length as <paramref name="Data"/> - only the set bits are compared.</param>
+public record AndroidManufacturerDataFilter(
+    int ManufacturerId,
+    byte[] Data,
+    byte[]? Mask = null
 );

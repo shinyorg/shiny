@@ -157,8 +157,16 @@ public record AndroidScanConfig(
     bool UseScanBatching = false,                  // Enable scan batching if supported
     bool IncludeExtendedAdvertisements = true,     // true (default) = legacy + BT5 extended (when chipset supports it); false = legacy only
     params string[] ServiceUuids
-) : ScanConfig(ServiceUuids);
+) : ScanConfig(ServiceUuids)
+{
+    // OR'd with the service UUID filters; Android pauses unfiltered scans while the screen is off
+    public AndroidManufacturerDataFilter[] ManufacturerData { get; init; } = [];
+}
+
+public record AndroidManufacturerDataFilter(int ManufacturerId, byte[] Data, byte[]? Mask = null);
 ```
+
+> `ManufacturerData` filters on the manufacturer-specific data (company identifier plus a data prefix, optionally masked) - use it to keep a background scan alive for peripherals that advertise no service UUID, e.g. `new AndroidScanConfig(ScanMode.LowPower) { ManufacturerData = [new(0x004C, [0x02, 0x15])] }` for iBeacons.
 
 > `IncludeExtendedAdvertisements` defaults to `true`, so scans discover both legacy and Bluetooth 5 extended advertisements automatically. Shiny only enables extended scanning when the chipset reports `IsLeExtendedAdvertisingSupported`, and always pairs `setLegacy(false)` with all-PHY scanning so legacy advertisements (what most peripherals send) are never suppressed. Set it to `false` only if you specifically want a legacy-only scan.
 
