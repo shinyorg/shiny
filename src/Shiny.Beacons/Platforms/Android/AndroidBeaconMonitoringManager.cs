@@ -113,8 +113,10 @@ public class AndroidBeaconMonitoringManager : BleScanBeaconMonitoringManager, IS
 
     void StartService()
     {
+        // stopWithTask is false (as GPS does by default): monitoring is a background feature, and
+        // nothing brings the service back if swiping the app away stops it while the process lives
         if (!ShinyBeaconMonitoringService.IsStarted)
-            this.platform.StartService(typeof(ShinyBeaconMonitoringService));
+            this.platform.StartService(typeof(ShinyBeaconMonitoringService), stopWithTask: false);
     }
 
 

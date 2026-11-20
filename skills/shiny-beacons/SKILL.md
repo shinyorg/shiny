@@ -297,6 +297,8 @@ distance directly, so the filter and estimator are bypassed there — only the t
 - **macOS monitoring** registers successfully but reports `AccessState.NotSupported` and throws
   `PlatformNotSupportedException` from `StartMonitoring`. This is deliberate so shared startup code
   runs unchanged; branch on `CurrentStatus` rather than on `OperatingSystem.IsMacOS()`.
+- **Android monitoring survives the app being swiped away.** The foreground service is started
+  with `stopWithTask: false`, so the scan keeps running until `StopMonitoring`/`StopAllMonitoring`.
 - **iOS caps an app at 20 monitored regions** across beacons *and* geofences together. Below iOS 18
   Shiny throws a named error at the cap; iOS itself would silently drop the excess.
 - **Apple cannot broadcast Eddystone.** `startAdvertising` accepts only a local name and service
