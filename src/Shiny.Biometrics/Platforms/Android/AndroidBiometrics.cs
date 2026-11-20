@@ -35,9 +35,7 @@ public class AndroidBiometrics(AndroidPlatform platform) : IBiometrics
         BiometricMapper.Validate(request);
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (platform.CurrentActivity is not FragmentActivity activity)
-            throw new InvalidOperationException("BiometricPrompt needs the current activity to be a FragmentActivity (AppCompatActivity / MauiAppCompatActivity)");
-
+        var activity = await this.GetPromptActivity(cancellationToken).ConfigureAwait(false);
         var authenticators = BiometricMapper.ToAndroidAuthenticators(request.Strength, request.AllowDeviceCredential, (int)Build.VERSION.SdkInt);
         var builder = new BiometricPrompt.PromptInfo.Builder()
             .SetTitle(request.Title ?? request.Reason)
@@ -80,6 +78,52 @@ public class AndroidBiometrics(AndroidPlatform platform) : IBiometrics
         cancellationToken.ThrowIfCancellationRequested();
         return result;
     }
+
+
+    static readonly TimeSpan ActivityTimeout = TimeSpan.FromSeconds(5);
+
+    // Right after another activity returns (a file picker, the camera, a share sheet) its result arrives before the app's
+    // own activity is back in front, so the last tracked activity can still be the one that just finished - often a plain
+    // Activity, or the app's activity with its state still saved (where BiometricPrompt silently does nothing).
+    // Wait a short moment for a FragmentActivity that can host the prompt instead of failing straight away.
+    async Task<FragmentActivity> GetPromptActivity(CancellationToken cancellationToken)
+    {
+        var activity = AsPromptHost(platform.CurrentActivity);
+        if (activity != null)
+            return activity;
+
+        var tcs = new TaskCompletionSource<FragmentActivity>(TaskCreationOptions.RunContinuationsAsynchronously);
+        void OnActivityChanged(object? sender, ActivityChanged e)
+        {
+            if (e.State == ActivityState.Resumed && AsPromptHost(e.Activity) is { } host)
+                tcs.TrySetResult(host);
+        }
+
+        platform.ActivityChanged += OnActivityChanged;
+        try
+        {
+            // it may have resumed between the first check and the subscription
+            activity = AsPromptHost(platform.CurrentActivity);
+            if (activity != null)
+                return activity;
+
+            return await tcs.Task.WaitAsync(ActivityTimeout, cancellationToken).ConfigureAwait(false);
+        }
+        catch (TimeoutException ex)
+        {
+            throw new InvalidOperationException("BiometricPrompt needs the current activity to be a FragmentActivity (AppCompatActivity / MauiAppCompatActivity) and none was resumed within " + ActivityTimeout.TotalSeconds + " seconds", ex);
+        }
+        finally
+        {
+            platform.ActivityChanged -= OnActivityChanged;
+        }
+    }
+
+
+    static FragmentActivity? AsPromptHost(Activity? activity) =>
+        activity is FragmentActivity host && !host.IsFinishing && !host.IsDestroyed && !host.SupportFragmentManager.IsStateSaved
+            ? host
+            : null;
 
 
     static BiometricType GetSensors(PackageManager? pm)
