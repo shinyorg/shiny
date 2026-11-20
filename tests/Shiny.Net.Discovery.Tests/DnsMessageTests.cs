@@ -1,6 +1,11 @@
 using System.Net;
 using Shiny.Net.Discovery.Internals;
 using Shiny.Net.Discovery.Managed.Dns;
+// .NET 11 added System.Net.PtrRecord/SrvRecord/TxtRecord/AddressRecord - these names mean the mDNS wire records
+using AddressRecord = Shiny.Net.Discovery.Managed.Dns.AddressRecord;
+using PtrRecord = Shiny.Net.Discovery.Managed.Dns.PtrRecord;
+using SrvRecord = Shiny.Net.Discovery.Managed.Dns.SrvRecord;
+using TxtRecord = Shiny.Net.Discovery.Managed.Dns.TxtRecord;
 using Xunit;
 
 namespace Shiny.Net.Discovery.Tests;
