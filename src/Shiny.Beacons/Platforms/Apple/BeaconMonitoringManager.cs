@@ -43,6 +43,8 @@ public class BeaconMonitoringManager(
     volatile CLMonitor? monitor;
     readonly SemaphoreSlim monitorLock = new(1, 1);
     readonly ConcurrentDictionary<string, byte> initialFires = new();
+    readonly ConcurrentDictionary<string, byte> freshConditions = new();
+    CLLocationManager? authManager;
     CLServiceSession? session;
     TaskCompletionSource<AccessState>? authTcs;
 
@@ -93,10 +95,23 @@ public class BeaconMonitoringManager(
     /// <inheritdoc />
     public async Task<AccessState> RequestAccess()
     {
-        if (this.CurrentStatus != AccessState.Unknown)
+        // CLServiceSession only reports whether its requirement is met - it never prompts for Always.
+        // Without an explicit request an app holding when-in-use (or nothing yet) gets Denied at once,
+        // and that Denied used to stick for the life of the process. Prompt first, as
+        // CLLocationBeaconMonitoringManager does: when-in-use, then the upgrade to always.
+        var prompted = await this.PromptForAlways().ConfigureAwait(false);
+        if (prompted != AccessState.Available)
+        {
+            this.CurrentStatus = prompted;
+            return prompted;
+        }
+
+        if (this.CurrentStatus == AccessState.Available)
             return this.CurrentStatus;
 
-        this.authTcs ??= new TaskCompletionSource<AccessState>();
+        // a Denied from before the user granted Always must not answer for the new state
+        this.CurrentStatus = AccessState.Unknown;
+        this.authTcs = new TaskCompletionSource<AccessState>();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
         await using var registration = cts.Token.Register(
             () => this.authTcs.TrySetException(new TimeoutException("Beacon monitoring authorization request timed out"))
@@ -105,6 +120,28 @@ public class BeaconMonitoringManager(
         this.EnsureSession();
         return await this.authTcs.Task.ConfigureAwait(false);
     }
+
+
+    async Task<AccessState> PromptForAlways()
+    {
+        var prompt = platform.InvokeTaskOnMainThread(() =>
+        {
+            this.authManager ??= new CLLocationManager { Delegate = new AuthorizationDelegate() };
+            return this.authManager.RequestAccess(true);
+        });
+
+        // iOS shows the upgrade to always only once; asked again it stays silent and no callback comes
+        var finished = await Task.WhenAny(prompt, Task.Delay(TimeSpan.FromSeconds(30))).ConfigureAwait(false);
+        if (finished == prompt)
+            return await prompt.ConfigureAwait(false);
+
+        return await platform
+            .InvokeOnMainThreadAsync(() => this.authManager!.GetCurrentStatus(true))
+            .ConfigureAwait(false);
+    }
+
+
+    sealed class AuthorizationDelegate : ShinyBeaconLocationDelegate;
 
 
     /// <inheritdoc />
@@ -171,7 +208,10 @@ public class BeaconMonitoringManager(
             mon.RemoveCondition(region.Identifier);
         }
 
-        this.initialFires.TryAdd(region.Identifier, 0);
+        // The first event of a condition the app has just asked for is its current state, not a replay
+        // of an older one - it must not be swallowed like the cold-start replays are.
+        this.initialFires.TryRemove(region.Identifier, out _);
+        this.freshConditions[region.Identifier] = 0;
         mon.AddCondition(region.ToCondition(), region.Identifier);
     }
 
@@ -277,7 +317,15 @@ public class BeaconMonitoringManager(
                     return;
                 }
 
-                if (this.initialFires.TryRemove(evt.Identifier, out _))
+                if (this.freshConditions.TryRemove(evt.Identifier, out _))
+                {
+                    // Unsatisfied is what the app assumes anyway. Satisfied means the device was already
+                    // inside when monitoring started - CoreLocation will not report that again, so it is
+                    // the only chance the delegate gets to learn it.
+                    if (evt.State != CLMonitoringState.Satisfied)
+                        return;
+                }
+                else if (this.initialFires.TryRemove(evt.Identifier, out _))
                 {
                     logger.LogDebug("Suppressed initial state fire for beacon region {Identifier}", evt.Identifier);
                     return;
@@ -325,6 +373,7 @@ public class BeaconMonitoringManager(
             this.monitor?.Dispose();
             this.monitor = null;
             this.initialFires.Clear();
+            this.freshConditions.Clear();
 
             this.session?.Invalidate();
             this.session = null;
