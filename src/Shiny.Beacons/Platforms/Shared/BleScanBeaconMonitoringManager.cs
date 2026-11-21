@@ -115,7 +115,7 @@ public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IDisposa
 
             this.logger.LogInformation("Starting beacon region monitoring scan");
 
-            var scanner = new BleBeaconScanner(this.bleManager, this.options, BeaconScanConfigFactory.Create(true));
+            var scanner = new BleBeaconScanner(this.bleManager, this.options, BeaconScanConfigFactory.Create(true, this.options));
 
             this.scanSubscription =
             [

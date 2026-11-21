@@ -373,6 +373,14 @@ public partial class BleManager : ScanCallback, INativeBleManager, IShinyStartup
             }
         }
 
+        foreach (var md in cfg.ManufacturerData)
+        {
+            scanFilters.Add(new ScanFilter.Builder()
+                .SetManufacturerData(md.CompanyId, md.DataPrefix)!
+                .Build()!
+            );
+        }
+
         if (cfg.UseScanBatching && this.Native.Adapter!.IsOffloadedScanBatchingSupported)
             builder.SetReportDelay(100);
 

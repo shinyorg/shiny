@@ -28,4 +28,24 @@ public record AndroidScanConfig(
     params string[] ServiceUuids
 ) : ScanConfig(
     ServiceUuids
-);
+)
+{
+    /// <summary>
+    /// Manufacturer data scan filters. Like service UUID filters they are OR'd: an advertisement matching any
+    /// service UUID or any manufacturer filter is reported.
+    /// </summary>
+    /// <remarks>
+    /// Android stops delivering results from an unfiltered scan while the screen is off. Use this for a
+    /// peripheral that advertises no service UUID, such as an iBeacon.
+    /// </remarks>
+    public AndroidManufacturerDataFilter[] ManufacturerData { get; init; } = [];
+}
+
+
+/// <summary>
+/// Matches advertisements whose manufacturer data arrives under <paramref name="CompanyId"/> and starts with
+/// <paramref name="DataPrefix"/>.
+/// </summary>
+/// <param name="CompanyId">The Bluetooth SIG company identifier, e.g. 0x004C for Apple.</param>
+/// <param name="DataPrefix">The bytes the manufacturer data (company identifier excluded) has to start with. Empty matches any data.</param>
+public record AndroidManufacturerDataFilter(ushort CompanyId, byte[] DataPrefix);

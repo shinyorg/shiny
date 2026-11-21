@@ -32,6 +32,8 @@ triggers:
   - BeaconRegion
   - BeaconRegionState
   - BeaconRangingOptions
+  - ServiceUuids
+  - beacon screen off
   - BeaconIdentity
   - EddystoneUid
   - EddystoneFrame
@@ -267,6 +269,29 @@ services.AddBeaconRanging(new BeaconRangingOptions
 - **`CurveFitDistanceEstimator`** — the Radius Networks/AltBeacon empirical fit. Use it for parity
   with other Android beacon stacks; its constants were fitted to one specific device.
 - Implement `IBeaconDistanceEstimator` for your own model.
+
+### Scan filter (`ServiceUuids`)
+
+`ServiceUuids` filters the BLE scan wherever beacons come from one (Android, Windows, Linux, Blazor,
+plain .NET); Apple platforms use CoreLocation and ignore it. **An iBeacon advertises no service UUID**
+(the region UUID is a field inside the manufacturer data, not a service UUID), so never put the
+region's proximity UUID here. Set it only when the beacons also advertise a vendor service UUID in the
+**same packet** — only advertisements carrying one are reported, so a beacon that sends it in a
+separate packet is never seen:
+
+```csharp
+services.AddBeaconMonitoring<MyDelegate>(new BeaconRangingOptions
+{
+    // WRONG: ["B9407F30-F5F8-466E-AFF9-25556B57FE6D"] - that is the region UUID, nothing advertises it as a service
+    ServiceUuids = ["<vendor service uuid>"] // must be in the SAME packet as the iBeacon data
+});
+```
+
+With no `ServiceUuids`, **Android** filters on Apple's iBeacon identifier (company `0x004C`, payload
+starting `0x02 0x15`) automatically, because Android delivers **nothing** from an unfiltered scan while
+the screen is off. Other platforms scan unfiltered. With `AllowNonAppleCompanyId = true` and no
+`ServiceUuids`, Android scans unfiltered too (those payloads use other company ids), so it stops while
+the screen is off.
 
 Samples are **always** fed through a windowed trimmed-mean filter first (`RssiFilter`), which is what
 actually removes the jitter. On Apple platforms CoreLocation does its own filtering and hands back a

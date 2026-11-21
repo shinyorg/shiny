@@ -29,7 +29,7 @@ public class BleScanBeaconRangingManager : IBeaconRangingManager
     {
         this.bleManager = bleManager;
         this.scanner = new Lazy<BleBeaconScanner>(
-            () => new BleBeaconScanner(bleManager, options, BeaconScanConfigFactory.Create(false))
+            () => new BleBeaconScanner(bleManager, options, BeaconScanConfigFactory.Create(false, options))
         );
     }
 

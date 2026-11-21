@@ -79,6 +79,24 @@ public record BeaconRangingOptions
     public bool AllowNonAppleCompanyId { get; init; } = false;
 
     /// <summary>
+    /// The service UUIDs the iBeacon scan is filtered on - only advertisements carrying one of them are reported.
+    /// Defaults to none. Applies wherever beacons are found by a BLE scan (Android, Windows, Linux, Blazor and
+    /// plain .NET); Apple platforms range iBeacons through CoreLocation and ignore it.
+    /// </summary>
+    /// <remarks>
+    /// An iBeacon advertises no service UUID - the whole packet is Apple manufacturer data, and the region's
+    /// UUID is a field inside it - so set this only when your beacons also advertise a service UUID of their
+    /// own in the same packet, as some vendors do. A beacon that sends it in a separate packet is never seen.
+    /// <para>
+    /// With none set, Android filters on Apple's iBeacon identifier instead (company 0x004C, payload starting
+    /// 0x02 0x15), because it stops delivering results from an unfiltered scan while the screen is off. With
+    /// <see cref="AllowNonAppleCompanyId"/> on and none set, the scan is unfiltered everywhere, as those payloads
+    /// arrive under other company identifiers.
+    /// </para>
+    /// </remarks>
+    public string[] ServiceUuids { get; init; } = [];
+
+    /// <summary>
     /// The clock the filters and region timers run against. Defaults to the system clock; tests
     /// substitute a fake so windows and timeouts can be driven deterministically.
     /// </summary>
