@@ -177,6 +177,12 @@ if (access == AccessState.Available)
 Monitored regions are persisted and re-armed on the next launch. Monitoring reports **only**
 entry/exit — it never reports distance. Range the region in the foreground when you need that.
 
+A region the device is already inside reports `Entered` right after `StartMonitoring` on Android and
+on iOS / Mac Catalyst 18+. iOS below 18 does not - call `RequestState(region)` there if the starting
+state matters. On Apple, `RequestAccess()` returns `Restricted` while only when-in-use is granted.
+The first upgrade request waits up to 30 seconds for the user's answer; iOS shows that prompt once,
+so later calls return straight away and the user has to change it in Settings.
+
 ## Eddystone
 
 ```csharp

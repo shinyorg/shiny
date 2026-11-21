@@ -65,6 +65,12 @@ public class GeofencingTests(IGeofenceManager geofences, IGpsManager gps) : Devi
             return Task.CompletedTask;
         });
 
+        this.Test("RequestAccess_MatchesSystemStatus", async ctx =>
+        {
+            await LocationAuthorization.AssertAnswersForAlways(ctx, "RequestAccess", geofences.RequestAccess);
+            Assert.Equal(LocationAuthorization.ExpectedForAlways(), geofences.CurrentStatus);
+        }, timeout: TimeSpan.FromSeconds(90));
+
         this.Test("StartMonitoring_RoundTripsThroughGetMonitorRegions", async ctx =>
         {
             this.RequireAccess(ctx);
@@ -107,7 +113,7 @@ public class GeofencingTests(IGeofenceManager geofences, IGpsManager gps) : Devi
 
         this.Test("StartMonitoring_WhileInside_ReportsStateWithoutEntered", async ctx =>
         {
-            this.RequireLocation(ctx);
+            await this.RequireLocation(ctx);
             await this.DriveGpsAsync(ctx, async () =>
             {
                 await SimulatedLocation.SetAsync(ctx, Inside);
@@ -124,7 +130,7 @@ public class GeofencingTests(IGeofenceManager geofences, IGpsManager gps) : Devi
 
         this.Test("EnterThenExit_FiresDelegate", async ctx =>
         {
-            this.RequireLocation(ctx);
+            await this.RequireLocation(ctx);
             await this.DriveGpsAsync(ctx, async () =>
             {
                 var region = await this.StartOutsideAsync(ctx, NewRegion());
@@ -146,7 +152,7 @@ public class GeofencingTests(IGeofenceManager geofences, IGpsManager gps) : Devi
 
         this.Test("NotifyOnEntryFalse_OnlyReportsExit", async ctx =>
         {
-            this.RequireLocation(ctx);
+            await this.RequireLocation(ctx);
             await this.DriveGpsAsync(ctx, async () =>
             {
                 var region = await this.StartOutsideAsync(ctx, NewRegion() with { NotifyOnEntry = false });
@@ -161,7 +167,7 @@ public class GeofencingTests(IGeofenceManager geofences, IGpsManager gps) : Devi
 
         this.Test("SingleUse_IsRemovedAfterFirstTransition", async ctx =>
         {
-            this.RequireLocation(ctx);
+            await this.RequireLocation(ctx);
             await this.DriveGpsAsync(ctx, async () =>
             {
                 var region = await this.StartOutsideAsync(ctx, NewRegion() with { SingleUse = true });
@@ -256,9 +262,10 @@ public class GeofencingTests(IGeofenceManager geofences, IGpsManager gps) : Devi
         => ctx.SkipUnless(this.access == AccessState.Available, $"Geofence access is {this.access}");
 
 
-    void RequireLocation(TestContext ctx)
+    async Task RequireLocation(TestContext ctx)
     {
         ctx.RequireCapability(HostCapability.Location);
         this.RequireAccess(ctx);
+        await RegionMonitoring.RequireAsync(ctx);
     }
 }

@@ -16,6 +16,7 @@ public static class DeviceTestModules
         services.AddNetworkPrinterDeviceTests();
         services.AddGpsDeviceTests();
         services.AddGeofencingDeviceTests();
+        services.AddBeaconsDeviceTests();
         services.AddNotificationDeviceTests();
         services.AddPushDeviceTests();
         services.AddJobsDeviceTests();

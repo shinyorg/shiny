@@ -109,6 +109,19 @@ public class GpsManager(
 
         var access = this.GetCurrentStatus(request);
 
+        // ⚠️ An always session never asks for the upgrade itself: holding when-in-use, its first diagnostic
+        // already says always is denied and no prompt appears. So ask the way CLLocationGpsManager does -
+        // when-in-use first, then the one-time upgrade - before the session is opened to hold the grant.
+        if (requirement == CLServiceSessionAuthorizationRequirement.Always && access is AccessState.Unknown or AccessState.Restricted)
+        {
+            await services
+                .GetRequiredService<IPlatform>()
+                .InvokeTaskOnMainThread(() => this.AuthManager.RequestAccess(true))
+                .ConfigureAwait(false);
+
+            access = this.GetCurrentStatus(request);
+        }
+
         // A prompt cannot revisit either of these - the user has decided, or the device has - and opening a
         // session to be told so costs a round trip and a dialog nobody sees.
         if (access is AccessState.Denied or AccessState.Disabled)
@@ -209,6 +222,10 @@ public class GpsManager(
 
         return await tcs.Task.ConfigureAwait(false);
     }
+
+
+    // only touched on the main thread - CoreLocation delivers a manager's callbacks to the run loop it was created on
+    CLLocationManager AuthManager => field ??= new CLLocationManager { Delegate = new ShinyLocationDelegate() };
 
 
     /// <summary>

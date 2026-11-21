@@ -1,6 +1,8 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreLocation;
+using Foundation;
 
 namespace Shiny.Beacons;
 
@@ -71,39 +73,75 @@ public static class AppleLocationAccess
     /// </param>
     public static async Task<AccessState> RequestAccess(this CLLocationManager manager, bool background)
     {
-        var status = manager.GetCurrentStatus(background);
-        if (status != AccessState.Unknown && !(background && status == AccessState.Restricted))
-            return status;
+        if (!CLLocationManager.LocationServicesEnabled)
+            return AccessState.Disabled;
 
         if (manager.Delegate is not ShinyBeaconLocationDelegate locationDelegate)
             throw new InvalidOperationException("The location manager's delegate must derive from ShinyBeaconLocationDelegate");
 
         // iOS insists on when-in-use being granted before always can even be asked for
         if (manager.AuthorizationStatus == CLAuthorizationStatus.NotDetermined)
-            status = await Wait(locationDelegate, false, manager.RequestWhenInUseAuthorization).ConfigureAwait(false);
+        {
+            // undecided again (a fresh install, or reset in Settings), so the upgrade prompt is back too
+            NSUserDefaults.StandardUserDefaults.RemoveObject(UpgradeRequestedKey);
+            await Wait(locationDelegate, CLAuthorizationStatus.NotDetermined, manager.RequestWhenInUseAuthorization).ConfigureAwait(false);
+        }
 
-        if (background && status is AccessState.Available or AccessState.Restricted)
-            status = await Wait(locationDelegate, true, manager.RequestAlwaysAuthorization).ConfigureAwait(false);
+#if !MACOS
+        if (background && manager.AuthorizationStatus == CLAuthorizationStatus.AuthorizedWhenInUse)
+            await RequestAlways(manager, locationDelegate).ConfigureAwait(false);
+#endif
 
-        return status;
+        return manager.GetCurrentStatus(background);
     }
 
 
-    static Task<AccessState> Wait(ShinyBeaconLocationDelegate locationDelegate, bool background, Action request)
+    const string UpgradeRequestedKey = "shiny.location.alwaysUpgradeRequested";
+
+#if !MACOS
+    static readonly TimeSpan UpgradeAnswerTimeout = TimeSpan.FromSeconds(30);
+
+    // iOS shows the upgrade to always once per install, and the app cannot see it: it stays active while
+    // the prompt is up, "keep only while using" changes nothing so no callback comes, and asked again iOS
+    // stays silent. So the first request waits (bounded) for the answer and later ones don't wait at all.
+    // The key is shared by every Shiny location package, because the prompt is per app.
+    static async Task RequestAlways(CLLocationManager manager, ShinyBeaconLocationDelegate locationDelegate)
     {
-        var tcs = new TaskCompletionSource<AccessState>();
+        var defaults = NSUserDefaults.StandardUserDefaults;
+        var asked = defaults.BoolForKey(UpgradeRequestedKey);
+        defaults.SetBool(true, UpgradeRequestedKey);
+
+        using var cts = new CancellationTokenSource();
+        var answered = Wait(locationDelegate, CLAuthorizationStatus.AuthorizedWhenInUse, manager.RequestAlwaysAuthorization, cts.Token);
+        if (!asked)
+            await Task.WhenAny(answered, Task.Delay(UpgradeAnswerTimeout, cts.Token)).ConfigureAwait(false);
+
+        cts.Cancel();
+    }
+#endif
+
+
+    static Task Wait(ShinyBeaconLocationDelegate locationDelegate, CLAuthorizationStatus from, Action request, CancellationToken cancelToken = default)
+    {
+        var tcs = new TaskCompletionSource();
 
         EventHandler<CLAuthorizationStatus>? handler = null;
         handler = (_, status) =>
         {
-            if (status == CLAuthorizationStatus.NotDetermined)
+            // CoreLocation also reports the unchanged status when a manager is created
+            if (status == CLAuthorizationStatus.NotDetermined || status == from)
                 return;
 
             locationDelegate.AuthorizationStatusChanged -= handler;
-            tcs.TrySetResult(status.FromNative(background));
+            tcs.TrySetResult();
         };
 
         locationDelegate.AuthorizationStatusChanged += handler;
+        cancelToken.Register(() =>
+        {
+            locationDelegate.AuthorizationStatusChanged -= handler;
+            tcs.TrySetCanceled();
+        });
         request();
 
         return tcs.Task;

@@ -221,6 +221,21 @@ public class GpsTests(IGpsManager gps) : DeviceTestSuite
             Assert.False(outside);
         });
 
+#if IOS || MACCATALYST
+        // the helper behind the iOS 17 manager, which no installed runtime runs - called directly instead
+        this.Test("AppleLocationExtensions_Background_MatchesSystemStatus", ctx => LocationAuthorization.AssertAnswersForAlways(
+            ctx,
+            "AppleLocationExtensions.RequestAccess(true)",
+            () => MainThread.InvokeOnMainThreadAsync(() => AppleLocationExtensions.RequestAccess(true))
+        ), timeout: TimeSpan.FromSeconds(90));
+
+        this.Test("RequestAccess_Background_MatchesSystemStatus", ctx => LocationAuthorization.AssertAnswersForAlways(
+            ctx,
+            "RequestAccess(Realtime background)",
+            () => gps.RequestAccess(GpsRequest.Realtime(true))
+        ), timeout: TimeSpan.FromSeconds(90));
+#endif
+
         this.Test("RealtimeBackgroundListener_DeliversReadings", async ctx =>
         {
             ctx.RequireCapability(HostCapability.Location);

@@ -1,7 +1,9 @@
 #if APPLE
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreLocation;
+using Foundation;
 
 namespace Shiny.Locations;
 
@@ -67,40 +69,71 @@ public static class AppleLocationExtensions
 
     public static async Task<AccessState> RequestAccess(this CLLocationManager locationManager, bool background)
     {
-        var status = locationManager.GetCurrentStatus(background);
-        if (status != AccessState.Unknown)
-            return status;
+        if (!CLLocationManager.LocationServicesEnabled)
+            return AccessState.Disabled;
 
         locationManager.Delegate ??= new ShinyLocationDelegate();
         if (locationManager.Delegate is not ShinyLocationDelegate shinyDelegate)
             throw new NotSupportedException("You cannot call this method with non-ShinyLocationDelegate");
 
-        // locationManager.AccuracyAuthorization
-        // locationManager.RequestTemporaryFullAccuracyAuthorizationAsync()
-        status = await WaitForAuthorization(shinyDelegate, false, locationManager.RequestWhenInUseAuthorization).ConfigureAwait(false);
+        // iOS insists on when-in-use being granted before always can even be asked for
+        if (locationManager.AuthorizationStatus == CLAuthorizationStatus.NotDetermined)
+        {
+            // undecided again (a fresh install, or reset in Settings), so the upgrade prompt is back too
+            NSUserDefaults.StandardUserDefaults.RemoveObject(UpgradeRequestedKey);
+            await WaitForAuthorization(shinyDelegate, CLAuthorizationStatus.NotDetermined, locationManager.RequestWhenInUseAuthorization).ConfigureAwait(false);
+        }
 
-        if (status == AccessState.Available && background)
-            status = await WaitForAuthorization(shinyDelegate, true, locationManager.RequestAlwaysAuthorization).ConfigureAwait(false);
+        if (background && locationManager.AuthorizationStatus == CLAuthorizationStatus.AuthorizedWhenInUse)
+            await RequestAlways(locationManager, shinyDelegate).ConfigureAwait(false);
 
-        return status;
+        return locationManager.GetCurrentStatus(background);
     }
 
 
-    static Task<AccessState> WaitForAuthorization(ShinyLocationDelegate shinyDelegate, bool background, Action requestAction)
+    const string UpgradeRequestedKey = "shiny.location.alwaysUpgradeRequested";
+    static readonly TimeSpan UpgradeAnswerTimeout = TimeSpan.FromSeconds(30);
+
+    // iOS shows the upgrade to always once per install, and the app cannot see it: it stays active while
+    // the prompt is up, "keep only while using" changes nothing so no callback comes, and asked again iOS
+    // stays silent. So the first request waits (bounded) for the answer and later ones don't wait at all.
+    // The key is shared by every Shiny location package, because the prompt is per app.
+    static async Task RequestAlways(CLLocationManager locationManager, ShinyLocationDelegate shinyDelegate)
     {
-        var tcs = new TaskCompletionSource<AccessState>();
+        var defaults = NSUserDefaults.StandardUserDefaults;
+        var asked = defaults.BoolForKey(UpgradeRequestedKey);
+        defaults.SetBool(true, UpgradeRequestedKey);
+
+        using var cts = new CancellationTokenSource();
+        var answered = WaitForAuthorization(shinyDelegate, CLAuthorizationStatus.AuthorizedWhenInUse, locationManager.RequestAlwaysAuthorization, cts.Token);
+        if (!asked)
+            await Task.WhenAny(answered, Task.Delay(UpgradeAnswerTimeout, cts.Token)).ConfigureAwait(false);
+
+        cts.Cancel();
+    }
+
+
+    static Task WaitForAuthorization(ShinyLocationDelegate shinyDelegate, CLAuthorizationStatus from, Action requestAction, CancellationToken cancelToken = default)
+    {
+        var tcs = new TaskCompletionSource();
 
         EventHandler<CLAuthorizationStatus>? handler = null;
         handler = (_, authStatus) =>
         {
-            if (authStatus == CLAuthorizationStatus.NotDetermined)
+            // CoreLocation also reports the unchanged status when a manager is created
+            if (authStatus == CLAuthorizationStatus.NotDetermined || authStatus == from)
                 return;
 
             shinyDelegate.AuthorizationStatusChanged -= handler;
-            tcs.TrySetResult(authStatus.FromNative(background));
+            tcs.TrySetResult();
         };
 
         shinyDelegate.AuthorizationStatusChanged += handler;
+        cancelToken.Register(() =>
+        {
+            shinyDelegate.AuthorizationStatusChanged -= handler;
+            tcs.TrySetCanceled();
+        });
         requestAction();
 
         return tcs.Task;

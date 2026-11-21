@@ -28,7 +28,9 @@ public static class AppleGpsRequestExtensions
             return apple;
 
         return new AppleGpsRequest(
-            request.BackgroundMode
+            request.BackgroundMode,
+            request.RequestPreciseAccuracy,
+            request.AutoRestart
         );
     }
 }

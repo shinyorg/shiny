@@ -26,6 +26,8 @@ namespace Shiny.Beacons;
 /// <para>
 /// CLMonitor persists its conditions at the OS level, so it re-attaches and replays their current
 /// state on a cold start. Those first fires are suppressed; only genuine changes reach the delegate.
+/// A condition added by <see cref="StartMonitoring"/> is different: its first event is the current
+/// state, so a device already inside the region reports <see cref="BeaconRegionState.Entered"/>.
 /// </para>
 /// </remarks>
 [SupportedOSPlatform("ios18.0")]
@@ -43,8 +45,8 @@ public class BeaconMonitoringManager(
     volatile CLMonitor? monitor;
     readonly SemaphoreSlim monitorLock = new(1, 1);
     readonly ConcurrentDictionary<string, byte> initialFires = new();
+    readonly ConcurrentDictionary<string, byte> freshConditions = new();
     CLServiceSession? session;
-    TaskCompletionSource<AccessState>? authTcs;
 
 
     /// <inheritdoc />
@@ -93,18 +95,22 @@ public class BeaconMonitoringManager(
     /// <inheritdoc />
     public async Task<AccessState> RequestAccess()
     {
-        if (this.CurrentStatus != AccessState.Unknown)
-            return this.CurrentStatus;
+        // CLServiceSession only reports whether always is held - it never prompts - so ask the way
+        // CLLocationBeaconMonitoringManager does: when-in-use first, then the upgrade to always
+        var status = await platform
+            .InvokeTaskOnMainThread(() => this.AuthManager.RequestAccess(true))
+            .ConfigureAwait(false);
 
-        this.authTcs ??= new TaskCompletionSource<AccessState>();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        await using var registration = cts.Token.Register(
-            () => this.authTcs.TrySetException(new TimeoutException("Beacon monitoring authorization request timed out"))
-        );
-
-        this.EnsureSession();
-        return await this.authTcs.Task.ConfigureAwait(false);
+        // never answered from a cache - the user can grant always in Settings at any time
+        this.CurrentStatus = status;
+        return status;
     }
+
+
+    // only touched on the main thread - CoreLocation delivers a manager's callbacks to the run loop it was created on
+    CLLocationManager AuthManager => field ??= new CLLocationManager { Delegate = new AuthorizationDelegate() };
+
+    sealed class AuthorizationDelegate : ShinyBeaconLocationDelegate;
 
 
     /// <inheritdoc />
@@ -114,11 +120,27 @@ public class BeaconMonitoringManager(
     /// <inheritdoc />
     public async Task StartMonitoring(BeaconRegion region)
     {
+        AssertNotifies(region);
         this.EnsureSession();
 
         var mon = await this.GetMonitor().ConfigureAwait(false);
-        await platform.InvokeOnMainThreadAsync(() => this.AddToMonitor(mon, region)).ConfigureAwait(false);
+
+        // stored first - the condition's first event can arrive as soon as it is added, and it needs the region
+        var previous = repository.Get<BeaconRegion>(region.Identifier);
         repository.Set(region);
+        try
+        {
+            await platform.InvokeOnMainThreadAsync(() => this.AddToMonitor(mon, region)).ConfigureAwait(false);
+        }
+        catch
+        {
+            if (previous == null)
+                repository.Remove<BeaconRegion>(region.Identifier);
+            else
+                repository.Set(previous);
+
+            throw;
+        }
     }
 
 
@@ -159,10 +181,16 @@ public class BeaconMonitoringManager(
         }, cancelToken);
 
 
-    void AddToMonitor(CLMonitor mon, BeaconRegion region)
+    static void AssertNotifies(BeaconRegion region)
     {
         if (region is { NotifyOnEntry: false, NotifyOnExit: false })
             throw new InvalidOperationException("The region is not set to notify on entry or exit");
+    }
+
+
+    void AddToMonitor(CLMonitor mon, BeaconRegion region)
+    {
+        AssertNotifies(region);
 
         // conditions are persisted by the OS, so re-registering an identifier has to replace
         if (mon.GetMonitoringRecord(region.Identifier) != null)
@@ -171,7 +199,10 @@ public class BeaconMonitoringManager(
             mon.RemoveCondition(region.Identifier);
         }
 
-        this.initialFires.TryAdd(region.Identifier, 0);
+        // The first event of a condition the app has just added is its current state, not a replay of
+        // an older one - it must not be swallowed like the cold-start replays are.
+        this.initialFires.TryRemove(region.Identifier, out _);
+        this.freshConditions[region.Identifier] = 0;
         mon.AddCondition(region.ToCondition(), region.Identifier);
     }
 
@@ -198,8 +229,6 @@ public class BeaconMonitoringManager(
                     this.CurrentStatus = diagnostic.AuthorizationDenied || diagnostic.AlwaysAuthorizationDenied
                         ? AccessState.Denied
                         : AccessState.Available;
-
-                    this.authTcs?.TrySetResult(this.CurrentStatus);
                 }
                 catch (Exception ex)
                 {
@@ -270,14 +299,23 @@ public class BeaconMonitoringManager(
                 if (evt == null)
                     return;
 
-                if (evt.ConditionUnsupported)
+                if (evt.ConditionUnsupported || evt.State == CLMonitoringState.Unmonitored)
                 {
-                    // macOS in particular may refuse beacon conditions outright
-                    logger.LogWarning("CoreLocation reports beacon condition {Identifier} is unsupported on this platform", evt.Identifier);
+                    // macOS in particular may refuse beacon conditions outright, and a device without region
+                    // monitoring reports Unmonitored. Neither may use up the first-event handling below
+                    logger.LogWarning("CoreLocation is not monitoring beacon region {Identifier} ({State})", evt.Identifier, evt.State);
                     return;
                 }
 
-                if (this.initialFires.TryRemove(evt.Identifier, out _))
+                if (this.freshConditions.TryRemove(evt.Identifier, out _))
+                {
+                    // Unsatisfied is what the app assumes anyway. Satisfied means the device was already
+                    // inside when monitoring started - CoreLocation will not report that again, so this
+                    // is the only chance the delegate gets to hear it.
+                    if (evt.State != CLMonitoringState.Satisfied)
+                        return;
+                }
+                else if (this.initialFires.TryRemove(evt.Identifier, out _))
                 {
                     logger.LogDebug("Suppressed initial state fire for beacon region {Identifier}", evt.Identifier);
                     return;
@@ -325,11 +363,10 @@ public class BeaconMonitoringManager(
             this.monitor?.Dispose();
             this.monitor = null;
             this.initialFires.Clear();
+            this.freshConditions.Clear();
 
             this.session?.Invalidate();
             this.session = null;
-            this.authTcs = null;
-            this.CurrentStatus = AccessState.Unknown;
         }
         finally
         {

@@ -181,7 +181,11 @@ public abstract class AbstractGpsManager : IGpsManager, IShinyStartupTask
     {
         request ??= new();
         if (request is not AndroidGpsRequest android)
-            android = new AndroidGpsRequest(request.BackgroundMode);
+            android = new AndroidGpsRequest(
+                request.BackgroundMode,
+                RequestPreciseAccuracy: request.RequestPreciseAccuracy,
+                AutoRestart: request.AutoRestart
+            );
 
         this.Callback.StationaryMetersThreshold = android.StationaryMetersThreshold;
         this.Callback.StationarySecondsThreshold = android.StationarySecondsThreshold;

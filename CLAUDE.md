@@ -231,6 +231,19 @@ has the details; `tests/Shiny.DeviceTests/run.sh <ios|android|maccatalyst>` buil
 - An incremental iOS build does not always regenerate the app's `Info.plist`; after editing it, delete
   `obj/Debug/net11.0-ios` and `bin/Debug/net11.0-ios` before trusting a run.
 - The DevFlow agent's HTTP server needs a `Content-Length` - send buffered `StringContent`, not `JsonContent`.
+- Newer DevFlow agents refuse mutating calls (409 "take control") without a lease; the test app sets
+  `RequireMutationLease = false` in `MauiProgram.cs` because the runner is its only driver.
+- **Location prompts:** an unanswered prompt stays "in flight" in `locationd` across relaunches and reinstalls, and
+  every later request is "ignored because another authorization effort is already in flight". Reboot the simulator
+  to clear it. Wait ~20 s after `bootstatus` before launching, or SpringBoard's unlock covers the app and it is
+  suspended mid-run. `xcrun simctl spawn <udid> log show --predicate 'eventMessage CONTAINS "#AuthPrompt"'` shows
+  what `locationd` did with each request.
+- On iOS 27 the app stays `Active` (and its scene `ForegroundActive`) while the always-upgrade prompt is up - no
+  `WillResignActive` - and an always `CLServiceSession` never shows that upgrade itself. Shiny's location
+  `RequestAccess` therefore waits (30 s cap) only on the first upgrade request and records that it asked.
+- The iOS 27.2 simulator has **no region monitoring**: `CLMonitor` reports every condition `Unmonitored` at once and
+  `CLLocationManager.StartMonitoring` fails with `kCLErrorRegionMonitoringFailure`, even with always granted. The
+  geofence transition tests skip there (`Tests/Geofencing/RegionMonitoring.cs`); they need a real device.
 
 ## Blog posts (only when explicitly requested)
 

@@ -108,7 +108,6 @@ public class GeofenceManager(
     
 
     CLServiceSession? session;
-    TaskCompletionSource<AccessState>? authTcs;
 
     void EnsureSession()
     {
@@ -130,8 +129,6 @@ public class GeofenceManager(
                     this.CurrentStatus = (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
                         ? AccessState.Denied
                         : AccessState.Available;
-
-                    this.authTcs?.TrySetResult(this.CurrentStatus);
                 }
                 catch (Exception ex)
                 {
@@ -144,16 +141,20 @@ public class GeofenceManager(
 
     public async Task<AccessState> RequestAccess()
     {
-        if (this.CurrentStatus != AccessState.Unknown)
-            return this.CurrentStatus;
+        // CLServiceSession only reports whether always is held - it never prompts - so ask the way
+        // CLLocationGeofenceManager does: when-in-use first, then the upgrade to always
+        var status = await platform
+            .InvokeTaskOnMainThread(() => this.AuthManager.RequestAccess(true))
+            .ConfigureAwait(false);
 
-        this.authTcs ??= new TaskCompletionSource<AccessState>();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        cts.Token.Register(() => this.authTcs.TrySetException(new TimeoutException("Geofence authorization request timed out")));
-
-        this.EnsureSession();
-        return await this.authTcs.Task.ConfigureAwait(false);
+        // never answered from a cache - the user can grant always in Settings at any time
+        this.CurrentStatus = status;
+        return status;
     }
+
+
+    // only touched on the main thread - CoreLocation delivers a manager's callbacks to the run loop it was created on
+    CLLocationManager AuthManager => field ??= new CLLocationManager { Delegate = new GeofenceLocationDelegate() };
 
     
     public IList<GeofenceRegion> GetMonitorRegions() => repository.GetAll<GeofenceRegion>().ToList();
@@ -165,15 +166,21 @@ public class GeofenceManager(
         this.EnsureSession();
         var mon = await this.GetMonitor().ConfigureAwait(false);
 
-        // stored first - the condition's initial event can arrive as soon as it is added, and it needs the region
-        repository.Insert(region);
+        // stored first - the condition's initial event can arrive as soon as it is added, and it needs the region.
+        // Set, not Insert: the same identifier replaces the region, as it does on every other platform
+        var previous = repository.Get<GeofenceRegion>(region.Identifier);
+        repository.Set(region);
         try
         {
             await platform.InvokeOnMainThreadAsync(() => this.AddToMonitor(mon, region)).ConfigureAwait(false);
         }
         catch
         {
-            repository.Remove<GeofenceRegion>(region.Identifier);
+            if (previous == null)
+                repository.Remove<GeofenceRegion>(region.Identifier);
+            else
+                repository.Set(previous);
+
             throw;
         }
     }
@@ -306,6 +313,14 @@ public class GeofenceManager(
             // Handler runs on MainQueue as a void-returning delegate; unhandled throws would terminate the app.
             try
             {
+                // CoreLocation could not monitor the condition (no region monitoring on this device, or the condition
+                // is refused). Return before the initial-fire check, so it still suppresses the first real state
+                if (evt.ConditionUnsupported || evt.State == CLMonitoringState.Unmonitored)
+                {
+                    logger.LogWarning("CoreLocation is not monitoring geofence {Identifier} ({State})", evt.Identifier, evt.State);
+                    return;
+                }
+
                 // CLMonitor fires an initial event when a condition is first added (and after cold-start
                 // re-attach) - those never reach the delegate. Dwell still uses them: an initial "inside" starts
                 // the clock for a region the device was already in, and a replayed exit still ends a stay.
@@ -372,8 +387,6 @@ public class GeofenceManager(
 
             this.session?.Invalidate();
             this.session = null;
-            this.authTcs = null;
-            this.CurrentStatus = AccessState.Unknown;
         }
         finally
         {

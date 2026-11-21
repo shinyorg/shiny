@@ -23,6 +23,9 @@ public static class MauiProgram
         builder.AddMauiDevFlowAgent(opts =>
         {
             opts.Port = GetAgentPort();
+
+            // the runner is this app's only driver - newer agents refuse its POSTs (409 "take control") without a lease
+            opts.RequireMutationLease = false;
             DevFlowTestExtension.Register(opts);
         });
 
