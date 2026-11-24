@@ -111,7 +111,7 @@ public class ChannelManager : IChannelManager
         if (android.Description != null)
             native.Description = android.Description;
 
-        if (android.AllowBubbles != null && OperatingSystem.IsAndroidVersionAtLeast(26))
+        if (android.AllowBubbles != null && OperatingSystem.IsAndroidVersionAtLeast(29))
             native.SetAllowBubbles(android.AllowBubbles.Value!);
 
         if (android.ShowBadge != null)
