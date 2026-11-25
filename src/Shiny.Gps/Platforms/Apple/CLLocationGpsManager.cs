@@ -6,7 +6,6 @@ using Foundation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Extensions.Stores;
-using UIKit;
 
 namespace Shiny.Locations;
 
@@ -102,7 +101,6 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
         if (
             status == AccessState.Available &&
             request.RequestPreciseAccuracy &&
-            UIDevice.CurrentDevice.CheckSystemVersion(14, 0) &&
             this.locationManager.AccuracyAuthorization == CLAccuracyAuthorization.ReducedAccuracy
         )
         {
@@ -168,7 +166,9 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
         else
             this.locationManager.StopUpdatingLocation();
 
+#if !MACOS
         this.locationManager.AllowsBackgroundLocationUpdates = false;
+#endif
         this.CurrentSettings = null;
         return Task.CompletedTask;
     }
@@ -198,6 +198,15 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
         // this.locationManager.StartUpdatingHeading();
 
         var appleRequest = request.ToApple();
+#if MACOS
+        // A Mac app isn't suspended in the background, so there is no background mode to turn on: Standard
+        // is significant location changes and Realtime is continuous updates, the same as on iOS.
+        // PausesLocationUpdatesAutomatically, ActivityType and the background indicator are iOS-only.
+        if (request.BackgroundMode == GpsBackgroundMode.Standard)
+            this.locationManager.StartMonitoringSignificantLocationChanges();
+        else
+            this.locationManager.StartUpdatingLocation();
+#else
         this.locationManager.PausesLocationUpdatesAutomatically = appleRequest.PausesLocationUpdatesAutomatically;
         this.locationManager.ActivityType = appleRequest.ActivityType;
 
@@ -219,6 +228,7 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
                 this.locationManager.StartUpdatingLocation();
                 break;
         }
+#endif
         this.CurrentSettings = appleRequest;
     }
 }

@@ -26,9 +26,13 @@ public class Geocoder(IPlatform platform) : IGeocoder
         var location = new CLLocation(position.Latitude, position.Longitude);
         try
         {
-            // CLGeocoder is deprecated from iOS 26 in favour of MapKit's MKReverseGeocodingRequest
+            // CLGeocoder is deprecated from iOS / macOS 26 in favour of MapKit's MKReverseGeocodingRequest
             // MapKit is main-thread only - the request has to be created, started and cancelled there
+#if MACOS
+            if (OperatingSystem.IsMacOSVersionAtLeast(26))
+#else
             if (OperatingSystem.IsIOSVersionAtLeast(26) || OperatingSystem.IsMacCatalystVersionAtLeast(26))
+#endif
                 return await platform
                     .InvokeTaskOnMainThread(() => this.ReverseWithMapKit(location, position, cancelToken))
                     .ConfigureAwait(false);
@@ -44,6 +48,7 @@ public class Geocoder(IPlatform platform) : IGeocoder
 
     [System.Runtime.Versioning.SupportedOSPlatform("ios26.0")]
     [System.Runtime.Versioning.SupportedOSPlatform("maccatalyst26.0")]
+    [System.Runtime.Versioning.SupportedOSPlatform("macos26.0")]
     async Task<IReadOnlyList<Placemark>> ReverseWithMapKit(CLLocation location, Position position, CancellationToken cancelToken)
     {
         using var request = new MKReverseGeocodingRequest(location);
@@ -66,6 +71,7 @@ public class Geocoder(IPlatform platform) : IGeocoder
 
     [System.Runtime.Versioning.ObsoletedOSPlatform("ios26.0")]
     [System.Runtime.Versioning.ObsoletedOSPlatform("maccatalyst26.0")]
+    [System.Runtime.Versioning.ObsoletedOSPlatform("macos26.0")]
     static async Task<IReadOnlyList<Placemark>> ReverseWithCoreLocation(CLLocation location, Position position, CancellationToken cancelToken)
     {
         var geocoder = new CLGeocoder();
@@ -82,6 +88,7 @@ public class Geocoder(IPlatform platform) : IGeocoder
 
     [System.Runtime.Versioning.ObsoletedOSPlatform("ios26.0")]
     [System.Runtime.Versioning.ObsoletedOSPlatform("maccatalyst26.0")]
+    [System.Runtime.Versioning.ObsoletedOSPlatform("macos26.0")]
     static string? Format(CNPostalAddress? address)
     {
         if (address == null)

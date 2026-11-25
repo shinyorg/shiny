@@ -1,3 +1,5 @@
+// Not on macOS (AppKit): CoreMotion has no CMMotionActivityManager there, so AddMotionActivity is a no-op.
+#if !MACOS
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -205,3 +207,4 @@ public class MotionActivityManager(
         return new MotionActivityReading(type, confidence, timestamp);
     }
 }
+#endif

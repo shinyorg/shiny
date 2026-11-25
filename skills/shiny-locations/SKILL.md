@@ -1,6 +1,6 @@
 ---
 name: shiny-locations
-description: GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, and Android using Shiny.Gps and Shiny.Geofencing (Shiny.Locations meta-package), plus unlimited GPS-driven region geofencing (Shiny.Geofencing.Regions) over SQLite documents or the reverse geocoder
+description: GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, Android, macOS, Windows, Linux (GeoClue2) and Blazor using Shiny.Gps and Shiny.Geofencing (Shiny.Locations meta-package), plus unlimited GPS-driven region geofencing (Shiny.Geofencing.Regions) over SQLite documents or the reverse geocoder
 auto_invoke: true
 triggers:
   - gps
@@ -28,6 +28,14 @@ triggers:
   - IGpsManager
   - IGeofenceManager
   - AddGps
+  - AddLinuxGps
+  - LinuxGpsOptions
+  - GeoClue
+  - GeoClue2
+  - GeoClueAccuracyLevel
+  - Shiny.Gps.Linux
+  - macOS location
+  - Linux location
   - AddGeofencing
   - dwell
   - geofence dwell
@@ -92,7 +100,7 @@ triggers:
 
 # Shiny Locations
 
-GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, and Android applications with full foreground and background support.
+GPS tracking, geofence monitoring (enter/exit/dwell), reverse geocoding, and motion activity recognition for .NET MAUI, iOS, Android, macOS, Windows, Linux and Blazor applications, with full foreground and background support on mobile.
 
 ## When to Use This Skill
 
@@ -116,7 +124,7 @@ Use this skill when the user needs to:
 |------------|------------------------------|
 | NuGet      | `Shiny.Gps` (GPS, motion activity, geocoding), `Shiny.Geofencing` (geofences), `Shiny.Locations` (meta-package referencing both - no code of its own). Blazor WASM GPS is in `Shiny.Gps`'s `net11.0` build (chosen with `OperatingSystem.IsBrowser()`); `Shiny.Locations.Blazor` no longer exists |
 | Namespace  | `Shiny.Locations`            |
-| Platforms  | iOS, Android, Windows, Blazor WebAssembly (foreground GPS only). **No tvOS target** — `CLMonitor`, `CLMonitorConfiguration` and `CLRegionState` are absent on tvOS, so geofencing cannot be implemented there |
+| Platforms  | GPS: iOS, Mac Catalyst, Android, macOS (AppKit, CoreLocation), Windows (foreground only), Linux (GeoClue2, separate `Shiny.Gps.Linux` package) and Blazor WebAssembly (foreground only). Geofencing: iOS, Mac Catalyst, Android, Windows. **No tvOS target** — `CLMonitor`, `CLMonitorConfiguration` and `CLRegionState` are absent on tvOS, so geofencing cannot be implemented there |
 | DI Namespace | `Shiny` (extension methods on `IServiceCollection`) |
 | Shared types | `Position` and `Distance` live in `Shiny.Core` (same namespaces as before: `Shiny.Locations.Position`, `Shiny.Distance`) |
 
@@ -137,6 +145,61 @@ services.AddGps();
 // GPS with a background delegate
 services.AddGps<MyGpsDelegate>();
 ```
+
+`AddGps()` / `AddGps<TDelegate>()` exist on every target with the same signature, so shared `net11.0`
+startup code compiles once and binds on every platform. The platform switches are separate overloads:
+`AddGps(forceUseOldCLManager: true)` (iOS / Mac Catalyst - ignored on macOS, which always uses
+`CLLocationManager`) and `AddGps(forceLocationApi: true)` (Android) - guard them with `#if IOS` / `#if ANDROID`.
+
+### macOS (AppKit) GPS Registration
+
+`Shiny.Gps` has a `net11.0-macos` target - same `AddGps()` / `AddGps<TDelegate>()` call, backed by
+`CLLocationManager`. Add `NSLocationUsageDescription` (and `NSLocationWhenInUseUsageDescription`) to
+`Info.plist`, and the `com.apple.security.personal-information.location` entitlement for a sandboxed app.
+macOS differences to respect when generating code:
+
+- A Mac app isn't suspended, so there are no background modes to configure: `GpsBackgroundMode.Standard` uses
+  significant location changes, `Realtime` (and `None`) continuous updates. `AppleGpsRequest`'s
+  `PausesLocationUpdatesAutomatically`, `ActivityType` and background indicator are ignored.
+- macOS has no when-in-use level - a grant is always `AuthorizedAlways`, so a background `RequestAccess` never
+  returns `Restricted` for "when-in-use only" and there is no always-upgrade prompt.
+- `AddMotionActivity()` is a no-op (no `CMMotionActivityManager` on macOS).
+- `AddGeocoding()` uses the native Apple geocoder (MapKit on macOS 26+, `CLGeocoder` below), not Nominatim.
+- No geofencing (`Shiny.Geofencing` has no macOS target).
+
+### Linux GPS Registration (GeoClue2)
+
+Reference **`Shiny.Gps.Linux`** (keeps the `Tmds.DBus.Protocol` dependency out of WebAssembly apps) and call
+`AddLinuxGps()`. It talks to GeoClue2 on the D-Bus system bus (installed by default on GNOME, KDE and most
+desktop distributions), which locates from Wi-Fi, IP, a GPS receiver or a modem. It does nothing on other
+operating systems, so it can sit next to `AddGps()` in shared startup code, and it replaces any `IGpsManager`
+registered before it - call it **after** `AddGps()`.
+
+```csharp
+services.AddGps<MyGpsDelegate>();          // every other platform
+services.AddLinuxGps<MyGpsDelegate>(o =>   // Linux - no-op elsewhere
+{
+    o.DesktopId = "com.mycompany.myapp";   // the app's .desktop file name without extension - GeoClue refuses a client without one
+    o.AccuracyLevel = GeoClueAccuracyLevel.Street;        // used when RequestPreciseAccuracy is false (default Street = Wi-Fi)
+    o.PreciseAccuracyLevel = GeoClueAccuracyLevel.Exact;  // used when RequestPreciseAccuracy is true (default)
+    o.DistanceThresholdMeters = 0;         // GeoClue DistanceThreshold, 0 = every change
+    o.TimeThresholdSeconds = 0;            // GeoClue TimeThreshold, 0 = every change
+    o.StationaryMetersThreshold = 10;      // GpsReading.IsStationary detection
+    o.StationarySecondsThreshold = 30;
+});
+```
+
+Linux behavior to respect when generating code:
+
+- GeoClue has no "ask" of its own - its agent (GNOME's location privacy setting, the location portal) decides when a
+  client starts. `RequestAccess` starts and stops a client to find out; `GetCurrentStatus` returns what was learned
+  (`Unknown` until then, `NotSupported` when GeoClue or the system bus is missing, `Denied` when the agent or the
+  location switch refused). Always call `RequestAccess` rather than relying on `GetCurrentStatus` on Linux.
+- Background modes mean nothing to a desktop process: `Standard`/`Realtime` listen continuously like `None`, but a
+  background listener is still persisted and restarted at startup when `AutoRestart` is set.
+- `GpsReadingReceived` and `IGpsDelegate`s are called on the D-Bus thread - marshal to the UI thread yourself.
+- Unknown altitude is `0`; unknown speed and heading are `-1`.
+- `AddMotionActivity()` is a no-op and geofencing is unavailable; `AddGeocoding()` uses Nominatim.
 
 ### Blazor WebAssembly GPS Registration
 
@@ -173,9 +236,9 @@ no longer an automatic GPS-direct fallback.
 ### Geocoding Registration
 
 ```csharp
-services.AddGeocoding(); // IGeocoder - native on iOS, Mac Catalyst, Android; OpenStreetMap Nominatim everywhere else
+services.AddGeocoding(); // IGeocoder - native on iOS, Mac Catalyst, macOS, Android; OpenStreetMap Nominatim everywhere else
 
-// optional - configure the Nominatim fallback (Windows, Linux, macOS, Blazor, Android without Play Services)
+// optional - configure the Nominatim fallback (Windows, Linux, Blazor, Android without Play Services)
 services.AddGeocoding(o =>
 {
     o.UserAgent = "MyApp/1.0 (contact@myapp.com)"; // public server policy: identify your app (defaults to entry assembly name/version)
@@ -204,7 +267,7 @@ services.AddMotionActivity();
 services.AddMotionActivity<MyMotionActivityDelegate>();
 ```
 
-> **Platform support:** Motion activity is supported on iOS (CMMotionActivityManager) and Android (Google Play Services Activity Recognition). On Android, Google Play Services must be available — the registration silently no-ops if unavailable. Other platforms (Windows, Blazor) are no-ops.
+> **Platform support:** Motion activity is supported on iOS (CMMotionActivityManager) and Android (Google Play Services Activity Recognition). On Android, Google Play Services must be available — the registration silently no-ops if unavailable. Other platforms (macOS, Windows, Linux, Blazor) are no-ops.
 
 ## Code Generation Instructions
 
@@ -226,7 +289,7 @@ When generating code for Shiny.Locations:
 10. **For `GeofenceRegion`**, always provide a unique `Identifier` string. The `SingleUse` parameter removes the region after the first trigger. `StartMonitoring` with an identifier that is already monitored replaces that region on every platform (iOS 18+ threw before 7.0.0). To register a region idempotently, use the `TryStartMonitoring(region, replaceIfExists)` extension on `IGeofenceManager` — it only starts monitoring if a region with the same identifier isn't already being monitored, and (when `replaceIfExists` is `true`, the default) stops and restarts an existing region so changed position/notification settings take effect. It returns `true` when the region already existed, `false` when it was newly added.
 11. **Inject `IMotionActivityManager`** via constructor injection for motion activity features. Call `RequestAccess()` before `StartListener()`, then subscribe to `MotionActivityReadingReceived` for foreground updates or register `IMotionActivityDelegate` for background processing. `IsListening` is persisted and the listener is re-registered at startup after the process is killed, so generate `if (!manager.IsListening) await manager.StartListener();` - never call `StartListener()` unconditionally on app start, it throws when already listening. The same holds for `IGpsManager`: a `Standard`/`Realtime` listener with `AutoRestart` (default `true`) is persisted on every platform and restarted at startup (a plain `GpsRequest` with `AutoRestart: false` was saved as `true` on iOS and Android before 7.0.0), so check `CurrentListener == null` (or the `IsListening()` extension) before starting.
 12. **For geofence dwell, set `DwellTime` with an object initializer** - `new GeofenceRegion("id", center, radius) { DwellTime = TimeSpan.FromMinutes(5) }` - and handle `GeofenceState.Dwelling` in `IGeofenceDelegate.OnStatusChanged`. `DwellTime` is not a constructor parameter. Entry and exit are always tracked internally; `NotifyOnEntry`/`NotifyOnExit` only filter what reaches the delegate (set both false for dwell-only). A `SingleUse` region with a `DwellTime` is removed after the dwell, not the entry. No GPS, background mode or extra permission is needed. **Timing differs on iOS:** Android (native loitering delay) and Windows (timer) report `Dwelling` while the user is still inside, but iOS usually reports it at exit, just before `Exited`, because iOS suspends the app between region events. When generating dwell code, don't assume the user is still inside on iOS, and say so if the user's scenario needs an in-place action.
-13. **For reverse geocoding, inject `IGeocoder`** (registered by `AddGeocoding()`), check `IsSupported`, then `await geocoder.ReverseGeocode(position, ct)` - it returns `IReadOnlyList<Placemark>` (empty when nothing matched) with `FormattedAddress`, `Thoroughfare`, `Locality`, `AdministrativeArea`, `PostalCode`, `CountryCode`, etc. It needs network access. On Windows, Linux, macOS, Blazor and Android without Play Services the registered `IGeocoder` uses OpenStreetMap Nominatim - display `NominatimOptions.Attribution` with its results, and expect calls to queue at one per second against the public server.
+13. **For reverse geocoding, inject `IGeocoder`** (registered by `AddGeocoding()`), check `IsSupported`, then `await geocoder.ReverseGeocode(position, ct)` - it returns `IReadOnlyList<Placemark>` (empty when nothing matched) with `FormattedAddress`, `Thoroughfare`, `Locality`, `AdministrativeArea`, `PostalCode`, `CountryCode`, etc. It needs network access. On Windows, Linux, Blazor and Android without Play Services the registered `IGeocoder` uses OpenStreetMap Nominatim (macOS uses the native Apple geocoder from 7.1.0) - display `NominatimOptions.Attribution` with its results, and expect calls to queue at one per second against the public server.
 
 ## Conventions
 

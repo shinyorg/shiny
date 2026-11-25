@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Shiny GPS for Linux via GeoClue2/D-Bus - IGpsManager on the desktop location service (Wi-Fi, IP, GPS receivers and modems)</Description>
+        <RootNamespace>Shiny.Locations</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Gps\Shiny.Gps.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Tmds.DBus.Protocol" />
+        <!-- direct reference so the [ShinyJsonContext] analyzer runs against this project -->
+        <PackageReference Include="Shiny.Extensions.Serialization" />
+    </ItemGroup>
+</Project>

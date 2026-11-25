@@ -15,11 +15,27 @@ namespace Shiny;
 
 public static class GpsServiceCollectionExtensions
 {
+    // ⚠️ Every target has the parameterless AddGps() / AddGps<TDelegate>(). A library or shared project built
+    // against net11.0 compiles its call to those, and the platform assembly the app loads must have the same
+    // signature - an optional parameter is a different method, so it would throw MissingMethodException.
+
     #if APPLE
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, bool forceUseOldCLManager = false) where TDelegate : class, IGpsDelegate
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGpsDelegate
+        => services.AddGps<TDelegate>(false);
+
+    /// <summary>
+    /// This registers GPS services with the Shiny container - you can also auto-start the listener when necessary background permissions are received
+    /// </summary>
+    public static IServiceCollection AddGps(this IServiceCollection services)
+        => services.AddGps(false);
+
+    /// <summary>
+    /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
+    /// </summary>
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, bool forceUseOldCLManager) where TDelegate : class, IGpsDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         services.AddGps(forceUseOldCLManager);
@@ -30,12 +46,17 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    public static IServiceCollection AddGps(this IServiceCollection services, bool forceUseOldCLManager = false)
+    public static IServiceCollection AddGps(this IServiceCollection services, bool forceUseOldCLManager)
     {
+#if MACOS
+        // macOS (AppKit) has no CLServiceSession / CLLocationUpdater session pair, so it is always CLLocationManager
+        services.AddSingletonAsImplementedInterfaces<CLLocationGpsManager>();
+#else
         if (!forceUseOldCLManager && (OperatingSystem.IsIOSVersionAtLeast(18) || OperatingSystem.IsMacCatalystVersionAtLeast(18)))
             services.AddSingletonAsImplementedInterfaces<GpsManager>();
         else
             services.AddSingletonAsImplementedInterfaces<CLLocationGpsManager>();
+#endif
 
         return services;
     }
@@ -47,12 +68,33 @@ public static class GpsServiceCollectionExtensions
     public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TGpsDelegate>(this IServiceCollection services) where TGpsDelegate : class, IGpsDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TGpsDelegate>();
+        services.AddGps();
+        return services;
+    }
+
+    /// <summary>
+    /// This registers GPS services with the Shiny container - Windows supports foreground GPS only (no background)
+    /// </summary>
+    public static IServiceCollection AddGps(this IServiceCollection services)
+    {
         services.AddSingletonAsImplementedInterfaces<GpsManager>();
         return services;
     }
 
     #elif ANDROID
-    public static IServiceCollection AddGps(this IServiceCollection services, bool forceLocationApi = false)
+    /// <summary>
+    /// This registers GPS services with the Shiny container - Google Play Services when available, the platform location API otherwise
+    /// </summary>
+    public static IServiceCollection AddGps(this IServiceCollection services)
+        => services.AddGps(false);
+
+    /// <summary>
+    /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
+    /// </summary>
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services) where TDelegate : class, IGpsDelegate
+        => services.AddGps<TDelegate>(false);
+
+    public static IServiceCollection AddGps(this IServiceCollection services, bool forceLocationApi)
     {
         if (forceLocationApi)
             services.AddSingletonAsImplementedInterfaces<LocationServicesGpsManager>();
@@ -76,7 +118,7 @@ public static class GpsServiceCollectionExtensions
     /// <summary>
     /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
     /// </summary>
-    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, bool forceLocationApi = false) where TDelegate : class, IGpsDelegate
+    public static IServiceCollection AddGps<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)] TDelegate>(this IServiceCollection services, bool forceLocationApi) where TDelegate : class, IGpsDelegate
     {
         services.AddSingletonAsImplementedInterfaces<TDelegate>();
         services.AddGps(forceLocationApi);

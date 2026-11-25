@@ -12,7 +12,8 @@ namespace Shiny;
 
 public static class MotionActivityServiceCollectionExtensions
 {
-    #if APPLE
+    // macOS (AppKit) has no CMMotionActivityManager - it takes the no-op registration below
+    #if APPLE && !MACOS
 
     /// <summary>
     /// Registers motion activity recognition services with the Shiny container

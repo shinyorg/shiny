@@ -13,10 +13,17 @@ For MAUI / native targets:
 <PackageReference Include="Shiny.Locations" Version="7.*" />
 ```
 
-For Blazor WebAssembly:
+For Blazor WebAssembly and macOS (AppKit, `net11.0-macos`):
 
 ```xml
 <PackageReference Include="Shiny.Gps" Version="7.*" />
+```
+
+For Linux (GeoClue2 over D-Bus - kept out of `Shiny.Gps` so the D-Bus dependency never reaches a WebAssembly app):
+
+```xml
+<PackageReference Include="Shiny.Gps" Version="7.*" />
+<PackageReference Include="Shiny.Gps.Linux" Version="7.*" />
 ```
 
 `Position` and `Distance` live in `Shiny.Core`, which both packages depend on. All types keep the `Shiny.Locations` namespace.
@@ -319,8 +326,8 @@ public interface IGeofenceManager
 
 ### IGeocoder
 
-Reverse geocoding through the platform geocoder. iOS/Mac Catalyst 26+ use MapKit `MKReverseGeocodingRequest`
-(`CLGeocoder` below 26); Android uses `android.location.Geocoder` (listener API on 33+). Windows, Linux, macOS,
+Reverse geocoding through the platform geocoder. iOS/Mac Catalyst/macOS 26+ use MapKit `MKReverseGeocodingRequest`
+(`CLGeocoder` below 26); Android uses `android.location.Geocoder` (listener API on 33+). Windows, Linux,
 Blazor WebAssembly and Android devices without a geocoder backend get an internal OpenStreetMap Nominatim geocoder. Needs
 network access.
 
@@ -555,13 +562,36 @@ services.AddGps();
 // GPS with a background delegate
 services.AddGps<MyGpsDelegate>();
 
-// Non-generic version
-services.AddGps(typeof(MyGpsDelegate));
+// Linux (Shiny.Gps.Linux) - GeoClue2; a no-op on other OSes, replaces any IGpsManager registered before it
+services.AddLinuxGps<MyGpsDelegate>(o => o.DesktopId = "com.mycompany.myapp");
 ```
 
-**Platform-specific parameters:**
-- **iOS/macOS:** `bool forceUseOldCLManager = false` -- forces use of the legacy CLLocationManager (not recommended on iOS 18+)
-- **Android:** `bool forceLocationApi = false` -- bypasses FusedLocationProvider and uses the legacy Location API
+`AddGps()` and `AddGps<TDelegate>()` have the same parameterless signature on every target, so shared `net11.0`
+code binds on every platform. Platform switches are separate overloads (no longer optional parameters):
+- **iOS / Mac Catalyst:** `AddGps(bool forceUseOldCLManager)` / `AddGps<TDelegate>(bool forceUseOldCLManager)` -- forces the legacy CLLocationManager (not recommended on 18+). On macOS (AppKit) the flag is ignored; it always uses `CLLocationManager`.
+- **Android:** `AddGps(bool forceLocationApi)` / `AddGps<TDelegate>(bool forceLocationApi)` -- bypasses FusedLocationProvider and uses the legacy Location API
+
+### LinuxGpsOptions (Shiny.Gps.Linux)
+
+```csharp
+public class LinuxGpsOptions
+{
+    string DesktopId { get; set; }                         // .desktop file name w/o extension; defaults to entry assembly name. GeoClue refuses a client without one
+    GeoClueAccuracyLevel AccuracyLevel { get; set; }       // RequestPreciseAccuracy == false; default Street (Wi-Fi)
+    GeoClueAccuracyLevel PreciseAccuracyLevel { get; set; } // RequestPreciseAccuracy == true; default Exact (GPS / modem)
+    uint DistanceThresholdMeters { get; set; }             // GeoClue DistanceThreshold, 0 = every change
+    uint TimeThresholdSeconds { get; set; }                // GeoClue TimeThreshold, 0 = every change
+    int StationaryMetersThreshold { get; set; }            // default 10
+    int StationarySecondsThreshold { get; set; }           // default 30
+}
+
+public enum GeoClueAccuracyLevel : uint { None = 0, Country = 1, City = 4, Neighborhood = 5, Street = 6, Exact = 8 }
+```
+
+`LinuxGpsManager` notes: `RequestAccess` starts a GeoClue client to learn the answer (the GeoClue agent decides);
+`GetCurrentStatus` returns what has been learned (`Unknown` until then, `NotSupported` without GeoClue/system bus).
+Background modes all listen continuously; background listeners still persist and auto-restart. Readings and
+delegates arrive on the D-Bus thread. Unknown altitude is `0`, unknown speed/heading `-1`.
 
 ### Geofence Registration
 
@@ -576,7 +606,7 @@ services.AddGeofencing(typeof(MyGeofenceDelegate));
 ### Geocoding Registration
 
 ```csharp
-services.AddGeocoding(); // native IGeocoder on iOS, Mac Catalyst and Android; OpenStreetMap Nominatim elsewhere
+services.AddGeocoding(); // native IGeocoder on iOS, Mac Catalyst, macOS and Android; OpenStreetMap Nominatim elsewhere
 services.AddGeocoding(o => o.Email = "contact@myapp.com"); // configure the Nominatim fallback
 ```
 
@@ -594,9 +624,9 @@ services.AddMotionActivity(typeof(MyMotionActivityDelegate));
 ```
 
 **Platform notes:**
-- **iOS/macOS:** Uses `CMMotionActivityManager`. Requires `NSMotionUsageDescription` in `Info.plist`.
+- **iOS / Mac Catalyst:** Uses `CMMotionActivityManager`. Requires `NSMotionUsageDescription` in `Info.plist`.
 - **Android:** Uses Google Play Services Activity Recognition API. Requires `com.google.android.gms.permission.ACTIVITY_RECOGNITION`. Registration silently no-ops if Google Play Services is unavailable.
-- **Other platforms:** Registration is a no-op.
+- **Other platforms (macOS AppKit, Windows, Linux, Blazor):** Registration is a no-op.
 
 ---
 

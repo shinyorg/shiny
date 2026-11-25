@@ -1,3 +1,5 @@
+// Not on macOS (AppKit): CLServiceSession and CLBackgroundActivitySession are not bound there, so AddGps uses CLLocationGpsManager.
+#if !MACOS
 using System;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -348,3 +350,4 @@ public class GpsManager(
         }
     }
 }
+#endif

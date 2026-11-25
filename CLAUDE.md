@@ -164,7 +164,7 @@ Uno 7 / Uno.Extensions 8 is the first line that supports net11.0 (Uno.Sdk 6.7 st
 ## Linux / D-Bus (Tmds.DBus.Protocol)
 
 The Linux packages that reference `Tmds.DBus.Protocol` (`Shiny.BluetoothLE.Linux`,
-`Shiny.BluetoothLE.Hosting.Linux`, `Shiny.Net.Wifi.Linux`, `Shiny.Net.Vpn.Linux`,
+`Shiny.BluetoothLE.Hosting.Linux`, `Shiny.Gps.Linux`, `Shiny.Net.Wifi.Linux`, `Shiny.Net.Vpn.Linux`,
 `Shiny.Notifications.Linux`, `Shiny.ScreenRecorder.Linux`) talk to BlueZ, NetworkManager, the
 notification service and the portals through it. Its low-level API fails in ways that
 compile cleanly, pass on a dev machine, and only break against a real system bus. Three of these shipped

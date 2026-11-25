@@ -14,7 +14,10 @@ public static class AppleLocationExtensions
     {
         CLAuthorizationStatus.Denied => AccessState.Denied,
         CLAuthorizationStatus.Restricted => AccessState.Restricted,
+#if !MACOS
+        // macOS has no when-in-use level: a grant there is always AuthorizedAlways
         CLAuthorizationStatus.AuthorizedWhenInUse => background ? AccessState.Restricted : AccessState.Available,
+#endif
         CLAuthorizationStatus.AuthorizedAlways => AccessState.Available,
         CLAuthorizationStatus.NotDetermined => AccessState.Unknown,
         _ => AccessState.Unknown
@@ -84,14 +87,18 @@ public static class AppleLocationExtensions
             await WaitForAuthorization(shinyDelegate, CLAuthorizationStatus.NotDetermined, locationManager.RequestWhenInUseAuthorization).ConfigureAwait(false);
         }
 
+#if !MACOS
         if (background && locationManager.AuthorizationStatus == CLAuthorizationStatus.AuthorizedWhenInUse)
             await RequestAlways(locationManager, shinyDelegate).ConfigureAwait(false);
+#endif
 
         return locationManager.GetCurrentStatus(background);
     }
 
 
     const string UpgradeRequestedKey = "shiny.location.alwaysUpgradeRequested";
+
+#if !MACOS
     static readonly TimeSpan UpgradeAnswerTimeout = TimeSpan.FromSeconds(30);
 
     // iOS shows the upgrade to always once per install, and the app cannot see it: it stays active while
@@ -111,6 +118,7 @@ public static class AppleLocationExtensions
 
         cts.Cancel();
     }
+#endif
 
 
     static Task WaitForAuthorization(ShinyLocationDelegate shinyDelegate, CLAuthorizationStatus from, Action requestAction, CancellationToken cancelToken = default)
