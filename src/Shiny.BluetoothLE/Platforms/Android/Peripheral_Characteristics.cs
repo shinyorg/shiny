@@ -54,23 +54,27 @@ public partial class Peripheral
 
 
     Subject<BleCharacteristicInfo>? charSubSubj;
-    Dictionary<string, IObservable<BleCharacteristicResult>>? notifiers;
-
-    protected void ClearNotifiers() => this.notifiers?.Clear();
+    // Not cleared on disconnect: each stream re-hooks itself on WhenConnected, so dropping it from the cache let a later
+    // caller build a second stream for the same characteristic, whose disposal turned notifications off under the first.
+    readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
 
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
         this.AssertConnection();
 
-        this.notifiers ??= new();
         this.notifySubj ??= new();
         this.charSubSubj ??= new();
 
         var key = $"{serviceUuid}-{characteristicUuid}";
 
-        if (!this.notifiers.ContainsKey(key))
+        // concurrent callers for the same characteristic must share one stream - an unlocked check-then-add threw
+        lock (this.notifiers)
         {
-            var obs = Observable
+            if (this.notifiers.TryGetValue(key, out var existing))
+                return existing;
+
+            IObservable<BleCharacteristicResult>? obs = null;
+            obs = Observable
                 .Create<BleCharacteristicResult>(ob =>
                 {
                     this.logger.LogDebug($"Hooking Characteristic Notification: {serviceUuid} / {characteristicUuid}");
@@ -143,13 +147,26 @@ public partial class Peripheral
                         this.TryNotificationCleanup(serviceUuid, characteristicUuid);
                     };
                 })
+                // drop the cached stream once it ends - an errored one would otherwise replay its error to every later
+                // subscriber, and after the last subscriber leaves the next caller should start a fresh one
+                .Finally(() => this.RemoveNotifier(key, obs))
                 .Publish()
                 .RefCount();
 
             this.notifiers.Add(key, obs);
+            return obs;
         }
+    }
 
-        return this.notifiers[key];
+
+    void RemoveNotifier(string key, IObservable<BleCharacteristicResult>? stream)
+    {
+        lock (this.notifiers)
+        {
+            var isCurrent = this.notifiers.TryGetValue(key, out var current) && ReferenceEquals(current, stream);
+            if (isCurrent)
+                this.notifiers.Remove(key);
+        }
     }
 
 
@@ -287,7 +304,8 @@ public partial class Peripheral
                 ? BleCharacteristicEvent.Write
                 : BleCharacteristicEvent.WriteWithoutResponse;
 
-            return this.ToResult(ch, eventType);
+            // the API 33+ write never stores the value on the characteristic, so GetValue() would be stale
+            return this.ToResult(ch, eventType, data);
         }))
         .Switch();
 
@@ -306,10 +324,14 @@ public partial class Peripheral
         });
 
     
-    protected BleCharacteristicResult ToResult(BluetoothGattCharacteristic ch, BleCharacteristicEvent @event) => new BleCharacteristicResult(
+    protected BleCharacteristicResult ToResult(BluetoothGattCharacteristic ch, BleCharacteristicEvent @event) =>
+        this.ToResult(ch, @event, ch.GetValue());
+
+
+    protected BleCharacteristicResult ToResult(BluetoothGattCharacteristic ch, BleCharacteristicEvent @event, byte[]? data) => new BleCharacteristicResult(
         this.FromNative(ch),
         @event,
-        ch.GetValue()
+        data
     );
 
     

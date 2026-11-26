@@ -86,6 +86,7 @@ public partial class Peripheral : BluetoothGattCallback, INativePeripheral
         {
             this.RequiresServiceDiscovery = true;
             this.Gatt = null;
+            this.Mtu = BleConstants.DefaultPayloadSize;
             gatt.Disconnect();
             gatt.Close();
         }
@@ -217,6 +218,8 @@ public partial class Peripheral : BluetoothGattCallback, INativePeripheral
             // producing status 133 on subsequent connects.
             this.CloseExistingGatt();
 
+            // a new link starts at the default ATT MTU - the value negotiated on a previous one no longer applies
+            this.Mtu = BleConstants.DefaultPayloadSize;
             this.Gatt = this.Native.ConnectGatt(
                 this.platform.AppContext,
                 cfg.AutoConnect,
@@ -282,7 +285,8 @@ public partial class Peripheral : BluetoothGattCallback, INativePeripheral
 
         this.rssiSubj ??= new();
         var task = this.WaitForOperation(this.rssiSubj, ct);
-        this.Gatt!.ReadRemoteRssi();
+        if (!this.Gatt!.ReadRemoteRssi())
+            throw new BleException("Android GATT refused the RSSI read");
 
         var result = await task.ConfigureAwait(false);
         if (result.Status != GattStatus.Success)
@@ -388,7 +392,6 @@ public partial class Peripheral : BluetoothGattCallback, INativePeripheral
     {
         this.RequiresServiceDiscovery = true;
         this.ClearNotifications();
-        this.ClearNotifiers();
         this.BreakOperations();
 
         try
@@ -400,6 +403,7 @@ public partial class Peripheral : BluetoothGattCallback, INativePeripheral
             this.logger.LogWarning(ex, "Error closing GATT on disconnect");
         }
         this.Gatt = null;
+        this.Mtu = BleConstants.DefaultPayloadSize;
     }
 
 

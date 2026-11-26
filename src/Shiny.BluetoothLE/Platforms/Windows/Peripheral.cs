@@ -54,7 +54,9 @@ public partial class Peripheral : INativePeripheral
     public DeviceInformation? DeviceInfo => this.Native?.DeviceInformation;
     public string Uuid { get; }
     public string? Name => this.Native?.Name;
-    internal bool CanReuse => this.Native != null;
+    // A wrapper whose BluetoothLEDevice was released (CancelConnection) re-resolves it from BluetoothAddress on the next
+    // Connect, so callers holding the IPeripheral can reconnect on it - and the manager keeps handing out the same one.
+    internal bool CanReuse => true;
     GattSession? gattSession;
 
 
@@ -87,8 +89,25 @@ public partial class Peripheral : INativePeripheral
         this.HookNativeEvents();
     }
 
-    // Windows doesn't expose the negotiated MTU on the client side - assume the default link payload
-    public int Mtu => BleConstants.DefaultPayloadSize;
+    // GattSession.MaxPduSize is the negotiated ATT MTU (Windows usually settles on 247+); the payload is that minus the
+    // ATT header. Without a session yet, assume the default link payload.
+    public int Mtu
+    {
+        get
+        {
+            try
+            {
+                var pdu = this.gattSession?.MaxPduSize ?? 0;
+                return pdu > BleConstants.AttHeaderSize
+                    ? pdu - BleConstants.AttHeaderSize
+                    : BleConstants.DefaultPayloadSize;
+            }
+            catch (ObjectDisposedException)
+            {
+                return BleConstants.DefaultPayloadSize;
+            }
+        }
+    }
 
 
     public ConnectionState Status
@@ -151,7 +170,17 @@ public partial class Peripheral : INativePeripheral
             this.connectSub = ObservableTask.FromAsync(async ct =>
             {
                 if (this.Native == null)
-                    throw new BleException("Device is disposed");
+                {
+                    var device = await BluetoothLEDevice
+                        .FromBluetoothAddressAsync(this.BluetoothAddress)
+                        .AsTask(ct)
+                        .ConfigureAwait(false);
+
+                    if (device == null)
+                        throw new BleException("Peripheral could not be found - it may be out of range or no longer paired");
+
+                    this.RefreshNative(device);
+                }
 
                 using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, connectToken);
                 var result = await this.Native
@@ -227,7 +256,6 @@ public partial class Peripheral : INativePeripheral
 
         this.connSubj.OnNext(ConnectionState.Disconnected);
         this.manager.FirePeripheralStateChanged(this);
-        this.manager.RemovePeripheral(this);
     }
 
 
@@ -298,6 +326,15 @@ public partial class Peripheral : INativePeripheral
     void OnGattServicesChanged(BluetoothLEDevice sender, object args)
     {
         this.logger.LogDebug("Peripheral {Uuid} GATT services changed", this.Uuid);
+
+        // rediscover on next use - the cached objects stay tracked (and are disposed) until the connection is released,
+        // since an operation may still be using one
+        lock (this.trackedServices)
+        {
+            this.serviceCache.Clear();
+            this.characteristicCache.Clear();
+        }
+
         this.servicesChangedSubj.OnNext(Unit.Default);
     }
 
@@ -329,7 +366,6 @@ public partial class Peripheral : INativePeripheral
         );
         this.connectSub?.Dispose();
         this.connectSub = null;
-        this.ClearNotifications();
 
         // Only tear down the GattSession on a hard cleanup. Keeping it alive with
         // MaintainConnection=true after a transient drop lets the OS auto-reconnect
@@ -357,13 +393,15 @@ public partial class Peripheral : INativePeripheral
         {
             services = this.trackedServices.ToList();
             this.trackedServices.Clear();
+            this.serviceCache.Clear();
+            this.characteristicCache.Clear();
         }
 
         foreach (var service in services)
         {
             try
             {
-                service.Session?.Dispose();
+                // not service.Session - that is the device's shared GattSession, which a soft cleanup keeps alive
                 service.Dispose();
             }
             catch
@@ -475,8 +513,11 @@ public partial class Peripheral : INativePeripheral
 
         connectAttemptCts?.Dispose();
 
-        if (shouldCleanup)
-            this.CleanupDisconnectedPeripheral();
+        // A Disconnected seen mid-connect is often transient (the link comes straight back). This used to run the hard
+        // cleanup - disposing the device and evicting the wrapper - right after a successful connect had reported
+        // Connected. Only release per-connection resources, and only if the link really is down now.
+        if (shouldCleanup && !this.IsNativeConnected())
+            this.SoftCleanupOnDisconnect();
     }
 
 

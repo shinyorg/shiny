@@ -176,7 +176,6 @@ public partial class Peripheral : CBPeripheralDelegate, INativePeripheral
 
         if (connStatus == ConnectionState.Disconnected)
         {
-            this.ClearNotifiers();
             this.BreakOperations();
         }
 

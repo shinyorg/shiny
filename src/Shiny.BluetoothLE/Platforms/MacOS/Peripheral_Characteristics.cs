@@ -18,18 +18,22 @@ namespace Shiny.BluetoothLE;
 
 public partial class Peripheral
 {
+    // Not cleared on disconnect: each stream re-hooks itself on WhenConnected, so dropping it from the cache let a later
+    // caller build a second stream for the same characteristic, whose disposal turned notifications off under the first.
     readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
-
-    protected void ClearNotifiers() => this.notifiers.Clear();
 
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicateIfAvailable = true)
     {
         this.AssertConnnection();
         var key = $"{serviceUuid}-{characteristicUuid}";
 
-        if (!this.notifiers.ContainsKey(key))
+        lock (this.notifiers)
         {
-            var obs = Observable
+            if (this.notifiers.TryGetValue(key, out var existing))
+                return existing;
+
+            IObservable<BleCharacteristicResult>? obs = null;
+            obs = Observable
                 .Create<BleCharacteristicResult>(ob =>
                 {
                     this.logger.LogInformation($"Initial Notification Hook: {serviceUuid} / {characteristicUuid}");
@@ -52,14 +56,28 @@ public partial class Peripheral
                             // SetNotifyValue turns the peripheral's notifications on - devices that
                             // stream immediately on subscribe would otherwise drop them (issue #1542).
                             var notifyStream = this.charUpdateSubj
-                                .Where(x => x.Char.Equals(ch))
-                                .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification));
+                                .Where(x => x.Char.Equals(ch) && x.Error == null)
+                                .Select(x => this.ToResult(x.Char, BleCharacteristicEvent.Notification, x.Data));
 
-                            var enable = Observable.Defer(() =>
+                            // SetNotifyValue reports through UpdatedNotificationState - a peripheral refusing the
+                            // subscription (e.g. insufficient authentication) errors the stream instead of leaving it
+                            // silent forever. Subscribed before the call so the callback can't be missed.
+                            var enable = Observable.Create<BleCharacteristicResult>(eob =>
                             {
+                                var stateSub = this.notifySubj
+                                    .Where(x => x.Char.Equals(ch))
+                                    .Take(1)
+                                    .Subscribe(x =>
+                                    {
+                                        if (x.Error == null)
+                                            eob.OnCompleted();
+                                        else
+                                            eob.OnError(ToException(x.Error));
+                                    });
+
                                 this.logger.CharacteristicInfo("Hooking Notification Characteristic", serviceUuid, characteristicUuid);
                                 this.Native.SetNotifyValue(true, ch);
-                                return Observable.Empty<BleCharacteristicResult>();
+                                return stateSub;
                             });
 
                             return notifyStream.Merge(enable);
@@ -86,13 +104,26 @@ public partial class Peripheral
                         }
                     };
                 })
+                // drop the cached stream once it ends - an errored one would otherwise replay its error to every later
+                // subscriber, and after the last subscriber leaves the next caller should start a fresh one
+                .Finally(() => this.RemoveNotifier(key, obs))
                 .Publish()
                 .RefCount();
 
             this.notifiers.Add(key, obs);
+            return obs;
         }
+    }
 
-        return this.notifiers[key];
+
+    void RemoveNotifier(string key, IObservable<BleCharacteristicResult>? stream)
+    {
+        lock (this.notifiers)
+        {
+            var isCurrent = this.notifiers.TryGetValue(key, out var current) && ReferenceEquals(current, stream);
+            if (isCurrent)
+                this.notifiers.Remove(key);
+        }
     }
 
 
@@ -143,28 +174,22 @@ public partial class Peripheral
         .Switch();
 
 
+    // Queued like the single-characteristic discovery in GetNativeCharacteristic: run alongside it, either one's
+    // DiscoveredCharacteristics callback completed the other (a full listing came back with one characteristic), and
+    // outside WaitForOperation a disconnect mid-discovery left it waiting forever.
     public IObservable<IReadOnlyList<BleCharacteristicInfo>> GetCharacteristics(string serviceUuid) => this
         .GetNativeService(serviceUuid)
-        .Select(service => Observable.Create<IReadOnlyList<BleCharacteristicInfo>>(ob =>
+        .Select(service => this.operations.QueueToObservable(async ct =>
         {
-            var sub = this.charDiscoverySubj
-                .Where(x => x.Service.Equals(service))
-                .Subscribe(x =>
-                {
-                    if (x.Error != null)
-                    {
-                        ob.OnError(ToException(x.Error));
-                    }
-                    else if (service.Characteristics != null)
-                    {
-                        var list = service.Characteristics.Select(this.FromNative).ToList();
-                        ob.Respond(list);
-                    }
-                });
-
+            var task = this.WaitForOperation(this.charDiscoverySubj.Where(x => x.Service.Equals(service)), ct);
             this.Native.DiscoverCharacteristics(service);
 
-            return () => sub.Dispose();
+            var result = await task.ConfigureAwait(false);
+            if (result.Error != null)
+                throw ToException(result.Error);
+
+            IReadOnlyList<BleCharacteristicInfo> list = service.Characteristics?.Select(this.FromNative).ToList() ?? new List<BleCharacteristicInfo>();
+            return list;
         }))
         .Switch();
 
@@ -183,7 +208,8 @@ public partial class Peripheral
             if (result.Error != null)
                 throw ToException(result.Error);
 
-            return this.ToResult(ch, BleCharacteristicEvent.Read);
+            // the value captured in the callback - ch.Value can already hold a later notification by now
+            return this.ToResult(ch, BleCharacteristicEvent.Read, result.Data);
         }))
         .Switch();
 
@@ -214,11 +240,12 @@ public partial class Peripheral
     }
 
 
-    readonly Subject<(CBCharacteristic Char, NSError? Error)> charUpdateSubj = new();
+    // reads and notifications both arrive here - the value is copied now, before the next update overwrites it
+    readonly Subject<(CBCharacteristic Char, NSError? Error, byte[]? Data)> charUpdateSubj = new();
     public override void UpdatedCharacterteristicValue(CBPeripheral peripheral, CBCharacteristic characteristic, NSError? error)
     {
         this.logger.CharacteristicEvent(characteristic, error);
-        this.charUpdateSubj.OnNext((characteristic, error));
+        this.charUpdateSubj.OnNext((characteristic, error, error == null ? characteristic.Value?.ToArray() : null));
     }
 
 
@@ -230,10 +257,10 @@ public partial class Peripheral
     }
 
 
-    protected BleCharacteristicResult ToResult(CBCharacteristic ch, BleCharacteristicEvent @event) => new(
+    protected BleCharacteristicResult ToResult(CBCharacteristic ch, BleCharacteristicEvent @event, byte[]? data) => new(
         this.FromNative(ch),
         @event,
-        ch.Value?.ToArray()
+        data
     );
 
 
@@ -284,7 +311,8 @@ public partial class Peripheral
         if (result.Error != null)
             throw ToException(result.Error);
 
-        return this.ToResult(nativeCh, BleCharacteristicEvent.Write);
+        // CoreBluetooth never stores a written value on the characteristic - ch.Value is the last read/notification
+        return this.ToResult(nativeCh, BleCharacteristicEvent.Write, value);
     });
 
 
@@ -315,7 +343,7 @@ public partial class Peripheral
             {
                 this.logger.LogDebug("Writing characteristic without response");
                 this.Native.WriteValue(NSData.FromArray(value), nativeCh, CBCharacteristicWriteType.WithoutResponse);
-                result = this.ToResult(nativeCh, BleCharacteristicEvent.WriteWithoutResponse);
+                result = this.ToResult(nativeCh, BleCharacteristicEvent.WriteWithoutResponse, value);
                 return Task.CompletedTask;
             }, ct, nameof(WriteWithoutResponse)).ConfigureAwait(false);
 

@@ -26,13 +26,13 @@ public partial class Peripheral
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.WaitForOperation(this.descSubj.Where(x => x.Descriptor.Equals(desc)), ct);
+            var task = this.WaitForOperation(this.descSubj.Where(x => x.Descriptor.Equals(desc) && !x.IsWrite), ct);
             this.Native.ReadValue(desc);
             var result = await task.ConfigureAwait(false);
             if (result.Error != null)
                 throw ToException(result.Error);
 
-            return this.ToResult(desc);
+            return this.ToResult(desc, ToBytes(desc.Value));
         }))
         .Switch();
 
@@ -41,7 +41,7 @@ public partial class Peripheral
         .GetNativeDescriptor(serviceUuid, characteristicUuid, descriptorUuid)
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
-            var task = this.WaitForOperation(this.descSubj.Where(x => x.Descriptor!.Equals(desc)), ct);
+            var task = this.WaitForOperation(this.descSubj.Where(x => x.Descriptor!.Equals(desc) && x.IsWrite), ct);
 
             var nsdata = NSData.FromArray(data);
             this.Native.WriteValue(nsdata, desc);
@@ -50,7 +50,7 @@ public partial class Peripheral
             if (result.Error != null)
                 throw ToException(result.Error);
 
-            return this.ToResult(desc);
+            return this.ToResult(desc, data);
         }))
         .Switch();
 
@@ -68,10 +68,22 @@ public partial class Peripheral
         => this.descDiscSubj.OnNext((characteristic, error));
 
 
-    protected BleDescriptorResult ToResult(CBDescriptor native) => new(
+    protected BleDescriptorResult ToResult(CBDescriptor native, byte[]? data) => new(
         this.FromNative(native),
-        (native.Value as NSData)?.ToArray()
+        data
     );
+
+
+    // CoreBluetooth hands the standard descriptors back as Foundation types, not NSData: Client Characteristic
+    // Configuration (0x2902), Server Characteristic Configuration and Extended Properties as NSNumber, User Description
+    // (0x2901) as NSString. Casting to NSData alone returned null for all of them.
+    static byte[]? ToBytes(NSObject? value) => value switch
+    {
+        NSData data => data.ToArray(),
+        NSNumber number => BitConverter.GetBytes(number.UInt16Value), // 16-bit little-endian, as on the wire
+        NSString str => System.Text.Encoding.UTF8.GetBytes(str.ToString()),
+        _ => null
+    };
 
     protected BleDescriptorInfo FromNative(CBDescriptor native) => new(
         this.FromNative(native.Characteristic!),

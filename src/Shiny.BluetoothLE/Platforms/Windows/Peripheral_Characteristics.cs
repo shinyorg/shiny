@@ -27,14 +27,7 @@ public partial class Peripheral
     {
         this.AssertConnection();
 
-        var suid = Utils.ToUuidType(serviceUuid);
-        var result = await this.Native!.GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Uncached).AsTask(ct).ConfigureAwait(false);
-        result.Status.Assert("GetServices", serviceUuid);
-
-        var service = result.Services.FirstOrDefault()
-            ?? throw new BleException($"Service '{serviceUuid}' not found");
-        this.TrackService(service);
-
+        var service = await this.GetNativeServiceAsync(serviceUuid, ct).ConfigureAwait(false);
         var chResult = await service
             .GetCharacteristicsAsync(BluetoothCacheMode.Uncached)
             .AsTask(ct)
@@ -57,17 +50,23 @@ public partial class Peripheral
     }
 
 
+    // One stream per characteristic, shared by RefCount: the first subscriber writes the CCCD, the last one leaving
+    // writes None and unhooks ValueChanged. It is not torn down on disconnect - it re-hooks itself on WhenConnected - and
+    // drops out of the cache when it ends, so an errored stream isn't replayed to later callers.
     readonly Dictionary<string, IObservable<BleCharacteristicResult>> notifiers = new();
-    readonly Dictionary<string, IDisposable> notifierConnections = new();
     public IObservable<BleCharacteristicResult> NotifyCharacteristic(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = true)
     {
         this.AssertConnection();
 
         var key = $"{serviceUuid}-{characteristicUuid}";
 
-        if (!this.notifiers.ContainsKey(key))
+        lock (this.notifiers)
         {
-            var connectable = this.WhenConnected()
+            if (this.notifiers.TryGetValue(key, out var existing))
+                return existing;
+
+            IObservable<BleCharacteristicResult>? obs = null;
+            obs = this.WhenConnected()
                 .Select(_ => ObservableTask.FromAsync(ct => this.GetNativeCharacteristicAsync(serviceUuid, characteristicUuid, ct)))
                 .Switch()
                 .Select(ch => Observable.Create<BleCharacteristicResult>(ob =>
@@ -127,12 +126,24 @@ public partial class Peripheral
                     };
                 }))
                 .Switch()
-                .Publish();
+                .Finally(() => this.RemoveNotifier(key, obs))
+                .Publish()
+                .RefCount();
 
-            this.notifierConnections[key] = connectable.Connect();
-            this.notifiers[key] = connectable;
+            this.notifiers.Add(key, obs);
+            return obs;
         }
-        return this.notifiers[key];
+    }
+
+
+    void RemoveNotifier(string key, IObservable<BleCharacteristicResult>? stream)
+    {
+        lock (this.notifiers)
+        {
+            var isCurrent = this.notifiers.TryGetValue(key, out var current) && ReferenceEquals(current, stream);
+            if (isCurrent)
+                this.notifiers.Remove(key);
+        }
     }
 
 
@@ -184,16 +195,6 @@ public partial class Peripheral
     });
 
 
-    protected void ClearNotifications()
-    {
-        foreach (var conn in this.notifierConnections.Values)
-            conn.Dispose();
-
-        this.notifierConnections.Clear();
-        this.notifiers.Clear();
-    }
-
-
     protected static BleCharacteristicInfo ToCharInfo(GattCharacteristic ch, bool? isNotifying = null) => new(
         new BleServiceInfo(ch.Service.Uuid.ToString()),
         ch.Uuid.ToString(),
@@ -234,12 +235,21 @@ public partial class Peripheral
     }
 
 
-    protected async System.Threading.Tasks.Task<GattCharacteristic> GetNativeCharacteristicAsync(
-        string serviceUuid,
-        string characteristicUuid,
-        System.Threading.CancellationToken ct)
+    // Cached per connection (cleared on release and on GattServicesChanged). Every operation used to run an uncached
+    // service and characteristic discovery and keep the new GattDeviceService until disconnect - a chunked write of
+    // thousands of packets opened thousands of service handles and twice as many radio round trips.
+    readonly Dictionary<Guid, GattDeviceService> serviceCache = new();
+    readonly Dictionary<(Guid Service, Guid Characteristic), GattCharacteristic> characteristicCache = new();
+
+
+    protected async System.Threading.Tasks.Task<GattDeviceService> GetNativeServiceAsync(string serviceUuid, System.Threading.CancellationToken ct)
     {
         var suid = Utils.ToUuidType(serviceUuid);
+        lock (this.trackedServices)
+        {
+            if (this.serviceCache.TryGetValue(suid, out var cached))
+                return cached;
+        }
 
         var result = await this.Native!
             .GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Uncached)
@@ -250,11 +260,38 @@ public partial class Peripheral
 
         var service = result.Services.FirstOrDefault()
             ?? throw new BleException($"Service '{serviceUuid}' not found");
-        this.TrackService(service);
 
-        var cuid = Utils.ToUuidType(characteristicUuid);
+        foreach (var extra in result.Services.Skip(1))
+            extra.Dispose();
+
+        lock (this.trackedServices)
+        {
+            // a concurrent lookup may have won - keep its object, the tracked set disposes this one with the connection
+            this.trackedServices.Add(service);
+            if (this.serviceCache.TryGetValue(suid, out var raced))
+                return raced;
+
+            this.serviceCache[suid] = service;
+        }
+        return service;
+    }
+
+
+    protected async System.Threading.Tasks.Task<GattCharacteristic> GetNativeCharacteristicAsync(
+        string serviceUuid,
+        string characteristicUuid,
+        System.Threading.CancellationToken ct)
+    {
+        var key = (Utils.ToUuidType(serviceUuid), Utils.ToUuidType(characteristicUuid));
+        lock (this.trackedServices)
+        {
+            if (this.characteristicCache.TryGetValue(key, out var cached))
+                return cached;
+        }
+
+        var service = await this.GetNativeServiceAsync(serviceUuid, ct).ConfigureAwait(false);
         var chResult = await service
-            .GetCharacteristicsForUuidAsync(cuid, BluetoothCacheMode.Uncached)
+            .GetCharacteristicsForUuidAsync(key.Item2, BluetoothCacheMode.Uncached)
             .AsTask(ct)
             .ConfigureAwait(false);
 
@@ -262,6 +299,9 @@ public partial class Peripheral
 
         var ch = chResult.Characteristics.FirstOrDefault()
             ?? throw new BleException($"Characteristic '{characteristicUuid}' not found in service '{serviceUuid}'");
+
+        lock (this.trackedServices)
+            this.characteristicCache[key] = ch;
 
         return ch;
     }

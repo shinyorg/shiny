@@ -29,7 +29,8 @@ public partial class Peripheral
         .Select(desc => this.operations.QueueToObservable(async ct =>
         {
             await this.WriteDescriptor(desc, data, ct).ConfigureAwait(false);
-            return this.ToResult(desc);
+            // the API 33+ write never stores the value on the descriptor, so GetValue() would be stale
+            return this.ToResult(desc, data);
         }))
         .Switch();
 
@@ -48,8 +49,11 @@ public partial class Peripheral
             if (!this.Gatt!.ReadDescriptor(desc))
                 throw new InvalidOperationException("Could not read descriptor: " + descriptorUuid);
 
-            await task.ConfigureAwait(false);
-            return this.ToResult(desc);
+            var result = await task.ConfigureAwait(false);
+            if (result.Status != GattStatus.Success)
+                throw ToException("Failed to read descriptor: " + descriptorUuid, result.Status);
+
+            return this.ToResult(desc, desc.GetValue());
         }))
         .Switch();
 
@@ -112,9 +116,9 @@ public partial class Peripheral
         => this.descSubj?.OnNext((descriptor!, status, true));
 
 
-    protected BleDescriptorResult ToResult(BluetoothGattDescriptor desc) => new BleDescriptorResult(
+    protected BleDescriptorResult ToResult(BluetoothGattDescriptor desc, byte[]? data) => new BleDescriptorResult(
         this.FromNative(desc),
-        desc.GetValue()
+        data
     );
 
     

@@ -16,19 +16,7 @@ public partial class Peripheral
     {
         this.AssertConnection();
 
-        var suid = Utils.ToUuidType(serviceUuid);
-        var result = await this.Native!
-            .GetGattServicesForUuidAsync(suid, BluetoothCacheMode.Uncached)
-            .AsTask(ct)
-            .ConfigureAwait(false);
-
-        result.Status.Assert("GetService", serviceUuid);
-
-        var service = result.Services.FirstOrDefault();
-        if (service == null)
-            throw new BleException($"Service '{serviceUuid}' not found");
-
-        this.TrackService(service);
+        var service = await this.GetNativeServiceAsync(serviceUuid, ct).ConfigureAwait(false);
         return new BleServiceInfo(service.Uuid.ToString());
     });
 
