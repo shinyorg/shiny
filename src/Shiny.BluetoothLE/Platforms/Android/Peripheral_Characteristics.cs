@@ -255,61 +255,37 @@ public partial class Peripheral
             if (ch.Properties.HasFlag(GattProperty.SignedWrite) && this.Native.BondState == Bond.Bonded)
                 ch.WriteType |= GattWriteType.Signed;
 
-            if (withResponse)
-            {
-                this.charEventSubj ??= new();
-                var task = this.WaitForOperation(
-                    this.charEventSubj.Where(x => x.Char.Equals(ch) && x.IsWrite),
-                    ct
-                );
+            this.charEventSubj ??= new();
+            var task = this.WaitForOperation(
+                this.charEventSubj.Where(x => x.Char.Equals(ch) && x.IsWrite),
+                ct
+            );
 
 #if XAMARIN
-                if (!ch.SetValue(data))
-                    throw new BleException("Could not set value of characteristic: " + characteristicUuid);
+            if (!ch.SetValue(data))
+                throw new BleException("Could not set value of characteristic: " + characteristicUuid);
 
-                if (!this.Gatt!.WriteCharacteristic(ch))
-                    throw new BleException("Failed to write to characteristic: " + characteristicUuid);
+            if (!this.Gatt!.WriteCharacteristic(ch))
+                throw new BleException("Failed to write to characteristic: " + characteristicUuid);
 #else
-                if (OperatingSystem.IsAndroidVersionAtLeast(33))
-                {
-                    this.Gatt!.WriteCharacteristic(ch, data, (int)ch.WriteType);
-                }
-                else
-                {
-                    if (!ch.SetValue(data))
-                        throw new BleException("Could not set value of characteristic: " + characteristicUuid);
-
-                    if (!this.Gatt!.WriteCharacteristic(ch))
-                        throw new BleException("Failed to write to characteristic: " + characteristicUuid);
-                }
-#endif
-                var result = await task.ConfigureAwait(false);
-                if (result.Status != GattStatus.Success)
-                    throw ToException($"Failed to write to characteristic: {characteristicUuid}", result.Status);
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                var status = this.Gatt!.WriteCharacteristic(ch, data, (int)ch.WriteType);
+                if (status != (int)CurrentBluetoothStatusCodes.Success)
+                    throw new BleException($"Failed to write to characteristic: {characteristicUuid} - Android status code {status}");
             }
             else
             {
-#if XAMARIN
                 if (!ch.SetValue(data))
                     throw new BleException("Could not set value of characteristic: " + characteristicUuid);
 
                 if (!this.Gatt!.WriteCharacteristic(ch))
                     throw new BleException("Failed to write to characteristic: " + characteristicUuid);
-#else
-                if (OperatingSystem.IsAndroidVersionAtLeast(33))
-                {
-                    this.Gatt!.WriteCharacteristic(ch, data, (int)ch.WriteType);
-                }
-                else
-                {
-                    if (!ch.SetValue(data))
-                        throw new BleException("Could not set value of characteristic: " + characteristicUuid);
-
-                    if (!this.Gatt!.WriteCharacteristic(ch))
-                        throw new BleException("Failed to write to characteristic: " + characteristicUuid);
-                }
-#endif
             }
+#endif
+            var result = await task.ConfigureAwait(false);
+            if (result.Status != GattStatus.Success)
+                throw ToException($"Failed to write to characteristic: {characteristicUuid}", result.Status);
 
             var eventType = withResponse
                 ? BleCharacteristicEvent.Write
