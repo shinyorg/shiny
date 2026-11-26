@@ -71,7 +71,9 @@ public partial class Peripheral
 #else
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
-            this.Gatt!.WriteDescriptor(descriptor, data);
+            var rc = this.Gatt!.WriteDescriptor(descriptor, data);
+            if (rc != (int)CurrentBluetoothStatusCodes.Success)
+                throw new BleOperationException($"Failed to write descriptor: {descriptor.Uuid} (status code: {rc})", rc);
         }
         else
         {
