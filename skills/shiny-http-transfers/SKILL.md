@@ -35,6 +35,8 @@ triggers:
   - resume transfer
   - pause download
   - resume download
+  - If-Range
+  - ETag
   - AddTransferProgress
   - TransferProgressManager
   - TransferProgressOptions
@@ -146,7 +148,7 @@ public partial class MyHttpTransferDelegate : IAndroidForegroundServiceDelegate
 
 ### Linux / macOS / Plain .NET Setup
 
-On non-platform .NET hosts (Linux, macOS server, console apps, etc.) call `AddHttpClientTransfers<TDelegate>()` instead of `AddHttpTransfers<TDelegate>()`. It registers `HttpClientHttpTransferManager` backed by an `HttpClient` loop driven by `IConnectivity` that wakes immediately on connectivity changes. Downloads resume after network interruption via HTTP Range requests (`Range: bytes=N-`, `FileMode.Append` when the server responds with `206 Partial Content`); uploads always restart from scratch. Only a partial file the transfer itself wrote is resumed - a file already at `LocalFilePath` before the download was queued is overwritten - and a `416` for an already-complete partial file completes the transfer. A connection failure (no HTTP status) pauses a transfer as `PausedByNoNetwork` for the next pass instead of failing it.
+On non-platform .NET hosts (Linux, macOS server, console apps, etc.) call `AddHttpClientTransfers<TDelegate>()` instead of `AddHttpTransfers<TDelegate>()`. It registers `HttpClientHttpTransferManager` backed by an `HttpClient` loop driven by `IConnectivity` that wakes immediately on connectivity changes. Downloads resume after network interruption via HTTP Range requests (`Range: bytes=N-`, `FileMode.Append` when the server responds with `206 Partial Content`); uploads always restart from scratch. Only a partial file the transfer itself wrote is resumed - a file already at `LocalFilePath` before the download was queued is overwritten - and a `416` for an already-complete partial file completes the transfer. The resume also checks the server file hasn't changed: the response that starts a download has its strong `ETag` (weak `W/` tags are ignored) or, failing that, its `Last-Modified` stored internally beside the transfer, and the resume sends it as `If-Range`. A `206` appends; a `200` means the file changed, so the partial is truncated and the download restarts from byte 0 with the new validator. With neither header the resume is a plain `Range` request. The validator is removed with the transfer (completed, failed, cancelled). Apple (`NSURLSession`) does its own resume validation; Blazor has no resume. For safe resumes, servers should send a strong `ETag` - no app code is needed. A connection failure (no HTTP status) pauses a transfer as `PausedByNoNetwork` for the next pass instead of failing it.
 
 `TransferProgress.IsDeterministic` is false for an unknown, zero or negative (iOS "unknown size") total; `PercentComplete` is then `-1` and `EstimatedTimeRemaining` is zero.
 
@@ -219,7 +221,7 @@ When generating code that uses Shiny HTTP Transfers, follow these conventions:
 ### Pausing & Resuming
 
 - Call `transferManager.Pause(identifier)` to stop a transfer **without cancelling it**. The transfer stays in the queue and reports `HttpTransferState.Paused`. Use this instead of `Cancel(identifier)` (which removes the transfer and deletes a download's partial file) when the user may want to continue later.
-- Call `transferManager.Resume(identifier)` to continue a paused transfer. **Downloads** resume from where they left off (HTTP Range on managed platforms; native `NSUrlSessionTask.Resume()` on iOS/Mac Catalyst). **Uploads** are not resumable — resuming an upload restarts it from the beginning — **except tus uploads** (`TransferType.UploadTus`), which continue from the offset the server reports.
+- Call `transferManager.Resume(identifier)` to continue a paused transfer. **Downloads** resume from where they left off (HTTP Range + `If-Range` on managed platforms, so a server file that changed in between restarts instead of corrupting the download; native `NSUrlSessionTask.Resume()` on iOS/Mac Catalyst). **Uploads** are not resumable — resuming an upload restarts it from the beginning — **except tus uploads** (`TransferType.UploadTus`), which continue from the offset the server reports.
 - A user-paused transfer is not auto-resumed when the app relaunches or when connectivity returns; it stays paused until you call `Resume`.
 
 ### Building Requests

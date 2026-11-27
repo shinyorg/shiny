@@ -112,6 +112,7 @@ public class HttpClientHttpTransferManager(
         if (transfer != null)
         {
             repository.Remove(transfer);
+            repository.RemoveTransferValidator(identifier);
 
             if (transfer.Request.Type == TransferType.Download)
             {
@@ -182,6 +183,7 @@ public class HttpClientHttpTransferManager(
     {
         var transfers = repository.GetAll<HttpTransfer>();
         repository.Clear<HttpTransfer>();
+        repository.ClearTransferValidators();
 
         foreach (var transfer in transfers)
         {

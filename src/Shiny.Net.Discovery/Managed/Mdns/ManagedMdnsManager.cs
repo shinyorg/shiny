@@ -20,7 +20,16 @@ sealed class ManagedMdnsManager : IMdnsManager, IDisposable
     readonly DnsName hostName;
 
 
-    public ManagedMdnsManager(ILogger<ManagedMdnsManager> logger)
+    public ManagedMdnsManager(ILogger<ManagedMdnsManager> logger) : this((ILogger)logger)
+    {
+    }
+
+
+    /// <summary>
+    /// For hosts that borrow the managed stack for part of their work (the Android legacy resolve
+    /// fallback) and log under their own category.
+    /// </summary>
+    internal ManagedMdnsManager(ILogger logger)
     {
         this.logger = logger;
         this.client = new MdnsMulticastClient(logger);

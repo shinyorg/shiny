@@ -272,7 +272,10 @@ static class GoogleFixtures
     """;
 
 
-    public static readonly string Product = $$"""
+    public static readonly string Product = ProductWith("CONSUMPTION_STATE_YET_TO_BE_CONSUMED");
+
+
+    public static string ProductWith(string consumptionState) => $$"""
     {
       "kind": "androidpublisher#productPurchaseV2",
       "orderId": "GPA.1111-2222-3333-44444",
@@ -282,7 +285,7 @@ static class GoogleFixtures
       "obfuscatedExternalAccountId": "{{AccountToken:N}}",
       "purchaseStateContext": { "purchaseState": "PURCHASED" },
       "productLineItem": [
-        { "productId": "coins_100", "productOfferDetails": { "quantity": 3, "refundableQuantity": 3, "consumptionState": "CONSUMPTION_STATE_YET_TO_BE_CONSUMED" } }
+        { "productId": "coins_100", "productOfferDetails": { "quantity": 3, "refundableQuantity": 3, "consumptionState": "{{consumptionState}}" } }
       ]
     }
     """;

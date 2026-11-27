@@ -28,14 +28,19 @@
     </PropertyGroup>
 
     <!--
-        The managed mDNS responder only ships where there is no OS-level DNS-SD daemon to lean on:
-        plain .NET (Linux/macOS console/server) and Windows. Android and Apple delegate to
+        The managed mDNS responder is the IMdnsManager only where there is no OS-level DNS-SD daemon
+        to lean on: plain .NET (Linux/macOS console/server) and Windows. Android and Apple delegate to
         NsdManager / NSNetService instead.
+
+        Android still compiles it: below API 34 NsdManager allows one resolve in flight and cannot
+        cancel it, so a resolve that never answers is worked around by resolving through the managed
+        stack until it reports back. Apple drops it - raw multicast there needs an entitlement that
+        NSNetService does not.
 
         Only Managed\Mdns is dropped - the shared multicast socket layer, SSDP and WS-Discovery
         are managed on every platform, because no OS exposes an API for those two protocols.
     -->
-    <ItemGroup Condition="$(TargetFramework.Contains('-android')) OR $(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos')) OR $(TargetFramework.Contains('-tvos'))">
+    <ItemGroup Condition="$(TargetFramework.Contains('-ios')) OR $(TargetFramework.Contains('maccatalyst')) OR $(TargetFramework.Contains('-macos')) OR $(TargetFramework.Contains('-tvos'))">
         <Compile Remove="Managed\Mdns\**\*.cs" />
         <None Include="Managed\Mdns\**\*.cs" />
     </ItemGroup>

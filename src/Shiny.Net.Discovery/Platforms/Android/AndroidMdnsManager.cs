@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
@@ -6,25 +7,38 @@ using Android.Content;
 using Android.Net.Nsd;
 using Microsoft.Extensions.Logging;
 using Shiny.Net.Discovery.Internals;
+using Shiny.Net.Discovery.Managed;
 using Application = Android.App.Application;
+
+// the managed mDNS fallback for the pre-API 34 resolve holds a WifiManager.MulticastLock while it
+// queries; without this the lock throws and nothing is received over Wi-Fi. Normal permission, no prompt.
+[assembly: UsesPermission("android.permission.CHANGE_WIFI_MULTICAST_STATE")]
 
 namespace Shiny.Net.Discovery;
 
 
 /// <summary>
-/// Browses and publishes through NsdManager, the system DNS-SD service. Going through the
-/// platform means no CHANGE_WIFI_MULTICAST_STATE permission and no WifiManager.MulticastLock -
-/// the OS keeps the multicast path alive for us.
+/// Browses and publishes through NsdManager, the system DNS-SD service, which keeps the multicast
+/// path alive for us. The one exception is below API 34: while NsdManager's single resolve slot is
+/// held by a resolve that timed out, resolves go through the managed mDNS stack, which holds a
+/// WifiManager.MulticastLock (CHANGE_WIFI_MULTICAST_STATE, declared by this package) while it queries.
 /// </summary>
 public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManager
 {
     static readonly TimeSpan defaultResolveTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// Pre-API 34 NsdManager only tolerates one resolve in flight; a second concurrent call comes
-    /// back as FailureAlreadyActive. The legacy path queues through here.
+    /// Pre-API 34 NsdManager only tolerates one resolve in flight (a second comes back as
+    /// FailureAlreadyActive) and cannot cancel it, so the slot is only free once the outstanding
+    /// resolve's listener reports back - not when the caller's timeout runs out.
     /// </summary>
-    readonly SemaphoreSlim resolveLock = new(1, 1);
+    readonly LegacyResolveSlot legacySlot = new();
+
+    /// <summary>
+    /// Only built when a pre-API 34 resolve finds the slot orphaned. Its sockets (and the multicast
+    /// lock) are only open while a fallback resolve runs.
+    /// </summary>
+    readonly Lazy<ManagedMdnsManager> managed = new(() => new ManagedMdnsManager(logger));
 
     NsdManager Native => (NsdManager)Application.Context.GetSystemService(Context.NsdService)!;
 
@@ -104,12 +118,12 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
         try
         {
             var final = config.ResolveServices
-                ? await this.ResolveNative(info, config.ResolveTimeout, ct).ConfigureAwait(false) ?? info
-                : info;
+                ? await this.ResolveNative(info, serviceType, config.ResolveTimeout, ct).ConfigureAwait(false) ?? Convert(info, serviceType)
+                : Convert(info, serviceType);
 
             var isCurrent = generations.TryGetValue(info.ServiceName ?? String.Empty, out var latest) && latest == generation;
             if (isCurrent)
-                channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, Convert(final, serviceType)));
+                channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, final));
             else
                 logger.LogDebug("Dropped a stale resolve of {Name} - it was lost or found again while resolving", info.ServiceName);
         }
@@ -140,18 +154,21 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
             ServiceType = info.ServiceType
         };
 
-        var resolved = await this
-            .ResolveNative(request, timeout ?? defaultResolveTimeout, ct)
+        return await this
+            .ResolveNative(request, info, timeout ?? defaultResolveTimeout, ct)
             .ConfigureAwait(false);
-
-        return resolved == null ? null : Convert(resolved, info);
     }
 
 
-    Task<NsdServiceInfo?> ResolveNative(NsdServiceInfo info, TimeSpan timeout, CancellationToken ct)
-        => OperatingSystem.IsAndroidVersionAtLeast(34)
-            ? this.ResolveViaCallback(info, timeout, ct)
-            : this.ResolveViaListener(info, timeout, ct);
+    async Task<MdnsService?> ResolveNative(NsdServiceInfo info, ServiceTypeInfo serviceType, TimeSpan timeout, CancellationToken ct)
+    {
+        if (OperatingSystem.IsAndroidVersionAtLeast(34))
+        {
+            var resolved = await this.ResolveViaCallback(info, timeout, ct).ConfigureAwait(false);
+            return resolved == null ? null : Convert(resolved, serviceType);
+        }
+        return await this.ResolveViaListener(info, serviceType, timeout, ct).ConfigureAwait(false);
+    }
 
 
     /// <summary>
@@ -197,40 +214,152 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
 
 
     /// <summary>
-    /// Pre-API 34 path, serialised because NsdManager only tolerates one resolve at a time.
+    /// Pre-API 34 path. Callers queue behind a live resolve with their own timeout; while the slot is
+    /// held by one that timed out (and may never report back), or NsdManager says another resolve is
+    /// already active, they resolve through the managed mDNS stack instead.
     /// </summary>
-    async Task<NsdServiceInfo?> ResolveViaListener(NsdServiceInfo info, TimeSpan timeout, CancellationToken ct)
+    async Task<MdnsService?> ResolveViaListener(NsdServiceInfo info, ServiceTypeInfo serviceType, TimeSpan timeout, CancellationToken ct)
     {
-        await this.resolveLock.WaitAsync(ct).ConfigureAwait(false);
+        var elapsed = Stopwatch.StartNew();
+        var (outcome, ticket) = await this.legacySlot.AcquireAsync(timeout, ct).ConfigureAwait(false);
+
+        if (outcome == LegacyResolveSlotOutcome.TimedOut)
+        {
+            logger.LogDebug("Resolving {Name} timed out after {Timeout} waiting for NsdManager's resolve slot", info.ServiceName, timeout);
+            return null;
+        }
+
+        if (outcome == LegacyResolveSlotOutcome.Orphaned)
+            return await this.ResolveAroundOrphan(info, serviceType, timeout - elapsed.Elapsed, ct).ConfigureAwait(false);
+
+        var (resolved, alreadyActive) = await this
+            .ResolveWithTicket(ticket!, info, timeout, ct)
+            .ConfigureAwait(false);
+
+        if (alreadyActive)
+            return await this.ResolveViaManaged(info, serviceType, timeout - elapsed.Elapsed, ct).ConfigureAwait(false);
+
+        return resolved == null ? null : Convert(resolved, serviceType);
+    }
+
+
+    async Task<(NsdServiceInfo? Resolved, bool AlreadyActive)> ResolveWithTicket(
+        LegacyResolveSlot.Ticket ticket,
+        NsdServiceInfo info,
+        TimeSpan timeout,
+        CancellationToken ct
+    )
+    {
+        var completion = new TaskCompletionSource<(NsdServiceInfo?, bool)>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // deliberately not disposed: NsdManager keeps the listener registered after a timeout, and
+        // calling back into a disposed Java peer crashes the process. That late callback is also
+        // the only thing that frees the slot, so the ticket is completed before the caller resumes.
+        var listener = new NsdResolveListener(
+            resolved =>
+            {
+                ticket.Complete();
+                completion.TrySetResult((resolved, false));
+            },
+            error =>
+            {
+                ticket.Complete();
+                logger.LogDebug("NsdManager could not resolve {Name} - {Error}", info.ServiceName, error);
+                completion.TrySetResult((null, error == NsdFailure.AlreadyActive));
+            }
+        );
+
         try
         {
-            var completion = new TaskCompletionSource<NsdServiceInfo?>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-            // deliberately not disposed: NsdManager keeps the listener registered even after a
-            // timeout, and calling back into a disposed Java peer crashes the process
-            var listener = new NsdResolveListener(
-                resolved => completion.TrySetResult(resolved),
-                error =>
-                {
-                    logger.LogDebug("NsdManager could not resolve {Name} - {Error}", info.ServiceName, error);
-                    completion.TrySetResult(null);
-                }
-            );
-
 #pragma warning disable CA1422 // superseded by RegisterServiceInfoCallback in API 34, handled above
             this.Native.ResolveService(info, listener);
 #pragma warning restore CA1422
+        }
+        catch (Exception ex)
+        {
+            // never reached NsdService, so there is nothing outstanding to wait for
+            ticket.Complete();
+            logger.LogWarning(ex, "NsdManager rejected the resolve of {Name}", info.ServiceName);
+            return (null, false);
+        }
+
+        try
+        {
             return await completion.Task.WaitAsync(timeout, ct).ConfigureAwait(false);
         }
         catch (TimeoutException)
         {
-            logger.LogDebug("Resolving {Name} timed out after {Timeout}", info.ServiceName, timeout);
+            ticket.Orphan();
+            logger.LogDebug("Resolving {Name} timed out after {Timeout} - NsdManager's resolve slot stays taken until it reports back", info.ServiceName, timeout);
+            return (null, false);
+        }
+        catch (OperationCanceledException)
+        {
+            ticket.Orphan();
+            throw;
+        }
+    }
+
+
+    /// <summary>
+    /// The slot is held by a resolve that timed out. Resolve through the managed stack; if that cannot
+    /// run here, wait out the rest of the window in case the orphan reports back.
+    /// </summary>
+    async Task<MdnsService?> ResolveAroundOrphan(NsdServiceInfo info, ServiceTypeInfo serviceType, TimeSpan timeout, CancellationToken ct)
+    {
+        var elapsed = Stopwatch.StartNew();
+        try
+        {
+            return await this.ResolveViaManagedCore(info, serviceType, timeout, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex, "The managed mDNS fallback could not resolve {Name} - queuing behind NsdManager's stuck resolve instead", info.ServiceName);
+        }
+
+        var remaining = timeout - elapsed.Elapsed;
+        var (outcome, ticket) = await this.legacySlot
+            .AcquireAsync(remaining, ct, waitBehindOrphan: true)
+            .ConfigureAwait(false);
+
+        if (outcome != LegacyResolveSlotOutcome.Acquired)
+        {
+            logger.LogDebug("Resolving {Name} timed out after {Timeout} - NsdManager's resolve slot never came free", info.ServiceName, timeout);
             return null;
         }
-        finally
+
+        var (resolved, _) = await this
+            .ResolveWithTicket(ticket!, info, timeout - elapsed.Elapsed, ct)
+            .ConfigureAwait(false);
+
+        return resolved == null ? null : Convert(resolved, serviceType);
+    }
+
+
+    async Task<MdnsService?> ResolveViaManaged(NsdServiceInfo info, ServiceTypeInfo serviceType, TimeSpan timeout, CancellationToken ct)
+    {
+        try
         {
-            this.resolveLock.Release();
+            return await this.ResolveViaManagedCore(info, serviceType, timeout, ct).ConfigureAwait(false);
         }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex, "The managed mDNS fallback could not resolve {Name}", info.ServiceName);
+            return null;
+        }
+    }
+
+
+    Task<MdnsService?> ResolveViaManagedCore(NsdServiceInfo info, ServiceTypeInfo serviceType, TimeSpan timeout, CancellationToken ct)
+    {
+        if (timeout <= TimeSpan.Zero)
+            return Task.FromResult<MdnsService?>(null);
+
+        logger.LogDebug("NsdManager's resolve slot is unavailable - resolving {Name} through the managed mDNS stack", info.ServiceName);
+
+        // the managed manager's socket set acquires the WifiManager.MulticastLock when the resolve's
+        // browse opens its sockets and releases it when they close
+        return this.managed.Value.Resolve(info.ServiceName ?? String.Empty, serviceType.QualifiedName, timeout, ct);
     }
 
 

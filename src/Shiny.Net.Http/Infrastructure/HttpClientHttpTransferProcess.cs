@@ -70,6 +70,7 @@ public class HttpClientHttpTransferProcess(
                     repository.ActionOccurred -= repoHandler;
                     logger.LogInformation("HTTP Transfers cleared - cancelling all transfers");
                     cancelSrc.Cancel();
+                    repository.ClearTransferValidators();
                 }
                 else if (x.Action == RepositoryAction.Update &&
                          x.Entity is HttpTransfer ht &&
@@ -233,6 +234,7 @@ public class HttpClientHttpTransferProcess(
                 null
             ));
             repository.Remove(transfer);
+            repository.RemoveTransferValidator(transfer.Identifier);
         }
         catch (HttpRequestException ex) when (ex.StatusCode == null && (transfer.Request.Type == TransferType.UploadTus || IsConnectionFailure(ex)))
         {
@@ -243,6 +245,7 @@ public class HttpClientHttpTransferProcess(
         catch (HttpRequestException ex)
         {
             repository.Remove(transfer);
+            repository.RemoveTransferValidator(transfer.Identifier);
 
             logger.LogError(ex, "There was an error processing transfer: " + transfer?.Identifier);
             await services
@@ -268,7 +271,10 @@ public class HttpClientHttpTransferProcess(
 #endif
         catch (OperationCanceledException)
         {
-            // transfer has been cancelled or removed - nothing to do
+            // transfer has been cancelled or removed - a validator saved while the cancel was landing
+            // would otherwise outlive it
+            if (!repository.Exists<HttpTransfer>(transfer.Identifier))
+                repository.RemoveTransferValidator(transfer.Identifier);
         }
         catch (Exception ex)
         {
@@ -450,10 +456,17 @@ public class HttpClientHttpTransferProcess(
         if (partial.Exists && partial.LastWriteTimeUtc >= transfer.CreatedAt.UtcDateTime)
             startOffset = partial.Length;
 
+        // the validator of the file the partial came from - sent as If-Range so a server file that changed
+        // since comes back whole (200) instead of as a range of a different file. None stored (a transfer
+        // queued before validators were kept, or a server that sent neither) keeps the plain Range resume.
+        TransferValidator? validator = null;
         if (startOffset > 0)
-            logger.StandardInfo(request.Identifier, $"Resuming download from byte {startOffset}");
+        {
+            validator = repository.Get<TransferValidator>(request.Identifier);
+            logger.StandardInfo(request.Identifier, $"Resuming download from byte {startOffset}" + (validator == null ? "" : " (If-Range)"));
+        }
 
-        var response = await this.SendDownloadRequest(request, startOffset, cancelToken).ConfigureAwait(false);
+        var response = await this.SendDownloadRequest(request, startOffset, validator, cancelToken).ConfigureAwait(false);
         if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable && startOffset > 0)
         {
             var serverLength = response.Content.Headers.ContentRange?.Length;
@@ -469,19 +482,27 @@ public class HttpClientHttpTransferProcess(
 
             logger.StandardInfo(request.Identifier, "Server rejected the resume range - restarting download");
             startOffset = 0;
-            response = await this.SendDownloadRequest(request, 0, cancelToken).ConfigureAwait(false);
+            response = await this.SendDownloadRequest(request, 0, null, cancelToken).ConfigureAwait(false);
         }
         using var responseScope = response;
 
-        // server didn't honor range -> start over from byte 0
+        // server didn't honor range, or the If-Range validator no longer matches (the file changed) -> start
+        // over from byte 0. FileMode.Create below truncates the partial.
         var append = response.StatusCode == HttpStatusCode.PartialContent && startOffset > 0;
         if (!append && startOffset > 0)
         {
-            logger.StandardInfo(request.Identifier, "Server ignored Range header - restarting download");
+            var reason = validator == null
+                ? "Server ignored Range header - restarting download"
+                : "Server file changed since the download started - restarting download";
+            logger.StandardInfo(request.Identifier, reason);
             startOffset = 0;
         }
 
         response.EnsureSuccessStatusCode();
+
+        // a download starting from byte 0 records the validator of the file it is now writing
+        if (!append)
+            this.SaveValidator(request.Identifier, response);
 
         long? totalBytes = null;
         if (response.Content.Headers.ContentLength.HasValue)
@@ -538,7 +559,21 @@ public class HttpClientHttpTransferProcess(
     }
 
 
-    async Task<HttpResponseMessage> SendDownloadRequest(HttpTransferRequest request, long startOffset, CancellationToken cancelToken)
+    void SaveValidator(string identifier, HttpResponseMessage response)
+    {
+        // a transfer cancelled while its request was in flight must not leave a validator behind
+        if (!repository.Exists<HttpTransfer>(identifier))
+            return;
+
+        var validator = TransferValidator.FromResponse(identifier, response);
+        if (validator == null)
+            repository.RemoveTransferValidator(identifier);
+        else
+            repository.Set(validator);
+    }
+
+
+    async Task<HttpResponseMessage> SendDownloadRequest(HttpTransferRequest request, long startOffset, TransferValidator? validator, CancellationToken cancelToken)
     {
         using var httpReq = new HttpRequestMessage();
         httpReq.Method = request.HttpMethod != null ? new HttpMethod(request.HttpMethod) : HttpMethod.Get;
@@ -555,7 +590,12 @@ public class HttpClientHttpTransferProcess(
         }
 
         if (startOffset > 0)
+        {
             httpReq.Headers.Range = new RangeHeaderValue(startOffset, null);
+            var ifRange = validator?.ToIfRange();
+            if (ifRange != null)
+                httpReq.Headers.IfRange = ifRange;
+        }
 
         return await this.httpClient
             .SendAsync(httpReq, HttpCompletionOption.ResponseHeadersRead, cancelToken)

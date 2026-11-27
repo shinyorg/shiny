@@ -112,7 +112,7 @@ speak the others.
 | Platform                     | Implementation                | Why                                                       |
 |------------------------------|-------------------------------|-----------------------------------------------------------|
 | iOS / tvOS / Mac Catalyst / macOS | `NSNetService` (Bonjour) | Goes through the system mDNSResponder, so **no** `com.apple.developer.networking.multicast` entitlement |
-| Android                      | `NsdManager`                  | No `CHANGE_WIFI_MULTICAST_STATE` and no `WifiManager.MulticastLock` |
+| Android                      | `NsdManager`                  | The OS keeps the multicast path alive. Below API 34 a resolve falls back to the managed responder while NsdManager's one resolve slot is held by a timed-out resolve |
 | Windows / Linux / server .NET| Managed responder on UDP 5353 | No OS DNS-SD API to lean on; dependency-free, AOT-safe     |
 
 **SSDP and WS-Discovery are managed on every platform**, including iOS and Android. This is not a
@@ -131,7 +131,7 @@ approval-gated by Apple:
 |----------|------|---------------------|
 | iOS      | nothing | **`com.apple.developer.networking.multicast`** - request at https://developer.apple.com/contact/request/networking-multicast, granted per developer team. Cannot be tested in the simulator |
 | Mac Catalyst / macOS | sandbox network entitlements | same sandbox entitlements; **not** the multicast entitlement (iOS only). macOS 15+ also prompts for Local Network |
-| Android  | nothing | `CHANGE_WIFI_MULTICAST_STATE` (the lock is acquired for you) **plus** `ACCESS_LOCAL_NETWORK` when targeting SDK 37+ |
+| Android  | nothing (`CHANGE_WIFI_MULTICAST_STATE` is declared by the package) | `CHANGE_WIFI_MULTICAST_STATE` (the lock is acquired for you) **plus** `ACCESS_LOCAL_NETWORK` when targeting SDK 37+ |
 | Windows  | firewall; MSIX capability | same |
 | Linux    | firewall | same; Docker bridge networking does not work |
 
@@ -196,6 +196,17 @@ No runtime permission is needed, but declare:
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
+
+The package itself declares `CHANGE_WIFI_MULTICAST_STATE` (a normal, install-time permission) - it
+merges into the app manifest, so do not tell users to add it for mDNS.
+
+**Below API 34 (Android 13 and older)** NsdManager allows one resolve in flight and cannot cancel
+it. Resolves queue behind a live one, each with its own timeout. A resolve that times out keeps the
+slot until NsdManager eventually reports back (a service that vanished mid-resolve may never), and
+while it does, `Resolve` and browse resolution go through the managed mDNS responder instead
+(SRV/TXT/A over UDP 5353, holding the `WifiManager.MulticastLock` only for that query). If the
+managed query cannot run, callers wait behind the stuck resolve until their own timeout. Nothing to
+configure - do not write workarounds such as re-creating `NsdManager` or retry loops.
 
 ### Windows / Linux
 

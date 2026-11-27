@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Shiny.Nfc.Infrastructure;
 using Shiny.Nfc.Infrastructure.Tags;
@@ -18,10 +19,15 @@ namespace Shiny.Nfc;
 /// reader attached - the scan keeps waiting for it rather than failing.</para>
 /// <para>MIFARE Classic and other storage cards that are not Type 2 are reported, but read as
 /// having no NDEF and refuse writes.</para>
+/// <para>A tag pushed out of the scan's one-slot queue by another reader's tag is released (its card
+/// handle closed) and offered again once the queue has room, as long as it is still on the reader. A
+/// re-offered tag never pushes out another one, so a slow consumer gets every reader's tag in turn
+/// rather than readers reconnecting over each other.</para>
 /// </remarks>
 class PcscNfcManager : AbstractNfcManager
 {
     const uint PollMs = 1000;
+    const uint DroppedPollMs = 250; // how often a dropped tag looks for room in the queue
     readonly IPcscApi? api;
 
 
@@ -100,6 +106,10 @@ class PcscNfcManager : AbstractNfcManager
         readonly CancellationTokenSource stop = new();
         readonly Dictionary<string, uint> known = new();
         readonly Dictionary<string, PcscTag> present = new();
+        // readers whose tag the queue dropped while the card stayed on them, with the card's ATR
+        readonly Dictionary<string, byte[]> dropped = new();
+        // the queue's drop callback runs on whichever thread wrote to it - handed to the loop here
+        readonly ConcurrentQueue<(string Reader, PcscTag Tag, byte[] Atr)> released = new();
         nint context;
         Task? loop;
 
@@ -155,6 +165,7 @@ class PcscNfcManager : AbstractNfcManager
         {
             var readers = await Task.Run(() => api.ListReaders(this.context)).ConfigureAwait(false);
             this.Forget(readers);
+            this.ApplyReleases();
 
             if (readers.Length == 0)
             {
@@ -162,11 +173,15 @@ class PcscNfcManager : AbstractNfcManager
                 return;
             }
 
+            await this.ReofferDropped().ConfigureAwait(false);
+
             var states = readers
                 .Select(r => new ReaderState(r, this.known.GetValueOrDefault(r, PcscState.Unaware)))
                 .ToArray();
 
-            var rc = await Task.Run(() => api.GetStatusChange(this.context, states, PollMs)).ConfigureAwait(false);
+            // a card sitting on a reader raises no status change, so wake sooner while one waits for room
+            var timeout = this.dropped.Count > 0 ? DroppedPollMs : PollMs;
+            var rc = await Task.Run(() => api.GetStatusChange(this.context, states, timeout)).ConfigureAwait(false);
             switch (rc)
             {
                 case PcscError.Success:
@@ -196,16 +211,53 @@ class PcscNfcManager : AbstractNfcManager
                 var current = state.EventState & ~PcscState.Changed;
                 this.known[state.Reader] = current;
 
-                var hasTag = (current & PcscState.Present) != 0 && (current & PcscState.Mute) == 0;
-                if (!hasTag)
+                if (!HasTag(current))
                     this.Drop(state.Reader);
                 else if (!this.present.ContainsKey(state.Reader))
-                    await this.Connect(state.Reader, state.Atr).ConfigureAwait(false);
+                    await this.Connect(state.Reader, state.Atr, reoffer: false).ConfigureAwait(false);
             }
         }
 
 
-        async Task Connect(string reader, byte[] atr)
+        static bool HasTag(uint state) => (state & PcscState.Present) != 0 && (state & PcscState.Mute) == 0;
+
+
+        // tags the queue dropped since the last pass: their reader leaves "present" for "dropped",
+        // unless the card already left (or was replaced) in the meantime
+        void ApplyReleases()
+        {
+            while (this.released.TryDequeue(out var item))
+            {
+                if (this.present.TryGetValue(item.Reader, out var current) && ReferenceEquals(current, item.Tag))
+                {
+                    this.present.Remove(item.Reader);
+                    this.dropped[item.Reader] = item.Atr;
+                    logger.LogDebug("The tag on {Reader} was dropped from the scan queue - offering it again once there is room", item.Reader);
+                }
+            }
+        }
+
+
+        // offers dropped tags still on their reader again, only into an empty slot - never evicting
+        // another reader's tag, and not reconnecting at all while the queue is full
+        async Task ReofferDropped()
+        {
+            var waiting = this.dropped
+                .Where(x => HasTag(this.known.GetValueOrDefault(x.Key, PcscState.Unaware)))
+                .ToList();
+
+            foreach (var (reader, atr) in waiting)
+            {
+                if (sink.HasRoom)
+                {
+                    this.dropped.Remove(reader);
+                    await this.Connect(reader, atr, reoffer: true).ConfigureAwait(false);
+                }
+            }
+        }
+
+
+        async Task Connect(string reader, byte[] atr, bool reoffer)
         {
             nint card = 0;
             try
@@ -216,9 +268,20 @@ class PcscNfcManager : AbstractNfcManager
                 var channel = new PcscChannel(api, card, protocol);
                 var tag = await ApduNfcTag.Connect(channel, atr, logger, this.stop.Token).ConfigureAwait(false);
 
-                var pcscTag = new PcscTag(tag, channel);
+                var pcscTag = new PcscTag(tag, channel, x => this.released.Enqueue((reader, x, atr)));
                 this.present[reader] = pcscTag;
-                sink.Report(pcscTag);
+
+                if (!reoffer)
+                {
+                    sink.Report(pcscTag);
+                }
+                else if (!sink.TryReportWithoutEvicting(pcscTag))
+                {
+                    // the slot filled while connecting - wait for room again
+                    this.present.Remove(reader);
+                    pcscTag.Dispose();
+                    this.dropped[reader] = atr;
+                }
             }
             catch (Exception ex) when (ex is PcscException or NfcException && !this.stop.IsCancellationRequested)
             {
@@ -241,8 +304,10 @@ class PcscNfcManager : AbstractNfcManager
         }
 
 
+        // the card left the reader (or the reader left): a dropped reader is back to normal
         void Drop(string reader)
         {
+            this.dropped.Remove(reader);
             if (this.present.Remove(reader, out var tag))
                 tag.Dispose();
         }
@@ -254,6 +319,8 @@ class PcscNfcManager : AbstractNfcManager
                 tag.Dispose();
 
             this.present.Clear();
+            this.dropped.Clear();
+            this.released.Clear();
             this.known.Clear();
         }
 
@@ -310,8 +377,12 @@ sealed class PcscChannel(IPcscApi api, nint card, uint protocol) : IApduChannel,
 }
 
 
-/// <summary>A tag on a PC/SC reader. Disposed - its card handle closed - once it leaves the reader.</summary>
-sealed class PcscTag(ApduNfcTag tag, PcscChannel channel) : INfcTag, IDisposable
+/// <summary>
+/// A tag on a PC/SC reader. Disposed - its card handle closed - once it leaves the reader. When the
+/// scan queue drops it, the handle is closed the same way and the scan session is told, so it can
+/// offer the card again while it is still on the reader.
+/// </summary>
+sealed class PcscTag(ApduNfcTag tag, PcscChannel channel, Action<PcscTag> released) : INfcTag, IDisposable, IDroppableNfcTag
 {
     public byte[]? Identifier => tag.Identifier;
     public bool IsWritable => tag.IsWritable;
@@ -322,4 +393,10 @@ sealed class PcscTag(ApduNfcTag tag, PcscChannel channel) : INfcTag, IDisposable
     public Task MakeReadOnly(CancellationToken ct = default) => tag.MakeReadOnly(ct);
 
     public void Dispose() => channel.Dispose();
+
+    public void OnDropped()
+    {
+        channel.Dispose();
+        released(this);
+    }
 }

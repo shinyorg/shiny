@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using Shiny.Nfc.Infrastructure;
 using Xunit;
 
 namespace Shiny.Nfc.Tests;
@@ -63,6 +64,9 @@ public class PcscManagerTests
             // a blank tag's read is answered from what was read at connect, so lose it with I/O
             api.Remove(Reader);
             await Assert.ThrowsAsync<NfcTagLostException>(() => tag.WriteNdef(new NdefMessage(NdefRecord.CreateText("gone")), cts.Token));
+
+            // let the scan see the removal before the tag goes back, or it never saw it leave
+            await WaitFor(() => api.OpenCards(Reader) == 0, cts.Token);
             api.Place(Reader, sim, SimulatedType2Tag.UltralightAtr);
         }
 
@@ -136,5 +140,140 @@ public class PcscManagerTests
         var none = new PcscNfcManager(null, NullLogger.Instance);
         Assert.Equal(AccessState.NotSupported, await none.RequestAccess());
         Assert.Equal(NfcCapabilities.None, none.Capabilities);
+    }
+
+
+    const string ReaderA = "Reader A";
+    const string ReaderB = "Reader B";
+
+
+    // an NTAG213 already holding a text record, so a test can tell which reader a tag came from
+    static SimulatedType2Tag Labelled(string label)
+    {
+        var ndef = new NdefMessage(NdefRecord.CreateText(label)).ToByteArray();
+        return SimulatedType2Tag.Custom([0xE1, 0x10, 0x12, 0x00], [0x03, (byte)ndef.Length, .. ndef, 0xFE]);
+    }
+
+
+    static async Task<string?> Label(INfcTag tag, CancellationToken ct)
+    {
+        var message = await tag.ReadNdef(ct);
+        return message != null && message.Records[0].TryGetText(out var text) ? text.Text : null;
+    }
+
+
+    static async Task WaitFor(Func<bool> condition, CancellationToken ct)
+    {
+        while (!condition())
+            await Task.Delay(20, ct);
+    }
+
+
+    // A is read and held by a slow consumer, B's tag waits in the slot, then A is re-presented and
+    // its new tag pushes B's out of the slot while B's card stays on the reader
+    static async Task<IAsyncEnumerator<INfcTag>> DropReaderBsTag(FakePcscApi api, CancellationToken ct)
+    {
+        api.PlugIn(ReaderA);
+        api.PlugIn(ReaderB);
+
+        var scan = Create(api).Scan(ct: ct).GetAsyncEnumerator(ct);
+        var next = scan.MoveNextAsync();
+        api.Place(ReaderA, Labelled("A"), SimulatedType2Tag.UltralightAtr);
+        Assert.True(await next);
+        Assert.Equal("A", await Label(scan.Current, ct));
+
+        api.Place(ReaderB, Labelled("B"), SimulatedType2Tag.UltralightAtr);
+        await WaitFor(() => api.ConnectCount(ReaderB) == 1, ct);
+
+        api.Remove(ReaderA);
+        await WaitFor(() => api.OpenCards(ReaderA) == 0, ct);
+        api.Place(ReaderA, Labelled("A"), SimulatedType2Tag.UltralightAtr);
+
+        // B's card handle is closed when its tag is dropped
+        await WaitFor(() => api.ConnectCount(ReaderA) == 2 && api.OpenCards(ReaderB) == 0, ct);
+        return scan;
+    }
+
+
+    [Fact]
+    public async Task A_dropped_tag_waits_for_room_and_is_delivered_again_without_evicting()
+    {
+        var api = new FakePcscApi();
+        using var cts = new CancellationTokenSource(Wait);
+        var scan = await DropReaderBsTag(api, cts.Token);
+
+        // the slot is full with A's tag: B must not reconnect, and must not push A's tag out
+        await Task.Delay(1500, cts.Token);
+        Assert.Equal(1, api.ConnectCount(ReaderB));
+        Assert.Equal(2, api.ConnectCount(ReaderA));
+
+        Assert.True(await scan.MoveNextAsync());
+        Assert.Equal("A", await Label(scan.Current, cts.Token));
+
+        // room now - B's tag, still on the reader, comes back
+        Assert.True(await scan.MoveNextAsync());
+        Assert.Equal("B", await Label(scan.Current, cts.Token));
+        Assert.Equal(2, api.ConnectCount(ReaderB));
+
+        // a slow consumer holding B's tag causes no further reconnects on either reader
+        await Task.Delay(1000, cts.Token);
+        Assert.Equal(2, api.ConnectCount(ReaderB));
+        Assert.Equal(2, api.ConnectCount(ReaderA));
+
+        await scan.DisposeAsync();
+    }
+
+
+    [Fact]
+    public async Task A_dropped_tag_removed_from_its_reader_goes_back_to_normal()
+    {
+        var api = new FakePcscApi();
+        using var cts = new CancellationTokenSource(Wait);
+        var scan = await DropReaderBsTag(api, cts.Token);
+
+        api.Remove(ReaderB);
+        await Task.Delay(500, cts.Token);
+
+        Assert.True(await scan.MoveNextAsync());
+        Assert.Equal("A", await Label(scan.Current, cts.Token));
+
+        // the card left while dropped, so there is nothing to offer again
+        await Task.Delay(1000, cts.Token);
+        Assert.Equal(1, api.ConnectCount(ReaderB));
+
+        // and putting it back is an ordinary tap
+        var next = scan.MoveNextAsync();
+        api.Place(ReaderB, Labelled("B2"), SimulatedType2Tag.UltralightAtr);
+        Assert.True(await next);
+        Assert.Equal("B2", await Label(scan.Current, cts.Token));
+        Assert.Equal(2, api.ConnectCount(ReaderB));
+
+        await scan.DisposeAsync();
+    }
+
+
+    [Fact]
+    public async Task A_single_readers_dropped_tag_is_delivered_again()
+    {
+        var api = new FakePcscApi();
+        api.PlugIn(Reader);
+        api.Place(Reader, Labelled("only"), SimulatedType2Tag.UltralightAtr);
+
+        using var cts = new CancellationTokenSource(Wait);
+        var scan = Create(api).Scan(ct: cts.Token).GetAsyncEnumerator(cts.Token);
+        Assert.True(await scan.MoveNextAsync());
+        var first = scan.Current;
+
+        // what the scan queue does to a tag it drops
+        ((IDroppableNfcTag)first).OnDropped();
+        Assert.Equal(0, api.OpenCards(Reader));
+        await Assert.ThrowsAsync<NfcTagLostException>(() => first.WriteNdef(new NdefMessage(NdefRecord.CreateText("x")), cts.Token));
+
+        Assert.True(await scan.MoveNextAsync());
+        Assert.NotSame(first, scan.Current);
+        Assert.Equal("only", await Label(scan.Current, cts.Token));
+        Assert.Equal(2, api.ConnectCount(Reader));
+
+        await scan.DisposeAsync();
     }
 }

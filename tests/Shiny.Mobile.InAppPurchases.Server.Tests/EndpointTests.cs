@@ -336,17 +336,38 @@ public class EndpointTests : IDisposable
         });
         Assert.True(revoked.IsValid);
         Assert.False(revoked.IsActive);
+        Assert.Null(revoked.IsConsumed);
     }
 
 
     [Fact]
-    public async Task Verify_GoogleOneTimeProduct_FallsBackFromSubscriptionLookup()
+    public async Task Verify_GoogleSubscription_LeavesIsConsumedNull()
+    {
+        await using var host = await InAppPurchaseTestHost.StartAsync(o => this.ConfigureGoogle(o, auth: false), this.GoogleStub());
+
+        var result = await host.Services.GetRequiredService<IPurchaseVerifier>().VerifyAsync(new PurchaseVerificationRequest
+        {
+            Platform = StorePlatform.GooglePlay,
+            VerificationData = "tok-sub",
+            ProductId = "premium_monthly"
+        });
+
+        Assert.True(result.IsValid);
+        Assert.Equal(PurchaseKind.Subscription, result.Kind);
+        Assert.Null(result.IsConsumed);
+    }
+
+
+    [Theory]
+    [InlineData("CONSUMPTION_STATE_YET_TO_BE_CONSUMED", false)]
+    [InlineData("CONSUMPTION_STATE_CONSUMED", true)]
+    public async Task Verify_GoogleOneTimeProduct_FallsBackFromSubscriptionLookup(string consumptionState, bool consumed)
     {
         var stub = new StubHttpHandler((req, _) => req.RequestUri!.ToString() switch
         {
             "https://oauth2.googleapis.com/token" => StubHttpHandler.Json("""{"access_token":"ya29.test","expires_in":3600}"""),
             var u when u.Contains("subscriptionsv2") => StubHttpHandler.Json("""{"error":{"code":400,"message":"Invalid Value"}}""", HttpStatusCode.BadRequest),
-            var u when u.Contains("productsv2") => StubHttpHandler.Json(GoogleFixtures.Product),
+            var u when u.Contains("productsv2") => StubHttpHandler.Json(GoogleFixtures.ProductWith(consumptionState)),
             var u => throw new InvalidOperationException(u)
         });
         await using var host = await InAppPurchaseTestHost.StartAsync(o => this.ConfigureGoogle(o, auth: false), stub);
@@ -359,7 +380,9 @@ public class EndpointTests : IDisposable
         });
 
         Assert.True(result.IsValid);
-        Assert.True(result.IsActive);
+        Assert.True(result.IsActive); // consumption never changes IsActive - IsConsumed is what stops a replay
+        Assert.Equal(consumed, result.IsConsumed);
+        Assert.Equal("GPA.1111-2222-3333-44444", result.TransactionId);
         Assert.Equal(PurchaseKind.OneTime, result.Kind);
         Assert.False(result.IsAcknowledged);
         Assert.Equal(3, result.Quantity);

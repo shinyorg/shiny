@@ -21,6 +21,23 @@ class FakePcscApi : IPcscApi
     public int Cancels { get; private set; }
     public int Releases { get; private set; }
     public List<nint> Disconnects { get; } = new();
+    readonly List<string> connects = new();
+
+
+    /// <summary>How many times a card handle has been opened on <paramref name="reader"/>.</summary>
+    public int ConnectCount(string reader)
+    {
+        lock (this.sync)
+            return this.connects.Count(x => x == reader);
+    }
+
+
+    /// <summary>How many card handles on <paramref name="reader"/> are open right now.</summary>
+    public int OpenCards(string reader)
+    {
+        lock (this.sync)
+            return this.cards.Values.Count(x => x == reader);
+    }
 
 
     public void PlugIn(string reader)
@@ -129,6 +146,7 @@ class FakePcscApi : IPcscApi
 
             var card = this.nextCard++;
             this.cards[card] = reader;
+            this.connects.Add(reader);
             return (card, PcscConstants.ProtocolT1);
         }
     }

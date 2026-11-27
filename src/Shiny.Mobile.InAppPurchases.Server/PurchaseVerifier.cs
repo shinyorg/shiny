@@ -56,6 +56,13 @@ namespace Shiny.InAppPurchases.Server
         /// <summary>Google only - unacknowledged purchases are refunded after 3 days</summary>
         public bool? IsAcknowledged { get; init; }
 
+        /// <summary>
+        /// Google one-time products only - true once the purchase token has been consumed, false while it is yet to be
+        /// consumed. Null for subscriptions, for the App Store (which does not report it) and when Google does not say.
+        /// <see cref="IsActive"/> stays true for a consumed purchase, so refuse to grant a consumed token to stop replays.
+        /// </summary>
+        public bool? IsConsumed { get; init; }
+
         public int? Quantity { get; init; }
         public AppleTransaction? AppleTransaction { get; init; }
         public GoogleSubscriptionPurchase? GoogleSubscription { get; init; }
@@ -222,6 +229,12 @@ namespace Shiny.InAppPurchases.Server.Infrastructure
                 PurchaseDate = product.PurchaseCompletionTime,
                 Environment = product.IsTestPurchase ? StoreEnvironment.Sandbox : StoreEnvironment.Production,
                 IsAcknowledged = product.IsAcknowledged,
+                IsConsumed = item.ProductOfferDetails?.ConsumptionState switch
+                {
+                    "CONSUMPTION_STATE_CONSUMED" => true,
+                    "CONSUMPTION_STATE_YET_TO_BE_CONSUMED" => false,
+                    _ => null
+                },
                 Quantity = item.ProductOfferDetails?.Quantity,
                 GoogleProduct = product
             };

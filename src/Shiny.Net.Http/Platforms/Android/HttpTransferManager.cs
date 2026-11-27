@@ -109,6 +109,7 @@ public class HttpTransferManager(
         if (transfer != null)
         {
             repository.Remove(transfer);
+            repository.RemoveTransferValidator(identifier);
 
             this.UpdateReceived?.Invoke(this, new(
                 transfer.Request,
@@ -164,6 +165,7 @@ public class HttpTransferManager(
     public Task CancelAll()
     {
         repository.Clear<HttpTransfer>();
+        repository.ClearTransferValidators();
         return Task.CompletedTask;
     }
 

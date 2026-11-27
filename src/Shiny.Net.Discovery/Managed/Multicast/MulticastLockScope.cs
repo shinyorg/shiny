@@ -20,8 +20,9 @@ namespace Shiny.Net.Discovery.Managed.Multicast;
 /// consumer.</para>
 /// <para>The lock costs battery, so it is scoped to the lifetime of the sockets - it goes away as
 /// soon as the last browse or publication is disposed.</para>
-/// <para>mDNS on Android never gets here; it goes through <c>NsdManager</c>, which manages its own
-/// lock internally.</para>
+/// <para>mDNS on Android normally goes through <c>NsdManager</c>, which manages its own lock. It only
+/// gets here below API 34, when a resolve falls back to the managed stack because NsdManager's one
+/// resolve slot is held by a resolve that timed out.</para>
 /// </remarks>
 sealed class MulticastLockScope : IDisposable
 {

@@ -49,6 +49,9 @@ triggers:
   - IAppleStoreClient
   - IGooglePlayClient
   - IPurchaseEventDeduplicator
+  - IsConsumed
+  - replay protection
+  - consumptionState
 ---
 
 # Shiny.Mobile.InAppPurchases
@@ -81,6 +84,11 @@ Namespaces: `Shiny.InAppPurchases` (client) and `Shiny.InAppPurchases.Server` (s
 7. Always set `PurchaseOptions.AccountToken` (a `Guid`, your user id). It comes back as Apple `appAccountToken` /
    Google `obfuscatedAccountId`, both on-device and in server notifications.
 8. Libraries use Shiny.Core only. Do not suggest MAUI Essentials APIs inside library code.
+9. **Replay protection on the server.** A verified purchase can be sent again (a retry, or a captured token/JWS replayed),
+   and a finished Apple consumable or a consumed Google token still verifies with `IsActive == true`. Grant at most once
+   per `VerifiedPurchase.TransactionId` (Apple `transactionId`, Google `orderId`) - store it with a unique constraint and
+   treat a repeat as "already granted". On Google one-time products also refuse a token with `IsConsumed == true` (it was
+   already granted and finished). `IsConsumed` is null on Apple (not reported) and for subscriptions.
 
 ## Client registration
 
@@ -283,7 +291,8 @@ Status codes:
 
 Direct access:
 - `IPurchaseVerifier.VerifyAsync(new PurchaseVerificationRequest { Platform, VerificationData, ProductId })` returns
-  `VerifiedPurchase` (`IsValid`, `Error`, `IsActive`, `Kind`, ids, `AccountToken`, `ExpiresAt`, `Environment`, `IsAcknowledged`).
+  `VerifiedPurchase` (`IsValid`, `Error`, `IsActive`, `Kind`, ids, `AccountToken`, `ExpiresAt`, `Environment`, `IsAcknowledged`,
+  `IsConsumed` - Google one-time products only, from `consumptionState`; null on Apple and for subscriptions).
   Apple verifies offline, Google calls the Play Developer API.
 - `IAppleStoreClient`: `VerifyNotification`, `VerifyTransaction`, `VerifyRenewalInfo`, `GetTransactionAsync`,
   `GetSubscriptionStatusesAsync`, `RequestTestNotificationAsync(sandbox)`.
@@ -291,6 +300,20 @@ Direct access:
   `AcknowledgeProductAsync`, `ConsumeProductAsync`.
 
 Always grant to the **authenticated user** in your verify endpoint, never to an id taken from the request body.
+
+```csharp
+var result = await verifier.VerifyAsync(new PurchaseVerificationRequest { Platform = dto.Platform, VerificationData = dto.VerificationData, ProductId = dto.ProductId });
+if (!result.IsValid || !result.IsActive)
+    return Results.BadRequest(result.Error);
+
+if (await db.HasGrant(result.Platform, result.TransactionId!))   // Apple transactionId / Google orderId
+    return Results.Ok();                                          // already granted - idempotent, not an error
+
+if (result.IsConsumed == true)                                    // Google: consumed token we have no record of
+    return Results.Conflict("Purchase was already consumed");
+
+await db.Grant(user.GetUserId(), result.Platform, result.TransactionId!, result.ProductId, result.Quantity ?? 1);
+```
 
 ## Store setup & testing pointers
 

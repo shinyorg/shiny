@@ -17,6 +17,7 @@ namespace Shiny.Nfc.Infrastructure;
 /// </remarks>
 abstract class AbstractNfcManager(ILogger logger) : INfcManager
 {
+    const int QueueCapacity = 1;
     int scanning;
 
     protected ILogger Logger => logger;
@@ -40,7 +41,7 @@ abstract class AbstractNfcManager(ILogger logger) : INfcManager
         try
         {
             var channel = Channel.CreateBounded<INfcTag>(
-                new BoundedChannelOptions(1)
+                new BoundedChannelOptions(QueueCapacity)
                 {
                     FullMode = BoundedChannelFullMode.DropOldest,
                     SingleReader = true,
@@ -48,7 +49,7 @@ abstract class AbstractNfcManager(ILogger logger) : INfcManager
                 },
                 this.OnTagDropped
             );
-            var sink = new NfcScanSink(channel.Writer);
+            var sink = new NfcScanSink(channel, QueueCapacity);
 
             this.Logger.ScanStarting();
             await using var session = await this.StartScan(options ?? new(), sink, ct).ConfigureAwait(false);
@@ -67,8 +68,23 @@ abstract class AbstractNfcManager(ILogger logger) : INfcManager
     void OnTagDropped(INfcTag tag)
     {
         this.Logger.TagDropped();
-        (tag as IDisposable)?.Dispose();
+        if (tag is IDroppableNfcTag droppable)
+            droppable.OnDropped();
+        else
+            (tag as IDisposable)?.Dispose();
     }
+}
+
+
+/// <summary>
+/// A tag whose backend wants to know when a newer tag pushed it out of the one-slot queue before the
+/// consumer read it, instead of having it simply disposed. PC/SC uses this to close the card handle
+/// and offer the tag again later, since the card is still sitting on the reader.
+/// </summary>
+interface IDroppableNfcTag
+{
+    /// <summary>Called instead of <see cref="IDisposable.Dispose"/> when the queue drops the tag.</summary>
+    void OnDropped();
 }
 
 
@@ -76,18 +92,51 @@ abstract class AbstractNfcManager(ILogger logger) : INfcManager
 /// Where a backend reports what its scan session sees. Safe to call from any thread, and after the
 /// consumer has stopped listening.
 /// </summary>
-sealed class NfcScanSink(ChannelWriter<INfcTag> writer)
+sealed class NfcScanSink(Channel<INfcTag> channel, int capacity)
 {
-    /// <summary>A tag came into range.</summary>
+    // writers only ever fill the queue and the single consumer only empties it, so taking this
+    // around every write makes "is there room, then write" atomic
+    readonly Lock gate = new();
+
+
+    /// <summary>Whether a tag can be queued right now without pushing out one the consumer has not read.</summary>
+    public bool HasRoom
+    {
+        get
+        {
+            lock (this.gate)
+                return channel.Reader.Count < capacity;
+        }
+    }
+
+
+    /// <summary>A tag came into range. It replaces a queued tag the consumer has not read yet.</summary>
     public void Report(INfcTag tag)
     {
-        if (!writer.TryWrite(tag))
+        bool written;
+        lock (this.gate)
+            written = channel.Writer.TryWrite(tag);
+
+        if (!written)
             (tag as IDisposable)?.Dispose();
     }
 
+
+    /// <summary>
+    /// Queues a tag only if that pushes nothing else out - for offering a tag again, which must never
+    /// cost another tag its place. Returns false (and leaves the tag to the caller) when the queue is
+    /// full or the session has ended.
+    /// </summary>
+    public bool TryReportWithoutEvicting(INfcTag tag)
+    {
+        lock (this.gate)
+            return channel.Reader.Count < capacity && channel.Writer.TryWrite(tag);
+    }
+
+
     /// <summary>The session ended without error - the user dismissed the scan UI, for instance.</summary>
-    public void Complete() => writer.TryComplete();
+    public void Complete() => channel.Writer.TryComplete();
 
     /// <summary>The session ended with an error, which the consumer's loop rethrows.</summary>
-    public void Fail(Exception exception) => writer.TryComplete(exception);
+    public void Fail(Exception exception) => channel.Writer.TryComplete(exception);
 }

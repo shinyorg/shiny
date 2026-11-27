@@ -1,7 +1,7 @@
 # Plan: Bug-scan follow-ups
 
-Status: **in progress**. Implemented (uncommitted, device checks pending): 1 (option B), 2, 4 (option B), 5, 6, 7, 8, 9, 10.
-Open: 3 (awaiting a decision), 11–14.
+Status: **implemented except 14**. Done (device checks pending): 1 (option B), 2, 3 (option B), 4 (option B), 5–13.
+Deferred: 14 (Windows toast activation), at the user's request.
 Last updated: 2026-11-26
 
 ## Summary
