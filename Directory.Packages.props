@@ -61,7 +61,7 @@
         <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1"/>
         <PackageVersion Include="System.Drawing.Common" Version="11.0.0"/>
         <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="15.0.0-beta.1"/>
+        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="15.0.0"/>
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1"/>
         <PackageVersion Include="xunit" Version="2.9.3"/>
         <PackageVersion Include="xunit.assert" Version="2.9.3"/>
