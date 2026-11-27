@@ -3,7 +3,7 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
         <MsftExtensionVersion>11.0.0</MsftExtensionVersion>
-        <MauiLabsVersion>0.1.0-preview.14.26567.2</MauiLabsVersion>
+        <MauiLabsVersion>0.1.0-preview.16.26575.3</MauiLabsVersion>
         <MauiVersion>11.0.10</MauiVersion>
         <AvaloniaVersion>12.1.5</AvaloniaVersion>
         <!-- the Uno.WinUI / Uno.Extensions versions Uno.Sdk 7.0.22 resolves (samples/Sample.Uno builds on that Sdk; Uno 7 is the first with net11.0) -->
@@ -12,7 +12,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageVersion Include="Shiny.Maui.Shell" Version="7.0.3"/>
+        <PackageVersion Include="Shiny.Maui.Shell" Version="8.0.1"/>
         <PackageVersion Include="Shiny.Maui.Controls" Version="1.6.0"/>
         <PackageVersion Include="Shiny.Extensions.DependencyInjection" Version="6.0.0"/>
         <PackageVersion Include="Shiny.Extensions.Stores" Version="6.0.0"/>
@@ -61,7 +61,7 @@
         <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1"/>
         <PackageVersion Include="System.Drawing.Common" Version="11.0.0"/>
         <PackageVersion Include="Microsoft.Data.Sqlite" Version="$(MsftExtensionVersion)"/>
-        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="14.1.0"/>
+        <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="15.0.0-beta.1"/>
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1"/>
         <PackageVersion Include="xunit" Version="2.9.3"/>
         <PackageVersion Include="xunit.assert" Version="2.9.3"/>

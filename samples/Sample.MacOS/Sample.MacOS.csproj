@@ -23,7 +23,7 @@
     -->
     <ItemGroup>
         <!-- Push page: Push Notifications capability -->
-        <CustomEntitlements Include="aps-environment" Type="String" Value="development" Visible="false" />
+        <CustomEntitlements Include="com.apple.developer.aps-environment" Type="String" Value="development" Visible="false" />
     </ItemGroup>
 
     <ItemGroup>

@@ -4,7 +4,7 @@ using Shiny.Infrastructure;
 namespace Sample.Shared.Maui.Pages.Device;
 
 [ShellMap<PosturePage>("posture")]
-public partial class PostureViewModel(IScreenPosture posture, IMainThread mainThread) : ObservableObject, IPageLifecycleAware
+public partial class PostureViewModel(IScreenPosture posture, IDispatcher dispatcher) : ObservableObject, IPageLifecycleAware
 {
     [ObservableProperty] ScreenPosture current = ScreenPosture.None;
     [ObservableProperty] string supported = "";
@@ -25,7 +25,7 @@ public partial class PostureViewModel(IScreenPosture posture, IMainThread mainTh
     public void OnDisappearing() => posture.Changed -= this.OnChanged;
 
     void OnChanged(object? sender, ScreenPosture value)
-        => mainThread.BeginInvokeOnMainThread(() => this.Show(value));
+        => dispatcher.Dispatch(() => this.Show(value));
 
     void Show(ScreenPosture value)
     {

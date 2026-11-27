@@ -34,14 +34,25 @@ public static class NorthAmericaExtensions
 
     /// <summary>
     /// Maps the spatial properties of <see cref="GeoRegion"/> and <see cref="GeoCity"/> so containment /
-    /// proximity queries work.
+    /// proximity queries work, and registers source-generated JSON metadata for them (and the seeder's run-once
+    /// marker) so the store stays trim / NativeAOT safe.
     /// </summary>
+    /// <remarks>
+    /// The metadata is added to the store's <c>JsonSerializerOptions</c> - set your own options (if any) before
+    /// calling this, as replacing them afterwards drops it.
+    /// </remarks>
     /// <param name="options">The document store options.</param>
     public static DocumentStoreOptions MapNorthAmericaData(this DocumentStoreOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
         options.ConfigureDocument<GeoRegion>(cfg => cfg.MapSpatialProperty(nameof(GeoRegion.Boundary), r => r.Boundary));
         options.ConfigureDocument<GeoCity>(cfg => cfg.MapSpatialProperty(nameof(GeoCity.Location), c => c.Location));
+
+        // ahead of the reflection fallback: under trimming it sees the marker's Id with its getter removed
+        var json = ((IDocumentStoreOptions)options).EnsureSerializerOptions();
+        if (!json.TypeInfoResolverChain.Contains(NorthAmericaJsonContext.Default))
+            json.TypeInfoResolverChain.Insert(0, NorthAmericaJsonContext.Default);
+
         return options;
     }
 

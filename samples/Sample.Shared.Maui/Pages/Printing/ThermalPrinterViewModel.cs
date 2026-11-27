@@ -12,7 +12,7 @@ public partial class ThermalPrinterViewModel(
     BlePrinterManager bleManager,
     INetworkPrinterScanner networkScanner,
     NetworkPrinterManager networkManager,
-    IMainThread mainThread,
+    IDispatcher dispatcher,
     IDialogs dialogs
 ) : ObservableObject, IDisposable
 {
@@ -93,7 +93,7 @@ public partial class ThermalPrinterViewModel(
             .Buffer(TimeSpan.FromMilliseconds(500))
             .Where(batch => batch.Count > 0)
             .Subscribe(
-                batch => mainThread.BeginInvokeOnMainThread(() =>
+                batch => dispatcher.Dispatch(() =>
                 {
                     // the same printer advertises repeatedly - keep the latest per peripheral
                     this.BlePrinters = this.BlePrinters
@@ -104,7 +104,7 @@ public partial class ThermalPrinterViewModel(
                         .ToList();
                     this.Status = $"Found {this.BlePrinters.Count} BLE printer(s)";
                 }),
-                ex => mainThread.BeginInvokeOnMainThread(() =>
+                ex => dispatcher.Dispatch(() =>
                 {
                     this.IsBleScanning = false;
                     this.Status = $"BLE scan error: {ex.Message}";
@@ -130,12 +130,12 @@ public partial class ThermalPrinterViewModel(
         this.networkScanSub = networkScanner
             .Scan()
             .Subscribe(
-                found => mainThread.BeginInvokeOnMainThread(() =>
+                found => dispatcher.Dispatch(() =>
                 {
                     this.NetworkPrinters = this.NetworkPrinters.Append(found).ToList();
                     this.Status = $"Found {this.NetworkPrinters.Count} WiFi printer(s)";
                 }),
-                ex => mainThread.BeginInvokeOnMainThread(() =>
+                ex => dispatcher.Dispatch(() =>
                 {
                     this.IsNetworkScanning = false;
                     this.Status = $"WiFi scan error: {ex.Message}";

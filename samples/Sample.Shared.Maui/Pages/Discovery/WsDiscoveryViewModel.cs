@@ -6,7 +6,7 @@ namespace Sample.Shared.Maui.Pages.Discovery;
 [ShellMap<WsDiscoveryPage>("wsdiscovery")]
 public partial class WsDiscoveryViewModel(
     IWsDiscoveryManager wsd,
-    IMainThread mainThread,
+    IDispatcher dispatcher,
     IDialogs dialogs
 ) : ObservableObject, IDisposable
 {
@@ -100,7 +100,7 @@ public partial class WsDiscoveryViewModel(
             ))
             .ToList();
 
-        mainThread.BeginInvokeOnMainThread(() =>
+        dispatcher.Dispatch(() =>
         {
             this.Targets = items;
             this.Status = $"{items.Count} target(s)";

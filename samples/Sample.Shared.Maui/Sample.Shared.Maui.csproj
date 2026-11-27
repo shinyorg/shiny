@@ -48,6 +48,14 @@
         <EmbeddedResource Include="Pages\Printing\receipt-logo.png" />
     </ItemGroup>
 
+    <!--
+        the macOS SDK globs Resources\** into BundleResource; the maui-labs macOS head (preview.16+) resizes this
+        library's MauiImage/MauiIcon/MauiSplashScreen itself, so the raw copies collide with them (MAUIAPPKIT001)
+    -->
+    <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'macos'">
+        <BundleResource Remove="Resources\**" />
+    </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />

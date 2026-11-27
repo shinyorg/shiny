@@ -6,7 +6,7 @@ namespace Sample.Shared.Maui.Pages.Discovery;
 [ShellMap<SsdpPage>("ssdp")]
 public partial class SsdpViewModel(
     ISsdpManager ssdp,
-    IMainThread mainThread,
+    IDispatcher dispatcher,
     IDialogs dialogs
 ) : ObservableObject, IDisposable
 {
@@ -124,7 +124,7 @@ public partial class SsdpViewModel(
             ))
             .ToList();
 
-        mainThread.BeginInvokeOnMainThread(() =>
+        dispatcher.Dispatch(() =>
         {
             this.Devices = items;
             this.Status = $"{items.Count} device(s)";

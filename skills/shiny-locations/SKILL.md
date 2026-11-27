@@ -360,6 +360,8 @@ public class MyRegionDelegate : IRegionGeofenceDelegate
 - US/Canada dataset (in `.DocumentDb`): `opts.MapNorthAmericaData()`, `services.AddNorthAmericaSeeder()`, then
   `cfg.AddNorthAmericanRegions()` (set "regions", ids `US-CO`/`CA-ON`) and `cfg.AddNorthAmericanCities(withinMeters: 25_000)`
   (set "cities", ids `US-CO-denver`). Types `GeoRegion`/`GeoCity`/`NorthAmericaData` live in `Shiny.Locations.NorthAmerica`.
+  `MapNorthAmericaData()` also adds source-generated JSON metadata for those types and the seed marker (trim/NativeAOT
+  safe) to the store's `JsonSerializerOptions` - assign custom `opts.JsonSerializerOptions` BEFORE calling it, never after.
 - Geocoder sets: a failed lookup keeps the current region (no false exit while offline); sets share one lookup per
   reading; exits after a restart carry only `RegionId` (`Region`/`RegionName` null). Respect geocoder rate limits -
   keep `MinimumTime` >= 1 minute.

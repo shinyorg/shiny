@@ -7,7 +7,7 @@ namespace Sample.Shared.Maui.Pages.Beacons;
 [ShellMap<EddystonePage>("eddystone")]
 public partial class EddystoneViewModel(
     IEddystoneScanner scanner,
-    IMainThread mainThread
+    IDispatcher dispatcher
 ) : ObservableObject, IPageLifecycleAware
 {
     // one row per peripheral+frame type, so a beacon interleaving UID and TLM shows both, updating
@@ -53,8 +53,8 @@ public partial class EddystoneViewModel(
             .Buffer(TimeSpan.FromSeconds(1))
             .Where(x => x.Count > 0)
             .Subscribe(
-                frames => mainThread.BeginInvokeOnMainThread(() => this.OnFrames(frames)),
-                ex => mainThread.BeginInvokeOnMainThread(() => this.Status = ex.Message)
+                frames => dispatcher.Dispatch(() => this.OnFrames(frames)),
+                ex => dispatcher.Dispatch(() => this.Status = ex.Message)
             );
 
         this.ScanText = "Stop Scanning";

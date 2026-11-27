@@ -7,7 +7,7 @@ namespace Sample.Shared.Maui.Pages.ScreenRecorder;
 [ShellMap<ScreenRecorderPage>("screenrecorder")]
 public partial class ScreenRecorderViewModel(
     IScreenRecorder recorder,
-    IMainThread mainThread
+    IDispatcher dispatcher
 ) : ObservableObject, IDisposable
 {
     IScreenRecording? session;
@@ -199,7 +199,7 @@ public partial class ScreenRecorderViewModel(
 
 
     // the OS ended it: the user hit the cast notification, a call came in, the encoder failed
-    void OnFaulted(object? sender, ScreenRecordingFaultedEventArgs e) => mainThread.BeginInvokeOnMainThread(() =>
+    void OnFaulted(object? sender, ScreenRecordingFaultedEventArgs e) => dispatcher.Dispatch(() =>
     {
         this.Status = $"Ended by the system - {e.Reason}";
 

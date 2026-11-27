@@ -6,7 +6,7 @@ namespace Sample.Shared.Maui.Pages.BLE;
 public partial class BleScanViewModel(
     IBleManager bleManager,
     INavigator navigator,
-    IMainThread mainThread,
+    IDispatcher dispatcher,
     IDialogs dialogs
 ) : ObservableObject, IDisposable
 {
@@ -66,7 +66,7 @@ public partial class BleScanViewModel(
             .Where(batch => batch.Count > 0)
             .Subscribe(
                 // TODO: this need to be actually pushed on the macOS thread
-                batch => mainThread.BeginInvokeOnMainThread(() =>
+                batch => dispatcher.Dispatch(() =>
                 {
                     var latest = new Dictionary<string, ScanResult>(batch.Count);
                     foreach (var r in batch)
@@ -74,7 +74,7 @@ public partial class BleScanViewModel(
                     foreach (var r in latest.Values)
                         this.OnScanResult(r);
                 }),
-                ex => mainThread.BeginInvokeOnMainThread(() =>
+                ex => dispatcher.Dispatch(() =>
                 {
                     this.Status = $"Scan error: {ex.Message}";
                     this.IsScanning = false;

@@ -3,7 +3,7 @@ using Shiny.Infrastructure;
 namespace Sample.Shared.Maui.Pages.Device;
 
 [ShellMap<BatteryPage>("battery")]
-public partial class BatteryViewModel(Shiny.Power.IBattery battery, IMainThread mainThread) : ObservableObject, IPageLifecycleAware
+public partial class BatteryViewModel(Shiny.Power.IBattery battery, IDispatcher dispatcher) : ObservableObject, IPageLifecycleAware
 {
     [ObservableProperty] string status = "Unknown";
     [ObservableProperty] double level;
@@ -27,7 +27,7 @@ public partial class BatteryViewModel(Shiny.Power.IBattery battery, IMainThread 
 
     void OnChanged(object? sender, EventArgs e)
     {
-        mainThread.InvokeOnMainThreadAsync(() =>
+        dispatcher.DispatchAsync(() =>
         {
             this.Status = battery.Status.ToString();
             this.Level = battery.Level;

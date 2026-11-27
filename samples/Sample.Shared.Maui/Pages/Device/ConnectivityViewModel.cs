@@ -5,7 +5,7 @@ namespace Sample.Shared.Maui.Pages.Device;
 [ShellMap<ConnectivityPage>("connectivity")]
 public partial class ConnectivityViewModel(
     Shiny.Net.IConnectivity connectivity,
-    IMainThread mainThread
+    IDispatcher dispatcher
 ) : ObservableObject, IPageLifecycleAware
 {
     [ObservableProperty] string access = "Unknown";
@@ -30,7 +30,7 @@ public partial class ConnectivityViewModel(
 
     void OnChanged(object? sender, EventArgs e)
     {
-        mainThread.InvokeOnMainThreadAsync(() =>
+        dispatcher.DispatchAsync(() =>
         {
             var access = connectivity.Access.ToString();
             var types = connectivity.ConnectionTypes.ToString();

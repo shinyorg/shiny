@@ -12,14 +12,14 @@ public partial class BeaconRangingViewModel : ObservableObject, IPageLifecycleAw
     const string SampleUuid = "B9407F30-F5F8-466E-AFF9-25556B57FE6D";
 
     readonly IBeaconRangingManager rangingManager;
-    readonly IMainThread mainThread;
+    readonly IDispatcher dispatcher;
     readonly ManagedBeaconScan scan;
     IDisposable? refreshSub;
 
-    public BeaconRangingViewModel(IBeaconRangingManager rangingManager, IMainThread mainThread)
+    public BeaconRangingViewModel(IBeaconRangingManager rangingManager, IDispatcher dispatcher)
     {
         this.rangingManager = rangingManager;
-        this.mainThread = mainThread;
+        this.dispatcher = dispatcher;
         this.scan = rangingManager.CreateManagedScan();
     }
 
@@ -46,7 +46,7 @@ public partial class BeaconRangingViewModel : ObservableObject, IPageLifecycleAw
         // otherwise the list re-sorts faster than it can be read.
         => this.refreshSub = Observable
             .Interval(TimeSpan.FromSeconds(1))
-            .Subscribe(_ => this.mainThread.BeginInvokeOnMainThread(this.Refresh));
+            .Subscribe(_ => this.dispatcher.Dispatch(this.Refresh));
 
 
     public void OnDisappearing()

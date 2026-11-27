@@ -6,7 +6,7 @@ namespace Sample.Shared.Maui.Pages.Discovery;
 [ShellMap<MdnsPage>("mdns")]
 public partial class MdnsViewModel(
     IMdnsManager mdns,
-    IMainThread mainThread,
+    IDispatcher dispatcher,
     IDialogs dialogs
 ) : ObservableObject, IDisposable
 {
@@ -91,7 +91,7 @@ public partial class MdnsViewModel(
             ))
             .ToList();
 
-        mainThread.BeginInvokeOnMainThread(() =>
+        dispatcher.Dispatch(() =>
         {
             this.Services = items;
             this.Status = $"{items.Count} service(s)";

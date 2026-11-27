@@ -7,7 +7,7 @@ namespace Sample.Shared.Maui.Pages.Wifi;
 [ShellMap<WifiPage>("wifi")]
 public partial class WifiViewModel(
     IWifiManager wifi,
-    IMainThread mainThread,
+    IDispatcher dispatcher,
     IDialogs dialogs
 ) : ObservableObject, IDisposable
 {
@@ -222,7 +222,7 @@ public partial class WifiViewModel(
 
     // the event carries the new network, so this never has to go and read it again
     void OnChanged(object? sender, WifiNetworkInfo? info)
-        => mainThread.BeginInvokeOnMainThread(() =>
+        => dispatcher.Dispatch(() =>
         {
             this.CurrentNetwork = Describe(info);
             this.Status = info == null ? "Left the network" : $"Now on {info.Ssid ?? "(ssid hidden)"}";
