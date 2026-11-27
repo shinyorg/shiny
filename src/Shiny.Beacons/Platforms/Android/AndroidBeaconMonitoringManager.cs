@@ -16,7 +16,7 @@ namespace Shiny.Beacons;
 /// at low power with the enter/exit state machine on top. The only way to keep that scan running
 /// once the app leaves the foreground is a foreground service with a visible notification.
 /// </remarks>
-public class AndroidBeaconMonitoringManager : BleScanBeaconMonitoringManager, IShinyStartupTask
+public class AndroidBeaconMonitoringManager : BleScanBeaconMonitoringManager
 {
     readonly AndroidPlatform platform;
     readonly ILogger logger;
@@ -40,7 +40,7 @@ public class AndroidBeaconMonitoringManager : BleScanBeaconMonitoringManager, IS
 
 
     /// <inheritdoc />
-    public void Start()
+    public override void Start()
     {
         try
         {

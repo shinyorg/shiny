@@ -30,9 +30,11 @@ public static class PhoneNumbers
         if (!international)
         {
             var national = digits.TrimStart('0');
+            var hadTrunkPrefix = national.Length < digits.Length;
             var cc = defaultCountryCode.ToString();
-            // "1 800 555 0100" already carries the code - E.164 numbers are at most 15 digits, a national one rarely 11+
-            digits = national.StartsWith(cc) && national.Length > 10 ? national : cc + national;
+            // "1 800 555 0100" already carries the code - E.164 numbers are at most 15 digits, a national one rarely 11+.
+            // A trunk '0' marks the number as national, so it never already carries the code ("04941 1234567" in 49).
+            digits = !hadTrunkPrefix && national.StartsWith(cc) && national.Length > 10 ? national : cc + national;
         }
 
         if (digits.Length == 0 || digits.Length > 15)

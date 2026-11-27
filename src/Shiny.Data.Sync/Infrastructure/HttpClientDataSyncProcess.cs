@@ -27,6 +27,8 @@ public class HttpClientDataSyncProcess(
 )
 {
     static readonly TimeSpan MaxBackoff = TimeSpan.FromSeconds(60);
+    static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(10);
+    static readonly TimeSpan MinPassDelay = TimeSpan.FromMilliseconds(100);
 
     public static event EventHandler<SyncOperationResult>? ProgressOccurred;
 
@@ -53,76 +55,129 @@ public class HttpClientDataSyncProcess(
 
             try
             {
-                var ops = this.GetReadyPending();
-                while (!cancelSrc.IsCancellationRequested && ops.Count > 0)
+                // Keep looping while anything is queued - including ops waiting out a retry backoff,
+                // which GetReadyPending leaves out. Exiting on "nothing ready" stranded those ops until
+                // the next Queue/Start/connectivity change.
+                var hasWork = repository.GetAll<SyncOperation>().Count > 0;
+                while (!cancelSrc.IsCancellationRequested && hasWork)
                 {
-                    if (connectivity.IsInternetAvailable())
+                    try
                     {
-                        var unmetered = connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
-
-                        var groups = new Dictionary<string, List<SyncOperation>>();
-                        foreach (var op in ops)
-                        {
-                            if (!groups.TryGetValue(op.EndpointKey, out var list))
-                            {
-                                list = new List<SyncOperation>();
-                                groups[op.EndpointKey] = list;
-                            }
-                            list.Add(op);
-                        }
-
-                        foreach (var (key, list) in groups)
-                        {
-                            if (cancelSrc.IsCancellationRequested)
-                                break;
-
-                            var endpoint = registry.Get(key);
-                            if (endpoint == null)
-                            {
-                                logger.StandardWarn(key, $"No endpoint registered for key '{key}' - dropping {list.Count} ops");
-                                var orphans = list.Where(op => repository.Exists<SyncOperation>(op.Identifier));
-                                foreach (var op in orphans)
-                                    repository.Remove(op);
-                            }
-                            else if (!endpoint.UseMeteredConnection && !unmetered)
-                            {
-                                logger.StandardInfo(key, "Waiting for unmetered connection");
-                            }
-                            else if (endpoint.Batch && list.Count > 1)
-                            {
-                                var coalesced = OperationCoalescer.Coalesce(list);
-                                await this.RunBatch(endpoint, list, coalesced, cancelSrc.Token).ConfigureAwait(false);
-                            }
-                            else
-                            {
-                                var live = list.Where(op => repository.Exists<SyncOperation>(op.Identifier));
-                                foreach (var op in live)
-                                {
-                                    if (cancelSrc.IsCancellationRequested)
-                                        break;
-                                    await this.RunOperation(endpoint, op, cancelSrc.Token).ConfigureAwait(false);
-                                }
-                            }
-                        }
+                        await this.RunPass(cancelSrc.Token).ConfigureAwait(false);
                     }
-                    else
+                    catch (OperationCanceledException) when (cancelSrc.IsCancellationRequested)
                     {
-                        logger.LogDebug("Internet unavailable - waiting for next pass");
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        // a failed pass must not end the loop - the queued ops would wait for the next start
+                        logger.LogError(ex, "Error in sync outbox pass");
                     }
 
-                    ops = this.GetReadyPending();
-                    if (ops.Count > 0)
-                        await Task.Delay(10000, cancelSrc.Token).ConfigureAwait(false);
+                    hasWork = repository.GetAll<SyncOperation>().Count > 0;
+                    if (hasWork)
+                        await Task.Delay(this.GetNextPassDelay(), cancelSrc.Token).ConfigureAwait(false);
                 }
                 logger.LogDebug("Outbox drained");
             }
-            catch (TaskCanceledException) { }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error in sync outbox loop");
             }
             onComplete();
         });
+    }
+
+
+    async Task RunPass(CancellationToken cancelToken)
+    {
+        var ops = this.GetReadyPending();
+        if (ops.Count == 0)
+            return;
+
+        if (!connectivity.IsInternetAvailable())
+        {
+            logger.LogDebug("Internet unavailable - waiting for next pass");
+            return;
+        }
+
+        var unmetered = connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
+        var groups = new Dictionary<string, List<SyncOperation>>();
+        foreach (var op in ops)
+        {
+            if (!groups.TryGetValue(op.EndpointKey, out var list))
+            {
+                list = new List<SyncOperation>();
+                groups[op.EndpointKey] = list;
+            }
+            list.Add(op);
+        }
+
+        foreach (var (key, list) in groups)
+        {
+            if (cancelToken.IsCancellationRequested)
+                break;
+
+            var endpoint = registry.Get(key);
+            if (endpoint == null)
+            {
+                logger.StandardWarn(key, $"No endpoint registered for key '{key}' - dropping {list.Count} ops");
+                var orphans = list.Where(op => repository.Exists<SyncOperation>(op.Identifier));
+                foreach (var op in orphans)
+                    repository.Remove(op);
+            }
+            else if (!endpoint.UseMeteredConnection && !unmetered)
+            {
+                logger.StandardInfo(key, "Waiting for unmetered connection");
+            }
+            else if (endpoint.Batch && list.Count > 1)
+            {
+                var coalesced = OperationCoalescer.Coalesce(list);
+                await this.RunBatch(endpoint, list, coalesced, cancelToken).ConfigureAwait(false);
+            }
+            else
+            {
+                // Once an op for an entity is still queued after its attempt (retry scheduled, conflict kept
+                // local), later ops for that entity wait - sending them now would reach the server out of order.
+                var blockedEntities = new HashSet<string>();
+                var live = list.Where(op =>
+                    !blockedEntities.Contains(op.EntityIdentifier) &&
+                    repository.Exists<SyncOperation>(op.Identifier)
+                );
+                foreach (var op in live)
+                {
+                    if (cancelToken.IsCancellationRequested)
+                        break;
+
+                    await this.RunOperation(endpoint, op, cancelToken).ConfigureAwait(false);
+                    if (repository.Exists<SyncOperation>(op.Identifier))
+                        blockedEntities.Add(op.EntityIdentifier);
+                }
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Time until the next pass: the default poll interval, shortened to the earliest retry backoff.
+    /// </summary>
+    TimeSpan GetNextPassDelay()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var delay = PollInterval;
+        var waiting = repository
+            .GetAll<SyncOperation>()
+            .Where(op => op.NextAttemptAt.HasValue && op.NextAttemptAt.Value > now);
+
+        foreach (var op in waiting)
+        {
+            var untilReady = op.NextAttemptAt!.Value - now;
+            if (untilReady < delay)
+                delay = untilReady;
+        }
+        return delay < MinPassDelay ? MinPassDelay : delay;
     }
 
 
@@ -133,11 +188,21 @@ public class HttpClientDataSyncProcess(
     IList<SyncOperation> GetReadyPending()
     {
         var now = DateTimeOffset.UtcNow;
-        var ready = repository
-            .GetAll<SyncOperation>()
-            .Where(op => !op.NextAttemptAt.HasValue || op.NextAttemptAt.Value <= now)
-            .ToList();
-        ready.Sort((a, b) => a.CreatedAt.CompareTo(b.CreatedAt));
+        var all = repository.GetAll<SyncOperation>().ToList();
+        all.Sort((a, b) => a.CreatedAt.CompareTo(b.CreatedAt));
+
+        // an op still in its backoff window holds back every later op for the same entity,
+        // so the server sees them in the order they were queued
+        var blockedEntities = new HashSet<string>();
+        var ready = new List<SyncOperation>();
+        foreach (var op in all)
+        {
+            var isReady = !op.NextAttemptAt.HasValue || op.NextAttemptAt.Value <= now;
+            if (!isReady)
+                blockedEntities.Add(op.EntityIdentifier);
+            else if (!blockedEntities.Contains(op.EntityIdentifier))
+                ready.Add(op);
+        }
         return ready;
     }
 
@@ -173,13 +238,7 @@ public class HttpClientDataSyncProcess(
             }
 
             logger.StandardInfo(op.Identifier, "Sent successfully");
-            foreach (var d in services.GetServices<IDataSyncDelegate>())
-            {
-                try { await d.OnSent(inProgress, result.ResponseBody).ConfigureAwait(false); }
-                catch (Exception dex) { logger.LogError(dex, "Sync delegate OnSent threw"); }
-            }
-            repository.Remove(inProgress);
-            Publish(inProgress, SyncOperationState.Completed, result.StatusCode, null);
+            await this.Complete(inProgress, result.StatusCode, result.ResponseBody).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -206,8 +265,33 @@ public class HttpClientDataSyncProcess(
     }
 
 
+    /// <summary>
+    /// The op reached the server (or, for a DELETE answered 404 / 410, the entity is already gone): run
+    /// <see cref="IDataSyncDelegate.OnSent"/>, drop it from the outbox and report it completed.
+    /// </summary>
+    async Task Complete(SyncOperation op, int statusCode, string? responseBody)
+    {
+        foreach (var d in services.GetServices<IDataSyncDelegate>())
+        {
+            try { await d.OnSent(op, responseBody).ConfigureAwait(false); }
+            catch (Exception dex) { logger.LogError(dex, "Sync delegate OnSent threw"); }
+        }
+        if (repository.Exists<SyncOperation>(op.Identifier))
+            repository.Remove(op);
+
+        Publish(op, SyncOperationState.Completed, statusCode, null);
+    }
+
+
     async Task HandleError(SyncEndpoint endpoint, SyncOperation op, int statusCode, Exception ex)
     {
+        if (endpoint.IsAlreadyDeleted(op.Verb, statusCode))
+        {
+            logger.StandardInfo(op.Identifier, $"DELETE returned {statusCode} - entity already gone, completing");
+            await this.Complete(op, statusCode, null).ConfigureAwait(false);
+            return;
+        }
+
         var isTransient = statusCode == 0 || statusCode >= 500 || statusCode == 408 || statusCode == 429;
         if (isTransient && op.Attempts < endpoint.MaxAttempts)
         {
@@ -248,8 +332,7 @@ public class HttpClientDataSyncProcess(
     void ScheduleRetry(SyncEndpoint endpoint, SyncOperation op, int statusCode, Exception ex, string? reason = null)
     {
         var attempts = op.Attempts;
-        var delayMs = (long)endpoint.RetryBaseDelay.TotalMilliseconds * (long)Math.Pow(2, Math.Max(0, attempts - 1));
-        var delay = TimeSpan.FromMilliseconds(Math.Min(delayMs, MaxBackoff.TotalMilliseconds));
+        var delay = GetRetryDelay(endpoint, op);
         var nextAt = DateTimeOffset.UtcNow + delay;
 
         logger.StandardWarn(op.Identifier,
@@ -264,21 +347,57 @@ public class HttpClientDataSyncProcess(
     }
 
 
+    static TimeSpan GetRetryDelay(SyncEndpoint endpoint, SyncOperation op)
+    {
+        var delayMs = (long)endpoint.RetryBaseDelay.TotalMilliseconds * (long)Math.Pow(2, Math.Max(0, op.Attempts - 1));
+        return TimeSpan.FromMilliseconds(Math.Min(delayMs, MaxBackoff.TotalMilliseconds));
+    }
+
+
     async Task RunBatch(SyncEndpoint endpoint, IList<SyncOperation> originals, IReadOnlyList<SyncOperation> coalesced, CancellationToken cancelToken)
     {
+        var coalescedIdByEntity = new Dictionary<string, string>();
+        foreach (var op in coalesced)
+            coalescedIdByEntity[op.EntityIdentifier] = op.Identifier;
+
+        // A Create that never reached the server followed by its Delete coalesces to nothing: remove both and
+        // report them canceled - removed from the outbox without being sent, the same as Cancel(). No delegate
+        // runs: OnSent would claim a server round trip that never happened, and nothing failed.
+        var dropped = originals
+            .Where(op =>
+                !coalescedIdByEntity.ContainsKey(op.EntityIdentifier) &&
+                repository.Exists<SyncOperation>(op.Identifier)
+            )
+            .ToList();
+
+        foreach (var op in dropped)
+        {
+            logger.StandardInfo(op.Identifier, "Create was never sent and is now deleted - dropping without sending");
+            repository.Remove(op);
+            Publish(op, SyncOperationState.Canceled, null, null);
+        }
+
+        if (coalesced.Count == 0)
+            return;
+
         logger.LogInformation("Sending batch of {count} coalesced ops ({original} originals) for endpoint {key}",
             coalesced.Count, originals.Count, endpoint.Key);
 
-        foreach (var op in coalesced)
-        {
-            if (repository.Exists<SyncOperation>(op.Identifier))
-                repository.Set(op with { State = SyncOperationState.InProgress, Attempts = op.Attempts + 1, NextAttemptAt = null });
-        }
+        // Record the attempt on the originals too: a batch that throws (timeout) may still have reached the server,
+        // so a Create in it must not look unsent to the coalescer afterwards.
+        var liveOriginals = originals.Where(op => repository.Exists<SyncOperation>(op.Identifier));
+        foreach (var op in liveOriginals)
+            repository.Set(op with { State = SyncOperationState.InProgress, Attempts = op.Attempts + 1, NextAttemptAt = null });
+
+        // what goes out carries the attempt it is on, so retry limits apply to batched ops too
+        var sending = coalesced
+            .Select(op => op with { State = SyncOperationState.InProgress, Attempts = op.Attempts + 1, NextAttemptAt = null })
+            .ToList();
 
         SyncBatchResult result;
         try
         {
-            result = await transport.SendBatch(endpoint, coalesced, cancelToken).ConfigureAwait(false);
+            result = await transport.SendBatch(endpoint, sending, cancelToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -287,50 +406,46 @@ public class HttpClientDataSyncProcess(
             foreach (var op in live)
             {
                 var current = repository.Get<SyncOperation>(op.Identifier)!;
-                this.ScheduleRetry(endpoint, current, 0, ex, "Batch send failed");
+                this.HandleTransient(endpoint, current, "Batch send failed", ex);
             }
             return;
         }
 
-        var coalescedById = new Dictionary<string, SyncOperation>();
-        foreach (var op in coalesced)
-            coalescedById[op.Identifier] = op;
+        var sentById = new Dictionary<string, SyncOperation>();
+        foreach (var op in sending)
+            sentById[op.Identifier] = op;
 
         foreach (var item in result.Items)
         {
-            if (!coalescedById.TryGetValue(item.OperationIdentifier, out var coalescedOp))
+            if (!sentById.TryGetValue(item.OperationIdentifier, out var sentOp))
             {
                 // result references an op we didn't send - drop it silently
             }
             else if (item.IsConflict)
             {
-                await this.HandleConflict(endpoint, coalescedOp, item.StatusCode, item.ResponseBody ?? string.Empty).ConfigureAwait(false);
+                await this.HandleConflict(endpoint, sentOp, item.StatusCode, item.ResponseBody ?? string.Empty).ConfigureAwait(false);
             }
             else if (item.StatusCode < 200 || item.StatusCode > 299)
             {
                 var ex = new InvalidOperationException(item.ErrorMessage ?? $"Batch item failed with status {item.StatusCode}");
-                await this.HandleError(endpoint, coalescedOp, item.StatusCode, ex).ConfigureAwait(false);
+                await this.HandleError(endpoint, sentOp, item.StatusCode, ex).ConfigureAwait(false);
             }
             else
             {
-                foreach (var d in services.GetServices<IDataSyncDelegate>())
-                {
-                    try { await d.OnSent(coalescedOp, item.ResponseBody).ConfigureAwait(false); }
-                    catch (Exception dex) { logger.LogError(dex, "Sync delegate OnSent threw"); }
-                }
-                Publish(coalescedOp, SyncOperationState.Completed, item.StatusCode, null);
+                await this.Complete(sentOp, item.StatusCode, item.ResponseBody).ConfigureAwait(false);
             }
         }
 
-        var coalescedEntityIds = new HashSet<string>();
-        foreach (var op in coalesced)
-            coalescedEntityIds.Add(op.EntityIdentifier);
-
-        foreach (var original in originals)
-        {
-            if (coalescedEntityIds.Contains(original.EntityIdentifier) && repository.Exists<SyncOperation>(original.Identifier))
-                repository.Remove(original);
-        }
+        // Every original folded into a coalesced op is now represented by it: drop them. The coalesced op
+        // itself (stored under the first original's id) is left alone - it is either gone (sent, failed
+        // permanently, remote accepted) or was re-queued with the coalesced payload for a retry.
+        var folded = originals.Where(original =>
+            coalescedIdByEntity.TryGetValue(original.EntityIdentifier, out var coalescedId) &&
+            !coalescedId.Equals(original.Identifier) &&
+            repository.Exists<SyncOperation>(original.Identifier)
+        );
+        foreach (var original in folded.ToList())
+            repository.Remove(original);
     }
 
 
@@ -352,39 +467,47 @@ public class HttpClientDataSyncProcess(
                 if (repository.Exists<SyncOperation>(op.Identifier))
                     repository.Remove(op);
 
-                await DispatchReceived(endpoint, remotePayload).ConfigureAwait(false);
+                await DispatchReceived(endpoint, op.EntityIdentifier, remotePayload).ConfigureAwait(false);
                 Publish(op, SyncOperationState.Completed, statusCode, null);
                 break;
 
             case ConflictAction.KeepLocal:
-                // Re-queue the op as Pending; the next outbox pass will re-send it as-is.
-                // Servers that want a "force overwrite" header should set it via OnBeforeSend.
-                logger.StandardInfo(op.Identifier, "Conflict resolved: keep local - retrying");
-                if (repository.Exists<SyncOperation>(op.Identifier))
-                    repository.Set(op with { State = SyncOperationState.Pending, NextAttemptAt = null });
-                Publish(op, SyncOperationState.Pending, statusCode, null);
-                break;
-
             case ConflictAction.UseMerged:
-                logger.StandardInfo(op.Identifier, "Conflict resolved: merged payload - retrying");
-                if (repository.Exists<SyncOperation>(op.Identifier))
+                // Re-queue the op as Pending; the next outbox pass re-sends it (with the merged payload if
+                // there is one). Servers that want a "force overwrite" header should set it via OnBeforeSend.
+                var retry = resolution.Action == ConflictAction.UseMerged
+                    ? op with { Payload = resolution.MergedPayload }
+                    : op;
+
+                if (retry.Attempts >= endpoint.MaxAttempts)
                 {
-                    var merged = op with { Payload = resolution.MergedPayload, State = SyncOperationState.Pending, NextAttemptAt = null };
-                    repository.Set(merged);
-                    Publish(merged, SyncOperationState.Pending, statusCode, null);
+                    // the server keeps rejecting it - fail instead of re-sending it every pass forever
+                    var ex = new InvalidOperationException($"Conflict (HTTP {statusCode}) still unresolved after {retry.Attempts} attempts");
+                    await this.HandleError(endpoint, retry, statusCode, ex).ConfigureAwait(false);
+                }
+                else if (repository.Exists<SyncOperation>(op.Identifier))
+                {
+                    logger.StandardInfo(op.Identifier, $"Conflict resolved: {resolution.Action} - retrying");
+                    var pending = retry with
+                    {
+                        State = SyncOperationState.Pending,
+                        NextAttemptAt = DateTimeOffset.UtcNow + GetRetryDelay(endpoint, retry)
+                    };
+                    repository.Set(pending);
+                    Publish(pending, SyncOperationState.Pending, statusCode, null);
                 }
                 break;
         }
     }
 
 
-    async Task DispatchReceived(SyncEndpoint endpoint, string remotePayload)
+    async Task DispatchReceived(SyncEndpoint endpoint, string entityIdentifier, string remotePayload)
     {
         object? entity = null;
         try { entity = SyncInboxProcessor.DeserializeEntity(endpoint, remotePayload); }
         catch (Exception ex) { logger.LogError(ex, "Failed to deserialize conflict remote payload for {key}", endpoint.Key); }
 
-        var item = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, remotePayload, SyncVerb.Update);
+        var item = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, remotePayload, SyncVerb.Update, entityIdentifier);
         foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
             try { await d.OnReceived(item).ConfigureAwait(false); }

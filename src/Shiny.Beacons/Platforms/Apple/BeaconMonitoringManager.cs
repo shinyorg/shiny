@@ -89,7 +89,16 @@ public class BeaconMonitoringManager(
 
 
     /// <inheritdoc />
-    public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
+    // read live, like CLLocationBeaconMonitoringManager - it used to stay Unknown until RequestAccess or a session
+    // callback ran
+    public AccessState CurrentStatus
+    {
+        get
+        {
+            using var locationManager = new CLLocationManager();
+            return locationManager.GetCurrentStatus(true);
+        }
+    }
 
 
     /// <inheritdoc />
@@ -101,8 +110,6 @@ public class BeaconMonitoringManager(
             .InvokeTaskOnMainThread(() => this.AuthManager.RequestAccess(true))
             .ConfigureAwait(false);
 
-        // never answered from a cache - the user can grant always in Settings at any time
-        this.CurrentStatus = status;
         return status;
     }
 
@@ -148,6 +155,7 @@ public class BeaconMonitoringManager(
     public async Task StopMonitoring(string identifier)
     {
         repository.Remove<BeaconRegion>(identifier);
+        repository.Remove<BeaconMonitorState>(identifier);
 
         var mon = await this.GetMonitor().ConfigureAwait(false);
         await platform.InvokeOnMainThreadAsync(() => mon.RemoveCondition(identifier)).ConfigureAwait(false);
@@ -162,6 +170,7 @@ public class BeaconMonitoringManager(
     {
         await this.DestroyMonitor().ConfigureAwait(false);
         repository.Clear<BeaconRegion>();
+        repository.Clear<BeaconMonitorState>();
     }
 
 
@@ -169,7 +178,9 @@ public class BeaconMonitoringManager(
     public Task<BeaconRegionState> RequestState(BeaconRegion region, CancellationToken cancelToken = default)
         => platform.InvokeTaskOnMainThread(async () =>
         {
-            var mon = await this.GetMonitor().ConfigureAwait(false);
+            // no ConfigureAwait(false): the record has to be read back on the main queue CLMonitor runs on, and a
+            // monitor that is not open yet completes this await on the thread pool
+            var mon = await this.GetMonitor();
             var record = mon.GetMonitoringRecord(region.Identifier);
 
             return record?.LastEvent.State switch
@@ -203,6 +214,7 @@ public class BeaconMonitoringManager(
         // an older one - it must not be swallowed like the cold-start replays are.
         this.initialFires.TryRemove(region.Identifier, out _);
         this.freshConditions[region.Identifier] = 0;
+        repository.Remove<BeaconMonitorState>(region.Identifier);
         mon.AddCondition(region.ToCondition(), region.Identifier);
     }
 
@@ -223,12 +235,8 @@ public class BeaconMonitoringManager(
                 // runs on MainQueue as an Action - an unhandled throw here terminates the app
                 try
                 {
-                    if (diagnostic is null || diagnostic.AuthorizationRequestInProgress)
-                        return;
-
-                    this.CurrentStatus = diagnostic.AuthorizationDenied || diagnostic.AlwaysAuthorizationDenied
-                        ? AccessState.Denied
-                        : AccessState.Available;
+                    if (diagnostic is { AuthorizationRequestInProgress: false } && (diagnostic.AuthorizationDenied || diagnostic.AlwaysAuthorizationDenied))
+                        logger.LogWarning("Always location authorization is not held - beacon region events will not be delivered in the background");
                 }
                 catch (Exception ex)
                 {
@@ -307,23 +315,31 @@ public class BeaconMonitoringManager(
                     return;
                 }
 
-                if (this.freshConditions.TryRemove(evt.Identifier, out _))
-                {
-                    // Unsatisfied is what the app assumes anyway. Satisfied means the device was already
-                    // inside when monitoring started - CoreLocation will not report that again, so this
-                    // is the only chance the delegate gets to hear it.
-                    if (evt.State != CLMonitoringState.Satisfied)
-                        return;
-                }
-                else if (this.initialFires.TryRemove(evt.Identifier, out _))
-                {
-                    logger.LogDebug("Suppressed initial state fire for beacon region {Identifier}", evt.Identifier);
-                    return;
-                }
+                var fresh = this.freshConditions.TryRemove(evt.Identifier, out _);
+                var initial = !fresh && this.initialFires.TryRemove(evt.Identifier, out _);
 
                 var region = repository.Get<BeaconRegion>(evt.Identifier);
                 if (region == null)
                     return;
+
+                var inside = evt.State == CLMonitoringState.Satisfied;
+                var last = repository.Get<BeaconMonitorState>(evt.Identifier);
+                repository.Set(new BeaconMonitorState(evt.Identifier, inside));
+
+                // Unsatisfied is what the app assumes anyway. Satisfied means the device was already inside when
+                // monitoring started - CoreLocation will not report that again, so this is the only chance the
+                // delegate gets to hear it.
+                if (fresh && !inside)
+                    return;
+
+                // The first event after a cold start is only swallowed when it repeats the state last handled.
+                // When the OS relaunched the app for a crossing, that event is the crossing - it differs from what
+                // was persisted and is reported like any other.
+                if (initial && (last == null || last.Inside == inside))
+                {
+                    logger.LogDebug("Suppressed initial state fire for beacon region {Identifier}", evt.Identifier);
+                    return;
+                }
 
                 switch (evt.State)
                 {
@@ -374,4 +390,11 @@ public class BeaconMonitoringManager(
         }
     }
 }
+
+
+/// <summary>
+/// The last CLMonitor state handled for a beacon region - persisted so the first event after a cold start can be
+/// told apart: a repeat of this is a replay, anything else is a transition that happened while the app was not running.
+/// </summary>
+record BeaconMonitorState(string Identifier, bool Inside) : IRepositoryEntity;
 #endif

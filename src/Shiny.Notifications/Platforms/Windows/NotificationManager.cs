@@ -20,8 +20,13 @@ public class NotificationManager(
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore settings,
     ILogger<NotificationManager> logger,
     IPlatform platform
-) : INotificationManager
+) : INotificationManager, IShinyStartupTask
 {
+    // Windows has no repeating toast, so a repeating notification is scheduled this many occurrences ahead
+    // and topped up each time the app starts
+    internal const int RepeatOccurrences = 30;
+    const string ToastGroup = "shiny";
+
     // toasts can't load remote images without package identity, so the image is stored locally and referenced by file:///
     string ImageDirectory => System.IO.Path.Combine(platform.AppData.FullName, "shiny-notification-images");
 
@@ -90,9 +95,31 @@ public class NotificationManager(
 
 
     public Task<Notification>? GetNotification(int notificationId)
+        => Task.FromResult(repository.Get<Notification>(notificationId.ToString())!);
+
+
+    public void Start()
     {
-        var n = repository.Get<Notification>(notificationId.ToString());
-        return n == null ? null : Task.FromResult(n);
+        try
+        {
+            var repeating = repository
+                .GetAll<Notification>()
+                .Where(x => x.RepeatInterval != null)
+                .ToList();
+
+            foreach (var notification in repeating)
+            {
+                var channel = notification.Channel.IsEmpty()
+                    ? Channel.Default
+                    : channelManager.Get(notification.Channel!) ?? Channel.Default;
+
+                this.ScheduleRepeating(notification, this.BuildDocument(notification, channel));
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to top up repeating notifications");
+        }
     }
 
 
@@ -125,69 +152,85 @@ public class NotificationManager(
         else
             await NotificationImages.TryStore(notification.ImageUri!, this.ImageDirectory, notification.Id.ToString(), logger).ConfigureAwait(false);
 
-        var xml = this.BuildToastXml(notification, channel);
-        var doc = new XmlDocument();
-        doc.LoadXml(xml);
-
+        var doc = this.BuildDocument(notification, channel);
         var tag = notification.Id.ToString();
+
+        // a notification sent again with the same id replaces what was scheduled for it
+        this.RemoveScheduled(tag);
+
+        // only what is still to come is pending - a toast shown now is not
+        if (notification.ScheduleDate != null || notification.RepeatInterval != null)
+            repository.Set(notification);
+        else
+            repository.Remove<Notification>(tag);
 
         if (notification.ScheduleDate != null)
         {
-            var scheduled = new ScheduledToastNotification(doc, notification.ScheduleDate.Value)
+            this.Notifier.AddToSchedule(new ScheduledToastNotification(doc, notification.ScheduleDate.Value)
             {
                 Id = tag,
                 Tag = tag,
-                Group = "shiny"
-            };
-            repository.Set(notification);
-            this.Notifier.AddToSchedule(scheduled);
+                Group = ToastGroup
+            });
         }
         else if (notification.RepeatInterval != null)
         {
-            var first = notification.RepeatInterval.CalculateNextAlarm();
-            var firstOffset = new DateTimeOffset(first, TimeSpan.Zero);
-
-            if (notification.RepeatInterval.Interval != null)
-            {
-                // Windows requires the snooze interval to be 60s..60d
-                var interval = notification.RepeatInterval.Interval.Value;
-                if (interval < TimeSpan.FromMinutes(1))
-                    interval = TimeSpan.FromMinutes(1);
-                if (interval > TimeSpan.FromDays(60))
-                    interval = TimeSpan.FromDays(60);
-
-                var scheduled = new ScheduledToastNotification(doc, firstOffset, interval, 5)
-                {
-                    Id = tag,
-                    Tag = tag,
-                    Group = "shiny"
-                };
-                repository.Set(notification);
-                this.Notifier.AddToSchedule(scheduled);
-            }
-            else
-            {
-                // TimeOfDay (optionally with DayOfWeek): schedule the next occurrence only.
-                var scheduled = new ScheduledToastNotification(doc, firstOffset)
-                {
-                    Id = tag,
-                    Tag = tag,
-                    Group = "shiny"
-                };
-                repository.Set(notification);
-                this.Notifier.AddToSchedule(scheduled);
-            }
+            this.ScheduleRepeating(notification, doc);
         }
         else
         {
-            var toast = new ToastNotification(doc)
+            this.Notifier.Show(new ToastNotification(doc)
             {
                 Tag = tag,
-                Group = "shiny"
-            };
-            repository.Set(notification);
-            this.Notifier.Show(toast);
+                Group = ToastGroup
+            });
         }
+    }
+
+
+    XmlDocument BuildDocument(Notification notification, Channel channel)
+    {
+        var doc = new XmlDocument();
+        doc.LoadXml(this.BuildToastXml(notification, channel));
+        return doc;
+    }
+
+
+    void ScheduleRepeating(Notification notification, XmlDocument doc)
+    {
+        var tag = notification.Id.ToString();
+        this.RemoveScheduled(tag);
+
+        var trigger = notification.RepeatInterval!;
+        var at = trigger.TimeProvider.GetUtcNow();
+
+        // Windows rejects a scheduled toast less than a minute after the previous one
+        var interval = trigger.Interval;
+        if (interval != null && interval.Value < TimeSpan.FromMinutes(1))
+            trigger = new IntervalTrigger { Interval = TimeSpan.FromMinutes(1), TimeProvider = trigger.TimeProvider };
+
+        for (var i = 0; i < RepeatOccurrences; i++)
+        {
+            at = trigger.CalculateNextAlarm(at);
+            this.Notifier.AddToSchedule(new ScheduledToastNotification(doc, at)
+            {
+                Id = $"{tag}_{i}",
+                Tag = tag,
+                Group = ToastGroup
+            });
+        }
+    }
+
+
+    void RemoveScheduled(string tag)
+    {
+        var scheduled = this.Notifier
+            .GetScheduledToastNotifications()
+            .Where(x => x.Tag == tag)
+            .ToList();
+
+        foreach (var toast in scheduled)
+            this.Notifier.RemoveFromSchedule(toast);
     }
 
 
@@ -197,12 +240,7 @@ public class NotificationManager(
 
         try
         {
-            var scheduled = this.Notifier
-                .GetScheduledToastNotifications()
-                .FirstOrDefault(x => x.Tag == tag);
-
-            if (scheduled != null)
-                this.Notifier.RemoveFromSchedule(scheduled);
+            this.RemoveScheduled(tag);
 
             if (this.aumid != null)
                 ToastNotificationManager.History.Remove(tag, "shiny", this.aumid);

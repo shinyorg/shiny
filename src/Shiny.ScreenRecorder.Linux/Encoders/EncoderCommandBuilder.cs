@@ -54,7 +54,9 @@ internal static class EncoderCommandBuilder
         args.Add("!");
         args.Add("videoscale");
         args.Add("!");
-        args.Add($"video/x-raw,width={dimensions.Width},height={dimensions.Height},framerate={dimensions.FrameRate}/1");
+        // format=I420 pins 4:2:0 - left open, x264enc negotiates Y444 from a BGRx PipeWire source and
+        // writes High 4:4:4, which browsers and QuickTime refuse to play (the ffmpeg path's yuv420p)
+        args.Add($"video/x-raw,format=I420,width={dimensions.Width},height={dimensions.Height},framerate={dimensions.FrameRate}/1");
         args.Add("!");
 
         // x264enc takes kbit/s, not bit/s - passing bits produces a file hundreds of times larger

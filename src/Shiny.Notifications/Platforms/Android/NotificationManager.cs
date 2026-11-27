@@ -258,5 +258,10 @@ public partial class NotificationManager(
     }
 
     public void ActivityOnCreate(Android.App.Activity activity, Bundle? savedInstanceState)
-        => this.Handle(activity, activity.Intent!);
+    {
+        // a recreated activity (rotation, process restore) or one reopened from recents still carries the intent
+        // that launched it - processing it again would run OnEntry a second time for the same tap
+        if (savedInstanceState == null && !activity.IsLaunchedFromHistory())
+            this.Handle(activity, activity.Intent!);
+    }
 }

@@ -1,5 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
+
+// scheduled notifications live in AlarmManager, which forgets every alarm on reboot - BOOT_COMPLETED sets them again
+[assembly: UsesPermission(Android.Manifest.Permission.ReceiveBootCompleted)]
 
 namespace Shiny.Notifications;
 
@@ -9,6 +13,7 @@ namespace Shiny.Notifications;
     Enabled = true,
     Exported = false
 )]
+[IntentFilter([Intent.ActionBootCompleted])]
 public class ShinyNotificationBroadcastReceiver : ShinyBroadcastReceiver
 {
     public const string ReceiverName = "com.shiny.notifications." + nameof(ShinyNotificationBroadcastReceiver);

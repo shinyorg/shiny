@@ -104,8 +104,8 @@ public func shiny_storekit_purchase(_ productId: UnsafePointer<CChar>, _ options
 
             switch result {
             case .success(let verification):
-                let transaction = try verified(verification)
-                let payload = await serializeTransaction(transaction, jws: verification.jwsRepresentation, isFinished: false)
+                // a transaction that fails on-device verification is still a success - it carries "verified": false
+                let payload = await serializeVerification(verification, isFinished: false)
                 ctx.success(["status": "success", "transaction": payload])
 
             case .userCancelled:
@@ -131,12 +131,10 @@ public func shiny_storekit_current_entitlements(_ context: UnsafeMutableRawPoint
         let unfinished = await unfinishedTransactionIds()
         var result: [[String: Any]] = []
         for await verification in Transaction.currentEntitlements {
-            // an entitlement that fails on-device verification is never reported as owned
-            guard case .verified(let transaction) = verification else { continue }
-            result.append(await serializeTransaction(
-                transaction,
-                jws: verification.jwsRepresentation,
-                isFinished: !unfinished.contains(transaction.id)
+            // entitlements that fail on-device verification are reported with "verified": false - never grant them
+            result.append(await serializeVerification(
+                verification,
+                isFinished: !unfinished.contains(verification.unsafePayloadValue.id)
             ))
         }
         ctx.success(result)
@@ -150,8 +148,8 @@ public func shiny_storekit_unfinished(_ context: UnsafeMutableRawPointer?, _ cal
     Task {
         var result: [[String: Any]] = []
         for await verification in Transaction.unfinished {
-            guard case .verified(let transaction) = verification else { continue }
-            result.append(await serializeTransaction(transaction, jws: verification.jwsRepresentation, isFinished: false))
+            // unverified transactions are surfaced too, so the app can finish them instead of seeing them redelivered
+            result.append(await serializeVerification(verification, isFinished: false))
         }
         ctx.success(result)
     }
@@ -227,14 +225,10 @@ public func shiny_storekit_start_updates(_ callback: ShinyStoreKitUpdateCallback
 
     updatesTask = Task.detached(priority: .background) {
         for await verification in Transaction.updates {
-            guard case .verified(let transaction) = verification else {
-                continue
-            }
             let unfinished = await unfinishedTransactionIds()
-            let payload = await serializeTransaction(
-                transaction,
-                jws: verification.jwsRepresentation,
-                isFinished: !unfinished.contains(transaction.id)
+            let payload = await serializeVerification(
+                verification,
+                isFinished: !unfinished.contains(verification.unsafePayloadValue.id)
             )
             if
                 let data = try? JSONSerialization.data(withJSONObject: payload),
@@ -249,13 +243,22 @@ public func shiny_storekit_start_updates(_ callback: ShinyStoreKitUpdateCallback
 
 // MARK: - Serialization
 
-func verified<T>(_ result: VerificationResult<T>) throws -> T {
-    switch result {
-    case .verified(let value):
-        return value
+// Serializes verified and unverified transactions alike. An unverified one carries "verified": false and the reason,
+// so C# reports it as Purchase.IsVerified = false rather than StoreKit redelivering it unseen on every launch.
+func serializeVerification(_ verification: VerificationResult<Transaction>, isFinished: Bool) async -> [String: Any] {
+    var dict = await serializeTransaction(
+        verification.unsafePayloadValue,
+        jws: verification.jwsRepresentation,
+        isFinished: isFinished
+    )
+    switch verification {
+    case .verified:
+        dict["verified"] = true
     case .unverified(_, let error):
-        throw error
+        dict["verified"] = false
+        dict["verificationError"] = "\(error.localizedDescription) (VerificationError.\(error))"
     }
+    return dict
 }
 
 

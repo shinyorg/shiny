@@ -8,16 +8,23 @@ namespace Shiny.Data.Sync.Tests;
 
 public class OperationCoalescerTests
 {
-    static SyncOperation Op(string entityId, SyncVerb verb, string? payload = null, int orderTicks = 0)
+    static SyncOperation Op(
+        string entityId,
+        SyncVerb verb,
+        string? payload = null,
+        int orderTicks = 0,
+        int attempts = 0,
+        SyncOperationState state = SyncOperationState.Pending
+    )
         => new(
             Identifier: $"op-{entityId}-{verb}-{orderTicks}",
             EndpointKey: "Endpoint",
             EntityIdentifier: entityId,
             Verb: verb,
             Payload: payload,
-            State: SyncOperationState.Pending,
+            State: state,
             CreatedAt: new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero).AddTicks(orderTicks),
-            Attempts: 0,
+            Attempts: attempts,
             LastError: null
         );
 
@@ -82,7 +89,7 @@ public class OperationCoalescerTests
     {
         var input = new List<SyncOperation>
         {
-            Op("a", SyncVerb.Create, "{\"v\":1}", orderTicks: 1),
+            Op("a", SyncVerb.Create, "{\"v\":1}", orderTicks: 1, attempts: 1),
             Op("a", SyncVerb.Update, "{\"v\":2}", orderTicks: 2),
             Op("a", SyncVerb.Delete, payload: null, orderTicks: 3)
         };
@@ -154,7 +161,7 @@ public class OperationCoalescerTests
     {
         var input = new List<SyncOperation>
         {
-            Op("a", SyncVerb.Create, "{}", orderTicks: 1),
+            Op("a", SyncVerb.Create, "{}", orderTicks: 1, attempts: 1),
             Op("a", SyncVerb.Delete, payload: null, orderTicks: 2),
             Op("b", SyncVerb.Update, "{}", orderTicks: 3),
             Op("b", SyncVerb.Delete, payload: null, orderTicks: 4)
@@ -164,5 +171,106 @@ public class OperationCoalescerTests
 
         Assert.Equal(2, result.Count);
         Assert.All(result, op => Assert.Equal(SyncVerb.Delete, op.Verb));
+    }
+
+
+    [Fact]
+    public void UnsentCreatePlusDelete_DropsBoth()
+    {
+        var input = new List<SyncOperation>
+        {
+            Op("a", SyncVerb.Create, "{}", orderTicks: 1),
+            Op("a", SyncVerb.Delete, payload: null, orderTicks: 2)
+        };
+
+        var result = OperationCoalescer.Coalesce(input);
+
+        Assert.Empty(result);
+    }
+
+
+    [Fact]
+    public void UnsentCreateUpdateDelete_DropsAll()
+    {
+        var input = new List<SyncOperation>
+        {
+            Op("a", SyncVerb.Create, "{\"v\":1}", orderTicks: 1),
+            Op("a", SyncVerb.Update, "{\"v\":2}", orderTicks: 2),
+            Op("a", SyncVerb.Delete, payload: null, orderTicks: 3),
+            Op("b", SyncVerb.Update, "{}", orderTicks: 4)
+        };
+
+        var result = OperationCoalescer.Coalesce(input);
+
+        var only = Assert.Single(result);
+        Assert.Equal("b", only.EntityIdentifier);
+    }
+
+
+    [Fact]
+    public void AttemptedCreatePlusDelete_KeepsDelete()
+    {
+        // the Create may have reached the server (a timeout can't tell) - the DELETE still has to go
+        var input = new List<SyncOperation>
+        {
+            Op("a", SyncVerb.Create, "{}", orderTicks: 1, attempts: 1),
+            Op("a", SyncVerb.Delete, payload: null, orderTicks: 2)
+        };
+
+        var result = OperationCoalescer.Coalesce(input);
+
+        var only = Assert.Single(result);
+        Assert.Equal(SyncVerb.Delete, only.Verb);
+        Assert.Equal(input[0].Identifier, only.Identifier);
+    }
+
+
+    [Fact]
+    public void InProgressCreatePlusDelete_KeepsDelete()
+    {
+        var input = new List<SyncOperation>
+        {
+            Op("a", SyncVerb.Create, "{}", orderTicks: 1, state: SyncOperationState.InProgress),
+            Op("a", SyncVerb.Delete, payload: null, orderTicks: 2)
+        };
+
+        var result = OperationCoalescer.Coalesce(input);
+
+        Assert.Equal(SyncVerb.Delete, Assert.Single(result).Verb);
+    }
+
+
+    [Fact]
+    public void DeleteCreateDelete_KeepsDelete()
+    {
+        // the first Delete targets an entity the server has - re-creating and deleting it again must not cancel that
+        var input = new List<SyncOperation>
+        {
+            Op("a", SyncVerb.Delete, payload: null, orderTicks: 1),
+            Op("a", SyncVerb.Create, "{}", orderTicks: 2),
+            Op("a", SyncVerb.Delete, payload: null, orderTicks: 3)
+        };
+
+        var result = OperationCoalescer.Coalesce(input);
+
+        Assert.Equal(SyncVerb.Delete, Assert.Single(result).Verb);
+    }
+
+
+    [Fact]
+    public void UnsentCreateDeleteCreate_SendsSecondCreate()
+    {
+        var input = new List<SyncOperation>
+        {
+            Op("a", SyncVerb.Create, "{\"v\":1}", orderTicks: 1),
+            Op("a", SyncVerb.Delete, payload: null, orderTicks: 2),
+            Op("a", SyncVerb.Create, "{\"v\":2}", orderTicks: 3)
+        };
+
+        var result = OperationCoalescer.Coalesce(input);
+
+        var only = Assert.Single(result);
+        Assert.Equal(SyncVerb.Create, only.Verb);
+        Assert.Equal("{\"v\":2}", only.Payload);
     }
 }

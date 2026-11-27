@@ -51,12 +51,18 @@ public interface IDataSyncDelegate
 /// <param name="Entity">The deserialized entity, or null if deserialization failed.</param>
 /// <param name="RawPayload">The raw JSON payload as returned by the server.</param>
 /// <param name="Verb">The verb the server reported (Create/Update/Delete).</param>
+/// <param name="EntityIdentifier">
+/// The identifier of the entity the delta applies to. Always set for tombstones (where
+/// <paramref name="Entity"/> is null and the id is the only thing identifying the deleted row);
+/// set from the pull item / local operation otherwise.
+/// </param>
 public record SyncReceivedItem(
     string EndpointKey,
     Type EntityType,
     object? Entity,
     string RawPayload,
-    SyncVerb Verb
+    SyncVerb Verb,
+    string? EntityIdentifier = null
 );
 
 

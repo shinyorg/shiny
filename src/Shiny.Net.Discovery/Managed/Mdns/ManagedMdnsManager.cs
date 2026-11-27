@@ -50,7 +50,10 @@ sealed class ManagedMdnsManager : IMdnsManager, IDisposable
         ServiceTypeParser.ValidateInstanceName(instanceName);
         var window = timeout ?? defaultResolveTimeout;
 
-        var config = new MdnsBrowseConfig(serviceType) { ResolveTimeout = window };
+        // the browse's resolve deadline runs from when the instance is first seen, which is always after
+        // the call started - so it has to fall inside the window, or the partial-result fallback below
+        // is cancelled before the browse ever emits it
+        var config = new MdnsBrowseConfig(serviceType) { ResolveTimeout = TimeSpan.FromTicks(window.Ticks * 3 / 4) };
         MdnsService? unresolved = null;
 
         using var cancel = CancellationTokenSource.CreateLinkedTokenSource(ct);

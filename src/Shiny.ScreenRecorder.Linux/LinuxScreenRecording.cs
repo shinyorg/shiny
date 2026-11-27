@@ -33,6 +33,7 @@ partial class LinuxScreenRecording : AbstractScreenRecording
     readonly StringBuilder errorOutput = new();
 
     Process? process;
+    int exitReported;
 
 
     public LinuxScreenRecording(
@@ -79,9 +80,6 @@ partial class LinuxScreenRecording : AbstractScreenRecording
         this.process = Process.Start(info)
             ?? throw new ScreenRecorderException($"Could not start the encoder - {this.command.FileName}");
 
-        this.process.EnableRaisingEvents = true;
-        this.process.Exited += this.OnProcessExited;
-
         // both encoders write everything to stderr; keeping it means an unusable recording can say
         // why instead of just reporting a missing file
         this.process.ErrorDataReceived += (_, e) =>
@@ -96,15 +94,29 @@ partial class LinuxScreenRecording : AbstractScreenRecording
         // an encoder that fails on its arguments dies within milliseconds, and reporting that here
         // is far clearer than returning a session that produces an empty file
         if (this.process.WaitForExit(500))
-            throw new ScreenRecorderException($"The encoder exited immediately - {this.ReadErrorOutput()}");
+        {
+            var error = this.ReadErrorOutput();
+            this.process.Dispose();
+            this.process = null;
+            throw new ScreenRecorderException($"The encoder exited immediately - {error}");
+        }
 
+        // subscribed only now: an exit inside the check above is a failed start, reported by the
+        // throw, not a fault on a session the caller never received
+        this.process.EnableRaisingEvents = true;
+        this.process.Exited += this.OnProcessExited;
         this.BeginClock();
+
+        // an exit between the check and the subscription would otherwise go unnoticed
+        if (this.process.HasExited)
+            this.OnProcessExited(this, EventArgs.Empty);
     }
 
 
     void OnProcessExited(object? sender, EventArgs e)
     {
-        if (this.IsFinished)
+        // both the Exited event and the post-subscription check can report the same exit
+        if (this.IsFinished || Interlocked.Exchange(ref this.exitReported, 1) == 1)
             return;
 
         this.OnPlatformStopped(
@@ -161,14 +173,14 @@ partial class LinuxScreenRecording : AbstractScreenRecording
 
         running.Exited -= this.OnProcessExited;
 
-        if (running.HasExited)
-            return running.ExitCode == 0;
-
-        if (kill(running.Id, SIGINT) != 0)
-            this.Logger.SignalFailed(Marshal.GetLastPInvokeError());
-
         try
         {
+            if (running.HasExited)
+                return running.ExitCode == 0;
+
+            if (kill(running.Id, SIGINT) != 0)
+                this.Logger.SignalFailed(Marshal.GetLastPInvokeError());
+
             // flushing and writing the index on a long recording is not instant
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             await running.WaitForExitAsync(timeout.Token).ConfigureAwait(false);

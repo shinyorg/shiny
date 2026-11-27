@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -92,13 +93,26 @@ public class JobManager(
 
                 task.ExpirationHandler = () =>
                 {
-                    cancelSrc.Cancel();
+                    // the work may already have completed (and disposed the source) when iOS expires us
+                    if (Volatile.Read(ref completed) == 0)
+                    {
+                        try
+                        {
+                            cancelSrc.Cancel();
+                        }
+                        catch (ObjectDisposedException) { }
+                    }
                     Complete(false);
                 };
 
                 try
                 {
                     var jobs = this.GetJobsByCategory(task.Identifier);
+
+                    // a BGProcessingTaskRequest fires once - submit the next one now, or this category never runs
+                    // again until the next cold launch (Start) when iOS ran it inside a still-living process
+                    this.Reschedule(jobs);
+
                     foreach (var job in jobs)
                         await this.RunJob(job, cancelSrc.Token).ConfigureAwait(false);
 
@@ -111,6 +125,22 @@ public class JobManager(
                 }
             }
         );
+    }
+
+
+    void Reschedule(IList<JobRegistration> jobs)
+    {
+        foreach (var reg in jobs)
+        {
+            try
+            {
+                this.ScheduleNative(reg);
+            }
+            catch (Exception ex)
+            {
+                this.Log.LogWarning(ex, "Could not reschedule background job '{JobType}'", reg.JobType.FullName);
+            }
+        }
     }
 
 

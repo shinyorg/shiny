@@ -245,7 +245,7 @@ public class MyWearableDelegate : WearableDelegate
 
 - **Reply semantics:** delegates are asked in turn; **the first non-null reply wins**; a throwing delegate is logged and skipped; with no answer the watch gets an empty reply. `message.ExpectsReply` is false when the sender used a fire-and-forget send - the return value is discarded.
 - All other callbacks run on every registered delegate.
-- On Wear OS, `OnTransferCompleted` fires when the receiver deletes the data item (the delivery receipt), so `result.Path` is empty - track by `Id`.
+- On Wear OS, `OnTransferCompleted` fires when the receiver deletes the data item (the delivery receipt), so `result.Path` is empty - track by `Id`. A transfer you cancel with `CancelTransfer` does not raise it.
 
 ### Companion apps (wire format - `WearableProtocol`)
 

@@ -106,9 +106,9 @@ class GameCenterStateStore(string filePath)
             using var stream = File.OpenRead(filePath);
             return JsonSerializer.Deserialize(stream, GameCenterStateContext.Default.GameCenterState) ?? new GameCenterState();
         }
-        catch (JsonException)
+        catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
         {
-            // a corrupt file must not stop the game - start clean
+            // a corrupt or unreadable file must not stop the game - start clean
             return new GameCenterState();
         }
     }

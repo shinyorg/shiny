@@ -15,7 +15,7 @@ public class PushManager(
     [FromKeyedServices(StoreKeys.Default)] IKeyValueStore store,
     ILogger<PushManager> logger,
     IPushProvider? provider = null
-) : IPushManager
+) : IPushManager, IShinyStartupTask
 {
     readonly IServiceProvider services = services;
     readonly IKeyValueStore store = store;
@@ -55,6 +55,25 @@ public class PushManager(
                 this.store.SetOrRemove(Key(nameof(NativeRegistrationToken)), value);
             }
         }
+    }
+
+
+    /// <summary>
+    /// The push channel lives only as long as the process, and WNS channel URIs expire - so a device that was registered
+    /// opens its channel again at startup, which also hands a changed URI to the provider and OnNewToken.
+    /// </summary>
+    public void Start()
+    {
+        if (this.RegistrationToken.IsEmpty())
+            return;
+
+        this.RequestAccess().ContinueWith(x =>
+        {
+            if (x.Exception != null)
+                this.logger.LogWarning(x.Exception, "Failed to restart push");
+            else if (x.Result.Status != AccessState.Available)
+                this.logger.LogWarning("Push could not be restarted - " + x.Result.Status);
+        });
     }
 
 

@@ -124,24 +124,38 @@ public abstract class AbstractJobManager(
     /// <summary>
     /// Gets all registrations matching a background task category identifier
     /// </summary>
-    internal IList<JobRegistration> GetJobsByCategory(string categoryId)
+    /// <param name="categoryId">The category identifier from <see cref="GetCategoryId"/></param>
+    /// <param name="separateUnmetered">
+    /// True where the OS scheduler can require an unmetered network (Android WorkManager) - unmetered jobs then
+    /// live in their own "unmetered" categories instead of the "net" ones. Apple has no unmetered constraint and
+    /// a fixed set of permitted identifiers, so it keeps unmetered jobs in "net".
+    /// </param>
+    internal IList<JobRegistration> GetJobsByCategory(string categoryId, bool separateUnmetered = false)
     {
         return categoryId switch
         {
-            "com.shiny.job" => registrar.Jobs.Values
+            CategoryPrefix => registrar.Jobs.Values
                 .Where(x => !x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.None)
                 .ToList(),
 
-            "com.shiny.jobpower" => registrar.Jobs.Values
+            CategoryPrefix + "power" => registrar.Jobs.Values
                 .Where(x => x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.None)
                 .ToList(),
 
-            "com.shiny.jobnet" => registrar.Jobs.Values
-                .Where(x => !x.DeviceCharging && x.RequiredInternetAccess != InternetAccess.None)
+            CategoryPrefix + "net" => registrar.Jobs.Values
+                .Where(x => !x.DeviceCharging && IsNetCategory(x, separateUnmetered))
                 .ToList(),
 
-            "com.shiny.jobpowernet" => registrar.Jobs.Values
-                .Where(x => x.DeviceCharging && x.RequiredInternetAccess != InternetAccess.None)
+            CategoryPrefix + "powernet" => registrar.Jobs.Values
+                .Where(x => x.DeviceCharging && IsNetCategory(x, separateUnmetered))
+                .ToList(),
+
+            CategoryPrefix + "unmetered" => registrar.Jobs.Values
+                .Where(x => separateUnmetered && !x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.Unmetered)
+                .ToList(),
+
+            CategoryPrefix + "powerunmetered" => registrar.Jobs.Values
+                .Where(x => separateUnmetered && x.DeviceCharging && x.RequiredInternetAccess == InternetAccess.Unmetered)
                 .ToList(),
 
             _ => new List<JobRegistration>()
@@ -149,15 +163,29 @@ public abstract class AbstractJobManager(
     }
 
 
+    static bool IsNetCategory(JobRegistration reg, bool separateUnmetered) => separateUnmetered
+        ? reg.RequiredInternetAccess == InternetAccess.Any
+        : reg.RequiredInternetAccess != InternetAccess.None;
+
+
+    const string CategoryPrefix = "com.shiny.job";
+
     internal static string GetCategoryId(bool extPower, bool network)
     {
-        var id = "com.shiny.job";
+        var id = CategoryPrefix;
         if (extPower)
             id += "power";
         if (network)
             id += "net";
         return id;
     }
+
+
+    /// <summary>
+    /// The unmetered variant of <see cref="GetCategoryId"/> - only used with <c>separateUnmetered</c>.
+    /// </summary>
+    internal static string GetUnmeteredCategoryId(bool extPower)
+        => CategoryPrefix + (extPower ? "power" : String.Empty) + "unmetered";
 
 
     /// <summary>

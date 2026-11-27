@@ -16,6 +16,7 @@ public class ManagerTests : IDisposable
         .AddAchievement("first_win", appleId: "apple.first", googleId: "g_first")
         .AddAchievement("ten_games", appleId: "apple.ten", googleId: "g_ten", totalSteps: 10)
         .AddAchievement("apple_only", appleId: "apple.only")
+        .AddAchievement("many_games", googleId: "g_many", totalSteps: 1000)
         .AddLeaderboard("high", appleId: "apple.high", googleId: "g_high");
 
 
@@ -93,6 +94,28 @@ public class ManagerTests : IDisposable
 
         Assert.Equal([("g_ten", 5, 10), ("g_ten", 7, 10)], this.provider.Progress);
         Assert.Equal(1, this.provider.LoadCount); // synced once per sign-in
+    }
+
+
+    [Fact]
+    public async Task Increment_Concurrent_CountsEveryCall()
+    {
+        this.provider.Remote.Add(new PlatformAchievement("g_many", null, null, 0, 1000, null, false, false));
+        var manager = await SignedIn(this.Create(), this.provider, Alice);
+
+        // every increment waits on the first sync, then they all resume on the thread pool at once
+        this.provider.LoadGate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var calls = Enumerable.Range(0, 50)
+            .Select(_ => Task.Run(() => manager.IncrementAsync("many_games")))
+            .ToList();
+
+        this.provider.LoadGate.SetResult();
+        await Task.WhenAll(calls);
+        await manager.FlushAsync();
+
+        var achievement = Assert.Single(await manager.GetAchievementsAsync(), x => x.Key == "many_games");
+        Assert.Equal(50, achievement.CurrentSteps);
+        Assert.Equal(50, this.provider.Progress.Where(x => x.Id == "g_many").Max(x => x.Steps));
     }
 
 

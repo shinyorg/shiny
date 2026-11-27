@@ -53,7 +53,16 @@ internal sealed class PortalRequestWatcher : IAsyncDisposable
                 if (notification.IsCompletion)
                     return;
 
-                ((PortalRequestWatcher)notification.State!).Dispatch(notification.Value);
+                // and so must the parsing: the rule matches every Request.Response on the bus, not
+                // only ours, and one malformed body must not end the session
+                try
+                {
+                    ((PortalRequestWatcher)notification.State!).Dispatch(notification.Value);
+                }
+                catch (Exception)
+                {
+                    // not a response this client can use - a real one for us still arrives
+                }
             },
             emitOnCapturedContext: false,
             ObserverFlags.None,

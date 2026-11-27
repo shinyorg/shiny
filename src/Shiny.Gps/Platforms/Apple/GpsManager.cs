@@ -200,11 +200,18 @@ public class GpsManager(
                         else
                             currentAccess = AccessState.Denied;
                     }
+                    else if (diag.AuthorizationDenied)
+                    {
+                        currentAccess = AccessState.Denied;
+                    }
+                    else if (diag.AuthorizationRestricted || (request.RequestPreciseAccuracy && diag.FullAccuracyDenied))
+                    {
+                        // a device restriction, or reduced accuracy when precise was asked for
+                        currentAccess = AccessState.Restricted;
+                    }
                     else
                     {
-                        currentAccess = diag.AuthorizationDenied
-                            ? AccessState.Denied
-                            : AccessState.Available;
+                        currentAccess = AccessState.Available;
                     }
 
                     tcs.TrySetResult(currentAccess);
@@ -242,6 +249,7 @@ public class GpsManager(
 
 
     GpsReading? lastReading;
+    GpsReading? lastDelivered; // the last reading that passed DistanceFilterMeters in this listener
     public Task<GpsReading?> GetLastReading(TimeSpan? timeout = null)
     {
         if (this.lastReading != null)
@@ -283,34 +291,53 @@ public class GpsManager(
             new DispatchQueue("shinygps"),
             async update =>
             {
-                if (update.Location == null || this.updater == null)
-                    return;
+                // runs on a dispatch queue as an async void - anything that escapes takes the process down
+                try
+                {
+                    if (update.Location == null || this.updater == null)
+                        return;
 
-                var epochTimestamp = Convert.ToInt64(update.Location.Timestamp.SecondsSince1970);
-                var timestamp = DateTimeOffset.FromUnixTimeSeconds(epochTimestamp);
+                    var epochTimestamp = Convert.ToInt64(update.Location.Timestamp.SecondsSince1970);
+                    var timestamp = DateTimeOffset.FromUnixTimeSeconds(epochTimestamp);
 
-                // update.Location.Floor.Level
-                var reading = new GpsReading(
-                    update.Location.Coordinate.FromNative(),
-                    update.Location.HorizontalAccuracy,
-                    timestamp,
-                    update.Location.Course,
-                    update.Location.VerticalAccuracy,
-                    update.Location.Altitude,
-                    update.Location.Speed,
-                    update.Location.SpeedAccuracy,
-                    update.Location.Floor?.Level.ToInt32() ?? 0,
-                    update.Stationary
-                );
-                this.lastReading = reading;
-                this.GpsReadingReceived?.Invoke(this, reading);
+                    // update.Location.Floor.Level
+                    var reading = new GpsReading(
+                        update.Location.Coordinate.FromNative(),
+                        update.Location.HorizontalAccuracy,
+                        timestamp,
+                        update.Location.Course,
+                        update.Location.VerticalAccuracy,
+                        update.Location.Altitude,
+                        update.Location.Speed,
+                        update.Location.SpeedAccuracy,
+                        update.Location.Floor?.Level.ToInt32() ?? 0,
+                        update.Stationary
+                    );
 
-                await services
-                    .RunDelegates<IGpsDelegate>(
-                        x => x.OnReading(reading),
-                        logger
-                    )
-                    .ConfigureAwait(false);
+                    // CLLocationUpdater has no distance filter of its own, so DistanceFilterMeters is applied here
+                    var last = this.lastDelivered;
+                    var filtered = appleRequest.DistanceFilterMeters > 0 &&
+                                   last != null &&
+                                   last.Position.GetDistanceTo(reading.Position).TotalMeters < appleRequest.DistanceFilterMeters;
+
+                    if (!filtered)
+                    {
+                        this.lastReading = reading;
+                        this.lastDelivered = reading;
+                        this.GpsReadingReceived?.Invoke(this, reading);
+
+                        await services
+                            .RunDelegates<IGpsDelegate>(
+                                x => x.OnReading(reading),
+                                logger
+                            )
+                            .ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error processing GPS reading");
+                }
             }
         );
         this.updater!.Resume();
@@ -322,6 +349,7 @@ public class GpsManager(
     {
         this.updater?.Invalidate();
         this.updater = null;
+        this.lastDelivered = null;
 
         this.bgSession?.Invalidate();
         this.bgSession = null;

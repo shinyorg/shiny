@@ -71,27 +71,40 @@ public class PushManager(
         if (this.RegistrationToken.IsEmpty())
             return;
 
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        this.RequestAccess(cts.Token)
-            .ContinueWith(x =>
+        _ = this.RestartAsync();
+    }
+
+
+    async Task RestartAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var result = await this.RequestAccess(cts.Token).ConfigureAwait(false);
+
+            if (result.Status == AccessState.Available)
             {
-                if (x.IsCanceled)
-                {
-                    logger.LogWarning("Push auto-start timed out - ensure AppDelegate push hooks are wired");
-                }
-                else if (x.Exception != null)
-                {
-                    logger.LogWarning(x.Exception, "Failed to auto start push");
-                }
-                else if (x.Result.Status != AccessState.Available)
-                {
-                    logger.LogInformation("User has removed push notification access - " + x.Result.Status);
-                }
-                else
-                {
-                    logger.LogInformation("PushManager still has user permissions");
-                }
-            });
+                logger.LogInformation("PushManager still has user permissions");
+            }
+            else if (result.Status == AccessState.Denied && await this.GetCurrentAccess().ConfigureAwait(false) == AccessState.Denied)
+            {
+                // only a definitive denial unregisters - a timeout, failure or any other state keeps the registration
+                logger.LogInformation("User has removed push notification access - unregistering");
+                await this.UnRegister().ConfigureAwait(false);
+            }
+            else
+            {
+                logger.LogInformation("Push notification access is not available - " + result.Status);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("Push auto-start timed out - ensure AppDelegate push hooks are wired");
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to auto start push");
+        }
     }
 
 
@@ -276,6 +289,11 @@ public class PushManager(
 
         var native = launchOptions[key] as NSDictionary;
         if (native == null)
+            return;
+
+        // With Shiny's UNUserNotificationCenter delegate installed, the launching tap also reaches
+        // OnDidReceiveNotificationResponse - raising OnEntry here as well would run it twice
+        if (UNUserNotificationCenter.Current.Delegate is ShinyUNUserNotificationCenterDelegate)
             return;
 
         logger.LogDebug("App entry remote notification detected");

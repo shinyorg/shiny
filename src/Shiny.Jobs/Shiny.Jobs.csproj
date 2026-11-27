@@ -13,6 +13,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <InternalsVisibleTo Include="Shiny.Jobs.Tests" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('android'))">

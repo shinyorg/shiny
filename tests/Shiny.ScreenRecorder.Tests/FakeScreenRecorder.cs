@@ -73,9 +73,16 @@ internal sealed class FakeScreenRecording(
     }
 
 
+    /// <summary>Set to make the stop fail, the way an encoder that never finalised would.</summary>
+    public Exception? StopFailure { get; set; }
+
+
     protected override Task<ScreenRecordingResult> OnStop(CancellationToken ct)
     {
         this.StopCount++;
+
+        if (this.StopFailure != null)
+            throw this.StopFailure;
 
         return Task.FromResult(new ScreenRecordingResult
         {

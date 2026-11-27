@@ -21,10 +21,19 @@ public class Contact
             if (!string.IsNullOrWhiteSpace(displayName))
                 return displayName;
 
-            if (!string.IsNullOrWhiteSpace(GivenName) && !string.IsNullOrWhiteSpace(FamilyName))
+            var hasGiven = !string.IsNullOrWhiteSpace(GivenName);
+            var hasFamily = !string.IsNullOrWhiteSpace(FamilyName);
+            if (hasGiven && hasFamily)
                 return $"{GivenName} {FamilyName}";
 
-            return GivenName ?? FamilyName ?? Organization?.Company ?? string.Empty;
+            // platforms hand back empty strings (not null) for unset names, so test for content
+            if (hasGiven)
+                return GivenName!;
+
+            if (hasFamily)
+                return FamilyName!;
+
+            return string.IsNullOrWhiteSpace(Organization?.Company) ? string.Empty : Organization!.Company!;
         }
         set => displayName = value;
     }

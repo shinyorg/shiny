@@ -42,11 +42,10 @@ class WindowsScreenRecording : AbstractScreenRecording
     MediaStreamSourceSampleRequest? pendingRequest;
     MediaStreamSourceSampleRequestDeferral? pendingDeferral;
 
-    TimeSpan startTime = TimeSpan.MinValue;
-    TimeSpan pausedTotal = TimeSpan.Zero;
-    TimeSpan pauseStartedAt = TimeSpan.MinValue;
+    // in TimeSpan ticks, on the capture's SystemRelativeTime clock
+    readonly PauseTimeline timeline = new();
+    long startTicks = -1;
     TimeSpan lastTimestamp = TimeSpan.Zero;
-    bool paused;
     bool ended;
 
 
@@ -176,27 +175,22 @@ class WindowsScreenRecording : AbstractScreenRecording
             if (this.ended)
                 return;
 
-            if (this.startTime == TimeSpan.MinValue)
-                this.startTime = frame.SystemRelativeTime;
+            var raw = frame.SystemRelativeTime.Ticks;
+            if (this.startTicks < 0)
+                this.startTicks = raw;
 
-            if (this.paused)
-            {
-                // remember where the pause began so Resume knows how much to discount
-                if (this.pauseStartedAt == TimeSpan.MinValue)
-                    this.pauseStartedAt = frame.SystemRelativeTime;
-
+            // paused frames are dropped here, and the span is taken out of every later timestamp
+            // once the first frame after resume arrives - see PauseTimeline
+            if (!this.timeline.TryMap(raw, out var mapped))
                 return;
-            }
 
             // nothing is waiting for a frame, so this one is dropped rather than queued - the
             // encoder is behind and buffering would only make it further behind
             if (this.pendingRequest == null)
                 return;
 
-            timestamp = frame.SystemRelativeTime - this.startTime - this.pausedTotal;
-            if (timestamp < TimeSpan.Zero)
-                timestamp = TimeSpan.Zero;
-
+            this.timeline.Commit(raw, mapped);
+            timestamp = TimeSpan.FromTicks(Math.Max(0, mapped - this.startTicks));
             this.lastTimestamp = timestamp;
 
             request = this.pendingRequest;
@@ -248,10 +242,7 @@ class WindowsScreenRecording : AbstractScreenRecording
     protected override Task OnPause(CancellationToken ct)
     {
         lock (this.gate)
-        {
-            this.paused = true;
-            this.pauseStartedAt = TimeSpan.MinValue;
-        }
+            this.timeline.Pause();
 
         return Task.CompletedTask;
     }
@@ -260,23 +251,7 @@ class WindowsScreenRecording : AbstractScreenRecording
     protected override Task OnResume(CancellationToken ct)
     {
         lock (this.gate)
-        {
-            if (!this.paused)
-                return Task.CompletedTask;
-
-            this.paused = false;
-
-            if (this.pauseStartedAt != TimeSpan.MinValue)
-            {
-                // the gap runs from the first dropped frame to the last one written, measured on
-                // the capture's own clock, so the timeline closes up exactly
-                var skipped = this.pauseStartedAt - this.startTime - this.pausedTotal - this.lastTimestamp;
-                if (skipped > TimeSpan.Zero)
-                    this.pausedTotal += skipped;
-
-                this.pauseStartedAt = TimeSpan.MinValue;
-            }
-        }
+            this.timeline.Resume();
 
         return Task.CompletedTask;
     }
@@ -297,6 +272,13 @@ class WindowsScreenRecording : AbstractScreenRecording
             catch (TimeoutException)
             {
                 this.Logger.TranscodeDidNotFinish();
+            }
+            catch (OperationCanceledException)
+            {
+                // the session is already marked finished, so nothing else will ever release the
+                // frame pool, the D3D device or the output stream (which keeps the file locked)
+                this.Teardown();
+                throw;
             }
         }
 

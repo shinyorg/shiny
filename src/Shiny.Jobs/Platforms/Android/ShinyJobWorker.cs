@@ -46,7 +46,7 @@ public class ShinyJobWorker : ListenableWorker, CallbackToFutureAdapter.IResolve
                 {
                     try
                     {
-                        var jobs = jobManager.GetJobsByCategory(categoryId!);
+                        var jobs = jobManager.GetJobsByCategory(categoryId!, true);
                         foreach (var job in jobs)
                         {
                             await jobManager.RunJob(job, this.cancelSource.Token);

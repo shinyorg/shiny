@@ -22,7 +22,17 @@ public class RemoteConfigurationProvider(
         
         if (config.WaitForLoadOnStartup)
         {
-            this.LoadAsync().GetAwaiter().GetResult();
+            // Task.Run so a getData callback that captures the caller's (UI) synchronization context can't deadlock
+            // the blocking wait. A failed remote load must not fail the whole configuration build (no network on
+            // first launch, a server outage) - the cached file, when there is one, keeps serving.
+            try
+            {
+                Task.Run(() => this.LoadAsync()).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
         else
         {
@@ -52,14 +62,13 @@ public class RemoteConfigurationProvider(
     readonly SemaphoreSlim semaphore = new(1);
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
+        // there can only be one! - acquired outside the try so a cancelled wait never releases a slot it didn't take
+        await this.semaphore
+            .WaitAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         try
         {
-            // var wasWaiting = this.semaphore.CurrentCount == 0;
-            // there can only be one!
-            await this.semaphore
-                .WaitAsync(cancellationToken)
-                .ConfigureAwait(false);
-
             if (this.LastLoaded != null)
             {
                 var ts = DateTimeOffset.UtcNow.Subtract(this.LastLoaded.Value);

@@ -26,6 +26,9 @@ public class WearableManager(
 
     string? localNodeId;
 
+    // deleting our own item is also how the receiver signals delivery - a cancelled id must not be reported as delivered
+    readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> cancelledTransfers = new();
+
     DataClient Data => WearableClass.GetDataClient(platform.AppContext);
     MessageClient Messages => WearableClass.GetMessageClient(platform.AppContext);
     NodeClient Nodes => WearableClass.GetNodeClient(platform.AppContext);
@@ -220,6 +223,7 @@ public class WearableManager(
     {
         var local = await this.GetLocalNodeId(cancelToken).ConfigureAwait(false);
         var deleted = 0;
+        this.cancelledTransfers[id] = 0;
 
         foreach (var prefix in new[] { WearableProtocol.TransferPrefix, WearableProtocol.FilePrefix })
         {
@@ -231,6 +235,10 @@ public class WearableManager(
 
             deleted += count?.IntValue() ?? 0;
         }
+
+        if (deleted == 0)
+            this.cancelledTransfers.TryRemove(id, out _);
+
         return deleted > 0;
     }
 
@@ -400,6 +408,10 @@ public class WearableManager(
         {
             return;
         }
+
+        // CancelTransfer deleted it, not the receiver
+        if (this.cancelledTransfers.TryRemove(id, out _))
+            return;
 
         // The item is gone, so its path is not known here; the id is what the sender tracks.
         var result = new WearableTransferResult(id, "", kind, null);

@@ -75,7 +75,9 @@ public class ManagedBeaconScan(IBeaconRangingManager rangingManager) : IDisposab
                 .Buffer(this.BufferTime)
                 .Where(x => x.Count > 0)
                 .ObserveOnIf(scheduler)
-                .Subscribe(this.OnBeacons)
+                // without an error handler Rx rethrows on the scan thread and takes the app down - a failed
+                // ranging scan (Bluetooth switched off, access revoked) ends this scan instead
+                .Subscribe(this.OnBeacons, _ => this.Stop())
         );
 
         if (clearTime != null)

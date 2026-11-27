@@ -8,6 +8,7 @@ using Android.Content;
 using Android.Gms.Extensions;
 using Android.OS;
 using Android.Runtime;
+using AndroidX.Core.App;
 using Firebase;
 using Firebase.Messaging;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ public class PushManager(
     readonly IServiceProvider services = services;
     readonly IKeyValueStore store = store;
     readonly ILogger logger = logger;
-    readonly IPushProvider provider = pushProvider ?? new FirebasePushProvider();
+    readonly IPushProvider provider = pushProvider ?? new FirebasePushProvider(store);
     bool registrationRequest = false;
 
     static string Key(string prop) => $"Shiny.Push.PushManager.{prop}";
@@ -49,6 +50,14 @@ public class PushManager(
 
         try
         {
+            // the user turned notifications off (or revoked POST_NOTIFICATIONS on 13+) since the last session
+            if (!this.AreNotificationsEnabled())
+            {
+                this.logger.LogInformation("User has removed push notification access - unregistering");
+                await this.UnRegister().ConfigureAwait(false);
+                return;
+            }
+
             this.NativeRegistrationToken = await this.RequestNativeToken();
             var regToken = await this.provider.Register(this.NativeRegistrationToken); // never null on firebase
 
@@ -67,6 +76,13 @@ public class PushManager(
         {
             this.logger.LogWarning(ex, "There was an error restarting push services");
         }
+    }
+
+
+    bool AreNotificationsEnabled()
+    {
+        using var compat = NotificationManagerCompat.From(this.platform.AppContext)!;
+        return compat.AreNotificationsEnabled();
     }
 
 
@@ -170,6 +186,9 @@ public class PushManager(
         if (this.RegistrationToken == null)
             return;
 
+        // Start can unregister before anything in this process has touched Firebase
+        this.DoInit();
+
         await this.provider
             .UnRegister()
             .ConfigureAwait(false);
@@ -193,7 +212,13 @@ public class PushManager(
 
 
     public void ActivityOnCreate(Activity activity, Bundle? savedInstanceState)
-        => this.Handle(activity, activity.Intent);
+    {
+        // a recreated activity (rotation, process restore) or one reopened from recents still carries the intent
+        // that launched it - processing it again would run OnEntry a second time for the same tap
+        var fromHistory = activity.Intent?.Flags.HasFlag(ActivityFlags.LaunchedFromHistory) ?? false;
+        if (savedInstanceState == null && !fromHistory)
+            this.Handle(activity, activity.Intent);
+    }
 
     public void Handle(Activity activity, Intent? intent)
     {
@@ -264,20 +289,33 @@ public class PushManager(
             }
         }
 
+        // async void (Action<string>) - an exception escaping it would crash the app, so nothing may
         ShinyFirebaseService.NewToken = async token =>
         {
-            if (this.NativeRegistrationToken == token || this.registrationRequest)
-                return;
+            try
+            {
+                // not registered (never, or unregistered - FCM can mint a new token after DeleteToken): only
+                // RequestAccess registers, so a refresh must not quietly register the device again
+                if (this.RegistrationToken == null || this.NativeRegistrationToken == token || this.registrationRequest)
+                    return;
 
-            this.NativeRegistrationToken = token;
-            this.RegistrationToken = await this.provider.Register(token);
-            
-            await this.services
-                .RunDelegates<IPushDelegate>(
-                    x => x.OnNewToken(this.RegistrationToken),
-                    this.logger
-                )
-                .ConfigureAwait(false);
+                // the provider (e.g. a hub installation) is registered before the token is stored, so a failure here
+                // leaves the old native token in place and the next refresh or app start tries again
+                var regToken = await this.provider.Register(token).ConfigureAwait(false);
+                this.NativeRegistrationToken = token;
+                this.RegistrationToken = regToken;
+
+                await this.services
+                    .RunDelegates<IPushDelegate>(
+                        x => x.OnNewToken(regToken),
+                        this.logger
+                    )
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to register the refreshed push token");
+            }
         };
 
         ShinyFirebaseService.MessageReceived = async msg =>

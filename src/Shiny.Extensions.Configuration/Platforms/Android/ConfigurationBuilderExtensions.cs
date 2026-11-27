@@ -1,5 +1,4 @@
 ﻿using Android.App;
-using Java.Nio.FileNio.Attributes;
 using Shiny.Extensions.Configuration;
 using System;
 using System.Linq;
@@ -36,12 +35,14 @@ public static partial class ConfigurationBuilderExtensions
 
     static IConfigurationBuilder AddJsonAssetInternal(this IConfigurationBuilder builder, string fileName, string? environment, bool optional)
     {
+        // the base file first - the source added last wins, so the environment file has to come after it
+        builder.AddJsonAssetInternal(fileName, optional);
         if (!String.IsNullOrWhiteSpace(environment))
         {
             var newFileName = GetEnvFileName(fileName, environment);
             builder.AddJsonAssetInternal(newFileName, true);
         }
-        return builder.AddJsonAssetInternal(fileName, optional);
+        return builder;
     }
 
 
@@ -53,7 +54,7 @@ public static partial class ConfigurationBuilderExtensions
             .Any(x => x.Equals(fileName, StringComparison.InvariantCultureIgnoreCase));
 
         if (exists)
-            builder.AddJsonStream(assets.Open(fileName));
+            builder.Add(new AndroidAssetJsonConfigurationSource(fileName));
 
         else if (!optional)
             throw new InvalidOperationException($"Android Asset file '{fileName}' not found");

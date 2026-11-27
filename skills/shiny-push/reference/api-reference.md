@@ -243,7 +243,8 @@ public interface IPushDelegate
     /// Called when the registration token changes
     Task OnNewToken(string token);
 
-    /// Called when the user denies permission or UnRegister() is called
+    /// Called when UnRegister() is called, or at app start when the user has since turned notifications off
+    /// (the stored token is cleared; a later successful RequestAccess raises OnNewToken)
     Task OnUnRegistered(string token);
 }
 ```

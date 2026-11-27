@@ -25,9 +25,9 @@ public static partial class ConfigurationBuilderExtensions
     public static IConfigurationBuilder AddJsonPlatformBundle(this IConfigurationBuilder builder, string? environment = null, bool optional = true, bool addPlatformSpecific = true)
     {
 #if APPLE
-        builder.AddJsonIosBundle(environment, optional, addPlatformSpecific);
+        builder.AddJsonIosBundle(environment, optional, includePlatformSpecific: addPlatformSpecific);
 #elif ANDROID
-        builder.AddJsonAndroidAsset(environment, optional, addPlatformSpecific);
+        builder.AddJsonAndroidAsset(environment, optional, includePlatformSpecific: addPlatformSpecific);
 #endif
         return builder;
     }

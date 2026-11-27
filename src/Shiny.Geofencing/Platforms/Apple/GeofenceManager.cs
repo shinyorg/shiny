@@ -72,7 +72,15 @@ public class GeofenceManager(
     }
     
     
-    public AccessState CurrentStatus { get; private set; } = AccessState.Unknown;
+    // read live, like CLLocationGeofenceManager - it used to stay Unknown until RequestAccess or a session callback ran
+    public AccessState CurrentStatus
+    {
+        get
+        {
+            using var locationManager = new CLLocationManager();
+            return locationManager.GetCurrentStatus(true);
+        }
+    }
 
 
     public void OnForeground()
@@ -123,12 +131,8 @@ public class GeofenceManager(
                 // Callback runs on MainQueue as an Action; an unhandled throw here would terminate the app.
                 try
                 {
-                    if (diag is null || diag.AuthorizationRequestInProgress)
-                        return;
-
-                    this.CurrentStatus = (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied)
-                        ? AccessState.Denied
-                        : AccessState.Available;
+                    if (diag is { AuthorizationRequestInProgress: false } && (diag.AuthorizationDenied || diag.AlwaysAuthorizationDenied))
+                        logger.LogWarning("Always location authorization is not held - geofence events will not be delivered in the background");
                 }
                 catch (Exception ex)
                 {
@@ -147,8 +151,6 @@ public class GeofenceManager(
             .InvokeTaskOnMainThread(() => this.AuthManager.RequestAccess(true))
             .ConfigureAwait(false);
 
-        // never answered from a cache - the user can grant always in Settings at any time
-        this.CurrentStatus = status;
         return status;
     }
 
@@ -190,6 +192,7 @@ public class GeofenceManager(
     {
         this.Dwell.Remove(identifier);
         repository.Remove<GeofenceRegion>(identifier);
+        repository.Remove<GeofenceMonitorState>(identifier);
         var mon = await this.GetMonitor().ConfigureAwait(false);
         await platform.InvokeOnMainThreadAsync(() => mon.RemoveCondition(identifier)).ConfigureAwait(false);
 
@@ -203,6 +206,7 @@ public class GeofenceManager(
         this.Dwell.Clear();
         await this.DestroyMonitor().ConfigureAwait(false);
         repository.Clear<GeofenceRegion>();
+        repository.Clear<GeofenceMonitorState>();
     }
 
 
@@ -242,7 +246,10 @@ public class GeofenceManager(
             region.Radius.TotalMeters
         );
 
-        // we monitor ALL state changes for RequestState and dwell, but we only fire delegates according to flags
+        // we monitor ALL state changes for RequestState and dwell, but we only fire delegates according to flags.
+        // A new condition's first event is the state it starts in, never reported - forget any state an earlier
+        // registration under this identifier left, so nothing compares against it
+        repository.Remove<GeofenceMonitorState>(region.Identifier);
         this.initialFires.TryAdd(region.Identifier, 0);
         mon.AddCondition(condition, region.Identifier);
     }
@@ -325,12 +332,22 @@ public class GeofenceManager(
                 // re-attach) - those never reach the delegate. Dwell still uses them: an initial "inside" starts
                 // the clock for a region the device was already in, and a replayed exit still ends a stay.
                 var initial = this.initialFires.TryRemove(evt.Identifier, out _);
-                if (initial)
-                    logger.LogDebug("Geofence initial state fire suppressed for {Identifier}", evt.Identifier);
 
                 var region = repository.Get<GeofenceRegion>(evt.Identifier);
                 if (region != null)
                 {
+                    // The first event after a cold start is only swallowed when it repeats the state last handled.
+                    // When the OS relaunched the app for a crossing, that first event is the crossing - it differs
+                    // from what was persisted and is reported like any other.
+                    var inside = evt.State == CLMonitoringState.Satisfied;
+                    var last = repository.Get<GeofenceMonitorState>(evt.Identifier);
+                    if (initial && last != null && last.Inside != inside)
+                        initial = false;
+
+                    repository.Set(new GeofenceMonitorState(evt.Identifier, inside));
+                    if (initial)
+                        logger.LogDebug("Geofence initial state fire suppressed for {Identifier}", evt.Identifier);
+
                     // when CoreLocation saw the crossing, not when the app got to handle it
                     DateTimeOffset? at = evt.Date is { } date ? new DateTimeOffset((DateTime)date) : null;
 
@@ -394,3 +411,10 @@ public class GeofenceManager(
         }
     }
 }
+
+
+/// <summary>
+/// The last CLMonitor state handled for a geofence - persisted so the first event after a cold start can be told
+/// apart: a repeat of this is a replay, anything else is a crossing that happened while the app was not running.
+/// </summary>
+record GeofenceMonitorState(string Identifier, bool Inside) : IRepositoryEntity;

@@ -25,26 +25,16 @@ public static class LocationExtensions
     /// <returns></returns>
     public static async Task<GpsReading?> GetCurrentPosition(this IGpsManager gpsManager, CancellationToken cancellationToken = default)
     {
+        await currentLocSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+
         var iStarted = false;
+        var tcs = new TaskCompletionSource<GpsReading?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        EventHandler<GpsReading> handler = (_, reading) => tcs.TrySetResult(reading);
+        gpsManager.GpsReadingReceived += handler;
+
         try
         {
-            await currentLocSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-
-            var tcs = new TaskCompletionSource<GpsReading?>();
-
-            EventHandler<GpsReading> handler = null!;
-            handler = (_, reading) =>
-            {
-                gpsManager.GpsReadingReceived -= handler;
-                tcs.TrySetResult(reading);
-            };
-            gpsManager.GpsReadingReceived += handler;
-
-            cancellationToken.Register(() =>
-            {
-                gpsManager.GpsReadingReceived -= handler;
-                tcs.TrySetCanceled(cancellationToken);
-            });
+            using var registration = cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken));
 
             if (!gpsManager.IsListening())
             {
@@ -56,6 +46,9 @@ public static class LocationExtensions
         }
         finally
         {
+            // always detached - a StartListener that throws used to leave the handler on the manager for good
+            gpsManager.GpsReadingReceived -= handler;
+
             if (iStarted)
                 await gpsManager.StopListener().ConfigureAwait(false);
 

@@ -5,6 +5,7 @@ using Timer = System.Timers.Timer;
 using Microsoft.Extensions.Logging;
 using Shiny.Net;
 using Shiny.Power;
+using Shiny.Jobs.Infrastructure;
 
 namespace Shiny.Jobs;
 
@@ -28,7 +29,7 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
     }
 
 
-    readonly IBattery battery;
+    readonly IBattery? battery;
     readonly IConnectivity connectivity;
     readonly Timer timer;
     bool disposed;
@@ -37,9 +38,10 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
     public JobManager(
         IServiceProvider container,
         ILogger<IJobManager> logger,
-        IBattery battery,
         IConnectivity connectivity,
-        JobRegistrar registrar
+        JobRegistrar registrar,
+        // plain .NET on Windows / macOS has no battery API, so nothing registers IBattery there
+        IBattery? battery = null
     ) : base(container, logger, registrar)
     {
         this.battery = battery;
@@ -67,30 +69,38 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
         if (this.disposed)
             return;
 
-        this.Log.LogDebug("Starting foreground jobs");
-
-        var jobs = this.GetJobs()
-            .Where(kvp => this.CanRun(kvp.Value))
-            .ToList();
-
-        foreach (var (type, reg) in jobs)
+        // async void - anything escaping here would take the process down and the timer would never restart
+        try
         {
-            try
-            {
-                this.Log.LogDebug("Job '{JobType}' Foreground Started", type.FullName);
-                await this
-                    .RunJob(type, reg, default)
-                    .ConfigureAwait(false);
+            this.Log.LogDebug("Starting foreground jobs");
 
-                this.Log.LogDebug("Job '{JobType}' Foreground Finished Successfully", type.FullName);
-            }
-            catch (Exception ex)
+            var jobs = this.GetJobs()
+                .Where(kvp => this.CanRun(kvp.Value))
+                .ToList();
+
+            foreach (var (type, reg) in jobs)
             {
-                this.Log.LogWarning(ex, "Job '{JobType}' Foreground Error", type.FullName);
+                try
+                {
+                    this.Log.LogDebug("Job '{JobType}' Foreground Started", type.FullName);
+                    await this
+                        .RunJob(type, reg, default)
+                        .ConfigureAwait(false);
+
+                    this.Log.LogDebug("Job '{JobType}' Foreground Finished Successfully", type.FullName);
+                }
+                catch (Exception ex)
+                {
+                    this.Log.LogWarning(ex, "Job '{JobType}' Foreground Error", type.FullName);
+                }
             }
+
+            this.Log.LogDebug("Foreground jobs finished");
         }
-
-        this.Log.LogDebug("Foreground jobs finished");
+        catch (Exception ex)
+        {
+            this.Log.LogError(ex, "Error evaluating foreground jobs");
+        }
 
         if (!this.disposed)
         {
@@ -106,19 +116,19 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
         if (!reg.RunOnForeground)
             return false;
 
-        if (reg.BatteryNotLow && this.battery.Level <= 20 && !this.battery.IsPluggedIn())
+        if (!JobConstraints.HasPowerLevel(reg, this.battery))
         {
             this.Log.LogDebug("Job '{JobType}' won't run because of insufficient power level", reg.JobType.FullName);
             return false;
         }
 
-        if (!this.HasReqInternet(reg))
+        if (!JobConstraints.HasReqInternet(reg, this.connectivity))
         {
             this.Log.LogDebug("Job '{JobType}' won't run because of insufficient internet requirement", reg.JobType.FullName);
             return false;
         }
 
-        if (reg.DeviceCharging && !this.battery.IsPluggedIn())
+        if (!JobConstraints.HasChargeStatus(reg, this.battery))
         {
             this.Log.LogDebug("Job '{JobType}' won't run because of insufficient charge status", reg.JobType.FullName);
             return false;
@@ -126,15 +136,6 @@ public class JobManager : AbstractJobManager, IShinyStartupTask, IDisposable
 
         return true;
     }
-
-
-    bool HasReqInternet(JobRegistration reg) => reg.RequiredInternetAccess switch
-    {
-        InternetAccess.Any => this.connectivity.IsInternetAvailable(true),
-        InternetAccess.Unmetered => this.connectivity.IsInternetAvailable(false),
-        InternetAccess.None => true,
-        _ => false
-    };
 
 
     public void Dispose()

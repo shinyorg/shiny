@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
@@ -40,17 +41,29 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
             new UnboundedChannelOptions { SingleReader = true, SingleWriter = false }
         );
 
+        // Bumped on every found and lost for a name. A resolve that finishes after its instance was lost
+        // (or found again) is stale, and emitting it would resurrect a service the caller saw go away.
+        var generations = new ConcurrentDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
         var listener = new NsdDiscoveryListener(
-            found => _ = this.OnServiceFound(found, serviceType, config, channel, ct),
-            lost => channel.Writer.TryWrite(new MdnsBrowseResult(
-                MdnsBrowseStatus.Lost,
-                new MdnsService
-                {
-                    InstanceName = lost.ServiceName ?? String.Empty,
-                    ServiceType = serviceType.ServiceType,
-                    Domain = serviceType.Domain
-                }
-            )),
+            found =>
+            {
+                var generation = generations.AddOrUpdate(found.ServiceName ?? String.Empty, 1, (_, x) => x + 1);
+                _ = this.OnServiceFound(found, serviceType, config, channel, generations, generation, ct);
+            },
+            lost =>
+            {
+                generations.AddOrUpdate(lost.ServiceName ?? String.Empty, 1, (_, x) => x + 1);
+                channel.Writer.TryWrite(new MdnsBrowseResult(
+                    MdnsBrowseStatus.Lost,
+                    new MdnsService
+                    {
+                        InstanceName = lost.ServiceName ?? String.Empty,
+                        ServiceType = serviceType.ServiceType,
+                        Domain = serviceType.Domain
+                    }
+                ));
+            },
             (type, error) => channel.Writer.TryComplete(new MdnsException(
                 $"NsdManager refused to browse '{type}' - {error}"
             ))
@@ -83,6 +96,8 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
         ServiceTypeInfo serviceType,
         MdnsBrowseConfig config,
         Channel<MdnsBrowseResult> channel,
+        ConcurrentDictionary<string, int> generations,
+        int generation,
         CancellationToken ct
     )
     {
@@ -92,7 +107,11 @@ public class AndroidMdnsManager(ILogger<AndroidMdnsManager> logger) : IMdnsManag
                 ? await this.ResolveNative(info, config.ResolveTimeout, ct).ConfigureAwait(false) ?? info
                 : info;
 
-            channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, Convert(final, serviceType)));
+            var isCurrent = generations.TryGetValue(info.ServiceName ?? String.Empty, out var latest) && latest == generation;
+            if (isCurrent)
+                channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, Convert(final, serviceType)));
+            else
+                logger.LogDebug("Dropped a stale resolve of {Name} - it was lost or found again while resolving", info.ServiceName);
         }
         catch (OperationCanceledException)
         {

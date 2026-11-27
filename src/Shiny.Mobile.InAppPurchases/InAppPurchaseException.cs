@@ -23,7 +23,10 @@ public enum InAppPurchaseErrorCode
     /// <summary>Invalid arguments supplied by the app (Google DEVELOPER_ERROR, Apple invalid offer)</summary>
     DeveloperError,
 
-    /// <summary>The store signature on the transaction could not be verified on device</summary>
+    /// <summary>
+    /// The store signature could not be verified on device. Transactions that fail StoreKit verification are not thrown -
+    /// they are reported as a <see cref="Purchase"/> with <see cref="Purchase.IsVerified"/> false.
+    /// </summary>
     VerificationFailed,
 
     /// <summary>No foreground activity/window scene is available to present the purchase UI</summary>

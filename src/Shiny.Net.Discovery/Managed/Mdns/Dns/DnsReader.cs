@@ -12,6 +12,12 @@ sealed class DnsReader(byte[] data)
     /// <summary>A malformed packet can point at itself - bail out well before stack/CPU damage.</summary>
     const int MaxPointerJumps = 64;
 
+    /// <summary>
+    /// RFC 1035 section 3.1 - a name is at most 255 bytes on the wire. Without this a few pointers
+    /// looping over a long run of labels turn one small packet into millions of decoded strings.
+    /// </summary>
+    const int MaxNameLength = 255;
+
     public int Position { get; set; }
 
     public int Length => data.Length;
@@ -58,6 +64,7 @@ sealed class DnsReader(byte[] data)
         var labels = new List<string>();
         var current = this.Position;
         var jumps = 0;
+        var nameLength = 1; // the terminating zero
         int? resume = null;
 
         while (true)
@@ -88,6 +95,10 @@ sealed class DnsReader(byte[] data)
             {
                 if (current + 1 + length > data.Length)
                     throw new DnsFormatException("A label ran past the end of the packet.");
+
+                nameLength += 1 + length;
+                if (nameLength > MaxNameLength)
+                    throw new DnsFormatException($"The name is longer than the {MaxNameLength} bytes DNS allows.");
 
                 labels.Add(Encoding.UTF8.GetString(data, current + 1, length));
                 current += 1 + length;

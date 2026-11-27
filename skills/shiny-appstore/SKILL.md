@@ -107,7 +107,7 @@ public record AppStoreResult(
 | iOS / Mac Catalyst | iTunes Search API - every `AppStoreResult` field | StoreKit `AppStore.RequestReview` (16+) / `SKStoreReviewController` |
 | macOS (AppKit) | iTunes Search API, `entity=macSoftware`; `macappstore://` links | `AppStore.RequestReview` on the key window (macOS 14+) |
 | Android | Google Play page scrape - version and `NeedsUpdate` only | Play in-app review flow (needs a current activity) |
-| Windows | Microsoft Store DisplayCatalog - version, description as release notes, release date | `StoreContext.RequestRateAndReviewAppAsync` |
+| Windows | Microsoft Store DisplayCatalog - version, description as release notes, release date (catalog last-modified) | `StoreContext.RequestRateAndReviewAppAsync`, parented to the app's main window so it works in WinUI / unpackaged apps |
 | Linux | `flatpak remote-info` / `snap info` for the installed origin or tracked channel | Opens the software centre page - no in-app prompt exists |
 | Other plain .NET | `null` | `false` |
 

@@ -95,14 +95,14 @@ Windows uses COM-activated in-process background tasks. Call `ShinyJobsBackgroun
 
 On the base .NET TFM there is no native OS scheduler — Shiny runs an in-process managed `JobManager` on a recurring timer (default 30s; configurable via the static `JobManager.Interval` property, minimum 15s, maximum 5 minutes). Jobs only execute while the host process is alive.
 
-There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` directly on all plain .NET targets (Blazor WASM included). `AddJob` registers `IConnectivity` and `IBattery` for you on every target - `Shiny.Core` picks the Linux or browser implementation at runtime. The one gap is plain .NET on **Windows or macOS** (a console or service, not MAUI): there is no battery API there, so register your own `IBattery` or the `JobManager` cannot be built. To replace the defaults with your own implementation on any target, register yours **before** `AddJob` — the auto-registration never replaces an existing one.
+There is **no separate `Shiny.Jobs.Blazor` package** — reference `Shiny.Jobs` directly on all plain .NET targets (Blazor WASM included). `AddJob` registers `IConnectivity` and `IBattery` for you on every target - `Shiny.Core` picks the Linux or browser implementation at runtime. Plain .NET on **Windows or macOS** (a console, service or Avalonia desktop head, not MAUI) has no battery API, so no `IBattery` is registered there; the `JobManager` then treats the machine as mains powered (`WithCharging()` / `WithBatteryNotLow()` always pass). Register your own `IBattery` if you need real readings. To replace the defaults with your own implementation on any target, register yours **before** `AddJob` — the auto-registration never replaces an existing one.
 
 ```csharp
 using Shiny;
 using Shiny.Jobs;
 
 // Linux / Blazor WASM - battery + connectivity are registered by AddJob
-// Windows / macOS console - register an IBattery first: services.AddSingleton<IBattery, MyBattery>();
+// Windows / macOS console - no IBattery needed (treated as mains powered); register one to get real readings
 services.AddJob<MySyncJob>(r => r
     .WithForeground()
     .WithInternet(InternetAccess.Any)
@@ -122,8 +122,8 @@ When generating job-related code, follow these conventions:
 3. **Use constructor injection** — job classes are resolved through DI. Inject dependencies through the constructor.
 4. **`IJob.Run` takes only `CancellationToken`** — there is no `JobInfo` argument. If a job needs configuration, inject it through the constructor or read from a settings store.
 5. **Honor the `CancellationToken`** — the platform may cancel a run on time-budget expiry; check `cancelToken.ThrowIfCancellationRequested()` between work units.
-6. **Use `WithForeground()`** when the job should also execute periodically while the app is in the foreground (driven by `JobLifecycleTask` — platform builds only).
-7. **Use `WithInternet(InternetAccess.Any | Unmetered)`** to require connectivity before the job runs.
+6. **Use `WithForeground()`** when the job should also execute periodically while the app is in the foreground (driven by `JobLifecycleTask` — platform builds only). The timer stops when the app is backgrounded and a batch never overlaps another. On a normal launch the foreground jobs run straight away; when the OS launches the process in the background (iOS `BGTask` / silent push / location, Android WorkManager or a service - `UIApplication.ApplicationState == Background`, or process importance below visible) they do **not** run at start, so a background launch never runs them twice. They run, and the timer starts, on the first foreground.
+7. **Use `WithInternet(InternetAccess.Any | Unmetered)`** to require connectivity before the job runs. `Unmetered` maps to WorkManager's `NetworkType.Unmetered` on Android; for foreground runs it means internet that is neither constrained (roaming / Low Data Mode) nor cellular. iOS `BGProcessingTaskRequest` has no unmetered constraint, so there `Unmetered` background jobs only require connectivity.
 8. **Use `WithCharging()` / `WithBatteryNotLow()`** for power-sensitive jobs — be aware these may delay a job indefinitely under hostile conditions.
 9. **Call `RequestAccess()`** (on the concrete `JobManager` via `AbstractJobManager`) before relying on background execution, so you can guide the user if a platform configuration is missing.
 10. **Register jobs at host build time** via `services.AddJob<TJob>(...)`. There is no public runtime-register API on `IJobManager`.

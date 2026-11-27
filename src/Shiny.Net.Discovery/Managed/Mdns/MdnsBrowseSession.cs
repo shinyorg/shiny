@@ -17,11 +17,18 @@ namespace Shiny.Net.Discovery.Managed;
 /// One live browse. Sends the PTR query on a backoff, feeds every received record into a small
 /// TTL-aware cache, and pushes appear/disappear changes onto a channel.
 /// </summary>
+/// <remarks>
+/// SRV and TXT records are refreshed the way RFC 6762 section 5.2 describes: a question at 80%, 85%,
+/// 90% and 95% of the record's TTL (plus up to 2% jitter), dropped when the TTL runs out. An instance
+/// whose SRV or TXT ran out while its PTR is still live is asked about once more instead of being
+/// reported lost, and keeps its last reported details while that answer is awaited.
+/// </remarks>
 sealed class MdnsBrowseSession(
     MdnsMulticastClient client,
     ServiceTypeInfo serviceType,
     MdnsBrowseConfig config,
-    ILogger logger
+    ILogger logger,
+    TimeProvider? timeProvider = null
 )
 {
     /// <summary>How often the maintenance loop checks expiries and re-issues resolve queries.</summary>
@@ -38,8 +45,9 @@ sealed class MdnsBrowseSession(
 
     readonly Lock sync = new();
     readonly Dictionary<DnsName, InstanceState> instances = new();
-    readonly Dictionary<DnsName, SrvRecord> srvRecords = new();
-    readonly Dictionary<DnsName, TxtRecord> txtRecords = new();
+    readonly Dictionary<DnsName, CachedRecord<SrvRecord>> srvRecords = new();
+    readonly Dictionary<DnsName, CachedRecord<TxtRecord>> txtRecords = new();
+    readonly TimeProvider clock = timeProvider ?? TimeProvider.System;
     readonly Dictionary<DnsName, Dictionary<IPAddress, DateTimeOffset>> addressRecords = new();
 
     readonly DnsName typeName = DnsName.ForServiceType(serviceType.Application, serviceType.Protocol, serviceType.Domain);
@@ -57,7 +65,7 @@ sealed class MdnsBrowseSession(
         var pump = Task.Run(() => this.PumpAsync(cancel.Token), cancel.Token);
         try
         {
-            await foreach (var result in this.channel.Reader.ReadAllAsync(ct).ConfigureAwait(false))
+            await foreach (var result in this.Results.ReadAllAsync(ct).ConfigureAwait(false))
                 yield return result;
         }
         finally
@@ -71,14 +79,14 @@ sealed class MdnsBrowseSession(
 
     async Task PumpAsync(CancellationToken ct)
     {
-        var nextQuery = DateTimeOffset.UtcNow;
+        var nextQuery = this.clock.GetUtcNow();
         var queryInterval = initialQueryInterval;
 
         try
         {
             while (!ct.IsCancellationRequested)
             {
-                var now = DateTimeOffset.UtcNow;
+                var now = this.clock.GetUtcNow();
                 if (now >= nextQuery)
                 {
                     await this.SendTypeQuery(ct).ConfigureAwait(false);
@@ -91,7 +99,7 @@ sealed class MdnsBrowseSession(
                 await this.SendResolveQueries(ct).ConfigureAwait(false);
                 this.Sweep();
 
-                await Task.Delay(tickInterval, ct).ConfigureAwait(false);
+                await Task.Delay(tickInterval, this.clock, ct).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)
@@ -115,78 +123,94 @@ sealed class MdnsBrowseSession(
     }
 
 
-    /// <summary>
-    /// Asks for the SRV/TXT of every instance we know about but have not resolved, and the
-    /// A/AAAA of every SRV target we have no address for.
-    /// </summary>
     async Task SendResolveQueries(CancellationToken ct)
     {
-        if (!config.ResolveServices)
-            return;
-
-        var query = DnsMessage.CreateQuery();
-        lock (this.sync)
-        {
-            var now = DateTimeOffset.UtcNow;
-            foreach (var instance in this.instances.Values)
-            {
-                // once the deadline passes we emit what we have and stop asking
-                if (now <= instance.ResolveDeadline)
-                {
-                    if (!this.srvRecords.ContainsKey(instance.FullName))
-                        query.Questions.Add(new DnsQuestion { Name = instance.FullName, Type = DnsRecordType.SRV });
-
-                    if (!this.txtRecords.ContainsKey(instance.FullName))
-                        query.Questions.Add(new DnsQuestion { Name = instance.FullName, Type = DnsRecordType.TXT });
-
-                    if (this.srvRecords.TryGetValue(instance.FullName, out var srv) && !this.HasAddresses(srv.Target))
-                    {
-                        query.Questions.Add(new DnsQuestion { Name = srv.Target, Type = DnsRecordType.A });
-                        query.Questions.Add(new DnsQuestion { Name = srv.Target, Type = DnsRecordType.AAAA });
-                    }
-                }
-            }
-        }
-
-        if (query.Questions.Count > 0)
+        var query = this.BuildResolveQuery();
+        if (query != null)
             await client.Send(query, ct).ConfigureAwait(false);
     }
 
 
-    void OnMessageReceived(DnsMessage message, IPEndPoint from)
+    /// <summary>
+    /// The SRV/TXT of every instance we know about but have not resolved (or whose SRV/TXT just
+    /// expired), the A/AAAA of every SRV target we have no address for, and the SRV/TXT whose TTL
+    /// reached a refresh point. Null when there is nothing to ask.
+    /// </summary>
+    internal DnsMessage? BuildResolveQuery()
+    {
+        if (!config.ResolveServices)
+            return null;
+
+        var query = DnsMessage.CreateQuery();
+        lock (this.sync)
+        {
+            var now = this.clock.GetUtcNow();
+            foreach (var instance in this.instances.Values)
+            {
+                // once the deadline passes we emit what we have and stop asking - unless a cached
+                // record expired under a live PTR, which earns one more question
+                var asking = now <= instance.ResolveDeadline || instance.RequeryPending;
+                instance.RequeryPending = false;
+
+                this.srvRecords.TryGetValue(instance.FullName, out var srv);
+                this.txtRecords.TryGetValue(instance.FullName, out var txt);
+
+                if ((srv == null && asking) || (srv != null && srv.TakeRefresh(now)))
+                    query.Questions.Add(new DnsQuestion { Name = instance.FullName, Type = DnsRecordType.SRV });
+
+                if ((txt == null && asking) || (txt != null && txt.TakeRefresh(now)))
+                    query.Questions.Add(new DnsQuestion { Name = instance.FullName, Type = DnsRecordType.TXT });
+
+                if (now <= instance.ResolveDeadline && srv != null && !this.HasAddresses(srv.Record.Target))
+                {
+                    query.Questions.Add(new DnsQuestion { Name = srv.Record.Target, Type = DnsRecordType.A });
+                    query.Questions.Add(new DnsQuestion { Name = srv.Record.Target, Type = DnsRecordType.AAAA });
+                }
+            }
+        }
+        return query.Questions.Count > 0 ? query : null;
+    }
+
+
+    internal void OnMessageReceived(DnsMessage message, IPEndPoint from)
     {
         lock (this.sync)
         {
+            var now = this.clock.GetUtcNow();
             foreach (var record in message.CacheableRecords)
-                this.Apply(record);
+                this.Apply(record, now);
 
-            this.Emit(DateTimeOffset.UtcNow);
+            this.Emit(now);
         }
     }
 
 
-    void Apply(DnsResourceRecord record)
-    {
-        var now = DateTimeOffset.UtcNow;
+    /// <summary>What the session has emitted so far - read by <see cref="Run"/>, and by tests directly.</summary>
+    internal ChannelReader<MdnsBrowseResult> Results => this.channel.Reader;
 
+
+    void Apply(DnsResourceRecord record, DateTimeOffset now)
+    {
         switch (record)
         {
             case PtrRecord ptr when ptr.Name.Equals(this.typeName):
                 this.ApplyPtr(ptr, now);
                 break;
 
-            case SrvRecord srv:
+            // only instances of the browsed type - every responder on the link answers into the same
+            // group, and caching everyone's records grows without bound on a busy network
+            case SrvRecord srv when this.IsInstanceName(srv.Name):
                 if (srv.IsGoodbye)
                     this.srvRecords.Remove(srv.Name);
                 else
-                    this.srvRecords[srv.Name] = srv;
+                    this.srvRecords[srv.Name] = new CachedRecord<SrvRecord>(srv, now);
                 break;
 
-            case TxtRecord txt:
+            case TxtRecord txt when this.IsInstanceName(txt.Name):
                 if (txt.IsGoodbye)
                     this.txtRecords.Remove(txt.Name);
                 else
-                    this.txtRecords[txt.Name] = txt;
+                    this.txtRecords[txt.Name] = new CachedRecord<TxtRecord>(txt, now);
                 break;
 
             case AddressRecord address:
@@ -194,6 +218,11 @@ sealed class MdnsBrowseSession(
                 break;
         }
     }
+
+
+    /// <summary>True for "&lt;instance label&gt;.&lt;the type we browse&gt;".</summary>
+    bool IsInstanceName(DnsName name)
+        => name.Count == this.typeName.Count + 1 && name.EndsWith(this.typeName);
 
 
     void ApplyPtr(PtrRecord ptr, DateTimeOffset now)
@@ -250,19 +279,23 @@ sealed class MdnsBrowseSession(
 
 
     /// <summary>
-    /// Drops expired records and emits Lost for instances whose PTR aged out.
+    /// Drops expired records, emits Lost for instances whose PTR aged out, and marks instances
+    /// whose SRV/TXT aged out under a live PTR for one more question.
     /// </summary>
-    void Sweep()
+    internal void Sweep()
     {
         lock (this.sync)
         {
-            var now = DateTimeOffset.UtcNow;
+            var now = this.clock.GetUtcNow();
 
             foreach (var addresses in this.addressRecords.Values)
             {
                 foreach (var expired in addresses.Where(x => x.Value <= now).Select(x => x.Key).ToList())
                     addresses.Remove(expired);
             }
+
+            foreach (var host in this.addressRecords.Where(x => x.Value.Count == 0).Select(x => x.Key).ToList())
+                this.addressRecords.Remove(host);
 
             foreach (var state in this.instances.Values.Where(x => x.PtrExpiry <= now).ToList())
             {
@@ -272,6 +305,13 @@ sealed class MdnsBrowseSession(
 
                 if (state.Emitted)
                     this.Enqueue(new MdnsBrowseResult(MdnsBrowseStatus.Lost, this.BuildMinimal(state)));
+            }
+
+            var aged = Expire(this.srvRecords, now).Concat(Expire(this.txtRecords, now)).Distinct().ToList();
+            foreach (var state in aged.Where(this.instances.ContainsKey).Select(x => this.instances[x]))
+            {
+                state.RequeryPending = config.ResolveServices;
+                state.HoldUntil = config.ResolveServices ? now + config.ResolveTimeout : DateTimeOffset.MinValue;
             }
 
             this.Emit(now);
@@ -290,7 +330,13 @@ sealed class MdnsBrowseSession(
             var service = this.Build(state);
             var complete = !config.ResolveServices || service.IsResolved;
 
-            if (complete || now >= state.ResolveDeadline)
+            // an SRV/TXT that expired under a live PTR is being asked for again - keep what was
+            // reported rather than flicker to a half-empty service, unless the answer never comes
+            var held = state.Emitted &&
+                       now < state.HoldUntil &&
+                       (!this.srvRecords.ContainsKey(state.FullName) || !this.txtRecords.ContainsKey(state.FullName));
+
+            if (!held && (complete || now >= state.ResolveDeadline))
             {
                 var signature = Signature(service);
                 if (!state.Emitted || state.Signature != signature)
@@ -306,8 +352,8 @@ sealed class MdnsBrowseSession(
 
     MdnsService Build(InstanceState state)
     {
-        this.srvRecords.TryGetValue(state.FullName, out var srv);
-        this.txtRecords.TryGetValue(state.FullName, out var txt);
+        var srv = this.srvRecords.GetValueOrDefault(state.FullName)?.Record;
+        var txt = this.txtRecords.GetValueOrDefault(state.FullName)?.Record;
 
         var addresses = srv != null && this.addressRecords.TryGetValue(srv.Target, out var known)
             ? known.Keys.ToList()
@@ -348,6 +394,17 @@ sealed class MdnsBrowseSession(
         );
 
 
+    /// <summary>Removes the records whose TTL ran out and returns their names.</summary>
+    static List<DnsName> Expire<T>(Dictionary<DnsName, CachedRecord<T>> records, DateTimeOffset now) where T : DnsResourceRecord
+    {
+        var expired = records.Where(x => x.Value.Expires <= now).Select(x => x.Key).ToList();
+        foreach (var name in expired)
+            records.Remove(name);
+
+        return expired;
+    }
+
+
     void Enqueue(MdnsBrowseResult result)
     {
         if (!this.channel.Writer.TryWrite(result))
@@ -370,5 +427,55 @@ sealed class MdnsBrowseSession(
         public bool Emitted { get; set; }
 
         public string? Signature { get; set; }
+
+        /// <summary>Set when a cached SRV/TXT expired under a live PTR - the next resolve query asks once more.</summary>
+        public bool RequeryPending { get; set; }
+
+        /// <summary>Until when a re-asked instance keeps its last reported details while SRV/TXT are missing.</summary>
+        public DateTimeOffset HoldUntil { get; set; } = DateTimeOffset.MinValue;
+    }
+
+
+    /// <summary>
+    /// A cached SRV or TXT with its expiry and the RFC 6762 section 5.2 refresh schedule - questions
+    /// at 80%, 85%, 90% and 95% of the TTL, each with the same 0-2% jitter so a link full of browsers
+    /// does not ask in step.
+    /// </summary>
+    sealed class CachedRecord<T> where T : DnsResourceRecord
+    {
+        static readonly double[] refreshPoints = [0.80, 0.85, 0.90, 0.95];
+
+        readonly DateTimeOffset received;
+        readonly double jitter = Random.Shared.NextDouble() * 0.02;
+        int refreshStep;
+
+        public CachedRecord(T record, DateTimeOffset received)
+        {
+            this.Record = record;
+            this.received = received;
+            this.Expires = received + TimeSpan.FromSeconds(record.Ttl);
+        }
+
+        public T Record { get; }
+
+        public DateTimeOffset Expires { get; }
+
+        /// <summary>
+        /// True once per refresh point reached. Points that passed while nobody looked are skipped
+        /// together, so a stalled loop sends one question rather than four.
+        /// </summary>
+        public bool TakeRefresh(DateTimeOffset now)
+        {
+            var due = false;
+            while (this.refreshStep < refreshPoints.Length && now >= this.PointAt(this.refreshStep))
+            {
+                this.refreshStep++;
+                due = true;
+            }
+            return due;
+        }
+
+        DateTimeOffset PointAt(int step)
+            => this.received + TimeSpan.FromSeconds(this.Record.Ttl * (refreshPoints[step] + this.jitter));
     }
 }

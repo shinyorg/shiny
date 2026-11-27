@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,8 @@ public partial class HttpTransferManager(
     IIosLifecycle.IHandleEventsForBackgroundUrl
 {
     Action? completionHandler;
+    bool backgroundEventsFinished;
+    int pendingDelegateCalls;
 
     public event EventHandler<int>? CountChanged;
     public event EventHandler<HttpTransferResult>? UpdateReceived;
@@ -136,7 +139,9 @@ public partial class HttpTransferManager(
                 return tus;
             }
 
-            var transfer = new HttpTransfer(request, 0, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
+            // the size isn't known until the task reports it - 0 here read as "0 of 0 bytes" (NaN percent)
+            long? size = request.Type.IsUpload() ? new FileInfo(request.LocalFilePath).Length : null;
+            var transfer = new HttpTransfer(request, size, 0, HttpTransferState.Pending, DateTimeOffset.UtcNow);
             repository.Insert(transfer);
 
             NSUrlSessionTask task;
@@ -276,6 +281,7 @@ public partial class HttpTransferManager(
             return false;
 
         _ = this.Session;
+        this.backgroundEventsFinished = false;
         this.completionHandler = incomingCompletionHandler;
         return true;
     }
@@ -291,20 +297,28 @@ public partial class HttpTransferManager(
     async void OnError(HttpTransfer ht, int statusCode, Exception ex)
     {
         logger.LogError(ex, $"Transfer {ht.Identifier} was completed with error");
-        this.Remove(ht);
+        Interlocked.Increment(ref this.pendingDelegateCalls);
+        try
+        {
+            this.Remove(ht);
 
-        await services
-            .RunDelegates<IHttpTransferDelegate>(
-                x => x.OnError(ht.Request, statusCode, ex),
-                logger
-            );
+            await services
+                .RunDelegates<IHttpTransferDelegate>(
+                    x => x.OnError(ht.Request, statusCode, ex),
+                    logger
+                );
 
-        this.UpdateReceived?.Invoke(this, new(
-            ht.Request,
-            HttpTransferState.Error,
-            TransferProgress.Empty,
-            ex
-        ));
+            this.UpdateReceived?.Invoke(this, new(
+                ht.Request,
+                HttpTransferState.Error,
+                TransferProgress.Empty,
+                ex
+            ));
+        }
+        finally
+        {
+            Interlocked.Decrement(ref this.pendingDelegateCalls);
+        }
         this.TryCompleteSession();
     }
 
@@ -326,15 +340,23 @@ public partial class HttpTransferManager(
 
     async void OnFinish(HttpTransfer ht)
     {
-        this.Remove(ht);
-        await services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), logger);
+        Interlocked.Increment(ref this.pendingDelegateCalls);
+        try
+        {
+            this.Remove(ht);
+            await services.RunDelegates<IHttpTransferDelegate>(x => x.OnCompleted(ht.Request), logger);
 
-        this.UpdateReceived?.Invoke(this, new(
-            ht.Request,
-            HttpTransferState.Completed,
-            TransferProgress.Empty,
-            null
-        ));
+            this.UpdateReceived?.Invoke(this, new(
+                ht.Request,
+                HttpTransferState.Completed,
+                TransferProgress.Empty,
+                null
+            ));
+        }
+        finally
+        {
+            Interlocked.Decrement(ref this.pendingDelegateCalls);
+        }
         this.TryCompleteSession();
     }
 
@@ -432,13 +454,24 @@ public partial class HttpTransferManager(
     }
 
 
+    /// <summary>
+    /// Hands iOS its background-session completion handler back once - after the session's events are
+    /// delivered (or nothing is left to transfer) and no delegate call is still running, so the app isn't
+    /// suspended in the middle of <see cref="IHttpTransferDelegate.OnCompleted"/>.
+    /// </summary>
     void TryCompleteSession()
     {
-        var transfers = repository.GetAll<HttpTransfer>();
-        if (transfers.Count == 0)
+        if (Volatile.Read(ref this.pendingDelegateCalls) > 0)
+            return;
+
+        if (!this.backgroundEventsFinished && repository.GetAll<HttpTransfer>().Count > 0)
+            return;
+
+        var handler = Interlocked.Exchange(ref this.completionHandler, null);
+        if (handler != null)
         {
-            this.completionHandler?.Invoke();
-            this.completionHandler = null;
+            this.backgroundEventsFinished = false;
+            handler.Invoke();
         }
     }
 }

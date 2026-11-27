@@ -25,7 +25,9 @@ namespace Shiny.Net.Wifi;
 public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiManager(logger), IAsyncDisposable
 {
     readonly NmClient client = new();
+    readonly Lock watcherLock = new();
     IDisposable? watcher;
+    int listenGeneration;
     string? activeConnectionPath;
 
 
@@ -87,17 +89,26 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
 
 
     protected override void StartListening()
-        => _ = this.StartWatching();
+        => _ = this.StartWatching(Interlocked.Increment(ref this.listenGeneration));
 
 
-    async Task StartWatching()
+    async Task StartWatching(int generation)
     {
         try
         {
-            this.watcher = await this.client
+            var subscription = await this.client
                 .WatchPropertiesChanged(this.RaiseChangedIfDifferent)
                 .ConfigureAwait(false);
 
+            lock (this.watcherLock)
+            {
+                // the last subscriber may have left while the match was being added - drop it
+                // rather than leave a match nobody will ever dispose
+                if (generation == this.listenGeneration)
+                    this.watcher = subscription;
+                else
+                    subscription.Dispose();
+            }
             logger.WatcherStarted("NetworkManager PropertiesChanged");
         }
         catch (Exception ex)
@@ -109,8 +120,12 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
 
     protected override void StopListening()
     {
-        this.watcher?.Dispose();
-        this.watcher = null;
+        lock (this.watcherLock)
+        {
+            Interlocked.Increment(ref this.listenGeneration);
+            this.watcher?.Dispose();
+            this.watcher = null;
+        }
     }
 
 
@@ -213,7 +228,7 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
     }
 
 
-    static NmConnectionSettings BuildStationSettings(WifiConnectionRequest request)
+    internal static NmConnectionSettings BuildStationSettings(WifiConnectionRequest request)
     {
         var settings = new NmConnectionSettings();
 
@@ -227,7 +242,16 @@ public class LinuxWifiManager(ILogger<LinuxWifiManager> logger) : AbstractWifiMa
         wireless["mode"] = VariantValue.String("infrastructure");
         wireless["hidden"] = VariantValue.Bool(request.IsHidden);
 
-        if (request.Passphrase != null)
+        if (request.Passphrase != null && request.Security == WifiSecurity.Wep)
+        {
+            // "none" is NetworkManager's spelling of static WEP; the key goes in wep-key0, and
+            // type 1 takes it as the 10/26 hex digit or 5/13 character key itself
+            var security = settings.Group("802-11-wireless-security");
+            security["key-mgmt"] = VariantValue.String("none");
+            security["wep-key0"] = VariantValue.String(request.Passphrase);
+            security["wep-key-type"] = VariantValue.UInt32(1);
+        }
+        else if (request.Passphrase != null)
         {
             var security = settings.Group("802-11-wireless-security");
             security["key-mgmt"] = VariantValue.String(request.Security == WifiSecurity.Wpa3Psk ? "sae" : "wpa-psk");

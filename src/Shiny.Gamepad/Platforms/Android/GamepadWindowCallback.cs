@@ -35,22 +35,15 @@ class GamepadWindowCallback(
     public Window.ICallback? Inner => inner;
 
 
+    // onKey / onMotion answer true only when the event came from a controller and ConsumeEvents is
+    // on - and then it must not reach the inner callback at all, or the D-pad still moves focus and
+    // B still goes back. Returning true after forwarding only suppresses the fallback handling.
     public bool DispatchKeyEvent(KeyEvent? e)
-    {
-        var handled = onKey(e);
-        var forwarded = inner?.DispatchKeyEvent(e) ?? false;
-
-        return handled || forwarded;
-    }
+        => onKey(e) || (inner?.DispatchKeyEvent(e) ?? false);
 
 
     public bool DispatchGenericMotionEvent(MotionEvent? e)
-    {
-        var handled = onMotion(e);
-        var forwarded = inner?.DispatchGenericMotionEvent(e) ?? false;
-
-        return handled || forwarded;
-    }
+        => onMotion(e) || (inner?.DispatchGenericMotionEvent(e) ?? false);
 
 
     public bool DispatchKeyShortcutEvent(KeyEvent? e) => inner?.DispatchKeyShortcutEvent(e) ?? false;

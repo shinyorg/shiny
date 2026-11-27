@@ -280,6 +280,29 @@ public class ScreenRecorderStateTests
 
 
     [Fact]
+    public async Task MaxDurationStillReportsWhenTheStopFails()
+    {
+        var recorder = new FakeScreenRecorder(Full);
+        var recording = await recorder.Start(new ScreenRecordingRequest
+        {
+            MaxDuration = TimeSpan.FromMilliseconds(300)
+        });
+        recorder.Current!.StopFailure = new ScreenRecorderException("the encoder never finalised");
+        recorder.Current.Begin();
+
+        ScreenRecordingFaultedEventArgs? faulted = null;
+        recording.Faulted += (_, e) => faulted = e;
+
+        await WaitFor(() => faulted != null, TimeSpan.FromSeconds(5));
+
+        Assert.Equal(ScreenRecordingFaultReason.MaxDurationReached, faulted!.Reason);
+        Assert.Null(faulted.Result);
+        Assert.IsType<ScreenRecorderException>(faulted.Exception);
+        Assert.Equal(ScreenRecorderState.Idle, recorder.State);
+    }
+
+
+    [Fact]
     public async Task RequestOutputPathIsPassedThrough()
     {
         var recorder = new FakeScreenRecorder(Full);

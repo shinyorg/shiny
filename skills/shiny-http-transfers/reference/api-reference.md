@@ -211,7 +211,7 @@ public record HttpTransferResult(
 )
 {
     // True if total bytes to transfer is known
-    public bool IsDeterministic => this.Progress.BytesToTransfer != null;
+    public bool IsDeterministic => this.Progress.IsDeterministic;
 }
 ```
 
@@ -229,7 +229,7 @@ public record TransferProgress(
     public static TransferProgress Empty { get; }
 
     // True if total bytes to transfer is known
-    public bool IsDeterministic => this.BytesToTransfer != null;
+    public bool IsDeterministic => this.BytesToTransfer is > 0; // a 0 or unknown (-1) total is not
 
     // Percentage complete (0.0 to 1.0), or -1 if indeterminate
     public double PercentComplete { get; }

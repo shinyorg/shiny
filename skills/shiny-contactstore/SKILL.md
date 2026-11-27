@@ -18,6 +18,8 @@ triggers:
   - ContactSortField
   - ContactFilterMatch
   - ContactFilterOperation
+  - ContactDate
+  - HasYear
   - search contacts
   - contacts AI tools
   - Shiny.Contacts.Extensions.AI
@@ -253,6 +255,12 @@ contact.GivenName = "Jane";
 await contactStore.Update(contact);
 ```
 
+`Update` replaces the fields this model covers. On Android, data it does not model (group
+memberships, IM/SIP addresses, other apps' rows) is left alone, a `null` `Photo` leaves the existing
+photo in place (bulk reads only load `Thumbnail`), and the display name is rebuilt from the name parts
+when any are set. A contact that aggregates several raw contacts (e.g. Google + local) is written to its
+first raw contact, and the covered fields of the others are removed so values are not duplicated.
+
 ### Delete a Contact
 
 ```csharp
@@ -293,6 +301,13 @@ await contactStore.Delete(contactId);
 **AddressType:** Home, Work, Other, Custom
 
 **ContactDateType:** Birthday, Anniversary, Other, Custom
+
+### Dates without a year
+
+A birthday saved with only a day and month comes back with `ContactDate.HasYear == false`. Its
+`Date` holds year 1 (year 4 for Feb 29, which year 1 cannot hold). To create one, use that year:
+`new ContactDate(new DateOnly(1, 6, 15))`. It is written back as a year-less date on Android (`--06-15`)
+and Apple (`NSDateComponents` with no year). Don't compute ages from a date where `HasYear` is false.
 
 **RelationshipType:** Father, Mother, Parent, Brother, Sister, Child, Friend, Spouse, Partner, Assistant, Manager, Other, Custom
 

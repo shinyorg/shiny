@@ -3,17 +3,39 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Gms.Extensions;
 using Firebase.Messaging;
+using Shiny.Extensions.Stores;
 
 namespace Shiny.Push;
 
 
 public class FirebasePushProvider : IPushProvider, IPushTagSupport
 {
+    const string TagsKey = "Shiny.Push.FirebasePushProvider.RegisteredTags";
+    readonly IKeyValueStore? store;
     string[]? registeredTags;
+
+
+    public FirebasePushProvider() { }
+
+
+    /// <summary>
+    /// Keeps the subscribed topics in <paramref name="store"/>, so ClearTags/SetTags can unsubscribe them after an app restart
+    /// </summary>
+    public FirebasePushProvider(IKeyValueStore store)
+    {
+        this.store = store;
+        this.registeredTags = store.Get<string[]>(TagsKey);
+    }
+
+
     public string[]? RegisteredTags
     {
         get => this.registeredTags;
-        set => this.registeredTags = value;
+        set
+        {
+            this.registeredTags = value;
+            this.store?.SetOrRemove(TagsKey, value);
+        }
     }
 
 
@@ -34,8 +56,11 @@ public class FirebasePushProvider : IPushProvider, IPushTagSupport
             .ConfigureAwait(false);
 
         var tags = this.RegisteredTags?.ToList() ?? new List<string>(1);
-        tags.Add(tag);
-        this.RegisteredTags = tags.ToArray();
+        if (!tags.Contains(tag))
+        {
+            tags.Add(tag);
+            this.RegisteredTags = tags.ToArray();
+        }
     }
 
 

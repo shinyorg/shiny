@@ -199,7 +199,7 @@ public class CalendarStoreImpl : ICalendarStore
 
     public Task<CalendarEvent?> GetEvent(string eventId, CancellationToken ct = default)
     {
-        var ev = this.store.EventFromIdentifier(eventId);
+        var ev = this.FindEvent(eventId);
         return Task.FromResult(ev == null ? null : ToEvent(ev));
     }
 
@@ -241,7 +241,7 @@ public class CalendarStoreImpl : ICalendarStore
         if (string.IsNullOrWhiteSpace(calendarEvent.Id))
             throw new ArgumentException("Event Id is required for update.", nameof(calendarEvent));
 
-        var ev = this.store.EventFromIdentifier(calendarEvent.Id)
+        var ev = this.FindEvent(calendarEvent.Id)
             ?? throw new InvalidOperationException($"Event with Id '{calendarEvent.Id}' not found.");
 
         this.PopulateEvent(ev, calendarEvent);
@@ -254,7 +254,7 @@ public class CalendarStoreImpl : ICalendarStore
 
     public Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default)
     {
-        var ev = this.store.EventFromIdentifier(eventId)
+        var ev = this.FindEvent(eventId)
             ?? throw new InvalidOperationException($"Event with Id '{eventId}' not found.");
 
         var span = deleteSeries ? EKSpan.FutureEvents : EKSpan.ThisEvent;
@@ -262,6 +262,35 @@ public class CalendarStoreImpl : ICalendarStore
             throw new InvalidOperationException($"Failed to delete event: {error?.LocalizedDescription}");
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Resolves an event id. EventFromIdentifier returns a series' FIRST occurrence, so an occurrence id
+    /// (see <see cref="EventOccurrenceId"/>) is looked up by its original start instead.
+    /// </summary>
+    EKEvent? FindEvent(string id)
+    {
+        var (eventId, occurrence) = EventOccurrenceId.Decode(id);
+        var first = this.store.EventFromIdentifier(eventId);
+        if (first == null || occurrence == null)
+            return first;
+
+        EKCalendar[]? calendars = first.Calendar == null ? null : [first.Calendar];
+
+        // a moved (detached) occurrence starts away from its original date, so widen the window once
+        return this.FindOccurrence(eventId, occurrence.Value, TimeSpan.FromDays(1), calendars)
+            ?? this.FindOccurrence(eventId, occurrence.Value, TimeSpan.FromDays(366), calendars);
+    }
+
+    EKEvent? FindOccurrence(string eventId, DateTimeOffset originalStart, TimeSpan margin, EKCalendar[]? calendars)
+    {
+        var predicate = this.store.PredicateForEvents(ToNsDate(originalStart - margin), ToNsDate(originalStart + margin), calendars);
+        var matches = this.store.EventsMatching(predicate) ?? [];
+        return matches.FirstOrDefault(x =>
+            x.EventIdentifier == eventId &&
+            x.OccurrenceDate != null &&
+            Math.Abs((ToDto(x.OccurrenceDate) - originalStart).TotalSeconds) < 1
+        );
     }
 
     // ── Mapping ──────────────────────────────────────────────────────
@@ -308,7 +337,10 @@ public class CalendarStoreImpl : ICalendarStore
     {
         var result = new CalendarEvent
         {
-            Id = ev.EventIdentifier,
+            // every occurrence of a series shares EventIdentifier; the occurrence id lets update/delete reach this one
+            Id = (ev.HasRecurrenceRules || ev.IsDetached) && ev.OccurrenceDate != null
+                ? EventOccurrenceId.Encode(ev.EventIdentifier, ToDto(ev.OccurrenceDate))
+                : ev.EventIdentifier,
             CalendarId = ev.Calendar?.CalendarIdentifier,
             Title = ev.Title ?? string.Empty,
             Description = ev.Notes,

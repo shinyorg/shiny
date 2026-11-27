@@ -39,8 +39,10 @@ public class AndroidNotificationManager
 
     public virtual void Send(AndroidNotification notification)
     {
-        var channel = this.channelManager.Get(notification.Channel!);
-        var builder = this.CreateNativeBuilder(notification, channel!);
+        // the channel may have been removed since the notification was scheduled - fall back to the default channel
+        var channel = this.channelManager.Get(notification.Channel ?? Channel.Default.Identifier)
+            ?? this.channelManager.Get(Channel.Default.Identifier)!;
+        var builder = this.CreateNativeBuilder(notification, channel);
         this.NativeManager.Notify(notification.Id, builder.Build());
     }
 
@@ -246,7 +248,7 @@ public class AndroidNotificationManager
                 .AddNextIntent(launchIntent)
                 .GetPendingIntent(
                     notification.Id,
-                    (int)this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
+                    (int)this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot | PendingIntentFlags.UpdateCurrent)
                 )!;
         }
         else
@@ -255,7 +257,9 @@ public class AndroidNotificationManager
                 this.platform.AppContext!,
                 notification.Id,
                 launchIntent!,
-                this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
+                // UpdateCurrent - a PendingIntent left over from an earlier notification with the same id would
+                // otherwise be handed back with that notification's extras
+                this.platform.GetPendingIntentFlags(PendingIntentFlags.OneShot | PendingIntentFlags.UpdateCurrent)
             )!;
         }
         return pendingIntent;
@@ -308,21 +312,22 @@ public class AndroidNotificationManager
     }
 
 
-    static int counter = 100;
     protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
-    {
-        counter++;
-        return this.platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
+        => this.platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
             ShinyNotificationBroadcastReceiver.EntryIntentAction,
             PendingIntentFlags.UpdateCurrent,
-            counter,
+            notification.Id,
             intent =>
             {
                 this.PopulateIntent(intent, notification);
                 intent.PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
+
+                // PendingIntent equality ignores extras - the category makes each notification/action pair its own
+                // PendingIntent, so a new notification can't overwrite the action of one still on screen
+                intent.AddCategory(ActionCategory + notification.Id + "." + action.Identifier);
             }
         );
-    }
+    const string ActionCategory = "com.shiny.notifications.ACTION.";
 
 
     protected virtual NotificationCompat.Action CreateAction(Notification notification, ChannelAction action)

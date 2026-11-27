@@ -32,7 +32,9 @@ public partial class HttpTransferManager
             {
                 BytesToTransfer = totalBytesExpectedToSend,
                 BytesTransferred = totalBytesSent,
-                Status = HttpTransferState.InProgress
+                // a callback already queued when the task was suspended must not undo the pause -
+                // Resume() only acts on a Paused transfer
+                Status = ht.Status == HttpTransferState.Paused ? HttpTransferState.Paused : HttpTransferState.InProgress
             };
 
             try
@@ -66,11 +68,15 @@ public partial class HttpTransferManager
         {
             logger.TransferProgress(downloadTask.TaskDescription!, totalBytesWritten, totalBytesExpectedToWrite);
 
+            // NSURLSessionTransferSizeUnknown (-1) when the server sends no Content-Length
+            long? expected = totalBytesExpectedToWrite < 0 ? null : totalBytesExpectedToWrite;
             ht = ht with
             {
-                BytesToTransfer = totalBytesExpectedToWrite,
+                BytesToTransfer = expected,
                 BytesTransferred = totalBytesWritten,
-                Status = HttpTransferState.InProgress
+                // a callback already queued when the task was suspended must not undo the pause -
+                // Resume() only acts on a Paused transfer
+                Status = ht.Status == HttpTransferState.Paused ? HttpTransferState.Paused : HttpTransferState.InProgress
             };
 
             try
@@ -81,7 +87,7 @@ public partial class HttpTransferManager
                 this.UpdateReceived?.Invoke(this, new(
                     ht.Request,
                     ht.Status,
-                    new(bps, totalBytesExpectedToWrite, totalBytesWritten),
+                    new(bps, expected, totalBytesWritten),
                     null
                 ));
             }
@@ -108,7 +114,21 @@ public partial class HttpTransferManager
         else
         {
             logger.StateMethod(id);
-            File.Copy(location.Path!, ht.Request.LocalFilePath, true);
+            try
+            {
+                // the temp file at location is deleted as soon as this method returns
+                var dir = Path.GetDirectoryName(ht.Request.LocalFilePath);
+                if (!String.IsNullOrEmpty(dir))
+                    Directory.CreateDirectory(dir);
+
+                File.Copy(location.Path!, ht.Request.LocalFilePath, true);
+            }
+            catch (Exception ex)
+            {
+                // left unhandled, the transfer was never finished or failed - it stayed in the repository forever
+                this.OnError(ht, downloadTask.GetStatusCode(), ex);
+                return;
+            }
             this.OnFinish(ht);
         }
     }
@@ -165,7 +185,8 @@ public partial class HttpTransferManager
     public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
     {
         logger.LogInformation("DidFinishEventsForBackgroundSession");
-        this.completionHandler?.Invoke();
+        this.backgroundEventsFinished = true;
+        this.TryCompleteSession();
     }
 
 

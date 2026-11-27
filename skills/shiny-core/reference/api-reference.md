@@ -966,6 +966,9 @@ public static partial class ConfigurationBuilderExtensions
     );
 
     // Add remote configuration with an explicit cache file (all platforms). Note: URI first.
+    // waitForRemoteLoad blocks the configuration build on the first fetch, but a failed fetch (offline first
+    // launch, server down) is logged and never fails the build - the cached file keeps serving.
+    // Await GetRemoteConfigurationProvider().LoadAsync() yourself when you need the error.
     // Replaces AddRemote(configurationFilePath, configurationUri, ...), which was ambiguous on iOS/Android;
     // that overload is gone there and [Obsolete] elsewhere - never generate it.
     public static IConfigurationBuilder AddRemoteWithCacheFile(

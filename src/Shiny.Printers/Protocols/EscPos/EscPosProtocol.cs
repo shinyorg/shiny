@@ -143,6 +143,11 @@ public sealed class EscPosProtocol : IPrinterStatusProtocol
 
         var (code, data) = MapBarcode(bc.Format, bc.Data, this.Encoding);
 
+        // n is one byte - a longer payload would wrap it, and the printer would read the bytes after
+        // the barcode as more barcode data
+        if (data.Length > 255)
+            throw new NotSupportedException($"ESC/POS barcodes carry at most 255 bytes; '{bc.Format}' data encodes to {data.Length}.");
+
         // GS k m n d1..dn   (function B form, m = 65..73)
         buffer.Write(GS, (byte)'k', code, (byte)data.Length);
         buffer.Write(data);

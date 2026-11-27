@@ -147,6 +147,9 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
 
     // ── Events ───────────────────────────────────────────────────────
 
+    // SQLite before 3.32 (Android 11 and older) caps a statement at 999 bound variables.
+    const int MaxSqlArgs = 500;
+
     public Task<IReadOnlyList<CalendarEvent>> GetEvents(
         string? calendarId = null,
         DateTimeOffset? start = null,
@@ -154,25 +157,30 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
         CancellationToken ct = default
     ) => Task.Run(() =>
     {
-        var results = ReadEvents(calendarId, start, end);
+        var results = ReadInstances(calendarId, start, end);
         return (IReadOnlyList<CalendarEvent>)results;
     }, ct);
 
     public Task<CalendarEvent?> GetEvent(string eventId, CancellationToken ct = default) => Task.Run(() =>
     {
-        var results = ReadEventsBySelection(EventsColumns.InterfaceConsts.Id + " = ?", [eventId]);
+        var (id, occurrence) = EventOccurrenceId.Decode(eventId);
+        if (occurrence != null)
+            return ReadOccurrence(id, occurrence.Value);
+
+        var results = ReadEventsBySelection(EventsColumns.InterfaceConsts.Id + " = ?", [id]);
         return results.Count > 0 ? results[0] : null;
     }, ct);
 
     public CalendarEventQuery Query() => new((descriptor, ct) => Task.Run(
-        () => (IEnumerable<CalendarEvent>)ReadEvents(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore),
+        () => (IEnumerable<CalendarEvent>)ReadInstances(descriptor.CalendarId, descriptor.StartAfter, descriptor.EndBefore),
         ct
     ));
 
     public Task<string> CreateEvent(CalendarEvent calendarEvent, CancellationToken ct = default) => Task.Run(() =>
     {
         var calendarId = ResolveTargetCalendarId(calendarEvent.CalendarId);
-        var values = ToContentValues(calendarEvent, calendarId);
+        var values = ToContentValues(calendarEvent, false, null);
+        values.Put(EventsColumns.InterfaceConsts.CalendarId, calendarId);
 
         var uri = Resolver.Insert(EventsColumns.ContentUri!, values)
             ?? throw new InvalidOperationException("Failed to create event.");
@@ -189,44 +197,85 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
         if (string.IsNullOrWhiteSpace(calendarEvent.Id))
             throw new ArgumentException("Event Id is required for update.", nameof(calendarEvent));
 
-        var eventId = long.Parse(calendarEvent.Id);
-        var calendarId = ResolveTargetCalendarId(calendarEvent.CalendarId);
-        var values = ToContentValues(calendarEvent, calendarId);
+        var (id, occurrence) = EventOccurrenceId.Decode(calendarEvent.Id);
+        var eventId = long.Parse(id);
+        var row = ReadEventRow(eventId)
+            ?? throw new InvalidOperationException($"Event with Id '{calendarEvent.Id}' not found.");
+
+        if (occurrence != null && row.IsRecurring)
+        {
+            // one occurrence of a series: an exception row against its original start replaces just that instance
+            var exceptionValues = ToContentValues(calendarEvent, false, row.Timezone);
+            exceptionValues.Put(EventsColumns.InterfaceConsts.OriginalInstanceTime, occurrence.Value.ToUnixTimeMilliseconds());
+            exceptionValues.PutNull(EventsColumns.InterfaceConsts.Duration);
+            exceptionValues.PutNull(EventsColumns.InterfaceConsts.Rrule);
+
+            var exceptionUri = ContentUris.WithAppendedId(EventsColumns.ContentExceptionUri!, eventId);
+            var inserted = Resolver.Insert(exceptionUri!, exceptionValues)
+                ?? throw new InvalidOperationException("Failed to update the event occurrence.");
+            var exceptionId = ContentUris.ParseId(inserted);
+
+            ReplaceReminders(exceptionId, calendarEvent.Reminders);
+            ReplaceAttendees(exceptionId, calendarEvent.Attendees);
+            return;
+        }
+
+        // a series keeps its RRULE and must carry DURATION rather than DTEND
+        var values = ToContentValues(calendarEvent, row.IsRecurring, row.Timezone);
+        if (!string.IsNullOrWhiteSpace(calendarEvent.CalendarId))
+            values.Put(EventsColumns.InterfaceConsts.CalendarId, ResolveTargetCalendarId(calendarEvent.CalendarId));
 
         var uri = ContentUris.WithAppendedId(EventsColumns.ContentUri!, eventId);
         Resolver.Update(uri!, values, null, null);
 
-        // Replace child reminders/attendees
-        Resolver.Delete(RemindersColumns.ContentUri!, RemindersColumns.InterfaceConsts.EventId + " = ?", [eventId.ToString()]);
-        Resolver.Delete(AttendeesColumns.ContentUri!, AttendeesColumns.InterfaceConsts.EventId + " = ?", [eventId.ToString()]);
-        WriteReminders(eventId, calendarEvent.Reminders);
-        WriteAttendees(eventId, calendarEvent.Attendees);
+        ReplaceReminders(eventId, calendarEvent.Reminders);
+        ReplaceAttendees(eventId, calendarEvent.Attendees);
     }, ct);
 
     public Task DeleteEvent(string eventId, bool deleteSeries = false, CancellationToken ct = default) => Task.Run(() =>
     {
-        var id = long.Parse(eventId);
-        var existing = this.ReadEventsBySelection(EventsColumns.InterfaceConsts.Id + " = ?", [eventId]).FirstOrDefault()
+        var (rawId, occurrence) = EventOccurrenceId.Decode(eventId);
+        var id = long.Parse(rawId);
+        var row = ReadEventRow(id)
             ?? throw new InvalidOperationException($"Event with Id '{eventId}' not found.");
 
-        // Deleting the Events row takes the whole series with it, which is what we want for a series
-        // delete and the only sensible option for a one-off event.
-        if (deleteSeries || !existing.IsRecurring)
+        var uri = ContentUris.WithAppendedId(EventsColumns.ContentUri!, id);
+        if (!row.IsRecurring)
         {
-            var uri = ContentUris.WithAppendedId(EventsColumns.ContentUri!, id);
             Resolver.Delete(uri!, null, null);
             return;
         }
 
-        // Cancelling a single occurrence means inserting an exception row against the occurrence's
-        // original start time. Reads come from the Events table (series masters), so the only instance
-        // time we can resolve here is the series' own DTSTART - i.e. the first occurrence.
-        var values = new ContentValues();
-        values.Put(EventsColumns.InterfaceConsts.OriginalInstanceTime, existing.Start.ToUnixTimeMilliseconds());
-        values.Put(EventsColumns.InterfaceConsts.Status, (int)EventsStatus.Canceled);
+        // a series id (rather than an occurrence id) stands for the series' first occurrence
+        var instanceTime = occurrence?.ToUnixTimeMilliseconds() ?? row.Dtstart;
+
+        if (deleteSeries)
+        {
+            if (instanceTime <= row.Dtstart)
+            {
+                Resolver.Delete(uri!, null, null);
+                return;
+            }
+
+            // this and all future occurrences: end the series just before this one, and drop later exceptions
+            var values = new ContentValues();
+            values.Put(EventsColumns.InterfaceConsts.Rrule, RecurrenceRules.EndBefore(row.Rrule!, DateTimeOffset.FromUnixTimeMilliseconds(instanceTime), row.AllDay));
+            Resolver.Update(uri!, values, null, null);
+            Resolver.Delete(
+                EventsColumns.ContentUri!,
+                EventsColumns.InterfaceConsts.OriginalId + " = ? AND " + EventsColumns.InterfaceConsts.OriginalInstanceTime + " >= ?",
+                [id.ToString(), instanceTime.ToString()]
+            );
+            return;
+        }
+
+        // cancelling a single occurrence means inserting a cancelled exception row against its original start time
+        var cancel = new ContentValues();
+        cancel.Put(EventsColumns.InterfaceConsts.OriginalInstanceTime, instanceTime);
+        cancel.Put(EventsColumns.InterfaceConsts.Status, (int)EventsStatus.Canceled);
 
         var exceptionUri = ContentUris.WithAppendedId(EventsColumns.ContentExceptionUri!, id);
-        Resolver.Insert(exceptionUri!, values);
+        Resolver.Insert(exceptionUri!, cancel);
     }, ct);
 
     // ── Calendar reading ─────────────────────────────────────────────
@@ -267,42 +316,89 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
 
     // ── Event reading ────────────────────────────────────────────────
 
-    List<CalendarEvent> ReadEvents(string? calendarId, DateTimeOffset? start, DateTimeOffset? end)
+    static readonly string[] EventColumns =
+    [
+        EventsColumns.InterfaceConsts.CalendarId,
+        EventsColumns.InterfaceConsts.Title,
+        EventsColumns.InterfaceConsts.Description,
+        EventsColumns.InterfaceConsts.EventLocation,
+        EventsColumns.InterfaceConsts.AllDay,
+        EventsColumns.InterfaceConsts.Availability,
+        EventsColumns.InterfaceConsts.Rrule
+    ];
+
+    // The Instances table expands recurring series into the occurrences inside the window (the Events table only
+    // holds series masters, whose DTEND is NULL - recurring rows carry a DURATION instead).
+    List<CalendarEvent> ReadInstances(string? calendarId, DateTimeOffset? start, DateTimeOffset? end)
     {
         var (from, to) = ResolveWindow(start, end);
-        var clauses = new List<string>
-        {
-            EventsColumns.InterfaceConsts.Dtstart + " <= ?",
-            EventsColumns.InterfaceConsts.Dtend + " >= ?"
-        };
-        var args = new List<string> { to.ToUnixTimeMilliseconds().ToString(), from.ToUnixTimeMilliseconds().ToString() };
-
+        string? selection = null;
+        string[]? args = null;
         if (!string.IsNullOrWhiteSpace(calendarId))
         {
-            clauses.Add(EventsColumns.InterfaceConsts.CalendarId + " = ?");
-            args.Add(calendarId);
+            selection = EventsColumns.InterfaceConsts.CalendarId + " = ?";
+            args = [calendarId];
         }
+        return QueryInstances(from.ToUnixTimeMilliseconds(), to.ToUnixTimeMilliseconds(), selection, args);
+    }
 
-        return ReadEventsBySelection(string.Join(" AND ", clauses), args.ToArray());
+    CalendarEvent? ReadOccurrence(string eventId, DateTimeOffset originalStart)
+    {
+        var begin = originalStart.ToUnixTimeMilliseconds();
+        var results = QueryInstances(
+            begin,
+            begin + 1,
+            CalendarContract.Instances.EventId + " = ? AND " + CalendarContract.Instances.Begin + " = ?",
+            [eventId, begin.ToString()]
+        );
+        return results.Count > 0 ? results[0] : null;
+    }
+
+    List<CalendarEvent> QueryInstances(long begin, long end, string? selection, string[]? args)
+    {
+        var builder = CalendarContract.Instances.ContentUri!.BuildUpon()!;
+        ContentUris.AppendId(builder, begin);
+        ContentUris.AppendId(builder, end);
+
+        var events = new List<(long EventId, CalendarEvent Event)>();
+        using (var cursor = Resolver.Query(
+            builder.Build()!,
+            [CalendarContract.Instances.EventId, CalendarContract.Instances.Begin, CalendarContract.Instances.End, .. EventColumns],
+            selection,
+            args,
+            CalendarContract.Instances.Begin + " ASC"))
+        {
+            if (cursor != null)
+            {
+                while (cursor.MoveToNext())
+                {
+                    var eventId = cursor.GetLong(0);
+                    var rawBegin = DateTimeOffset.FromUnixTimeMilliseconds(cursor.GetLong(1));
+                    var rawEnd = DateTimeOffset.FromUnixTimeMilliseconds(cursor.GetLong(2));
+                    var evt = ReadEventColumns(cursor, 3, rawBegin, rawEnd);
+                    evt.Id = evt.IsRecurring
+                        ? EventOccurrenceId.Encode(eventId.ToString(), rawBegin)
+                        : eventId.ToString();
+                    events.Add((eventId, evt));
+                }
+            }
+        }
+        LoadChildren(events);
+        return events.Select(x => x.Event).ToList();
     }
 
     List<CalendarEvent> ReadEventsBySelection(string? selection, string[]? args)
     {
-        var events = new Dictionary<long, CalendarEvent>();
+        var events = new List<(long EventId, CalendarEvent Event)>();
 
         using (var cursor = Resolver.Query(
             EventsColumns.ContentUri!,
             [
                 EventsColumns.InterfaceConsts.Id,
-                EventsColumns.InterfaceConsts.CalendarId,
-                EventsColumns.InterfaceConsts.Title,
-                EventsColumns.InterfaceConsts.Description,
-                EventsColumns.InterfaceConsts.EventLocation,
                 EventsColumns.InterfaceConsts.Dtstart,
                 EventsColumns.InterfaceConsts.Dtend,
-                EventsColumns.InterfaceConsts.AllDay,
-                EventsColumns.InterfaceConsts.Availability,
-                EventsColumns.InterfaceConsts.Rrule
+                EventsColumns.InterfaceConsts.Duration,
+                .. EventColumns
             ],
             selection,
             args,
@@ -313,41 +409,92 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
                 while (cursor.MoveToNext())
                 {
                     var id = cursor.GetLong(0);
-                    var rrule = cursor.GetString(9);
-                    events[id] = new CalendarEvent
-                    {
-                        Id = id.ToString(),
-                        CalendarId = cursor.GetString(1),
-                        Title = cursor.GetString(2) ?? string.Empty,
-                        Description = cursor.GetString(3),
-                        Location = cursor.GetString(4),
-                        Start = DateTimeOffset.FromUnixTimeMilliseconds(cursor.GetLong(5)),
-                        End = DateTimeOffset.FromUnixTimeMilliseconds(cursor.GetLong(6)),
-                        IsAllDay = cursor.GetInt(7) == 1,
-                        Availability = FromAndroidAvailability(cursor.GetInt(8)),
-                        IsRecurring = !string.IsNullOrWhiteSpace(rrule),
-                        RecurrenceRule = string.IsNullOrWhiteSpace(rrule) ? null : rrule
-                    };
+                    var rawStart = DateTimeOffset.FromUnixTimeMilliseconds(cursor.GetLong(1));
+
+                    // recurring rows have a NULL DTEND and a DURATION
+                    var duration = RecurrenceDuration.Parse(cursor.GetString(3));
+                    var rawEnd = !cursor.IsNull(2)
+                        ? DateTimeOffset.FromUnixTimeMilliseconds(cursor.GetLong(2))
+                        : rawStart + (duration ?? TimeSpan.Zero);
+
+                    var evt = ReadEventColumns(cursor, 4, rawStart, rawEnd);
+                    evt.Id = id.ToString();
+                    events.Add((id, evt));
                 }
             }
         }
 
-        if (events.Count == 0)
-            return [];
-
-        LoadReminders(events);
-        LoadAttendees(events);
-        return events.Values.ToList();
+        LoadChildren(events);
+        return events.Select(x => x.Event).ToList();
     }
 
-    static void LoadReminders(Dictionary<long, CalendarEvent> events)
+    static CalendarEvent ReadEventColumns(ICursor cursor, int offset, DateTimeOffset rawStart, DateTimeOffset rawEnd)
     {
-        var ids = events.Keys.ToList();
-        var placeholders = string.Join(",", ids.Select(_ => "?"));
+        var allDay = cursor.GetInt(offset + 4) == 1;
+        var rrule = cursor.GetString(offset + 6);
+        return new CalendarEvent
+        {
+            CalendarId = cursor.GetString(offset),
+            Title = cursor.GetString(offset + 1) ?? string.Empty,
+            Description = cursor.GetString(offset + 2),
+            Location = cursor.GetString(offset + 3),
+            // all-day rows are UTC midnights; hand them out as local midnights, like EventKit does
+            Start = allDay ? AllDayDates.FromStorage(rawStart) : rawStart,
+            End = allDay ? AllDayDates.FromStorage(rawEnd) : rawEnd,
+            IsAllDay = allDay,
+            Availability = FromAndroidAvailability(cursor.GetInt(offset + 5)),
+            IsRecurring = !string.IsNullOrWhiteSpace(rrule),
+            RecurrenceRule = string.IsNullOrWhiteSpace(rrule) ? null : rrule
+        };
+    }
+
+    static EventRow? ReadEventRow(long eventId)
+    {
+        using var cursor = Resolver.Query(
+            EventsColumns.ContentUri!,
+            [
+                EventsColumns.InterfaceConsts.Rrule,
+                EventsColumns.InterfaceConsts.Dtstart,
+                EventsColumns.InterfaceConsts.AllDay,
+                EventsColumns.InterfaceConsts.EventTimezone
+            ],
+            EventsColumns.InterfaceConsts.Id + " = ?",
+            [eventId.ToString()],
+            null
+        );
+        if (cursor == null || !cursor.MoveToFirst())
+            return null;
+
+        return new EventRow(cursor.GetString(0), cursor.GetLong(1), cursor.GetInt(2) == 1, cursor.GetString(3));
+    }
+
+    sealed record EventRow(string? Rrule, long Dtstart, bool AllDay, string? Timezone)
+    {
+        public bool IsRecurring => !string.IsNullOrWhiteSpace(this.Rrule);
+    }
+
+    static void LoadChildren(List<(long EventId, CalendarEvent Event)> events)
+    {
+        if (events.Count == 0)
+            return;
+
+        var byId = events.ToLookup(x => x.EventId, x => x.Event);
+        foreach (var chunk in byId.Select(x => x.Key).Chunk(MaxSqlArgs))
+        {
+            LoadReminders(byId, chunk);
+            LoadAttendees(byId, chunk);
+        }
+    }
+
+    static string InClause(string column, long[] ids)
+        => column + " IN (" + string.Join(",", ids.Select(_ => "?")) + ")";
+
+    static void LoadReminders(ILookup<long, CalendarEvent> events, long[] ids)
+    {
         using var cursor = Resolver.Query(
             RemindersColumns.ContentUri!,
             [RemindersColumns.InterfaceConsts.EventId, RemindersColumns.InterfaceConsts.Minutes],
-            RemindersColumns.InterfaceConsts.EventId + " IN (" + placeholders + ")",
+            InClause(RemindersColumns.InterfaceConsts.EventId, ids),
             ids.Select(i => i.ToString()).ToArray(),
             null
         );
@@ -358,15 +505,16 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
         {
             var eventId = cursor.GetLong(0);
             var minutes = cursor.GetInt(1);
-            if (events.TryGetValue(eventId, out var evt) && minutes >= 0)
-                evt.Reminders.Add(new EventReminder(TimeSpan.FromMinutes(minutes)));
+            if (minutes >= 0)
+            {
+                foreach (var evt in events[eventId])
+                    evt.Reminders.Add(new EventReminder(TimeSpan.FromMinutes(minutes)));
+            }
         }
     }
 
-    static void LoadAttendees(Dictionary<long, CalendarEvent> events)
+    static void LoadAttendees(ILookup<long, CalendarEvent> events, long[] ids)
     {
-        var ids = events.Keys.ToList();
-        var placeholders = string.Join(",", ids.Select(_ => "?"));
         using var cursor = Resolver.Query(
             AttendeesColumns.ContentUri!,
             [
@@ -377,7 +525,7 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
                 AttendeesColumns.InterfaceConsts.AttendeeStatus,
                 AttendeesColumns.InterfaceConsts.AttendeeType
             ],
-            AttendeesColumns.InterfaceConsts.EventId + " IN (" + placeholders + ")",
+            InClause(AttendeesColumns.InterfaceConsts.EventId, ids),
             ids.Select(i => i.ToString()).ToArray(),
             null
         );
@@ -387,41 +535,79 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
         while (cursor.MoveToNext())
         {
             var eventId = cursor.GetLong(0);
-            if (!events.TryGetValue(eventId, out var evt))
-                continue;
-
             var relationship = cursor.GetInt(3);
-            var attendee = new EventAttendee
+            foreach (var evt in events[eventId])
             {
-                Name = cursor.GetString(1),
-                Email = cursor.GetString(2),
-                Role = FromAndroidAttendeeType(cursor.GetInt(5)),
-                Status = FromAndroidAttendeeStatus(cursor.GetInt(4)),
-                IsOrganizer = relationship == (int)CalendarAttendeesRelationship.Organizer
-            };
-            evt.Attendees.Add(attendee);
-            if (attendee.IsOrganizer)
-                evt.Organizer = attendee;
+                var attendee = new EventAttendee
+                {
+                    Name = cursor.GetString(1),
+                    Email = cursor.GetString(2),
+                    Role = FromAndroidAttendeeType(cursor.GetInt(5)),
+                    Status = FromAndroidAttendeeStatus(cursor.GetInt(4)),
+                    IsOrganizer = relationship == (int)CalendarAttendeesRelationship.Organizer
+                };
+                evt.Attendees.Add(attendee);
+                if (attendee.IsOrganizer)
+                    evt.Organizer = attendee;
+            }
         }
     }
 
     // ── Event writing ────────────────────────────────────────────────
 
-    static ContentValues ToContentValues(CalendarEvent evt, long calendarId)
+    static ContentValues ToContentValues(CalendarEvent evt, bool recurring, string? existingTimezone)
     {
+        // all-day events must be stored as UTC midnights in the UTC zone, with an exclusive end
+        var (start, end) = evt.IsAllDay
+            ? AllDayDates.ToStorage(evt.Start, evt.End)
+            : (evt.Start, evt.End);
+
         var values = new ContentValues();
-        values.Put(EventsColumns.InterfaceConsts.CalendarId, calendarId);
         values.Put(EventsColumns.InterfaceConsts.Title, evt.Title);
         values.Put(EventsColumns.InterfaceConsts.Description, evt.Description);
         values.Put(EventsColumns.InterfaceConsts.EventLocation, evt.Location);
-        values.Put(EventsColumns.InterfaceConsts.Dtstart, evt.Start.ToUnixTimeMilliseconds());
-        values.Put(EventsColumns.InterfaceConsts.Dtend, evt.End.ToUnixTimeMilliseconds());
+        values.Put(EventsColumns.InterfaceConsts.Dtstart, start.ToUnixTimeMilliseconds());
+        if (recurring)
+        {
+            values.Put(EventsColumns.InterfaceConsts.Duration, RecurrenceDuration.ToRfc5545(end - start, evt.IsAllDay));
+            values.PutNull(EventsColumns.InterfaceConsts.Dtend);
+        }
+        else
+        {
+            values.Put(EventsColumns.InterfaceConsts.Dtend, end.ToUnixTimeMilliseconds());
+        }
         values.Put(EventsColumns.InterfaceConsts.AllDay, evt.IsAllDay ? 1 : 0);
         values.Put(EventsColumns.InterfaceConsts.Availability, ToAndroidAvailability(evt.Availability));
-        // EventTimezone is mandatory on insert.
-        values.Put(EventsColumns.InterfaceConsts.EventTimezone, Java.Util.TimeZone.Default!.ID);
+        // EventTimezone is mandatory on insert, and must be UTC for all-day events
+        var timezone = evt.IsAllDay ? "UTC" : (existingTimezone ?? Java.Util.TimeZone.Default!.ID);
+        values.Put(EventsColumns.InterfaceConsts.EventTimezone, timezone);
         return values;
     }
+
+    static void ReplaceReminders(long eventId, List<EventReminder> reminders)
+    {
+        Resolver.Delete(RemindersColumns.ContentUri!, RemindersColumns.InterfaceConsts.EventId + " = ?", [eventId.ToString()]);
+        WriteReminders(eventId, reminders);
+    }
+
+    static void ReplaceAttendees(long eventId, List<EventAttendee> attendees)
+    {
+        // rewriting attendees makes sync adapters send fresh invitations, so leave an unchanged list alone
+        var current = new List<(long EventId, CalendarEvent Event)> { (eventId, new CalendarEvent()) };
+        var byId = current.ToLookup(x => x.EventId, x => x.Event);
+        LoadAttendees(byId, [eventId]);
+        var existing = current[0].Event.Attendees;
+        if (AttendeeKeys(existing).SequenceEqual(AttendeeKeys(attendees)))
+            return;
+
+        Resolver.Delete(AttendeesColumns.ContentUri!, AttendeesColumns.InterfaceConsts.EventId + " = ?", [eventId.ToString()]);
+        WriteAttendees(eventId, attendees);
+    }
+
+    static IEnumerable<string> AttendeeKeys(IEnumerable<EventAttendee> attendees)
+        => attendees
+            .Select(a => $"{a.Email?.ToLowerInvariant()}|{a.Name}|{a.Role}|{a.Status}|{a.IsOrganizer}")
+            .Order(StringComparer.Ordinal);
 
     static void WriteReminders(long eventId, List<EventReminder> reminders)
     {
@@ -444,6 +630,7 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
             values.Put(AttendeesColumns.InterfaceConsts.AttendeeName, attendee.Name);
             values.Put(AttendeesColumns.InterfaceConsts.AttendeeEmail, attendee.Email);
             values.Put(AttendeesColumns.InterfaceConsts.AttendeeType, ToAndroidAttendeeType(attendee.Role));
+            values.Put(AttendeesColumns.InterfaceConsts.AttendeeStatus, ToAndroidAttendeeStatus(attendee.Status));
             values.Put(AttendeesColumns.InterfaceConsts.AttendeeRelationship, (int)(attendee.IsOrganizer
                 ? CalendarAttendeesRelationship.Organizer
                 : CalendarAttendeesRelationship.Attendee));
@@ -535,5 +722,14 @@ public class CalendarStoreImpl(AndroidPlatform platform) : ICalendarStore
         (int)CalendarAttendeesStatus.Invited => AttendeeStatus.Pending,
         (int)CalendarAttendeesStatus.Tentative => AttendeeStatus.Tentative,
         _ => AttendeeStatus.Unknown
+    };
+
+    static int ToAndroidAttendeeStatus(AttendeeStatus status) => status switch
+    {
+        AttendeeStatus.Accepted => (int)CalendarAttendeesStatus.Accepted,
+        AttendeeStatus.Declined => (int)CalendarAttendeesStatus.Declined,
+        AttendeeStatus.Pending => (int)CalendarAttendeesStatus.Invited,
+        AttendeeStatus.Tentative => (int)CalendarAttendeesStatus.Tentative,
+        _ => (int)CalendarAttendeesStatus.None
     };
 }

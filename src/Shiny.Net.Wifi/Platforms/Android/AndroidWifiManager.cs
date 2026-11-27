@@ -42,7 +42,7 @@ public class AndroidWifiManager(
     readonly LocationInfoCache locationInfo = new();
     WifiChangeCallback? changeCallback;
     WifiRequestCallback? requestCallback;
-    Network? boundNetwork;
+    volatile Network? boundNetwork;
 
     Android.Net.Wifi.WifiManager Native => platform.GetSystemService<Android.Net.Wifi.WifiManager>(Context.WifiService);
     ConnectivityManager Connectivity => platform.GetSystemService<ConnectivityManager>(Context.ConnectivityService);
@@ -407,8 +407,21 @@ public class AndroidWifiManager(
         // registerNetworkCallback request does not match it, so this callback is the only thing
         // that ever sees its unredacted WifiInfo
         var callback = WifiRequestCallback.Create(
-            network => tcs.TrySetResult(network),
+            network =>
+            {
+                // the request stays registered, so Android hands the network back after a drop -
+                // re-bind to it rather than leave the dead one in place
+                if (!tcs.TrySetResult(network))
+                    this.boundNetwork = network;
+            },
             () => tcs.TrySetException(new WifiConnectionException($"Android could not join '{request.Ssid}' - the network was unavailable or the user declined the prompt")),
+            network =>
+            {
+                // a lost specifier network must not stay "bound", or every read keeps asking about
+                // a network that is gone and reports nothing even once the device is back on Wi-Fi
+                if (this.boundNetwork?.NetworkHandle == network.NetworkHandle)
+                    this.boundNetwork = null;
+            },
             this.locationInfo
         );
 
@@ -927,33 +940,37 @@ class WifiRequestCallback : ConnectivityManager.NetworkCallback
 {
     readonly Action<Network> onAvailable;
     readonly Action onFailed;
+    readonly Action<Network> onLost;
     readonly LocationInfoCache cache;
 
-    WifiRequestCallback(Action<Network> onAvailable, Action onFailed, LocationInfoCache cache)
+    WifiRequestCallback(Action<Network> onAvailable, Action onFailed, Action<Network> onLost, LocationInfoCache cache)
     {
         this.onAvailable = onAvailable;
         this.onFailed = onFailed;
+        this.onLost = onLost;
         this.cache = cache;
     }
 
 
     [SupportedOSPlatform("android31.0")]
-    WifiRequestCallback(Action<Network> onAvailable, Action onFailed, LocationInfoCache cache, NetworkCallbackFlags flags) : base((int)flags)
+    WifiRequestCallback(Action<Network> onAvailable, Action onFailed, Action<Network> onLost, LocationInfoCache cache, NetworkCallbackFlags flags) : base((int)flags)
     {
         this.onAvailable = onAvailable;
         this.onFailed = onFailed;
+        this.onLost = onLost;
         this.cache = cache;
     }
 
 
-    public static WifiRequestCallback Create(Action<Network> onAvailable, Action onFailed, LocationInfoCache cache)
+    public static WifiRequestCallback Create(Action<Network> onAvailable, Action onFailed, Action<Network> onLost, LocationInfoCache cache)
         => OperatingSystem.IsAndroidVersionAtLeast(31)
-            ? new WifiRequestCallback(onAvailable, onFailed, cache, NetworkCallbackFlags.IncludeLocationInfo)
-            : new WifiRequestCallback(onAvailable, onFailed, cache);
+            ? new WifiRequestCallback(onAvailable, onFailed, onLost, cache, NetworkCallbackFlags.IncludeLocationInfo)
+            : new WifiRequestCallback(onAvailable, onFailed, onLost, cache);
 
 
     public override void OnAvailable(Network network) => this.onAvailable(network);
     public override void OnUnavailable() => this.onFailed();
+    public override void OnLost(Network network) => this.onLost(network);
 
     public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
     {

@@ -95,8 +95,22 @@ public abstract class AbstractScreenRecording : IScreenRecording
                     continue;
 
                 this.logger.MaxDurationReached(max);
-                var final = await this.Finish(CancellationToken.None).ConfigureAwait(false);
-                this.RaiseFaulted(ScreenRecordingFaultReason.MaxDurationReached, final, null);
+
+                // a stop that fails here still ended the session; the app must hear about it
+                // through Faulted rather than find out from a recording that silently stopped
+                ScreenRecordingResult? final = null;
+                Exception? failure = null;
+                try
+                {
+                    final = await this.Finish(CancellationToken.None).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.FinishAfterFaultFailed(ex);
+                    failure = ex;
+                }
+
+                this.RaiseFaulted(ScreenRecordingFaultReason.MaxDurationReached, final, failure);
                 return;
             }
         }

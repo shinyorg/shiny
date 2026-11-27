@@ -14,6 +14,7 @@ sealed class SsdpPublication : ISsdpPublication
     /// <summary>UDA requires each announcement to be sent more than once, since UDP loses datagrams.</summary>
     const int AnnounceTransmissions = 3;
     static readonly TimeSpan announceGap = TimeSpan.FromMilliseconds(150);
+    static readonly TimeSpan minimumRefreshDelay = TimeSpan.FromSeconds(1);
 
     /// <summary>Per-source response allowance. SSDP reflection is a real amplification vector.</summary>
     const int ResponseBurst = 10;
@@ -175,6 +176,10 @@ sealed class SsdpPublication : ISsdpPublication
             {
                 var half = this.registration.MaxAge.TotalMilliseconds / 2;
                 var delay = TimeSpan.FromMilliseconds(half * (0.5 + (Random.Shared.NextDouble() * 0.5)));
+
+                // a zero or tiny MaxAge would otherwise re-announce in a tight loop and flood the link
+                if (delay < minimumRefreshDelay)
+                    delay = minimumRefreshDelay;
 
                 await Task.Delay(delay, ct).ConfigureAwait(false);
                 await this.Announce(ct).ConfigureAwait(false);

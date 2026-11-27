@@ -136,7 +136,9 @@ approval-gated by Apple:
 | Linux    | firewall | same; Docker bridge networking does not work |
 
 A missing permission throws `DiscoveryPermissionException` with a message naming exactly what to
-add, rather than silently returning nothing.
+add, rather than silently returning nothing. An unreachable/network-down send error only counts as
+a denial until a send has worked - after that it is an interface dropping (a Wi-Fi handoff), and a
+browse or publication keeps going and re-joins the group when the network comes back.
 
 ## Setup
 

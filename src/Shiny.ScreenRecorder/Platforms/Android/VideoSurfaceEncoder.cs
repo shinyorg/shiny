@@ -28,12 +28,10 @@ internal sealed class VideoSurfaceEncoder : IDisposable
     readonly Thread drainThread;
     readonly object pauseGate = new();
 
+    readonly PauseTimeline timeline = new();
+
     int trackIndex = -1;
     volatile bool draining = true;
-    volatile bool paused;
-    long pauseStartedUs = -1;
-    long offsetUs;
-    long lastWrittenUs = -1;
 
 
     public VideoSurfaceEncoder(VideoDimensions dimensions, MediaMuxerSink muxer, ILogger logger)
@@ -65,44 +63,34 @@ internal sealed class VideoSurfaceEncoder : IDisposable
     /// <summary>The surface the VirtualDisplay renders into.</summary>
     public Surface InputSurface { get; }
 
-    /// <summary>The presentation time of the last frame written, in microseconds.</summary>
-    public long LastWrittenUs => Interlocked.Read(ref this.lastWrittenUs);
+    /// <summary>
+    /// How much video has been written, from the first frame to the last with paused spans removed.
+    /// </summary>
+    /// <remarks>
+    /// The encoder's timestamps come from the surface, which is the system's monotonic clock - the
+    /// last one on its own is device uptime, not a recording length.
+    /// </remarks>
+    public TimeSpan Duration
+    {
+        get
+        {
+            lock (this.pauseGate)
+                return TimeSpan.FromMilliseconds(this.timeline.Duration / 1000d);
+        }
+    }
 
 
     public void Pause()
     {
         lock (this.pauseGate)
-        {
-            this.paused = true;
-            this.pauseStartedUs = -1;
-        }
+            this.timeline.Pause();
     }
 
 
     public void Resume()
     {
         lock (this.pauseGate)
-        {
-            if (!this.paused)
-                return;
-
-            this.paused = false;
-
-            // nothing arrived while paused, so there is no gap to close
-            if (this.pauseStartedUs < 0 || this.lastWrittenUs < 0)
-            {
-                this.pauseStartedUs = -1;
-                return;
-            }
-
-            // the gap runs from the last frame actually written to the first frame dropped, both
-            // measured on the encoder's own (un-offset) clock
-            var skipped = this.pauseStartedUs - (this.lastWrittenUs + this.offsetUs);
-            if (skipped > 0)
-                this.offsetUs += skipped;
-
-            this.pauseStartedUs = -1;
-        }
+            this.timeline.Resume();
     }
 
 
@@ -134,12 +122,8 @@ internal sealed class VideoSurfaceEncoder : IDisposable
                 // output format - writing it as a sample corrupts the track
                 var isConfig = (info.Flags & MediaCodecBufferFlags.CodecConfig) != 0;
 
-                if (!isConfig && buffer != null && info.Size > 0 && !this.ShouldDrop(info))
-                {
-                    info.PresentationTimeUs -= this.offsetUs;
-                    Interlocked.Exchange(ref this.lastWrittenUs, info.PresentationTimeUs);
-                    this.muxer.Write(this.trackIndex, buffer, info);
-                }
+                if (!isConfig && buffer != null && info.Size > 0)
+                    this.WriteSample(buffer, info);
 
                 this.codec.ReleaseOutputBuffer(index, false);
 
@@ -158,18 +142,26 @@ internal sealed class VideoSurfaceEncoder : IDisposable
     }
 
 
-    bool ShouldDrop(MediaCodec.BufferInfo info)
+    void WriteSample(Java.Nio.ByteBuffer buffer, MediaCodec.BufferInfo info)
     {
+        var raw = info.PresentationTimeUs;
+        long mapped;
+
+        // the compositor keeps drawing while paused; those frames are dropped here and the span
+        // they covered is taken out of every later timestamp once the first frame after resume
+        // arrives - see PauseTimeline
         lock (this.pauseGate)
         {
-            if (!this.paused)
-                return false;
-
-            if (this.pauseStartedUs < 0)
-                this.pauseStartedUs = info.PresentationTimeUs;
-
-            return true;
+            if (!this.timeline.TryMap(raw, out mapped))
+                return;
         }
+
+        info.PresentationTimeUs = mapped;
+        if (!this.muxer.Write(this.trackIndex, buffer, info))
+            return;
+
+        lock (this.pauseGate)
+            this.timeline.Commit(raw, mapped);
     }
 
 

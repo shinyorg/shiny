@@ -16,6 +16,10 @@ public class ShinyLocationCallback : LocationCallback, Android.Locations.ILocati
     public int StationarySecondsThreshold { get; set; } = 30;
 
 
+    // a new listener must not compare its first reading against where the last one stopped
+    internal void ResetStationary() => this.detector.Reset();
+
+
     public void OnLocationChanged(Location? location)
     {
         if (location == null)

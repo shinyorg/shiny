@@ -10,6 +10,7 @@ public class CallScreeningTests
     [InlineData("8005550100", 1, 18005550100L)]
     [InlineData("+1 (800) 555-0100", 1, 18005550100L)]
     [InlineData("02079460018", 44, 442079460018L)]
+    [InlineData("049411234567", 49, 4949411234567L)]
     public void Normalize_IncomingHandles(string handle, int countryCode, long expected)
         => Assert.Equal(expected, CallScreening.Normalize(handle, countryCode));
 

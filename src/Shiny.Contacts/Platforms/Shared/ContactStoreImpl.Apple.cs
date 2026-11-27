@@ -596,23 +596,15 @@ public class ContactStoreImpl : IContactStore
     {
         if (components == null) return null;
 
-        var year = (int)components.Year;
-        var month = (int)components.Month;
-        var day = (int)components.Day;
-
-        if (month < 1 || month > 12 || day < 1 || day > 31)
-            return null;
-
-        // Year may be unset (NSDateComponentUndefined) for birthday without year
-        if (year == nint.MaxValue || year < 1 || year > 9999)
-            year = 1;
-
-        return new DateOnly(year, month, day);
+        // Year is NSDateComponentUndefined for a birthday saved without one (see ContactDate.HasYear).
+        // ContactDates.Create returns null rather than throwing for a day the month does not have.
+        int? year = components.Year == NSDateComponents.Undefined ? null : (int)components.Year;
+        return ContactDates.Create(year, (int)components.Month, (int)components.Day);
     }
 
     static NSDateComponents ToNSDateComponents(DateOnly date) => new()
     {
-        Year = date.Year,
+        Year = ContactDates.IsYearless(date) ? NSDateComponents.Undefined : date.Year,
         Month = date.Month,
         Day = date.Day
     };

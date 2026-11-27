@@ -281,6 +281,28 @@ public class VpnManagerTests
 
 
     [Fact]
+    public async Task ALaterSubscriberAlsoGetsTheCurrentState()
+    {
+        var vpn = new FakeVpnManager(Everything, VpnConnectionState.Connected);
+        var first = new SemaphoreSlim(0);
+        EventHandler<VpnConnectionState> firstHandler = (_, _) => first.Release();
+
+        vpn.StatusChanged += firstHandler;
+        Assert.True(await first.WaitAsync(TimeSpan.FromSeconds(5)));
+
+        var seen = new List<VpnConnectionState>();
+        EventHandler<VpnConnectionState> secondHandler = (_, state) => seen.Add(state);
+        vpn.StatusChanged += secondHandler;
+
+        Assert.Equal([VpnConnectionState.Connected], seen);
+        Assert.Equal(1, vpn.ListenStarts);
+
+        vpn.StatusChanged -= secondHandler;
+        vpn.StatusChanged -= firstHandler;
+    }
+
+
+    [Fact]
     public void WithoutStatusSubscribingStartsNoWatcher()
     {
         var vpn = new FakeVpnManager(Everything & ~VpnCapabilities.Status);

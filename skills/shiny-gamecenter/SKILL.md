@@ -46,6 +46,9 @@ Namespace `Shiny.GameCenter`; `AddGameCenter` lives in `Shiny`.
 2. **Incremental achievements must be registered with `totalSteps`**, matching the step count in the Play Console.
    Apple counts in percent, so the total has to be known on the device. `IncrementAsync`/`SetProgressAsync` on an
    unregistered key throws `ArgumentException`.
+   Progress read back from Game Center (a percentage) is converted to the nearest step: exact for `totalSteps <= 100`
+   whatever precision Apple keeps. Above 100 steps it is exact at full precision, but if Apple rounds to a whole percent
+   the read-back can be off by up to `totalSteps / 200` steps either way (e.g. 5 of 1000) - prefer `totalSteps <= 100` for Apple.
 3. **Do not wrap progress calls in try/catch or retry loops.** `UnlockAsync`, `SetProgressAsync`, `IncrementAsync`,
    `RevealAsync` and `SubmitScoreAsync` record to a persisted queue and do not throw for offline / signed-out. The
    queue flushes on sign-in, on connectivity returning, and after every call.

@@ -24,7 +24,7 @@ public class IntervalTrigger
     public TimeSpan? Interval { get; set; }
 
     /// <summary>
-    /// Clock source used by <see cref="CalculateNextAlarm"/>. Defaults to <see cref="TimeProvider.System"/>;
+    /// Clock source used by <see cref="CalculateNextAlarm()"/>. Defaults to <see cref="TimeProvider.System"/>;
     /// tests can substitute a <see cref="FakeTimeProvider"/> for deterministic alarm calculation.
     /// </summary>
     public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
@@ -48,24 +48,39 @@ public class IntervalTrigger
 
     /// <summary>
     /// Calculates the next UTC time the trigger should fire based on the configured interval or time-of-day (and optional day-of-week).
+    /// <see cref="TimeOfDay"/> is a local time in <see cref="TimeProvider"/>'s local time zone - today when it is still ahead,
+    /// otherwise the next day (or the next matching <see cref="DayOfWeek"/>).
     /// </summary>
     /// <returns>The next fire time in UTC.</returns>
     public DateTime CalculateNextAlarm()
+        => this.CalculateNextAlarm(this.TimeProvider.GetUtcNow()).UtcDateTime;
+
+
+    /// <summary>
+    /// The first time the trigger fires strictly after <paramref name="after"/>.
+    /// </summary>
+    internal DateTimeOffset CalculateNextAlarm(DateTimeOffset after)
     {
-        var now = this.TimeProvider.GetUtcNow().UtcDateTime;
-
         if (this.Interval != null)
-            return now.Add(this.Interval.Value);
+            return after.ToUniversalTime().Add(this.Interval.Value);
 
+        var tz = this.TimeProvider.LocalTimeZone;
         var time = this.TimeOfDay!.Value;
-        var dt = now.Date.AddDays(1).Add(time);
+        var day = TimeZoneInfo.ConvertTime(after, tz).Date;
+        var next = AtLocal(day, time, tz);
 
-        if (this.DayOfWeek != null)
+        while (next <= after || (this.DayOfWeek != null && day.DayOfWeek != this.DayOfWeek.Value))
         {
-            var day = this.DayOfWeek.Value;
-            while (dt.DayOfWeek != day)
-                dt = dt.AddDays(1);
+            day = day.AddDays(1);
+            next = AtLocal(day, time, tz);
         }
-        return dt;
+        return next.ToUniversalTime();
+    }
+
+
+    static DateTimeOffset AtLocal(DateTime day, TimeSpan time, TimeZoneInfo tz)
+    {
+        var local = DateTime.SpecifyKind(day.Add(time), DateTimeKind.Unspecified);
+        return new DateTimeOffset(local, tz.GetUtcOffset(local));
     }
 }

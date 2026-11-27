@@ -19,11 +19,11 @@ public class GpsManager(
     public GpsRequest? CurrentListener { get; private set; }
 
 
+    // read without asking - RequestAccessAsync can show the consent prompt, and blocking on it from the UI thread hangs
     public AccessState GetCurrentStatus(GpsRequest request)
-    {
-        var status = Geolocator.RequestAccessAsync().AsTask().GetAwaiter().GetResult();
-        return FromNative(status);
-    }
+        => request.BackgroundMode != GpsBackgroundMode.None
+            ? AccessState.NotSupported
+            : WindowsLocationAccess.GetCurrentStatus();
 
 
     public async Task<AccessState> RequestAccess(GpsRequest request)

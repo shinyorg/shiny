@@ -41,7 +41,13 @@ public class AndroidWifiHotspot(
         var tcs = new TaskCompletionSource<NativeWifiManager.LocalOnlyHotspotReservation>();
 
         var callback = new LocalOnlyHotspotCallback(
-            reservation => tcs.TrySetResult(reservation),
+            reservation =>
+            {
+                // the caller cancelled before Android answered - nobody holds this reservation, so
+                // close it rather than leave the hotspot up until the process dies
+                if (!tcs.TrySetResult(reservation))
+                    reservation.Close();
+            },
             error => tcs.TrySetException(new WifiException($"Android refused to start the local-only hotspot - {error}")),
             this.OnHotspotStopped
         );

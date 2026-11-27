@@ -54,7 +54,7 @@ public class EncoderCommandTests
     {
         var command = EncoderCommandBuilder.GStreamer(1, Dimensions, "/tmp/out.mp4", null, false);
 
-        Assert.Contains("video/x-raw,width=1280,height=720,framerate=30/1", command.Arguments);
+        Assert.Contains("video/x-raw,format=I420,width=1280,height=720,framerate=30/1", command.Arguments);
     }
 
 

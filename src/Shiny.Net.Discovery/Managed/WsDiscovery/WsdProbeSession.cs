@@ -250,24 +250,26 @@ sealed class WsdProbeSession(
         {
             lock (this.sync)
             {
-                if (!this.targets.TryGetValue(match.EndpointReference, out var state))
-                    return;
-
-                // a Bye from a previous instance must not kill a device that already came back
-                if (!state.AcceptSequence(message.AppSequence))
+                // an unknown or stale entry only skips itself - the rest of the Bye still applies
+                if (this.targets.TryGetValue(match.EndpointReference, out var state))
                 {
-                    logger.LogTrace("Ignoring a stale WS-Discovery Bye for {Epr}", match.EndpointReference);
-                    return;
-                }
+                    // a Bye from a previous instance must not kill a device that already came back
+                    if (state.AcceptSequence(message.AppSequence))
+                    {
+                        this.targets.Remove(match.EndpointReference);
 
-                this.targets.Remove(match.EndpointReference);
-
-                if (state.Emitted)
-                {
-                    this.Enqueue(new WsDiscoveryResult(
-                        WsDiscoveryStatus.Lost,
-                        new WsdTarget { EndpointReference = state.EndpointReference }
-                    ));
+                        if (state.Emitted)
+                        {
+                            this.Enqueue(new WsDiscoveryResult(
+                                WsDiscoveryStatus.Lost,
+                                new WsdTarget { EndpointReference = state.EndpointReference }
+                            ));
+                        }
+                    }
+                    else
+                    {
+                        logger.LogTrace("Ignoring a stale WS-Discovery Bye for {Epr}", match.EndpointReference);
+                    }
                 }
             }
         }

@@ -83,20 +83,23 @@ internal sealed class MediaMuxerSink : IDisposable
     /// recording is allowed to lose; after it stops, anything still in flight belongs to a file
     /// that is already finalised.
     /// </remarks>
-    public void Write(int trackIndex, ByteBuffer buffer, MediaCodec.BufferInfo info)
+    /// <returns>Whether the sample reached the file.</returns>
+    public bool Write(int trackIndex, ByteBuffer buffer, MediaCodec.BufferInfo info)
     {
         lock (this.gate)
         {
             if (!this.started || this.stopped || trackIndex < 0 || info.Size <= 0)
-                return;
+                return false;
 
             try
             {
                 this.muxer.WriteSampleData(trackIndex, buffer, info);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.MuxerWriteFailed(ex);
+                return false;
             }
         }
     }

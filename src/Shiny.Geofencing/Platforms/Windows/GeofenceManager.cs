@@ -70,14 +70,8 @@ public class GeofenceManager : IGeofenceManager, IShinyStartupTask
     }
 
 
-    public AccessState CurrentStatus
-    {
-        get
-        {
-            var status = Geolocator.RequestAccessAsync().AsTask().GetAwaiter().GetResult();
-            return FromNative(status);
-        }
-    }
+    // read without asking - RequestAccessAsync can show the consent prompt, and blocking on it from the UI thread hangs
+    public AccessState CurrentStatus => WindowsLocationAccess.GetCurrentStatus();
 
 
     public async Task<AccessState> RequestAccess()

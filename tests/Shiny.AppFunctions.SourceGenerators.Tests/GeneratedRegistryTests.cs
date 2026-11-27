@@ -18,8 +18,8 @@ public class GeneratedRegistryTests
         return services.BuildServiceProvider().GetRequiredService<AppFunctionDispatcher>();
     }
 
-    static Task<AppFunctionOutcome> Run(string id, string json, AppFunctionPlatform platform = AppFunctionPlatform.Other)
-        => Dispatcher().Execute(new AppFunctionInvocation(id, platform), json, CancellationToken.None);
+    static Task<AppFunctionOutcome> Run(string id, string json, AppFunctionPlatform platform = AppFunctionPlatform.Other, bool foreground = false)
+        => Dispatcher().Execute(new AppFunctionInvocation(id, platform, foreground), json, CancellationToken.None);
 
     [Fact]
     public void AddAppFunctions_RegistersEverything()
@@ -115,12 +115,13 @@ public class GeneratedRegistryTests
     [Fact]
     public async Task VoidFunction_WithRequiredInitializerProperty()
     {
-        var outcome = await Run("cancel_order", """{"number":"ORD-9"}""");
+        // cancel_order is OpensApp, which only runs while the app is on screen
+        var outcome = await Run("cancel_order", """{"number":"ORD-9"}""", foreground: true);
         Assert.Equal(AppFunctionStatus.Success, outcome.Status);
         Assert.Null(outcome.ResultJson);
         Assert.Equal("ORD-9", CancelOrderHandler.LastCancelled);
 
-        var missing = await Run("cancel_order", "{}");
+        var missing = await Run("cancel_order", "{}", foreground: true);
         Assert.Equal("number is required", missing.Message);
     }
 

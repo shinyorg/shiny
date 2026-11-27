@@ -28,14 +28,15 @@ static class SwiftEmitter
         sb.AppendLine("import Foundation");
         sb.AppendLine();
 
+        var names = new SwiftNames(model);
         foreach (var e in model.Enums)
-            EmitEnum(sb, e);
+            EmitEnum(sb, e, names);
 
         foreach (var e in model.Entities)
-            EmitEntity(sb, e);
+            EmitEntity(sb, e, names);
 
         foreach (var fn in model.Functions.Where(f => f.SearchesEntityId == null))
-            EmitIntent(sb, fn, model);
+            EmitIntent(sb, fn, names);
 
         var shortcuts = model.Functions.Where(f => f.ShortcutPhrases.Count > 0).ToList();
         if (shortcuts.Count > 0)
@@ -46,7 +47,7 @@ static class SwiftEmitter
             {
                 var phrases = string.Join(", ", fn.ShortcutPhrases.Select(Phrase));
                 sb.AppendLine("        AppShortcut(");
-                sb.AppendLine($"            intent: {IntentName(fn)}(),");
+                sb.AppendLine($"            intent: {names.Intent(fn)}(),");
                 sb.AppendLine($"            phrases: [{phrases}],");
                 sb.AppendLine($"            shortTitle: {Str(fn.ShortcutTitle ?? fn.Title)},");
                 sb.AppendLine($"            systemImageName: {Str(fn.ShortcutImage ?? "app")}");
@@ -58,9 +59,9 @@ static class SwiftEmitter
         return sb.ToString();
     }
 
-    static void EmitEnum(StringBuilder sb, TypeModel e)
+    static void EmitEnum(StringBuilder sb, TypeModel e, SwiftNames names)
     {
-        var name = EnumName(e);
+        var name = names.Enum(e);
         sb.AppendLine($"enum {name}: String, AppEnum {{");
         foreach (var v in e.EnumValues)
             sb.AppendLine($"    case {Ident(Analyzer.CamelCase(v))} = {Str(v)}");
@@ -73,9 +74,9 @@ static class SwiftEmitter
         sb.AppendLine();
     }
 
-    static void EmitEntity(StringBuilder sb, EntityModel e)
+    static void EmitEntity(StringBuilder sb, EntityModel e, SwiftNames names)
     {
-        var name = EntityName(e.SimpleName);
+        var name = names.Entity(e.TypeName);
         sb.AppendLine($"struct {name}: AppEntity {{");
         sb.AppendLine($"    static let typeDisplayRepresentation: TypeDisplayRepresentation = {Str(e.Title)}");
         sb.AppendLine($"    static let defaultQuery = {name}Query()");
@@ -98,9 +99,9 @@ static class SwiftEmitter
         sb.AppendLine();
     }
 
-    static void EmitIntent(StringBuilder sb, FunctionModel fn, GenerationModel model)
+    static void EmitIntent(StringBuilder sb, FunctionModel fn, SwiftNames names)
     {
-        var name = IntentName(fn);
+        var name = names.Intent(fn);
         sb.AppendLine($"struct {name}: AppIntent {{");
         sb.AppendLine($"    static let title: LocalizedStringResource = {Str(fn.Title)}");
         sb.AppendLine($"    static let description = IntentDescription({Str(fn.Description)})");
@@ -113,7 +114,7 @@ static class SwiftEmitter
             if (p.Description != null)
                 args += $", description: {Str(p.Description)}";
             sb.AppendLine($"    @Parameter({args})");
-            sb.AppendLine($"    var {Ident(p.WireName)}: {SwiftType(p.Type)}{(p.IsRequired ? "" : "?")}");
+            sb.AppendLine($"    var {Ident(p.WireName)}: {SwiftType(p.Type, names)}{(p.IsRequired ? "" : "?")}");
             sb.AppendLine();
         }
 
@@ -164,15 +165,15 @@ static class SwiftEmitter
         _ => (" & ReturnsValue<String>", "reply.text")
     };
 
-    static string SwiftType(TypeModel t) => t.Kind switch
+    static string SwiftType(TypeModel t, SwiftNames names) => t.Kind switch
     {
         ValueKind.String => "String",
         ValueKind.Int32 or ValueKind.Int64 => "Int",
         ValueKind.Double => "Double",
         ValueKind.Boolean => "Bool",
         ValueKind.DateTimeOffset => "Date",
-        ValueKind.Enum => EnumName(t),
-        ValueKind.Entity => EntityName(t.SimpleName),
+        ValueKind.Enum => names.Enum(t),
+        ValueKind.Entity => names.Entity(t.TypeName),
         _ => "String"
     };
 
@@ -184,9 +185,46 @@ static class SwiftEmitter
         _ => expr
     };
 
-    static string IntentName(FunctionModel fn) => Sanitize(fn.RequestSimpleName) + "Intent";
-    static string EntityName(string simpleName) => Sanitize(simpleName) + "AppEntity";
-    static string EnumName(TypeModel e) => Sanitize(e.SimpleName) + "AppEnum";
+    /// <summary>
+    /// Swift type names. Swift has no namespaces, so a C# simple name is used unless two types in the same category
+    /// share it (nested enums both called Status, two CreateItem records in different namespaces); those take their
+    /// namespace/containing-type qualified name instead.
+    /// </summary>
+    sealed class SwiftNames
+    {
+        readonly Dictionary<string, string> intents = new();
+        readonly Dictionary<string, string> entities = new();
+        readonly Dictionary<string, string> enums = new();
+
+        public SwiftNames(GenerationModel model)
+        {
+            Assign(this.intents, model.Functions.Where(f => f.SearchesEntityId == null).Select(f => (f.RequestType, f.RequestSimpleName)), "Intent");
+            Assign(this.entities, model.Entities.Select(e => (e.TypeName, e.SimpleName)), "AppEntity");
+            Assign(this.enums, model.Enums.Select(e => (e.TypeName, e.SimpleName)), "AppEnum");
+        }
+
+        public string Intent(FunctionModel fn) => this.intents[fn.RequestType];
+        public string Entity(string typeName) => this.entities[typeName];
+        public string Enum(TypeModel e) => this.enums[e.TypeName];
+
+        static void Assign(Dictionary<string, string> map, IEnumerable<(string FullName, string SimpleName)> types, string suffix)
+        {
+            var list = types.ToList();
+            var duplicated = new HashSet<string>(list
+                .GroupBy(x => Sanitize(x.SimpleName))
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key));
+
+            foreach (var (fullName, simpleName) in list)
+            {
+                var simple = Sanitize(simpleName);
+                var name = duplicated.Contains(simple)
+                    ? Sanitize(fullName.Replace("global::", "").Replace('.', '_'))
+                    : simple;
+                map[fullName] = name + suffix;
+            }
+        }
+    }
 
     static string Sanitize(string name)
     {

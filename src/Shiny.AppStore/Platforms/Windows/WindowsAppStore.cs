@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using Windows.Services.Store;
 
@@ -11,6 +12,7 @@ namespace Shiny.AppStore;
 public class WindowsAppStore(IPlatform platform, AppStoreOptions options) : IAppStore
 {
     readonly HttpClient http = new();
+    StoreContext? storeContext;
 
 
     public async Task<AppStoreResult?> GetCurrent(CancellationToken cancellationToken = default)
@@ -71,11 +73,11 @@ public class WindowsAppStore(IPlatform platform, AppStoreOptions options) : IApp
             }
         }
 
-        if (storeVersion == null && product.TryGetProperty("LastModifiedDate", out var mod) && mod.TryGetDateTimeOffset(out var dto))
-            releasedAt = dto;
-
         if (storeVersion == null)
             return null;
+
+        if (product.TryGetProperty("LastModifiedDate", out var mod) && mod.TryGetDateTimeOffset(out var dto))
+            releasedAt = dto;
 
         var current = platform.AppVersion;
         return new AppStoreResult(
@@ -110,13 +112,32 @@ public class WindowsAppStore(IPlatform platform, AppStoreOptions options) : IApp
     {
         try
         {
-            var result = await StoreContext.GetDefault().RequestRateAndReviewAppAsync();
+            var result = await this.GetStoreContext().RequestRateAndReviewAppAsync();
             return result.Status == StoreRateAndReviewStatus.Succeeded;
         }
         catch (Exception)
         {
             return false;
         }
+    }
+
+
+    StoreContext GetStoreContext()
+    {
+        if (this.storeContext != null)
+            return this.storeContext;
+
+        var context = StoreContext.GetDefault();
+
+        // a desktop (WinUI / unpackaged) app has no CoreWindow - StoreContext UI fails with "invalid window handle"
+        // unless it is parented to the app's window first, which may only be done once per context
+        var hwnd = Process.GetCurrentProcess().MainWindowHandle;
+        if (hwnd != IntPtr.Zero)
+        {
+            WinRT.Interop.InitializeWithWindow.Initialize(context, hwnd);
+            this.storeContext = context;
+        }
+        return context;
     }
 
 

@@ -289,9 +289,11 @@ internal sealed class NmClient : IAsyncDisposable
             {
                 return await this.AddAndActivate2(conn, settings, devicePath, specificObject).ConfigureAwait(false);
             }
-            catch (DBusErrorReplyException)
+            catch (DBusErrorReplyException ex) when (IsUnknownMethod(ex))
             {
-                // pre-1.16 daemon: the profile will be saved, which is the documented fallback
+                // pre-1.16 daemon: the profile will be saved, which is the documented fallback.
+                // Any other refusal (bad passphrase, polkit, no AP mode) propagates - retrying it with
+                // the persisting call would prompt again and leave a saved profile behind
             }
         }
 
@@ -317,6 +319,11 @@ internal sealed class NmClient : IAsyncDisposable
             }
         ).ConfigureAwait(false);
     }
+
+
+    /// <summary>True when the daemon does not implement the method at all - an older NetworkManager.</summary>
+    internal static bool IsUnknownMethod(DBusErrorReplyException ex)
+        => ex.ErrorName is "org.freedesktop.DBus.Error.UnknownMethod" or "org.freedesktop.DBus.Error.UnknownInterface";
 
 
     async Task<string> AddAndActivate2(DBusConnection conn, NmConnectionSettings settings, string devicePath, string specificObject)
@@ -513,8 +520,19 @@ internal sealed class NmClient : IAsyncDisposable
             static (Message msg, object? _) => msg,
             static (MessageNotification n) =>
             {
-                if (n.Exception == null)
+                // IsCompletion first: on a value notification reading Exception throws, and a
+                // handler that throws disconnects the whole connection (CLAUDE.md, D-Bus rule 3)
+                if (n.IsCompletion)
+                    return;
+
+                try
+                {
                     ((Action)n.State!).Invoke();
+                }
+                catch
+                {
+                    // never let a subscriber's failure take the shared connection down
+                }
             },
             emitOnCapturedContext: false,
             ObserverFlags.None,

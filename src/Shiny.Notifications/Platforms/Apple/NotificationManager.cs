@@ -242,7 +242,9 @@ public class NotificationManager(
                 break;
 
             case ChannelSound.Default:
-                native.Sound = UNNotificationSound.Default;
+                native.Sound = useCriticalSound
+                    ? UNNotificationSound.DefaultCriticalSound
+                    : UNNotificationSound.Default;
                 break;
 
             case ChannelSound.Custom:
@@ -253,38 +255,6 @@ public class NotificationManager(
 
             case ChannelSound.None:
                 break;
-        }
-
-        if (!channel.CustomSoundPath.IsEmpty())
-        {
-            if (channel.Importance == ChannelImportance.Critical)
-            {
-                native.Sound = UNNotificationSound.GetCriticalSound(channel.CustomSoundPath!);
-            }
-            else
-            {
-                native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath!);
-            }
-        }
-        else
-        {
-            switch (channel.Importance)
-            {
-                case ChannelImportance.Critical:
-                case ChannelImportance.High:
-                    var is12 = (OperatingSystem.IsIOSVersionAtLeast(12) || OperatingSystem.IsMacCatalystVersionAtLeast(12));
-                    native.Sound = configuration.UNAuthorizationOptions.HasFlag(UNAuthorizationOptions.CriticalAlert) && is12
-                        ? UNNotificationSound.DefaultCriticalSound
-                        : UNNotificationSound.Default;
-                    break;
-
-                case ChannelImportance.Normal:
-                    native.Sound = UNNotificationSound.Default;
-                    break;
-
-                case ChannelImportance.Low:
-                    break;
-            }
         }
     }
 
@@ -329,6 +299,10 @@ public class NotificationManager(
             var tcfg = notification.RepeatInterval!;
             if (tcfg.Interval != null)
             {
+                // UserNotifications raises a native exception for a repeating interval under a minute
+                if (tcfg.Interval.Value < TimeSpan.FromMinutes(1))
+                    throw new InvalidOperationException("A repeating Interval must be at least 1 minute on Apple platforms");
+
                 trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(
                     tcfg.Interval.Value.TotalSeconds,
                     true

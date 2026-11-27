@@ -127,9 +127,9 @@ public record HttpTransferResult(
 )
 {
     /// <summary>
-    /// Gets a value indicating whether the total transfer size is known.
+    /// Gets a value indicating whether the total transfer size is known (and greater than zero).
     /// </summary>
-    public bool IsDeterministic => this.Progress.BytesToTransfer != null;
+    public bool IsDeterministic => this.Progress.IsDeterministic;
 };
 
 
@@ -151,9 +151,10 @@ public record TransferProgress(
     public static TransferProgress Empty { get; } = new(0, 0, 0);
 
     /// <summary>
-    /// Gets a value indicating whether the total transfer size is known.
+    /// Gets a value indicating whether the total transfer size is known. A total of zero (or a negative
+    /// "unknown" size reported by a platform) is not - a percentage of it would be NaN or negative.
     /// </summary>
-    public bool IsDeterministic => this.BytesToTransfer != null;
+    public bool IsDeterministic => this.BytesToTransfer is > 0;
 
     double? percentComplete;
 
@@ -194,14 +195,14 @@ public record TransferProgress(
         {
             if (this.estimate == null)
             {
-                if (this.BytesToTransfer == null || this.BytesPerSecond == 0)
+                if (this.BytesToTransfer is not > 0 || this.BytesPerSecond <= 0)
                 {
                     this.estimate = TimeSpan.Zero;
                 }
                 else
                 {
-                    var bytesRemaining = this.BytesToTransfer.Value - this.BytesTransferred;
-                    this.estimate = TimeSpan.FromSeconds(bytesRemaining / this.BytesPerSecond);
+                    var bytesRemaining = this.BytesToTransfer.GetValueOrDefault() - this.BytesTransferred;
+                    this.estimate = TimeSpan.FromSeconds(Math.Max(0, bytesRemaining) / this.BytesPerSecond);
                 }
             }
             return this.estimate!.Value;

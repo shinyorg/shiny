@@ -32,6 +32,7 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
     // NEHotspotConfigurationError.AlreadyAssociated - the join succeeded before we asked
     const int AlreadyAssociated = 13;
     const int UserDenied = 7;
+    static readonly TimeSpan joinVerifyTimeout = TimeSpan.FromSeconds(15);
 
     readonly AppleLocationAccess location = new();
     ApplePathWatcher? watcher;
@@ -55,7 +56,9 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
     /// </remarks>
     public override async Task<WifiNetworkInfo?> GetCurrentNetwork(CancellationToken ct = default)
     {
-        var addressing = ManagedNetworkInfo.Read();
+        // .NET reports Apple's Wi-Fi interface as Ethernet (its link type is IFT_ETHER), so the
+        // "first wireless interface" lookup can come back empty - en0 is the Wi-Fi interface on iOS
+        var addressing = ManagedNetworkInfo.Read() ?? ManagedNetworkInfo.Read("en0");
         var network = await NEHotspotNetwork
             .FetchCurrentAsync()
             .WaitAsync(ct)
@@ -152,8 +155,49 @@ public class AppleWifiManager(ILogger<AppleWifiManager> logger) : AbstractWifiMa
             throw new WifiConnectionException($"Timed out joining '{request.Ssid}'", ex);
         }
 
-        return await this.GetCurrentNetwork(ct).ConfigureAwait(false)
-            ?? throw new WifiConnectionException($"Applied the configuration for '{request.Ssid}' but no Wi-Fi interface came up");
+        return await this.WaitForSsid(request.Ssid, ct).ConfigureAwait(false);
+    }
+
+
+    /// <remarks>
+    /// ApplyConfiguration can report success without the device ever joining - a wrong passphrase
+    /// is the usual case - so the join is only trusted once the current network names the SSID.
+    /// Without location access the SSID is unreadable, so the current network is returned unverified.
+    /// </remarks>
+    async Task<WifiNetworkInfo> WaitForSsid(string ssid, CancellationToken ct)
+    {
+        if (!this.location.IsGranted)
+        {
+            return await this.GetCurrentNetwork(ct).ConfigureAwait(false)
+                ?? throw new WifiConnectionException($"Applied the configuration for '{ssid}' but no Wi-Fi interface came up");
+        }
+
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        cts.CancelAfter(joinVerifyTimeout);
+
+        WifiNetworkInfo? current = null;
+        try
+        {
+            while (true)
+            {
+                current = await this.GetCurrentNetwork(cts.Token).ConfigureAwait(false);
+                if (current?.Ssid == ssid && current.IpAddresses.Count > 0)
+                    return current;
+
+                await Task.Delay(500, cts.Token).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            if (current?.Ssid == ssid)
+                return current;
+
+            if (current?.Ssid != null)
+                throw new WifiConnectionException($"Applied the configuration for '{ssid}' but the device is still on '{current.Ssid}' - check the passphrase");
+
+            return current
+                ?? throw new WifiConnectionException($"Applied the configuration for '{ssid}' but no Wi-Fi interface came up");
+        }
     }
 
 

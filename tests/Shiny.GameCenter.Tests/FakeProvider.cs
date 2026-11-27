@@ -23,7 +23,10 @@ class FakeProvider : IGameServicesProvider
     public Queue<GameCenterException> FailNext { get; } = new();
     public bool Offline { get; set; }
     public HashSet<string> UnknownIds { get; } = new();
-    public int LoadCount { get; private set; }
+    public int LoadCount => this.loadCount;
+
+    /// <summary>When set, achievement loads wait for it - lets a test line several calls up behind the first sync</summary>
+    public TaskCompletionSource? LoadGate { get; set; }
 
 
     public void ChangePlayer(GamePlayer? player)
@@ -35,11 +38,16 @@ class FakeProvider : IGameServicesProvider
 
     public Task<GamePlayer?> Authenticate(bool interactive, CancellationToken cancelToken) => Task.FromResult(this.SignedIn);
 
-    public Task<IReadOnlyList<PlatformAchievement>> LoadAchievements(bool forceReload, CancellationToken cancelToken)
+    public async Task<IReadOnlyList<PlatformAchievement>> LoadAchievements(bool forceReload, CancellationToken cancelToken)
     {
-        this.LoadCount++;
-        return Task.FromResult<IReadOnlyList<PlatformAchievement>>(this.Remote.ToList());
+        Interlocked.Increment(ref this.loadCount);
+        if (this.LoadGate is { } gate)
+            await gate.Task.ConfigureAwait(false);
+
+        lock (this.Remote)
+            return this.Remote.ToList();
     }
+    int loadCount;
 
     public Task SetAchievementProgress(string platformId, int steps, int totalSteps, CancellationToken cancelToken)
     {
@@ -47,7 +55,8 @@ class FakeProvider : IGameServicesProvider
         if (this.UnknownIds.Contains(platformId))
             throw new GameCenterException(GameCenterErrorCode.InvalidId, "unknown");
 
-        this.Progress.Add((platformId, steps, totalSteps));
+        lock (this.Progress)
+            this.Progress.Add((platformId, steps, totalSteps));
         return Task.CompletedTask;
     }
 

@@ -36,6 +36,17 @@ class AppleLocationAccess : IDisposable
     }
 
 
+    /// <summary>True when location is granted - the condition for reading the real SSID.</summary>
+    public bool IsGranted
+    {
+        get
+        {
+            this.manager ??= new CLLocationManager();
+            return ToAccessState(this.manager.AuthorizationStatus) == AccessState.Available;
+        }
+    }
+
+
     async Task<AccessState> Await(CancellationToken ct)
     {
         var tcs = this.pending!;

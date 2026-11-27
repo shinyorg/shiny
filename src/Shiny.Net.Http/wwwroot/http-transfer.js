@@ -73,7 +73,21 @@ function handleMessage(event) {
     }
 }
 
-export async function queue(entry) {
+function toBlob(base64Body, contentType) {
+    const binary = atob(base64Body);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new Blob([bytes], { type: contentType || 'application/octet-stream' });
+}
+
+// Persists a transfer and nudges the service worker to send it. An upload's body is passed here and
+// stored in the same write - storing it afterwards (setBody) let the worker send the entry before the
+// body existed.
+export async function queue(entry, base64Body, contentType) {
+    if (base64Body != null) {
+        entry.body = toBlob(base64Body, contentType);
+    }
+
     const db = await openDb();
     try {
         await promisify(store(db, 'readwrite').put(entry));
@@ -129,7 +143,7 @@ export async function remove(identifier) {
     }
 }
 
-// Marks a transfer 'paused'. The service worker drain only runs 'pending'/'error' entries,
+// Marks a transfer 'paused'. The service worker drain only runs 'pending' entries (and 'in-progress' ones a stopped worker left behind),
 // so a paused entry is skipped without being removed. NOTE: an already in-flight fetch cannot
 // be aborted, so pause only guarantees a not-yet-started (or retry-pending) transfer stays
 // parked. Returns false if the transfer is missing or already completed.
@@ -200,16 +214,14 @@ export async function getResultBase64(identifier) {
 }
 
 // Sets the body for an upload entry. base64Body is decoded into a Blob and
-// persisted alongside the entry. Call AFTER queue().
+// persisted alongside the entry. Kept for compatibility - pass the body to queue() instead, which
+// stores it before the service worker can pick the entry up.
 export async function setBody(identifier, base64Body, contentType) {
     const db = await openDb();
     try {
         const row = await promisify(store(db, 'readonly').get(identifier));
         if (!row) return;
-        const binary = atob(base64Body);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-        row.body = new Blob([bytes], { type: contentType || 'application/octet-stream' });
+        row.body = toBlob(base64Body, contentType);
         await promisify(store(db, 'readwrite').put(row));
     } finally {
         db.close();

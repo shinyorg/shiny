@@ -98,7 +98,8 @@ sealed class Analyzer
             ?? props.FirstOrDefault(p => p.Name == "Name")?.Name
             ?? props.FirstOrDefault(p => p.Name == "Title")?.Name
             ?? "Id";
-        if (!props.Any(p => p.Name == display))
+        var displayProp = props.FirstOrDefault(p => p.Name == display);
+        if (displayProp == null)
             this.Report(Rules.EntityDisplay, type, type.Name, display);
 
         var queryInterface = this.entityQuery!.Construct(type);
@@ -116,6 +117,7 @@ sealed class Analyzer
             SimpleName = type.Name,
             TypeName = TypeName(type),
             DisplayProperty = display,
+            DisplayIsValueType = displayProp != null && displayProp.Type.IsValueType && displayProp.Type.OriginalDefinition.SpecialType != SpecialType.System_Nullable_T,
             QueryType = query?.ToDisplayString(Fqn)
         };
         this.entities[type] = entity;
@@ -244,6 +246,7 @@ sealed class Analyzer
                     Type = mapped,
                     // constructor parameters are required unless nullable; initializer properties only when marked `required`
                     IsRequired = !mapped.IsNullable && (ctorIndex >= 0 || prop.IsRequired),
+                    IsRequiredMember = prop.IsRequired,
                     ConstructorIndex = ctorIndex
                 });
             }

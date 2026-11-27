@@ -76,5 +76,6 @@ public sealed class TsplProtocol(int labelWidthMm = 50, int labelHeightMm = 30, 
     }
 
 
-    static string Escape(string value) => value.Replace("\"", "\\\"");
+    // TSPL has no backslash escape - a double quote inside a string is written \["]
+    static string Escape(string value) => value.Replace("\"", "\\[\"]");
 }

@@ -16,6 +16,7 @@ public class HttpClientHttpTransferManager(
     IRepository repository
 ) : IHttpTransferManager, IShinyStartupTask, IDisposable
 {
+    static readonly object runGate = new();
     static bool isRunning;
     bool subscribed;
 
@@ -207,10 +208,32 @@ public class HttpClientHttpTransferManager(
 
     void TryStartProcess()
     {
-        if (!isRunning)
+        lock (runGate)
         {
+            if (isRunning)
+                return;
+
             isRunning = true;
-            process.Run(() => isRunning = false);
+        }
+        process.Run(this.OnProcessComplete);
+    }
+
+
+    void OnProcessComplete()
+    {
+        lock (runGate)
+            isRunning = false;
+
+        // A transfer queued (or resumed) while the loop was shutting down saw isRunning == true and didn't
+        // start a loop. The loop only exits once no transfers remain, so anything here arrived in that window.
+        try
+        {
+            if (repository.GetAll<HttpTransfer>().Count > 0)
+                this.TryStartProcess();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to restart the HTTP transfer loop");
         }
     }
 }

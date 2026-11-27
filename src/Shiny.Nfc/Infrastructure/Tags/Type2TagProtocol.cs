@@ -72,11 +72,11 @@ sealed class Type2TagProtocol : INdefTagProtocol
             if (!this.IsNdefFormatted)
                 return null;
 
+            // a message under 0xFF bytes takes the 2-byte TLV header, anything longer the 4-byte one
             var available = this.dataSize - this.ndefOffset;
-            if (available - 2 <= 0xFE)
-                return Math.Max(0, available - 2);
-
-            return Math.Min(available - 4, 0xFFFE);
+            var shortForm = Math.Min(available - 2, 0xFE);
+            var longForm = Math.Min(available - 4, 0xFFFE);
+            return Math.Max(0, Math.Max(shortForm, longForm));
         }
     }
 

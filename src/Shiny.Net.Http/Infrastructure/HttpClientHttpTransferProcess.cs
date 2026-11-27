@@ -45,12 +45,19 @@ public class HttpClientHttpTransferProcess(
     public static event EventHandler<HttpTransferResult>? ProgressOccurred;
 
 
-    public void Run(Action onComplete)
+    public void Run(Action onComplete) => this.Run(onComplete, CancellationToken.None);
+
+
+    /// <summary>
+    /// Runs the transfer loop until no transfers remain, the transfers are cleared, or
+    /// <paramref name="cancelToken"/> is cancelled (for example when the hosting Android service is stopped).
+    /// </summary>
+    public void Run(Action onComplete, CancellationToken cancelToken)
     {
         _ = Task.Run(async () =>
         {
             logger.LogInformation("Starting Transfer Loop");
-            using var cancelSrc = new CancellationTokenSource();
+            using var cancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
             EventHandler<(RepositoryAction Action, Type EntityType, IRepositoryEntity? Entity)> repoHandler = null!;
             repoHandler = (_, x) =>
@@ -89,43 +96,18 @@ public class HttpClientHttpTransferProcess(
                 while (!cancelSrc.IsCancellationRequested && transfers.Count > 0)
                 {
                     logger.LogDebug("Starting Loop");
-                    if (connectivity.IsInternetAvailable())
+                    try
                     {
-                        var full = connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
-                        logger.LogDebug("Internet Available - WIFI: " + full);
-
-                        foreach (var transfer in transfers)
-                        {
-                            if (cancelSrc.IsCancellationRequested)
-                            {
-                                logger.LogDebug("Transfer Loop cancelled");
-                            }
-                            else if (!repository.Exists<HttpTransfer>(transfer.Identifier))
-                            {
-                                logger.LogDebug($"HTTP Transfer {transfer.Identifier} has been removed");
-                            }
-                            else if (transfer.Status == HttpTransferState.Paused)
-                            {
-                                logger.LogDebug($"HTTP Transfer {transfer.Identifier} is paused - skipping");
-                            }
-                            else if (transfer.Request.UseMeteredConnection || full)
-                            {
-                                logger.LogInformation($"Transfer {transfer.Identifier} starting");
-                                await this.RunTransfer(transfer, cancelSrc.Token).ConfigureAwait(false);
-                            }
-                            else
-                            {
-                                logger.LogDebug($"Transfer {transfer.Identifier} is a metered transfer - waiting for WIFI");
-                                repository.Set(transfer with
-                                {
-                                    Status = HttpTransferState.PausedByCostedNetwork
-                                });
-                            }
-                        }
+                        await this.RunPass(transfers, cancelSrc.Token).ConfigureAwait(false);
                     }
-                    else
+                    catch (OperationCanceledException) when (cancelSrc.IsCancellationRequested)
                     {
-                        logger.LogDebug("Internet Unavailable - Waiting for next pass");
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        // a failed pass must not end the loop - the queued transfers would wait for the next start
+                        logger.LogError(ex, "Error in transfer loop pass");
                     }
 
                     transfers = repository.GetAll<HttpTransfer>();
@@ -139,7 +121,7 @@ public class HttpClientHttpTransferProcess(
                 }
                 logger.LogDebug("All transfers complete");
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
             }
             catch (Exception ex)
@@ -149,6 +131,52 @@ public class HttpClientHttpTransferProcess(
             logger.LogDebug("Shutting down HTTP transfer process");
             onComplete();
         });
+    }
+
+
+    async Task RunPass(IReadOnlyList<HttpTransfer> transfers, CancellationToken cancelToken)
+    {
+        if (!connectivity.IsInternetAvailable())
+        {
+            logger.LogDebug("Internet Unavailable - Waiting for next pass");
+            return;
+        }
+
+        var full = connectivity.ConnectionTypes.HasFlag(ConnectionTypes.Wifi);
+        logger.LogDebug("Internet Available - WIFI: " + full);
+
+        foreach (var snapshot in transfers)
+        {
+            // re-read - the snapshot is from the start of the pass, and a transfer paused while an
+            // earlier one was running must not be started
+            var transfer = repository.Get<HttpTransfer>(snapshot.Identifier);
+
+            if (cancelToken.IsCancellationRequested)
+            {
+                logger.LogDebug("Transfer Loop cancelled");
+            }
+            else if (transfer == null)
+            {
+                logger.LogDebug($"HTTP Transfer {snapshot.Identifier} has been removed");
+            }
+            else if (transfer.Status == HttpTransferState.Paused)
+            {
+                logger.LogDebug($"HTTP Transfer {transfer.Identifier} is paused - skipping");
+            }
+            else if (transfer.Request.UseMeteredConnection || full)
+            {
+                logger.LogInformation($"Transfer {transfer.Identifier} starting");
+                await this.RunTransfer(transfer, cancelToken).ConfigureAwait(false);
+            }
+            else
+            {
+                logger.LogDebug($"Transfer {transfer.Identifier} is a metered transfer - waiting for WIFI");
+                repository.Set(transfer with
+                {
+                    Status = HttpTransferState.PausedByCostedNetwork
+                });
+            }
+        }
     }
 
 
@@ -177,6 +205,12 @@ public class HttpClientHttpTransferProcess(
         using var repoSub = new RepoSub(() => repository.ActionOccurred -= removeHandler);
         using var activeSub = new RepoSub(() => this.activeTransfers.TryRemove(transfer.Identifier, out _));
 
+        // a pause that landed between the pass reading the transfer and it being registered as active
+        // above would otherwise go unnoticed
+        var latest = repository.Get<HttpTransfer>(transfer.Identifier);
+        if (latest == null || latest.Status == HttpTransferState.Paused)
+            return;
+
         try
         {
             await this
@@ -200,10 +234,10 @@ public class HttpClientHttpTransferProcess(
             ));
             repository.Remove(transfer);
         }
-        catch (HttpRequestException ex) when (transfer.Request.Type == TransferType.UploadTus && ex.StatusCode == null)
+        catch (HttpRequestException ex) when (ex.StatusCode == null && (transfer.Request.Type == TransferType.UploadTus || IsConnectionFailure(ex)))
         {
             // no HTTP status means the connection failed, not the server - a tus upload resumes from the
-            // server's offset on the next pass instead of failing
+            // server's offset on the next pass, and any other transfer is retried, instead of failing
             this.PauseTransfer(transfer, "Network Disconnected", ex);
         }
         catch (HttpRequestException ex)
@@ -243,13 +277,18 @@ public class HttpClientHttpTransferProcess(
     }
 
 
+    static bool IsConnectionFailure(HttpRequestException ex)
+        => ex.HttpRequestError is HttpRequestError.ConnectionError or HttpRequestError.NameResolutionError or HttpRequestError.ProxyTunnelError;
+
+
     void PauseTransfer(HttpTransfer transfer, string reason, Exception exception)
     {
         logger.StandardInfo(transfer.Identifier, reason + $" - {exception}");
 
-        // re-read so state persisted during the attempt (such as a tus upload URL) isn't overwritten
+        // re-read so state persisted during the attempt (such as a tus upload URL) isn't overwritten,
+        // and so a user pause that interrupted the request isn't turned into an automatic retry
         var current = repository.Get<HttpTransfer>(transfer.Identifier);
-        if (current != null)
+        if (current != null && current.Status != HttpTransferState.Paused)
         {
             repository.Set(current with
             {
@@ -403,34 +442,36 @@ public class HttpClientHttpTransferProcess(
     {
         var request = transfer.Request;
 
-        // resumable: figure out where the existing partial file leaves off (if any)
+        // resumable - but only a file THIS transfer has written to is a partial download. A file that was
+        // already at the path before the transfer was queued (an older copy, a cancelled transfer's
+        // leftovers) is overwritten; resuming from its length appended the new download onto unrelated bytes.
         long startOffset = 0;
-        if (File.Exists(request.LocalFilePath))
-            startOffset = new FileInfo(request.LocalFilePath).Length;
-
-        var httpReq = new HttpRequestMessage();
-        httpReq.Method = request.HttpMethod != null ? new HttpMethod(request.HttpMethod) : HttpMethod.Get;
-        httpReq.RequestUri = new Uri(request.Uri);
-
-        var c = request.HttpContent;
-        if (c != null)
-            httpReq.Content = new StringContent(c.Content, Encoding.UTF8, c.ContentType);
-
-        if (request.Headers != null)
-        {
-            foreach (var header in request.Headers)
-                httpReq.Headers.TryAddWithoutValidation(header.Key, header.Value);
-        }
+        var partial = new FileInfo(request.LocalFilePath);
+        if (partial.Exists && partial.LastWriteTimeUtc >= transfer.CreatedAt.UtcDateTime)
+            startOffset = partial.Length;
 
         if (startOffset > 0)
-        {
-            httpReq.Headers.Range = new RangeHeaderValue(startOffset, null);
             logger.StandardInfo(request.Identifier, $"Resuming download from byte {startOffset}");
-        }
 
-        using var response = await this.httpClient
-            .SendAsync(httpReq, HttpCompletionOption.ResponseHeadersRead, cancelToken)
-            .ConfigureAwait(false);
+        var response = await this.SendDownloadRequest(request, startOffset, cancelToken).ConfigureAwait(false);
+        if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable && startOffset > 0)
+        {
+            var serverLength = response.Content.Headers.ContentRange?.Length;
+            response.Dispose();
+
+            if (serverLength == startOffset)
+            {
+                // the file was already complete (the app stopped between the last write and completion)
+                logger.StandardInfo(request.Identifier, "Partial download is already complete");
+                this.PublishProgress(transfer, new TransferProgress(0, startOffset, startOffset));
+                return;
+            }
+
+            logger.StandardInfo(request.Identifier, "Server rejected the resume range - restarting download");
+            startOffset = 0;
+            response = await this.SendDownloadRequest(request, 0, cancelToken).ConfigureAwait(false);
+        }
+        using var responseScope = response;
 
         // server didn't honor range -> start over from byte 0
         var append = response.StatusCode == HttpStatusCode.PartialContent && startOffset > 0;
@@ -475,7 +516,9 @@ public class HttpClientHttpTransferProcess(
         int bytesRead;
         while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancelToken).ConfigureAwait(false)) != 0)
         {
-            await dest.WriteAsync(buffer.AsMemory(0, bytesRead), cancelToken).ConfigureAwait(false);
+            // bytes already received are always written - a pause landing here would otherwise drop them
+            // from the partial file the resume continues from
+            await dest.WriteAsync(buffer.AsMemory(0, bytesRead), CancellationToken.None).ConfigureAwait(false);
             totalSince += bytesRead;
             totalBytesXfer += bytesRead;
 
@@ -492,6 +535,31 @@ public class HttpClientHttpTransferProcess(
                 stop.Restart();
             }
         }
+    }
+
+
+    async Task<HttpResponseMessage> SendDownloadRequest(HttpTransferRequest request, long startOffset, CancellationToken cancelToken)
+    {
+        using var httpReq = new HttpRequestMessage();
+        httpReq.Method = request.HttpMethod != null ? new HttpMethod(request.HttpMethod) : HttpMethod.Get;
+        httpReq.RequestUri = new Uri(request.Uri);
+
+        var c = request.HttpContent;
+        if (c != null)
+            httpReq.Content = new StringContent(c.Content, Encoding.UTF8, c.ContentType);
+
+        if (request.Headers != null)
+        {
+            foreach (var header in request.Headers)
+                httpReq.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
+
+        if (startOffset > 0)
+            httpReq.Headers.Range = new RangeHeaderValue(startOffset, null);
+
+        return await this.httpClient
+            .SendAsync(httpReq, HttpCompletionOption.ResponseHeadersRead, cancelToken)
+            .ConfigureAwait(false);
     }
 
 

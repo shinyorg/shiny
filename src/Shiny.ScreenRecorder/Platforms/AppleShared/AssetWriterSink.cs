@@ -38,12 +38,16 @@ internal sealed class AssetWriterSink : IDisposable
     readonly AVAssetWriterInput? systemAudioInput;
     readonly AVAssetWriterInput? micInput;
 
+    // the pause arithmetic runs in integer nanoseconds so it can be shared (and unit tested) with
+    // the other backends; CMTime timescales vary per buffer, so everything is converted on the way in
+    const int Nanoseconds = 1_000_000_000;
+
+    readonly PauseTimeline timeline = new();
+
     bool sessionStarted;
     bool finished;
-    bool paused;
-    CMTime offset = CMTime.Zero;
-    CMTime pauseStartedAt = CMTime.Invalid;
-    CMTime lastVideoTime = CMTime.Invalid;
+    long? firstVideoNs;
+    long? lastVideoNs;
 
 
     public AssetWriterSink(
@@ -97,18 +101,43 @@ internal sealed class AssetWriterSink : IDisposable
     public string OutputPath { get; }
     public VideoDimensions Dimensions { get; }
 
-    /// <summary>The duration actually written, which excludes any paused span.</summary>
-    public TimeSpan Duration => this.lastVideoTime.IsNumeric
-        ? TimeSpan.FromSeconds(Math.Max(0, this.lastVideoTime.Seconds))
-        : TimeSpan.Zero;
+    /// <summary>
+    /// The duration actually written, from the first video frame to the last, excluding any paused
+    /// span.
+    /// </summary>
+    /// <remarks>
+    /// Capture timestamps are on the host clock (time since boot), so the last frame's timestamp on
+    /// its own is device uptime - it has to be measured from the first.
+    /// </remarks>
+    public TimeSpan Duration
+    {
+        get
+        {
+            lock (this.gate)
+            {
+                return this.firstVideoNs is { } first && this.lastVideoNs is { } last
+                    ? TimeSpan.FromSeconds(Math.Max(0, last - first) / (double)Nanoseconds)
+                    : TimeSpan.Zero;
+            }
+        }
+    }
 
 
     AVAssetWriterInput AddAudioInput()
     {
-        // no explicit settings: passing null lets AVFoundation choose an AAC configuration that
-        // matches the incoming format description, which is what both capture APIs hand us and is
-        // far more robust than guessing a sample rate and channel count that must match exactly
-        var input = new AVAssetWriterInput(AudioMediaType, (AudioSettings?)null)
+        // explicit AAC: null output settings mean passthrough, not "pick something", and both
+        // capture APIs deliver linear PCM - which an MPEG-4 file cannot hold, so the first audio
+        // append would fail the whole writer, video included. The writer input resamples and
+        // remixes whatever arrives into this, so mono 48kHz microphone audio is fine too.
+        var settings = new AudioSettings
+        {
+            Format = AudioToolbox.AudioFormatType.MPEG4AAC,
+            SampleRate = 44_100,
+            NumberChannels = 2,
+            EncoderBitRate = 128_000
+        };
+
+        var input = new AVAssetWriterInput(AudioMediaType, settings)
         {
             ExpectsMediaDataInRealTime = true
         };
@@ -149,15 +178,6 @@ internal sealed class AssetWriterSink : IDisposable
                 this.sessionStarted = true;
             }
 
-            if (this.paused)
-            {
-                // remember where the pause began so Resume knows how much to discount
-                if (!this.pauseStartedAt.IsNumeric)
-                    this.pauseStartedAt = pts;
-
-                return;
-            }
-
             var input = track switch
             {
                 AssetWriterTrack.Video => this.videoInput,
@@ -166,10 +186,18 @@ internal sealed class AssetWriterSink : IDisposable
                 _ => null
             };
 
+            var rawNs = pts.ConvertScale(Nanoseconds, CMTimeRoundingMethod.Default).Value;
+
+            // a paused buffer is dropped here, and the span is taken out of every later timestamp
+            // once the first buffer after resume arrives - see PauseTimeline
+            if (!this.timeline.TryMap(rawNs, out var mappedNs))
+                return;
+
             if (input == null || !input.ReadyForMoreMediaData)
                 return;
 
-            var adjusted = this.Retime(buffer, pts);
+            var offset = new CMTime(rawNs - mappedNs, Nanoseconds);
+            var adjusted = this.Retime(buffer, pts, offset);
             try
             {
                 if (!input.AppendSampleBuffer(adjusted))
@@ -178,8 +206,13 @@ internal sealed class AssetWriterSink : IDisposable
                     return;
                 }
 
+                this.timeline.Commit(rawNs, mappedNs);
+
                 if (track == AssetWriterTrack.Video)
-                    this.lastVideoTime = CMTime.Subtract(pts, this.offset);
+                {
+                    this.firstVideoNs ??= mappedNs;
+                    this.lastVideoNs = mappedNs;
+                }
             }
             finally
             {
@@ -193,9 +226,9 @@ internal sealed class AssetWriterSink : IDisposable
     // shifting every buffer back by the accumulated paused span is what removes the gap; when
     // nothing has been paused the offset is zero and the original buffer is passed straight
     // through rather than copied for nothing
-    CMSampleBuffer Retime(CMSampleBuffer buffer, CMTime pts)
+    CMSampleBuffer Retime(CMSampleBuffer buffer, CMTime pts, CMTime offset)
     {
-        if (this.offset == CMTime.Zero)
+        if (offset.Value == 0)
             return buffer;
 
         var timing = buffer.GetSampleTimingInfo();
@@ -207,10 +240,10 @@ internal sealed class AssetWriterSink : IDisposable
 
         for (var i = 0; i < timing.Length; i++)
         {
-            timing[i].PresentationTimeStamp = CMTime.Subtract(timing[i].PresentationTimeStamp, this.offset);
+            timing[i].PresentationTimeStamp = CMTime.Subtract(timing[i].PresentationTimeStamp, offset);
 
             if (timing[i].DecodeTimeStamp.IsNumeric)
-                timing[i].DecodeTimeStamp = CMTime.Subtract(timing[i].DecodeTimeStamp, this.offset);
+                timing[i].DecodeTimeStamp = CMTime.Subtract(timing[i].DecodeTimeStamp, offset);
         }
 
         var copy = CMSampleBuffer.CreateWithNewTiming(buffer, timing);
@@ -227,41 +260,14 @@ internal sealed class AssetWriterSink : IDisposable
     public void Pause()
     {
         lock (this.gate)
-        {
-            this.paused = true;
-            this.pauseStartedAt = CMTime.Invalid;
-        }
+            this.timeline.Pause();
     }
 
 
     public void Resume()
     {
         lock (this.gate)
-        {
-            if (!this.paused)
-                return;
-
-            this.paused = false;
-
-            // no buffer arrived while paused, so nothing was actually skipped
-            if (!this.pauseStartedAt.IsNumeric || !this.lastVideoTime.IsNumeric)
-            {
-                this.pauseStartedAt = CMTime.Invalid;
-                return;
-            }
-
-            // the span to discount runs from the first dropped buffer to now; "now" is derived from
-            // the last buffer actually written plus the offset already in effect, which is the same
-            // clock the incoming timestamps are on
-            var resumeAt = this.pauseStartedAt;
-            var lastWritten = CMTime.Add(this.lastVideoTime, this.offset);
-            var skipped = CMTime.Subtract(resumeAt, lastWritten);
-
-            if (skipped.IsNumeric && CMTime.Compare(skipped, CMTime.Zero) > 0)
-                this.offset = CMTime.Add(this.offset, skipped);
-
-            this.pauseStartedAt = CMTime.Invalid;
-        }
+            this.timeline.Resume();
     }
 
 
@@ -282,8 +288,8 @@ internal sealed class AssetWriterSink : IDisposable
             this.systemAudioInput?.MarkAsFinished();
             this.micInput?.MarkAsFinished();
 
-            if (this.lastVideoTime.IsNumeric)
-                this.writer.EndSessionAtSourceTime(this.lastVideoTime);
+            if (this.lastVideoNs is { } lastVideo)
+                this.writer.EndSessionAtSourceTime(new CMTime(lastVideo, Nanoseconds));
         }
 
         await this.writer.FinishWritingAsync().ConfigureAwait(false);

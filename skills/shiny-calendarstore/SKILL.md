@@ -305,11 +305,25 @@ Platform behaviour:
 | Platform | `deleteSeries: false` | `deleteSeries: true` |
 |---|---|---|
 | iOS / Mac Catalyst / macOS | `EKSpan.ThisEvent` | `EKSpan.FutureEvents` |
-| Android | Inserts a cancellation exception for the occurrence | Deletes the `Events` row (whole series) |
+| Android | Inserts a cancellation exception for the occurrence | Ends the series before the occurrence (`RRULE` `UNTIL`); deletes the series when it is the first occurrence |
 | Windows | Deletes the appointment — no per-instance delete exists in `AppointmentStore`, so the flag has no effect | Same |
 
-Android reads series masters from the `Events` table rather than expanded instances, so
-`deleteSeries: false` cancels the series' own `DTSTART` — i.e. the first occurrence.
+#### Recurring event ids
+
+`GetEvents` / `Query()` return every occurrence inside the window (Android reads the `Instances`
+table, Apple expands with `EventsMatching`). All occurrences of a series share the platform event id,
+so an occurrence carries an **occurrence id** - `{eventId}|{original start, unix ms}`. Pass it back
+unchanged: `GetEvent`, `UpdateEvent` and `DeleteEvent` use it to reach exactly that occurrence
+(Android writes an exception row, Apple saves/removes that occurrence with `EKSpan.ThisEvent` /
+`FutureEvents`). Treat ids as opaque strings - don't parse or build them. A plain series id (from an
+older read or stored elsewhere) still works and stands for the series' first occurrence.
+
+#### All-day events
+
+All-day events read back with `Start`/`End` at the device's local midnight on every platform
+(Android stores them as UTC midnights; Shiny converts). When creating one, only the calendar day of
+`Start`/`End` matters: an `End` on the same day (or any time on the last day) gives a one-day event;
+an `End` at midnight after `Start` is treated as the exclusive end.
 
 ## Models
 

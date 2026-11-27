@@ -153,4 +153,9 @@ public class EscPosProtocolTests
         var body = Body(Encode(d => d.Raw([0xDE, 0xAD, 0xBE, 0xEF])));
         Assert.Equal([0xDE, 0xAD, 0xBE, 0xEF], body);
     }
+
+    /// <remarks>GS k n is a single byte - 300 bytes would wrap to 44 and spill the rest into the command stream.</remarks>
+    [Fact]
+    public void Barcode_Longer_Than_255_Bytes_Throws()
+        => Assert.Throws<NotSupportedException>(() => Encode(d => d.Barcode(BarcodeFormat.Code39, new string('1', 300))));
 }

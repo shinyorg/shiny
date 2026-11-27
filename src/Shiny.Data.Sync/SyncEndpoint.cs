@@ -86,6 +86,24 @@ public class SyncEndpoint
     public TimeSpan RetryBaseDelay { get; set; } = TimeSpan.FromSeconds(2);
 
     /// <summary>
+    /// When true (the default), a <c>404 Not Found</c> or <c>410 Gone</c> answer to a <see cref="SyncVerb.Delete"/>
+    /// completes the op as sent (<see cref="IDataSyncDelegate.OnSent"/> runs and the op is reported
+    /// <see cref="SyncOperationState.Completed"/> with that status code) instead of failing it. The entity is gone
+    /// either way - this covers a retried DELETE whose first try already succeeded, and a Create + Delete pair whose
+    /// Create may never have reached the server. Set to false when your API uses 404 on DELETE to mean something else.
+    /// </summary>
+    public bool TreatMissingAsDeleted { get; set; } = true;
+
+    /// <summary>
+    /// True when <paramref name="statusCode"/> on an op with <paramref name="verb"/> counts as a completed delete
+    /// under <see cref="TreatMissingAsDeleted"/>.
+    /// </summary>
+    internal bool IsAlreadyDeleted(SyncVerb verb, int statusCode)
+        => this.TreatMissingAsDeleted
+            && verb == SyncVerb.Delete
+            && (statusCode == 404 || statusCode == 410);
+
+    /// <summary>
     /// Query-string parameter used to send the persisted cursor to the server on inbox pulls.
     /// Default <c>since</c>; set to null to omit the cursor query parameter entirely.
     /// </summary>

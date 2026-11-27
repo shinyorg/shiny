@@ -200,6 +200,21 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         }, ct);
     }
 
+    // The data kinds this model reads and writes. Update only replaces these, so rows the model does not cover
+    // (group memberships, IM/SIP addresses, other apps' custom rows) survive an update.
+    static readonly string[] ManagedMimeTypes =
+    [
+        CommonColumns.StructuredName.ContentItemType,
+        CommonColumns.Nickname.ContentItemType,
+        CommonColumns.Phone.ContentItemType,
+        CommonColumns.Email.ContentItemType,
+        CommonColumns.StructuredPostal.ContentItemType,
+        CommonColumns.Organization.ContentItemType,
+        CommonColumns.Note.ContentItemType,
+        CommonColumns.Relation.ContentItemType,
+        CommonColumns.Website.ContentItemType
+    ];
+
     public Task Update(Contact contact, CancellationToken ct = default)
     {
         return Task.Run(() =>
@@ -207,62 +222,115 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
             if (string.IsNullOrWhiteSpace(contact.Id))
                 throw new ArgumentException("Contact.Id is required for update");
 
-            var rawContactId = GetRawContactId(contact.Id);
-            if (rawContactId == null)
+            // A contact can aggregate several raw contacts (e.g. a Google and a local one). Reads merge all of them,
+            // so the merged values are written to the first raw contact and the managed rows of the others are
+            // removed - otherwise every phone/email would come back duplicated.
+            var rawContactIds = GetRawContactIds(contact.Id);
+            if (rawContactIds.Count == 0)
                 throw new InvalidOperationException($"No raw contact found for contact ID {contact.Id}");
 
-            var ops = new List<ContentProviderOperation>();
+            var rawContactId = rawContactIds[0];
+            var rawArgs = rawContactIds.Select(x => x.ToString()).ToArray();
+            var rawIn = DataColumns.InterfaceConsts.RawContactId + " IN (" + string.Join(",", rawArgs.Select(_ => "?")) + ")";
 
-            // Delete all existing data rows for this raw contact
-            ops.Add(ContentProviderOperation
-                .NewDelete(DataColumns.ContentUri)!
-                .WithSelection(
-                    DataColumns.InterfaceConsts.RawContactId + " = ?",
-                    new[] { rawContactId.ToString() })
-                .Build()!);
+            var ops = new List<ContentProviderOperation>
+            {
+                ContentProviderOperation
+                    .NewDelete(DataColumns.ContentUri!)!
+                    .WithSelection(
+                        rawIn + " AND " + DataColumns.InterfaceConsts.Mimetype + " IN (" + string.Join(",", ManagedMimeTypes.Select(_ => "?")) + ")",
+                        rawArgs.Concat(ManagedMimeTypes).ToArray())!
+                    .Build()!
+            };
 
-            // Re-insert all data rows
-            AddStructuredNameInsertDirect(ops, contact, rawContactId.Value);
+            // Only the dates this store could read are replaced; a value in a format it cannot parse never reached
+            // the Contact, so deleting it would lose it.
+            var readableDateRows = GetReadableDateRowIds(rawIn, rawArgs);
+            if (readableDateRows.Count > 0)
+            {
+                ops.Add(ContentProviderOperation
+                    .NewDelete(DataColumns.ContentUri!)!
+                    .WithSelection(
+                        DataColumns.InterfaceConsts.Id + " IN (" + string.Join(",", readableDateRows.Select(_ => "?")) + ")",
+                        readableDateRows.ToArray())!
+                    .Build()!);
+            }
+
+            // Bulk reads only load the thumbnail, so a null Photo means "unchanged", not "remove the photo".
+            if (contact.Photo != null && contact.Photo.Length > 0)
+            {
+                ops.Add(ContentProviderOperation
+                    .NewDelete(DataColumns.ContentUri!)!
+                    .WithSelection(
+                        rawIn + " AND " + DataColumns.InterfaceConsts.Mimetype + " = ?",
+                        rawArgs.Append(CommonColumns.Photo.ContentItemType).ToArray())!
+                    .Build()!);
+            }
+
+            // Re-insert all managed data rows
+            AddStructuredNameInsertDirect(ops, contact, rawContactId);
 
             if (!string.IsNullOrWhiteSpace(contact.Nickname))
             {
                 ops.Add(ContentProviderOperation
                     .NewInsert(DataColumns.ContentUri)!
-                    .WithValue(DataColumns.InterfaceConsts.RawContactId, rawContactId.Value)
+                    .WithValue(DataColumns.InterfaceConsts.RawContactId, rawContactId)
                     .WithValue(DataColumns.InterfaceConsts.Mimetype, CommonColumns.Nickname.ContentItemType)
                     .WithValue(CommonColumns.Nickname.Name, contact.Nickname)
                     .Build()!);
             }
 
             foreach (var phone in contact.Phones)
-                AddPhoneInsertDirect(ops, phone, rawContactId.Value);
+                AddPhoneInsertDirect(ops, phone, rawContactId);
 
             foreach (var email in contact.Emails)
-                AddEmailInsertDirect(ops, email, rawContactId.Value);
+                AddEmailInsertDirect(ops, email, rawContactId);
 
             foreach (var address in contact.Addresses)
-                AddAddressInsertDirect(ops, address, rawContactId.Value);
+                AddAddressInsertDirect(ops, address, rawContactId);
 
             if (contact.Organization != null)
-                AddOrganizationInsertDirect(ops, contact.Organization, rawContactId.Value);
+                AddOrganizationInsertDirect(ops, contact.Organization, rawContactId);
 
             if (!string.IsNullOrWhiteSpace(contact.Note))
-                AddNoteInsertDirect(ops, contact.Note, rawContactId.Value);
+                AddNoteInsertDirect(ops, contact.Note, rawContactId);
 
             foreach (var date in contact.Dates)
-                AddDateInsertDirect(ops, date, rawContactId.Value);
+                AddDateInsertDirect(ops, date, rawContactId);
 
             foreach (var rel in contact.Relationships)
-                AddRelationshipInsertDirect(ops, rel, rawContactId.Value);
+                AddRelationshipInsertDirect(ops, rel, rawContactId);
 
             foreach (var website in contact.Websites)
-                AddWebsiteInsertDirect(ops, website, rawContactId.Value);
+                AddWebsiteInsertDirect(ops, website, rawContactId);
 
             if (contact.Photo != null && contact.Photo.Length > 0)
-                AddPhotoInsertDirect(ops, contact.Photo, rawContactId.Value);
+                AddPhotoInsertDirect(ops, contact.Photo, rawContactId);
 
             Resolver.ApplyBatch(ContactsContract.Authority, ops);
         }, ct);
+    }
+
+    static List<string> GetReadableDateRowIds(string rawIn, string[] rawArgs)
+    {
+        var ids = new List<string>();
+        using var cursor = Resolver.Query(
+            DataColumns.ContentUri!,
+            [DataColumns.InterfaceConsts.Id, CommonColumns.Event.StartDate],
+            rawIn + " AND " + DataColumns.InterfaceConsts.Mimetype + " = ?",
+            rawArgs.Append(CommonColumns.Event.ContentItemType).ToArray(),
+            null
+        );
+        if (cursor == null)
+            return ids;
+
+        while (cursor.MoveToNext())
+        {
+            var id = cursor.GetString(0);
+            if (id != null && ContactDates.Parse(cursor.GetString(1)) != null)
+                ids.Add(id);
+        }
+        return ids;
     }
 
     public Task Delete(string contactId, CancellationToken ct = default)
@@ -276,58 +344,70 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
 
     // ── Query execution ──────────────────────────────────────────────
 
+    // SQLite before 3.32 (Android 11 and older) caps a statement at 999 bound variables.
+    const int MaxSqlArgs = 500;
+
     IEnumerable<Contact> ExecuteQuery(ContactQueryDescriptor descriptor)
     {
         if (descriptor.Filters.Count == 0)
             return ReadContacts(null, null);
 
+        // Each filter narrows to a set of contact ids, or null when it cannot be translated without risking a
+        // miss. The query builder re-applies every filter in memory, so only a superset may come back from here.
+        var sets = descriptor.Filters.Select(NarrowFilter).ToList();
         HashSet<string>? contactIds = null;
 
-        foreach (var filter in descriptor.Filters)
+        if (descriptor.Match == ContactFilterMatch.Any)
         {
-            HashSet<string> ids;
+            if (sets.Any(x => x == null))
+                return ReadContacts(null, null);
 
-            switch (filter.Field)
+            contactIds = new HashSet<string>(sets.SelectMany(x => x!));
+        }
+        else
+        {
+            foreach (var set in sets.Where(x => x != null))
             {
-                case ContactField.GivenName:
-                case ContactField.FamilyName:
-                case ContactField.MiddleName:
-                case ContactField.NamePrefix:
-                case ContactField.NameSuffix:
-                case ContactField.DisplayName:
-                case ContactField.Nickname:
-                    ids = QueryByName(filter);
-                    break;
-
-                case ContactField.Phone:
-                    ids = QueryByPhone(filter);
-                    break;
-
-                case ContactField.Email:
-                    ids = QueryByEmail(filter);
-                    break;
-
-                default:
-                    // No native column for this field (note/organization) — read everything and let the
-                    // query builder's in-memory pass narrow it.
-                    return ReadContacts(null, null);
+                if (contactIds == null)
+                    contactIds = set;
+                else
+                    contactIds.IntersectWith(set!);
             }
-
             if (contactIds == null)
-                contactIds = ids;
-            else if (descriptor.Match == ContactFilterMatch.Any)
-                contactIds.UnionWith(ids);
-            else
-                contactIds.IntersectWith(ids);
+                return ReadContacts(null, null);
         }
 
-        if (contactIds == null || contactIds.Count == 0)
-            return Array.Empty<Contact>();
+        var results = new List<Contact>();
+        foreach (var chunk in contactIds.Chunk(MaxSqlArgs))
+        {
+            results.AddRange(ReadContacts(
+                ContactsContract.Contacts.InterfaceConsts.Id + " IN (" + string.Join(",", chunk.Select(_ => "?")) + ")",
+                chunk
+            ));
+        }
+        return results;
+    }
 
-        return ReadContacts(
-            ContactsContract.Contacts.InterfaceConsts.Id + " IN (" + string.Join(",", contactIds.Select(_ => "?")) + ")",
-            contactIds.ToArray()
-        );
+    HashSet<string>? NarrowFilter(ContactQueryFilter filter)
+    {
+        // SQLite LIKE only ignores case for ASCII - "élodie" would miss "Élodie", which the in-memory pass matches
+        if (!filter.Value.All(char.IsAscii))
+            return null;
+
+        return filter.Field switch
+        {
+            ContactField.GivenName or
+            ContactField.FamilyName or
+            ContactField.MiddleName or
+            ContactField.NamePrefix or
+            ContactField.NameSuffix or
+            ContactField.DisplayName or
+            ContactField.Nickname => QueryByName(filter),
+            ContactField.Phone => QueryByPhone(filter),
+            ContactField.Email => QueryByEmail(filter),
+            // no native column for this field (note/organization)
+            _ => null
+        };
     }
 
     HashSet<string> QueryByName(ContactQueryFilter filter)
@@ -353,8 +433,10 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
                 column = CommonColumns.StructuredName.Suffix;
                 break;
             case ContactField.DisplayName:
-                column = CommonColumns.StructuredName.DisplayName;
-                break;
+                // a contact without a structured name (company-only, email-only) still has an aggregate display name
+                var ids = QueryContactsDisplayName(op, val);
+                ids.UnionWith(QueryDataTable(CommonColumns.StructuredName.ContentItemType, CommonColumns.StructuredName.DisplayName, op, val));
+                return ids;
             case ContactField.Nickname:
                 return QueryDataTable(
                     CommonColumns.Nickname.ContentItemType,
@@ -374,6 +456,29 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         );
     }
 
+    static HashSet<string> QueryContactsDisplayName(string op, string value)
+    {
+        var ids = new HashSet<string>();
+        using var cursor = Resolver.Query(
+            ContactsContract.Contacts.ContentUri!,
+            new[] { ContactsContract.Contacts.InterfaceConsts.Id },
+            ContactsContract.Contacts.InterfaceConsts.DisplayName + " " + op + " ?",
+            new[] { value },
+            null
+        );
+
+        if (cursor != null)
+        {
+            while (cursor.MoveToNext())
+            {
+                var id = cursor.GetString(0);
+                if (id != null)
+                    ids.Add(id);
+            }
+        }
+        return ids;
+    }
+
     HashSet<string> QueryDataTable(string mimeType, string column, string op, string value)
     {
         var ids = new HashSet<string>();
@@ -381,7 +486,7 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         var selectionArgs = new[] { mimeType, value };
 
         using var cursor = Resolver.Query(
-            DataColumns.ContentUri,
+            DataColumns.ContentUri!,
             new[] { DataColumns.InterfaceConsts.ContactId },
             selection,
             selectionArgs,
@@ -423,6 +528,8 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         );
     }
 
+    // LIKE (rather than "=") even for Equals: "=" is case-sensitive, and the in-memory pass compares ignoring case.
+    // Unescaped % and _ in the value only widen the match, which is fine for a superset.
     static (string Op, string Value) GetLikeArgs(ContactFilterOperation operation, string value)
     {
         return operation switch
@@ -430,7 +537,7 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
             ContactFilterOperation.Contains => ("LIKE", "%" + value + "%"),
             ContactFilterOperation.StartsWith => ("LIKE", value + "%"),
             ContactFilterOperation.EndsWith => ("LIKE", "%" + value),
-            ContactFilterOperation.Equals => ("=", value),
+            ContactFilterOperation.Equals => ("LIKE", value),
             _ => ("LIKE", "%" + value + "%")
         };
     }
@@ -465,13 +572,14 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
                 while (cursor.MoveToNext())
                 {
                     var id = cursor.GetString(idIdx);
-                    if (id == null) continue;
-
-                    contacts[id] = new Contact
+                    if (id != null)
                     {
-                        Id = id,
-                        DisplayName = cursor.GetString(nameIdx) ?? string.Empty
-                    };
+                        contacts[id] = new Contact
+                        {
+                            Id = id,
+                            DisplayName = cursor.GetString(nameIdx) ?? string.Empty
+                        };
+                    }
                 }
             }
         }
@@ -479,11 +587,50 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
         if (contacts.Count == 0)
             return new List<Contact>();
 
-        // Step 2: Load all data rows for these contacts
-        var contactIdList = contacts.Keys.ToList();
+        // Step 2: Load all data rows for these contacts, in chunks to stay under SQLite's bound-variable limit
+        foreach (var contactIdList in contacts.Keys.Chunk(MaxSqlArgs))
+            ReadDataRows(contacts, contactIdList);
+
+        // Step 3: Load thumbnails (always) and the full-size photo (single-contact reads only)
+        foreach (var kvp in contacts)
+        {
+            var contactUri = ContentUris.WithAppendedId(ContactsContract.Contacts.ContentUri, long.Parse(kvp.Key));
+            if (contactUri != null)
+            {
+                // Thumbnail
+                if (kvp.Value.Thumbnail == null)
+                {
+                    using var thumbStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, false);
+                    if (thumbStream != null)
+                    {
+                        using var ms = new MemoryStream();
+                        thumbStream.CopyTo(ms);
+                        kvp.Value.Thumbnail = ms.ToArray();
+                    }
+                }
+
+                // Full-size photo — only for single-contact reads to avoid bulk memory blow-up
+                if (includeFullPhoto && kvp.Value.Photo == null)
+                {
+                    using var photoStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, true);
+                    if (photoStream != null)
+                    {
+                        using var ms = new MemoryStream();
+                        photoStream.CopyTo(ms);
+                        kvp.Value.Photo = ms.ToArray();
+                    }
+                }
+            }
+        }
+
+        return contacts.Values.ToList();
+    }
+
+    static void ReadDataRows(Dictionary<string, Contact> contacts, string[] contactIdList)
+    {
         var placeholders = string.Join(",", contactIdList.Select(_ => "?"));
         var dataSelection = DataColumns.InterfaceConsts.ContactId + " IN (" + placeholders + ")";
-        var dataArgs = contactIdList.ToArray();
+        var dataArgs = contactIdList;
 
         using (var cursor = Resolver.Query(
             DataColumns.ContentUri,
@@ -526,93 +673,59 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
                 while (cursor.MoveToNext())
                 {
                     var cid = cursor.GetString(contactIdIdx);
-                    if (cid == null || !contacts.TryGetValue(cid, out var contact))
-                        continue;
-
-                    var mime = cursor.GetString(mimeIdx);
-                    switch (mime)
+                    if (cid != null && contacts.TryGetValue(cid, out var contact))
                     {
-                        case CommonColumns.StructuredName.ContentItemType:
-                            ReadStructuredName(cursor, contact, d1, d2, d3, d4, d5, d6);
-                            break;
+                        var mime = cursor.GetString(mimeIdx);
+                        switch (mime)
+                        {
+                            case CommonColumns.StructuredName.ContentItemType:
+                                ReadStructuredName(cursor, contact, d1, d2, d3, d4, d5, d6);
+                                break;
 
-                        case CommonColumns.Nickname.ContentItemType:
-                            contact.Nickname = cursor.GetString(d1);
-                            break;
+                            case CommonColumns.Nickname.ContentItemType:
+                                contact.Nickname = cursor.GetString(d1);
+                                break;
 
-                        case CommonColumns.Phone.ContentItemType:
-                            ReadPhone(cursor, contact, d1, d2, d3);
-                            break;
+                            case CommonColumns.Phone.ContentItemType:
+                                ReadPhone(cursor, contact, d1, d2, d3);
+                                break;
 
-                        case CommonColumns.Email.ContentItemType:
-                            ReadEmail(cursor, contact, d1, d2, d3);
-                            break;
+                            case CommonColumns.Email.ContentItemType:
+                                ReadEmail(cursor, contact, d1, d2, d3);
+                                break;
 
-                        case CommonColumns.StructuredPostal.ContentItemType:
-                            ReadAddress(cursor, contact, d2, d3, d4, d7, d8, d9, d10);
-                            break;
+                            case CommonColumns.StructuredPostal.ContentItemType:
+                                ReadAddress(cursor, contact, d2, d3, d4, d7, d8, d9, d10);
+                                break;
 
-                        case CommonColumns.Organization.ContentItemType:
-                            ReadOrganization(cursor, contact, d1, d4, d5);
-                            break;
+                            case CommonColumns.Organization.ContentItemType:
+                                ReadOrganization(cursor, contact, d1, d4, d5);
+                                break;
 
-                        case CommonColumns.Note.ContentItemType:
-                            contact.Note = cursor.GetString(d1);
-                            break;
+                            case CommonColumns.Note.ContentItemType:
+                                contact.Note = cursor.GetString(d1);
+                                break;
 
-                        case CommonColumns.Event.ContentItemType:
-                            ReadDate(cursor, contact, d1, d2, d3);
-                            break;
+                            case CommonColumns.Event.ContentItemType:
+                                ReadDate(cursor, contact, d1, d2, d3);
+                                break;
 
-                        case CommonColumns.Relation.ContentItemType:
-                            ReadRelationship(cursor, contact, d1, d2, d3);
-                            break;
+                            case CommonColumns.Relation.ContentItemType:
+                                ReadRelationship(cursor, contact, d1, d2, d3);
+                                break;
 
-                        case CommonColumns.Website.ContentItemType:
-                            ReadWebsite(cursor, contact, d1, d3);
-                            break;
+                            case CommonColumns.Website.ContentItemType:
+                                ReadWebsite(cursor, contact, d1, d3);
+                                break;
 
-                        case CommonColumns.Photo.ContentItemType:
-                            ReadPhotoBlob(cursor, contact, d15);
-                            break;
+                            case CommonColumns.Photo.ContentItemType:
+                                ReadPhotoBlob(cursor, contact, d15);
+                                break;
+                        }
                     }
                 }
             }
         }
-
-        // Step 3: Load thumbnails (always) and the full-size photo (single-contact reads only)
-        foreach (var kvp in contacts)
-        {
-            var contactUri = ContentUris.WithAppendedId(ContactsContract.Contacts.ContentUri, long.Parse(kvp.Key));
-            if (contactUri != null)
-            {
-                // Thumbnail
-                if (kvp.Value.Thumbnail == null)
-                {
-                    using var thumbStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, false);
-                    if (thumbStream != null)
-                    {
-                        using var ms = new MemoryStream();
-                        thumbStream.CopyTo(ms);
-                        kvp.Value.Thumbnail = ms.ToArray();
-                    }
-                }
-
-                // Full-size photo — only for single-contact reads to avoid bulk memory blow-up
-                if (includeFullPhoto && kvp.Value.Photo == null)
-                {
-                    using var photoStream = ContactsContract.Contacts.OpenContactPhotoInputStream(Resolver, contactUri, true);
-                    if (photoStream != null)
-                    {
-                        using var ms = new MemoryStream();
-                        photoStream.CopyTo(ms);
-                        kvp.Value.Photo = ms.ToArray();
-                    }
-                }
-            }
-        }
-
-        return contacts.Values.ToList();
     }
 
     // ── Data row readers ─────────────────────────────────────────────
@@ -681,36 +794,17 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
 
     static void ReadDate(ICursor cursor, Contact contact, int d1, int d2, int d3)
     {
-        var dateStr = cursor.GetString(d1);
-        if (string.IsNullOrWhiteSpace(dateStr)) return;
-
-        if (!TryParseContactDate(dateStr, out var date)) return;
+        // yyyy-MM-dd, or --MM-dd when saved without a year (see ContactDate.HasYear)
+        var date = ContactDates.Parse(cursor.GetString(d1));
+        if (date == null) return;
 
         var type = cursor.GetInt(d2);
         contact.Dates.Add(new ContactDate
         {
-            Date = date,
+            Date = date.Value,
             Type = FromAndroidEventType(type),
             Label = cursor.GetString(d3)
         });
-    }
-
-    static bool TryParseContactDate(string dateStr, out DateOnly date)
-    {
-        date = default;
-
-        // Android stores dates as yyyy-MM-dd or --MM-dd (no year)
-        if (dateStr.StartsWith("--"))
-            dateStr = "0001" + dateStr.Substring(1);
-
-        if (DateOnly.TryParse(dateStr, out date))
-            return true;
-
-        // Try common formats
-        if (DateOnly.TryParseExact(dateStr, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out date))
-            return true;
-
-        return false;
     }
 
     static void ReadRelationship(ICursor cursor, Contact contact, int d1, int d2, int d3)
@@ -754,7 +848,7 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
             .NewInsert(DataColumns.ContentUri)!
             .WithValueBackReference(DataColumns.InterfaceConsts.RawContactId, backRef)
             .WithValue(DataColumns.InterfaceConsts.Mimetype, CommonColumns.StructuredName.ContentItemType)
-            .WithValue(CommonColumns.StructuredName.DisplayName, contact.DisplayName)
+            .WithValue(CommonColumns.StructuredName.DisplayName, StructuredDisplayName(contact))
             .WithValue(CommonColumns.StructuredName.GivenName, contact.GivenName)
             .WithValue(CommonColumns.StructuredName.FamilyName, contact.FamilyName)
             .WithValue(CommonColumns.StructuredName.MiddleName, contact.MiddleName)
@@ -831,7 +925,7 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
             .NewInsert(DataColumns.ContentUri)!
             .WithValueBackReference(DataColumns.InterfaceConsts.RawContactId, backRef)
             .WithValue(DataColumns.InterfaceConsts.Mimetype, CommonColumns.Event.ContentItemType)
-            .WithValue(CommonColumns.Event.StartDate, date.Date.ToString("yyyy-MM-dd"))
+            .WithValue(CommonColumns.Event.StartDate, ContactDates.Format(date.Date))
             .WithValue(CommonColumns.Event.InterfaceConsts.Type, ToAndroidEventType(date.Type))
             .WithValue(CommonColumns.Event.InterfaceConsts.Label, date.Label)
             .Build()!);
@@ -878,7 +972,7 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
             .NewInsert(DataColumns.ContentUri)!
             .WithValue(DataColumns.InterfaceConsts.RawContactId, rawContactId)
             .WithValue(DataColumns.InterfaceConsts.Mimetype, CommonColumns.StructuredName.ContentItemType)
-            .WithValue(CommonColumns.StructuredName.DisplayName, contact.DisplayName)
+            .WithValue(CommonColumns.StructuredName.DisplayName, StructuredDisplayName(contact))
             .WithValue(CommonColumns.StructuredName.GivenName, contact.GivenName)
             .WithValue(CommonColumns.StructuredName.FamilyName, contact.FamilyName)
             .WithValue(CommonColumns.StructuredName.MiddleName, contact.MiddleName)
@@ -955,7 +1049,7 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
             .NewInsert(DataColumns.ContentUri)!
             .WithValue(DataColumns.InterfaceConsts.RawContactId, rawContactId)
             .WithValue(DataColumns.InterfaceConsts.Mimetype, CommonColumns.Event.ContentItemType)
-            .WithValue(CommonColumns.Event.StartDate, date.Date.ToString("yyyy-MM-dd"))
+            .WithValue(CommonColumns.Event.StartDate, ContactDates.Format(date.Date))
             .WithValue(CommonColumns.Event.InterfaceConsts.Type, ToAndroidEventType(date.Type))
             .WithValue(CommonColumns.Event.InterfaceConsts.Label, date.Label)
             .Build()!);
@@ -996,20 +1090,39 @@ public class ContactStoreImpl(AndroidPlatform platform) : IContactStore
 
     // ── Utility ──────────────────────────────────────────────────────
 
-    static long? GetRawContactId(string contactId)
+    static List<long> GetRawContactIds(string contactId)
     {
+        var ids = new List<long>();
         using var cursor = Resolver.Query(
-            RawContactsColumns.ContentUri,
+            RawContactsColumns.ContentUri!,
             new[] { RawContactsColumns.InterfaceConsts.Id },
-            RawContactsColumns.InterfaceConsts.ContactId + " = ?",
+            RawContactsColumns.InterfaceConsts.ContactId + " = ? AND " + RawContactsColumns.InterfaceConsts.Deleted + " = 0",
             new[] { contactId },
-            null
+            RawContactsColumns.InterfaceConsts.Id + " ASC"
         );
 
-        if (cursor != null && cursor.MoveToFirst())
-            return cursor.GetLong(0);
+        if (cursor != null)
+        {
+            while (cursor.MoveToNext())
+                ids.Add(cursor.GetLong(0));
+        }
+        return ids;
+    }
 
-        return null;
+    /// <summary>
+    /// The display name to store on the structured name row. When any name part is set it is left out, so the provider
+    /// builds it from the parts - otherwise a stale display name read earlier would win over a changed given/family name.
+    /// </summary>
+    static string? StructuredDisplayName(Contact contact)
+    {
+        var hasParts =
+            !string.IsNullOrWhiteSpace(contact.GivenName) ||
+            !string.IsNullOrWhiteSpace(contact.FamilyName) ||
+            !string.IsNullOrWhiteSpace(contact.MiddleName) ||
+            !string.IsNullOrWhiteSpace(contact.NamePrefix) ||
+            !string.IsNullOrWhiteSpace(contact.NameSuffix);
+
+        return hasParts ? null : contact.DisplayName;
     }
 
     // ── Enum mapping: Phone ──────────────────────────────────────────

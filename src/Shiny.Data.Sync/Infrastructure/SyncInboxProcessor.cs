@@ -129,7 +129,14 @@ public class SyncInboxProcessor(
         }
 
         var finalCursor = cursor ?? startingCursor;
-        repository.Set(new SyncCursor(endpoint.Key, finalCursor, DateTimeOffset.UtcNow));
+
+        // A failed pull keeps the cursor of any pages that did land, but not a fresh LastPulledAt -
+        // otherwise MinPullInterval would hold off the automatic retry of a pull that never completed.
+        var lastPulledAt = DateTimeOffset.UtcNow;
+        if (error != null)
+            lastPulledAt = repository.Get<SyncCursor>(endpoint.Key)?.LastPulledAt ?? DateTimeOffset.MinValue;
+
+        repository.Set(new SyncCursor(endpoint.Key, finalCursor, lastPulledAt));
 
         // Tombstones only run on a successful main pull and only when the endpoint asks for them.
         if (error == null && !string.IsNullOrEmpty(endpoint.TombstoneUrl))
@@ -176,7 +183,7 @@ public class SyncInboxProcessor(
                 verb = SyncVerb.Delete;
         }
 
-        var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, item.Payload, verb);
+        var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, item.Payload, verb, item.EntityIdentifier);
 
         foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
@@ -226,7 +233,7 @@ public class SyncInboxProcessor(
 
     async Task DispatchTombstone(SyncEndpoint endpoint, string entityId)
     {
-        var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, Entity: null, RawPayload: "null", SyncVerb.Delete);
+        var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, Entity: null, RawPayload: "null", SyncVerb.Delete, entityId);
         foreach (var d in services.GetServices<IDataSyncDelegate>())
         {
             try { await d.OnReceived(received).ConfigureAwait(false); }

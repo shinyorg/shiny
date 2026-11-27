@@ -120,6 +120,26 @@ public class Type2TagTests
     }
 
 
+    /// <remarks>
+    /// 257 bytes free after the TLVs: a 254-byte message fits with the 2-byte TLV header (256 bytes),
+    /// so that is the capacity - not the 253 the 4-byte header would leave.
+    /// </remarks>
+    [Fact]
+    public async Task Capacity_AtTheTlvHeaderBoundary_UsesTheShortForm()
+    {
+        // 264-byte data area (CC size 33), seven NULL TLVs, then the terminator at offset 7
+        var sim = SimulatedType2Tag.Custom([0xE1, 0x10, 0x21, 0x00], [0, 0, 0, 0, 0, 0, 0, 0xFE], pages: 75);
+        var tag = await Connect(sim);
+        Assert.Equal(254, tag.MaxSize);
+
+        // a 254-byte message: 3-byte record header + 3-byte type + 248-byte payload
+        var message = new NdefMessage(new NdefRecord(NdefTypeNameFormat.Media, "x/y"u8.ToArray(), new byte[248]));
+        Assert.Equal(254, message.Length);
+        await tag.WriteNdef(message);
+        Assert.Equal(message, await (await Connect(sim)).ReadNdef());
+    }
+
+
     [Fact]
     public async Task NotNdefFormatted_HasNoMessageAndCannotBeWritten()
     {

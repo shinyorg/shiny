@@ -17,8 +17,8 @@ public sealed class FakeSyncTransport : ISyncTransport
 {
     readonly ConcurrentDictionary<string, Queue<Func<string?, SyncPullResult>>> pullQueue = new();
     readonly ConcurrentDictionary<string, Queue<Func<string?, SyncTombstoneResult>>> tombstoneQueue = new();
-    readonly ConcurrentDictionary<string, Queue<SyncSendResult>> sendQueue = new();
-    readonly ConcurrentDictionary<string, Queue<SyncBatchResult>> batchQueue = new();
+    readonly ConcurrentDictionary<string, Queue<Func<SyncSendResult>>> sendQueue = new();
+    readonly ConcurrentDictionary<string, Queue<Func<SyncBatchResult>>> batchQueue = new();
 
     public List<(string Key, string? Cursor)> PullCalls { get; } = new();
     public List<(string Key, string? Cursor)> TombstoneCalls { get; } = new();
@@ -39,18 +39,26 @@ public sealed class FakeSyncTransport : ISyncTransport
 
 
     public void QueueSendResponse(string endpointKey, SyncSendResult result)
-        => this.sendQueue.GetOrAdd(endpointKey, _ => new()).Enqueue(result);
+        => this.sendQueue.GetOrAdd(endpointKey, _ => new()).Enqueue(() => result);
+
+
+    public void QueueSendFailure(string endpointKey, Exception exception)
+        => this.sendQueue.GetOrAdd(endpointKey, _ => new()).Enqueue(() => throw exception);
 
 
     public void QueueBatchResponse(string endpointKey, SyncBatchResult result)
-        => this.batchQueue.GetOrAdd(endpointKey, _ => new()).Enqueue(result);
+        => this.batchQueue.GetOrAdd(endpointKey, _ => new()).Enqueue(() => result);
+
+
+    public void QueueBatchFailure(string endpointKey, Exception exception)
+        => this.batchQueue.GetOrAdd(endpointKey, _ => new()).Enqueue(() => throw exception);
 
 
     public Task<SyncSendResult> Send(SyncEndpoint endpoint, SyncOperation operation, CancellationToken cancelToken)
     {
         this.SendCalls.Add(operation);
         if (this.sendQueue.TryGetValue(endpoint.Key, out var queue) && queue.Count > 0)
-            return Task.FromResult(queue.Dequeue());
+            return Task.FromResult(queue.Dequeue()());
         return Task.FromResult(new SyncSendResult(200, "{}", false));
     }
 
@@ -68,7 +76,7 @@ public sealed class FakeSyncTransport : ISyncTransport
     {
         this.BatchCalls.Add((endpoint, ops));
         if (this.batchQueue.TryGetValue(endpoint.Key, out var queue) && queue.Count > 0)
-            return Task.FromResult(queue.Dequeue());
+            return Task.FromResult(queue.Dequeue()());
         return Task.FromResult(new SyncBatchResult(200, Array.Empty<SyncBatchItemResult>()));
     }
 

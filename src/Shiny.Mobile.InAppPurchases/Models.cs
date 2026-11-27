@@ -203,6 +203,13 @@ public record PricingPhase(
 /// <param name="OriginalJson">Raw JSON as returned by the store (Apple transaction jsonRepresentation / Google originalJson)</param>
 /// <param name="Signature">Google Play: RSA-SHA1 signature of <paramref name="OriginalJson"/>. Null on Apple.</param>
 /// <param name="RevocationDate">Apple: date the transaction was refunded/revoked</param>
+/// <param name="IsVerified">
+/// Apple: false when StoreKit's on-device verification of the signed transaction failed (see
+/// <paramref name="VerificationError"/>). Never grant an unverified purchase - finish it after logging, or send
+/// <paramref name="VerificationData"/> to your server, which will reject the JWS. Google Play: always true (Play Billing
+/// verification happens server-side).
+/// </param>
+/// <param name="VerificationError">Apple: why on-device verification failed. Null when <paramref name="IsVerified"/> is true.</param>
 public record Purchase(
     StorePlatform Platform,
     string ProductId,
@@ -220,7 +227,9 @@ public record Purchase(
     StoreEnvironment Environment,
     string? OriginalJson = null,
     string? Signature = null,
-    DateTimeOffset? RevocationDate = null
+    DateTimeOffset? RevocationDate = null,
+    bool IsVerified = true,
+    string? VerificationError = null
 );
 
 

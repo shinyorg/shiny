@@ -22,7 +22,7 @@ namespace Shiny.Beacons;
 /// Android a foreground service keeps this alive while the app is backgrounded; on desktop the
 /// process simply has to stay running.
 /// </remarks>
-public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IDisposable
+public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IShinyStartupTask, IDisposable
 {
     readonly IBleManager bleManager;
     readonly IRepository repository;
@@ -33,6 +33,7 @@ public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IDisposa
     readonly SemaphoreSlim scanLock = new(1, 1);
 
     CompositeDisposable? scanSubscription;
+    ITimer? retryTimer;
 
 
     /// <summary>
@@ -58,6 +59,16 @@ public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IDisposa
 
     /// <inheritdoc />
     public AccessState CurrentStatus => this.bleManager.CurrentAccess;
+
+
+    /// <summary>
+    /// Regions survive a restart, so the scan comes back up with the app.
+    /// </summary>
+    public virtual void Start()
+    {
+        if (this.monitor.Count > 0)
+            _ = this.StartScan();
+    }
 
     /// <inheritdoc />
     public virtual Task<AccessState> RequestAccess() => this.bleManager.RequestAccess().ToTask();
@@ -123,7 +134,7 @@ public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IDisposa
                     .WhenBeaconSeen()
                     .Subscribe(
                         beacon => this.Fire(this.monitor.Report(beacon.Identity)),
-                        ex => this.logger.LogError(ex, "Beacon monitoring scan failed")
+                        ex => this.OnScanFailed(ex)
                     ),
 
                 // BLE never reports a departure, so exits are found by re-checking on a timer.
@@ -170,6 +181,37 @@ public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IDisposa
     }
 
 
+    // A failed scan never delivers again, but left in place it kept StartScan from ever starting another, and the
+    // exit timer ran on - every region reported Exited and monitoring was dead until the process restarted. It is
+    // torn down instead and retried after the exit timeout (Bluetooth switched off is the usual cause).
+    void OnScanFailed(Exception ex)
+    {
+        this.logger.LogError(ex, "Beacon monitoring scan failed - retrying in {Delay}", this.options.RegionExitTimeout);
+        _ = this.RestartAfterFailure();
+    }
+
+
+    async Task RestartAfterFailure()
+    {
+        try
+        {
+            await this.StopScan().ConfigureAwait(false);
+
+            var timer = this.options.TimeProvider.CreateTimer(
+                _ => _ = this.StartScan(),
+                null,
+                this.options.RegionExitTimeout,
+                Timeout.InfiniteTimeSpan
+            );
+            Interlocked.Exchange(ref this.retryTimer, timer)?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Failed to schedule a beacon monitoring scan restart");
+        }
+    }
+
+
     void Fire(IReadOnlyList<BeaconRegionTransition> transitions)
     {
         if (transitions.Count == 0)
@@ -201,6 +243,7 @@ public class BleScanBeaconMonitoringManager : IBeaconMonitoringManager, IDisposa
     /// <inheritdoc />
     public void Dispose()
     {
+        Interlocked.Exchange(ref this.retryTimer, null)?.Dispose();
         this.scanSubscription?.Dispose();
         this.scanSubscription = null;
         this.scanLock.Dispose();

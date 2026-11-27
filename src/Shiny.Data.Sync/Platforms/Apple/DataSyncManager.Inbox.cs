@@ -214,74 +214,95 @@ public partial class DataSyncManager
 
     async Task DispatchInbox(SyncEndpoint endpoint, string taskDescription, SyncPullResult result)
     {
-        var dispatched = 0;
-        foreach (var item in result.Items)
+        this.BeginDelegateDispatch();
+        try
         {
-            object? entity = null;
-            try { entity = SyncInboxProcessor.DeserializeEntity(endpoint, item.Payload); }
-            catch (Exception ex)
+            var dispatched = 0;
+            foreach (var item in result.Items)
             {
-                logger.LogError(ex, "Failed to deserialize inbox payload for {key}, entity {id}", endpoint.Key, item.EntityIdentifier);
+                object? entity = null;
+                try { entity = SyncInboxProcessor.DeserializeEntity(endpoint, item.Payload); }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to deserialize inbox payload for {key}, entity {id}", endpoint.Key, item.EntityIdentifier);
+                }
+
+                var verb = item.Verb;
+                if (entity != null && verb != SyncVerb.Delete)
+                {
+                    if (endpoint.SoftDeletePredicate?.Invoke(entity) == true || endpoint.ExpiryPredicate?.Invoke(entity) == true)
+                        verb = SyncVerb.Delete;
+                }
+
+                var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, item.Payload, verb, item.EntityIdentifier);
+                foreach (var d in this.GetDelegates())
+                {
+                    try { await d.OnReceived(received).ConfigureAwait(false); }
+                    catch (Exception ex) { logger.LogError(ex, "Delegate OnReceived threw for endpoint {key}, entity {id}", endpoint.Key, item.EntityIdentifier); }
+                }
+                this.RaiseActivity(new SyncEvent(SyncEventType.InboxItemReceived, endpoint.Key, Item: received));
+                dispatched++;
             }
 
-            var verb = item.Verb;
-            if (entity != null && verb != SyncVerb.Delete)
-            {
-                if (endpoint.SoftDeletePredicate?.Invoke(entity) == true || endpoint.ExpiryPredicate?.Invoke(entity) == true)
-                    verb = SyncVerb.Delete;
-            }
+            var existing = repository.Get<SyncCursor>(endpoint.Key)?.Cursor;
+            var nextCursor = result.NextCursor ?? existing;
+            repository.Set(new SyncCursor(endpoint.Key, nextCursor, DateTimeOffset.UtcNow));
 
-            var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, item.Payload, verb);
-            foreach (var d in this.GetDelegates())
-            {
-                try { await d.OnReceived(received).ConfigureAwait(false); }
-                catch (Exception ex) { logger.LogError(ex, "Delegate OnReceived threw for endpoint {key}, entity {id}", endpoint.Key, item.EntityIdentifier); }
-            }
-            this.RaiseActivity(new SyncEvent(SyncEventType.InboxItemReceived, endpoint.Key, Item: received));
-            dispatched++;
+            this.RaisePullCompleted(new SyncPullCompletion(endpoint.Key, dispatched, nextCursor, null));
+            this.RaiseActivity(new SyncEvent(SyncEventType.InboxPullCompleted, endpoint.Key, ItemCount: dispatched, Cursor: nextCursor));
+
+            var followupToken = this.inboxRequests.TryGetValue(taskDescription, out var ctx) ? ctx.CancelToken : CancellationToken.None;
+            this.CleanupInboxRequest(taskDescription);
+
+            if (result.HasMore && !followupToken.IsCancellationRequested)
+                await this.PullEndpoint(endpoint, force: true, followupToken).ConfigureAwait(false);
+            else if (!string.IsNullOrEmpty(endpoint.TombstoneUrl) && !followupToken.IsCancellationRequested)
+                await this.StartTombstoneFetch(endpoint, followupToken).ConfigureAwait(false);
         }
-
-        var existing = repository.Get<SyncCursor>(endpoint.Key)?.Cursor;
-        var nextCursor = result.NextCursor ?? existing;
-        repository.Set(new SyncCursor(endpoint.Key, nextCursor, DateTimeOffset.UtcNow));
-
-        this.RaisePullCompleted(new SyncPullCompletion(endpoint.Key, dispatched, nextCursor, null));
-        this.RaiseActivity(new SyncEvent(SyncEventType.InboxPullCompleted, endpoint.Key, ItemCount: dispatched, Cursor: nextCursor));
-
-        var followupToken = this.inboxRequests.TryGetValue(taskDescription, out var ctx) ? ctx.CancelToken : CancellationToken.None;
-        this.CleanupInboxRequest(taskDescription);
-
-        if (result.HasMore && !followupToken.IsCancellationRequested)
-            await this.PullEndpoint(endpoint, force: true, followupToken).ConfigureAwait(false);
-        else if (!string.IsNullOrEmpty(endpoint.TombstoneUrl) && !followupToken.IsCancellationRequested)
-            await this.StartTombstoneFetch(endpoint, followupToken).ConfigureAwait(false);
-
-        this.TryCompleteSession();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error dispatching inbox items for {key}", endpoint.Key);
+        }
+        finally
+        {
+            this.EndDelegateDispatch();
+        }
     }
 
 
     async Task DispatchTombstones(SyncEndpoint endpoint, string taskDescription, SyncTombstoneResult result)
     {
-        foreach (var id in result.DeletedIdentifiers)
+        this.BeginDelegateDispatch();
+        try
         {
-            var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, Entity: null, RawPayload: "null", SyncVerb.Delete);
-            foreach (var d in this.GetDelegates())
+            foreach (var id in result.DeletedIdentifiers)
             {
-                try { await d.OnReceived(received).ConfigureAwait(false); }
-                catch (Exception ex) { logger.LogError(ex, "Delegate OnReceived threw for tombstone {key}/{id}", endpoint.Key, id); }
+                var received = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, Entity: null, RawPayload: "null", SyncVerb.Delete, id);
+                foreach (var d in this.GetDelegates())
+                {
+                    try { await d.OnReceived(received).ConfigureAwait(false); }
+                    catch (Exception ex) { logger.LogError(ex, "Delegate OnReceived threw for tombstone {key}/{id}", endpoint.Key, id); }
+                }
+                this.RaiseActivity(new SyncEvent(SyncEventType.InboxItemReceived, endpoint.Key, Item: received));
             }
-            this.RaiseActivity(new SyncEvent(SyncEventType.InboxItemReceived, endpoint.Key, Item: received));
+
+            var existing = repository.Get<SyncTombstoneCursor>(endpoint.Key)?.Cursor;
+            var nextCursor = result.NextCursor ?? existing;
+            repository.Set(new SyncTombstoneCursor(endpoint.Key, nextCursor, DateTimeOffset.UtcNow));
+
+            if (result.DeletedIdentifiers.Count > 0)
+                this.RaiseActivity(new SyncEvent(SyncEventType.TombstonesApplied, endpoint.Key, ItemCount: result.DeletedIdentifiers.Count, Cursor: nextCursor));
+
+            this.CleanupInboxRequest(taskDescription);
         }
-
-        var existing = repository.Get<SyncTombstoneCursor>(endpoint.Key)?.Cursor;
-        var nextCursor = result.NextCursor ?? existing;
-        repository.Set(new SyncTombstoneCursor(endpoint.Key, nextCursor, DateTimeOffset.UtcNow));
-
-        if (result.DeletedIdentifiers.Count > 0)
-            this.RaiseActivity(new SyncEvent(SyncEventType.TombstonesApplied, endpoint.Key, ItemCount: result.DeletedIdentifiers.Count, Cursor: nextCursor));
-
-        this.CleanupInboxRequest(taskDescription);
-        this.TryCompleteSession();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error dispatching tombstones for {key}", endpoint.Key);
+        }
+        finally
+        {
+            this.EndDelegateDispatch();
+        }
     }
 
 

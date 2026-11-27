@@ -30,6 +30,7 @@ public class LinuxScreenRecorder : AbstractScreenRecorder, IAsyncDisposable
     readonly ILogger<LinuxScreenRecorder> logger;
     readonly Lazy<EncoderKind> encoder;
     readonly Lazy<bool> hasPulseAudio;
+    readonly Lazy<bool> ffmpegFallback;
 
 
     public LinuxScreenRecorder(ILogger<LinuxScreenRecorder> logger) : base(logger)
@@ -40,6 +41,10 @@ public class LinuxScreenRecorder : AbstractScreenRecorder, IAsyncDisposable
         // a DI container building the graph should not be shelling out
         this.encoder = new Lazy<EncoderKind>(DetectEncoder);
         this.hasPulseAudio = new Lazy<bool>(EncoderProbe.HasPulseAudio);
+
+        // GStreamer is preferred whenever it is installed, but it is only usable through a portal;
+        // an X11 session with ffmpeg as well still records when no portal is running
+        this.ffmpegFallback = new Lazy<bool>(() => EncoderProbe.IsX11 && EncoderProbe.Exists("ffmpeg"));
     }
 
 
@@ -104,7 +109,10 @@ public class LinuxScreenRecorder : AbstractScreenRecorder, IAsyncDisposable
 
         // the portal shows its consent picker per recording and cannot be pre-approved, so this
         // only answers whether a portal is there to ask
-        return available ? AccessState.Unknown : AccessState.NotSupported;
+        if (available)
+            return AccessState.Unknown;
+
+        return this.CanFallBackToFfmpeg(request) ? AccessState.Available : AccessState.NotSupported;
     }
 
 
@@ -131,6 +139,13 @@ public class LinuxScreenRecorder : AbstractScreenRecorder, IAsyncDisposable
         var portal = new ScreenCastPortal(this.logger);
         try
         {
+            var portalAvailable = await portal.IsAvailable(ct).ConfigureAwait(false);
+            if (!portalAvailable && this.CanFallBackToFfmpeg(request))
+            {
+                await portal.DisposeAsync().ConfigureAwait(false);
+                return this.StartFfmpeg(request, outputPath);
+            }
+
             var stream = await portal.Start(request.ShowCursor, ct).ConfigureAwait(false);
 
             // the portal's size hint is the real capture size where it is given; without it the
@@ -176,6 +191,12 @@ public class LinuxScreenRecorder : AbstractScreenRecorder, IAsyncDisposable
             throw;
         }
     }
+
+
+    // the ffmpeg path records the default input rather than a monitor source, so it cannot stand
+    // in for a request that asked for system audio
+    bool CanFallBackToFfmpeg(ScreenRecordingRequest request)
+        => !request.IncludeSystemAudio && this.ffmpegFallback.Value;
 
 
     AbstractScreenRecording StartFfmpeg(ScreenRecordingRequest request, string outputPath)

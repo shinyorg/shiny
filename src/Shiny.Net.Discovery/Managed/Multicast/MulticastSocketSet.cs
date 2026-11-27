@@ -42,6 +42,9 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
     CancellationTokenSource? cancelSource;
     int refCount;
 
+    // set once any send succeeds - see SendSafe for why it matters
+    volatile bool anySendSucceeded;
+
 
     /// <summary>
     /// Raised for every datagram received on any of this protocol's sockets. Handlers must not throw.
@@ -108,6 +111,7 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
     void Start()
     {
         this.cancelSource = new CancellationTokenSource();
+        this.anySendSucceeded = false;
         var ct = this.cancelSource.Token;
 
         // the lock must be held before the first receive or Android's Wi-Fi driver filters
@@ -254,6 +258,12 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
     {
         lock (this.joinLock)
         {
+            // A rejoin after a network change re-joins interfaces that are still members, and the OS
+            // refuses a duplicate join (EADDRINUSE / WSAEINVAL). Those interfaces are still joined, so
+            // what was joined before counts as joined now - otherwise they silently drop out of every send.
+            var previousV4 = this.joinedV4.ToList();
+            var previousV6 = this.joinedV6.ToList();
+
             this.joinedV4.Clear();
             this.joinedV6.Clear();
             this.interfaceAddresses.Clear();
@@ -274,12 +284,12 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
                 {
                     foreach (var address in addresses)
                     {
-                        if (address.AddressFamily == AddressFamily.InterNetwork && this.TryJoinV4(address))
+                        if (address.AddressFamily == AddressFamily.InterNetwork && (this.TryJoinV4(address) || WasJoinedV4(previousV4, address, index)))
                             this.joinedV4.Add(new V4Membership(address, index));
                     }
                 }
 
-                if (this.socketV6 != null && index != 0 && this.TryJoinV6(index))
+                if (this.socketV6 != null && index != 0 && (this.TryJoinV6(index) || previousV6.Contains(index)))
                     this.joinedV6.Add(index);
             }
 
@@ -287,6 +297,14 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
                 logger.LogWarning("No network interface accepted the {Protocol} multicast group - discovery will not work until one comes up", endpoint.Name);
         }
     }
+
+
+    /// <summary>
+    /// True when the interface already held the group before this rejoin - the same address, or a new
+    /// address on the same interface (a DHCP change keeps the interface's membership).
+    /// </summary>
+    internal static bool WasJoinedV4(IReadOnlyList<V4Membership> previous, IPAddress address, int interfaceIndex)
+        => previous.Any(x => x.LocalAddress.Equals(address) || (interfaceIndex != 0 && x.InterfaceIndex == interfaceIndex));
 
 
     static int TryGetInterfaceIndex(IPInterfaceProperties properties)
@@ -322,9 +340,15 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
             );
             return true;
         }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+        {
+            // already a member on this interface - still joined
+            return true;
+        }
         catch (SocketException)
         {
-            // already joined, or the interface went away between enumeration and join
+            // the interface went away between enumeration and join, or a platform that reports a
+            // duplicate join differently - JoinGroups falls back to the previous membership list
             return false;
         }
     }
@@ -510,13 +534,17 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
             await socket
                 .SendToAsync(payload, SocketFlags.None, destination, ct)
                 .ConfigureAwait(false);
+
+            this.anySendSucceeded = true;
         }
         catch (SocketException ex)
         {
             // an interface can drop mid-send - the retransmit timer covers us. A permission denial
-            // is not transient though, and silently swallowing it is how "no devices found" happens
+            // is not transient though, and silently swallowing it is how "no devices found" happens.
+            // Unreachable / network down are only a denial until a send has worked: after that they
+            // are an interface dropping (a Wi-Fi handoff), and throwing would end every browse loop.
             var permission = PermissionDiagnostics.Translate(ex, endpoint.Name);
-            if (permission != null)
+            if (permission != null && (!this.anySendSucceeded || ex.SocketErrorCode == SocketError.AccessDenied))
                 throw permission;
 
             logger.LogTrace(ex, "{Protocol} send to {Destination} failed", endpoint.Name, destination);
@@ -638,7 +666,7 @@ sealed class MulticastSocketSet(MulticastEndpoint endpoint, ILogger logger) : ID
     }
 
 
-    readonly record struct V4Membership(IPAddress LocalAddress, int InterfaceIndex);
+    internal readonly record struct V4Membership(IPAddress LocalAddress, int InterfaceIndex);
 
 
     sealed class Lease(MulticastSocketSet client) : IDisposable

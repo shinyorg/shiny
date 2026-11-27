@@ -109,7 +109,10 @@ services.AddBeaconBroadcasting();
 ```
 
 All four accept an optional `BeaconRangingOptions`. `AddBeaconMonitoring` also wires the default
-repository so regions survive a process restart.
+repository so regions survive a process restart. On every platform the monitoring comes back up at startup
+on its own (Windows, Linux and Blazor restart the BLE scan as a startup task), and a monitoring scan that fails
+(Bluetooth switched off) is retried after `RegionExitTimeout` - so don't generate code that calls
+`StartMonitoring` again on launch just to resume.
 
 On Linux or any plain-.NET host, register a `IBleManager` first (`AddBluetoothLE()` from
 `Shiny.BluetoothLE.Linux`) — the beacon registrations throw a named error if none is present.

@@ -21,16 +21,18 @@ public class NotificationManager(
     // of persistent scheduled notifications anyway — they live for the duration of the process.
     readonly ConcurrentDictionary<int, Notification> pending = new();
 
-    // Maps the freedesktop daemon-assigned id (uint) to our Shiny notification id (int)
-    readonly ConcurrentDictionary<uint, int> nativeToShinyId = new();
+    // Maps the freedesktop daemon-assigned id (uint) to the Shiny notification on screen, until the daemon reports it closed
+    readonly ConcurrentDictionary<uint, Notification> displayed = new();
 
     // Next fire time for each repeating notification. Held here rather than recalculated on every
     // scheduler tick - a fresh calculation always lands in the future, so it would never come due.
     readonly ConcurrentDictionary<int, DateTimeOffset> nextFire = new();
 
+    readonly SemaphoreSlim connectGate = new(1, 1);
     int nextId;
     DBusConnection? connection;
     Timer? scheduler;
+    bool disposed;
 
     public void Start()
     {
@@ -50,8 +52,8 @@ public class NotificationManager(
     {
         try
         {
-            await this.EnsureConnectionAsync().ConfigureAwait(false);
-            var writer = this.connection!.GetMessageWriter();
+            var conn = await this.EnsureConnectionAsync().ConfigureAwait(false);
+            var writer = conn.GetMessageWriter();
             writer.WriteMethodCallHeader(
                 destination: FreedesktopConstants.Service,
                 path: FreedesktopConstants.ObjectPath,
@@ -59,7 +61,7 @@ public class NotificationManager(
                 member: "GetCapabilities"
             );
             var msg = writer.CreateMessage();
-            await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+            await conn.CallMethodAsync(msg).ConfigureAwait(false);
             return AccessState.Available;
         }
         catch (Exception ex)
@@ -75,7 +77,7 @@ public class NotificationManager(
 
 
     public Task<Notification>? GetNotification(int notificationId)
-        => this.pending.TryGetValue(notificationId, out var n) ? Task.FromResult(n) : null;
+        => Task.FromResult(this.pending.TryGetValue(notificationId, out var n) ? n : null!);
 
 
     public Task<IList<Notification>> GetPendingNotifications()
@@ -120,8 +122,12 @@ public class NotificationManager(
 
     public Task Cancel(int id)
     {
-        var nativeId = this.nativeToShinyId.FirstOrDefault(kv => kv.Value == id).Key;
-        if (nativeId != 0)
+        var nativeIds = this.displayed
+            .Where(kv => kv.Value.Id == id)
+            .Select(kv => kv.Key)
+            .ToList();
+
+        foreach (var nativeId in nativeIds)
             _ = this.CloseNativeAsync(nativeId);
 
         this.pending.TryRemove(id, out _);
@@ -134,7 +140,7 @@ public class NotificationManager(
     {
         if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
         {
-            foreach (var nativeId in this.nativeToShinyId.Keys.ToList())
+            foreach (var nativeId in this.displayed.Keys.ToList())
                 _ = this.CloseNativeAsync(nativeId);
         }
 
@@ -150,6 +156,7 @@ public class NotificationManager(
 
     public ValueTask DisposeAsync()
     {
+        this.disposed = true;
         this.scheduler?.Dispose();
         this.connection?.Dispose();
         this.connection = null;
@@ -161,9 +168,9 @@ public class NotificationManager(
     {
         try
         {
-            await this.EnsureConnectionAsync().ConfigureAwait(false);
+            var conn = await this.EnsureConnectionAsync().ConfigureAwait(false);
 
-            var writer = this.connection!.GetMessageWriter();
+            var writer = conn.GetMessageWriter();
             writer.WriteMethodCallHeader(
                 destination: FreedesktopConstants.Service,
                 path: FreedesktopConstants.ObjectPath,
@@ -178,8 +185,9 @@ public class NotificationManager(
             writer.WriteString(notification.Title ?? string.Empty);   // summary
             writer.WriteString(notification.Message ?? string.Empty); // body
 
-            // actions: alternating identifier/label pairs (as)
-            var actions = new List<string>();
+            // actions: alternating identifier/label pairs (as). "default" is the action the daemon invokes when the
+            // notification itself is clicked - servers don't show it as a button
+            var actions = new List<string> { DefaultActionKey, "Open" };
             foreach (var a in channel.Actions)
             {
                 actions.Add(a.Identifier);
@@ -204,7 +212,7 @@ public class NotificationManager(
             writer.WriteInt32(-1); // expire_timeout (-1 = default)
 
             var msg = writer.CreateMessage();
-            var nativeId = await this.connection.CallMethodAsync(
+            var nativeId = await conn.CallMethodAsync(
                 msg,
                 static (Message reply, object? _) =>
                 {
@@ -213,7 +221,7 @@ public class NotificationManager(
                 }
             ).ConfigureAwait(false);
 
-            this.nativeToShinyId[nativeId] = notification.Id;
+            this.displayed[nativeId] = notification;
             logger.LogDebug("Sent notification {ShinyId} as freedesktop id {NativeId}", notification.Id, nativeId);
         }
         catch (Exception ex)
@@ -227,8 +235,8 @@ public class NotificationManager(
     {
         try
         {
-            await this.EnsureConnectionAsync().ConfigureAwait(false);
-            var writer = this.connection!.GetMessageWriter();
+            var conn = await this.EnsureConnectionAsync().ConfigureAwait(false);
+            var writer = conn.GetMessageWriter();
             writer.WriteMethodCallHeader(
                 destination: FreedesktopConstants.Service,
                 path: FreedesktopConstants.ObjectPath,
@@ -238,7 +246,7 @@ public class NotificationManager(
             );
             writer.WriteUInt32(nativeId);
             var msg = writer.CreateMessage();
-            await this.connection.CallMethodAsync(msg).ConfigureAwait(false);
+            await conn.CallMethodAsync(msg).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -247,11 +255,184 @@ public class NotificationManager(
     }
 
 
-    async Task EnsureConnectionAsync()
+    const string DefaultActionKey = "default";
+
+
+    /// <summary>
+    /// One connection, shared by every call. A failed connect is not kept, and a connection the bus drops is forgotten,
+    /// so the next call connects again instead of notifications staying broken until the process restarts.
+    /// </summary>
+    async Task<DBusConnection> EnsureConnectionAsync()
     {
-        if (this.connection != null) return;
-        this.connection = new DBusConnection(DBusAddress.Session!);
-        await this.connection.ConnectAsync().ConfigureAwait(false);
+        var current = this.connection;
+        if (current != null)
+            return current;
+
+        await this.connectGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            ObjectDisposedException.ThrowIf(this.disposed, this);
+            if (this.connection != null)
+                return this.connection;
+
+            var address = DBusAddress.Session
+                ?? throw new InvalidOperationException("No D-Bus session bus address is set - DBUS_SESSION_BUS_ADDRESS is empty");
+
+            var created = new DBusConnection(address);
+            try
+            {
+                await created.ConnectAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                created.Dispose();
+                throw;
+            }
+
+            await this.TryWatchSignalsAsync(created).ConfigureAwait(false);
+            this.connection = created;
+            _ = this.ForgetWhenDisconnected(created);
+            return created;
+        }
+        finally
+        {
+            this.connectGate.Release();
+        }
+    }
+
+
+    async Task ForgetWhenDisconnected(DBusConnection conn)
+    {
+        try
+        {
+            var reason = await conn.DisconnectedAsync().ConfigureAwait(false);
+            if (reason != null && !this.disposed)
+                logger.LogWarning(reason, "freedesktop notifications connection was lost - reconnecting on the next call");
+        }
+        catch
+        {
+            // the reason does not matter here - only that it is gone
+        }
+        Interlocked.CompareExchange(ref this.connection, null, conn);
+    }
+
+
+    /// <summary>
+    /// Subscribes to the daemon's ActionInvoked (a click or action button) and NotificationClosed signals. Notifications
+    /// still send without them, so a failure here is logged rather than thrown.
+    /// </summary>
+    async Task TryWatchSignalsAsync(DBusConnection conn)
+    {
+        try
+        {
+            await conn.AddMatchAsync(
+                new MatchRule
+                {
+                    Type = MessageType.Signal,
+                    Path = FreedesktopConstants.ObjectPath,
+                    Interface = FreedesktopConstants.Interface,
+                    Member = "ActionInvoked"
+                },
+                static (Message msg, object? _) =>
+                {
+                    // ActionInvoked (us): read here, while the message is current, into plain values. Any app on the
+                    // session bus can emit a signal under this name, so a malformed one reads as id 0 (never ours)
+                    // rather than throwing inside Tmds
+                    try
+                    {
+                        var reader = msg.GetBodyReader();
+                        var id = reader.ReadUInt32();
+                        var actionKey = reader.ReadString();
+                        return (Id: id, ActionKey: actionKey);
+                    }
+                    catch
+                    {
+                        return (Id: 0u, ActionKey: string.Empty);
+                    }
+                },
+                static (Tmds.DBus.Protocol.Notification<(uint Id, string ActionKey)> n) =>
+                {
+                    // IsCompletion first: on a value notification reading Exception throws, and a handler that
+                    // throws disconnects the whole connection (CLAUDE.md, D-Bus rule 3)
+                    if (n.IsCompletion)
+                        return;
+
+                    var manager = (NotificationManager)n.State!;
+                    try
+                    {
+                        manager.OnActionInvoked(n.Value.Id, n.Value.ActionKey);
+                    }
+                    catch (Exception ex)
+                    {
+                        manager.LogSignalError(ex, "ActionInvoked");
+                    }
+                },
+                emitOnCapturedContext: false,
+                ObserverFlags.None,
+                this
+            ).ConfigureAwait(false);
+
+            await conn.AddMatchAsync(
+                new MatchRule
+                {
+                    Type = MessageType.Signal,
+                    Path = FreedesktopConstants.ObjectPath,
+                    Interface = FreedesktopConstants.Interface,
+                    Member = "NotificationClosed"
+                },
+                static (Message msg, object? _) =>
+                {
+                    // NotificationClosed (uu): only the id is needed
+                    try
+                    {
+                        var reader = msg.GetBodyReader();
+                        return reader.ReadUInt32();
+                    }
+                    catch
+                    {
+                        return 0u;
+                    }
+                },
+                static (Tmds.DBus.Protocol.Notification<uint> n) =>
+                {
+                    if (n.IsCompletion)
+                        return;
+
+                    var manager = (NotificationManager)n.State!;
+                    try
+                    {
+                        manager.displayed.TryRemove(n.Value, out _);
+                    }
+                    catch (Exception ex)
+                    {
+                        manager.LogSignalError(ex, "NotificationClosed");
+                    }
+                },
+                emitOnCapturedContext: false,
+                ObserverFlags.None,
+                this
+            ).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Could not watch freedesktop notification signals - taps and actions will not reach INotificationDelegate");
+        }
+    }
+
+
+    void LogSignalError(Exception ex, string signal)
+        => logger.LogError(ex, "Error processing {Signal}", signal);
+
+
+    void OnActionInvoked(uint nativeId, string actionKey)
+    {
+        // the signal is broadcast for every app's notifications - only ours are in the map
+        if (!this.displayed.TryGetValue(nativeId, out var notification))
+            return;
+
+        var action = actionKey == DefaultActionKey ? null : actionKey;
+        var response = new NotificationResponse(notification, action, null);
+        _ = services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response), logger);
     }
 
 

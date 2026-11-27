@@ -109,6 +109,15 @@ public partial class DataSyncManager
             return;
         }
 
+        var endpoint = registry.Get(op.EndpointKey);
+        if (endpoint != null && endpoint.IsAlreadyDeleted(op.Verb, statusCode))
+        {
+            // the entity is gone either way - a retried DELETE whose first try succeeded, or a Create that never landed
+            logger.StandardInfo(op.Identifier, $"DELETE returned {statusCode} - entity already gone, completing");
+            this.OnFinish(op, statusCode, body);
+            return;
+        }
+
         if (statusCode < 200 || statusCode > 299)
         {
             this.OnError(op, statusCode, new InvalidOperationException("Sync transport error - non-success status: " + statusCode));
@@ -131,22 +140,33 @@ public partial class DataSyncManager
     public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
     {
         logger.LogInformation("Data sync DidFinishEventsForBackgroundSession");
-        this.completionHandler?.Invoke();
-        this.completionHandler = null;
+        this.backgroundEventsFinished = true;
+        this.TryCompleteSession();
     }
 
 
     async void OnFinish(SyncOperation op, int statusCode, string? responseBody)
     {
-        logger.OperationUpdate(op.Identifier, SyncOperationState.Completed);
-        this.TryDeleteTempFile(op.Identifier);
-        repository.Remove(op);
+        this.BeginDelegateDispatch();
+        try
+        {
+            logger.OperationUpdate(op.Identifier, SyncOperationState.Completed);
+            this.TryDeleteTempFile(op.Identifier);
+            repository.Remove(op);
 
-        await services.RunDelegates<IDataSyncDelegate>(d => d.OnSent(op, responseBody), logger);
+            await services.RunDelegates<IDataSyncDelegate>(d => d.OnSent(op, responseBody), logger);
 
-        this.UpdateReceived?.Invoke(this, new SyncOperationResult(op, SyncOperationState.Completed, statusCode, null));
-        this.RaiseActivity(new SyncEvent(SyncEventType.OutboxSent, op.EndpointKey, Operation: op, StatusCode: statusCode));
-        this.TryCompleteSession();
+            this.UpdateReceived?.Invoke(this, new SyncOperationResult(op, SyncOperationState.Completed, statusCode, null));
+            this.RaiseActivity(new SyncEvent(SyncEventType.OutboxSent, op.EndpointKey, Operation: op, StatusCode: statusCode));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error completing sync op {id}", op.Identifier);
+        }
+        finally
+        {
+            this.EndDelegateDispatch();
+        }
     }
 
 
@@ -161,15 +181,26 @@ public partial class DataSyncManager
             return;
         }
 
-        logger.LogError(ex, "Sync op {id} failed permanently (status {code}, attempts {attempts})", op.Identifier, statusCode, op.Attempts);
-        this.TryDeleteTempFile(op.Identifier);
-        repository.Remove(op);
+        this.BeginDelegateDispatch();
+        try
+        {
+            logger.LogError(ex, "Sync op {id} failed permanently (status {code}, attempts {attempts})", op.Identifier, statusCode, op.Attempts);
+            this.TryDeleteTempFile(op.Identifier);
+            repository.Remove(op);
 
-        await services.RunDelegates<IDataSyncDelegate>(d => d.OnError(op, statusCode, ex), logger);
+            await services.RunDelegates<IDataSyncDelegate>(d => d.OnError(op, statusCode, ex), logger);
 
-        this.UpdateReceived?.Invoke(this, new SyncOperationResult(op, SyncOperationState.Error, statusCode, ex));
-        this.RaiseActivity(new SyncEvent(SyncEventType.OutboxFailed, op.EndpointKey, Operation: op, StatusCode: statusCode, Error: ex));
-        this.TryCompleteSession();
+            this.UpdateReceived?.Invoke(this, new SyncOperationResult(op, SyncOperationState.Error, statusCode, ex));
+            this.RaiseActivity(new SyncEvent(SyncEventType.OutboxFailed, op.EndpointKey, Operation: op, StatusCode: statusCode, Error: ex));
+        }
+        catch (Exception fex)
+        {
+            logger.LogError(fex, "Error failing sync op {id}", op.Identifier);
+        }
+        finally
+        {
+            this.EndDelegateDispatch();
+        }
     }
 
 
@@ -181,25 +212,28 @@ public partial class DataSyncManager
             $"Transient error (status {statusCode}, attempts {op.Attempts}/{endpoint.MaxAttempts}) - retry in {delay.TotalSeconds:N1}s: {ex.Message}");
 
         this.TryDeleteTempFile(op.Identifier);
-        var retry = op with { State = SyncOperationState.Pending, LastError = ex.Message };
+
+        // NextAttemptAt marks the op as having no native task, so Start() re-sends it if the app dies
+        // before the in-process delay below runs out
+        var retry = op with { State = SyncOperationState.Pending, LastError = ex.Message, NextAttemptAt = DateTimeOffset.UtcNow + delay };
         repository.Set(retry);
         this.UpdateReceived?.Invoke(this, new SyncOperationResult(retry, SyncOperationState.Pending, statusCode, ex));
         this.RaiseActivity(new SyncEvent(SyncEventType.OutboxRetryScheduled, retry.EndpointKey, Operation: retry, StatusCode: statusCode, Error: ex));
 
         await Task.Delay(delay).ConfigureAwait(false);
 
-        if (!repository.Exists<SyncOperation>(retry.Identifier))
+        // re-read - cancelled, or already re-sent by Start(), while we waited
+        var current = repository.Get<SyncOperation>(retry.Identifier);
+        if (current?.NextAttemptAt == null)
             return;
 
         try
         {
-            var task = await this.CreateUploadTask(endpoint, retry).ConfigureAwait(false);
-            task.TaskDescription = retry.Identifier;
-            task.Resume();
+            await this.SendOperation(endpoint, current).ConfigureAwait(false);
         }
         catch (Exception inner)
         {
-            this.OnError(retry, 0, inner);
+            this.OnError(current, 0, inner);
         }
     }
 
@@ -213,57 +247,73 @@ public partial class DataSyncManager
             return;
         }
 
-        this.RaiseActivity(new SyncEvent(SyncEventType.OutboxConflict, op.EndpointKey, Operation: op, StatusCode: statusCode));
-
-        var resolution = endpoint.DefaultConflictPolicy switch
+        this.BeginDelegateDispatch();
+        try
         {
-            ConflictPolicy.ServerWins => ConflictResolution.AcceptRemote,
-            ConflictPolicy.ClientWins => ConflictResolution.KeepLocal,
-            _ => await this.AskDelegateForConflict(op, remotePayload)
-        };
+            this.RaiseActivity(new SyncEvent(SyncEventType.OutboxConflict, op.EndpointKey, Operation: op, StatusCode: statusCode));
 
-        switch (resolution.Action)
-        {
-            case ConflictAction.AcceptRemote:
-                this.TryDeleteTempFile(op.Identifier);
-                repository.Remove(op);
-                await this.DispatchConflictRemote(endpoint, remotePayload).ConfigureAwait(false);
-                this.UpdateReceived?.Invoke(this, new SyncOperationResult(op, SyncOperationState.Completed, statusCode, null));
-                break;
+            var resolution = endpoint.DefaultConflictPolicy switch
+            {
+                ConflictPolicy.ServerWins => ConflictResolution.AcceptRemote,
+                ConflictPolicy.ClientWins => ConflictResolution.KeepLocal,
+                _ => await this.AskDelegateForConflict(op, remotePayload)
+            };
 
-            case ConflictAction.KeepLocal:
-                this.TryDeleteTempFile(op.Identifier);
-                repository.Set(op with { State = SyncOperationState.Pending });
-                this.UpdateReceived?.Invoke(this, new SyncOperationResult(op, SyncOperationState.Pending, statusCode, null));
-                break;
+            switch (resolution.Action)
+            {
+                case ConflictAction.AcceptRemote:
+                    this.TryDeleteTempFile(op.Identifier);
+                    repository.Remove(op);
+                    await this.DispatchConflictRemote(endpoint, op.EntityIdentifier, remotePayload).ConfigureAwait(false);
+                    this.UpdateReceived?.Invoke(this, new SyncOperationResult(op, SyncOperationState.Completed, statusCode, null));
+                    break;
 
-            case ConflictAction.UseMerged:
-                this.TryDeleteTempFile(op.Identifier);
-                var merged = op with { Payload = resolution.MergedPayload, State = SyncOperationState.Pending };
-                repository.Set(merged);
-                try
-                {
-                    var task = await this.CreateUploadTask(endpoint, merged).ConfigureAwait(false);
-                    task.TaskDescription = merged.Identifier;
-                    task.Resume();
-                }
-                catch (Exception ex)
-                {
-                    this.OnError(merged, 0, ex);
-                }
-                break;
+                case ConflictAction.KeepLocal:
+                case ConflictAction.UseMerged:
+                    this.TryDeleteTempFile(op.Identifier);
+                    var retry = resolution.Action == ConflictAction.UseMerged
+                        ? op with { Payload = resolution.MergedPayload, State = SyncOperationState.Pending }
+                        : op with { State = SyncOperationState.Pending };
+
+                    if (op.Attempts >= endpoint.MaxAttempts)
+                    {
+                        // the server keeps rejecting it - fail instead of re-sending it forever
+                        this.OnError(retry, statusCode, new InvalidOperationException($"Conflict (HTTP {statusCode}) still unresolved after {op.Attempts} attempts"));
+                        return;
+                    }
+
+                    repository.Set(retry);
+                    this.UpdateReceived?.Invoke(this, new SyncOperationResult(retry, SyncOperationState.Pending, statusCode, null));
+                    try
+                    {
+                        // KeepLocal used to only mark the op Pending - nothing on Apple ever sent it again
+                        await this.SendOperation(endpoint, retry).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.OnError(retry, 0, ex);
+                    }
+                    break;
+            }
         }
-        this.TryCompleteSession();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error resolving sync conflict for op {id}", op.Identifier);
+        }
+        finally
+        {
+            this.EndDelegateDispatch();
+        }
     }
 
 
-    async Task DispatchConflictRemote(SyncEndpoint endpoint, string remotePayload)
+    async Task DispatchConflictRemote(SyncEndpoint endpoint, string entityIdentifier, string remotePayload)
     {
         object? entity = null;
         try { entity = Shiny.Data.Sync.Infrastructure.SyncInboxProcessor.DeserializeEntity(endpoint, remotePayload); }
         catch (Exception ex) { logger.LogError(ex, "Failed to deserialize conflict remote payload for {key}", endpoint.Key); }
 
-        var item = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, remotePayload, SyncVerb.Update);
+        var item = new SyncReceivedItem(endpoint.Key, endpoint.EntityType, entity, remotePayload, SyncVerb.Update, entityIdentifier);
         await services.RunDelegates<IDataSyncDelegate>(d => d.OnReceived(item), logger);
     }
 

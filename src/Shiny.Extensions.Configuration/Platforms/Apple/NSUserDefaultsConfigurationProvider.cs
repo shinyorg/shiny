@@ -8,6 +8,8 @@ public class NSUserDefaultsConfigurationProvider : ConfigurationProvider
 {
     public override void Load()
     {
+        // Load runs again on IConfigurationRoot.Reload()
+        this.Data.Clear();
         this.DoLoad();
         base.Load();
     }
@@ -32,8 +34,10 @@ public class NSUserDefaultsConfigurationProvider : ConfigurationProvider
         foreach (var pair in dict)
         {
             var key = pair.Key.ToString();
-            var value = pair.Value.ToString();
-            this.Data.Add(key, value);
+            var value = pair.Value?.ToString();
+
+            // the indexer, not Add - configuration keys are case-insensitive and defaults keys are not
+            this.Data[key] = value;
         }
     }
 }

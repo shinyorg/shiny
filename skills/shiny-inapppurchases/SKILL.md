@@ -31,6 +31,9 @@ triggers:
   - PurchaseResultStatus
   - PurchaseOptions
   - PurchaseState
+  - IsVerified
+  - VerificationError
+  - unverified transaction
   - SubscriptionReplacement
   - InAppPurchaseException
   - InAppPurchaseErrorCode
@@ -69,10 +72,15 @@ Namespaces: `Shiny.InAppPurchases` (client) and `Shiny.InAppPurchases.Server` (s
 3. **Consumable vs non-consumable is decided at finish time**: `FinishPurchaseAsync(purchase, consume: true)` for things that can be
    bought again. Google Play does not model consumables, and `ProductType` is only `OneTime` / `Subscription`.
 4. **Verify on the server** with `Purchase.VerificationData` (Apple signed JWS / Google purchase token). Don't trust the device.
-5. **Handle updates idempotently**, keyed on `TransactionId` on the client and `NotificationId` / `TransactionId` on the server.
-6. Always set `PurchaseOptions.AccountToken` (a `Guid`, your user id). It comes back as Apple `appAccountToken` /
+5. **Never grant an unverified purchase.** On Apple, a transaction that fails StoreKit's on-device verification arrives
+   like any other (from `PurchaseAsync` as `Success`, from `GetUnfinishedPurchasesAsync`, `GetEntitlementsAsync` and
+   `IPurchaseDelegate`) with `Purchase.IsVerified == false` and the reason in `VerificationError`. Log it and finish it
+   without granting, or send it to the server, which rejects the JWS - but always finish it, or StoreKit redelivers it on
+   every launch. Google Play purchases are always `IsVerified == true` (Play verification is server-side only).
+6. **Handle updates idempotently**, keyed on `TransactionId` on the client and `NotificationId` / `TransactionId` on the server.
+7. Always set `PurchaseOptions.AccountToken` (a `Guid`, your user id). It comes back as Apple `appAccountToken` /
    Google `obfuscatedAccountId`, both on-device and in server notifications.
-7. Libraries use Shiny.Core only. Do not suggest MAUI Essentials APIs inside library code.
+8. Libraries use Shiny.Core only. Do not suggest MAUI Essentials APIs inside library code.
 
 ## Client registration
 
@@ -125,6 +133,12 @@ public class StoreViewModel(IInAppPurchaseManager purchases, MyApi api)
 
             switch (result.Status)
             {
+                case PurchaseResultStatus.Success when !result.Purchase!.IsVerified:
+                    // Apple: failed on-device verification - never grant. Finish so StoreKit stops redelivering it.
+                    logger.LogWarning("Unverified purchase {Id}: {Error}", result.Purchase.TransactionId, result.Purchase.VerificationError);
+                    await purchases.FinishPurchaseAsync(result.Purchase, consume: product.Id == "coins_100");
+                    break;
+
                 case PurchaseResultStatus.Success:
                     await api.VerifyAndGrant(result.Purchase!.VerificationData, result.Purchase.ProductId);
                     await purchases.FinishPurchaseAsync(result.Purchase!, consume: product.Id == "coins_100");
@@ -155,6 +169,11 @@ public class MyPurchaseDelegate(IInAppPurchaseManager purchases, MyApi api) : IP
     {
         switch (purchase.State)
         {
+            case PurchaseState.Purchased when !purchase.IsVerified && !purchase.IsFinished:
+                // Apple only - log, never grant, finish so it is not redelivered
+                await purchases.FinishPurchaseAsync(purchase, consume: IsConsumable(purchase.ProductId));
+                break;
+
             case PurchaseState.Purchased when !purchase.IsFinished:
                 await api.VerifyAndGrant(purchase.VerificationData, purchase.ProductId);
                 await purchases.FinishPurchaseAsync(purchase, consume: IsConsumable(purchase.ProductId));
@@ -196,6 +215,7 @@ Delegates are resolved lazily, so they may inject `IInAppPurchaseManager`. At ap
 | `IsFinished` | finished | acknowledged |
 | `Environment` | Production / Sandbox / Xcode | Unknown |
 | `Signature` | null | RSA signature of `OriginalJson` |
+| `IsVerified` / `VerificationError` | false + reason when StoreKit verification fails | always true / null |
 
 ## Server
 

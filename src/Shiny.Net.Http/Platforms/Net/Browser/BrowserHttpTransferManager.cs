@@ -100,10 +100,11 @@ public class BrowserHttpTransferManager(
                     Filename = Path.GetFileName(request.LocalFilePath)
                 }
             };
-            await mod.InvokeVoidAsync("queue", entry).ConfigureAwait(false);
+            // the body is stored with the entry in one write - queueing first and setting the body
+            // afterwards let the service worker send the upload before its body existed
             await mod.InvokeVoidAsync(
-                "setBody",
-                request.Identifier,
+                "queue",
+                entry,
                 Convert.ToBase64String(fileBytes),
                 "application/octet-stream"
             ).ConfigureAwait(false);
@@ -111,10 +112,9 @@ public class BrowserHttpTransferManager(
         else if (request.Type == TransferType.UploadRaw)
         {
             var fileBytes = await ReadLocalFileAsync(request.LocalFilePath).ConfigureAwait(false);
-            await mod.InvokeVoidAsync("queue", entry).ConfigureAwait(false);
             await mod.InvokeVoidAsync(
-                "setBody",
-                request.Identifier,
+                "queue",
+                entry,
                 Convert.ToBase64String(fileBytes),
                 request.HttpContent?.ContentType ?? "application/octet-stream"
             ).ConfigureAwait(false);

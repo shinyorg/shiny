@@ -20,6 +20,9 @@ triggers:
   - eventual consistency
   - conflict resolution
   - PullNow
+  - SyncReceivedItem
+  - tombstone
+  - TreatMissingAsDeleted
 ---
 
 # Shiny Data Sync
@@ -84,6 +87,7 @@ builder.Services.AddDataSync<MyDataSyncDelegate>(opts =>
         ep.Batch = true;                             // coalesce ops per round-trip
         ep.MaxAttempts = 8;                          // retry transient failures up to 8x
         ep.RetryBaseDelay = TimeSpan.FromSeconds(3);
+        ep.TreatMissingAsDeleted = true;             // default: 404/410 on a DELETE completes it as sent
 
         // -- Conflicts --
         ep.DefaultConflictPolicy = ConflictPolicy.ServerWins;
@@ -163,6 +167,8 @@ public class MyDataSyncDelegate : IDataSyncDelegate
         // or JsonOptions. RawPayload is also available for custom handling.
         if (item.Entity is TodoItem todo)
             myLocalStore.Apply(todo, item.Verb);
+        else if (item.Verb == SyncVerb.Delete && item.EntityIdentifier is { } id)
+            myLocalStore.Delete(id);    // tombstones carry no entity - only the id
         return Task.CompletedTask;
     }
 
@@ -244,6 +250,14 @@ A regained network connection on the HttpClient platforms (Windows / Linux / des
 
 Every endpoint has `MaxAttempts` (default 5) and `RetryBaseDelay` (default 2s). Transient failures — `HttpStatusCode 0` (network down), `5xx`, `408`, `429` — schedule a retry at `baseDelay * 2^(attempts-1)` capped at 60s. The retry timestamp is persisted on the `SyncOperation` as `NextAttemptAt`, so a process restart resumes the wait window correctly. After `MaxAttempts`, the op is handed to `IDataSyncDelegate.OnError` and removed from the outbox (the delegate can re-queue if it wants).
 
+**DELETE answered `404` / `410`.** With `TreatMissingAsDeleted` (default `true`) a `404 Not Found` or `410 Gone` on a `Delete` op completes it as sent: `OnSent` runs (response body `null`) and the op is reported `Completed` / `OutboxSent` with that status code. The entity is gone either way - this covers a retried DELETE whose first try succeeded, and a coalesced Create + Delete whose Create may never have landed. It applies on every platform (single sends, batch items, and Apple upload tasks). Set it to `false` only when your API returns 404 on DELETE for something else; those ops then fail permanently through `OnError` as before. Other verbs are unaffected - a 404 on an Update still fails.
+
+Ordering is per entity: while an op waits out its backoff, later ops for the same `EntityIdentifier` wait too, so the server always sees an entity's changes in the order they were queued. The outbox loop keeps running through backoff windows (it no longer stops until the next `Queue`/app start). On iOS / Mac Catalyst an op waiting for a retry has no native task; if the app is killed during the wait, `Start()` re-sends it on the next launch, and `Cancel(id)` / `CancelAll()` cancel such ops too. `Start()` also re-sends any op left `Pending` / `InProgress` with no retry marker and no native task (stranded by older versions) - with no task it can't be in flight, so this never duplicates a request.
+
+On iOS / Mac Catalyst a background relaunch hands its completion handler back to iOS only after `DidFinishEventsForBackgroundSession` **and** after every `IDataSyncDelegate` call it triggered (`OnSent`, `OnError`, `OnConflict`, `OnReceived`) has returned - so the app isn't suspended part-way through your delegate. Keep delegate work short: iOS still gives a background relaunch only ~30 seconds.
+
+In a batched endpoint (`Batch = true`), an item the server fails transiently (or a `KeepLocal` / `UseMerged` conflict) is re-queued as the coalesced op - the folded originals are removed, the change is not lost.
+
 ## Conflict Resolution
 
 When the server returns `409 Conflict` or `412 Precondition Failed`, the engine consults the endpoint's `DefaultConflictPolicy`:
@@ -257,6 +271,8 @@ The delegate's `OnConflict` returns:
 - `ConflictResolution.AcceptRemote` — same as `ServerWins`
 - `ConflictResolution.KeepLocal` — re-queue the local op
 - `ConflictResolution.UseMerged(string mergedPayload)` — replace the op's payload with a merge result and retry
+
+`ClientWins` / `KeepLocal` / `UseMerged` retries back off like transient failures and count toward `MaxAttempts` - a server that keeps answering 409 ends in `OnError` (status 409) instead of an endless re-send. Send a "force overwrite" header from `OnBeforeSend` if the server needs one to accept the local version. With `AcceptRemote` the remote payload reaches `OnReceived` with `EntityIdentifier` set to the local op's entity id.
 
 ## Tombstones (separate delete stream)
 
@@ -273,7 +289,8 @@ or, when the server paginates / cursors deletes separately:
 { "cursor": "<opaque next cursor>", "ids": ["id1","id2",...] }
 ```
 
-Each ID dispatched to `IDataSyncDelegate.OnReceived` with `Verb = Delete` and `Entity = null`.
+Each ID dispatched to `IDataSyncDelegate.OnReceived` with `Verb = Delete`, `Entity = null` and the deleted
+row's id in `SyncReceivedItem.EntityIdentifier` (set for pulled items too, from the pull item's `id`).
 A separate `SyncTombstoneCursor` record persists the tombstone cursor independently from the
 main `SyncCursor`. On iOS / Mac Catalyst the tombstone fetch also rides the background
 NSURLSession (`tombstone:{endpointKey}` task description), so it survives suspension just
@@ -368,7 +385,8 @@ If `hasMore: true`, the engine immediately re-pulls with the new cursor — drai
 
 Set `endpoint.Batch = true` to coalesce multiple queued ops for one endpoint into a single `POST {url}/batch` request. Coalescing rules:
 
-- Trailing `Delete` wins — any preceding Create/Update for the same entity drop
+- A `Create` that was never sent (`Attempts == 0`, `Pending`) followed by a `Delete` cancels out - **both ops are removed and nothing is sent**. Each is reported `Canceled` (`UpdateReceived` state `Canceled`, `Activity` `OutboxCanceled`), the same as `Cancel(id)`; no delegate method runs, since nothing reached the server and nothing failed
+- Otherwise a trailing `Delete` wins — any preceding Create/Update for the same entity drop (a Create that was attempted may be on the server, so the DELETE still goes; a 404 back completes it under `TreatMissingAsDeleted`)
 - `Create + Update(s)` → single `Create` with the latest payload
 - `Update + Update(s)` → single `Update` with the latest payload
 

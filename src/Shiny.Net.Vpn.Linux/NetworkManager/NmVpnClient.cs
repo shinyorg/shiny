@@ -14,6 +14,42 @@ internal sealed record NmActiveConnection(string Path, uint State);
 
 
 /// <summary>
+/// The signal subscriptions <see cref="LinuxVpnManager"/> listens with, and the connection they live on.
+/// </summary>
+/// <remarks>
+/// A match rule dies with its connection, so <see cref="Lost"/> - the <c>DisconnectedAsync</c> of the
+/// exact connection the watches were added on - tells the owner when to subscribe again.
+/// </remarks>
+internal sealed class NmWatch(IDisposable[] subscriptions, Task<Exception?> lost) : IDisposable
+{
+    /// <summary>Completes with the reason (null when there is none) once the connection drops.</summary>
+    public Task<Exception?> Lost => lost;
+
+    public void Dispose()
+    {
+        foreach (var subscription in subscriptions)
+        {
+            try
+            {
+                subscription.Dispose();
+            }
+            catch
+            {
+                // a handle on a dead connection has nothing left to release
+            }
+        }
+    }
+}
+
+
+/// <summary>Where <see cref="LinuxVpnManager"/> gets its watches from - a seam so re-subscribing can be tested without a bus.</summary>
+internal interface INmVpnWatchSource
+{
+    Task<NmWatch> Watch(Action onPropertiesChanged, Action<NmVpnStateChange> onVpnStateChanged, CancellationToken ct = default);
+}
+
+
+/// <summary>
 /// The slice of the NetworkManager D-Bus API a VPN profile needs: saved connections by UUID, the
 /// active connections, activate/deactivate, and the VPN state signal.
 /// </summary>
@@ -24,7 +60,7 @@ internal sealed record NmActiveConnection(string Path, uint State);
 /// before touching anything else and never throw, because a throwing handler disconnects the whole
 /// connection.
 /// </remarks>
-internal sealed class NmVpnClient : IAsyncDisposable
+internal sealed class NmVpnClient : INmVpnWatchSource, IAsyncDisposable
 {
     readonly SemaphoreSlim connectLock = new(1, 1);
     DBusConnection? connection;
@@ -44,8 +80,17 @@ internal sealed class NmVpnClient : IAsyncDisposable
                     ?? throw new VpnException("No D-Bus system bus address is set - DBUS_SYSTEM_BUS_ADDRESS is empty and the default socket is missing");
 
                 var created = new DBusConnection(address);
-                await created.ConnectAsync().ConfigureAwait(false);
+                try
+                {
+                    await created.ConnectAsync().ConfigureAwait(false);
+                }
+                catch
+                {
+                    created.Dispose();
+                    throw;
+                }
                 this.connection = created;
+                _ = this.ForgetWhenDisconnected(created);
             }
             return this.connection;
         }
@@ -53,6 +98,24 @@ internal sealed class NmVpnClient : IAsyncDisposable
         {
             this.connectLock.Release();
         }
+    }
+
+
+    /// <summary>
+    /// A dead connection fails every call made on it, so once the bus drops it is forgotten and the
+    /// next call connects again rather than the manager staying broken until the process restarts.
+    /// </summary>
+    async Task ForgetWhenDisconnected(DBusConnection conn)
+    {
+        try
+        {
+            await conn.DisconnectedAsync().ConfigureAwait(false);
+        }
+        catch
+        {
+            // the reason does not matter here - only that it is gone
+        }
+        Interlocked.CompareExchange(ref this.connection, null, conn);
     }
 
 
@@ -231,6 +294,42 @@ internal sealed class NmVpnClient : IAsyncDisposable
 
 
     /// <summary>
+    /// Adds both VPN watches on one connection and hands back that connection's disconnect, so the
+    /// caller knows when the watches are dead.
+    /// </summary>
+    public async Task<NmWatch> Watch(Action onPropertiesChanged, Action<NmVpnStateChange> onVpnStateChanged, CancellationToken ct = default)
+    {
+        var conn = await this.GetConnection(ct).ConfigureAwait(false);
+        var lost = WhenLost(conn);
+
+        var properties = await WatchPropertiesChanged(conn, onPropertiesChanged).ConfigureAwait(false);
+        try
+        {
+            var vpnState = await WatchVpnStateChanged(conn, onVpnStateChanged).ConfigureAwait(false);
+            return new NmWatch([properties, vpnState], lost);
+        }
+        catch
+        {
+            properties.Dispose();
+            throw;
+        }
+    }
+
+
+    static async Task<Exception?> WhenLost(DBusConnection conn)
+    {
+        try
+        {
+            return await conn.DisconnectedAsync().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return ex;
+        }
+    }
+
+
+    /// <summary>
     /// Watches every <c>PropertiesChanged</c> NetworkManager emits, which is how active connections
     /// appearing, changing state and going away show up.
     /// </summary>
@@ -238,9 +337,8 @@ internal sealed class NmVpnClient : IAsyncDisposable
     /// Unfiltered by path: the active connection's path is new on every activation, so a path filter
     /// would miss the very change worth hearing about. The caller de-duplicates.
     /// </remarks>
-    public async Task<IDisposable> WatchPropertiesChanged(Action onChanged, CancellationToken ct = default)
+    static async Task<IDisposable> WatchPropertiesChanged(DBusConnection conn, Action onChanged)
     {
-        var conn = await this.GetConnection(ct).ConfigureAwait(false);
         var rule = new MatchRule
         {
             Type = MessageType.Signal,
@@ -279,9 +377,8 @@ internal sealed class NmVpnClient : IAsyncDisposable
     /// Watches <c>VpnStateChanged</c> on every VPN connection - the only signal that carries the reason
     /// a VPN failed (bad secrets, timeout, plugin missing).
     /// </summary>
-    public async Task<IDisposable> WatchVpnStateChanged(Action<NmVpnStateChange> onChanged, CancellationToken ct = default)
+    static async Task<IDisposable> WatchVpnStateChanged(DBusConnection conn, Action<NmVpnStateChange> onChanged)
     {
-        var conn = await this.GetConnection(ct).ConfigureAwait(false);
         var rule = new MatchRule
         {
             Type = MessageType.Signal,

@@ -16,7 +16,9 @@ public static class WearablesServiceCollectionExtensions
     public static IServiceCollection AddWearables(this IServiceCollection services)
     {
 #if IOS || ANDROID
-        services.AddSingletonAsImplementedInterfaces<WearableManager>();
+        // AddWearables<TDelegate> calls this once per delegate - register the manager (and its startup task) only once
+        if (!services.Any(x => x.ServiceType == typeof(WearableManager)))
+            services.AddSingletonAsImplementedInterfaces<WearableManager>();
 #endif
         return services;
     }

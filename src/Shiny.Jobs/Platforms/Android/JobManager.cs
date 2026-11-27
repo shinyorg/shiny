@@ -31,11 +31,13 @@ public class JobManager(
             (Id: GetCategoryId(true, false), Charging: true, Network: InternetAccess.None),
             (Id: GetCategoryId(false, true), Charging: false, Network: InternetAccess.Any),
             (Id: GetCategoryId(true, true), Charging: true, Network: InternetAccess.Any),
+            (Id: GetUnmeteredCategoryId(false), Charging: false, Network: InternetAccess.Unmetered),
+            (Id: GetUnmeteredCategoryId(true), Charging: true, Network: InternetAccess.Unmetered),
         };
 
         foreach (var cat in categories)
         {
-            var jobs = this.GetJobsByCategory(cat.Id);
+            var jobs = this.GetJobsByCategory(cat.Id, true);
             if (jobs.Count == 0)
             {
                 // Clean up a schedule left over from a previous run that registered jobs in this category

@@ -39,26 +39,34 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
 
     internal async void LocationsUpdated(CLLocation[] locations)
     {
-        if (this.CurrentSettings == null)
-            return;
+        // async void from a native callback - nothing may escape or it takes the process down
+        try
+        {
+            if (this.CurrentSettings == null)
+                return;
 
-        var reading = locations.Last().FromNative();
-        var isStationary = this.stationaryDetector.Detect(
-            reading,
-            this.CurrentSettings.StationaryMetersThreshold,
-            this.CurrentSettings.StationarySecondsThreshold
-        );
-        if (isStationary)
-            reading = reading with { IsStationary = true };
+            var reading = locations.Last().FromNative();
+            var isStationary = this.stationaryDetector.Detect(
+                reading,
+                this.CurrentSettings.StationaryMetersThreshold,
+                this.CurrentSettings.StationarySecondsThreshold
+            );
+            if (isStationary)
+                reading = reading with { IsStationary = true };
 
-        await this.services
-            .RunDelegates<IGpsDelegate>(
-                x => x.OnReading(reading),
-                this.logger
-            )
-            .ConfigureAwait(false);
+            await this.services
+                .RunDelegates<IGpsDelegate>(
+                    x => x.OnReading(reading),
+                    this.logger
+                )
+                .ConfigureAwait(false);
 
-        this.GpsReadingReceived?.Invoke(this, reading);
+            this.GpsReadingReceived?.Invoke(this, reading);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Error processing GPS reading");
+        }
     }
 
     // CLLocationManager keeps trying after most failures (kCLErrorLocationUnknown is transient), so
@@ -161,10 +169,12 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
         if (this.CurrentSettings == null)
             return Task.CompletedTask;
 
-        if (this.CurrentSettings.BackgroundMode == GpsBackgroundMode.Standard)
+        if (UsesSignificantChanges(this.CurrentSettings))
             this.locationManager.StopMonitoringSignificantLocationChanges();
         else
             this.locationManager.StopUpdatingLocation();
+
+        this.stationaryDetector.Reset();
 
 #if !MACOS
         this.locationManager.AllowsBackgroundLocationUpdates = false;
@@ -176,33 +186,16 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
 
     protected virtual async Task StartListenerInternal(GpsRequest request)
     {
-        // this.locationManager.DistanceFilter = request.DistanceFilterMeters;
-        // this.locationManager.DesiredAccuracy = request.Accuracy switch
-        // {
-        //     //CLLocation.AccurracyBestForNavigation;
-        //     //CLLocation.AccuracyReduced
-        //     GpsAccuracy.Highest => CLLocation.AccuracyBest,
-        //     GpsAccuracy.High => CLLocation.AccuracyNearestTenMeters,
-        //     GpsAccuracy.Normal => CLLocation.AccuracyHundredMeters,
-        //     GpsAccuracy.Low => CLLocation.AccuracyKilometer,
-        //     GpsAccuracy.Lowest => CLLocation.AccuracyThreeKilometers
-        // };
-
-        // this.locationManager.UpdatedHeading
-        // this.locationManager.DeferredUpdatesFinished
-        // this.locationManager.ShouldDisplayHeadingCalibration
-        // this.locationManager.DismissHeadingCalibrationDisplay();
-        // this.locationManager.Heading
-        // this.locationManager.AccuracyAuthorization
-        // if (this.locationManager.StopUpdatingHeading();
-        // this.locationManager.StartUpdatingHeading();
-
         var appleRequest = request.ToApple();
+        this.locationManager.DistanceFilter = appleRequest.DistanceFilterMeters > 0
+            ? appleRequest.DistanceFilterMeters
+            : CLLocationDistance.FilterNone;
+
 #if MACOS
         // A Mac app isn't suspended in the background, so there is no background mode to turn on: Standard
         // is significant location changes and Realtime is continuous updates, the same as on iOS.
         // PausesLocationUpdatesAutomatically, ActivityType and the background indicator are iOS-only.
-        if (request.BackgroundMode == GpsBackgroundMode.Standard)
+        if (UsesSignificantChanges(appleRequest))
             this.locationManager.StartMonitoringSignificantLocationChanges();
         else
             this.locationManager.StartUpdatingLocation();
@@ -212,23 +205,23 @@ public class CLLocationGpsManager : IGpsManager, IShinyStartupTask
 
         switch (request.BackgroundMode)
         {
-            case GpsBackgroundMode.None:
-                this.locationManager.StartUpdatingLocation();
-                break;
-
             case GpsBackgroundMode.Standard:
-                this.locationManager.AllowsBackgroundLocationUpdates = true;
-                this.locationManager.ShowsBackgroundLocationIndicator = appleRequest.ShowsBackgroundLocationIndicator;
-                this.locationManager.StartMonitoringSignificantLocationChanges();
-                break;
-
             case GpsBackgroundMode.Realtime:
                 this.locationManager.AllowsBackgroundLocationUpdates = true;
                 this.locationManager.ShowsBackgroundLocationIndicator = appleRequest.ShowsBackgroundLocationIndicator;
-                this.locationManager.StartUpdatingLocation();
                 break;
         }
+
+        if (UsesSignificantChanges(appleRequest))
+            this.locationManager.StartMonitoringSignificantLocationChanges();
+        else
+            this.locationManager.StartUpdatingLocation();
 #endif
         this.CurrentSettings = appleRequest;
     }
+
+
+    // Standard is significant location changes by definition; any mode can opt into them
+    static bool UsesSignificantChanges(AppleGpsRequest request)
+        => request.BackgroundMode == GpsBackgroundMode.Standard || request.UseSignificantLocationChanges;
 }

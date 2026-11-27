@@ -25,12 +25,29 @@ namespace Shiny.Net.Vpn;
 public class LinuxVpnManager(ILogger<LinuxVpnManager> logger) : AbstractVpnManager(logger), IAsyncDisposable
 {
     readonly NmVpnClient client = new();
+    readonly INmVpnWatchSource? watchOverride;
     readonly ConcurrentDictionary<string, string> failures = new();
     readonly string uuid = StrongSwanProfile.GetConnectionUuid(
         Assembly.GetEntryAssembly()?.GetName().Name ?? AppDomain.CurrentDomain.FriendlyName
     );
-    Task<IDisposable[]>? listening;
+    Task? listening;
+    CancellationTokenSource? listenCancel;
     volatile string? activePath;
+
+
+    /// <summary>Watches added on a connection that is not a real bus - tests only.</summary>
+    internal LinuxVpnManager(ILogger<LinuxVpnManager> logger, INmVpnWatchSource watches) : this(logger)
+        => this.watchOverride = watches;
+
+
+    INmVpnWatchSource Watches => this.watchOverride ?? this.client;
+
+
+    /// <summary>The first wait before subscribing again after the bus dropped; doubles per failed attempt.</summary>
+    internal TimeSpan ResubscribeDelay { get; set; } = TimeSpan.FromSeconds(1);
+
+    /// <summary>The longest wait between attempts to subscribe again while the bus is unavailable.</summary>
+    internal TimeSpan MaxResubscribeDelay { get; set; } = TimeSpan.FromSeconds(30);
 
 
     public override VpnCapabilities Capabilities =>
@@ -194,31 +211,108 @@ public class LinuxVpnManager(ILogger<LinuxVpnManager> logger) : AbstractVpnManag
 
 
     protected override void StartListening()
-        => this.listening = this.Listen();
+    {
+        var cancel = new CancellationTokenSource();
+        var firstAttempt = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        this.listenCancel = cancel;
+        this.listening = firstAttempt.Task;
+        _ = this.Listen(firstAttempt, cancel);
+    }
 
 
     protected override void StopListening()
     {
-        var current = this.listening;
+        // the loop owns the source and disposes it once it has seen the cancellation
+        var cancel = Interlocked.Exchange(ref this.listenCancel, null);
         this.listening = null;
-        if (current != null)
-            _ = DisposeWhenReady(current);
+        cancel?.Cancel();
     }
 
 
-    async Task<IDisposable[]> Listen()
+    /// <summary>
+    /// Keeps the two watches alive for as long as anyone listens. A match rule dies with its D-Bus
+    /// connection, so when the bus drops the dead handles are disposed and the watches added again on
+    /// a new connection - backing off from <see cref="ResubscribeDelay"/> to <see cref="MaxResubscribeDelay"/>
+    /// while the bus is unavailable - and the state is re-read once, because a change may have been
+    /// missed in between.
+    /// </summary>
+    async Task Listen(TaskCompletionSource firstAttempt, CancellationTokenSource cancel)
+    {
+        var ct = cancel.Token;
+        var delay = this.ResubscribeDelay;
+        var resubscribing = false;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                var watch = await this.TryWatch(ct).ConfigureAwait(false);
+                firstAttempt.TrySetResult();
+
+                if (watch != null)
+                {
+                    delay = this.ResubscribeDelay;
+                    if (resubscribing)
+                        this.RaiseStatusIfChanged();
+
+                    resubscribing = true;
+                    await this.WaitForLoss(watch, ct).ConfigureAwait(false);
+                }
+                await Task.Delay(delay, ct).ConfigureAwait(false);
+                delay = TimeSpan.FromTicks(Math.Min(delay.Ticks * 2, this.MaxResubscribeDelay.Ticks));
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // StopListening
+        }
+        finally
+        {
+            firstAttempt.TrySetResult();
+            cancel.Dispose();
+        }
+    }
+
+
+    async Task<NmWatch?> TryWatch(CancellationToken ct)
     {
         try
         {
-            var properties = await this.client.WatchPropertiesChanged(this.RaiseStatusIfChanged).ConfigureAwait(false);
-            var vpnState = await this.client.WatchVpnStateChanged(this.OnVpnStateChanged).ConfigureAwait(false);
+            var watch = await this.Watches.Watch(this.RaiseStatusIfChanged, this.OnVpnStateChanged, ct).ConfigureAwait(false);
+            if (ct.IsCancellationRequested)
+            {
+                // StopListening ran while the subscription was in flight
+                watch.Dispose();
+                return null;
+            }
             logger.WatcherStarted("NetworkManager PropertiesChanged + VpnStateChanged");
-            return [properties, vpnState];
+            return watch;
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            return null;
         }
         catch (Exception ex)
         {
-            logger.VpnError(ex, "Could not watch NetworkManager for VPN changes");
-            return [];
+            logger.VpnError(ex, "Could not watch NetworkManager for VPN changes - retrying");
+            return null;
+        }
+    }
+
+
+    /// <summary>Returns once the watch's connection drops or listening stops, with the dead handles disposed either way.</summary>
+    async Task WaitForLoss(NmWatch watch, CancellationToken ct)
+    {
+        var stopped = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var registration = ct.Register(static x => ((TaskCompletionSource)x!).TrySetResult(), stopped);
+        try
+        {
+            var first = await Task.WhenAny(watch.Lost, stopped.Task).ConfigureAwait(false);
+            if (first == watch.Lost)
+                logger.VpnError(watch.Lost.Result ?? new VpnException("The D-Bus connection closed"), "Lost the D-Bus connection - watching NetworkManager again");
+        }
+        finally
+        {
+            watch.Dispose();
         }
     }
 
@@ -241,13 +335,6 @@ public class LinuxVpnManager(ILogger<LinuxVpnManager> logger) : AbstractVpnManag
             }
         }
         this.RaiseStatusIfChanged();
-    }
-
-
-    static async Task DisposeWhenReady(Task<IDisposable[]> subscriptions)
-    {
-        foreach (var subscription in await subscriptions.ConfigureAwait(false))
-            subscription.Dispose();
     }
 
 

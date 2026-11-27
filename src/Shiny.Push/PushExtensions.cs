@@ -45,7 +45,7 @@ public static class PushExtensions
 
 
     /// <summary>
-    /// Requests push access and, when the provider supports tagging, applies the supplied tags to the registration.
+    /// Requests push access and, when access is granted and the provider supports tagging, applies the supplied tags to the registration.
     /// </summary>
     /// <param name="pushManager">The push manager.</param>
     /// <param name="tags">Tags to set after a successful registration.</param>
@@ -56,7 +56,8 @@ public static class PushExtensions
             .RequestAccess()
             .ConfigureAwait(false);
 
-        if (pushManager.Tags != null)
+        // tags belong to a registration - there is none to tag when access was not granted
+        if (access.Status == AccessState.Available && pushManager.Tags != null)
         {
             await pushManager
                 .Tags

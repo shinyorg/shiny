@@ -232,6 +232,11 @@ class MacOSScreenRecording : AbstractScreenRecording
         if (track == null)
             return;
 
+        // ScreenCaptureKit also delivers idle and blank frames (nothing changed on screen) that
+        // carry no image at all; appending one to the video input can fail the whole writer
+        if (track == AssetWriterTrack.Video && !HasImage(buffer))
+            return;
+
         try
         {
             this.sink.Append(buffer, track.Value);
@@ -240,6 +245,13 @@ class MacOSScreenRecording : AbstractScreenRecording
         {
             this.OnPlatformStopped(ScreenRecordingFaultReason.EncoderFailed, ex);
         }
+    }
+
+
+    static bool HasImage(CMSampleBuffer buffer)
+    {
+        using var image = buffer.GetImageBuffer();
+        return image != null;
     }
 
 

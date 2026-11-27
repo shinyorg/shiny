@@ -59,9 +59,20 @@ export async function start(objRef, options) {
         audio: !!options.includeSystemAudio
     });
 
+    // everything after the picker can still fail (microphone denied, no MediaRecorder for the
+    // chosen type) - the screen share must not be left running, with the browser's sharing bar up,
+    // behind a session .NET never received
+    try {
+        return await beginRecording(options);
+    } catch (e) {
+        await cleanup();
+        throw e;
+    }
+}
+
+async function beginRecording(options) {
     const videoTrack = displayStream.getVideoTracks()[0];
     if (!videoTrack) {
-        await cleanup();
         throw new Error('The browser returned no video track');
     }
 

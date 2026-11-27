@@ -2,7 +2,9 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using System.Threading;
 using Microsoft.Extensions.Logging;
+using Shiny.Extensions.Stores.Repositories;
 using Shiny.Net.Http.Infrastructure;
 
 namespace Shiny.Net.Http;
@@ -51,21 +53,52 @@ public class HttpTransferService : ShinyAndroidForegroundService<IHttpTransferMa
             : ForegroundService.TypeDataSync;
 
 
+    CancellationTokenSource? loopCancel;
+
+
     protected override void OnStart(Intent? intent)
     {
         Current = this;
         if (!IsStarted)
         {
-            this.GetService<HttpClientHttpTransferProcess>().Run(() => this.Stop());
             IsStarted = true;
+            this.loopCancel = new CancellationTokenSource();
+            this.RunLoop(this.loopCancel.Token);
         }
     }
 
 
+    void RunLoop(CancellationToken cancelToken) => this
+        .GetService<HttpClientHttpTransferProcess>()
+        .Run(() =>
+        {
+            // this service was stopped (timeout, task removed) - the loop ended because of it, and a newer
+            // service instance may already be running its own loop
+            if (cancelToken.IsCancellationRequested)
+                return;
+
+            // the loop only exits once no transfers remain - one queued while it was shutting down saw
+            // IsStarted == true and didn't start the service, so keep going instead of stopping
+            var queued = this.GetService<IRepository>().GetAll<HttpTransfer>().Count;
+            if (queued > 0)
+                this.RunLoop(cancelToken);
+            else
+                this.Stop();
+        }, cancelToken);
+
+
     protected override void OnStop()
     {
-        IsStarted = false;
-        Current = null;
+        // stop the transfer loop with the service - left running, it raced the loop of the next service start
+        this.loopCancel?.Cancel();
+        this.loopCancel?.Dispose();
+        this.loopCancel = null;
+
+        if (Current == this || Current == null)
+        {
+            IsStarted = false;
+            Current = null;
+        }
     }
 
     /// <summary>

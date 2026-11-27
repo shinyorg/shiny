@@ -297,6 +297,10 @@ When generating code for Shiny.Locations:
 - The convenience extension methods live on `Shiny.Locations.LocationExtensions` (renamed from `Extensions` in 5.2.5 — a type named `Shiny.Locations.Extensions` collides with the `Shiny.Locations.Extensions.AI` namespace and produces CS0434 in consuming projects). They are extension methods, so call sites are unaffected. Since the package split, the geofence ones (`TryStartMonitoring`, `IsPositionInside`) live on `Shiny.Locations.GeofenceExtensions` in `Shiny.Geofencing`; the GPS ones stay on `LocationExtensions` in `Shiny.Gps`.
 - Foreground observation uses C# `event EventHandler<T>` on the managers (`GpsReadingReceived`, `MotionActivityReadingReceived`) — Rx is no longer used in Shiny.Locations.
 - The `GpsBackgroundMode` enum controls background behavior: `None` (foreground), `Standard` (periodic), `Realtime` (continuous).
+- `IGpsDelegate`s receive every reading in every background mode on every platform (Android ran them only for `Realtime` before 7.0.0).
+- `AppleGpsRequest.DistanceFilterMeters` and `UseSignificantLocationChanges` are honored on iOS / Mac Catalyst / macOS (on iOS 18+ the distance filter is applied by Shiny, since `CLLocationUpdater` has none).
+- iOS below 18 monitors at most 20 regions per app (geofences and beacon regions together): `StartMonitoring` throws `InvalidOperationException` past that instead of silently never watching the region.
+- `IGeofenceManager.CurrentStatus` / `IGpsManager.GetCurrentStatus` never prompt - on Windows they read the permission without calling `RequestAccessAsync`, so call `RequestAccess` to ask.
 - `GeofenceState` enum values: `Unknown`, `Entered`, `Exited`, `Dwelling` (only for regions with a `DwellTime`).
 - `AccessState` is from Shiny.Core and includes `Available`, `Denied`, `Disabled`, `Restricted`, `NotSupported`, `Unknown`.
 

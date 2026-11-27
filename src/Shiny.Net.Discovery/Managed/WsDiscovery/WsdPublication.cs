@@ -190,6 +190,10 @@ sealed class WsdPublication : IWsDiscoveryPublication
                 .Delay(TimeSpan.FromMilliseconds(Random.Shared.Next(0, (int)WsdTransport.AppMaxDelay.TotalMilliseconds)), this.cancelSource.Token)
                 .ConfigureAwait(false);
 
+            // a reply sent after the Bye would put the target straight back into every client's cache
+            if (Volatile.Read(ref this.disposed) == 1)
+                return;
+
             var payload = WsdEnvelopeWriter.Matches(
                 // always answer in the version the request arrived in
                 request.Profile,
@@ -254,6 +258,9 @@ sealed class WsdPublication : IWsDiscoveryPublication
         this.sockets.DatagramReceived -= this.OnDatagramReceived;
         this.sockets.NetworkChanged -= this.OnNetworkChanged;
 
+        // cancel pending replies and re-announcements before the Bye, so none of them can follow it
+        await this.cancelSource.CancelAsync().ConfigureAwait(false);
+
         try
         {
             await this.SendAnnouncement(WsdMessageNames.Bye, CancellationToken.None).ConfigureAwait(false);
@@ -263,7 +270,6 @@ sealed class WsdPublication : IWsDiscoveryPublication
             this.logger.LogDebug(ex, "Could not send a WS-Discovery Bye for {Epr}", this.EndpointReference);
         }
 
-        await this.cancelSource.CancelAsync().ConfigureAwait(false);
         this.cancelSource.Dispose();
         this.lease.Dispose();
     }

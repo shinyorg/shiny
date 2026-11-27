@@ -44,6 +44,7 @@ internal sealed class AudioTrackEncoder : IDisposable
     volatile bool running = true;
     volatile bool paused;
     long framesWritten;
+    long baseUs = -1;
 
 
     public AudioTrackEncoder(
@@ -146,24 +147,27 @@ internal sealed class AudioTrackEncoder : IDisposable
                 var source = this.playback ?? this.mic!;
                 var read = source.Read(primary, 0, primary.Length);
 
-                if (read <= 0)
+                if (read > 0)
                 {
-                    this.DrainEncoder(info, endOfStream: false);
-                    continue;
-                }
+                    // the muxer lines tracks up by absolute timestamp, and the video track's come
+                    // from the surface - CLOCK_MONOTONIC, the same clock as System.nanoTime. Audio
+                    // starting at zero instead would put hours of empty lead-in before the video
+                    if (this.baseUs < 0)
+                        this.baseUs = Java.Lang.JavaSystem.NanoTime() / 1000L;
 
-                if (secondary != null)
-                {
-                    var other = this.mic!.Read(secondary, 0, read);
-                    if (other > 0)
-                        Mix(primary, secondary, Math.Min(read, other));
-                }
+                    if (secondary != null)
+                    {
+                        var other = this.mic!.Read(secondary, 0, read);
+                        if (other > 0)
+                            Mix(primary, secondary, Math.Min(read, other));
+                    }
 
-                // paused audio is discarded rather than encoded; the presentation timestamps are
-                // derived from the frame count, so skipping frames closes the gap automatically and
-                // needs no offset arithmetic of its own
-                if (!this.paused)
-                    this.Feed(primary, read);
+                    // paused audio is discarded rather than encoded; the presentation timestamps are
+                    // derived from the frame count, so skipping frames closes the gap automatically and
+                    // needs no offset arithmetic of its own
+                    if (!this.paused)
+                        this.Feed(primary, read);
+                }
 
                 this.DrainEncoder(info, endOfStream: false);
             }
@@ -212,7 +216,7 @@ internal sealed class AudioTrackEncoder : IDisposable
 
         // timestamps come from how many frames have been handed over, not from the wall clock -
         // the wall clock includes the time spent in the read and would drift audibly out of sync
-        var presentationUs = this.framesWritten * 1_000_000L / SampleRate;
+        var presentationUs = this.baseUs + (this.framesWritten * 1_000_000L / SampleRate);
         this.framesWritten += count / ChannelCount;
 
         this.codec.QueueInputBuffer(index, 0, byteCount, presentationUs, MediaCodecBufferFlags.None);
@@ -269,7 +273,7 @@ internal sealed class AudioTrackEncoder : IDisposable
             var index = this.codec.DequeueInputBuffer(10_000);
             if (index >= 0)
             {
-                var presentationUs = this.framesWritten * 1_000_000L / SampleRate;
+                var presentationUs = Math.Max(this.baseUs, 0) + (this.framesWritten * 1_000_000L / SampleRate);
                 this.codec.QueueInputBuffer(index, 0, 0, presentationUs, MediaCodecBufferFlags.EndOfStream);
                 this.DrainEncoder(new MediaCodec.BufferInfo(), endOfStream: true);
             }

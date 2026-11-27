@@ -115,7 +115,9 @@ class AndroidScreenRecording : AbstractScreenRecording
 
     protected override Task<ScreenRecordingResult> OnStop(CancellationToken ct)
     {
-        var lastFrameUs = this.video?.LastWrittenUs ?? -1;
+        // measured from the first frame written, with paused spans already removed - the raw
+        // surface timestamps are the system's monotonic clock, not a recording-relative one
+        var written = this.video?.Duration ?? TimeSpan.Zero;
 
         // order matters on the way down: the display must stop producing frames before the encoder
         // is flushed, and both encoders must be flushed before the muxer writes its index
@@ -132,7 +134,7 @@ class AndroidScreenRecording : AbstractScreenRecording
             throw new ScreenRecorderException("The recording produced no usable file - the encoder never delivered a frame");
 
         var info = new FileInfo(this.outputPath);
-        var duration = lastFrameUs > 0 ? TimeSpan.FromMilliseconds(lastFrameUs / 1000d) : this.Elapsed;
+        var duration = written > TimeSpan.Zero ? written : this.Elapsed;
 
         return Task.FromResult(new ScreenRecordingResult
         {

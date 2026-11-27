@@ -234,6 +234,11 @@ public class LinuxGpsManager : IGpsManager, IShinyStartupTask, IAsyncDisposable
         await this.gate.WaitAsync().ConfigureAwait(false);
         try
         {
+            // checked again under the gate - two StartListener calls racing past the CurrentListener check would
+            // otherwise both watch and start the client
+            if (this.activeClient != null)
+                throw new InvalidOperationException("There is already an active GPS listener");
+
             var client = await this.Configure(request).ConfigureAwait(false);
             this.nextReading = new TaskCompletionSource<GpsReading>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.watch = await this.geoClue.WatchLocationUpdated(client, this.OnLocationUpdated).ConfigureAwait(false);

@@ -30,7 +30,9 @@ sealed class AppleHapticsChannel : IDisposable
     ICHHapticAdvancedPatternPlayer? player;
     bool engineRunning;
     bool broken;
-    float intensity;
+    // whether the current player has been started - a fresh player (after the engine stopped or
+    // was reset) needs Start again however strong the last rumble was
+    bool playing;
 
 
     AppleHapticsChannel(ILogger logger, string gamepadId, CHHapticEngine engine)
@@ -89,7 +91,6 @@ sealed class AppleHapticsChannel : IDisposable
         // Core Haptics will not play a zero-intensity event, so "off" is a stop rather than a level
         if (value <= 0f)
         {
-            this.intensity = 0f;
             this.StopPlayer();
             return;
         }
@@ -101,15 +102,17 @@ sealed class AppleHapticsChannel : IDisposable
             if (this.player == null)
                 return;
 
-            if (this.intensity <= 0f)
+            if (!this.playing)
+            {
                 this.player.Start(0, out _);
+                this.playing = true;
+            }
 
             this.player.Send(
                 [new CHHapticDynamicParameter(CHHapticDynamicParameterId.HapticIntensityControl, value, 0)],
                 0,
                 out _
             );
-            this.intensity = value;
         }
         catch (Exception ex)
         {
@@ -158,6 +161,7 @@ sealed class AppleHapticsChannel : IDisposable
             return;
         }
 
+        this.playing = false;
         this.player = this.engine.CreateAdvancedPlayer(pattern, out var playerError);
         if (playerError != null)
         {
@@ -178,6 +182,7 @@ sealed class AppleHapticsChannel : IDisposable
     {
         try
         {
+            this.playing = false;
             this.player?.Stop(0, out _);
         }
         catch (Exception ex)

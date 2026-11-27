@@ -197,7 +197,10 @@ public class LiveActivityManager(
     void OnNativePushToStartToken(NSString token)
     {
         var value = token.ToString();
-        if (value == this.PushToStartToken)
+
+        // compared with the stored token, not PushToStartToken - the bridge caches the new token before this
+        // callback runs, so the property already returns it and the change would never be raised
+        if (value == store.Get<string>(PushToStartTokenKey))
             return;
 
         this.PushToStartToken = value;

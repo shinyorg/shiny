@@ -58,6 +58,10 @@ sealed class NativeTransaction
     public string BundleId { get; set; } = "";
     public string? Environment { get; set; }
     public string? AppAccountToken { get; set; }
+
+    // missing from older payloads = verified (the bridge used to drop unverified transactions)
+    public bool Verified { get; set; } = true;
+    public string? VerificationError { get; set; }
 }
 
 
@@ -191,7 +195,9 @@ static class StoreKitMapper
         },
         native.Json,
         null,
-        native.RevocationDate is { } rev ? FromMillis(rev) : null
+        native.RevocationDate is { } rev ? FromMillis(rev) : null,
+        native.Verified,
+        native.Verified ? null : native.VerificationError
     );
 
 

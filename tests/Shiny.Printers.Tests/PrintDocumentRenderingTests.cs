@@ -63,4 +63,24 @@ public class PrintDocumentRenderingTests
 
         Assert.True(IsPdf(pdf));
     }
+
+    // Skia writes each page as an uncompressed "/Type /Page" dictionary (the tree root is "/Type /Pages")
+    static int PageCount(byte[] pdf)
+        => System.Text.RegularExpressions.Regex.Matches(System.Text.Encoding.Latin1.GetString(pdf), @"/Type\s*/Page(?!s)").Count;
+
+    [Fact]
+    public void Trailing_Cut_Does_Not_Add_A_Blank_Page()
+    {
+        var pdf = Renderer.RenderToPdf(new PrintDocument().Line("Total $5.75").Cut());
+
+        Assert.Equal(1, PageCount(pdf));
+    }
+
+    [Fact]
+    public void Cut_Between_Content_Starts_A_New_Page()
+    {
+        var pdf = Renderer.RenderToPdf(new PrintDocument().Line("Receipt 1").Cut().Line("Receipt 2").Cut());
+
+        Assert.Equal(2, PageCount(pdf));
+    }
 }

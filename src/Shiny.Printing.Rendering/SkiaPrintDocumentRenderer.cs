@@ -130,6 +130,10 @@ public sealed class SkiaPrintDocumentRenderer : IPrintDocumentRenderer
             this.y = this.opts.Margin;
         }
 
+        /// <summary>
+        /// Ends the current page. The next one only begins when something is drawn on it, so a
+        /// trailing cut (or a feed that runs off the bottom) never leaves a blank last page.
+        /// </summary>
         public void NewPage()
         {
             if (this.canvas != null)
@@ -137,6 +141,11 @@ public sealed class SkiaPrintDocumentRenderer : IPrintDocumentRenderer
                 this.doc.EndPage();
                 this.canvas = null;
             }
+        }
+
+        void BreakPage()
+        {
+            this.NewPage();
             this.EnsurePage();
         }
 
@@ -155,7 +164,7 @@ public sealed class SkiaPrintDocumentRenderer : IPrintDocumentRenderer
             var maxHeightScale = runs.Max(r => r.HeightScale);
             var lineHeight = this.opts.FontSize * maxHeightScale * (1 + this.opts.LineSpacing);
             if (this.y + lineHeight > this.bottom)
-                this.NewPage();
+                this.BreakPage();
 
             // Measure runs so we can position the whole line for centre / right alignment.
             var measured = new List<(TextRun Run, SKFont Font, SKPaint Paint, float Width)>();
@@ -189,6 +198,9 @@ public sealed class SkiaPrintDocumentRenderer : IPrintDocumentRenderer
                 paint.Dispose();
             }
 
+            // the caller's buffer is reused for the next line - without this every line reprinted
+            // all the text before it
+            runs.Clear();
             this.Advance(lineHeight);
         }
 
@@ -202,7 +214,7 @@ public sealed class SkiaPrintDocumentRenderer : IPrintDocumentRenderer
             var drawHeight = image.Height * scale;
 
             if (this.y + drawHeight > this.bottom)
-                this.NewPage();
+                this.BreakPage();
 
             var x = alignment switch
             {

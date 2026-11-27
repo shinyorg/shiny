@@ -41,8 +41,11 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
 
         void OnRemoved(object? sender, NSNetServiceEventArgs args)
         {
+            NSNetService? inFlight;
             lock (resolving)
-                resolving.Remove(args.Service.Name);
+                resolving.Remove(args.Service.Name, out inFlight);
+
+            inFlight?.Stop();
 
             channel.Writer.TryWrite(new MdnsBrowseResult(
                 MdnsBrowseStatus.Lost,
@@ -126,12 +129,17 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
         }
 
         lock (resolving)
-            resolving[service.Name] = service;
+        {
+            // Bonjour reports an instance once per interface. Resolving each copy would emit it twice,
+            // and overwriting the entry would unroot the first copy mid-resolve.
+            if (!resolving.TryAdd(service.Name, service))
+                return;
+        }
 
         void OnResolved(object? sender, EventArgs args)
         {
-            channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, Convert(service, serviceType)));
-            Complete();
+            if (Complete())
+                channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, Convert(service, serviceType)));
         }
 
         void OnFailed(object? sender, NSNetServiceErrorEventArgs args)
@@ -139,11 +147,13 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
             logger.LogDebug("Could not resolve {Name} - {Error}", service.Name, Describe(args.Errors));
 
             // still surface it: the caller learns the instance exists even without an endpoint
-            channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, Convert(service, serviceType)));
-            Complete();
+            if (Complete())
+                channel.Writer.TryWrite(new MdnsBrowseResult(MdnsBrowseStatus.Found, Convert(service, serviceType)));
         }
 
-        void Complete()
+        // returns false when the instance was removed (or the browse ended) while it resolved - a
+        // Found then would resurrect a service the caller was already told is gone
+        bool Complete()
         {
             // unhook before dropping the reference so the handlers cannot fire against a
             // service the browse has already finished with
@@ -151,7 +161,14 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
             service.ResolveFailure -= OnFailed;
 
             lock (resolving)
-                resolving.Remove(service.Name);
+            {
+                if (resolving.TryGetValue(service.Name, out var current) && current == service)
+                {
+                    resolving.Remove(service.Name);
+                    return true;
+                }
+                return false;
+            }
         }
 
         service.AddressResolved += OnResolved;
@@ -171,23 +188,31 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
         var info = ServiceTypeParser.Parse(serviceType);
         var window = timeout ?? defaultResolveTimeout;
         var completion = new TaskCompletionSource<MdnsService?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        NSNetService? service = null;
 
         DispatchQueue.MainQueue.DispatchAsync(() =>
         {
-            var service = new NSNetService(info.Domain.ToBonjour(), info.ServiceType.ToBonjour(), instanceName);
+            var resolvingService = new NSNetService(info.Domain.ToBonjour(), info.ServiceType.ToBonjour(), instanceName);
+            service = resolvingService;
 
-            service.AddressResolved += (_, _) =>
+            resolvingService.AddressResolved += (_, _) =>
             {
-                completion.TrySetResult(Convert(service, info));
-                service.Stop();
+                completion.TrySetResult(Convert(resolvingService, info));
+                StopResolve(resolvingService);
             };
-            service.ResolveFailure += (_, args) =>
+            resolvingService.ResolveFailure += (_, args) =>
             {
                 logger.LogDebug("Could not resolve {Name} - {Error}", instanceName, Describe(args.Errors));
                 completion.TrySetResult(null);
-                service.Stop();
+                StopResolve(resolvingService);
             };
-            service.Resolve(window.TotalSeconds);
+
+            // same GC trap as publishing: only the service's own handlers reference it until Bonjour
+            // calls back, so it is rooted for the duration of the resolve
+            lock (resolvingServices)
+                resolvingServices.Add(resolvingService);
+
+            resolvingService.Resolve(window.TotalSeconds);
         });
 
         try
@@ -199,6 +224,29 @@ public class AppleMdnsManager(ILogger<AppleMdnsManager> logger) : IMdnsManager
             logger.LogDebug("Resolving {Name} timed out after {Timeout}", instanceName, window);
             return null;
         }
+        finally
+        {
+            // timed out or cancelled - stop the resolve so it does not outlive the call
+            DispatchQueue.MainQueue.DispatchAsync(() =>
+            {
+                if (service != null)
+                    StopResolve(service);
+            });
+        }
+    }
+
+
+    static readonly HashSet<NSNetService> resolvingServices = [];
+
+
+    static void StopResolve(NSNetService service)
+    {
+        bool removed;
+        lock (resolvingServices)
+            removed = resolvingServices.Remove(service);
+
+        if (removed)
+            service.Stop();
     }
 
 

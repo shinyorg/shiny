@@ -75,17 +75,36 @@ public class AndroidNotificationProcessor
     }
 
 
+    /// <summary>
+    /// Runs after a reboot, which clears every AlarmManager alarm: shows the scheduled notifications that came due while
+    /// the device was off and sets the alarm again for the ones still in the future.
+    /// </summary>
     public void ProcessPending()
     {
-        // fire any missed/pending alarms?
-        var missed = this.repository.GetAll<AndroidNotification>()
-            .Where(x => x.ScheduleDate != null && x.ScheduleDate < DateTime.UtcNow)
+        var now = DateTimeOffset.UtcNow;
+        var scheduled = this.repository
+            .GetAll<AndroidNotification>()
+            .Where(x => x.ScheduleDate != null)
             .ToList();
 
-        foreach (var notification in missed)
+        foreach (var notification in scheduled)
         {
-            this.notificationManager.Send(notification);
-            this.DeleteOrReschedule(notification);
+            try
+            {
+                if (notification.ScheduleDate < now)
+                {
+                    this.notificationManager.Send(notification);
+                    this.DeleteOrReschedule(notification);
+                }
+                else
+                {
+                    this.notificationManager.SetAlarm(notification);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to restore scheduled notification {NotificationId}", notification.Id);
+            }
         }
     }
 

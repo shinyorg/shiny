@@ -94,11 +94,14 @@ public class AzureNotificationHubsPushProvider(
 
     public async Task SetTags(params string[]? tags)
     {
-        // TODO: crash/assert
-        //if (this.InstallationId == null)
-        //    return;
+        // no installation in the hub yet (never registered, or unregistered) - keep the tags, Register sends them
+        if (this.InstallationId == null || this.NativeToken == null)
+        {
+            this.RegisteredTags = tags is { Length: > 0 } ? tags : null;
+            return;
+        }
 
-        var install = this.GetInstallation(this.NativeToken!);
+        var install = this.GetInstallation(this.NativeToken);
         if (tags == null || tags.Length == 0)
             install.Tags = null;
         else

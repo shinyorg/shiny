@@ -296,6 +296,10 @@ public class SyncInboxProcessorTests
         Assert.Single(transport.TombstoneCalls);
         Assert.Equal(2, del.Received.Count);
         Assert.All(del.Received, r => Assert.Equal(SyncVerb.Delete, r.Verb));
+
+        // a tombstone has no entity - the id is the only way to know which row to delete
+        var ids = del.Received.Select(r => r.EntityIdentifier).OrderBy(x => x).ToArray();
+        Assert.Equal(new[] { "x", "y" }, ids);
     }
 
 
@@ -308,6 +312,38 @@ public class SyncInboxProcessorTests
         await proc.PullEndpoint(endpoint);
 
         Assert.Empty(transport.TombstoneCalls);
+    }
+
+
+    [Fact]
+    public async Task Pull_ItemCarriesEntityIdentifier()
+    {
+        var (proc, _, transport, _, del, endpoint) = BuildFixture();
+        transport.QueuePull(endpoint.Key, new SyncPullResult(
+            "c",
+            new[] { MakePull("a", SyncVerb.Update, """{"identifier":"a"}""") }
+        ));
+
+        await proc.PullEndpoint(endpoint);
+
+        Assert.Equal("a", del.Received.Single().EntityIdentifier);
+    }
+
+
+    [Fact]
+    public async Task PullFailed_DoesNotRefreshLastPulledAt()
+    {
+        var (proc, _, transport, repo, _, endpoint) = BuildFixture(ep => ep.MinPullInterval = TimeSpan.FromMinutes(5));
+        var earlier = DateTimeOffset.UtcNow.AddHours(-1);
+        repo.Set(new SyncCursor(endpoint.Key, "c0", earlier));
+        transport.QueuePull(endpoint.Key, _ => throw new InvalidOperationException("boom"));
+
+        await proc.PullEndpoint(endpoint);
+
+        // a failed pull must not throttle the next automatic pull
+        Assert.Equal(earlier, repo.Get<SyncCursor>(endpoint.Key)!.LastPulledAt);
+        await proc.PullAll();
+        Assert.Equal(2, transport.PullCalls.Count);
     }
 
 

@@ -8,14 +8,14 @@ namespace Shiny.Locations.GeoClue;
 /// so messages are written and read by hand.
 /// </summary>
 /// <remarks>
-/// GeoClue hands one client per connection from <c>GetClient</c>, so the client path is cached for the life
-/// of the connection: starting and stopping it again reuses the same object.
+/// GeoClue hands one client per connection from <c>GetClient</c> - asked again it returns the same path. That
+/// path is not cached: GeoClue exits after a minute with no started client (and is D-Bus activated again on the
+/// next call), which takes the client object with it, so a cached path would point at nothing.
 /// </remarks>
 internal sealed class GeoClueClient : IAsyncDisposable
 {
     readonly SemaphoreSlim gate = new(1, 1);
     DBusConnection? connection;
-    string? clientPath;
 
 
     public async Task<DBusConnection> GetConnection()
@@ -31,6 +31,7 @@ internal sealed class GeoClueClient : IAsyncDisposable
                 var created = new DBusConnection(address);
                 await created.ConnectAsync().ConfigureAwait(false);
                 this.connection = created;
+                _ = this.ForgetWhenDisconnected(created);
             }
             return this.connection;
         }
@@ -38,6 +39,24 @@ internal sealed class GeoClueClient : IAsyncDisposable
         {
             this.gate.Release();
         }
+    }
+
+
+    /// <summary>
+    /// A dead connection fails every call made on it, so once the bus drops it is forgotten and the next call
+    /// connects again rather than GPS staying broken until the process restarts.
+    /// </summary>
+    async Task ForgetWhenDisconnected(DBusConnection conn)
+    {
+        try
+        {
+            await conn.DisconnectedAsync().ConfigureAwait(false);
+        }
+        catch
+        {
+            // the reason does not matter here - only that it is gone
+        }
+        Interlocked.CompareExchange(ref this.connection, null, conn);
     }
 
 
@@ -58,18 +77,18 @@ internal sealed class GeoClueClient : IAsyncDisposable
     public async Task<string> GetClient(string desktopId, GeoClueAccuracyLevel level, uint distanceThreshold, uint timeThreshold)
     {
         var connection = await this.GetConnection().ConfigureAwait(false);
-        this.clientPath ??= await connection.CallMethodAsync(
+        var clientPath = await connection.CallMethodAsync(
             Call(connection, GeoClueConstants.Service, GeoClueConstants.ManagerPath, GeoClueConstants.ManagerInterface, "GetClient"),
             static (Message reply, object? _) => reply.GetBodyReader().ReadObjectPathAsString()
         ).ConfigureAwait(false);
 
         // the desktop id is what the location agent shows and remembers the answer by - GeoClue refuses a client without one
-        await SetProperty(connection, this.clientPath, "DesktopId", w => w.WriteVariantString(desktopId)).ConfigureAwait(false);
-        await SetProperty(connection, this.clientPath, "RequestedAccuracyLevel", w => w.WriteVariantUInt32((uint)level)).ConfigureAwait(false);
-        await SetProperty(connection, this.clientPath, "DistanceThreshold", w => w.WriteVariantUInt32(distanceThreshold)).ConfigureAwait(false);
-        await SetProperty(connection, this.clientPath, "TimeThreshold", w => w.WriteVariantUInt32(timeThreshold)).ConfigureAwait(false);
+        await SetProperty(connection, clientPath, "DesktopId", w => w.WriteVariantString(desktopId)).ConfigureAwait(false);
+        await SetProperty(connection, clientPath, "RequestedAccuracyLevel", w => w.WriteVariantUInt32((uint)level)).ConfigureAwait(false);
+        await SetProperty(connection, clientPath, "DistanceThreshold", w => w.WriteVariantUInt32(distanceThreshold)).ConfigureAwait(false);
+        await SetProperty(connection, clientPath, "TimeThreshold", w => w.WriteVariantUInt32(timeThreshold)).ConfigureAwait(false);
 
-        return this.clientPath;
+        return clientPath;
     }
 
 
@@ -156,7 +175,6 @@ internal sealed class GeoClueClient : IAsyncDisposable
     {
         this.connection?.Dispose();
         this.connection = null;
-        this.clientPath = null;
         return ValueTask.CompletedTask;
     }
 

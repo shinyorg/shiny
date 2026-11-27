@@ -103,7 +103,11 @@ sealed class UpdateContactFunction : ContactAIFunctionBase
 
         var org = GetString(arguments, "organization");
         if (!string.IsNullOrWhiteSpace(org))
-            contact.Organization = new ContactOrganization(org);
+        {
+            // only the company changes - keep the existing job title and department
+            contact.Organization ??= new ContactOrganization();
+            contact.Organization.Company = org;
+        }
 
         var addPhone = GetString(arguments, "addPhone");
         if (!string.IsNullOrWhiteSpace(addPhone))

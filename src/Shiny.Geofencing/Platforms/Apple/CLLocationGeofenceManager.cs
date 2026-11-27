@@ -98,6 +98,10 @@ public class CLLocationGeofenceManager : IGeofenceManager, IShinyStartupTask, II
     }
 
 
+    internal void OnMonitoringFailed(CLRegion? region, Foundation.NSError? error)
+        => this.logger.LogError("Geofence monitoring failed for {Identifier} - {Error}", region?.Identifier, error?.LocalizedDescription);
+
+
     internal async void OnRegionChanged(CLRegion region, bool entered)
     {
         try
@@ -185,8 +189,20 @@ public class CLLocationGeofenceManager : IGeofenceManager, IShinyStartupTask, II
     }
 
 
+    /// <summary>The most regions iOS monitors for one app - geofences and beacon regions together.</summary>
+    public const int MaxMonitoredRegions = 20;
+
+
     public async Task StartMonitoring(GeofenceRegion region)
     {
+        // CoreLocation does not throw past the limit - it reports MonitoringFailed and the region is silently
+        // never watched. A replacement (same identifier) does not add to the count.
+        if (!this.repository.Exists<GeofenceRegion>(region.Identifier) &&
+            this.locationManager.MonitoredRegions.Count >= MaxMonitoredRegions)
+        {
+            throw new InvalidOperationException($"iOS monitors at most {MaxMonitoredRegions} regions per app, across geofences and beacons together. Stop monitoring one before adding another.");
+        }
+
         var native = region.ToNative();
 
         var tcs = new TaskCompletionSource<object?>();

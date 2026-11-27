@@ -58,7 +58,8 @@ public partial class AndroidPlatform
 
     public PendingIntentFlags GetPendingIntentFlags(PendingIntentFlags flags)
     {
-        if (OperatingSystem.IsAndroidVersionAtLeast(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
+        // Android throws when both FLAG_MUTABLE and FLAG_IMMUTABLE are set, so an explicit Immutable is kept as is
+        if (OperatingSystem.IsAndroidVersionAtLeast(31) && !flags.HasFlag(PendingIntentFlags.Mutable) && !flags.HasFlag(PendingIntentFlags.Immutable))
             flags |= PendingIntentFlags.Mutable;
 
         return flags;

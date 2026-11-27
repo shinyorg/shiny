@@ -144,12 +144,15 @@ public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWi
         // be in the current report - a stale one is why "it worked a minute ago" fails here
         await wifi.ScanAsync().AsTask(ct).ConfigureAwait(false);
 
+        // a hidden network is in the report with an empty SSID, so it is matched on that (and the
+        // BSSID when given) and the name goes to ConnectAsync separately
         var target = wifi
             .NetworkReport
             .AvailableNetworks
-            .Where(x => x.Ssid == request.Ssid)
+            .Where(x => x.Ssid == request.Ssid || (request.IsHidden && String.IsNullOrEmpty(x.Ssid)))
             .Where(x => request.Bssid == null || String.Equals(x.Bssid, request.Bssid, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(x => x.NetworkRssiInDecibelMilliwatts)
+            .OrderByDescending(x => x.Ssid == request.Ssid)
+            .ThenByDescending(x => x.NetworkRssiInDecibelMilliwatts)
             .FirstOrDefault();
 
         if (target == null)
@@ -160,9 +163,11 @@ public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWi
         var reconnect = request.Remember ? WiFiReconnectionKind.Automatic : WiFiReconnectionKind.Manual;
         var credential = request.Passphrase == null ? null : new PasswordCredential { Password = request.Passphrase };
 
-        var result = credential == null
-            ? await wifi.ConnectAsync(target, reconnect).AsTask(ct).ConfigureAwait(false)
-            : await wifi.ConnectAsync(target, reconnect, credential).AsTask(ct).ConfigureAwait(false);
+        var result = String.IsNullOrEmpty(target.Ssid)
+            ? await wifi.ConnectAsync(target, reconnect, credential, request.Ssid).AsTask(ct).ConfigureAwait(false)
+            : credential == null
+                ? await wifi.ConnectAsync(target, reconnect).AsTask(ct).ConfigureAwait(false)
+                : await wifi.ConnectAsync(target, reconnect, credential).AsTask(ct).ConfigureAwait(false);
 
         if (result.ConnectionStatus != WiFiConnectionStatus.Success)
             throw new WifiConnectionException($"Could not join '{request.Ssid}' - {result.ConnectionStatus}");
@@ -337,7 +342,10 @@ public class WindowsWifiManager(ILogger<WindowsWifiManager> logger) : AbstractWi
         NetworkAuthenticationType.WpaNone => WifiSecurity.WpaPsk,
         NetworkAuthenticationType.RsnaPsk => WifiSecurity.Wpa2Psk,
         NetworkAuthenticationType.Wpa3Sae => WifiSecurity.Wpa3Psk,
-        NetworkAuthenticationType.Wpa3 => WifiSecurity.Wpa3Psk,
+        // Wpa3 (10) is WPA3-Enterprise 192-bit - newer SDKs rename it Wpa3Enterprise192Bits - not SAE
+        NetworkAuthenticationType.Wpa3 => WifiSecurity.Enterprise,
+        // Wpa3Enterprise (13) is newer than the 19041 projection this compiles against
+        (NetworkAuthenticationType)13 => WifiSecurity.Enterprise,
         NetworkAuthenticationType.Owe => WifiSecurity.Owe,
         // Wpa and Rsna are the 802.1X forms - the PSK variants have their own values above
         NetworkAuthenticationType.Wpa => WifiSecurity.Enterprise,

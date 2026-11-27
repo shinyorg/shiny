@@ -24,8 +24,30 @@ public abstract class AbstractGpsManager : IGpsManager, IShinyStartupTask
         this.currentSettings = store.Get<AndroidGpsRequest>(CurrentSettingsKey);
         this.Callback = new ShinyLocationCallback
         {
-            OnReading = x => this.GpsReadingReceived?.Invoke(this, x)
+            OnReading = this.OnReading
         };
+    }
+
+
+    async void OnReading(GpsReading reading)
+    {
+        try
+        {
+            this.GpsReadingReceived?.Invoke(this, reading);
+
+            // a Realtime listener runs ShinyGpsService, which subscribes to GpsReadingReceived and runs the
+            // delegates itself - without the service (None, Standard) nothing else would, so they run from here
+            if (!ShinyGpsService.IsStarted)
+            {
+                await Shiny.Hosting.Host.ServiceProvider
+                    .RunDelegates<IGpsDelegate>(x => x.OnReading(reading), this.logger)
+                    .ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Error processing GPS reading");
+        }
     }
 
 
@@ -165,6 +187,7 @@ public abstract class AbstractGpsManager : IGpsManager, IShinyStartupTask
             return;
 
         await this.RemoveLocationUpdates();
+        this.Callback.ResetStationary();
         if (this.CurrentListener.BackgroundMode == GpsBackgroundMode.Realtime && ShinyGpsService.IsStarted)
             this.Platform.StopService(typeof(ShinyGpsService));
 

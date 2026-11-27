@@ -10,6 +10,9 @@ public class PhoneNumbersTests
     [InlineData("+44 20 7946 0958", 1, 442079460958)]
     [InlineData("0044 20 7946 0958", 1, 442079460958)]
     [InlineData("020 7946 0958", 44, 442079460958)]
+    [InlineData("04941 1234567", 49, 4949411234567)]
+    [InlineData("+49 4941 1234567", 49, 4949411234567)]
+    [InlineData("0491 12345678", 49, 4949112345678)]
     public void Converts(string input, int defaultCountryCode, long expected)
         => Assert.Equal(expected, PhoneNumbers.ToCallDirectory(input, defaultCountryCode));
 

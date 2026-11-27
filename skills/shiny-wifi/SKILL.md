@@ -256,7 +256,15 @@ catch (WifiConnectionException ex)
 ```
 
 `Connect` returns only once an address has been assigned, not when association completes - a
-`WifiNetworkInfo` with no IP on it is useless to the caller.
+`WifiNetworkInfo` with no IP on it is useless to the caller. On iOS, where `ApplyConfiguration` can
+report success without joining (a wrong passphrase, typically), `Connect` also waits for the current
+network to name the requested SSID and throws `WifiConnectionException` if the device stays on another
+one - this check needs location access (`RequestAccess`), without which the SSID cannot be read.
+
+Hidden networks: set `IsHidden = true` (and `Security`). Windows matches the nameless entry in the
+scan report and passes the SSID to the join. Linux sends `Security = Wep` as a static WEP key
+(`wep-key0`); every other passphrase is WPA-PSK, or SAE for `Wpa3Psk`. When `Remember = false` on
+Linux, a refused join is reported as-is - it is not retried as a saved profile.
 
 **Leave `Security` as `Unknown` unless you are joining a hidden network.** The platform reads the
 scheme off the beacon; a hidden network has no beacon to read, so it has to be told.

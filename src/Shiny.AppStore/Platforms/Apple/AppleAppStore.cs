@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using Foundation;
 using StoreKit;
+using Shiny.AppStore.Infrastructure;
 #if MACOS
 using AppKit;
 #else
@@ -183,7 +184,6 @@ public class AppleAppStore(IPlatform platform, AppStoreOptions options) : IAppSt
         if (!element.TryGetProperty(propertyName, out var prop))
             return false;
 
-        var str = prop.GetString();
-        return !String.IsNullOrWhiteSpace(str) && Version.TryParse(str, out version!);
+        return prop.ValueKind == JsonValueKind.String && StoreVersion.TryParse(prop.GetString(), out version);
     }
 }

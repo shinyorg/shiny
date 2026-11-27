@@ -111,7 +111,12 @@ static class CSharpEmitter
             // an optional initializer property that was not sent keeps the value the type gives it
             var needsDefaults = initializers.Any(x => !x.p.IsRequired && !x.p.Type.IsNullable);
             if (needsDefaults)
-                sb.AppendLine($"                    var defaults = new {fn.RequestType}({ctorArgs});");
+            {
+                // `required` members must be set on every object creation, including this one
+                var requiredInits = initializers.Where(x => x.p.IsRequiredMember).Select(x => $"{x.p.CSharpName} = p{x.i}").ToList();
+                var defaultsInit = requiredInits.Count == 0 ? "" : " { " + string.Join(", ", requiredInits) + " }";
+                sb.AppendLine($"                    var defaults = new {fn.RequestType}({ctorArgs}){defaultsInit};");
+            }
 
             var inits = initializers.Select(x =>
                 !x.p.IsRequired && !x.p.Type.IsNullable
@@ -190,7 +195,9 @@ static class CSharpEmitter
             sb.AppendLine("                    };");
             sb.AppendLine($"                    var items = new global::System.Collections.Generic.List<{R}AppEntityItem>(found.Count);");
             sb.AppendLine("                    foreach (var e in found)");
-            sb.AppendLine($"                        items.Add(new {R}AppEntityItem(e.Id, e.{e.DisplayProperty}?.ToString() ?? e.Id));");
+            sb.AppendLine(e.DisplayIsValueType
+                ? $"                        items.Add(new {R}AppEntityItem(e.Id, e.{e.DisplayProperty}.ToString()));"
+                : $"                        items.Add(new {R}AppEntityItem(e.Id, e.{e.DisplayProperty}?.ToString() ?? e.Id));");
             sb.AppendLine("                    return items;");
             sb.AppendLine("                }");
         }

@@ -37,12 +37,23 @@ public abstract class AbstractVpnManager(ILogger logger) : IVpnManager
         add
         {
             this.changed += value;
-            if (this.Capabilities.HasFlag(VpnCapabilities.Status) && Interlocked.Increment(ref this.subscriberCount) == 1)
+            if (this.Capabilities.HasFlag(VpnCapabilities.Status))
             {
-                this.StartListening();
+                if (Interlocked.Increment(ref this.subscriberCount) == 1)
+                {
+                    this.StartListening();
 
-                // publish where we are now so a subscriber does not sit blind until the tunnel next moves
-                this.RaiseStatusIfChanged();
+                    // publish where we are now so a subscriber does not sit blind until the tunnel next moves
+                    this.RaiseStatusIfChanged();
+                }
+                else
+                {
+                    // later subscribers get the current state too, as the contract promises. Before the
+                    // first read lands lastKnown is null, and that in-flight raise reaches them anyway.
+                    var known = this.lastKnown;
+                    if (known != null)
+                        value?.Invoke(this, known.Value);
+                }
             }
         }
         remove

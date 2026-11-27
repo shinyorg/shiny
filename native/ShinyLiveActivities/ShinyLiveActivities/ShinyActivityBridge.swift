@@ -19,6 +19,8 @@ public class ShinyActivityBridge: NSObject {
     private static var stateHandler: ((String, String) -> Void)?
     private static var startedHandler: ((String) -> Void)?
     private static var cachedPushToStartToken: String?
+    private static let observedLock = NSLock()
+    private static var observedIds = Set<String>()
 
     // MARK: - capability
 
@@ -253,9 +255,12 @@ public class ShinyActivityBridge: NSObject {
 
         // Activities started later, including by a push-to-start payload while we were closed.
         Task {
+            // activityUpdates also yields activities this app requested through start(), which already observes
+            // them and reports them started - only an activity seen here first is new to the managed side
             for await activity in Activity<ShinyActivityAttributes>.activityUpdates {
-                self.startedHandler?(activity.id)
-                self.observe(activity)
+                if self.observe(activity) {
+                    self.startedHandler?(activity.id)
+                }
             }
         }
 
@@ -280,8 +285,17 @@ public class ShinyActivityBridge: NSObject {
     }
 
 
+    /// Observes an activity's push tokens and state once. Returns false when it was already being observed, so the
+    /// same token or state change is never reported twice.
     @available(iOS 16.2, *)
-    private static func observe(_ activity: Activity<ShinyActivityAttributes>) {
+    @discardableResult
+    private static func observe(_ activity: Activity<ShinyActivityAttributes>) -> Bool {
+        self.observedLock.lock()
+        let isNew = self.observedIds.insert(activity.id).inserted
+        self.observedLock.unlock()
+
+        guard isNew else { return false }
+
         Task {
             for await tokenData in activity.pushTokenUpdates {
                 self.tokenHandler?(activity.id, self.hex(tokenData))
@@ -292,6 +306,7 @@ public class ShinyActivityBridge: NSObject {
                 self.stateHandler?(activity.id, self.stateName(state))
             }
         }
+        return true
     }
 
 

@@ -39,7 +39,13 @@ public partial class DataSyncManager(
     const string TombstoneTaskPrefix = "tombstone:";
 
     Action? completionHandler;
+    bool backgroundEventsFinished;
+    int pendingDelegateCalls;
     readonly ConcurrentDictionary<string, MemoryStream> responseBuffers = new();
+
+    // ops this process has started a native task for - Start() must not treat them as stranded while their
+    // task is still being created (Queue awaits interceptors before the task exists)
+    readonly ConcurrentDictionary<string, byte> startedThisProcess = new(StringComparer.InvariantCultureIgnoreCase);
     bool subscribed;
 
     public event EventHandler<int>? PendingCountChanged;
@@ -61,11 +67,81 @@ public partial class DataSyncManager(
             var tasks = await this.Session.GetAllTasksAsync();
             foreach (var task in tasks)
                 task.Resume();
+
+            // An op waiting out a retry delay (or re-queued after a KeepLocal conflict) has no native task -
+            // the in-process delay died with the app. Send those again now.
+            var running = tasks
+                .Where(IsOutboxTask)
+                .Select(x => x.TaskDescription!)
+                .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+
+            // Ops left Pending / InProgress with no retry marker and no native task (stranded by older versions,
+            // or any other path that loses the task) can't be in flight - mark them ready so this pass sends them.
+            this.MarkUntrackedReady(running);
+
+            var stranded = repository
+                .GetAll<SyncOperation>()
+                .Where(x => x.NextAttemptAt != null && !running.Contains(x.Identifier))
+                .OrderBy(x => x.CreatedAt)
+                .ToList();
+
+            foreach (var op in stranded)
+                await this.ResendStranded(op).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error auto-starting Data Sync");
         }
+    }
+
+
+    void MarkUntrackedReady(HashSet<string> running)
+    {
+        var tracked = new HashSet<string>(running, StringComparer.InvariantCultureIgnoreCase);
+        tracked.UnionWith(this.startedThisProcess.Keys);
+
+        var now = DateTimeOffset.UtcNow;
+        var untracked = UntrackedOperations.Select(repository.GetAll<SyncOperation>(), tracked);
+        foreach (var op in untracked)
+        {
+            logger.LogInformation("Sync op {id} has no native task - re-sending", op.Identifier);
+            repository.Set(op with { NextAttemptAt = now });
+        }
+    }
+
+
+    async Task ResendStranded(SyncOperation op)
+    {
+        var endpoint = registry.Get(op.EndpointKey);
+        if (endpoint == null)
+        {
+            logger.LogWarning("No endpoint registered for {key} - leaving op {id} queued", op.EndpointKey, op.Identifier);
+            return;
+        }
+
+        try
+        {
+            await this.SendOperation(endpoint, op).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            this.OnError(op, 0, ex);
+        }
+    }
+
+
+    /// <summary>
+    /// Starts the native upload task for an op. The attempt count goes up and the retry marker
+    /// (<see cref="SyncOperation.NextAttemptAt"/>) is cleared before the task runs, so a fast completion
+    /// can't be overwritten and <see cref="Start"/> can tell an op with a live task from a stranded one.
+    /// </summary>
+    async Task SendOperation(SyncEndpoint endpoint, SyncOperation op)
+    {
+        this.startedThisProcess[op.Identifier] = 0;
+        var task = await this.CreateUploadTask(endpoint, op).ConfigureAwait(false);
+        task.TaskDescription = op.Identifier;
+        repository.Set(op with { Attempts = op.Attempts + 1, NextAttemptAt = null });
+        task.Resume();
     }
 
 
@@ -84,6 +160,12 @@ public partial class DataSyncManager(
     {
         if (x.EntityType != typeof(SyncOperation) || x.Action == RepositoryAction.Update)
             return;
+
+        if (x.Action == RepositoryAction.Remove && x.Entity != null)
+            this.startedThisProcess.TryRemove(x.Entity.Identifier, out _);
+        else if (x.Action == RepositoryAction.Clear)
+            this.startedThisProcess.Clear();
+
         this.PendingCountChanged?.Invoke(this, repository.GetAll<SyncOperation>().Count);
     }
 
@@ -123,9 +205,7 @@ public partial class DataSyncManager(
         {
             repository.Insert(op);
             this.RaiseActivity(new SyncEvent(SyncEventType.OutboxQueued, op.EndpointKey, Operation: op));
-            var task = await this.CreateUploadTask(endpoint, op).ConfigureAwait(false);
-            task.TaskDescription = op.Identifier;
-            task.Resume();
+            await this.SendOperation(endpoint, op).ConfigureAwait(false);
             return op;
         }
         catch
@@ -165,7 +245,18 @@ public partial class DataSyncManager(
         var match = tasks.FirstOrDefault(x =>
             IsOutboxTask(x)
             && string.Equals(x.TaskDescription, operationId, StringComparison.InvariantCultureIgnoreCase));
-        match?.Cancel();
+
+        if (match != null)
+        {
+            match.Cancel();
+        }
+        else
+        {
+            // waiting for a retry - there is no native task to cancel
+            var op = repository.Get<SyncOperation>(operationId);
+            if (op != null)
+                this.OnCancel(op);
+        }
     }
 
 
@@ -174,6 +265,8 @@ public partial class DataSyncManager(
         var tasks = await this.Session.GetAllTasksAsync();
         foreach (var t in tasks.Where(IsOutboxTask))
             t.Cancel();
+
+        this.CancelOpsWithoutTask(tasks, _ => true);
     }
 
 
@@ -187,6 +280,25 @@ public partial class DataSyncManager(
             if (op != null && op.EndpointKey == key)
                 t.Cancel();
         }
+
+        this.CancelOpsWithoutTask(tasks, op => op.EndpointKey == key);
+    }
+
+
+    void CancelOpsWithoutTask(NSUrlSessionTask[] tasks, Func<SyncOperation, bool> predicate)
+    {
+        var running = tasks
+            .Where(IsOutboxTask)
+            .Select(x => x.TaskDescription!)
+            .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+
+        var idle = repository
+            .GetAll<SyncOperation>()
+            .Where(x => predicate(x) && !running.Contains(x.Identifier))
+            .ToList();
+
+        foreach (var op in idle)
+            this.OnCancel(op);
     }
 
 
@@ -202,6 +314,7 @@ public partial class DataSyncManager(
             return false;
 
         _ = this.Session;
+        this.backgroundEventsFinished = false;
         this.completionHandler = incomingCompletionHandler;
         return true;
     }
@@ -306,13 +419,38 @@ public partial class DataSyncManager(
     }
 
 
+    /// <summary>
+    /// Marks the start of a delegate dispatch (<see cref="IDataSyncDelegate"/> calls and the work around them). The
+    /// background-session completion handler is held until every dispatch has ended.
+    /// </summary>
+    void BeginDelegateDispatch() => Interlocked.Increment(ref this.pendingDelegateCalls);
+
+
+    void EndDelegateDispatch()
+    {
+        Interlocked.Decrement(ref this.pendingDelegateCalls);
+        this.TryCompleteSession();
+    }
+
+
+    /// <summary>
+    /// Hands iOS its background-session completion handler back once - only after
+    /// <see cref="DidFinishEventsForBackgroundSession"/> and with no delegate dispatch still running, so the app
+    /// isn't suspended in the middle of <see cref="IDataSyncDelegate.OnSent"/> / <see cref="IDataSyncDelegate.OnReceived"/>.
+    /// </summary>
     void TryCompleteSession()
     {
-        var ops = repository.GetAll<SyncOperation>();
-        if (ops.Count == 0)
+        if (Volatile.Read(ref this.pendingDelegateCalls) > 0)
+            return;
+
+        if (!this.backgroundEventsFinished)
+            return;
+
+        var handler = Interlocked.Exchange(ref this.completionHandler, null);
+        if (handler != null)
         {
-            this.completionHandler?.Invoke();
-            this.completionHandler = null;
+            this.backgroundEventsFinished = false;
+            handler.Invoke();
         }
     }
 

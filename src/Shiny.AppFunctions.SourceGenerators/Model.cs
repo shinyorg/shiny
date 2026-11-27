@@ -52,6 +52,8 @@ sealed class ParameterModel
     public string? Description;
     public TypeModel Type = null!;
     public bool IsRequired;
+    /// <summary>The property is a C# <c>required</c> member, so every object creation must set it.</summary>
+    public bool IsRequiredMember;
     /// <summary>Index into the chosen constructor, or -1 for an initializer.</summary>
     public int ConstructorIndex = -1;
 }
@@ -83,6 +85,8 @@ sealed class EntityModel
     public string SimpleName = "";
     public string TypeName = "";
     public string DisplayProperty = "";
+    /// <summary>The display property is a non-nullable value type (no <c>?.</c> on it).</summary>
+    public bool DisplayIsValueType;
     public string? QueryType;
 }
 

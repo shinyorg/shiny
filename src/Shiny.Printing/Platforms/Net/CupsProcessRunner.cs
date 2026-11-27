@@ -18,12 +18,25 @@ public sealed class CupsProcessRunner : ICupsProcessRunner
         foreach (var arg in arguments)
             psi.ArgumentList.Add(arg);
 
+        // lpstat translates its output ("printer X is idle", "system default destination:") and the
+        // parser matches the English text, so pin the C locale
+        psi.Environment["LC_ALL"] = "C";
+
         using var process = Process.Start(psi)
             ?? throw new InvalidOperationException($"Failed to start '{fileName}'.");
 
         var stdout = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var stderr = process.StandardError.ReadToEndAsync(cancellationToken);
-        await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // don't leave lp / lpstat running behind a cancelled call
+            try { process.Kill(entireProcessTree: true); } catch { /* already exited */ }
+            throw;
+        }
 
         return new ProcessResult(
             process.ExitCode,

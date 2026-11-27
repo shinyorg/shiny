@@ -154,7 +154,7 @@ public class IntervalTriggerTests
     [Fact]
     public void Calc_DayOfWeek_WhenTodayMatchesButTomorrowDoesnt_AdvancesFullWeek()
     {
-        // 2024-06-01 Sat — DayOfWeek=Saturday → 2024-06-08 09:00 (current code never returns "today")
+        // 2024-06-01 Sat 10:00 — DayOfWeek=Saturday 09:00 has passed today → 2024-06-08 09:00
         var clock = new FakeTimeProvider(new DateTimeOffset(2024, 6, 1, 10, 0, 0, TimeSpan.Zero));
         var t = new IntervalTrigger
         {
@@ -164,5 +164,78 @@ public class IntervalTriggerTests
         };
 
         Assert.Equal(new DateTime(2024, 6, 8, 9, 0, 0, DateTimeKind.Utc), t.CalculateNextAlarm());
+    }
+
+
+    // -------- CalculateNextAlarm: local time zone --------
+
+    static FakeTimeProvider Clock(DateTimeOffset utcNow, string tzId)
+    {
+        var clock = new FakeTimeProvider(utcNow);
+        clock.SetLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById(tzId));
+        return clock;
+    }
+
+
+    [Fact]
+    public void Calc_TimeOfDay_LaterToday_FiresToday()
+    {
+        var clock = new FakeTimeProvider(new DateTimeOffset(2024, 6, 1, 7, 0, 0, TimeSpan.Zero));
+        var t = new IntervalTrigger { TimeOfDay = new TimeSpan(9, 0, 0), TimeProvider = clock };
+
+        Assert.Equal(new DateTime(2024, 6, 1, 9, 0, 0, DateTimeKind.Utc), t.CalculateNextAlarm());
+    }
+
+
+    [Fact]
+    public void Calc_TimeOfDay_IsLocalTime_NotUtc()
+    {
+        // 2024-06-01 06:00 New York (EDT, UTC-4) - 09:00 local is 13:00 UTC, not 09:00 UTC
+        var clock = Clock(new DateTimeOffset(2024, 6, 1, 10, 0, 0, TimeSpan.Zero), "America/New_York");
+        var t = new IntervalTrigger { TimeOfDay = new TimeSpan(9, 0, 0), TimeProvider = clock };
+
+        var next = t.CalculateNextAlarm();
+        Assert.Equal(DateTimeKind.Utc, next.Kind);
+        Assert.Equal(new DateTime(2024, 6, 1, 13, 0, 0, DateTimeKind.Utc), next);
+    }
+
+
+    [Fact]
+    public void Calc_DayOfWeek_UsesLocalDay()
+    {
+        // 2024-06-08 02:00 UTC is still Friday 2024-06-07 22:00 in New York - Friday 23:00 local is later tonight
+        var clock = Clock(new DateTimeOffset(2024, 6, 8, 2, 0, 0, TimeSpan.Zero), "America/New_York");
+        var t = new IntervalTrigger
+        {
+            TimeOfDay = new TimeSpan(23, 0, 0),
+            DayOfWeek = DayOfWeek.Friday,
+            TimeProvider = clock
+        };
+
+        Assert.Equal(new DateTime(2024, 6, 8, 3, 0, 0, DateTimeKind.Utc), t.CalculateNextAlarm());
+    }
+
+
+    [Fact]
+    public void Calc_TimeOfDay_AcrossDstChange_KeepsLocalTime()
+    {
+        // 2024-03-09 12:00 New York (EST) - the next 09:00 is 2024-03-10, after clocks spring forward to EDT (UTC-4)
+        var clock = Clock(new DateTimeOffset(2024, 3, 9, 17, 0, 0, TimeSpan.Zero), "America/New_York");
+        var t = new IntervalTrigger { TimeOfDay = new TimeSpan(9, 0, 0), TimeProvider = clock };
+
+        Assert.Equal(new DateTime(2024, 3, 10, 13, 0, 0, DateTimeKind.Utc), t.CalculateNextAlarm());
+    }
+
+
+    [Fact]
+    public void Calc_After_ReturnsFollowingOccurrences()
+    {
+        var clock = new FakeTimeProvider(new DateTimeOffset(2024, 6, 1, 10, 0, 0, TimeSpan.Zero));
+        var t = new IntervalTrigger { TimeOfDay = new TimeSpan(8, 0, 0), TimeProvider = clock };
+
+        var first = t.CalculateNextAlarm(clock.GetUtcNow());
+        var second = t.CalculateNextAlarm(first);
+        Assert.Equal(new DateTimeOffset(2024, 6, 2, 8, 0, 0, TimeSpan.Zero), first);
+        Assert.Equal(new DateTimeOffset(2024, 6, 3, 8, 0, 0, TimeSpan.Zero), second);
     }
 }

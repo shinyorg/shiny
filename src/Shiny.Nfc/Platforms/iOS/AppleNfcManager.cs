@@ -80,9 +80,11 @@ class AppleNfcManager(ILogger<AppleNfcManager> logger) : AbstractNfcManager(logg
 
                 sink.Report(new AppleNfcTag(tag, status, capacity));
             }
-            catch (NSErrorException)
+            catch (Exception)
             {
-                // the tag went before it could be connected - keep the sheet up for the next one
+                // the tag went before it could be connected or queried (QueryStatus faults with the
+                // translated NfcException) - keep the sheet up for the next one. Anything escaping
+                // this async void would take the app down.
                 if (Volatile.Read(ref this.ended) == 0)
                     session.RestartPolling();
             }

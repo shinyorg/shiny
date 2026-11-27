@@ -160,11 +160,8 @@ class GameCenterManager : IGameCenterManager, IShinyStartupTask
 
         await this.EnsureSynced(cancelToken).ConfigureAwait(false);
 
-        int target;
-        lock (this.sync)
-            target = this.state.For(this.Player?.Id).GetSteps(def.Key) + steps;
-
-        await this.RecordProgress(def, target, cancelToken).ConfigureAwait(false);
+        // the target is read and recorded under one lock - concurrent increments must each add their steps
+        await this.RecordProgress(def, ps => ps.GetSteps(def.Key) + steps, cancelToken).ConfigureAwait(false);
     }
 
 
@@ -365,12 +362,16 @@ class GameCenterManager : IGameCenterManager, IShinyStartupTask
     }
 
 
-    async Task RecordProgress(AchievementDefinition def, int steps, CancellationToken cancelToken)
+    Task RecordProgress(AchievementDefinition def, int steps, CancellationToken cancelToken)
+        => this.RecordProgress(def, _ => steps, cancelToken);
+
+
+    async Task RecordProgress(AchievementDefinition def, Func<PlayerState, int> getSteps, CancellationToken cancelToken)
     {
-        steps = Math.Min(steps, def.TotalSteps);
         lock (this.sync)
         {
             var ps = this.state.For(this.Player?.Id);
+            var steps = Math.Min(getSteps(ps), def.TotalSteps);
             if (!ps.RecordSteps(def.Key, steps))
                 return;
 
@@ -425,9 +426,35 @@ class GameCenterManager : IGameCenterManager, IShinyStartupTask
             return steps;
 
         if (x.PercentComplete is double percent)
-            return (int)Math.Floor(percent * totalSteps / 100d);
+            return PercentToSteps(percent, totalSteps);
 
         return 0;
+    }
+
+
+    /// <summary>
+    /// Inverts the percentage the Apple provider reports (<c>steps * 100.0 / totalSteps</c>) back to whole steps.
+    /// Game Center may hand back that value at full precision or rounded to a whole percent, so the rule has to be
+    /// exact either way:
+    /// <list type="bullet">
+    /// <item>totalSteps &lt;= 100: one step is at least 1%, so rounding to whole percent moves the value by under
+    /// half a step - rounding to the nearest step is exact.</item>
+    /// <item>totalSteps &gt; 100: floor with a small epsilon for floating point error. Exact at full precision; if
+    /// Apple rounds to whole percent, a step is under 1% and the value can be off by up to <c>totalSteps / 200</c>
+    /// steps (e.g. 5 of 1000) - unavoidable, since several step counts map to the same whole percent.</item>
+    /// </list>
+    /// </summary>
+    internal static int PercentToSteps(double percent, int totalSteps)
+    {
+        if (totalSteps <= 0)
+            return 0;
+
+        var raw = percent * totalSteps / 100d;
+        var steps = totalSteps <= 100
+            ? (int)Math.Round(raw, MidpointRounding.AwayFromZero)
+            : (int)Math.Floor(raw + 1e-6);
+
+        return Math.Clamp(steps, 0, totalSteps);
     }
 
 

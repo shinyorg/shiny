@@ -15,4 +15,11 @@ static class PlatformExtensions
         ChannelImportance.Low => NotificationImportance.Low,
         _ => throw new InvalidOperationException("Invalid value - " + importance)
     };
+
+
+    /// <summary>
+    /// True when the activity was reopened from recents, where Android hands back the intent that originally launched it
+    /// </summary>
+    internal static bool IsLaunchedFromHistory(this Activity activity)
+        => activity.Intent is { } intent && intent.Flags.HasFlag(Android.Content.ActivityFlags.LaunchedFromHistory);
 }

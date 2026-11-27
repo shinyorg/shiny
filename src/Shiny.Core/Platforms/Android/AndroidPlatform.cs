@@ -288,10 +288,9 @@ public partial class AndroidPlatform : IPlatform,
         intent.SetAction(ActionServiceStart);
         intent.PutExtra(IntentActionStopWithTask, stopWithTask);
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(31))
-            this.AppContext.StartForegroundService(intent);
-        else
-            this.AppContext.StartService(intent);
+        // Android 8 (API 26, the minimum supported) refuses background service starts - only a foreground
+        // service start is allowed, and the service promotes itself in OnStartCommand
+        this.AppContext.StartForegroundService(intent);
     }
 
 

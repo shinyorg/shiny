@@ -30,11 +30,13 @@ public record AndroidPushNotification(
             foreach (var item in this.NativeMessage.Data)
                 intent.PutExtra(item.Key, item.Value);
 
+            // PendingIntent equality ignores extras, so every push needs its own request code - with a shared one the
+            // second notification on screen was handed the first one's PendingIntent (and data)
             var pendingIntent = PendingIntent.GetActivity(
                 this.Platform.AppContext,
-                99,
+                this.NativeMessage.MessageId?.GetHashCode() ?? Environment.TickCount,
                 intent,
-                PendingIntentFlags.OneShot | PendingIntentFlags.Immutable
+                PendingIntentFlags.OneShot | PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable
             );
             
             builder
@@ -76,10 +78,27 @@ public record AndroidPushNotification(
                         this.Platform.AppContext.PackageName
                     );
 
-                builder.SetColor(colorId);
+                // SetColor takes the color value, not its resource id; FCM also allows a #RRGGBB value here
+                if (colorId > 0)
+                    builder.SetColor(AndroidX.Core.Content.ContextCompat.GetColor(this.Platform.AppContext, colorId));
+                else
+                    TrySetColor(builder, not.Color!);
             }
         }
         return builder;
+    }
+
+
+    static void TrySetColor(NotificationCompat.Builder builder, string color)
+    {
+        try
+        {
+            builder.SetColor(Color.ParseColor(color).ToArgb());
+        }
+        catch (Java.Lang.IllegalArgumentException)
+        {
+            // not a color resource name or a #RRGGBB value - leave the default
+        }
     }
 
 
